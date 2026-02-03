@@ -193,6 +193,49 @@ print(f"\n투영된 픽셀 좌표:")
 for i, (p3d, p2d) in enumerate(zip(cube_vertices, pixels_cube)):
     print(f"  점 {i}: {p3d} → ({p2d[0]:.1f}, {p2d[1]:.1f})")
 
+# Plot projected pixel coordinates
+fig_proj = plt.figure(figsize=(8, 6))
+ax_proj = fig_proj.add_subplot(111)
+ax_proj.set_title('Projected Cube Vertices (Pixel Coordinates)', fontsize=14, pad=20)
+ax_proj.set_xlim([0, image_width])
+ax_proj.set_ylim([image_height, 0])  # Flip Y-axis (image coordinates)
+ax_proj.set_xlabel('u (pixels)', fontsize=12)
+ax_proj.set_ylabel('v (pixels)', fontsize=12)
+ax_proj.set_aspect('equal')
+ax_proj.grid(True, alpha=0.3)
+
+# Image boundaries
+ax_proj.axhline(y=0, color='gray', linestyle='-', linewidth=1.5)
+ax_proj.axhline(y=image_height, color='gray', linestyle='-', linewidth=1.5)
+ax_proj.axvline(x=0, color='gray', linestyle='-', linewidth=1.5)
+ax_proj.axvline(x=image_width, color='gray', linestyle='-', linewidth=1.5)
+
+# Principal point
+ax_proj.scatter([cx], [cy], c='red', s=150, marker='+', linewidths=3, 
+               label='Principal Point', zorder=5)
+
+# Projected points
+ax_proj.scatter(pixels_cube[:, 0], pixels_cube[:, 1], c='blue', s=100, 
+               alpha=0.7, edgecolors='navy', linewidths=2, zorder=4)
+
+# Add point labels
+for i, pixel in enumerate(pixels_cube):
+    ax_proj.annotate(f'{i}', (pixel[0], pixel[1]), 
+                    xytext=(5, 5), textcoords='offset points',
+                    fontsize=10, color='darkblue', fontweight='bold')
+
+# Draw cube edges
+for edge in cube_edges:
+    p1, p2 = pixels_cube[edge[0]], pixels_cube[edge[1]]
+    ax_proj.plot([p1[0], p2[0]], [p1[1], p2[1]], 'b-', 
+                linewidth=1.5, alpha=0.5, zorder=3)
+
+ax_proj.legend(loc='upper right', fontsize=11)
+plt.tight_layout()
+plt.savefig('projected_pixels.png', dpi=150, bbox_inches='tight')
+print("\nProjected pixel coordinates plot saved: projected_pixels.png")
+plt.close(fig_proj)
+
 # ============================================================
 # Part 4: 시각화
 # ============================================================
@@ -276,7 +319,7 @@ for dist, color in zip(distances, colors):
 ax3.legend()
 
 plt.tight_layout()
-plt.savefig('/Users/yeonge/SynologyDrive/1. YeongE/7. Visual SLAM Study/visual-slam-learning/Studies/Phase 2/week1/projection_visualization.png', dpi=150)
+plt.savefig('projection_visualization.png', dpi=150)
 print("\n시각화 저장: projection_visualization.png")
 print("→ 멀리 있을수록 이미지에서 작게 보임 (원근 효과)")
 
