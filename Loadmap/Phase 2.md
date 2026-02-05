@@ -36,26 +36,35 @@
 - [ ] 3D 점을 이미지에 투영할 때 K 사용
 - [ ] 재투영 오차 계산의 기초
 
-### Week 2: 왜곡과 캘리브레이션
+### Week 2: 왜곡과 캘리브레이션 🔥
 
-#### 렌즈 왜곡
+> 💻 **C++ 실습**: [PRACTICE.md](../Studies/Phase%202/week2/PRACTICE.md)  
+> 🛠️ **하드웨어**: Jetson Orin Nano + ELP Stereo Camera  
+> ⏰ **실습 시간**: 6-8시간
+
+#### 렌즈 왜곡 (이론)
 - [ ] 방사 왜곡 (Radial Distortion) - 배럴/핀쿠션
 - [ ] 접선 왜곡 (Tangential Distortion)
 - [ ] 왜곡 계수 (k1, k2, p1, p2, k3)
 - [ ] Fisheye 왜곡 모델 (선택 - VINS는 지원)
 
-#### 카메라 캘리브레이션 (OpenCV)
-- [ ] 체스보드 패턴 사용 이유
+#### 카메라 캘리브레이션 개념
+- [ ] 체커보드 패턴 사용 이유
 - [ ] 캘리브레이션 과정 이해
-- [ ] OpenCV `calibrateCamera()` 사용법
+- [ ] 재투영 오차 (Reprojection Error) 의미
 
-#### 실습: OpenCV 캘리브레이션
-- [ ] 체스보드 이미지 10-20장 촬영
-- [ ] OpenCV로 캘리브레이션 수행
-- [ ] 결과 파라미터 저장 및 분석
-- [ ] 왜곡 보정 (undistort) 적용
+#### 실습: OpenCV C++ 캘리브레이션 ⭐
+- [ ] **단일 카메라**: Left/Right 각각 캘리브레이션
+  - [ ] `CameraCalibration` 클래스 구현
+  - [ ] 체커보드 이미지 20장 캡처
+  - [ ] RMS < 0.5 픽셀 달성
+  - [ ] `camera_{left|right}_calib.yaml` 저장
+- [ ] **스테레오 캘리브레이션**: R, T (baseline) 측정
+  - [ ] 동시 촬영 이미지로 스테레오 캘리브레이션
+  - [ ] `stereo_calib.yaml` 저장
+- [ ] **결과 분석**: fx, fy, cx, cy 값 검증
 
-#### Kalibr 캘리브레이션 (VIO 필수)
+#### Kalibr 캘리브레이션 (선택 - Phase 4 준비)
 - [ ] Kalibr 설치 (Docker 권장)
 - [ ] AprilGrid 타겟 준비
 - [ ] Camera-only 캘리브레이션 실행
@@ -63,9 +72,9 @@
 
 > 💡 Kalibr는 Phase 4에서 Camera-IMU 캘리브레이션에도 사용됨. 미리 익혀두면 좋음.
 
-#### Stereo 카메라 (선택)
-- [ ] Stereo 카메라의 장점 (스케일 복원 가능)
-- [ ] Baseline 개념
+#### Stereo 카메라 특화
+- [ ] ✅ Stereo의 장점 (스케일 복원 가능 - Monocular 대비)
+- [ ] Baseline 개념 및 측정
 - [ ] VINS-Fusion Stereo 모드 config 파일 확인
 
 ### 🔍 Section 2.1 자체 점검
@@ -79,9 +88,13 @@
 
 ## 📋 Section 2.2: 특징점 검출과 매칭 (2주)
 
-### Week 3: 특징점 검출
+### Week 3-4: 특징점 검출과 매칭 🔥
 
-#### 코너 검출
+> 💻 **C++ 실습**: [PRACTICE.md](../Studies/Phase%202/week3/PRACTICE.md)  
+> 🛠️ **하드웨어**: Jetson Orin Nano + ELP Stereo Camera  
+> ⏰ **실습 시간**: 12-16시간 (2주)
+
+#### Week 3: 코너 검출
 - [ ] Harris Corner Detector 원리 이해
 - [ ] 코너 응답 함수
 - [ ] Non-maximum suppression
@@ -107,7 +120,7 @@
 - [ ] 파라미터 (임계값, 최대 개수) 변경에 따른 결과 차이 관찰
 - [ ] 검출 시간 측정
 
-### Week 4: 특징점 매칭
+#### Week 4: 특징점 매칭
 
 #### 매칭 알고리즘
 - [ ] Brute-Force 매칭
@@ -145,9 +158,15 @@
 
 ## 📋 Section 2.3: 에피폴라 기하학 (3주)
 
-### Week 5: 기본 개념
+### Week 5-7: 에피폴라 기하학 + 스테레오 비전 🔥
 
-#### 에피폴라 제약
+> 💻 **C++ 실습**: [PRACTICE.md](../Studies/Phase%202/week5/PRACTICE.md)  
+> 🛠️ **하드웨어**: Jetson Orin Nano + ELP Stereo (캘리브레이션 완료 필요)  
+> ⏰ **실습 시간**: 18-24시간 (3주)
+
+#### Week 5: 기본 개념 (이론)
+
+##### 에피폴라 제약
 - [ ] 에피폴 (Epipole) 정의 — 다른 카메라 중심의 투영점
 - [ ] 에피폴라 선 (Epipolar Line) 정의
 - [ ] 에피폴라 평면 이해
@@ -170,7 +189,7 @@
 - [ ] 에피폴라 제약으로 잘못된 매칭 걸러내기
 - [ ] VINS 초기화 과정에서 사용
 
-### Week 6: 포즈 추정
+#### Week 6: 포즈 추정 + Stereo Rectification (실습) ⭐
 
 #### Essential Matrix에서 포즈 복원
 - [ ] E → R, t 분해 (SVD 사용)
@@ -186,7 +205,7 @@
 - [ ] 에피폴라 선 그려서 제약 확인
 - [ ] 상대 포즈 (R, t) 복원 (`cv2.recoverPose`)
 
-### Week 7: 삼각측량과 PnP
+#### Week 7: Disparity/Depth Map 생성 (실습) ⭐
 
 #### 삼각측량 (Triangulation)
 - [ ] 두 카메라 뷰에서 3D 점 복원 원리
@@ -221,7 +240,13 @@
 
 ## 📋 Section 2.4: 광류 (Optical Flow) (1주)
 
-### Week 8: 광류 이해
+### Week 8: 광류 (Optical Flow) + KLT Tracker 🔥
+
+> 💻 **C++ 실습**: VINS feature_tracker 구조 이해 및 구현  
+> 🛠️ **하드웨어**: Jetson Orin Nano + ELP Stereo  
+> ⏰ **실습 시간**: 6-8시간
+
+#### 광류 이해
 
 #### 기본 개념
 - [ ] 광류의 정의 (프레임 간 픽셀 움직임 벡터)

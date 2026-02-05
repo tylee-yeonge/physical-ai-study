@@ -67,7 +67,46 @@ graph LR
 
 ---
 
+## 💻 언어 사용 전략
+
+| Phase | 내용 | 언어 | 이유 |
+|-------|------|------|------|
+| Phase 0-1 | 환경 세팅, 수학 | Python | 빠른 프로토타이핑 |
+| **Phase 2** | **컴퓨터 비전 기초** | **C++** ⭐ | Jetson 실습, OpenCV C++ |
+| **Phase 3** | **VO & BA** | **C++** ⭐ | g2o, Ceres (C++ 전용) |
+| **Phase 4** | **VIO (Pre-integration)** | **C++** ⭐ | Sophus, VINS 코드 분석 대비 |
+| Phase 5 | ORB-SLAM3 개념 | 이론만 | 코드 분석 스킵 |
+| **Phase 7** | **Detection + Depth** | **Python** (학습) + **C++/TensorRT** (배포) 🔥 | PyTorch → Jetson 최적화 |
+| **Phase 8** | **3D Perception** | **Python** 🔥 | MMDetection3D, nuScenes |
+
+### 핵심 원칙
+
+✅ **SLAM 알고리즘 (Phase 2-4)**: 무조건 **C++**
+- 이유: VINS, ORB-SLAM 모두 C++, 실무 적합성, Jetson 성능
+
+✅ **딥러닝 학습 (Phase 7-8)**: **Python** (PyTorch)
+- 이유: 딥러닝 생태계 표준
+
+✅ **딥러닝 배포**: **C++ + TensorRT** (Jetson)
+- 이유: 실시간 추론 성능 (30+ FPS 목표)
+
+---
+
 ## 🔷 Stage 1: 이직 전 (2026년)
+
+### 실습 가이드 위치
+
+**모든 실습 가이드는 `Studies/Phase X/PRACTICE.md`에 있습니다:**
+
+| Phase | 가이드 위치 | 언어 |
+|-------|------------|------|
+| Phase 2 | [`Studies/Phase 2/week2/PRACTICE.md`](./Studies/Phase%202/week2/PRACTICE.md) | C++ |
+| Phase 3 | [`Studies/Phase 3/PRACTICE.md`](./Studies/Phase%203/PRACTICE.md) | C++ |
+| Phase 4 | [`Studies/Phase 4/PRACTICE.md`](./Studies/Phase%204/PRACTICE.md) | C++ |
+| Phase 7 | [`Studies/Phase 7/PRACTICE.md`](./Studies/Phase%207/PRACTICE.md) | Python + TensorRT |
+| Phase 8 | [`Studies/Phase 8/PRACTICE.md`](./Studies/Phase%208/PRACTICE.md) | Python |
+
+---
 
 ### Phase 0-4: VIO 기초 (5개월)
 > 현재 진행 중

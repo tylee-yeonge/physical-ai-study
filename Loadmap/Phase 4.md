@@ -3,9 +3,20 @@
 > ⏰ **기간**: 3-4개월 (Pre-integration에 시간 여유 필요)  
 > 🎯 **목표**: IMU와 Vision 융합의 핵심 이해  
 > ⭐ **중요도**: 이 Phase가 AMR VIO의 핵심입니다  
-> ⏱️ **주간 시간**: 약 10시간
+> ⏱️ **주간 시간**: 약 10시간  
+> 💻 **언어**: **C++** (Eigen, Sophus, Ceres)
 
 ---
+
+## 👉 **실습 가이드**: [`Studies/Phase 4/PRACTICE.md`](file:///Users/yeonge/SynologyDrive/1.%20YeongE/7.%20Visual%20SLAM%20Study/visual-slam-and-perception-learning/Studies/Phase%204/PRACTICE.md)
+
+**주요 실습**:
+- IMU Pre-integration 클래스 구현 (C++)
+- Sophus SO(3) Lie 대수 활용
+- Ceres로 VIO Factor Graph 최적화
+- EuRoC 데이터셋으로 검증
+
+> ⚠️ **필수 C++**: VINS `imu_factor.cpp`, `integration_base.h` 분석 대비
 
 ## ⚠️ 시작 전 주의사항
 
