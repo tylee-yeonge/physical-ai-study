@@ -347,10 +347,10 @@ F_threshold: 1.0      # Fundamental matrix 임계값
 
 ### Phase 2 완료! 🎉
 
-다음은 **Phase 3: 비선형 최적화**:
-- 번들 조정 (Bundle Adjustment)
-- Ceres Solver
-- 그래프 최적화
+다음은 **Phase 3: Visual Odometry & Bundle Adjustment**:
+- VO 파이프라인 이해
+- 번들 조정 (Bundle Adjustment) 개념
+- Ceres Solver 맛보기
 
 ---
 
@@ -402,4 +402,4 @@ A: 직접은 불가. 추적된 점들로 E 분해 또는 PnP 필요.
 | 7 | 삼각측량/PnP | 2D↔3D |
 | 8 | 광류 | Lucas-Kanade |
 
-**다음: Phase 3 - 비선형 최적화! 🚀**
+**다음: Phase 3 - VO & BA! 🚀**

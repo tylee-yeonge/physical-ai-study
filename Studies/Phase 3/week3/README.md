@@ -648,15 +648,7 @@ Frame 2:
 
 ### 다음 주 준비
 
-**Week 4: 3D-3D (ICP)**
-- RGB-D/LiDAR용
-- Point Cloud 정합
-- VO보다는 참고용 (LiDAR SLAM 기초)
-
-**Week 5: Mini VO 프로젝트** ⭐
-- Week 2 + Week 3 통합!
-- 실제 데이터셋 테스트
-- 드리프트 직접 관찰
+다음: [Week 4 - 3D-3D 모션 추정 (ICP)](../week4/README.md)
 
 ---
 

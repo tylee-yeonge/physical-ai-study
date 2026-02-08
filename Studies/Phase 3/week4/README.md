@@ -1,7 +1,7 @@
 # Week 4: 3D-3D 모션 추정 - Point Cloud 정합
 
-> 🎯 **이번 주 목표**: ICP 알고리즘으로 Point Cloud들을 정합하는 방법 이해하기  
-> ⏰ **예상 시간**: 10시간  
+> 🎯 **이번 주 목표**: ICP 알고리즘으로 Point Cloud들을 정합하는 방법 이해하기
+> ⏰ **예상 시간**: 10시간
 > 💡 **핵심 질문**: "두 개의 3D Point Cloud를 어떻게 맞출까?"
 
 ---
@@ -573,7 +573,5 @@ Week 2 (Essential) + Week 3 (PnP)
    - AMR의 LiDAR 기반 위치 추정
 
 ---
-
-**다음 주가 하이라이트!** Week 5에서 드디어 Week 2-3를 합쳐서 완전한 VO를 만들고, 실제 데이터로 테스트합니다! 🚀
 
 다음: [Week 5 - Mini VO 프로젝트](../week5/README.md)

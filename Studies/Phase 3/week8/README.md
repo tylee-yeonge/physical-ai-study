@@ -1,7 +1,7 @@
 # Week 8: Bundle Adjustment (Ceres) - 자동 미분으로 더 쉽게
 
-> 🎯 **이번 주 목표**: Ceres Solver로 BA 구현하기  
-> ⏰ **예상 시간**: 10시간  
+> 🎯 **이번 주 목표**: Ceres Solver의 자동 미분 개념 이해하기
+> ⏰ **예상 시간**: 3-5시간
 > 💡 **핵심 질문**: "g2o vs Ceres, 어떤 것을 쓸까?"
 
 ---
@@ -398,12 +398,11 @@ Points optimized: 5
    - 목적에 따라 선택
 
 6. **다음 단계**
-   - Phase 4: VIO (IMU 융합)
-   - Loop Closure Detection
-   - Full SLAM System
+   - Week 9: BA 최적화 기법 (Schur Complement)
+   - Phase 4: VIO 개념
 
 ---
 
-**다음**: Phase 4 - VIO (Visual-Inertial Odometry)
+**다음**: Week 9 - BA 최적화 기법
 
-다음: [Phase 4 - VIO](../../Phase%204/README.md)
+다음: [Week 9 - BA 최적화 기법](../week9/README.md)

@@ -1,7 +1,7 @@
 # Week 5: Mini VO 프로젝트 - 완전한 Visual Odometry 구현!
 
-> 🎯 **이번 주 목표**: Week 2 + Week 3를 통합해서 완전한 VO 시스템 만들기  
-> ⏰ **예상 시간**: 15시간  
+> 🎯 **이번 주 목표**: Week 2 + Week 3를 통합해서 완전한 VO 시스템 만들기
+> ⏰ **예상 시간**: 15시간
 > 💡 **핵심 질문**: "실제로 작동하는 VO를 어떻게 만들까?"
 
 ---
@@ -560,7 +560,8 @@ Keyframe만:
 **축하합니다!** 🎉 드디어 완전한 VO 시스템을 만들었습니다! 이제 왜 IMU가 필요한지, 왜 SLAM이 필요한지 몸으로 느낄 수 있을 거예요!
 
 **다음 단계:**
-- Week 6-13: Keyframe, Bundle Adjustment, SLAM 고급 기법
-- Phase 4: VIO (Visual-Inertial Odometry) - IMU 융합!
+- Week 6-7: 키프레임 관리
+- Week 8-9: Bundle Adjustment
+- Phase 4: VIO 개념
 
 다음: [Week 6 - Keyframe Management](../week6/README.md)

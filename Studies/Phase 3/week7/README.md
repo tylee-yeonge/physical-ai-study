@@ -1,7 +1,7 @@
-# Week 7: Bundle Adjustment (g2o) - 모든 것을 한번에 최적화
+# Week 7: Bundle Adjustment 개념 - 모든 것을 한번에 최적화
 
-> 🎯 **이번 주 목표**: g2o로 Bundle Adjustment 구현하기  
-> ⏰ **예상 시간**: 12시간  
+> 🎯 **이번 주 목표**: Bundle Adjustment가 무엇을 최적화하는지 이해하기
+> ⏰ **예상 시간**: 5시간 (개념 중심)
 > 💡 **핵심 질문**: "왜 하나씩 업데이트하지 않고 한번에 최적화할까?"
 
 ---
@@ -516,6 +516,6 @@ Camera poses:
 
 ---
 
-**다음 주**: Week 8에서 Ceres Solver로 BA 구현!
+**다음 주**: Week 8에서 Ceres Solver 맛보기!
 
-다음: [Week 8 - Ceres Bundle Adjustment](../week8/README.md)
+다음: [Week 8 - Ceres Solver 맛보기](../week8/README.md)
