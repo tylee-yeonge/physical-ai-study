@@ -1,15 +1,16 @@
-# Phase 7: Detection + Depth 실습 (Python + Jetson 배포)
+# Phase 5: Detection + Depth 실습 (Python + Jetson 배포)
 
 > 🎯 **목표**: YOLO 객체 검출 + Depth Estimation을 Jetson에서 TensorRT로 배포  
 > 💻 **언어**: **Python** (학습) + **TensorRT/C++** (배포)  
 > 🛠️ **하드웨어**: **Jetson Orin Nano** 필수  
 > ⏰ **예상 시간**: ~90시간 (3개월)
+> 📌 각 주차별 상세 실습은 `week{N}/PRACTICE.md`를 참고하세요. 이 문서는 Phase 전체 개요입니다.
 
 ---
 
 ## 📋 실습 개요
 
-Phase 7은 **2D Perception의 핵심**으로, 딥러닝 모델을 학습하고 **Jetson에서 실시간 추론**하는 전 과정을 경험합니다.
+Phase 5은 **2D Perception의 핵심**으로, 딥러닝 모델을 학습하고 **Jetson에서 실시간 추론**하는 전 과정을 경험합니다.
 
 ### 언어 전략
 
@@ -31,8 +32,8 @@ Phase 7은 **2D Perception의 핵심**으로, 딥러닝 모델을 학습하고 *
 **환경 세팅**:
 ```bash
 # PC (학습용)
-conda create -n phase7 python=3.10
-conda activate phase7
+conda create -n phase5 python=3.10
+conda activate phase5
 
 pip install torch torchvision
 pip install ultralytics
@@ -361,4 +362,4 @@ class YOLODepthFusion:
 
 ---
 
-**다음 단계**: Phase 8 - 3D Perception (nuScenes, BEV)
+**다음 단계**: Phase 6 - 3D Perception (nuScenes, BEV)

@@ -8,7 +8,7 @@
 
 ---
 
-## 👉 **실습 가이드**: [`Studies/Phase 7/PRACTICE.md`](./Studies/Phase%207/PRACTICE.md)
+## 👉 **실습 가이드**: [`Studies/Phase 5/PRACTICE.md`](../Studies/Phase%205/PRACTICE.md)
 
 **핵심 산출물**:
 - YOLO 실시간 객체 검출 (Jetson 30+ FPS)

@@ -1,6 +1,6 @@
 # Phase 3: Visual Odometry & Bundle Adjustment
 
-> ⏰ **기간**: 1.5개월
+> ⏰ **기간**: 약 3개월 (13주 분량)
 > 🎯 **목표**: VO 파이프라인 이해 및 간단한 구현, BA 개념 파악
 > ⌛️ **주간 시간**: 약 10시간
 > 💻 **언어**: **C++** (g2o, Ceres)
@@ -8,7 +8,7 @@
 
 ---
 
-## 👉 **실습 가이드**: [`Studies/Phase 3/PRACTICE.md`](file:///Users/yeonge/SynologyDrive/1.%20YeongE/7.%20Visual%20SLAM%20Study/visual-slam-and-perception-learning/Studies/Phase%203/PRACTICE.md)
+## 👉 **실습 가이드**: 각 week별 PRACTICE.md (예: [`week8/PRACTICE.md`](../Studies/Phase%203/week8/PRACTICE.md))
 
 **주요 실습**:
 - Monocular VO 구현 (C++, FeatureTracker, MotionEstimator)

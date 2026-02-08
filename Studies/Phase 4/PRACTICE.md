@@ -4,6 +4,7 @@
 > 💻 **언어**: **C++** (Eigen, Sophus)  
 > 🛠️ **환경**: Ubuntu (또는 Jetson)  
 > ⏰ **예상 시간**: ~90시간 (3개월)
+> 📌 각 주차별 상세 실습은 `week{N}/PRACTICE.md`를 참고하세요. 이 문서는 Phase 전체 개요입니다.
 
 ---
 
@@ -448,4 +449,4 @@ ceres::Solve(options, &problem, &summary);
 
 ---
 
-**다음 단계**: Phase 7 - Detection/Depth (딥러닝 - Python)
+**다음 단계**: Phase 5 - Detection/Depth (딥러닝 - Python)

@@ -1,6 +1,6 @@
 # Phase 4: VIO 핵심 (Visual-Inertial Odometry)
 
-> ⏰ **기간**: 1개월
+> ⏰ **기간**: 약 3개월 (12-14주 분량)
 > 🎯 **목표**: IMU와 Vision 융합의 핵심 이해
 > ⭐ **중요도**: 이 Phase가 AMR VIO의 핵심입니다
 > ⏱️ **주간 시간**: 약 10시간
@@ -9,7 +9,7 @@
 
 ---
 
-## 👉 **실습 가이드**: [`Studies/Phase 4/PRACTICE.md`](file:///Users/yeonge/SynologyDrive/1.%20YeongE/7.%20Visual%20SLAM%20Study/visual-slam-and-perception-learning/Studies/Phase%204/PRACTICE.md)
+## 👉 **실습 가이드**: [`Studies/Phase 4/PRACTICE.md`](../Studies/Phase%204/PRACTICE.md)
 
 **주요 실습**:
 - IMU Pre-integration 클래스 구현 (C++)
@@ -26,7 +26,7 @@
 - Pre-integration은 예상보다 오래 걸릴 수 있음
 - 막히면 **혼자 끙끙대지 말고** 커뮤니티 질문 활용
 - 완벽한 수식 이해보다 **직관적 이해** 우선
-- 80% 이해되면 다음으로, 코드 분석하며 나머지 채우기
+- 막힌 부분은 표시해두고 다음으로, 코드 분석하며 나머지 채우기
 
 ---
 

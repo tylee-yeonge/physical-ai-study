@@ -1,6 +1,6 @@
 # Phase 6: 3D Perception
 
-> ⏰ **기간**: 2개월  
+> ⏰ **기간**: 약 3개월 (12주 분량)  
 > 🎯 **목표**: 카메라 기반 3D 객체 검출 마스터  
 > 💻 **언어**: **Python** (PyTorch, MMDetection3D)  
 > 🛠️ **환경**: PC (GPU 필수), Jetson (선택)  
@@ -9,7 +9,7 @@
 
 ---
 
-## 👉 **실습 가이드**: [`Studies/Phase 8/PRACTICE.md`](./Studies/Phase%208/PRACTICE.md)
+## 👉 **실습 가이드**: [`Studies/Phase 6/PRACTICE.md`](../Studies/Phase%206/PRACTICE.md)
 
 **핵심 산출물**:
 - KITTI 3D Detection 구현

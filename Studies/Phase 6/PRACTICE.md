@@ -1,15 +1,16 @@
-# Phase 8: 3D Perception 실습 (Python)
+# Phase 6: 3D Perception 실습 (Python)
 
 > 🎯 **목표**: 카메라 기반 3D 객체 검출 (KITTI → nuScenes)  
 > 💻 **언어**: **Python** (PyTorch, MMDetection3D)  
 > 🛠️ **환경**: PC (GPU 필수) + Jetson (옵션)  
 > ⏰ **예상 시간**: ~60시간 (2개월)
+> 📌 각 주차별 상세 실습은 `week{N}/PRACTICE.md`를 참고하세요. 이 문서는 Phase 전체 개요입니다.
 
 ---
 
 ## 📋 실습 개요
 
-Phase 8은 **3D Perception의 입문**으로, 카메라 영상에서 3D bounding box를 예측합니다. 로봇/자율주행 면접의 핵심 주제입니다.
+Phase 6은 **3D Perception의 입문**으로, 카메라 영상에서 3D bounding box를 예측합니다. 로봇/자율주행 면접의 핵심 주제입니다.
 
 ### 데이터셋 전략
 
