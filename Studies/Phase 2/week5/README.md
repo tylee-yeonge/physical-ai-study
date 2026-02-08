@@ -29,6 +29,23 @@
 
 ---
 
+## 🚀 먼저 돌려보기 (원칙 1: 역순 학습)
+
+> **이론을 읽기 전에 먼저 코드를 돌려보세요!**
+
+```bash
+cd week5 && mkdir build && cd build
+cmake .. && make
+./basic
+```
+
+실행 결과를 관찰한 후, 아래 이론을 읽으며 "아, 이게 이 뜻이었구나" 하고 채워갑니다.
+
+- 📂 [PRACTICE.md](./PRACTICE.md) - 실습 가이드
+- 📝 `quiz_easy.cpp` → `quiz_medium.cpp` 순서로 풀기
+
+---
+
 ## 📖 핵심 개념
 
 ### 1. 에피폴라 기하학 구성요소
