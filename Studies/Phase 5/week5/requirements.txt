@@ -1,0 +1,9 @@
+torch
+torchvision
+onnx
+onnxruntime-gpu
+ultralytics
+numpy
+opencv-python
+matplotlib
+onnxconverter-common
