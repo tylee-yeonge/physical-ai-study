@@ -297,6 +297,7 @@ void PnPBasic::demoPipeline(const cv::Mat& K) {
 }
 
 // 메인 함수
+#ifndef BASIC_LIB_ONLY
 int main() {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "  PnP 기본 데모 (Week 7)" << std::endl;
@@ -323,6 +324,7 @@ int main() {
     std::cout << "   1. quiz_easy.cpp - PnP 개념 확인" << std::endl;
     std::cout << "   2. quiz_medium.cpp - RANSAC 구현" << std::endl;
     std::cout << "   3. Week 8 - Optical Flow\n" << std::endl;
-    
+
     return 0;
 }
+#endif // BASIC_LIB_ONLY

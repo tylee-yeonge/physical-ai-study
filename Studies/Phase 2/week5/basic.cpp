@@ -263,6 +263,7 @@ void EpipolarGeometryBasic::demoPipeline(const cv::Mat& img1, const cv::Mat& img
 }
 
 // 메인 함수
+#ifndef BASIC_LIB_ONLY
 int main() {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "  에피폴라 기하학 기본 데모 (Week 5)" << std::endl;
@@ -305,6 +306,7 @@ int main() {
     std::cout << "   1. quiz_easy.cpp - 에피폴라 개념 확인" << std::endl;
     std::cout << "   2. quiz_medium.cpp - E/F 추정 실습" << std::endl;
     std::cout << "   3. PRACTICE.md - 실제 스테레오 카메라 사용\n" << std::endl;
-    
+
     return 0;
 }
+#endif // BASIC_LIB_ONLY

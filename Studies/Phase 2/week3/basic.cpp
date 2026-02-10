@@ -166,6 +166,7 @@ void FeatureDetectionBasic::demoNMS(const cv::Mat& image) {
 }
 
 // 메인 함수 - 데모
+#ifndef BASIC_LIB_ONLY
 int main() {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "  특징점 검출 기본 데모 (Week 3)" << std::endl;
@@ -243,3 +244,4 @@ int main() {
     
     return 0;
 }
+#endif // BASIC_LIB_ONLY

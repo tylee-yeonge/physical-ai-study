@@ -251,6 +251,7 @@ void TriangulationBasic::demoPipeline(const cv::Mat& K, const cv::Mat& R, const 
 }
 
 // 메인 함수
+#ifndef BASIC_LIB_ONLY
 int main() {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "  삼각측량 기본 데모 (Week 6)" << std::endl;
@@ -281,6 +282,7 @@ int main() {
     std::cout << "   1. quiz_easy.cpp - 삼각측량 개념 확인" << std::endl;
     std::cout << "   2. quiz_medium.cpp - 재투영 오차 최소화" << std::endl;
     std::cout << "   3. Week 7 - PnP로 카메라 포즈 추정\n" << std::endl;
-    
+
     return 0;
 }
+#endif // BASIC_LIB_ONLY

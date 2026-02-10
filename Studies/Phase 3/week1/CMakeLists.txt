@@ -15,6 +15,9 @@ include_directories(
 add_executable(basic basic.cpp)
 target_link_libraries(basic ${OpenCV_LIBS} Eigen3::Eigen)
 
+add_executable(my_basic my_basic.cpp)
+target_link_libraries(my_basic ${OpenCV_LIBS} Eigen3::Eigen)
+
 add_executable(quiz_easy quiz_easy.cpp)
 target_link_libraries(quiz_easy ${OpenCV_LIBS} Eigen3::Eigen)
 
@@ -24,9 +27,16 @@ target_link_libraries(quiz_medium ${OpenCV_LIBS} Eigen3::Eigen)
 find_package(GTest QUIET)
 if(GTest_FOUND)
     enable_testing()
-    add_executable(test_basic test/test_basic.cpp)
+    add_executable(test_basic test/test_basic.cpp basic.cpp)
+    target_compile_definitions(test_basic PRIVATE BASIC_LIB_ONLY)
     target_link_libraries(test_basic ${OpenCV_LIBS} Eigen3::Eigen GTest::GTest GTest::Main)
     add_test(NAME Week1Tests COMMAND test_basic)
+
+    # 내 풀이 테스트
+    add_executable(test_my_basic test/test_basic.cpp my_basic.cpp)
+    target_compile_definitions(test_my_basic PRIVATE MY_BASIC_LIB_ONLY)
+    target_link_libraries(test_my_basic ${OpenCV_LIBS} Eigen3::Eigen GTest::GTest GTest::Main)
+    add_test(NAME MyBasicTests COMMAND test_my_basic)
 endif()
 
 message(STATUS "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")

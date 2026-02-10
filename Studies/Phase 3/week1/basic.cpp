@@ -124,6 +124,7 @@ void demoScaleAmbiguity() {
     std::cout << "   3. 알려진 물체 크기" << std::endl;
 }
 
+#ifndef BASIC_LIB_ONLY
 int main() {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "  Phase 3 Week 1: VO 개요 데모" << std::endl;
@@ -144,6 +145,7 @@ int main() {
     std::cout << "   - Monocular VO의 스케일 모호성\n" << std::endl;
     
     std::cout << "다음: Week 2 - 2D-2D 모션 추정\n" << std::endl;
-    
+
     return 0;
 }
+#endif // BASIC_LIB_ONLY

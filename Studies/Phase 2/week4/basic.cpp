@@ -208,6 +208,7 @@ void FeatureMatchingBasic::demoPipeline(const cv::Mat& img1, const cv::Mat& img2
 }
 
 // 메인 함수
+#ifndef BASIC_LIB_ONLY
 int main() {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "  특징점 매칭 기본 데모 (Week 4)" << std::endl;
@@ -257,3 +258,4 @@ int main() {
     
     return 0;
 }
+#endif // BASIC_LIB_ONLY

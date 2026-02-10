@@ -351,7 +351,7 @@ for idx, cam in enumerate(cameras):
     ax.scatter([K[0, 2]], [K[1, 2]], c='red', marker='+', s=200, linewidths=2)
 
 plt.tight_layout()
-plt.savefig('/Users/yeonge/SynologyDrive/1. YeongE/7. Visual SLAM Study/visual-slam-learning/Studies/Phase 2/week1/multi_camera_projection.png', dpi=150)
+plt.savefig('./multi_camera_projection.png', dpi=150)
 print("\n시각화 저장: multi_camera_projection.png")
 print("→ 카메라 위치에 따라 같은 3D 점이 다르게 투영됨")
 

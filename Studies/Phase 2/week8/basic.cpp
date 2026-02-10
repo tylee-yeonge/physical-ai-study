@@ -274,6 +274,7 @@ void OpticalFlowBasic::demoPipeline() {
 }
 
 // 메인 함수
+#ifndef BASIC_LIB_ONLY
 int main() {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "  Optical Flow 기본 데모 (Week 8)" << std::endl;
@@ -296,6 +297,7 @@ int main() {
     
     std::cout << "🎉 Phase 2 (Computer Vision 기초) 완성!" << std::endl;
     std::cout << "   다음: Phase 3 (SLAM 기초 이론)\n" << std::endl;
-    
+
     return 0;
 }
+#endif // BASIC_LIB_ONLY

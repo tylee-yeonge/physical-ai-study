@@ -15,6 +15,9 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 add_executable(basic basic.cpp)
 target_link_libraries(basic ${OpenCV_LIBS})
 
+add_executable(my_basic my_basic.cpp)
+target_link_libraries(my_basic ${OpenCV_LIBS})
+
 # Quizzes
 add_executable(quiz_easy quiz_easy.cpp)
 add_executable(quiz_medium quiz_medium.cpp)

@@ -221,6 +221,7 @@ void Motion2D2D::demo() {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
 }
 
+#ifndef BASIC_LIB_ONLY
 int main() {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "  Phase 3 Week 2: 2D-2D 모션 추정" << std::endl;
@@ -235,6 +236,7 @@ int main() {
     std::cout << "   - ⚠️ 스케일 모호성 존재!\n" << std::endl;
     
     std::cout << "다음: Week 3 - 3D-2D 모션 추정 (PnP)\n" << std::endl;
-    
+
     return 0;
 }
+#endif // BASIC_LIB_ONLY

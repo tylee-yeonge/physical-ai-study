@@ -95,7 +95,7 @@ bool PinholeProjection::isInImage(const cv::Point2d& pixel, const cv::Size& imag
            pixel.y >= 0 && pixel.y < imageSize.height;
 }
 
-// 메인 함수 (데모)
+#ifndef PINHOLE_LIB_ONLY
 int main() {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "  핀홀 카메라 투영 기본 데모" << std::endl;
@@ -201,3 +201,4 @@ int main() {
 
     return 0;
 }
+#endif // PINHOLE_LIB_ONLY

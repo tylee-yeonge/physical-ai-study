@@ -158,6 +158,7 @@ std::string CameraCalibrationBasic::evaluateQuality(double rms) {
 }
 
 // 메인 함수 (데모)
+#ifndef BASIC_LIB_ONLY
 int main() {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "  카메라 캘리브레이션 기본 데모" << std::endl;
@@ -251,3 +252,4 @@ int main() {
     
     return 0;
 }
+#endif // BASIC_LIB_ONLY

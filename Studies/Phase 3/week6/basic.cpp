@@ -237,6 +237,7 @@ void demoKeyframeManagement() {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
 }
 
+#ifndef BASIC_LIB_ONLY
 int main() {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "  Phase 3 Week 6: Keyframe Management" << std::endl;
@@ -251,6 +252,7 @@ int main() {
     std::cout << "   - 맵 크기 제어\n" << std::endl;
     
     std::cout << "다음: Week 7 - Local Bundle Adjustment\n" << std::endl;
-    
+
     return 0;
 }
+#endif // BASIC_LIB_ONLY
