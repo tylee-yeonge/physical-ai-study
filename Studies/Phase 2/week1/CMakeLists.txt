@@ -49,6 +49,8 @@ add_executable(quiz_medium
 target_link_libraries(quiz_medium ${OpenCV_LIBS})
 
 # Google Test (선택적)
+# miniconda의 옛 버전 대신 Homebrew 버전을 우선 사용
+set(GTest_DIR "/opt/homebrew/lib/cmake/GTest" CACHE PATH "" FORCE)
 find_package(GTest QUIET)
 if(GTest_FOUND)
     message(STATUS "Found GTest - Building tests")

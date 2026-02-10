@@ -55,11 +55,12 @@ cv::Vec3d PinholeProjection::backProject(const cv::Point2d& pixel) const {
     double cx = K_.at<double>(0, 2);
     double cy = K_.at<double>(1, 2);
 
-    // 정규화 좌표 계산
+    // K⁻¹ 적용: 픽셀 좌표에서 주점을 빼고 초점거리로 나눠 정규화 좌표로 변환
     double x_norm = (pixel.x - cx) / fx;
     double y_norm = (pixel.y - cy) / fy;
 
-    // 광선 방향 (카메라 좌표계, Zc=1 가정)
+    // 카메라 원점에서 해당 픽셀 방향으로 뻗어나가는 3D 광선 벡터
+    // (x_norm, y_norm) = 정면(z=1) 기준 좌우/상하 기울기, 1.0 = 카메라 정면 방향
     cv::Vec3d ray(x_norm, y_norm, 1.0);
 
     // 단위 벡터로 정규화
@@ -72,6 +73,9 @@ cv::Size2d PinholeProjection::computeFOV(const cv::Size& imageSize) const {
     double fy = K_.at<double>(1, 1);
 
     // FOV = 2 * arctan(image_size / (2 * focal_length))
+    // 2.0 * fx: 이미지 폭을 절반(W/2)으로 나누는 효과 → 반쪽 직각삼각형의 각도(θ) 계산
+    // 바깥 2.0: 반쪽 각도 θ를 전체 시야각으로 복원
+    // * 180.0 / CV_PI: 라디안 → 도(degree) 변환
     double fov_h = 2.0 * std::atan2(imageSize.width, 2.0 * fx) * 180.0 / CV_PI;
     double fov_v = 2.0 * std::atan2(imageSize.height, 2.0 * fy) * 180.0 / CV_PI;
 
@@ -82,7 +86,9 @@ double PinholeProjection::reprojectionError(const cv::Point3d& P_world,
                                            const cv::Point2d& observed_pixel) const {
     cv::Point2d projected = project(P_world);
 
-    if (projected.x < 0) return -1.0;  // 투영 불가
+    // project()가 Zc ≤ 0 (카메라 뒤)이면 (-1,-1)을 반환하므로,
+    // x < 0 으로 투영 실패 여부를 감지
+    if (projected.x < 0) return -1.0;
 
     double dx = projected.x - observed_pixel.x;
     double dy = projected.y - observed_pixel.y;
