@@ -9,24 +9,23 @@
 #include <iostream>
 
 double FeatureMatchingBasic::matchBruteForce(const cv::Mat& descriptors1,
-                                              const cv::Mat& descriptors2,
-                                              std::vector<cv::DMatch>& matches,
-                                              int normType) {
+                                             const cv::Mat& descriptors2,
+                                             std::vector<cv::DMatch>& matches, int normType)
+{
     // TODO: cv::BFMatcher 사용
     return 0.0;
 }
 
-double FeatureMatchingBasic::matchFLANN(const cv::Mat& descriptors1,
-                                        const cv::Mat& descriptors2,
-                                        std::vector<cv::DMatch>& matches) {
+double FeatureMatchingBasic::matchFLANN(const cv::Mat& descriptors1, const cv::Mat& descriptors2,
+                                        std::vector<cv::DMatch>& matches)
+{
     // TODO: cv::FlannBasedMatcher 사용
     return 0.0;
 }
 
-int FeatureMatchingBasic::ratioTest(const cv::Mat& descriptors1,
-                                    const cv::Mat& descriptors2,
-                                    std::vector<cv::DMatch>& good_matches,
-                                    float ratio_thresh) {
+int FeatureMatchingBasic::ratioTest(const cv::Mat& descriptors1, const cv::Mat& descriptors2,
+                                    std::vector<cv::DMatch>& good_matches, float ratio_thresh)
+{
     // TODO: knnMatch + Lowe's Ratio Test
     return 0;
 }
@@ -35,8 +34,8 @@ double FeatureMatchingBasic::filterRANSAC(const std::vector<cv::KeyPoint>& keypo
                                           const std::vector<cv::KeyPoint>& keypoints2,
                                           const std::vector<cv::DMatch>& matches,
                                           std::vector<cv::DMatch>& inlier_matches,
-                                          cv::Mat& homography,
-                                          double ransac_thresh) {
+                                          cv::Mat& homography, double ransac_thresh)
+{
     // TODO: cv::findHomography + RANSAC
     return 0.0;
 }
@@ -45,22 +44,25 @@ void FeatureMatchingBasic::visualizeMatches(const cv::Mat& img1,
                                             const std::vector<cv::KeyPoint>& kp1,
                                             const cv::Mat& img2,
                                             const std::vector<cv::KeyPoint>& kp2,
-                                            const std::vector<cv::DMatch>& matches,
-                                            cv::Mat& output) {
+                                            const std::vector<cv::DMatch>& matches, cv::Mat& output)
+{
     // TODO: cv::drawMatches 사용
 }
 
-double FeatureMatchingBasic::evaluateMatchQuality(const std::vector<cv::DMatch>& matches) {
+double FeatureMatchingBasic::evaluateMatchQuality(const std::vector<cv::DMatch>& matches)
+{
     // TODO: 매칭들의 평균 거리 계산
     return 0.0;
 }
 
-void FeatureMatchingBasic::demoPipeline(const cv::Mat& img1, const cv::Mat& img2) {
+void FeatureMatchingBasic::demoPipeline(const cv::Mat& img1, const cv::Mat& img2)
+{
     // TODO: 전체 매칭 파이프라인
 }
 
 #ifndef MY_BASIC_LIB_ONLY
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "  [내 구현] 특징점 매칭 데모" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;

@@ -13,7 +13,8 @@
 using namespace Eigen;
 using namespace std;
 
-int main() {
+int main()
+{
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "Week 13 Quiz Solutions (Medium)" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
@@ -29,7 +30,7 @@ int main() {
 
     Eigen::VectorXd left_x(5);
     Eigen::VectorXd right_x(5);
-    left_x  << 320.0, 250.0, 400.0, 310.0, 350.0;
+    left_x << 320.0, 250.0, 400.0, 310.0, 350.0;
     right_x << 310.0, 220.0, 395.0, 280.0, 348.0;
 
     // disparity 계산
@@ -37,10 +38,14 @@ int main() {
 
     // depth 계산: depth = f * b / disparity
     Eigen::VectorXd depth(5);
-    for (int i = 0; i < 5; i++) {
-        if (disparity(i) > 0) {
+    for (int i = 0; i < 5; i++)
+    {
+        if (disparity(i) > 0)
+        {
             depth(i) = f * b / disparity(i);
-        } else {
+        }
+        else
+        {
             depth(i) = -1.0;  // 무한대 (오류)
         }
     }
@@ -48,9 +53,10 @@ int main() {
     cout << "  파라미터: f = " << f << " pixel, b = " << b << " m\n" << endl;
     cout << "  점 │ 좌 (pixel) │ 우 (pixel) │ Disparity │ Depth (m)" << endl;
     cout << "  ───┼───────────┼───────────┼───────────┼──────────" << endl;
-    for (int i = 0; i < 5; i++) {
-        printf("   %d  │  %7.1f   │  %7.1f   │  %7.1f   │  %7.2f\n",
-               i+1, left_x(i), right_x(i), disparity(i), depth(i));
+    for (int i = 0; i < 5; i++)
+    {
+        printf("   %d  │  %7.1f   │  %7.1f   │  %7.1f   │  %7.2f\n", i + 1, left_x(i), right_x(i),
+               disparity(i), depth(i));
     }
 
     cout << "\n  분석:" << endl;
@@ -86,7 +92,8 @@ int main() {
     velocity(0) = 0.0;
     position(0) = 0.0;
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; i++)
+    {
         // v(k+1) = v(k) + a(k) * dt
         velocity(i + 1) = velocity(i) + accel(i) * dt;
 
@@ -97,15 +104,16 @@ int main() {
     cout << "  바이어스 없는 경우 (정상):" << endl;
     cout << "  스텝 │ 시간 (초) │ 가속도 (m/s²) │ 속도 (m/s) │ 위치 (m)" << endl;
     cout << "  ─────┼──────────┼──────────────┼────────────┼─────────" << endl;
-    printf("    0   │   0.0     │      -       │   %6.3f    │  %6.3f\n",
-           velocity(0), position(0));
-    for (int i = 0; i < 10; i++) {
-        printf("   %2d   │   %4.1f    │    %5.2f     │   %6.3f    │  %6.3f\n",
-               i + 1, (i + 1) * dt, accel(i), velocity(i + 1), position(i + 1));
+    printf("    0   │   0.0     │      -       │   %6.3f    │  %6.3f\n", velocity(0), position(0));
+    for (int i = 0; i < 10; i++)
+    {
+        printf("   %2d   │   %4.1f    │    %5.2f     │   %6.3f    │  %6.3f\n", i + 1, (i + 1) * dt,
+               accel(i), velocity(i + 1), position(i + 1));
     }
 
     cout << "\n  최종: 속도 = " << fixed << setprecision(3) << velocity(10)
-         << " m/s, 위치 = " << position(10) << " m\n" << endl;
+         << " m/s, 위치 = " << position(10) << " m\n"
+         << endl;
 
     // 바이어스 추가
     cout << "  바이어스 0.01 m/s² 추가 시:" << endl;
@@ -116,15 +124,16 @@ int main() {
     velocity_biased(0) = 0.0;
     position_biased(0) = 0.0;
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; i++)
+    {
         double biased_accel = accel(i) + bias;
         velocity_biased(i + 1) = velocity_biased(i) + biased_accel * dt;
-        position_biased(i + 1) = position_biased(i) + velocity_biased(i) * dt
-                                  + 0.5 * biased_accel * dt * dt;
+        position_biased(i + 1) =
+            position_biased(i) + velocity_biased(i) * dt + 0.5 * biased_accel * dt * dt;
     }
 
-    cout << "  최종: 속도 = " << velocity_biased(10)
-         << " m/s, 위치 = " << position_biased(10) << " m" << endl;
+    cout << "  최종: 속도 = " << velocity_biased(10) << " m/s, 위치 = " << position_biased(10)
+         << " m" << endl;
     cout << "  위치 차이 = " << abs(position_biased(10) - position(10)) << " m\n" << endl;
 
     cout << "  분석:" << endl;
@@ -154,22 +163,21 @@ int main() {
 
     // 스케일 오차 (x축 기준)
     double mono_scale_error = abs(mono_estimate(0) - true_position(0)) / true_position(0) * 100.0;
-    double stereo_scale_error = abs(stereo_estimate(0) - true_position(0)) / true_position(0) * 100.0;
+    double stereo_scale_error =
+        abs(stereo_estimate(0) - true_position(0)) / true_position(0) * 100.0;
     double vio_scale_error = abs(vio_estimate(0) - true_position(0)) / true_position(0) * 100.0;
 
     cout << "  실제 위치: (" << true_position.transpose() << ") m\n" << endl;
 
     cout << "  방법       │ 추정 위치             │ 절대 오차 (m) │ 스케일 오차 (%)" << endl;
     cout << "  ───────────┼──────────────────────┼──────────────┼────────────────" << endl;
-    printf("  Monocular  │ (%5.1f, %5.2f, %5.2f) │    %6.3f     │     %5.1f%%\n",
-           mono_estimate(0), mono_estimate(1), mono_estimate(2),
-           mono_error, mono_scale_error);
+    printf("  Monocular  │ (%5.1f, %5.2f, %5.2f) │    %6.3f     │     %5.1f%%\n", mono_estimate(0),
+           mono_estimate(1), mono_estimate(2), mono_error, mono_scale_error);
     printf("  Stereo     │ (%5.1f, %5.2f, %5.2f) │    %6.3f     │     %5.1f%%\n",
-           stereo_estimate(0), stereo_estimate(1), stereo_estimate(2),
-           stereo_error, stereo_scale_error);
-    printf("  VIO        │ (%5.1f, %5.2f, %5.2f) │    %6.3f     │     %5.1f%%\n",
-           vio_estimate(0), vio_estimate(1), vio_estimate(2),
-           vio_error, vio_scale_error);
+           stereo_estimate(0), stereo_estimate(1), stereo_estimate(2), stereo_error,
+           stereo_scale_error);
+    printf("  VIO        │ (%5.1f, %5.2f, %5.2f) │    %6.3f     │     %5.1f%%\n", vio_estimate(0),
+           vio_estimate(1), vio_estimate(2), vio_error, vio_scale_error);
 
     cout << "\n  분석:" << endl;
     cout << "  1. Monocular (절대 오차: " << fixed << setprecision(3) << mono_error << "m)" << endl;

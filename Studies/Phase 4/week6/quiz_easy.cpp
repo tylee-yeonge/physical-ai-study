@@ -5,7 +5,8 @@
 #include <iostream>
 #include <cmath>
 
-void problem1_frequency_mismatch() {
+void problem1_frequency_mismatch()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: 센서 주파수 차이" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -25,7 +26,8 @@ void problem1_frequency_mismatch() {
     std::cout << "   IMU 데이터 수: " << num_imu << "개" << std::endl;
 }
 
-void problem2_reintegration_cost() {
+void problem2_reintegration_cost()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: 재적분 계산 비용" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -45,7 +47,8 @@ void problem2_reintegration_cost() {
     std::cout << "   절약 비율: " << opt_iters << "배!" << std::endl;
 }
 
-void problem3_pose_independent() {
+void problem3_pose_independent()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: 포즈 독립성" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -62,7 +65,8 @@ void problem3_pose_independent() {
     std::cout << "   의존하지 않으므로, 최적화로 포즈가 변경되어도 재계산 불필요" << std::endl;
 }
 
-void problem4_preintegration_analogy() {
+void problem4_preintegration_analogy()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4: Pre-integration 비유" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -76,10 +80,12 @@ void problem4_preintegration_analogy() {
     std::cout << "💡 답: B" << std::endl;
     std::cout << "   현재 위치(출발 포즈)에서의 '상대 이동'을 알려주는 것이" << std::endl;
     std::cout << "   Pre-integration의 핵심입니다." << std::endl;
-    std::cout << "   현재 위치가 바뀌어도 '북쪽 100m'라는 상대 이동은 변하지 않습니다." << std::endl;
+    std::cout << "   현재 위치가 바뀌어도 '북쪽 100m'라는 상대 이동은 변하지 않습니다."
+              << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 6 Quiz - Easy" << std::endl;
     std::cout << "Pre-integration 필요성" << std::endl;

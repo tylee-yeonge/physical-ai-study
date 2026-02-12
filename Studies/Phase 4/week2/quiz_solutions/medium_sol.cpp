@@ -11,7 +11,8 @@
 using namespace Eigen;
 using namespace std;
 
-void problem1_solution() {
+void problem1_solution()
+{
     cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 1 풀이: 노이즈 전파 시뮬레이션" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
@@ -26,8 +27,8 @@ void problem1_solution() {
 
     cout << "  이론값:" << endl;
     cout << "    σ_p = σ_a × √dt × T^{3/2} / √3" << endl;
-    cout << "        = " << sigma_a << " × " << sqrt(dt) << " × "
-         << pow(T, 1.5) << " / " << sqrt(3.0) << endl;
+    cout << "        = " << sigma_a << " × " << sqrt(dt) << " × " << pow(T, 1.5) << " / "
+         << sqrt(3.0) << endl;
     cout << "        = " << sigma_p_theory << " m\n" << endl;
 
     // 시뮬레이션 (여러 번 반복하여 RMS 계산)
@@ -37,9 +38,11 @@ void problem1_solution() {
     default_random_engine gen(42);
     normal_distribution<double> noise(0, sigma_a);
 
-    for (int trial = 0; trial < trials; trial++) {
+    for (int trial = 0; trial < trials; trial++)
+    {
         double v = 0, p = 0;
-        for (int i = 0; i < N; i++) {
+        for (int i = 0; i < N; i++)
+        {
             double a = noise(gen);
             v += a * dt;
             p += v * dt;
@@ -55,11 +58,11 @@ void problem1_solution() {
     cout << "    비율      = " << sigma_p_sim / sigma_p_theory << "\n" << endl;
 
     cout << "  핵심: White Noise → 위치 불확실성 ∝ t^{3/2}" << endl;
-    cout << "    5초 후 약 " << fixed << setprecision(3)
-         << sigma_p_theory << "m (1σ)" << endl;
+    cout << "    5초 후 약 " << fixed << setprecision(3) << sigma_p_theory << "m (1σ)" << endl;
 }
 
-void problem2_solution() {
+void problem2_solution()
+{
     cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 2 풀이: 바이어스 vs 노이즈 성장률" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
@@ -75,13 +78,13 @@ void problem2_solution() {
     cout << "  ────────┼──────────────┼──────────────┼─────────" << endl;
 
     double crossover = 0;
-    for (double t : {1.0, 5.0, 10.0, 30.0}) {
+    for (double t : {1.0, 5.0, 10.0, 30.0})
+    {
         double sigma_p = sigma_a * sqrt(dt) * pow(t, 1.5) / sqrt(3.0);
         double p_bias = 0.5 * b_a * t * t;
         const char* which = (sigma_p > p_bias) ? "노이즈" : "바이어스";
 
-        printf("    %4.0f   │    %8.4f    │    %8.4f    │  %s\n",
-               t, sigma_p, p_bias, which);
+        printf("    %4.0f   │    %8.4f    │    %8.4f    │  %s\n", t, sigma_p, p_bias, which);
     }
 
     // 교차점: σ_a √dt t^{3/2}/√3 = 0.5 b_a t²
@@ -99,7 +102,8 @@ void problem2_solution() {
     cout << "    → 바이어스가 항상 이김 (충분한 시간 후)" << endl;
 }
 
-void problem3_solution() {
+void problem3_solution()
+{
     cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 3 풀이: 연속-이산 노이즈 변환" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
@@ -112,20 +116,16 @@ void problem3_solution() {
     double sigma_a_200 = sigma_a_c / sqrt(dt_200);
     double sigma_g_200 = sigma_g_c / sqrt(dt_200);
 
-    printf("    σ_a_discrete = %.4f / √%.4f = %.4f m/s²\n",
-           sigma_a_c, dt_200, sigma_a_200);
-    printf("    σ_g_discrete = %.5f / √%.4f = %.5f rad/s\n\n",
-           sigma_g_c, dt_200, sigma_g_200);
+    printf("    σ_a_discrete = %.4f / √%.4f = %.4f m/s²\n", sigma_a_c, dt_200, sigma_a_200);
+    printf("    σ_g_discrete = %.5f / √%.4f = %.5f rad/s\n\n", sigma_g_c, dt_200, sigma_g_200);
 
     cout << "  (2) 400Hz (dt = 0.0025s):\n" << endl;
     double dt_400 = 0.0025;
     double sigma_a_400 = sigma_a_c / sqrt(dt_400);
     double sigma_g_400 = sigma_g_c / sqrt(dt_400);
 
-    printf("    σ_a_discrete = %.4f / √%.5f = %.4f m/s²\n",
-           sigma_a_c, dt_400, sigma_a_400);
-    printf("    σ_g_discrete = %.5f / √%.5f = %.5f rad/s\n\n",
-           sigma_g_c, dt_400, sigma_g_400);
+    printf("    σ_a_discrete = %.4f / √%.5f = %.4f m/s²\n", sigma_a_c, dt_400, sigma_a_400);
+    printf("    σ_g_discrete = %.5f / √%.5f = %.5f rad/s\n\n", sigma_g_c, dt_400, sigma_g_400);
 
     cout << "  비교:" << endl;
     cout << "    200Hz: σ_a = " << sigma_a_200 << " m/s²" << endl;
@@ -148,7 +148,8 @@ void problem3_solution() {
     cout << "    → σ_p ∝ √dt → dt가 절반이면 오차 1/√2" << endl;
 }
 
-int main() {
+int main()
+{
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "Week 2 Quiz Medium - 풀이" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;

@@ -7,7 +7,8 @@
 
 #include <iostream>
 
-void problem1_why_no_scale() {
+void problem1_why_no_scale()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Q1. 단안 카메라가 스케일을 결정할 수 없는 이유" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -25,7 +26,8 @@ void problem1_why_no_scale() {
     std::cout << "   λ * [u, v, 1]^T = K * [R|t] * [X, 1]^T\n" << std::endl;
 }
 
-void problem2_t_normalization() {
+void problem2_t_normalization()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Q2. Essential Matrix에서 ||t|| = 1 정규화의 의미" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -43,7 +45,8 @@ void problem2_t_normalization() {
     std::cout << "   어떤 α를 곱해도 에피폴라 제약이 성립합니다.\n" << std::endl;
 }
 
-void problem3_scale_drift() {
+void problem3_scale_drift()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Q3. 스케일 드리프트의 정의" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -59,7 +62,8 @@ void problem3_scale_drift() {
     std::cout << "💡 힌트: 매 프레임 1%의 스케일 오차가 100프레임 누적되면?\n" << std::endl;
 }
 
-void problem4_when_scale_known() {
+void problem4_when_scale_known()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Q4. 스케일을 알 수 있는 경우" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -76,7 +80,8 @@ void problem4_when_scale_known() {
     std::cout << "   baseline b가 물리적으로 알려진 값입니다.\n" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 12 Quiz - Easy" << std::endl;
     std::cout << "Monocular 스케일 모호성 기본 개념" << std::endl;

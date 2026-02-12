@@ -4,7 +4,8 @@
 
 #include <iostream>
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 9 Quiz - Medium" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;

@@ -4,7 +4,8 @@
 
 #include <iostream>
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 6 Easy Quiz - 정답 해설" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;

@@ -5,7 +5,8 @@
 #include <iostream>
 #include <cmath>
 
-void problem1_solution() {
+void problem1_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1 풀이: Vision-only SfM의 한계" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -25,7 +26,8 @@ void problem1_solution() {
     std::cout << "       → IMU도 가속도 → 실제 거리를 제공" << std::endl;
 }
 
-void problem2_solution() {
+void problem2_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2 풀이: 바이어스 추정 순서" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -46,7 +48,8 @@ void problem2_solution() {
     std::cout << "       → 나중에 비선형 최적화로 추정" << std::endl;
 }
 
-void problem3_solution() {
+void problem3_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3 풀이: 중력 제약 조건" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -54,19 +57,19 @@ void problem3_solution() {
     std::cout << "정답: (B) ||g|| = 9.81 제약을 적용하여 방향만 보정\n" << std::endl;
 
     double gx = 0.2, gy = -0.1, gz = -9.75;
-    double g_norm = std::sqrt(gx*gx + gy*gy + gz*gz);
+    double g_norm = std::sqrt(gx * gx + gy * gy + gz * gz);
 
     std::cout << "  풀이:" << std::endl;
     std::cout << "    g_estimated = [0.2, -0.1, -9.75]" << std::endl;
     std::cout << "    ||g_estimated|| = " << g_norm << "\n" << std::endl;
 
-    double gx_n = gx/g_norm, gy_n = gy/g_norm, gz_n = gz/g_norm;
+    double gx_n = gx / g_norm, gy_n = gy / g_norm, gz_n = gz / g_norm;
     std::cout << "    단위 벡터: g_hat = g / ||g||" << std::endl;
     printf("    = [%.6f, %.6f, %.6f]\n\n", gx_n, gy_n, gz_n);
 
     double g_true = 9.81;
     printf("    정제: g_refined = 9.81 * g_hat\n");
-    printf("    = [%.4f, %.4f, %.4f]\n\n", gx_n*g_true, gy_n*g_true, gz_n*g_true);
+    printf("    = [%.4f, %.4f, %.4f]\n\n", gx_n * g_true, gy_n * g_true, gz_n * g_true);
 
     std::cout << "  왜 (B)인가:" << std::endl;
     std::cout << "    (A) 틀림: 0.2 m/s² 수평 성분 → 큰 드리프트 유발" << std::endl;
@@ -76,7 +79,8 @@ void problem3_solution() {
     std::cout << "    (B) 맞음: 방향은 추정값 유지, 크기만 물리 상수로 보정" << std::endl;
 }
 
-void problem4_solution() {
+void problem4_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4 풀이: 초기화 실패 조건" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -103,7 +107,8 @@ void problem4_solution() {
     std::cout << "      → 이것이 Kalibr에서도 다양한 움직임을 요구하는 이유" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 12 Quiz Easy - 풀이" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

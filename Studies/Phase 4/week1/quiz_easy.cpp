@@ -4,7 +4,8 @@
 
 #include <iostream>
 
-void problem1_accel_stationary() {
+void problem1_accel_stationary()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: 정지 상태의 가속도계" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -18,7 +19,8 @@ void problem1_accel_stationary() {
     std::cout << "  답: _____\n" << std::endl;
 }
 
-void problem2_gyro_bias() {
+void problem2_gyro_bias()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: 자이로 바이어스 영향" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -32,7 +34,8 @@ void problem2_gyro_bias() {
     std::cout << "  답: _____\n" << std::endl;
 }
 
-void problem3_imu_frequency() {
+void problem3_imu_frequency()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: IMU vs Vision 주파수" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -46,7 +49,8 @@ void problem3_imu_frequency() {
     std::cout << "  답: _____\n" << std::endl;
 }
 
-void problem4_scale_recovery() {
+void problem4_scale_recovery()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4: 스케일 복구" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -60,7 +64,8 @@ void problem4_scale_recovery() {
     std::cout << "  답: _____\n" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Phase 4 Week 1 Quiz - Easy" << std::endl;
     std::cout << "IMU 센서 이해" << std::endl;

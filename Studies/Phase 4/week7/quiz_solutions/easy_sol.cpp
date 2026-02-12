@@ -5,7 +5,8 @@
 #include <iostream>
 #include <cmath>
 
-void problem1_solution() {
+void problem1_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1 풀이: IMU 측정 모델" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -26,7 +27,8 @@ void problem1_solution() {
     std::cout << "  - 이것이 a_w - g에서 g를 '빼는' 이유입니다" << std::endl;
 }
 
-void problem2_solution() {
+void problem2_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2 풀이: Pre-integrated 측정값의 의미" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -50,7 +52,8 @@ void problem2_solution() {
     std::cout << "    → 완전한 재적분보다 훨씬 빠름" << std::endl;
 }
 
-void problem3_solution() {
+void problem3_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3 풀이: 업데이트 순서" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -75,7 +78,8 @@ void problem3_solution() {
     std::cout << "  (또는 mid-point 방법 사용 시 순서 무관)" << std::endl;
 }
 
-void problem4_solution() {
+void problem4_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4 풀이: 상태 복원 공식" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -100,7 +104,8 @@ void problem4_solution() {
     std::cout << "    → Δv, Δp도 자연스럽게 시각 i 프레임" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 7 Quiz Easy - 풀이" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

@@ -5,7 +5,8 @@
 #include <iostream>
 #include <cmath>
 
-void problem1_solution() {
+void problem1_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1 풀이: EKF가 필요한 이유" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -22,7 +23,8 @@ void problem1_solution() {
     std::cout << "     → 쿼터니언 곱셈 → 비선형" << std::endl;
 }
 
-void problem2_solution() {
+void problem2_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2 풀이: 자코비안의 역할" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -40,14 +42,15 @@ void problem2_solution() {
     std::cout << "  공분산 예측: F 사용 (선형 근사)" << std::endl;
 }
 
-void problem3_solution() {
+void problem3_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3 풀이: 선형화 오차" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
     double x0 = 3.0, x1 = 4.0;
-    double f_actual = x1 * x1;          // 16
-    double f_approx = x0*x0 + 2*x0*(x1-x0);  // 9 + 6 = 15
+    double f_actual = x1 * x1;                       // 16
+    double f_approx = x0 * x0 + 2 * x0 * (x1 - x0);  // 9 + 6 = 15
 
     std::cout << "  f(x) = x², f'(x) = 2x" << std::endl;
     std::cout << "  x₀=3에서: f(3)=9, f'(3)=6" << std::endl;
@@ -61,7 +64,8 @@ void problem3_solution() {
     std::cout << "  - EKF는 매 스텝 재선형화로 오차 최소화" << std::endl;
 }
 
-void problem4_solution() {
+void problem4_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4 풀이: EKF vs 최적화" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -84,7 +88,8 @@ void problem4_solution() {
     std::cout << "  정확도 우선 (PC/Jetson): 최적화 기반" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 4 Quiz Easy - 풀이" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

@@ -11,7 +11,8 @@
 #include <iostream>
 #include <string>
 
-void problem1_pipeline_order() {
+void problem1_pipeline_order()
+{
     std::cout << "\n";
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: 모델 변환 파이프라인 순서" << std::endl;
@@ -32,7 +33,8 @@ void problem1_pipeline_order() {
     // std::string answer = "?";
 }
 
-void problem2_fp16_benefit() {
+void problem2_fp16_benefit()
+{
     std::cout << "\n";
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: FP16 변환의 이점" << std::endl;
@@ -51,7 +53,8 @@ void problem2_fp16_benefit() {
     // TODO: 여기에 정답을 작성하세요
 }
 
-void problem3_input_size() {
+void problem3_input_size()
+{
     std::cout << "\n";
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: 입력 크기 고정의 이유" << std::endl;
@@ -70,7 +73,8 @@ void problem3_input_size() {
     // TODO: 여기에 정답을 작성하세요
 }
 
-void problem4_memory_layout() {
+void problem4_memory_layout()
+{
     std::cout << "\n";
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4: GPU 메모리 계산" << std::endl;
@@ -101,7 +105,8 @@ void problem4_memory_layout() {
     std::cout << "    메모리: " << memory_mb << " MB" << std::endl;
 }
 
-void problem5_trt_optimization() {
+void problem5_trt_optimization()
+{
     std::cout << "\n";
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 5: TensorRT 최적화 기법" << std::endl;
@@ -111,7 +116,8 @@ void problem5_trt_optimization() {
     std::cout << "질문: TensorRT의 Layer Fusion 최적화에 대한 설명으로 올바른 것은?" << std::endl;
     std::cout << std::endl;
     std::cout << "보기:" << std::endl;
-    std::cout << "  A) Conv + BN + ReLU를 하나의 커널로 합쳐 메모리 접근과 커널 실행 횟수를 줄인다" << std::endl;
+    std::cout << "  A) Conv + BN + ReLU를 하나의 커널로 합쳐 메모리 접근과 커널 실행 횟수를 줄인다"
+              << std::endl;
     std::cout << "  B) 모든 레이어를 하나의 거대한 행렬 연산으로 변환한다" << std::endl;
     std::cout << "  C) 불필요한 레이어를 자동으로 삭제한다" << std::endl;
     std::cout << "  D) 입력 이미지를 여러 개의 작은 패치로 분할하여 병렬 처리한다" << std::endl;
@@ -120,7 +126,8 @@ void problem5_trt_optimization() {
     // TODO: 여기에 정답을 작성하세요
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "  Week 9 Quiz - Easy (C++)" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

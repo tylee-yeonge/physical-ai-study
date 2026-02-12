@@ -12,19 +12,19 @@
 using namespace Eigen;
 using namespace std;
 
-Matrix3d expSO3(const Vector3d& omega) {
+Matrix3d expSO3(const Vector3d& omega)
+{
     double angle = omega.norm();
-    if (angle < 1e-10) return Matrix3d::Identity();
+    if (angle < 1e-10)
+        return Matrix3d::Identity();
     Vector3d axis = omega / angle;
     Matrix3d K;
-    K <<    0, -axis.z(),  axis.y(),
-         axis.z(),     0, -axis.x(),
-        -axis.y(),  axis.x(),     0;
-    return Matrix3d::Identity()
-         + sin(angle) * K + (1.0 - cos(angle)) * K * K;
+    K << 0, -axis.z(), axis.y(), axis.z(), 0, -axis.x(), -axis.y(), axis.x(), 0;
+    return Matrix3d::Identity() + sin(angle) * K + (1.0 - cos(angle)) * K * K;
 }
 
-void problem1_validate_rotation() {
+void problem1_validate_rotation()
+{
     cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 1: 회전 행렬 검증" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
@@ -32,10 +32,8 @@ void problem1_validate_rotation() {
     cout << "Kalibr에서 다음 T_cam_imu가 출력되었습니다:\n" << endl;
 
     Matrix4d T_cam_imu;
-    T_cam_imu << 0.0148655, -0.999881, 0.00414029, -0.0216401,
-                 0.999557,  0.0149672, 0.0257155,  -0.064677,
-                -0.0257744, 0.00375619, 0.999661,   0.00981073,
-                 0.0,       0.0,        0.0,        1.0;
+    T_cam_imu << 0.0148655, -0.999881, 0.00414029, -0.0216401, 0.999557, 0.0149672, 0.0257155,
+        -0.064677, -0.0257744, 0.00375619, 0.999661, 0.00981073, 0.0, 0.0, 0.0, 1.0;
 
     cout << "  T_cam_imu:" << endl;
     cout << T_cam_imu << "\n" << endl;
@@ -64,23 +62,22 @@ void problem1_validate_rotation() {
     cout << "  정답은 quiz_solutions/medium_sol.cpp 참고" << endl;
 }
 
-void problem2_reprojection_analysis() {
+void problem2_reprojection_analysis()
+{
     cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 2: Reprojection Error 분석" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
 
     cout << "캘리브레이션 결과에서 15개 점의 reprojection error:\n" << endl;
 
-    vector<double> errors = {
-        0.23, 0.45, 0.31, 0.18, 0.52,
-        0.67, 0.29, 0.41, 0.35, 0.48,
-        1.23, 0.38, 0.27, 0.33, 0.42
-    };
+    vector<double> errors = {0.23, 0.45, 0.31, 0.18, 0.52, 0.67, 0.29, 0.41,
+                             0.35, 0.48, 1.23, 0.38, 0.27, 0.33, 0.42};
 
     cout << "  점 │ error (pixel)" << endl;
     cout << "  ───┼───────────────" << endl;
-    for (int i = 0; i < 15; i++) {
-        printf("  %2d │   %5.2f\n", i+1, errors[i]);
+    for (int i = 0; i < 15; i++)
+    {
+        printf("  %2d │   %5.2f\n", i + 1, errors[i]);
     }
 
     cout << "\n과제:" << endl;
@@ -98,7 +95,8 @@ void problem2_reprojection_analysis() {
     cout << "  정답은 quiz_solutions/medium_sol.cpp 참고" << endl;
 }
 
-void problem3_extrinsic_to_vins() {
+void problem3_extrinsic_to_vins()
+{
     cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 3: Kalibr → VINS 변환" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
@@ -131,7 +129,8 @@ void problem3_extrinsic_to_vins() {
     cout << "\n  정답은 quiz_solutions/medium_sol.cpp 참고" << endl;
 }
 
-int main() {
+int main()
+{
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "Week 14 Quiz - Medium" << endl;
     cout << "Kalibr 실습" << endl;

@@ -10,33 +10,36 @@
 using namespace Eigen;
 using namespace std;
 
-Matrix3d skew(const Vector3d& v) {
+Matrix3d skew(const Vector3d& v)
+{
     Matrix3d m;
-    m <<    0, -v.z(),  v.y(),
-         v.z(),     0, -v.x(),
-        -v.y(),  v.x(),     0;
+    m << 0, -v.z(), v.y(), v.z(), 0, -v.x(), -v.y(), v.x(), 0;
     return m;
 }
 
-Matrix3d expSO3(const Vector3d& omega) {
+Matrix3d expSO3(const Vector3d& omega)
+{
     double angle = omega.norm();
-    if (angle < 1e-10) return Matrix3d::Identity();
+    if (angle < 1e-10)
+        return Matrix3d::Identity();
     Vector3d axis = omega / angle;
     Matrix3d K = skew(axis);
-    return Matrix3d::Identity()
-         + sin(angle) * K + (1.0 - cos(angle)) * K * K;
+    return Matrix3d::Identity() + sin(angle) * K + (1.0 - cos(angle)) * K * K;
 }
 
-Vector3d logSO3(const Matrix3d& R) {
+Vector3d logSO3(const Matrix3d& R)
+{
     double cos_angle = (R.trace() - 1.0) / 2.0;
     cos_angle = max(-1.0, min(1.0, cos_angle));
     double angle = acos(cos_angle);
-    if (angle < 1e-10) return Vector3d::Zero();
+    if (angle < 1e-10)
+        return Vector3d::Zero();
     Matrix3d log_R = (angle / (2.0 * sin(angle))) * (R - R.transpose());
-    return Vector3d(log_R(2,1), log_R(0,2), log_R(1,0));
+    return Vector3d(log_R(2, 1), log_R(0, 2), log_R(1, 0));
 }
 
-void problem1_extrinsic_error_analysis() {
+void problem1_extrinsic_error_analysis()
+{
     cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 1: Extrinsic 오차 영향 분석" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
@@ -58,15 +61,17 @@ void problem1_extrinsic_error_analysis() {
     // TODO: 학생이 구현
     cout << "  delta (도) │ 가속도 오차(m/s²) │ 5초 드리프트(m)" << endl;
     cout << "  ───────────┼──────────────────┼────────────────" << endl;
-    for (double delta_deg : deltas_deg) {
-        cout << "    " << setw(4) << fixed << setprecision(1)
-             << delta_deg << "     │    ___________    │   ___________" << endl;
+    for (double delta_deg : deltas_deg)
+    {
+        cout << "    " << setw(4) << fixed << setprecision(1) << delta_deg
+             << "     │    ___________    │   ___________" << endl;
     }
 
     cout << "\n  정답은 quiz_solutions/medium_sol.cpp 참고" << endl;
 }
 
-void problem2_time_offset_effect() {
+void problem2_time_offset_effect()
+{
     cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 2: 시간 오프셋 영향 계산" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
@@ -96,7 +101,8 @@ void problem2_time_offset_effect() {
     cout << "  정답은 quiz_solutions/medium_sol.cpp 참고" << endl;
 }
 
-void problem3_hand_eye_simple() {
+void problem3_hand_eye_simple()
+{
     cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 3: 간단한 핸드-아이 문제" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
@@ -104,21 +110,22 @@ void problem3_hand_eye_simple() {
     cout << "실제 R_ci = Exp([0, 0, pi/4])  (z축 45도)\n" << endl;
     cout << "3개의 운동에서 Camera와 IMU의 상대 회전이 관측되었습니다.\n" << endl;
 
-    Matrix3d R_ci_true = expSO3(Vector3d(0, 0, M_PI/4));
+    Matrix3d R_ci_true = expSO3(Vector3d(0, 0, M_PI / 4));
 
     // 3개의 IMU 상대 회전
     vector<Vector3d> imu_rotations = {
-        {0.3, 0.0, 0.0},   // x축 회전
-        {0.0, 0.2, 0.0},   // y축 회전
-        {0.0, 0.0, 0.15}   // z축 회전
+        {0.3, 0.0, 0.0},  // x축 회전
+        {0.0, 0.2, 0.0},  // y축 회전
+        {0.0, 0.0, 0.15}  // z축 회전
     };
 
     cout << "  IMU 상대 회전 (angle-axis):" << endl;
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++)
+    {
         Matrix3d R_imu = expSO3(imu_rotations[i]);
         Matrix3d R_cam = R_ci_true * R_imu * R_ci_true.transpose();
 
-        cout << "  쌍 " << i+1 << ":" << endl;
+        cout << "  쌍 " << i + 1 << ":" << endl;
         cout << "    B (IMU): " << logSO3(R_imu).transpose() << endl;
         cout << "    A (Cam): " << logSO3(R_cam).transpose() << "\n" << endl;
     }
@@ -144,7 +151,8 @@ void problem3_hand_eye_simple() {
     cout << "  정답은 quiz_solutions/medium_sol.cpp 참고" << endl;
 }
 
-int main() {
+int main()
+{
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "Week 13 Quiz - Medium" << endl;
     cout << "Camera-IMU 외부 캘리브레이션" << endl;

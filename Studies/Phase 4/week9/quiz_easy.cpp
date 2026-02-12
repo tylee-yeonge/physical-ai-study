@@ -5,7 +5,8 @@
 #include <iostream>
 #include <cmath>
 
-void problem1_why_covariance() {
+void problem1_why_covariance()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: 공분산이 필요한 이유" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -20,7 +21,8 @@ void problem1_why_covariance() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-void problem2_covariance_growth() {
+void problem2_covariance_growth()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: 공분산 증가 패턴" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -35,7 +37,8 @@ void problem2_covariance_growth() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-void problem3_noise_parameters() {
+void problem3_noise_parameters()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: IMU 노이즈 파라미터" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -55,7 +58,8 @@ void problem3_noise_parameters() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-void problem4_vins_dimension() {
+void problem4_vins_dimension()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4: VINS의 15D 공분산" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -72,7 +76,8 @@ void problem4_vins_dimension() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 9 Quiz - Easy (Pre-integration 심화 개념)" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

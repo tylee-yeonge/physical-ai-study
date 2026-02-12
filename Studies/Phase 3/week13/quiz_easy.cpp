@@ -4,7 +4,8 @@
 
 #include <iostream>
 
-void problem1_stereo_depth() {
+void problem1_stereo_depth()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: Stereo Depth 공식" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -17,10 +18,12 @@ void problem1_stereo_depth() {
     std::cout << "   여기서 f = 초점 거리, b = baseline, disparity = 좌우 픽셀 차이\n" << std::endl;
     std::cout << "   답: _____\n" << std::endl;
 
-    std::cout << "   💡 힌트: baseline이 클수록, disparity가 클수록 가까운 물체입니다.\n" << std::endl;
+    std::cout << "   💡 힌트: baseline이 클수록, disparity가 클수록 가까운 물체입니다.\n"
+              << std::endl;
 }
 
-void problem2_vision_imu_complementary() {
+void problem2_vision_imu_complementary()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: Vision과 IMU의 상호 보완" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -36,7 +39,8 @@ void problem2_vision_imu_complementary() {
     std::cout << "   💡 힌트: 단안 카메라의 가장 큰 한계는 무엇이었나요? (Week 12)\n" << std::endl;
 }
 
-void problem3_gps_indoor() {
+void problem3_gps_indoor()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: GPS의 실내 한계" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -52,7 +56,8 @@ void problem3_gps_indoor() {
     std::cout << "   💡 힌트: GPS 신호는 위성에서 오는 전파입니다. 건물 내부에서는?\n" << std::endl;
 }
 
-void problem4_vio_definition() {
+void problem4_vio_definition()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4: VIO의 정의" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -64,10 +69,12 @@ void problem4_vio_definition() {
     std::cout << "   d) Virtual Inertial Observer - 가상 관성 관측기\n" << std::endl;
     std::cout << "   답: _____\n" << std::endl;
 
-    std::cout << "   💡 힌트: Visual + Inertial + Odometry의 각 의미를 생각해보세요.\n" << std::endl;
+    std::cout << "   💡 힌트: Visual + Inertial + Odometry의 각 의미를 생각해보세요.\n"
+              << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 13 Quiz - Easy" << std::endl;
     std::cout << "스케일 복구 방법" << std::endl;

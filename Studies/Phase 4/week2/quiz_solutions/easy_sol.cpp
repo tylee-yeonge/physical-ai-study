@@ -5,7 +5,8 @@
 #include <iostream>
 #include <cmath>
 
-void problem1_solution() {
+void problem1_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1 풀이: IMU 노이즈 종류" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -28,7 +29,8 @@ void problem1_solution() {
     std::cout << "    → 다만 바이어스(t에 비례)보다는 느리게 성장" << std::endl;
 }
 
-void problem2_solution() {
+void problem2_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2 풀이: Bias Random Walk" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -44,14 +46,16 @@ void problem2_solution() {
     std::cout << "    → 표준편차: σ_b(t) = σ_bw × √t\n" << std::endl;
 
     std::cout << "  수치 예시 (σ_bw = 0.0001 rad/s²/√Hz):" << std::endl;
-    for (double t : {1.0, 60.0, 3600.0}) {
+    for (double t : {1.0, 60.0, 3600.0})
+    {
         double sigma_b = 0.0001 * std::sqrt(t);
         printf("    t = %6.0fs: σ_b = %.6f rad/s\n", t, sigma_b);
     }
     std::cout << "    → 1시간 후 바이어스가 0.006 rad/s 변할 수 있음" << std::endl;
 }
 
-void problem3_solution() {
+void problem3_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3 풀이: Allan Variance" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -77,7 +81,8 @@ void problem3_solution() {
     std::cout << "    최소점: Bias Instability (σ_BI)" << std::endl;
 }
 
-void problem4_solution() {
+void problem4_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4 풀이: 노이즈 파라미터 단위" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -96,15 +101,16 @@ void problem4_solution() {
     double sigma_d = sigma_c / std::sqrt(dt);
 
     std::cout << "  예시: σ_a = 0.04 m/s²/√Hz, dt = 0.005s (200Hz)" << std::endl;
-    std::cout << "    σ_discrete = " << sigma_c << " / √" << dt
-              << " = " << sigma_d << " m/s²\n" << std::endl;
+    std::cout << "    σ_discrete = " << sigma_c << " / √" << dt << " = " << sigma_d << " m/s²\n"
+              << std::endl;
 
     std::cout << "  직관: noise density는 '주파수 대역당' 노이즈" << std::endl;
     std::cout << "    → 샘플링이 빠르면 각 샘플의 노이즈는 커짐" << std::endl;
     std::cout << "    → 하지만 적분 후 최종 오차는 동일" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 2 Quiz Easy - 풀이" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

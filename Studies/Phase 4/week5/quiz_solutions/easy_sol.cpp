@@ -5,7 +5,8 @@
 #include <iostream>
 #include <cmath>
 
-void problem1_solution() {
+void problem1_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1 풀이: Nominal State vs Error State" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -29,7 +30,8 @@ void problem1_solution() {
     std::cout << "     → Nominal은 대략적 추정, Error 보정이 필수" << std::endl;
 }
 
-void problem2_solution() {
+void problem2_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2 풀이: Over-parameterization 해결" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -49,7 +51,8 @@ void problem2_solution() {
     std::cout << "     ESKF: P가 3×3이고 full rank → 수치적으로 안정 ✓" << std::endl;
 }
 
-void problem3_solution() {
+void problem3_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3 풀이: Reset의 중요성" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -73,7 +76,8 @@ void problem3_solution() {
     std::cout << "\n  결론: Reset은 ESKF의 핵심! 항상 δx ≈ 0을 유지해야 함" << std::endl;
 }
 
-void problem4_solution() {
+void problem4_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4 풀이: ESKF 3단계 순서" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -100,7 +104,8 @@ void problem4_solution() {
     std::cout << "    → 10번 예측마다 1번 업데이트" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 5 Quiz Easy - 풀이" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

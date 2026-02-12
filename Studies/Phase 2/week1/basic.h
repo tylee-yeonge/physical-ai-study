@@ -10,8 +10,9 @@
  * 이 클래스는 핀홀 카메라 모델의 핵심 개념을 이해하기 위한 구현입니다.
  * 3D→2D 투영, 역투영, FOV 계산, 재투영 오차 등을 다룹니다.
  */
-class PinholeProjection {
-public:
+class PinholeProjection
+{
+   public:
     /**
      * @brief 생성자
      * @param K 3x3 카메라 내부 파라미터 행렬
@@ -54,8 +55,7 @@ public:
      * @param observed_pixel 실제 관측된 2D 좌표
      * @return 재투영 오차 (픽셀)
      */
-    double reprojectionError(const cv::Point3d& P_world,
-                            const cv::Point2d& observed_pixel) const;
+    double reprojectionError(const cv::Point3d& P_world, const cv::Point2d& observed_pixel) const;
 
     /**
      * @brief 점이 이미지 안에 있는지 확인
@@ -66,18 +66,39 @@ public:
     static bool isInImage(const cv::Point2d& pixel, const cv::Size& imageSize);
 
     // Getter
-    cv::Mat getK() const { return K_.clone(); }
-    cv::Mat getR() const { return R_.clone(); }
-    cv::Mat getT() const { return t_.clone(); }
-    double getFx() const { return K_.at<double>(0, 0); }
-    double getFy() const { return K_.at<double>(1, 1); }
-    double getCx() const { return K_.at<double>(0, 2); }
-    double getCy() const { return K_.at<double>(1, 2); }
+    cv::Mat getK() const
+    {
+        return K_.clone();
+    }
+    cv::Mat getR() const
+    {
+        return R_.clone();
+    }
+    cv::Mat getT() const
+    {
+        return t_.clone();
+    }
+    double getFx() const
+    {
+        return K_.at<double>(0, 0);
+    }
+    double getFy() const
+    {
+        return K_.at<double>(1, 1);
+    }
+    double getCx() const
+    {
+        return K_.at<double>(0, 2);
+    }
+    double getCy() const
+    {
+        return K_.at<double>(1, 2);
+    }
 
-private:
-    cv::Mat K_;    ///< 3x3 내부 파라미터 행렬
-    cv::Mat R_;    ///< 3x3 회전 행렬
-    cv::Mat t_;    ///< 3x1 이동 벡터
+   private:
+    cv::Mat K_;  ///< 3x3 내부 파라미터 행렬
+    cv::Mat R_;  ///< 3x3 회전 행렬
+    cv::Mat t_;  ///< 3x1 이동 벡터
 };
 
-#endif // PINHOLE_PROJECTION_BASIC_H
+#endif  // PINHOLE_PROJECTION_BASIC_H

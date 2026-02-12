@@ -8,44 +8,48 @@
 #include <cmath>
 #include <numeric>
 
-void problem1_solution() {
+void problem1_solution()
+{
     std::cout << "\n━━━ 문제 1 정답: 큐브 투영 ━━━\n" << std::endl;
 
     double fx = 600.0, fy = 600.0, cx = 400.0, cy = 300.0;
 
-    std::vector<cv::Point3d> cube = {
-        {-1, -1, 4}, { 1, -1, 4}, { 1,  1, 4}, {-1,  1, 4},
-        {-1, -1, 6}, { 1, -1, 6}, { 1,  1, 6}, {-1,  1, 6}
-    };
+    std::vector<cv::Point3d> cube = {{-1, -1, 4}, {1, -1, 4}, {1, 1, 4}, {-1, 1, 4},
+                                     {-1, -1, 6}, {1, -1, 6}, {1, 1, 6}, {-1, 1, 6}};
 
     // R=I, t=0 투영
     std::vector<cv::Point> pixels;
-    for (const auto& pt : cube) {
+    for (const auto &pt : cube)
+    {
         double u = fx * pt.x / pt.z + cx;
         double v = fy * pt.y / pt.z + cy;
         pixels.push_back(cv::Point((int)u, (int)v));
-        std::cout << "(" << pt.x << ", " << pt.y << ", " << pt.z << ") → ("
-                  << (int)u << ", " << (int)v << ")" << std::endl;
+        std::cout << "(" << pt.x << ", " << pt.y << ", " << pt.z << ") → (" << (int)u << ", "
+                  << (int)v << ")" << std::endl;
     }
 
     // 이미지에 큐브 그리기
     cv::Mat image = cv::Mat::zeros(600, 800, CV_8UC3);
 
     // 앞면 (초록)
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++)
+    {
         cv::line(image, pixels[i], pixels[(i + 1) % 4], cv::Scalar(0, 255, 0), 2);
     }
     // 뒷면 (파랑)
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++)
+    {
         cv::line(image, pixels[4 + i], pixels[4 + (i + 1) % 4], cv::Scalar(255, 0, 0), 2);
     }
     // 앞뒤 연결 (빨강)
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++)
+    {
         cv::line(image, pixels[i], pixels[i + 4], cv::Scalar(0, 0, 255), 1);
     }
 
     // 꼭짓점 표시
-    for (size_t i = 0; i < pixels.size(); i++) {
+    for (size_t i = 0; i < pixels.size(); i++)
+    {
         cv::circle(image, pixels[i], 5, cv::Scalar(255, 255, 0), -1);
     }
 
@@ -55,7 +59,8 @@ void problem1_solution() {
     // cv::waitKey(0);
 }
 
-void problem2_solution() {
+void problem2_solution()
+{
     std::cout << "\n━━━ 문제 2 정답: 재투영 오차 ━━━\n" << std::endl;
 
     double fx = 600.0, fy = 600.0, cx = 400.0, cy = 300.0;
@@ -64,7 +69,8 @@ void problem2_solution() {
     std::vector<cv::Point2d> observed_2d;
 
     srand(42);
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 20; i++)
+    {
         double x = (rand() % 100 - 50) / 25.0;
         double y = (rand() % 100 - 50) / 25.0;
         double z = 3.0 + (rand() % 70) / 10.0;
@@ -80,7 +86,8 @@ void problem2_solution() {
 
     // 재투영 오차 계산
     std::vector<double> errors;
-    for (size_t i = 0; i < points_3d.size(); i++) {
+    for (size_t i = 0; i < points_3d.size(); i++)
+    {
         double u_proj = fx * points_3d[i].x / points_3d[i].z + cx;
         double v_proj = fy * points_3d[i].y / points_3d[i].z + cy;
 
@@ -96,7 +103,8 @@ void problem2_solution() {
 
     // 표준편차
     double sq_sum = 0.0;
-    for (double e : errors) {
+    for (double e : errors)
+    {
         sq_sum += (e - mean) * (e - mean);
     }
     double std_dev = std::sqrt(sq_sum / errors.size());
@@ -106,7 +114,8 @@ void problem2_solution() {
     std::cout << "표준편차: " << std_dev << " 픽셀" << std::endl;
 }
 
-void problem3_solution() {
+void problem3_solution()
+{
     std::cout << "\n━━━ 문제 3 정답: 외부 파라미터 효과 ━━━\n" << std::endl;
 
     double fx = 600.0, fy = 600.0, cx = 400.0, cy = 300.0;
@@ -127,10 +136,8 @@ void problem3_solution() {
 
     // 시나리오 2: Y축 15° 회전
     double angle = 15.0 * CV_PI / 180.0;
-    cv::Mat Ry = (cv::Mat_<double>(3, 3) <<
-        std::cos(angle), 0, std::sin(angle),
-        0, 1, 0,
-        -std::sin(angle), 0, std::cos(angle));
+    cv::Mat Ry = (cv::Mat_<double>(3, 3) << std::cos(angle), 0, std::sin(angle), 0, 1, 0,
+                  -std::sin(angle), 0, std::cos(angle));
 
     cv::Mat Pw = (cv::Mat_<double>(3, 1) << P.x, P.y, P.z);
     cv::Mat Pc = Ry * Pw;
@@ -146,7 +153,8 @@ void problem3_solution() {
               << " → Pc=(" << Xc2 << ", " << Yc2 << ", " << Zc2 << ")" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Phase 2 Week 1 Quiz Medium - 정답" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

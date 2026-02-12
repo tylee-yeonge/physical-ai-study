@@ -6,33 +6,36 @@
 #include <Eigen/Dense>
 #include <cmath>
 
-Eigen::Matrix3d skew(const Eigen::Vector3d& v) {
+Eigen::Matrix3d skew(const Eigen::Vector3d& v)
+{
     Eigen::Matrix3d m;
-    m <<    0, -v.z(),  v.y(),
-         v.z(),     0, -v.x(),
-        -v.y(),  v.x(),     0;
+    m << 0, -v.z(), v.y(), v.z(), 0, -v.x(), -v.y(), v.x(), 0;
     return m;
 }
 
-Eigen::Matrix3d expSO3(const Eigen::Vector3d& omega) {
+Eigen::Matrix3d expSO3(const Eigen::Vector3d& omega)
+{
     double angle = omega.norm();
-    if (angle < 1e-10) return Eigen::Matrix3d::Identity();
+    if (angle < 1e-10)
+        return Eigen::Matrix3d::Identity();
     Eigen::Vector3d axis = omega / angle;
     Eigen::Matrix3d K = skew(axis);
-    return Eigen::Matrix3d::Identity()
-         + std::sin(angle) * K + (1.0 - std::cos(angle)) * K * K;
+    return Eigen::Matrix3d::Identity() + std::sin(angle) * K + (1.0 - std::cos(angle)) * K * K;
 }
 
-Eigen::Vector3d logSO3(const Eigen::Matrix3d& R) {
+Eigen::Vector3d logSO3(const Eigen::Matrix3d& R)
+{
     double cos_a = (R.trace() - 1.0) / 2.0;
     cos_a = std::max(-1.0, std::min(1.0, cos_a));
     double angle = std::acos(cos_a);
-    if (angle < 1e-10) return Eigen::Vector3d::Zero();
+    if (angle < 1e-10)
+        return Eigen::Vector3d::Zero();
     Eigen::Matrix3d log_R = angle / (2.0 * std::sin(angle)) * (R - R.transpose());
-    return Eigen::Vector3d(log_R(2,1), log_R(0,2), log_R(1,0));
+    return Eigen::Vector3d(log_R(2, 1), log_R(0, 2), log_R(1, 0));
 }
 
-void problem1_imu_residual_computation() {
+void problem1_imu_residual_computation()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: IMU Factor 잔차 계산" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -58,32 +61,34 @@ void problem1_imu_residual_computation() {
     // Pre-integrated (참값에서 역산)
     Eigen::Matrix3d delta_R = R_i.transpose() * R_j;
     Eigen::Vector3d delta_v = R_i.transpose() * (v_j - v_i - gravity * dt);
-    Eigen::Vector3d delta_p = R_i.transpose() *
-        (p_j - p_i - v_i * dt - 0.5 * gravity * dt * dt);
+    Eigen::Vector3d delta_p = R_i.transpose() * (p_j - p_i - v_i * dt - 0.5 * gravity * dt * dt);
 
     // 잔차 계산
     Eigen::Vector3d r_rot = logSO3(delta_R.transpose() * R_i.transpose() * R_j);
     Eigen::Vector3d r_vel = R_i.transpose() * (v_j - v_i - gravity * dt) - delta_v;
-    Eigen::Vector3d r_pos = R_i.transpose() *
-        (p_j - p_i - v_i * dt - 0.5 * gravity * dt * dt) - delta_p;
+    Eigen::Vector3d r_pos =
+        R_i.transpose() * (p_j - p_i - v_i * dt - 0.5 * gravity * dt * dt) - delta_p;
 
     std::cout << "💡 풀이:" << std::endl;
     std::cout << "  r_rotation = " << r_rot.transpose() << std::endl;
     std::cout << "  r_velocity = " << r_vel.transpose() << std::endl;
     std::cout << "  r_position = " << r_pos.transpose() << std::endl;
-    std::cout << "  ||r_total|| = " << std::sqrt(r_rot.squaredNorm() + r_vel.squaredNorm() + r_pos.squaredNorm()) << std::endl;
+    std::cout << "  ||r_total|| = "
+              << std::sqrt(r_rot.squaredNorm() + r_vel.squaredNorm() + r_pos.squaredNorm())
+              << std::endl;
     std::cout << "\n  → 참값이므로 잔차 ≈ 0!" << std::endl;
 
     // 오차를 주면?
     Eigen::Vector3d p_j_err = p_j + Eigen::Vector3d(0.3, 0.1, 0);
-    Eigen::Vector3d r_pos_err = R_i.transpose() *
-        (p_j_err - p_i - v_i * dt - 0.5 * gravity * dt * dt) - delta_p;
+    Eigen::Vector3d r_pos_err =
+        R_i.transpose() * (p_j_err - p_i - v_i * dt - 0.5 * gravity * dt * dt) - delta_p;
     std::cout << "\n  p_j에 [0.3, 0.1, 0] 오차 추가:" << std::endl;
     std::cout << "  r_position = " << r_pos_err.transpose() << std::endl;
     std::cout << "  → 잔차가 오차만큼 발생!" << std::endl;
 }
 
-void problem2_visual_residual_computation() {
+void problem2_visual_residual_computation()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: Visual Factor 잔차 계산" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -120,7 +125,8 @@ void problem2_visual_residual_computation() {
     std::cout << "\n  → 참값이면 잔차 = 0, 여기서는 " << r.norm() << " 픽셀 오차" << std::endl;
 }
 
-void problem3_mahalanobis_distance() {
+void problem3_mahalanobis_distance()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: 마하라노비스 거리 비교" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -155,7 +161,8 @@ void problem3_mahalanobis_distance() {
     std::cout << "\n  → 마하라노비스 거리는 '기대 대비 얼마나 벗어났나'를 측정!" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 8 Quiz - Medium (Factor Graph 계산)" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

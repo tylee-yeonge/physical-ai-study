@@ -5,7 +5,8 @@
 #include <iostream>
 #include <cmath>
 
-void problem1_factor_graph_components() {
+void problem1_factor_graph_components()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: Factor Graph 구성요소" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -25,7 +26,8 @@ void problem1_factor_graph_components() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-void problem2_imu_factor_residual() {
+void problem2_imu_factor_residual()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: IMU Factor 잔차" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -42,7 +44,8 @@ void problem2_imu_factor_residual() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-void problem3_information_matrix() {
+void problem3_information_matrix()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: 정보 행렬의 역할" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -61,7 +64,8 @@ void problem3_information_matrix() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-void problem4_sliding_window() {
+void problem4_sliding_window()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4: Sliding Window" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -77,7 +81,8 @@ void problem4_sliding_window() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 8 Quiz - Easy (Factor Graph 개념)" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

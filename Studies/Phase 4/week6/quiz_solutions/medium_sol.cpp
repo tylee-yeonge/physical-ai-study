@@ -6,7 +6,8 @@
 #include <Eigen/Dense>
 #include <cmath>
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 6 Medium Quiz - 정답 해설" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -47,29 +48,31 @@ int main() {
     Eigen::Matrix3d R = Eigen::Matrix3d::Identity();
 
     // 포즈 1
-    Eigen::Vector3d p1(0,0,0), v1(0,0,0);
+    Eigen::Vector3d p1(0, 0, 0), v1(0, 0, 0);
     Eigen::Vector3d pos1 = p1, vel1 = v1;
-    for (int i = 0; i < steps; ++i) {
-        Eigen::Vector3d a = R * (acc_body - Eigen::Vector3d(0,0,9.81)) + gravity;
-        pos1 += vel1*dt + 0.5*a*dt*dt;
-        vel1 += a*dt;
+    for (int i = 0; i < steps; ++i)
+    {
+        Eigen::Vector3d a = R * (acc_body - Eigen::Vector3d(0, 0, 9.81)) + gravity;
+        pos1 += vel1 * dt + 0.5 * a * dt * dt;
+        vel1 += a * dt;
     }
 
     // 포즈 2
-    Eigen::Vector3d p2(10,5,2), v2(1,0.5,0);
+    Eigen::Vector3d p2(10, 5, 2), v2(1, 0.5, 0);
     Eigen::Vector3d pos2 = p2, vel2 = v2;
-    for (int i = 0; i < steps; ++i) {
-        Eigen::Vector3d a = R * (acc_body - Eigen::Vector3d(0,0,9.81)) + gravity;
-        pos2 += vel2*dt + 0.5*a*dt*dt;
-        vel2 += a*dt;
+    for (int i = 0; i < steps; ++i)
+    {
+        Eigen::Vector3d a = R * (acc_body - Eigen::Vector3d(0, 0, 9.81)) + gravity;
+        pos2 += vel2 * dt + 0.5 * a * dt * dt;
+        vel2 += a * dt;
     }
 
-    Eigen::Vector3d dp1 = R.transpose()*(pos1-p1-v1*T-0.5*gravity*T*T);
-    Eigen::Vector3d dp2 = R.transpose()*(pos2-p2-v2*T-0.5*gravity*T*T);
+    Eigen::Vector3d dp1 = R.transpose() * (pos1 - p1 - v1 * T - 0.5 * gravity * T * T);
+    Eigen::Vector3d dp2 = R.transpose() * (pos2 - p2 - v2 * T - 0.5 * gravity * T * T);
 
     std::cout << "  Δp (포즈1): " << dp1.transpose() << std::endl;
     std::cout << "  Δp (포즈2): " << dp2.transpose() << std::endl;
-    std::cout << "  차이: " << (dp1-dp2).norm() << " (거의 0)" << std::endl;
+    std::cout << "  차이: " << (dp1 - dp2).norm() << " (거의 0)" << std::endl;
 
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "핵심 정리:" << std::endl;

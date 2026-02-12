@@ -7,24 +7,25 @@
 #include <cmath>
 #include <random>
 
-Eigen::Matrix3d skew(const Eigen::Vector3d& v) {
+Eigen::Matrix3d skew(const Eigen::Vector3d& v)
+{
     Eigen::Matrix3d m;
-    m <<    0, -v.z(),  v.y(),
-         v.z(),     0, -v.x(),
-        -v.y(),  v.x(),     0;
+    m << 0, -v.z(), v.y(), v.z(), 0, -v.x(), -v.y(), v.x(), 0;
     return m;
 }
 
-Eigen::Matrix3d expSO3(const Eigen::Vector3d& omega) {
+Eigen::Matrix3d expSO3(const Eigen::Vector3d& omega)
+{
     double angle = omega.norm();
-    if (angle < 1e-10) return Eigen::Matrix3d::Identity();
+    if (angle < 1e-10)
+        return Eigen::Matrix3d::Identity();
     Eigen::Vector3d axis = omega / angle;
     Eigen::Matrix3d K = skew(axis);
-    return Eigen::Matrix3d::Identity()
-         + std::sin(angle) * K + (1.0 - std::cos(angle)) * K * K;
+    return Eigen::Matrix3d::Identity() + std::sin(angle) * K + (1.0 - std::cos(angle)) * K * K;
 }
 
-void problem1_gravity_leak() {
+void problem1_gravity_leak()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: 중력 누출 계산" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -46,21 +47,25 @@ void problem1_gravity_leak() {
     double p_drift = 0.5 * fake_accel * t * t;
 
     std::cout << "💡 풀이:" << std::endl;
-    std::cout << "  회전 오차: " << b_g_y << " × " << t << " = " << angle_error << " rad" << std::endl;
+    std::cout << "  회전 오차: " << b_g_y << " × " << t << " = " << angle_error << " rad"
+              << std::endl;
     std::cout << "  (≈ " << angle_error * 180 / M_PI << "도)\n" << std::endl;
 
     std::cout << "  중력 누출 (가짜 수평 가속도):" << std::endl;
-    std::cout << "    sin(" << angle_error << ") × " << g << " = " << fake_accel << " m/s²\n" << std::endl;
+    std::cout << "    sin(" << angle_error << ") × " << g << " = " << fake_accel << " m/s²\n"
+              << std::endl;
 
     std::cout << "  이 가짜 가속도가 2초간 적분되면:" << std::endl;
-    std::cout << "    p = 0.5 × " << fake_accel << " × " << t*t << " = " << p_drift << " m\n" << std::endl;
+    std::cout << "    p = 0.5 × " << fake_accel << " × " << t * t << " = " << p_drift << " m\n"
+              << std::endl;
 
     std::cout << "  핵심: 0.005 rad/s의 작은 바이어스가" << std::endl;
     std::cout << "  → 2초 만에 " << p_drift << "m 위치 오차를 만듦!" << std::endl;
     std::cout << "  → 자이로 바이어스가 가장 치명적인 이유" << std::endl;
 }
 
-void problem2_noise_vs_bias_drift() {
+void problem2_noise_vs_bias_drift()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: 노이즈 vs 바이어스 드리프트" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -83,7 +88,8 @@ void problem2_noise_vs_bias_drift() {
 
     // 시뮬레이션 (가) 노이즈만
     double v_noise = 0, p_noise = 0;
-    for (int i = 0; i < N; i++) {
+    for (int i = 0; i < N; i++)
+    {
         double a = noise(gen);
         v_noise += a * dt;
         p_noise += v_noise * dt;
@@ -91,7 +97,8 @@ void problem2_noise_vs_bias_drift() {
 
     // 시뮬레이션 (나) 바이어스만
     double v_bias = 0, p_bias = 0;
-    for (int i = 0; i < N; i++) {
+    for (int i = 0; i < N; i++)
+    {
         v_bias += b_a * dt;
         p_bias += v_bias * dt;
     }
@@ -106,15 +113,18 @@ void problem2_noise_vs_bias_drift() {
 
     std::cout << "  (나) 바이어스 드리프트 (10초 후):" << std::endl;
     std::cout << "    시뮬레이션: p = " << p_bias << " m" << std::endl;
-    std::cout << "    이론값: 0.5 × " << b_a << " × " << T*T << " = " << p_bias_theory << " m\n" << std::endl;
+    std::cout << "    이론값: 0.5 × " << b_a << " × " << T * T << " = " << p_bias_theory << " m\n"
+              << std::endl;
 
     std::cout << "  비교:" << std::endl;
-    std::cout << "    바이어스가 노이즈보다 " << std::abs(p_bias / p_noise) << "배 큰 드리프트!" << std::endl;
+    std::cout << "    바이어스가 노이즈보다 " << std::abs(p_bias / p_noise) << "배 큰 드리프트!"
+              << std::endl;
     std::cout << "    → 바이어스: t²에 비례 (확정적, 항상 같은 방향)" << std::endl;
     std::cout << "    → 노이즈: t^{3/2}에 비례 (확률적, 방향 무작위)" << std::endl;
 }
 
-void problem3_integration_comparison() {
+void problem3_integration_comparison()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: 직접 적분 vs Pre-integration" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -137,7 +147,9 @@ void problem3_integration_comparison() {
     std::cout << "💡 풀이:" << std::endl;
     std::cout << "  직접 적분:" << std::endl;
     std::cout << "    매 반복마다 " << total_imu << "개 재적분" << std::endl;
-    std::cout << "    총: " << total_imu << " × " << iterations << " = " << direct_ops << " 적분 연산\n" << std::endl;
+    std::cout << "    총: " << total_imu << " × " << iterations << " = " << direct_ops
+              << " 적분 연산\n"
+              << std::endl;
 
     std::cout << "  Pre-integration:" << std::endl;
     std::cout << "    최초 1회: " << total_imu << " 적분 연산" << std::endl;
@@ -148,7 +160,8 @@ void problem3_integration_comparison() {
     std::cout << "  → Pre-integration이 실시간 VIO를 가능하게 함" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 10 Quiz - Medium (IMU 적분 계산)" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

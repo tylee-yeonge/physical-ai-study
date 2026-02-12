@@ -5,7 +5,8 @@
 #include <iostream>
 #include <cmath>
 
-void problem1_imu_measurement_model() {
+void problem1_imu_measurement_model()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: IMU 측정 모델" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -22,7 +23,8 @@ void problem1_imu_measurement_model() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-void problem2_preintegrated_meaning() {
+void problem2_preintegrated_meaning()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: Pre-integrated 측정값의 의미" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -38,7 +40,8 @@ void problem2_preintegrated_meaning() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-void problem3_update_order() {
+void problem3_update_order()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: 업데이트 순서" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -57,7 +60,8 @@ void problem3_update_order() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-void problem4_state_recovery() {
+void problem4_state_recovery()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4: 상태 복원 공식" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -77,7 +81,8 @@ void problem4_state_recovery() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 7 Quiz - Easy (Pre-integration 수식 개념)" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

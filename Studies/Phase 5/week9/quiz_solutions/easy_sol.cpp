@@ -8,7 +8,8 @@
 #include <iostream>
 #include <string>
 
-void problem1_solution() {
+void problem1_solution()
+{
     std::cout << "\n";
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1 정답: C) PyTorch -> ONNX -> TensorRT" << std::endl;
@@ -27,11 +28,14 @@ void problem1_solution() {
     std::cout << "  - TensorRT: NVIDIA GPU에 특화된 추론 최적화 엔진" << std::endl;
     std::cout << std::endl;
     std::cout << "  ONNX는 '중간 언어' 역할을 합니다." << std::endl;
-    std::cout << "  PyTorch, TensorFlow 등 다양한 프레임워크에서 ONNX로 변환 가능하며," << std::endl;
-    std::cout << "  ONNX에서 TensorRT, OpenVINO 등 다양한 추론 엔진으로 변환할 수 있습니다." << std::endl;
+    std::cout << "  PyTorch, TensorFlow 등 다양한 프레임워크에서 ONNX로 변환 가능하며,"
+              << std::endl;
+    std::cout << "  ONNX에서 TensorRT, OpenVINO 등 다양한 추론 엔진으로 변환할 수 있습니다."
+              << std::endl;
 }
 
-void problem2_solution() {
+void problem2_solution()
+{
     std::cout << "\n";
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2 정답: C) 모델의 학습 정확도 향상" << std::endl;
@@ -46,14 +50,17 @@ void problem2_solution() {
     std::cout << std::endl;
     std::cout << "  C는 틀렸습니다!" << std::endl;
     std::cout << "  FP16은 '추론 최적화'입니다. 학습 정확도와는 관련 없습니다." << std::endl;
-    std::cout << "  오히려 FP16 변환 시 약간의 정밀도 손실(< 1%)이 발생할 수 있습니다." << std::endl;
-    std::cout << "  하지만 Depth Estimation에서는 이 손실이 무시할 수 있는 수준입니다." << std::endl;
+    std::cout << "  오히려 FP16 변환 시 약간의 정밀도 손실(< 1%)이 발생할 수 있습니다."
+              << std::endl;
+    std::cout << "  하지만 Depth Estimation에서는 이 손실이 무시할 수 있는 수준입니다."
+              << std::endl;
     std::cout << std::endl;
     std::cout << "  FP32: [1비트 부호][8비트 지수][23비트 가수]" << std::endl;
     std::cout << "  FP16: [1비트 부호][5비트 지수][10비트 가수]" << std::endl;
 }
 
-void problem3_solution() {
+void problem3_solution()
+{
     std::cout << "\n";
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3 정답: B) 정적 크기에서 최적화 가능" << std::endl;
@@ -77,7 +84,8 @@ void problem3_solution() {
     std::cout << "  - ViT 패치 크기(14)와의 호환성도 고려해야 합니다" << std::endl;
 }
 
-void problem4_solution() {
+void problem4_solution()
+{
     std::cout << "\n";
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4 정답: B) 약 2.36 MB" << std::endl;
@@ -93,7 +101,8 @@ void problem4_solution() {
     float mb = bytes / (1024.0f * 1024.0f);
 
     std::cout << "  총 요소 수: 1 x 3 x 384 x 512 = " << total << std::endl;
-    std::cout << "  FP32 메모리: " << total << " x 4 bytes = " << static_cast<int>(bytes) << " bytes" << std::endl;
+    std::cout << "  FP32 메모리: " << total << " x 4 bytes = " << static_cast<int>(bytes)
+              << " bytes" << std::endl;
     std::cout << "             = " << mb << " MB" << std::endl;
     std::cout << std::endl;
     std::cout << "  참고 - FP16이라면:" << std::endl;
@@ -103,7 +112,8 @@ void problem4_solution() {
     std::cout << "  입력 + 출력 + 중간 텐서의 메모리를 모두 합산해야 합니다." << std::endl;
 }
 
-void problem5_solution() {
+void problem5_solution()
+{
     std::cout << "\n";
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 5 정답: A) Conv + BN + ReLU를 하나의 커널로 합침" << std::endl;
@@ -111,7 +121,8 @@ void problem5_solution() {
     std::cout << std::endl;
 
     std::cout << "해설:" << std::endl;
-    std::cout << "  Layer Fusion은 연속된 레이어들을 하나의 CUDA 커널로 합치는 기법입니다." << std::endl;
+    std::cout << "  Layer Fusion은 연속된 레이어들을 하나의 CUDA 커널로 합치는 기법입니다."
+              << std::endl;
     std::cout << std::endl;
     std::cout << "  Before fusion (3번의 커널 실행 + 2번의 메모리 읽기/쓰기):" << std::endl;
     std::cout << "    GPU Mem -> Conv -> GPU Mem -> BN -> GPU Mem -> ReLU -> GPU Mem" << std::endl;
@@ -130,7 +141,8 @@ void problem5_solution() {
     std::cout << "  - Memory Optimization: 텐서 재사용, 메모리 풀링" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "  Week 9 Quiz - Easy 정답 (C++)" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

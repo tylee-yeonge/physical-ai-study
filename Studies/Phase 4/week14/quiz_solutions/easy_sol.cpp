@@ -5,7 +5,8 @@
 #include <iostream>
 #include <cmath>
 
-void problem1_solution() {
+void problem1_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1 풀이: Kalibr 입력 데이터" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -24,7 +25,8 @@ void problem1_solution() {
     std::cout << "       타겟의 3D 좌표는 tagSize로부터 결정됨" << std::endl;
 }
 
-void problem2_solution() {
+void problem2_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2 풀이: 데이터 수집" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -45,7 +47,8 @@ void problem2_solution() {
     std::cout << "    5. 60~120초 촬영" << std::endl;
 }
 
-void problem3_solution() {
+void problem3_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3 풀이: Reprojection Error" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -67,7 +70,8 @@ void problem3_solution() {
     std::cout << "    4. 데이터 부족 → 더 다양한 운동으로 재촬영" << std::endl;
 }
 
-void problem4_solution() {
+void problem4_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4 풀이: tagSize 오차의 영향" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -82,15 +86,15 @@ void problem4_solution() {
     double wrong_size = 0.080;
     double scale = wrong_size / true_size;
 
-    std::cout << "    잘못된 tagSize: " << wrong_size << "m (실제: " << true_size << "m)" << std::endl;
+    std::cout << "    잘못된 tagSize: " << wrong_size << "m (실제: " << true_size << "m)"
+              << std::endl;
     std::cout << "    스케일 비: " << scale << "\n" << std::endl;
 
     std::cout << "  영향:" << std::endl;
     std::cout << "    (A) 회전 R: 스케일과 무관 → 영향 없음" << std::endl;
     std::cout << "    (B) 초점거리: 약간 영향 (보통 무시 가능)" << std::endl;
     std::cout << "    (C) 병진 t: 직접적 스케일 영향 ✓" << std::endl;
-    std::cout << "        → 실제 t = 7cm인데 " << 7.0 * scale
-              << "cm로 추정됨" << std::endl;
+    std::cout << "        → 실제 t = 7cm인데 " << 7.0 * scale << "cm로 추정됨" << std::endl;
     std::cout << "    (D) 시간 td: 스케일과 무관\n" << std::endl;
 
     std::cout << "  교훈:" << std::endl;
@@ -98,7 +102,8 @@ void problem4_solution() {
     std::cout << "    → mm 단위까지 정확하게 기입" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 14 Quiz Easy - 풀이" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

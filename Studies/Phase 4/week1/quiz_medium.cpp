@@ -8,7 +8,8 @@
 #include <Eigen/Dense>
 #include <cmath>
 
-void problem1_gravity_in_body() {
+void problem1_gravity_in_body()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: Body Frame에서의 중력" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -25,9 +26,7 @@ void problem1_gravity_in_body() {
 
     double angle = M_PI / 4.0;  // 45도
     Eigen::Matrix3d R_wb;
-    R_wb << 1, 0, 0,
-            0, cos(angle), -sin(angle),
-            0, sin(angle), cos(angle);
+    R_wb << 1, 0, 0, 0, cos(angle), -sin(angle), 0, sin(angle), cos(angle);
 
     Eigen::Vector3d g_world(0, 0, -9.81);
 
@@ -37,7 +36,8 @@ void problem1_gravity_in_body() {
     std::cout << "답: _____\n" << std::endl;
 }
 
-void problem2_accel_measurement() {
+void problem2_accel_measurement()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: 가속도계 측정값 계산" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -60,7 +60,8 @@ void problem2_accel_measurement() {
     std::cout << "답: _____\n" << std::endl;
 }
 
-void problem3_drift_estimation() {
+void problem3_drift_estimation()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: 바이어스에 의한 위치 드리프트" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -78,7 +79,8 @@ void problem3_drift_estimation() {
     std::cout << "답: _____\n" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Phase 4 Week 1 Quiz - Medium" << std::endl;
     std::cout << "IMU 센서 이해 (Eigen 계산)" << std::endl;

@@ -5,7 +5,8 @@
 #include <iostream>
 #include <cmath>
 
-void problem1_solution() {
+void problem1_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1 풀이: Factor Graph 구성요소" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -18,7 +19,8 @@ void problem1_solution() {
     std::cout << "    (다) 바이어스 {b_a, b_g}: IMU 센서 오차\n" << std::endl;
 
     std::cout << "  팩터 노드 (제약 조건 = 측정에서 유도):" << std::endl;
-    std::cout << "    (A) 재투영 오차: 3D 점이 이미지에 투영된 위치와 실제 관측의 차이" << std::endl;
+    std::cout << "    (A) 재투영 오차: 3D 점이 이미지에 투영된 위치와 실제 관측의 차이"
+              << std::endl;
     std::cout << "    (B) Pre-integrated measurement: IMU로 측정한 상대 운동" << std::endl;
     std::cout << "    (C) Random Walk 제약: 바이어스가 천천히 변한다는 사전 지식\n" << std::endl;
 
@@ -27,7 +29,8 @@ void problem1_solution() {
     std::cout << "    팩터 = '어떤 측정/제약이 있는가'" << std::endl;
 }
 
-void problem2_solution() {
+void problem2_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2 풀이: IMU Factor 잔차" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -48,7 +51,8 @@ void problem2_solution() {
     std::cout << "\n    상태에 오차가 있으면 → 잔차 ≠ 0 → 최적화가 줄여줌" << std::endl;
 }
 
-void problem3_solution() {
+void problem3_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3 풀이: 정보 행렬의 역할" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -71,7 +75,8 @@ void problem3_solution() {
     std::cout << "    → 같은 원리를 Factor Graph로 일반화한 것!" << std::endl;
 }
 
-void problem4_solution() {
+void problem4_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4 풀이: Sliding Window" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -98,7 +103,8 @@ void problem4_solution() {
     std::cout << "    → 항상 10개만 최적화 → 일정한 계산 시간" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 8 Quiz Easy - 풀이" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

@@ -4,11 +4,12 @@
 
 #include <iostream>
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 8 Quiz Solutions (Medium)" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
-    
+
     std::cout << "Q1. Ceres의 Jet 타입은 무엇을 저장하나요?\n";
     std::cout << "정답: 값(value)과 미분(derivative)을 동시에 저장\n";
     std::cout << "설명:\n";
@@ -20,7 +21,7 @@ int main() {
     std::cout << "    Jet.a = x² + y (값)\n";
     std::cout << "    Jet.v[0] = 2x (∂f/∂x)\n";
     std::cout << "    Jet.v[1] = 1  (∂f/∂y)\n\n";
-    
+
     std::cout << "Q2. DENSE_SCHUR solver를 사용하는 이유는?\n";
     std::cout << "정답: BA의 구조를 활용한 효율적 해법\n";
     std::cout << "설명:\n";
@@ -35,7 +36,7 @@ int main() {
     std::cout << "  - 카메라 변수만 직접 최적화 (차원 감소)\n";
     std::cout << "  - 점들은 closed-form 업데이트\n";
     std::cout << "  - 10-100배 빠름!\n\n";
-    
+
     std::cout << "Q3. Ceres vs g2o를 각각 언제 사용할지:\n";
     std::cout << "정답:\n";
     std::cout << "  Ceres 권장:\n";
@@ -56,8 +57,8 @@ int main() {
     std::cout << "  - 개발 초기: Ceres로 빠르게 구현\n";
     std::cout << "  - 성능 최적화 단계: g2o로 전환 고려\n";
     std::cout << "  - 혼용도 가능: 각 모듈에 적합한 것 선택\n";
-    
+
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
-    
+
     return 0;
 }

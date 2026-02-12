@@ -5,13 +5,15 @@
 #include <iostream>
 #include <cmath>
 
-void problem1_why_ekf() {
+void problem1_why_ekf()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: EKF가 필요한 이유" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
     std::cout << "질문: 일반 칼만 필터 대신 EKF를 써야 하는\n"
-              << "      상황 3가지는?\n" << std::endl;
+              << "      상황 3가지는?\n"
+              << std::endl;
 
     std::cout << "💡 답:" << std::endl;
     std::cout << "   1. IMU 적분: R(θ)·a → 회전×가속도 (비선형)" << std::endl;
@@ -19,7 +21,8 @@ void problem1_why_ekf() {
     std::cout << "   3. 쿼터니언 회전: q⊗δq (비선형 곱셈)" << std::endl;
 }
 
-void problem2_jacobian_meaning() {
+void problem2_jacobian_meaning()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: 자코비안의 의미" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -33,13 +36,15 @@ void problem2_jacobian_meaning() {
     std::cout << "   주의: 상태 예측은 f(x) 그대로 사용!" << std::endl;
 }
 
-void problem3_linearization_error() {
+void problem3_linearization_error()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: 선형화 오차" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
     std::cout << "질문: f(x) = x²을 x=3에서 선형화하면?\n"
-              << "      x=4에서의 실제값과 근사값의 차이는?\n" << std::endl;
+              << "      x=4에서의 실제값과 근사값의 차이는?\n"
+              << std::endl;
 
     double x0 = 3.0;
     double f_x0 = x0 * x0;
@@ -51,12 +56,15 @@ void problem3_linearization_error() {
 
     std::cout << "💡 답:" << std::endl;
     std::cout << "   f(3) = " << f_x0 << ", f'(3) = " << df_x0 << std::endl;
-    std::cout << "   선형 근사: f(4) ≈ " << f_x0 << " + " << df_x0 << "×(4-3) = " << f_approx << std::endl;
+    std::cout << "   선형 근사: f(4) ≈ " << f_x0 << " + " << df_x0 << "×(4-3) = " << f_approx
+              << std::endl;
     std::cout << "   실제값:    f(4) = " << f_actual << std::endl;
-    std::cout << "   오차: " << std::abs(f_actual - f_approx) << " (비선형 → 근사 오차)" << std::endl;
+    std::cout << "   오차: " << std::abs(f_actual - f_approx) << " (비선형 → 근사 오차)"
+              << std::endl;
 }
 
-void problem4_ekf_vs_optimization() {
+void problem4_ekf_vs_optimization()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4: EKF vs 최적화" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -70,7 +78,8 @@ void problem4_ekf_vs_optimization() {
     std::cout << "   4. 단, EKF가 더 빠름 → 리소스 제한 시 유리" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 4 Quiz - Easy" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

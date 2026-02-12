@@ -14,7 +14,8 @@
 #include <vector>
 #include <numeric>
 
-void problem1_preprocessing_order() {
+void problem1_preprocessing_order()
+{
     std::cout << "\n";
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: TensorRT 전처리 파이프라인 순서" << std::endl;
@@ -41,7 +42,8 @@ void problem1_preprocessing_order() {
     // TODO: 정답을 작성하세요
 }
 
-void problem2_memory_calculation() {
+void problem2_memory_calculation()
+{
     std::cout << "\n";
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: Jetson GPU 메모리 사용량 계산" << std::endl;
@@ -85,7 +87,8 @@ void problem2_memory_calculation() {
     std::cout << "  (정답은 quiz_solutions/medium_sol.cpp 참고)" << std::endl;
 }
 
-void problem3_fps_analysis() {
+void problem3_fps_analysis()
+{
     std::cout << "\n";
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: FPS 측정 결과 분석" << std::endl;
@@ -98,21 +101,24 @@ void problem3_fps_analysis() {
     // 시뮬레이션 데이터
     std::vector<float> inference_times;
     // 처음 10프레임은 워밍업 (느림)
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; i++)
+    {
         inference_times.push_back(120.0f + i * 5.0f);
     }
     // 나머지 90프레임은 안정적
-    for (int i = 0; i < 90; i++) {
+    for (int i = 0; i < 90; i++)
+    {
         inference_times.push_back(55.0f + (i % 10) * 1.0f);
     }
 
     // 전체 평균
-    float total_avg = std::accumulate(inference_times.begin(), inference_times.end(), 0.0f)
-                      / inference_times.size();
+    float total_avg = std::accumulate(inference_times.begin(), inference_times.end(), 0.0f) /
+                      inference_times.size();
 
     // 워밍업 제외 평균
     float stable_sum = 0.0f;
-    for (int i = 10; i < 100; i++) {
+    for (int i = 10; i < 100; i++)
+    {
         stable_sum += inference_times[i];
     }
     float stable_avg = stable_sum / 90.0f;
@@ -142,7 +148,8 @@ void problem3_fps_analysis() {
     // TODO: 정답을 작성하세요
 }
 
-void problem4_code_analysis() {
+void problem4_code_analysis()
+{
     std::cout << "\n";
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4: TensorRT 추론 코드 버그 찾기" << std::endl;
@@ -180,7 +187,8 @@ void problem4_code_analysis() {
     // TODO: 정답을 작성하세요
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "  Week 9 Quiz - Medium (C++)" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

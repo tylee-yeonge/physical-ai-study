@@ -5,7 +5,8 @@
 #include <iostream>
 #include <cmath>
 
-void problem1_noise_types() {
+void problem1_noise_types()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: IMU 노이즈 종류" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -20,7 +21,8 @@ void problem1_noise_types() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-void problem2_bias_random_walk() {
+void problem2_bias_random_walk()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: Bias Random Walk" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -36,7 +38,8 @@ void problem2_bias_random_walk() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-void problem3_allan_variance() {
+void problem3_allan_variance()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: Allan Variance" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -52,7 +55,8 @@ void problem3_allan_variance() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-void problem4_noise_units() {
+void problem4_noise_units()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4: 노이즈 파라미터 단위" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -68,7 +72,8 @@ void problem4_noise_units() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 2 Quiz - Easy (IMU 노이즈 모델)" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

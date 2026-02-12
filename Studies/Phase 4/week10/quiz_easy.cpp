@@ -5,7 +5,8 @@
 #include <iostream>
 #include <cmath>
 
-void problem1_drift_causes() {
+void problem1_drift_causes()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: 드리프트의 원인" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -20,7 +21,8 @@ void problem1_drift_causes() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-void problem2_gravity_compensation() {
+void problem2_gravity_compensation()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: 중력 보상" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -36,7 +38,8 @@ void problem2_gravity_compensation() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-void problem3_drift_magnitude() {
+void problem3_drift_magnitude()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: 드리프트 크기 추정" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -52,7 +55,8 @@ void problem3_drift_magnitude() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-void problem4_vio_motivation() {
+void problem4_vio_motivation()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4: VIO 동기" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -67,7 +71,8 @@ void problem4_vio_motivation() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 10 Quiz - Easy (IMU 적분 개념)" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

@@ -10,7 +10,8 @@
 using namespace Eigen;
 using namespace std;
 
-void problem1_solution() {
+void problem1_solution()
+{
     cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 1 풀이: 중력 방향 오차 전파" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
@@ -28,7 +29,8 @@ void problem1_solution() {
     cout << "  theta (deg) │ delta_g (m/s²)  │ 5초 후 위치 오차 (m)" << endl;
     cout << "  ────────────┼─────────────────┼─────────────────────" << endl;
 
-    for (double theta_deg : thetas_deg) {
+    for (double theta_deg : thetas_deg)
+    {
         double theta_rad = theta_deg * M_PI / 180.0;
 
         Vector3d g_wrong(g_mag * sin(theta_rad), 0, -g_mag * cos(theta_rad));
@@ -36,8 +38,8 @@ void problem1_solution() {
         double delta_g_norm = delta_g.norm();
         double pos_error = 0.5 * delta_g_norm * t * t;
 
-        printf("    %4.1f°      │     %7.4f      │      %7.3f\n",
-               theta_deg, delta_g_norm, pos_error);
+        printf("    %4.1f°      │     %7.4f      │      %7.3f\n", theta_deg, delta_g_norm,
+               pos_error);
     }
 
     cout << "\n  상세 풀이 (theta = 1.0도):" << endl;
@@ -49,8 +51,9 @@ void problem1_solution() {
     cout << "    g_true  = [" << g_true.transpose() << "]" << endl;
     cout << "    delta_g = [" << delta_g_1.transpose() << "]" << endl;
     cout << "    |delta_g| = " << delta_g_1.norm() << " m/s^2" << endl;
-    cout << "    pos_error = 0.5 * " << delta_g_1.norm() << " * 25 = "
-         << 0.5 * delta_g_1.norm() * 25 << " m\n" << endl;
+    cout << "    pos_error = 0.5 * " << delta_g_1.norm()
+         << " * 25 = " << 0.5 * delta_g_1.norm() * 25 << " m\n"
+         << endl;
 
     cout << "  추가 질문 답: theta = 0.1도일 때" << endl;
     double theta_01 = 0.1 * M_PI / 180.0;
@@ -65,24 +68,19 @@ void problem1_solution() {
     cout << "    → VIO 초기화에서 중력 추정이 매우 중요한 이유" << endl;
 }
 
-void problem2_solution() {
+void problem2_solution()
+{
     cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 2 풀이: 스케일 추정 (최소자승법)" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
 
     MatrixXd sfm_displacements(5, 3);
-    sfm_displacements << 0.30, 0.00, 0.02,
-                          0.28, 0.05, -0.01,
-                          0.32, -0.03, 0.01,
-                          0.15, 0.20, 0.00,
-                          0.25, 0.10, -0.02;
+    sfm_displacements << 0.30, 0.00, 0.02, 0.28, 0.05, -0.01, 0.32, -0.03, 0.01, 0.15, 0.20, 0.00,
+        0.25, 0.10, -0.02;
 
     MatrixXd imu_displacements(5, 3);
-    imu_displacements << 0.90, 0.01, 0.06,
-                          0.85, 0.14, -0.02,
-                          0.95, -0.08, 0.04,
-                          0.45, 0.61, 0.01,
-                          0.76, 0.29, -0.05;
+    imu_displacements << 0.90, 0.01, 0.06, 0.85, 0.14, -0.02, 0.95, -0.08, 0.04, 0.45, 0.61, 0.01,
+        0.76, 0.29, -0.05;
 
     cout << "  Step 1: 최소자승 해 유도\n" << endl;
     cout << "    모델: imu_i = s * sfm_i + e_i" << endl;
@@ -95,7 +93,8 @@ void problem2_solution() {
     double numerator = 0.0;
     double denominator = 0.0;
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++)
+    {
         Vector3d sfm_i = sfm_displacements.row(i).transpose();
         Vector3d imu_i = imu_displacements.row(i).transpose();
         double dot_si = sfm_i.dot(imu_i);
@@ -103,8 +102,7 @@ void problem2_solution() {
         numerator += dot_si;
         denominator += dot_ss;
 
-        printf("    i=%d: sfm.imu = %7.4f, sfm.sfm = %7.4f\n",
-               i, dot_si, dot_ss);
+        printf("    i=%d: sfm.imu = %7.4f, sfm.sfm = %7.4f\n", i, dot_si, dot_ss);
     }
 
     double s = numerator / denominator;
@@ -119,7 +117,8 @@ void problem2_solution() {
     cout << "    ──┼───────────────────────" << endl;
 
     double total_residual = 0.0;
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++)
+    {
         Vector3d sfm_i = sfm_displacements.row(i).transpose();
         Vector3d imu_i = imu_displacements.row(i).transpose();
         double residual = (imu_i - s * sfm_i).norm();
@@ -130,22 +129,16 @@ void problem2_solution() {
     cout << "    → 잔차가 작으면 스케일 추정이 신뢰할 만함" << endl;
 }
 
-void problem3_solution() {
+void problem3_solution()
+{
     cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 3 풀이: 자이로 바이어스 추정" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
 
     MatrixXd gyro_measurements(10, 3);
-    gyro_measurements <<  0.0023, -0.0008,  0.0018,
-                           0.0018, -0.0013,  0.0012,
-                           0.0021, -0.0009,  0.0016,
-                           0.0019, -0.0011,  0.0014,
-                           0.0022, -0.0007,  0.0017,
-                           0.0017, -0.0012,  0.0013,
-                           0.0024, -0.0010,  0.0019,
-                           0.0020, -0.0009,  0.0015,
-                           0.0021, -0.0011,  0.0016,
-                           0.0016, -0.0010,  0.0010;
+    gyro_measurements << 0.0023, -0.0008, 0.0018, 0.0018, -0.0013, 0.0012, 0.0021, -0.0009, 0.0016,
+        0.0019, -0.0011, 0.0014, 0.0022, -0.0007, 0.0017, 0.0017, -0.0012, 0.0013, 0.0024, -0.0010,
+        0.0019, 0.0020, -0.0009, 0.0015, 0.0021, -0.0011, 0.0016, 0.0016, -0.0010, 0.0010;
 
     Vector3d b_g_true(0.002, -0.001, 0.0015);
 
@@ -153,34 +146,32 @@ void problem3_solution() {
     cout << "    b_g_hat = (1/N) * Σ omega_i\n" << endl;
 
     Vector3d b_g_hat = Vector3d::Zero();
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; i++)
+    {
         b_g_hat += gyro_measurements.row(i).transpose();
     }
     b_g_hat /= 10.0;
 
     cout << "    추정된 바이어스:" << endl;
-    printf("      b_g_hat = [%8.5f, %8.5f, %8.5f] rad/s\n",
-           b_g_hat(0), b_g_hat(1), b_g_hat(2));
+    printf("      b_g_hat = [%8.5f, %8.5f, %8.5f] rad/s\n", b_g_hat(0), b_g_hat(1), b_g_hat(2));
     printf("    실제 바이어스:\n");
-    printf("      b_g_true = [%8.5f, %8.5f, %8.5f] rad/s\n",
-           b_g_true(0), b_g_true(1), b_g_true(2));
+    printf("      b_g_true = [%8.5f, %8.5f, %8.5f] rad/s\n", b_g_true(0), b_g_true(1), b_g_true(2));
     printf("    추정 오차:\n");
     Vector3d error = b_g_hat - b_g_true;
-    printf("      error   = [%8.5f, %8.5f, %8.5f] rad/s\n",
-           error(0), error(1), error(2));
+    printf("      error   = [%8.5f, %8.5f, %8.5f] rad/s\n", error(0), error(1), error(2));
 
     cout << "\n  Step 2: 표준편차 계산\n" << endl;
     cout << "    sigma = sqrt( (1/(N-1)) * Σ(omega_i - b_g_hat)^2 )\n" << endl;
 
     Vector3d sigma = Vector3d::Zero();
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; i++)
+    {
         Vector3d diff = gyro_measurements.row(i).transpose() - b_g_hat;
         sigma += diff.cwiseProduct(diff);
     }
     sigma = (sigma / 9.0).cwiseSqrt();  // N-1 = 9 (표본 표준편차)
 
-    printf("    sigma = [%8.5f, %8.5f, %8.5f] rad/s\n",
-           sigma(0), sigma(1), sigma(2));
+    printf("    sigma = [%8.5f, %8.5f, %8.5f] rad/s\n", sigma(0), sigma(1), sigma(2));
 
     cout << "\n  Step 3: 바이어스 크기\n" << endl;
     printf("    ||b_g_hat|| = %8.5f rad/s\n", b_g_hat.norm());
@@ -191,14 +182,14 @@ void problem3_solution() {
     cout << "    ──┼─────────────────────┼───────────────────────────" << endl;
 
     double sum_before = 0, sum_after = 0;
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; i++)
+    {
         Vector3d omega_i = gyro_measurements.row(i).transpose();
         double before = omega_i.norm();
         double after = (omega_i - b_g_hat).norm();
         sum_before += before;
         sum_after += after;
-        printf("    %2d│       %8.5f       │          %8.5f\n",
-               i+1, before, after);
+        printf("    %2d│       %8.5f       │          %8.5f\n", i + 1, before, after);
     }
 
     cout << "\n    평균 잔차:" << endl;
@@ -213,7 +204,8 @@ void problem3_solution() {
     cout << "    → 실제 VIO에서는 더 정교한 방법 사용 (움직이면서 추정)" << endl;
 }
 
-int main() {
+int main()
+{
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "Week 11 Quiz Medium - 풀이" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;

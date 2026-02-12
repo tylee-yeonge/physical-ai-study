@@ -5,7 +5,8 @@
 #include <iostream>
 #include <cmath>
 
-void problem1_solution() {
+void problem1_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1 풀이: 드리프트의 원인" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -30,7 +31,8 @@ void problem1_solution() {
     std::cout << "    → 바이어스이므로 확정적으로 누적 → 더 치명적!" << std::endl;
 }
 
-void problem2_solution() {
+void problem2_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2 풀이: 중력 보상" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -51,7 +53,8 @@ void problem2_solution() {
     std::cout << "    a_world = I·[0,0,9.81] + [0,0,-9.81] = [0,0,0] ✓" << std::endl;
 }
 
-void problem3_solution() {
+void problem3_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3 풀이: 드리프트 크기 추정" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -64,7 +67,7 @@ void problem3_solution() {
 
     std::cout << "  바이어스에 의한 위치 드리프트:" << std::endl;
     std::cout << "    p = 0.5 · b_a · t²" << std::endl;
-    std::cout << "    = 0.5 × " << b_a << " × " << t*t << std::endl;
+    std::cout << "    = 0.5 × " << b_a << " × " << t * t << std::endl;
     std::cout << "    = " << p_drift << " m\n" << std::endl;
 
     std::cout << "  유도:" << std::endl;
@@ -72,13 +75,15 @@ void problem3_solution() {
     std::cout << "    p(t) = ∫v dt = 0.5·b_a·t² (이차 함수)\n" << std::endl;
 
     std::cout << "  시간별:" << std::endl;
-    for (double ti : {1.0, 5.0, 10.0, 30.0}) {
+    for (double ti : {1.0, 5.0, 10.0, 30.0})
+    {
         printf("    t=%4.0fs: p = %.2f m\n", ti, 0.5 * b_a * ti * ti);
     }
     std::cout << "  → 시간의 제곱에 비례해서 빠르게 발산!" << std::endl;
 }
 
-void problem4_solution() {
+void problem4_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4 풀이: VIO 동기" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -101,7 +106,8 @@ void problem4_solution() {
     std::cout << "    → 무시하면 이차 함수 드리프트 발생" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 10 Quiz Easy - 풀이" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

@@ -8,47 +8,47 @@
 #include "basic.h"
 #include <iostream>
 
-double FeatureDetectionBasic::detectFAST(const cv::Mat& image,
-                                         std::vector<cv::KeyPoint>& keypoints,
-                                         int threshold,
-                                         bool nonmaxSuppression) {
+double FeatureDetectionBasic::detectFAST(const cv::Mat& image, std::vector<cv::KeyPoint>& keypoints,
+                                         int threshold, bool nonmaxSuppression)
+{
     // TODO: cv::FAST() 사용, 시간 측정 후 반환 (ms)
     return 0.0;
 }
 
-double FeatureDetectionBasic::detectORB(const cv::Mat& image,
-                                        std::vector<cv::KeyPoint>& keypoints,
-                                        cv::Mat& descriptors,
-                                        int nfeatures) {
+double FeatureDetectionBasic::detectORB(const cv::Mat& image, std::vector<cv::KeyPoint>& keypoints,
+                                        cv::Mat& descriptors, int nfeatures)
+{
     // TODO: cv::ORB::create() 사용, detectAndCompute
     return 0.0;
 }
 
 void FeatureDetectionBasic::visualizeKeypoints(const cv::Mat& image,
-                                                const std::vector<cv::KeyPoint>& keypoints,
-                                                cv::Mat& output,
-                                                const std::string& title) {
+                                               const std::vector<cv::KeyPoint>& keypoints,
+                                               cv::Mat& output, const std::string& title)
+{
     // TODO: cv::drawKeypoints 사용
 }
 
-cv::Mat FeatureDetectionBasic::analyzeDistribution(
-    const std::vector<cv::KeyPoint>& keypoints,
-    cv::Size imageSize,
-    int gridSize) {
+cv::Mat FeatureDetectionBasic::analyzeDistribution(const std::vector<cv::KeyPoint>& keypoints,
+                                                   cv::Size imageSize, int gridSize)
+{
     // TODO: 이미지를 gridSize x gridSize로 나누고 각 셀의 특징점 개수 계산
     return cv::Mat::zeros(gridSize, gridSize, CV_32S);
 }
 
-void FeatureDetectionBasic::compareDetectors(const cv::Mat& image) {
+void FeatureDetectionBasic::compareDetectors(const cv::Mat& image)
+{
     // TODO: FAST vs ORB 비교
 }
 
-void FeatureDetectionBasic::demoNMS(const cv::Mat& image) {
+void FeatureDetectionBasic::demoNMS(const cv::Mat& image)
+{
     // TODO: Non-Maximum Suppression 데모
 }
 
 #ifndef MY_BASIC_LIB_ONLY
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "  [내 구현] 특징점 검출 데모" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;

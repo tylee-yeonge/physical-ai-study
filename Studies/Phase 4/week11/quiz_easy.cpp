@@ -4,7 +4,8 @@
 
 #include <iostream>
 
-void problem1_initialization_unknowns() {
+void problem1_initialization_unknowns()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: 초기화 미지수" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -16,10 +17,12 @@ void problem1_initialization_unknowns() {
     std::cout << "   d) 자이로 바이어스 (gyro bias)\n" << std::endl;
     std::cout << "   답: _____\n" << std::endl;
 
-    std::cout << "   💡 힌트: 카메라 내부 파라미터는 사전 캘리브레이션으로 이미 알고 있습니다.\n" << std::endl;
+    std::cout << "   💡 힌트: 카메라 내부 파라미터는 사전 캘리브레이션으로 이미 알고 있습니다.\n"
+              << std::endl;
 }
 
-void problem2_scale_ambiguity() {
+void problem2_scale_ambiguity()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: 스케일 모호성" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -36,7 +39,8 @@ void problem2_scale_ambiguity() {
     std::cout << "            이미지가 같을 수 있습니다.\n" << std::endl;
 }
 
-void problem3_gravity_estimation() {
+void problem3_gravity_estimation()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: 중력 방향 추정" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -52,7 +56,8 @@ void problem3_gravity_estimation() {
     std::cout << "            단위 구 위의 한 점으로 표현할 수 있습니다.\n" << std::endl;
 }
 
-void problem4_initialization_failure() {
+void problem4_initialization_failure()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4: 초기화 실패 원인" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -68,7 +73,8 @@ void problem4_initialization_failure() {
     std::cout << "            정지 상태에서 시차는 얼마인가요?\n" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 11 Quiz - Easy" << std::endl;
     std::cout << "VIO 초기화 문제" << std::endl;

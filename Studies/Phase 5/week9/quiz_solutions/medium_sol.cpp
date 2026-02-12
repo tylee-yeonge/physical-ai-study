@@ -11,7 +11,8 @@
 #include <vector>
 #include <numeric>
 
-void problem1_solution() {
+void problem1_solution()
+{
     std::cout << "\n";
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1 정답: A) (c) -> (d) -> (e) -> (a) -> (b)" << std::endl;
@@ -45,7 +46,8 @@ void problem1_solution() {
     std::cout << "  NCHW 변환은 GPU에 올리기 직전(마지막)에 수행합니다." << std::endl;
 }
 
-void problem2_solution() {
+void problem2_solution()
+{
     std::cout << "\n";
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2 정답: Jetson 메모리 분석" << std::endl;
@@ -79,10 +81,12 @@ void problem2_solution() {
     std::cout << "  1. FP16 사용 (FP32 대비 ~40% 절약)" << std::endl;
     std::cout << "  2. 작은 모델 선택 (ViT-S > ViT-B > ViT-L)" << std::endl;
     std::cout << "  3. Zero-copy 활용 (cudaHostAllocMapped)" << std::endl;
-    std::cout << "  4. 불필요한 GUI 끄기 (sudo systemctl set-default multi-user.target)" << std::endl;
+    std::cout << "  4. 불필요한 GUI 끄기 (sudo systemctl set-default multi-user.target)"
+              << std::endl;
 }
 
-void problem3_solution() {
+void problem3_solution()
+{
     std::cout << "\n";
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3 정답: B) 초기화 오버헤드 포함" << std::endl;
@@ -114,7 +118,8 @@ void problem3_solution() {
     std::cout << "  - 전처리 + 추론 + 후처리 모두 포함" << std::endl;
 }
 
-void problem4_solution() {
+void problem4_solution()
+{
     std::cout << "\n";
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4 정답: B) cudaStreamSynchronize 누락" << std::endl;
@@ -147,7 +152,8 @@ void problem4_solution() {
     std::cout << "  - cudaEventSynchronize(event): 특정 이벤트 대기" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "  Week 9 Quiz - Medium 정답 (C++)" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

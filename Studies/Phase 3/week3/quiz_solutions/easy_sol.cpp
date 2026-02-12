@@ -1,7 +1,8 @@
 // Week 3 정답
 #include <iostream>
 
-int main() {
+int main()
+{
     std::cout << "Week 3 정답\n" << std::endl;
     std::cout << "1. 3D+2D → [R|t]" << std::endl;
     std::cout << "2. P3P: 최소3점, EPnP: O(n)" << std::endl;

@@ -6,15 +6,15 @@
 #include <Eigen/Dense>
 #include <cmath>
 
-Eigen::Matrix3d skew(const Eigen::Vector3d& v) {
+Eigen::Matrix3d skew(const Eigen::Vector3d& v)
+{
     Eigen::Matrix3d m;
-    m <<    0, -v.z(),  v.y(),
-         v.z(),     0, -v.x(),
-        -v.y(),  v.x(),     0;
+    m << 0, -v.z(), v.y(), v.z(), 0, -v.x(), -v.y(), v.x(), 0;
     return m;
 }
 
-void problem1_covariance_propagation() {
+void problem1_covariance_propagation()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: 공분산 전파 1스텝" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -34,19 +34,19 @@ void problem1_covariance_propagation() {
 
     // A 행렬
     Eigen::Matrix<double, 9, 9> A = Eigen::Matrix<double, 9, 9>::Identity();
-    A.block<3,3>(0,0) += -skew(gyro) * dt;  // = I (gyro=0)
-    A.block<3,3>(3,0) = -delta_R * skew(acc) * dt;
-    A.block<3,3>(6,3) = Eigen::Matrix3d::Identity() * dt;
+    A.block<3, 3>(0, 0) += -skew(gyro) * dt;  // = I (gyro=0)
+    A.block<3, 3>(3, 0) = -delta_R * skew(acc) * dt;
+    A.block<3, 3>(6, 3) = Eigen::Matrix3d::Identity() * dt;
 
     // B 행렬
     Eigen::Matrix<double, 9, 6> B = Eigen::Matrix<double, 9, 6>::Zero();
-    B.block<3,3>(0,0) = -Eigen::Matrix3d::Identity() * dt;
-    B.block<3,3>(3,3) = -delta_R * dt;
+    B.block<3, 3>(0, 0) = -Eigen::Matrix3d::Identity() * dt;
+    B.block<3, 3>(3, 3) = -delta_R * dt;
 
     // Q 행렬
     Eigen::Matrix<double, 6, 6> Q = Eigen::Matrix<double, 6, 6>::Zero();
-    Q.block<3,3>(0,0) = Eigen::Matrix3d::Identity() * sigma_gyro * sigma_gyro / dt;
-    Q.block<3,3>(3,3) = Eigen::Matrix3d::Identity() * sigma_acc * sigma_acc / dt;
+    Q.block<3, 3>(0, 0) = Eigen::Matrix3d::Identity() * sigma_gyro * sigma_gyro / dt;
+    Q.block<3, 3>(3, 3) = Eigen::Matrix3d::Identity() * sigma_acc * sigma_acc / dt;
 
     // 초기 Σ = 0
     Eigen::Matrix<double, 9, 9> Sigma = Eigen::Matrix<double, 9, 9>::Zero();
@@ -64,14 +64,16 @@ void problem1_covariance_propagation() {
     std::cout << "    σ²_position = 0 (속도 불확실성이 아직 적분되지 않음)\n" << std::endl;
 
     std::cout << "  Σ 대각:\n";
-    for (int i = 0; i < 9; i++) {
-        std::cout << "    Σ(" << i << "," << i << ") = " << Sigma(i,i) << std::endl;
+    for (int i = 0; i < 9; i++)
+    {
+        std::cout << "    Σ(" << i << "," << i << ") = " << Sigma(i, i) << std::endl;
     }
-    std::cout << "\n  √Σ(0,0) = σ_rotation = " << std::sqrt(Sigma(0,0)) << " rad" << std::endl;
-    std::cout << "  √Σ(3,3) = σ_velocity = " << std::sqrt(Sigma(3,3)) << " m/s" << std::endl;
+    std::cout << "\n  √Σ(0,0) = σ_rotation = " << std::sqrt(Sigma(0, 0)) << " rad" << std::endl;
+    std::cout << "  √Σ(3,3) = σ_velocity = " << std::sqrt(Sigma(3, 3)) << " m/s" << std::endl;
 }
 
-void problem2_time_dependence() {
+void problem2_time_dependence()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: 적분 시간에 따른 공분산" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -82,34 +84,36 @@ void problem2_time_dependence() {
     double sigma_acc = 0.1;
     double sigma_gyro = 0.01;
 
-    auto runIntegration = [&](int steps) -> double {
+    auto runIntegration = [&](int steps) -> double
+    {
         Eigen::Matrix3d delta_R = Eigen::Matrix3d::Identity();
         Eigen::Vector3d acc(0, 0, 9.81);
         Eigen::Vector3d gyro(0, 0, 0);
         Eigen::Matrix<double, 9, 9> Sigma = Eigen::Matrix<double, 9, 9>::Zero();
 
-        for (int i = 0; i < steps; i++) {
+        for (int i = 0; i < steps; i++)
+        {
             Eigen::Matrix<double, 9, 9> A = Eigen::Matrix<double, 9, 9>::Identity();
-            A.block<3,3>(3,0) = -delta_R * skew(acc) * dt;
-            A.block<3,3>(6,3) = Eigen::Matrix3d::Identity() * dt;
+            A.block<3, 3>(3, 0) = -delta_R * skew(acc) * dt;
+            A.block<3, 3>(6, 3) = Eigen::Matrix3d::Identity() * dt;
 
             Eigen::Matrix<double, 9, 6> B = Eigen::Matrix<double, 9, 6>::Zero();
-            B.block<3,3>(0,0) = -Eigen::Matrix3d::Identity() * dt;
-            B.block<3,3>(3,3) = -delta_R * dt;
+            B.block<3, 3>(0, 0) = -Eigen::Matrix3d::Identity() * dt;
+            B.block<3, 3>(3, 3) = -delta_R * dt;
 
             Eigen::Matrix<double, 6, 6> Q = Eigen::Matrix<double, 6, 6>::Zero();
-            Q.block<3,3>(0,0) = Eigen::Matrix3d::Identity() * sigma_gyro * sigma_gyro / dt;
-            Q.block<3,3>(3,3) = Eigen::Matrix3d::Identity() * sigma_acc * sigma_acc / dt;
+            Q.block<3, 3>(0, 0) = Eigen::Matrix3d::Identity() * sigma_gyro * sigma_gyro / dt;
+            Q.block<3, 3>(3, 3) = Eigen::Matrix3d::Identity() * sigma_acc * sigma_acc / dt;
 
             Sigma = A * Sigma * A.transpose() + B * Q * B.transpose();
         }
-        return std::sqrt(Sigma(6,6));  // σ_position_x
+        return std::sqrt(Sigma(6, 6));  // σ_position_x
     };
 
-    double sigma_01 = runIntegration(20);    // 0.1초
-    double sigma_05 = runIntegration(100);   // 0.5초
-    double sigma_10 = runIntegration(200);   // 1.0초
-    double sigma_20 = runIntegration(400);   // 2.0초
+    double sigma_01 = runIntegration(20);   // 0.1초
+    double sigma_05 = runIntegration(100);  // 0.5초
+    double sigma_10 = runIntegration(200);  // 1.0초
+    double sigma_20 = runIntegration(400);  // 2.0초
 
     std::cout << "💡 풀이:" << std::endl;
     std::cout << "  t=0.1s: σ_p = " << sigma_01 << " m" << std::endl;
@@ -127,7 +131,8 @@ void problem2_time_dependence() {
     std::cout << "  → 키프레임 간격이 2배 → 불확실성 2.83배!" << std::endl;
 }
 
-void problem3_weight_comparison() {
+void problem3_weight_comparison()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: Factor 가중치 비교" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -146,8 +151,10 @@ void problem3_weight_comparison() {
     double cost_B = r * r / sigma2_B;
 
     std::cout << "💡 풀이:" << std::endl;
-    std::cout << "  Factor A: E = r²/σ² = " << r*r << "/" << sigma2_A << " = " << cost_A << std::endl;
-    std::cout << "  Factor B: E = r²/σ² = " << r*r << "/" << sigma2_B << " = " << cost_B << "\n" << std::endl;
+    std::cout << "  Factor A: E = r²/σ² = " << r * r << "/" << sigma2_A << " = " << cost_A
+              << std::endl;
+    std::cout << "  Factor B: E = r²/σ² = " << r * r << "/" << sigma2_B << " = " << cost_B << "\n"
+              << std::endl;
 
     std::cout << "  Factor A의 비용이 " << cost_A / cost_B << "배 높음!" << std::endl;
     std::cout << "\n  의미:" << std::endl;
@@ -156,7 +163,8 @@ void problem3_weight_comparison() {
     std::cout << "    → 정확한 Factor에 더 의존하는 합리적 최적화!" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 9 Quiz - Medium (공분산 전파 계산)" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

@@ -5,7 +5,8 @@
 #include <iostream>
 #include <cmath>
 
-void problem1_extrinsic_definition() {
+void problem1_extrinsic_definition()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: Extrinsic의 정의" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -20,7 +21,8 @@ void problem1_extrinsic_definition() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-void problem2_rotation_vs_translation() {
+void problem2_rotation_vs_translation()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: 회전 vs 병진 오차" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -34,12 +36,13 @@ void problem2_rotation_vs_translation() {
     double error_deg = 1.0;
     double error_rad = error_deg * M_PI / 180.0;
     double gravity_leak = std::sin(error_rad) * 9.81;
-    std::cout << "  힌트: 1도 회전 오차 → sin(1°) × 9.81 = "
-              << gravity_leak << " m/s^2 가속도 오차" << std::endl;
+    std::cout << "  힌트: 1도 회전 오차 → sin(1°) × 9.81 = " << gravity_leak << " m/s^2 가속도 오차"
+              << std::endl;
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-void problem3_time_offset() {
+void problem3_time_offset()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: 시간 오프셋" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -55,7 +58,8 @@ void problem3_time_offset() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-void problem4_hand_eye() {
+void problem4_hand_eye()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4: 핸드-아이 캘리브레이션" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -71,7 +75,8 @@ void problem4_hand_eye() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 13 Quiz - Easy (외부 캘리브레이션)" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

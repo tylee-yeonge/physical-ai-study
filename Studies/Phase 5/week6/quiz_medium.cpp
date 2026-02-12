@@ -9,7 +9,8 @@
 #include <iostream>
 #include <string>
 
-void problem1_layer_fusion_analysis() {
+void problem1_layer_fusion_analysis()
+{
     std::cout << "\n" << std::string(28, '-') << std::endl;
     std::cout << "문제 1: Layer Fusion 분석" << std::endl;
     std::cout << std::string(28, '-') << "\n" << std::endl;
@@ -31,7 +32,8 @@ void problem1_layer_fusion_analysis() {
     std::cout << std::endl;
 }
 
-void problem2_cuda_memory_bug() {
+void problem2_cuda_memory_bug()
+{
     std::cout << "\n" << std::string(28, '-') << std::endl;
     std::cout << "문제 2: CUDA 메모리 관리 버그 찾기" << std::endl;
     std::cout << std::string(28, '-') << "\n" << std::endl;
@@ -41,8 +43,10 @@ void problem2_cuda_memory_bug() {
     std::cout << "  void runInference(const char* engine_file) {" << std::endl;
     std::cout << "      // 1. 엔진 로드" << std::endl;
     std::cout << "      IRuntime* runtime = createInferRuntime(logger);" << std::endl;
-    std::cout << "      ICudaEngine* engine = runtime->deserializeCudaEngine(data, size);" << std::endl;
-    std::cout << "      IExecutionContext* context = engine->createExecutionContext();" << std::endl;
+    std::cout << "      ICudaEngine* engine = runtime->deserializeCudaEngine(data, size);"
+              << std::endl;
+    std::cout << "      IExecutionContext* context = engine->createExecutionContext();"
+              << std::endl;
     std::cout << std::endl;
     std::cout << "      // 2. GPU 메모리 할당" << std::endl;
     std::cout << "      void* buffers[2];" << std::endl;
@@ -51,9 +55,11 @@ void problem2_cuda_memory_bug() {
     std::cout << std::endl;
     std::cout << "      // 3. 추론 루프" << std::endl;
     std::cout << "      while (running) {" << std::endl;
-    std::cout << "          cudaMemcpy(buffers[0], input, size, cudaMemcpyDeviceToHost);" << std::endl;
+    std::cout << "          cudaMemcpy(buffers[0], input, size, cudaMemcpyDeviceToHost);"
+              << std::endl;
     std::cout << "          context->executeV2(buffers);" << std::endl;
-    std::cout << "          cudaMemcpy(output, buffers[1], size, cudaMemcpyHostToDevice);" << std::endl;
+    std::cout << "          cudaMemcpy(output, buffers[1], size, cudaMemcpyHostToDevice);"
+              << std::endl;
     std::cout << "      }" << std::endl;
     std::cout << std::endl;
     std::cout << "      // 4. 정리" << std::endl;
@@ -66,7 +72,8 @@ void problem2_cuda_memory_bug() {
     std::cout << std::endl;
 }
 
-void problem3_performance_optimization() {
+void problem3_performance_optimization()
+{
     std::cout << "\n" << std::string(28, '-') << std::endl;
     std::cout << "문제 3: 성능 최적화 전략" << std::endl;
     std::cout << std::string(28, '-') << "\n" << std::endl;
@@ -98,7 +105,8 @@ void problem3_performance_optimization() {
     std::cout << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << std::string(37, '=') << std::endl;
     std::cout << "Week 6 Quiz - Medium (TensorRT 배포)" << std::endl;
     std::cout << std::string(37, '=') << std::endl;

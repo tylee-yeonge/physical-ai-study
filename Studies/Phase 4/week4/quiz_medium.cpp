@@ -6,7 +6,8 @@
 #include <Eigen/Dense>
 #include <cmath>
 
-void problem1_jacobian_computation() {
+void problem1_jacobian_computation()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: 자코비안 계산" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -27,19 +28,20 @@ void problem1_jacobian_computation() {
     F(1, 3) = std::sin(theta) * dt;
 
     std::cout << "💡 풀이:" << std::endl;
-    std::cout << "   F(0,2) = -v·sin(θ)·dt = -" << v << "×" << std::sin(theta) << "×" << dt
-              << " = " << F(0,2) << std::endl;
-    std::cout << "   F(0,3) = cos(θ)·dt = " << std::cos(theta) << "×" << dt
-              << " = " << F(0,3) << std::endl;
-    std::cout << "   F(1,2) = v·cos(θ)·dt = " << v << "×" << std::cos(theta) << "×" << dt
-              << " = " << F(1,2) << std::endl;
-    std::cout << "   F(1,3) = sin(θ)·dt = " << std::sin(theta) << "×" << dt
-              << " = " << F(1,3) << std::endl;
+    std::cout << "   F(0,2) = -v·sin(θ)·dt = -" << v << "×" << std::sin(theta) << "×" << dt << " = "
+              << F(0, 2) << std::endl;
+    std::cout << "   F(0,3) = cos(θ)·dt = " << std::cos(theta) << "×" << dt << " = " << F(0, 3)
+              << std::endl;
+    std::cout << "   F(1,2) = v·cos(θ)·dt = " << v << "×" << std::cos(theta) << "×" << dt << " = "
+              << F(1, 2) << std::endl;
+    std::cout << "   F(1,3) = sin(θ)·dt = " << std::sin(theta) << "×" << dt << " = " << F(1, 3)
+              << std::endl;
 
     std::cout << "\n   F =\n" << F << std::endl;
 }
 
-void problem2_numerical_jacobian() {
+void problem2_numerical_jacobian()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: 수치적 자코비안 검증" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -47,10 +49,11 @@ void problem2_numerical_jacobian() {
     std::cout << "해석적 자코비안과 수치적 자코비안을 비교\n" << std::endl;
 
     double dt = 0.1;
-    Eigen::Vector4d x(5.0, 3.0, M_PI/4, 2.0);
+    Eigen::Vector4d x(5.0, 3.0, M_PI / 4, 2.0);
 
     // 비선형 함수
-    auto f = [dt](const Eigen::Vector4d& x) -> Eigen::Vector4d {
+    auto f = [dt](const Eigen::Vector4d& x) -> Eigen::Vector4d
+    {
         Eigen::Vector4d xn;
         xn(0) = x(0) + x(3) * std::cos(x(2)) * dt;
         xn(1) = x(1) + x(3) * std::sin(x(2)) * dt;
@@ -71,7 +74,8 @@ void problem2_numerical_jacobian() {
     Eigen::Vector4d f0 = f(x);
     Eigen::Matrix4d F_numeric;
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++)
+    {
         Eigen::Vector4d x_plus = x;
         x_plus(i) += eps;
         F_numeric.col(i) = (f(x_plus) - f0) / eps;
@@ -85,7 +89,8 @@ void problem2_numerical_jacobian() {
     std::cout << "\n   이 방법으로 복잡한 자코비안의 버그를 찾을 수 있습니다." << std::endl;
 }
 
-void problem3_covariance_propagation() {
+void problem3_covariance_propagation()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: 공분산 전파" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -108,7 +113,8 @@ void problem3_covariance_propagation() {
     std::cout << "   P(0,1)=0.1 → 위치-속도 상관관계 생김!" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 4 Quiz - Medium" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

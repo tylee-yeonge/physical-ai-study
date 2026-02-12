@@ -11,7 +11,8 @@
 #include <iostream>
 
 #ifndef MY_BASIC_LIB_ONLY
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "  [내 구현] VO 자료구조 데모" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -27,8 +28,8 @@ int main() {
     vo::MapPoint mp;
     mp.id = 0;
     mp.position = Eigen::Vector3d(1.0, 2.0, 5.0);
-    std::cout << "MapPoint: (" << mp.position.x() << ", "
-              << mp.position.y() << ", " << mp.position.z() << ")" << std::endl;
+    std::cout << "MapPoint: (" << mp.position.x() << ", " << mp.position.y() << ", "
+              << mp.position.z() << ")" << std::endl;
 
     std::cout << "\n구현 완료 후 테스트: ./test_my_basic" << std::endl;
     return 0;

@@ -21,15 +21,13 @@
  *
  * TODO: 아래 함수를 완성하세요.
  */
-void problem1_intrinsic_analysis() {
+void problem1_intrinsic_analysis()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: K 행렬 분석" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    cv::Mat K = (cv::Mat_<double>(3, 3) <<
-        500.0, 0.0, 320.0,
-        0.0, 500.0, 240.0,
-        0.0, 0.0, 1.0);
+    cv::Mat K = (cv::Mat_<double>(3, 3) << 500.0, 0.0, 320.0, 0.0, 500.0, 240.0, 0.0, 0.0, 1.0);
 
     std::cout << "주어진 카메라 행렬 K:" << std::endl;
     std::cout << K << "\n" << std::endl;
@@ -52,8 +50,8 @@ void problem1_intrinsic_analysis() {
     int estimated_width = 0;   // TODO
     int estimated_height = 0;  // TODO
 
-    std::cout << "\n   추정 이미지 크기: " << estimated_width << " x "
-              << estimated_height << std::endl;
+    std::cout << "\n   추정 이미지 크기: " << estimated_width << " x " << estimated_height
+              << std::endl;
 }
 
 /**
@@ -67,7 +65,8 @@ void problem1_intrinsic_analysis() {
  *
  * TODO: 각 단계를 직접 계산하세요.
  */
-void problem2_projection_steps() {
+void problem2_projection_steps()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: 투영 단계별 계산" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -86,7 +85,8 @@ void problem2_projection_steps() {
     double Yc = 0.0;  // TODO
     double Zc = 0.0;  // TODO
 
-    std::cout << "Step 1 (월드→카메라): Pc = (" << Xc << ", " << Yc << ", " << Zc << ")" << std::endl;
+    std::cout << "Step 1 (월드→카메라): Pc = (" << Xc << ", " << Yc << ", " << Zc << ")"
+              << std::endl;
 
     // Step 2: 원근 투영 (정규화 좌표)
     // TODO: x' = Xc/Zc, y' = Yc/Zc
@@ -115,7 +115,8 @@ void problem2_projection_steps() {
  *
  * TODO: FOV를 계산하세요.
  */
-void problem3_fov_calculation() {
+void problem3_fov_calculation()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: FOV 계산" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -158,7 +159,8 @@ void problem3_fov_calculation() {
  *
  * TODO: 역투영을 계산하세요.
  */
-void problem4_back_projection() {
+void problem4_back_projection()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4: 역투영" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -194,7 +196,8 @@ void problem4_back_projection() {
     std::cout << "   좌상단 → 음의 X, 음의 Y → 왼쪽 위를 가리킴" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Phase 2 Week 1 Quiz - Easy" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

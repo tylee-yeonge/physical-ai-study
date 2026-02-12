@@ -7,34 +7,36 @@
 #include <cmath>
 
 // SO(3) 유틸리티
-Eigen::Matrix3d skew(const Eigen::Vector3d& v) {
+Eigen::Matrix3d skew(const Eigen::Vector3d& v)
+{
     Eigen::Matrix3d m;
-    m <<    0, -v.z(),  v.y(),
-         v.z(),     0, -v.x(),
-        -v.y(),  v.x(),     0;
+    m << 0, -v.z(), v.y(), v.z(), 0, -v.x(), -v.y(), v.x(), 0;
     return m;
 }
 
-Eigen::Matrix3d expSO3(const Eigen::Vector3d& omega) {
+Eigen::Matrix3d expSO3(const Eigen::Vector3d& omega)
+{
     double angle = omega.norm();
-    if (angle < 1e-10) return Eigen::Matrix3d::Identity();
+    if (angle < 1e-10)
+        return Eigen::Matrix3d::Identity();
     Eigen::Vector3d axis = omega / angle;
     Eigen::Matrix3d K = skew(axis);
-    return Eigen::Matrix3d::Identity()
-         + std::sin(angle) * K
-         + (1.0 - std::cos(angle)) * K * K;
+    return Eigen::Matrix3d::Identity() + std::sin(angle) * K + (1.0 - std::cos(angle)) * K * K;
 }
 
-Eigen::Vector3d logSO3(const Eigen::Matrix3d& R) {
+Eigen::Vector3d logSO3(const Eigen::Matrix3d& R)
+{
     double cos_angle = (R.trace() - 1.0) / 2.0;
     cos_angle = std::max(-1.0, std::min(1.0, cos_angle));
     double angle = std::acos(cos_angle);
-    if (angle < 1e-10) return Eigen::Vector3d::Zero();
+    if (angle < 1e-10)
+        return Eigen::Vector3d::Zero();
     Eigen::Matrix3d log_R = angle / (2.0 * std::sin(angle)) * (R - R.transpose());
-    return Eigen::Vector3d(log_R(2,1), log_R(0,2), log_R(1,0));
+    return Eigen::Vector3d(log_R(2, 1), log_R(0, 2), log_R(1, 0));
 }
 
-void problem1_single_step_preintegration() {
+void problem1_single_step_preintegration()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: 단일 스텝 Pre-integration" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -84,7 +86,8 @@ void problem1_single_step_preintegration() {
     std::cout << "\n  핵심: z축 0.0005 rad 회전, 가속도 적분으로 Δv, Δp 축적" << std::endl;
 }
 
-void problem2_multi_step_integration() {
+void problem2_multi_step_integration()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: 다중 스텝 Pre-integration" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -114,7 +117,8 @@ void problem2_multi_step_integration() {
     Eigen::Vector3d dv = Eigen::Vector3d::Zero();
     Eigen::Vector3d dp = Eigen::Vector3d::Zero();
 
-    for (int i = 0; i < steps; i++) {
+    for (int i = 0; i < steps; i++)
+    {
         Eigen::Vector3d acc = a_meas - b_a;
         Eigen::Vector3d gyro = w_meas - b_g;
         dp += dv * dt + 0.5 * dR * acc * dt * dt;
@@ -138,7 +142,8 @@ void problem2_multi_step_integration() {
 
     std::cout << "  상태 복원:" << std::endl;
     std::cout << "  p_j = p_i + v_i·Δt + 0.5·g·Δt² + R_i·Δp" << std::endl;
-    std::cout << "       = [0,0,0] + [1,0,0]·0.5 + 0.5·[0,0,-9.81]·0.25 + " << dp.transpose() << std::endl;
+    std::cout << "       = [0,0,0] + [1,0,0]·0.5 + 0.5·[0,0,-9.81]·0.25 + " << dp.transpose()
+              << std::endl;
     std::cout << "       = " << p_j.transpose() << std::endl;
     std::cout << "  실제: [0.5, 0, 0] (등속 0.5초)\n" << std::endl;
 
@@ -146,7 +151,8 @@ void problem2_multi_step_integration() {
     std::cout << "  → 중력 효과는 Pre-integration + 복원 공식에서 정확히 처리" << std::endl;
 }
 
-void problem3_bias_correction() {
+void problem3_bias_correction()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: 바이어스 보정" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -165,7 +171,8 @@ void problem3_bias_correction() {
     Eigen::Matrix3d J_v_ba = Eigen::Matrix3d::Zero();
     Eigen::Matrix3d dR = Eigen::Matrix3d::Identity();
 
-    for (int i = 0; i < N; i++) {
+    for (int i = 0; i < N; i++)
+    {
         J_v_ba -= dR * dt;
         // dR stays Identity (no rotation)
     }
@@ -183,7 +190,8 @@ void problem3_bias_correction() {
     std::cout << "  → 재적분 없이 행렬 곱 한 번으로 보정 완료!" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 7 Quiz - Medium (Pre-integration 계산)" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

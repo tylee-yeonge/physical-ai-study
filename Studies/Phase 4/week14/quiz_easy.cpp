@@ -5,7 +5,8 @@
 #include <iostream>
 #include <cmath>
 
-void problem1_kalibr_inputs() {
+void problem1_kalibr_inputs()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: Kalibr 입력 데이터" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -20,7 +21,8 @@ void problem1_kalibr_inputs() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-void problem2_data_collection() {
+void problem2_data_collection()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: 데이터 수집" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -35,7 +37,8 @@ void problem2_data_collection() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-void problem3_reprojection_error() {
+void problem3_reprojection_error()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: Reprojection Error" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -51,7 +54,8 @@ void problem3_reprojection_error() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-void problem4_tagsize_error() {
+void problem4_tagsize_error()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4: tagSize 오차의 영향" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -66,13 +70,14 @@ void problem4_tagsize_error() {
     double true_size = 0.088;
     double wrong_size = 0.080;
     double scale_error = true_size / wrong_size;
-    std::cout << "  스케일 오차: " << true_size << " / " << wrong_size
-              << " = " << scale_error << std::endl;
+    std::cout << "  스케일 오차: " << true_size << " / " << wrong_size << " = " << scale_error
+              << std::endl;
     std::cout << "  힌트: tagSize는 3D 점의 실제 위치를 결정합니다." << std::endl;
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 14 Quiz - Easy (Kalibr 실습)" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

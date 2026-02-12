@@ -7,7 +7,8 @@
 #include <cmath>
 #include <iomanip>
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 11 Medium Quiz - 정답 및 해설" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -63,13 +64,14 @@ int main() {
 
     double H_mem = (double)total_dim * total_dim * 8.0 / (1024 * 1024);
     double S_mem = (double)cam_total * cam_total * 8.0 / (1024 * 1024);
-    double ratio = (double)(total_dim) * total_dim / ((double)cam_total * cam_total);
+    double ratio = (double)(total_dim)*total_dim / ((double)cam_total * cam_total);
 
     std::cout << "정답:" << std::endl;
     std::cout << "  Schur 전: " << total_dim << " x " << total_dim << " = "
               << (long long)total_dim * total_dim << " 원소" << std::endl;
     std::cout << "  Schur 후: " << cam_total << " x " << cam_total << " = "
-              << (long long)cam_total * cam_total << " 원소\n" << std::endl;
+              << (long long)cam_total * cam_total << " 원소\n"
+              << std::endl;
 
     std::cout << "해설:" << std::endl;
     std::cout << "  전체 파라미터:" << std::endl;
@@ -79,15 +81,18 @@ int main() {
 
     std::cout << "  Schur Complement 전 (전체 Hessian H):" << std::endl;
     std::cout << "  H 크기: " << total_dim << " x " << total_dim << std::endl;
-    std::cout << "  메모리 (dense 가정): ~" << std::fixed << std::setprecision(0)
-              << H_mem << " MB\n" << std::endl;
+    std::cout << "  메모리 (dense 가정): ~" << std::fixed << std::setprecision(0) << H_mem
+              << " MB\n"
+              << std::endl;
 
     std::cout << "  Schur Complement 후 (S 행렬):" << std::endl;
     std::cout << "  S 크기: " << cam_total << " x " << cam_total << std::endl;
-    std::cout << "  메모리 (dense 가정): ~" << std::fixed << std::setprecision(2)
-              << S_mem << " MB\n" << std::endl;
+    std::cout << "  메모리 (dense 가정): ~" << std::fixed << std::setprecision(2) << S_mem
+              << " MB\n"
+              << std::endl;
 
-    std::cout << "  크기 감소: " << std::fixed << std::setprecision(0) << ratio << "배!" << std::endl;
+    std::cout << "  크기 감소: " << std::fixed << std::setprecision(0) << ratio << "배!"
+              << std::endl;
     std::cout << "  " << total_dim << "^2 → " << cam_total << "^2\n" << std::endl;
 
     std::cout << "  핵심 포인트:" << std::endl;
@@ -114,7 +119,8 @@ int main() {
     std::cout << "     Phase 1 (Iter 0-1): 급격한 감소" << std::endl;
     double p1_reduction = (1.0 - costs[1] / costs[0]) * 100.0;
     std::cout << "       " << std::scientific << costs[0] << " → " << costs[1] << std::endl;
-    std::cout << "       감소율: " << std::fixed << std::setprecision(1) << p1_reduction << "%" << std::endl;
+    std::cout << "       감소율: " << std::fixed << std::setprecision(1) << p1_reduction << "%"
+              << std::endl;
     std::cout << "       → 초기 추정이 나빴지만, 첫 step에서 크게 개선\n" << std::endl;
 
     std::cout << "     Phase 2 (Iter 1-3): 빠른 수렴" << std::endl;
@@ -129,7 +135,8 @@ int main() {
     std::cout << "  2. 전체 통계:" << std::endl;
     std::cout << "     초기 cost: " << std::scientific << costs[0] << std::endl;
     std::cout << "     최종 cost: " << costs[n - 1] << std::endl;
-    std::cout << "     총 감소율: " << std::fixed << std::setprecision(4) << total_reduction << "%" << std::endl;
+    std::cout << "     총 감소율: " << std::fixed << std::setprecision(4) << total_reduction << "%"
+              << std::endl;
     std::cout << "     Iteration 수: " << n << "\n" << std::endl;
 
     std::cout << "  3. Ceres 수렴 조건 (기본값):" << std::endl;

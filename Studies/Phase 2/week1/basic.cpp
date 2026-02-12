@@ -3,9 +3,12 @@
 #include <cmath>
 
 PinholeProjection::PinholeProjection(const cv::Mat& K, const cv::Mat& R, const cv::Mat& t)
-    : K_(K.clone()), R_(R.clone()), t_(t.clone()) {}
+    : K_(K.clone()), R_(R.clone()), t_(t.clone())
+{
+}
 
-cv::Point2d PinholeProjection::project(const cv::Point3d& P_world) const {
+cv::Point2d PinholeProjection::project(const cv::Point3d& P_world) const
+{
     // Step 1: 월드 → 카메라 좌표 변환
     // Pc = R * Pw + t
     cv::Mat Pw = (cv::Mat_<double>(3, 1) << P_world.x, P_world.y, P_world.z);
@@ -16,7 +19,8 @@ cv::Point2d PinholeProjection::project(const cv::Point3d& P_world) const {
     double Zc = Pc.at<double>(2);
 
     // Zc가 0 이하면 카메라 뒤에 있음 → 투영 불가
-    if (Zc <= 0) {
+    if (Zc <= 0)
+    {
         return cv::Point2d(-1, -1);
     }
 
@@ -37,19 +41,21 @@ cv::Point2d PinholeProjection::project(const cv::Point3d& P_world) const {
 }
 
 std::vector<cv::Point2d> PinholeProjection::projectMultiple(
-    const std::vector<cv::Point3d>& points_3d) const {
-
+    const std::vector<cv::Point3d>& points_3d) const
+{
     std::vector<cv::Point2d> pixels;
     pixels.reserve(points_3d.size());
 
-    for (const auto& pt : points_3d) {
+    for (const auto& pt : points_3d)
+    {
         pixels.push_back(project(pt));
     }
 
     return pixels;
 }
 
-cv::Vec3d PinholeProjection::backProject(const cv::Point2d& pixel) const {
+cv::Vec3d PinholeProjection::backProject(const cv::Point2d& pixel) const
+{
     double fx = K_.at<double>(0, 0);
     double fy = K_.at<double>(1, 1);
     double cx = K_.at<double>(0, 2);
@@ -68,7 +74,8 @@ cv::Vec3d PinholeProjection::backProject(const cv::Point2d& pixel) const {
     return ray / norm;
 }
 
-cv::Size2d PinholeProjection::computeFOV(const cv::Size& imageSize) const {
+cv::Size2d PinholeProjection::computeFOV(const cv::Size& imageSize) const
+{
     double fx = K_.at<double>(0, 0);
     double fy = K_.at<double>(1, 1);
 
@@ -83,12 +90,14 @@ cv::Size2d PinholeProjection::computeFOV(const cv::Size& imageSize) const {
 }
 
 double PinholeProjection::reprojectionError(const cv::Point3d& P_world,
-                                           const cv::Point2d& observed_pixel) const {
+                                            const cv::Point2d& observed_pixel) const
+{
     cv::Point2d projected = project(P_world);
 
     // project()가 Zc ≤ 0 (카메라 뒤)이면 (-1,-1)을 반환하므로,
     // x < 0 으로 투영 실패 여부를 감지
-    if (projected.x < 0) return -1.0;
+    if (projected.x < 0)
+        return -1.0;
 
     double dx = projected.x - observed_pixel.x;
     double dy = projected.y - observed_pixel.y;
@@ -96,22 +105,20 @@ double PinholeProjection::reprojectionError(const cv::Point3d& P_world,
     return std::sqrt(dx * dx + dy * dy);
 }
 
-bool PinholeProjection::isInImage(const cv::Point2d& pixel, const cv::Size& imageSize) {
-    return pixel.x >= 0 && pixel.x < imageSize.width &&
-           pixel.y >= 0 && pixel.y < imageSize.height;
+bool PinholeProjection::isInImage(const cv::Point2d& pixel, const cv::Size& imageSize)
+{
+    return pixel.x >= 0 && pixel.x < imageSize.width && pixel.y >= 0 && pixel.y < imageSize.height;
 }
 
 #ifndef PINHOLE_LIB_ONLY
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "  핀홀 카메라 투영 기본 데모" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
     // 카메라 내부 파라미터 K
-    cv::Mat K = (cv::Mat_<double>(3, 3) <<
-        600.0, 0.0, 400.0,
-        0.0, 600.0, 300.0,
-        0.0, 0.0, 1.0);
+    cv::Mat K = (cv::Mat_<double>(3, 3) << 600.0, 0.0, 400.0, 0.0, 600.0, 300.0, 0.0, 0.0, 1.0);
 
     // 카메라 외부 파라미터 (단위 행렬 = 원점에서 정면)
     cv::Mat R = cv::Mat::eye(3, 3, CV_64F);
@@ -126,8 +133,8 @@ int main() {
 
     // 3D 점 정의 (큐브 꼭짓점)
     std::vector<cv::Point3d> cube_points = {
-        {-1, -1, 5}, { 1, -1, 5}, { 1,  1, 5}, {-1,  1, 5},  // 앞면
-        {-1, -1, 7}, { 1, -1, 7}, { 1,  1, 7}, {-1,  1, 7}   // 뒷면
+        {-1, -1, 5}, {1, -1, 5}, {1, 1, 5}, {-1, 1, 5},  // 앞면
+        {-1, -1, 7}, {1, -1, 7}, {1, 1, 7}, {-1, 1, 7}   // 뒷면
     };
 
     std::cout << "📊 3D 큐브 투영 결과:" << std::endl;
@@ -136,7 +143,8 @@ int main() {
     auto pixels = camera.projectMultiple(cube_points);
     cv::Size imageSize(800, 600);
 
-    for (size_t i = 0; i < cube_points.size(); i++) {
+    for (size_t i = 0; i < cube_points.size(); i++)
+    {
         const auto& p3d = cube_points[i];
         const auto& p2d = pixels[i];
         bool visible = PinholeProjection::isInImage(p2d, imageSize);
@@ -160,15 +168,15 @@ int main() {
     cv::Point2d center(camera.getCx(), camera.getCy());
     cv::Vec3d ray_center = camera.backProject(center);
     std::cout << "   중심 (" << center.x << ", " << center.y << ")"
-              << " → ray [" << ray_center[0] << ", " << ray_center[1]
-              << ", " << ray_center[2] << "]" << std::endl;
+              << " → ray [" << ray_center[0] << ", " << ray_center[1] << ", " << ray_center[2]
+              << "]" << std::endl;
 
     // 모서리 역투영
     cv::Point2d corner(0, 0);
     cv::Vec3d ray_corner = camera.backProject(corner);
     std::cout << "   좌상단 (0, 0)"
-              << " → ray [" << ray_corner[0] << ", " << ray_corner[1]
-              << ", " << ray_corner[2] << "]" << std::endl;
+              << " → ray [" << ray_corner[0] << ", " << ray_corner[1] << ", " << ray_corner[2]
+              << "]" << std::endl;
 
     // 4. 재투영 오차
     std::cout << "\n📏 재투영 오차:" << std::endl;
@@ -207,4 +215,4 @@ int main() {
 
     return 0;
 }
-#endif // PINHOLE_LIB_ONLY
+#endif  // PINHOLE_LIB_ONLY

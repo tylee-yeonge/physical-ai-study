@@ -9,7 +9,8 @@
 #include <iostream>
 #include <string>
 
-void problem1_tensorrt_optimization() {
+void problem1_tensorrt_optimization()
+{
     std::cout << "\n" << std::string(28, '-') << std::endl;
     std::cout << "문제 1: TensorRT 최적화 기법" << std::endl;
     std::cout << std::string(28, '-') << "\n" << std::endl;
@@ -22,7 +23,8 @@ void problem1_tensorrt_optimization() {
     std::cout << std::endl;
 }
 
-void problem2_trtexec_command() {
+void problem2_trtexec_command()
+{
     std::cout << "\n" << std::string(28, '-') << std::endl;
     std::cout << "문제 2: trtexec 변환 명령어" << std::endl;
     std::cout << std::string(28, '-') << "\n" << std::endl;
@@ -43,7 +45,8 @@ void problem2_trtexec_command() {
     std::cout << std::endl;
 }
 
-void problem3_engine_portability() {
+void problem3_engine_portability()
+{
     std::cout << "\n" << std::string(28, '-') << std::endl;
     std::cout << "문제 3: 엔진 이식성" << std::endl;
     std::cout << std::string(28, '-') << "\n" << std::endl;
@@ -53,13 +56,15 @@ void problem3_engine_portability() {
     std::cout << "  a) Jetson에서 빌드한 .trt 파일은 RTX 4090에서도 실행 가능하다" << std::endl;
     std::cout << "  b) TensorRT 엔진은 GPU 아키텍처별로 다시 빌드해야 한다" << std::endl;
     std::cout << "  c) .onnx 파일은 어떤 GPU에서든 동일하게 사용 가능하다" << std::endl;
-    std::cout << "  d) TensorRT 버전이 다르면 같은 GPU라도 엔진이 호환되지 않을 수 있다" << std::endl;
+    std::cout << "  d) TensorRT 버전이 다르면 같은 GPU라도 엔진이 호환되지 않을 수 있다"
+              << std::endl;
     std::cout << std::endl;
     std::cout << "  답: _____" << std::endl;
     std::cout << std::endl;
 }
 
-void problem4_nms_concept() {
+void problem4_nms_concept()
+{
     std::cout << "\n" << std::string(28, '-') << std::endl;
     std::cout << "문제 4: NMS (Non-Maximum Suppression)" << std::endl;
     std::cout << std::string(28, '-') << "\n" << std::endl;
@@ -76,7 +81,8 @@ void problem4_nms_concept() {
     std::cout << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << std::string(35, '=') << std::endl;
     std::cout << "Week 6 Quiz - Easy (TensorRT 배포)" << std::endl;
     std::cout << std::string(35, '=') << std::endl;

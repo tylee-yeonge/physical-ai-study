@@ -6,13 +6,11 @@
 #include <iostream>
 #include <cmath>
 
-void problem1_solution() {
+void problem1_solution()
+{
     std::cout << "\n━━━ 문제 1 정답 ━━━\n" << std::endl;
 
-    cv::Mat K = (cv::Mat_<double>(3, 3) <<
-        500.0, 0.0, 320.0,
-        0.0, 500.0, 240.0,
-        0.0, 0.0, 1.0);
+    cv::Mat K = (cv::Mat_<double>(3, 3) << 500.0, 0.0, 320.0, 0.0, 500.0, 240.0, 0.0, 0.0, 1.0);
 
     double fx = K.at<double>(0, 0);  // 500.0
     double fy = K.at<double>(1, 1);  // 500.0
@@ -29,7 +27,8 @@ void problem1_solution() {
     std::cout << "추정 이미지 크기: " << estimated_width << " x " << estimated_height << std::endl;
 }
 
-void problem2_solution() {
+void problem2_solution()
+{
     std::cout << "\n━━━ 문제 2 정답 ━━━\n" << std::endl;
 
     double Xw = 2.0, Yw = 1.0, Zw = 5.0;
@@ -55,7 +54,8 @@ void problem2_solution() {
     std::cout << "Step 3: pixel = (" << u << ", " << v << ")" << std::endl;
 }
 
-void problem3_solution() {
+void problem3_solution()
+{
     std::cout << "\n━━━ 문제 3 정답 ━━━\n" << std::endl;
 
     int image_width = 640;
@@ -72,7 +72,8 @@ void problem3_solution() {
     std::cout << "카메라 B (fx=1200): FOV = " << fov_B << "° → 망원" << std::endl;
 }
 
-void problem4_solution() {
+void problem4_solution()
+{
     std::cout << "\n━━━ 문제 4 정답 ━━━\n" << std::endl;
 
     double fx = 600.0, fy = 600.0;
@@ -95,7 +96,8 @@ void problem4_solution() {
               << " → 왼쪽 위 방향" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Phase 2 Week 1 Quiz Easy - 정답" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

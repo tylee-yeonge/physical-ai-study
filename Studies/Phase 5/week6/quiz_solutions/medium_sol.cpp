@@ -8,7 +8,8 @@
 #include <iostream>
 #include <string>
 
-int main() {
+int main()
+{
     std::cout << std::string(37, '=') << std::endl;
     std::cout << "Week 6 Quiz - Medium 정답" << std::endl;
     std::cout << std::string(37, '=') << std::endl;
@@ -47,11 +48,13 @@ int main() {
     std::cout << "  수정: cudaMalloc(&buffers[1], output_size); 추가" << std::endl;
     std::cout << std::endl;
     std::cout << "  버그 2: cudaMemcpy 방향 오류 (입력: H->D인데 D->H로 되어있음)" << std::endl;
-    std::cout << "  수정: cudaMemcpy(buffers[0], input, size, cudaMemcpyHostToDevice);" << std::endl;
+    std::cout << "  수정: cudaMemcpy(buffers[0], input, size, cudaMemcpyHostToDevice);"
+              << std::endl;
     std::cout << "        (CPU에서 GPU로 복사해야 함)" << std::endl;
     std::cout << std::endl;
     std::cout << "  버그 3: cudaMemcpy 방향 오류 (출력: D->H인데 H->D로 되어있음)" << std::endl;
-    std::cout << "  수정: cudaMemcpy(output, buffers[1], size, cudaMemcpyDeviceToHost);" << std::endl;
+    std::cout << "  수정: cudaMemcpy(output, buffers[1], size, cudaMemcpyDeviceToHost);"
+              << std::endl;
     std::cout << "        (GPU에서 CPU로 복사해야 함)" << std::endl;
     std::cout << std::endl;
     std::cout << "  버그 4: 리소스 해제 누락 (context, runtime, buffers[1])" << std::endl;

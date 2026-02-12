@@ -4,7 +4,8 @@
 
 #include <iostream>
 
-void problem1_solution() {
+void problem1_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1 풀이: 예측-업데이트 사이클" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -26,7 +27,8 @@ void problem1_solution() {
     std::cout << "  VIO에서: IMU → 예측(빠르게), Vision → 업데이트(느리게)" << std::endl;
 }
 
-void problem2_solution() {
+void problem2_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2 풀이: 칼만 게인" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -44,7 +46,8 @@ void problem2_solution() {
     std::cout << "  → 결론: 예측값을 거의 100% 신뢰" << std::endl;
 }
 
-void problem3_solution() {
+void problem3_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3 풀이: 공분산 변화" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -60,7 +63,8 @@ void problem3_solution() {
     std::cout << "  - Vision 업데이트로 P 감소 = drift 보정" << std::endl;
 }
 
-void problem4_solution() {
+void problem4_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4 풀이: 가중 평균" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -72,9 +76,12 @@ void problem4_solution() {
     double result = pred + K * (meas - pred);
     double result_var = (1 - K) * pred_var;
 
-    std::cout << "  K = " << pred_var << " / (" << pred_var << " + " << meas_var << ") = " << K << std::endl;
-    std::cout << "  결과 = " << pred << " + " << K << " × (" << meas << " - " << pred << ") = " << result << std::endl;
-    std::cout << "  결과 분산 = (1 - " << K << ") × " << pred_var << " = " << result_var << "\n" << std::endl;
+    std::cout << "  K = " << pred_var << " / (" << pred_var << " + " << meas_var << ") = " << K
+              << std::endl;
+    std::cout << "  결과 = " << pred << " + " << K << " × (" << meas << " - " << pred
+              << ") = " << result << std::endl;
+    std::cout << "  결과 분산 = (1 - " << K << ") × " << pred_var << " = " << result_var << "\n"
+              << std::endl;
 
     std::cout << "  해석:" << std::endl;
     std::cout << "  - 측정(σ²=1)이 예측(σ²=9)보다 9배 확실" << std::endl;
@@ -83,7 +90,8 @@ void problem4_solution() {
     std::cout << "  → 정보를 합치면 항상 더 정확해짐" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 3 Quiz Easy - 풀이" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

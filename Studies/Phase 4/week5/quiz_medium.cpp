@@ -6,7 +6,8 @@
 #include <Eigen/Dense>
 #include <cmath>
 
-void problem1_error_state_dimension() {
+void problem1_error_state_dimension()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: Error State 차원 계산" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -23,28 +24,30 @@ void problem1_error_state_dimension() {
     std::cout << "질문 3: EKF의 공분산 P 크기 vs ESKF의 공분산 P 크기는?\n" << std::endl;
 
     // 정답 계산
-    int full_params = 3 + 3 + 4 + 3 + 3;   // 16
-    int error_dim = 3 + 3 + 3 + 3 + 3;      // 15
+    int full_params = 3 + 3 + 4 + 3 + 3;  // 16
+    int error_dim = 3 + 3 + 3 + 3 + 3;    // 15
 
     std::cout << "💡 풀이:" << std::endl;
     std::cout << "   Full State 파라미터: 3+3+4+3+3 = " << full_params << std::endl;
     std::cout << "   Error State 차원: 3+3+3+3+3 = " << error_dim << std::endl;
     std::cout << "   (쿼터니언 4D → δθ 3D로 1 줄어듦!)" << std::endl;
-    std::cout << "\n   EKF P: " << full_params << "×" << full_params
-              << " = " << full_params * full_params << " 원소" << std::endl;
-    std::cout << "   ESKF P: " << error_dim << "×" << error_dim
-              << " = " << error_dim * error_dim << " 원소" << std::endl;
+    std::cout << "\n   EKF P: " << full_params << "×" << full_params << " = "
+              << full_params * full_params << " 원소" << std::endl;
+    std::cout << "   ESKF P: " << error_dim << "×" << error_dim << " = " << error_dim * error_dim
+              << " 원소" << std::endl;
     std::cout << "   → ESKF가 더 작고 rank deficiency 없음!" << std::endl;
 }
 
-void problem2_linearization_error() {
+void problem2_linearization_error()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: 선형화 오차 비교 (EKF vs ESKF)" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
     std::cout << "f(θ) = sin(θ)를 선형화할 때," << std::endl;
     std::cout << "EKF는 θ₀에서, ESKF는 δθ≈0 에서 선형화합니다.\n" << std::endl;
-    std::cout << "θ₀ = π/4 (45도), δθ = 0.01 rad에서 각각의 선형화 오차를 비교하시오.\n" << std::endl;
+    std::cout << "θ₀ = π/4 (45도), δθ = 0.01 rad에서 각각의 선형화 오차를 비교하시오.\n"
+              << std::endl;
 
     // EKF: sin(θ₀ + Δ) ≈ sin(θ₀) + cos(θ₀)·Δ
     double theta0 = M_PI / 4.0;
@@ -75,7 +78,8 @@ void problem2_linearization_error() {
     std::cout << "   → ESKF가 훨씬 정확한 선형화!" << std::endl;
 }
 
-void problem3_eskf_update_reset() {
+void problem3_eskf_update_reset()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: ESKF 업데이트 + Reset 계산" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -89,8 +93,7 @@ void problem3_eskf_update_reset() {
 
     Eigen::Vector2d x_nom(10.0, 2.0);
     Eigen::Matrix2d P;
-    P << 0.5, 0.0,
-         0.0, 0.3;
+    P << 0.5, 0.0, 0.0, 0.3;
     double z_gps = 10.8;
     double R = 1.0;
     Eigen::Matrix<double, 1, 2> H;
@@ -100,7 +103,7 @@ void problem3_eskf_update_reset() {
     double y = z_gps - x_nom(0);
 
     // 잔차 공분산
-    double S = (H * P * H.transpose())(0,0) + R;
+    double S = (H * P * H.transpose())(0, 0) + R;
 
     // 칼만 게인
     Eigen::Vector2d K = P * H.transpose() / S;
@@ -116,19 +119,23 @@ void problem3_eskf_update_reset() {
 
     std::cout << "💡 풀이:" << std::endl;
     std::cout << "   잔차: y = z - p̄ = " << z_gps << " - " << x_nom(0) << " = " << y << std::endl;
-    std::cout << "   S = H·P·Hᵀ + R = " << (H * P * H.transpose())(0,0) << " + " << R << " = " << S << std::endl;
+    std::cout << "   S = H·P·Hᵀ + R = " << (H * P * H.transpose())(0, 0) << " + " << R << " = " << S
+              << std::endl;
     std::cout << "   K = P·Hᵀ/S = [" << K(0) << ", " << K(1) << "]ᵀ" << std::endl;
     std::cout << "\n   Error State:" << std::endl;
     std::cout << "   δp = K(0)·y = " << K(0) << "×" << y << " = " << dx(0) << std::endl;
     std::cout << "   δv = K(1)·y = " << K(1) << "×" << y << " = " << dx(1) << std::endl;
     std::cout << "\n   Reset 후 Nominal:" << std::endl;
-    std::cout << "   p̄_new = p̄ + δp = " << x_nom(0) << " + " << dx(0) << " = " << x_nom_new(0) << std::endl;
-    std::cout << "   v̄_new = v̄ + δv = " << x_nom(1) << " + " << dx(1) << " = " << x_nom_new(1) << std::endl;
+    std::cout << "   p̄_new = p̄ + δp = " << x_nom(0) << " + " << dx(0) << " = " << x_nom_new(0)
+              << std::endl;
+    std::cout << "   v̄_new = v̄ + δv = " << x_nom(1) << " + " << dx(1) << " = " << x_nom_new(1)
+              << std::endl;
     std::cout << "\n   업데이트 후 P:\n" << P_new << std::endl;
     std::cout << "   → GPS가 p̄보다 0.8m 더 크므로 Nominal이 양의 방향으로 보정됨" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 5 Quiz - Medium (ESKF 계산)" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

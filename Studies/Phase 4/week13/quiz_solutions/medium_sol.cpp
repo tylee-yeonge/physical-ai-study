@@ -11,33 +11,36 @@
 using namespace Eigen;
 using namespace std;
 
-Matrix3d skew(const Vector3d& v) {
+Matrix3d skew(const Vector3d& v)
+{
     Matrix3d m;
-    m <<    0, -v.z(),  v.y(),
-         v.z(),     0, -v.x(),
-        -v.y(),  v.x(),     0;
+    m << 0, -v.z(), v.y(), v.z(), 0, -v.x(), -v.y(), v.x(), 0;
     return m;
 }
 
-Matrix3d expSO3(const Vector3d& omega) {
+Matrix3d expSO3(const Vector3d& omega)
+{
     double angle = omega.norm();
-    if (angle < 1e-10) return Matrix3d::Identity();
+    if (angle < 1e-10)
+        return Matrix3d::Identity();
     Vector3d axis = omega / angle;
     Matrix3d K = skew(axis);
-    return Matrix3d::Identity()
-         + sin(angle) * K + (1.0 - cos(angle)) * K * K;
+    return Matrix3d::Identity() + sin(angle) * K + (1.0 - cos(angle)) * K * K;
 }
 
-Vector3d logSO3(const Matrix3d& R) {
+Vector3d logSO3(const Matrix3d& R)
+{
     double cos_angle = (R.trace() - 1.0) / 2.0;
     cos_angle = max(-1.0, min(1.0, cos_angle));
     double angle = acos(cos_angle);
-    if (angle < 1e-10) return Vector3d::Zero();
+    if (angle < 1e-10)
+        return Vector3d::Zero();
     Matrix3d log_R = (angle / (2.0 * sin(angle))) * (R - R.transpose());
-    return Vector3d(log_R(2,1), log_R(0,2), log_R(1,0));
+    return Vector3d(log_R(2, 1), log_R(0, 2), log_R(1, 0));
 }
 
-void problem1_solution() {
+void problem1_solution()
+{
     cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 1 풀이: Extrinsic 오차 영향 분석" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
@@ -57,7 +60,8 @@ void problem1_solution() {
     cout << "  delta (도) │ 가속도 오차(m/s²) │ 5초 드리프트(m)" << endl;
     cout << "  ───────────┼──────────────────┼────────────────" << endl;
 
-    for (double delta_deg : deltas_deg) {
+    for (double delta_deg : deltas_deg)
+    {
         double delta_rad = delta_deg * M_PI / 180.0;
         Matrix3d R_ci_est = R_ci_true * expSO3(Vector3d(0, delta_rad, 0));
 
@@ -65,8 +69,7 @@ void problem1_solution() {
         double error = (a_cam_est - a_cam_true).norm();
         double drift_5s = 0.5 * error * 25.0;
 
-        printf("    %4.1f°     │     %8.4f      │     %8.3f\n",
-               delta_deg, error, drift_5s);
+        printf("    %4.1f°     │     %8.4f      │     %8.3f\n", delta_deg, error, drift_5s);
     }
 
     cout << "\n  상세 (delta = 1.0도):" << endl;
@@ -84,7 +87,8 @@ void problem1_solution() {
     cout << "  → Extrinsic 회전은 0.1도 이내 정확도가 필요" << endl;
 }
 
-void problem2_solution() {
+void problem2_solution()
+{
     cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 2 풀이: 시간 오프셋 영향 계산" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
@@ -111,7 +115,8 @@ void problem2_solution() {
 
     cout << "  Step 3: 1초간 적분" << endl;
     cout << "    velocity_error = " << gravity_leak << " * 1.0 = " << vel_error << " m/s" << endl;
-    cout << "    position_error = 0.5 * " << gravity_leak << " * 1.0 = " << pos_error << " m\n" << endl;
+    cout << "    position_error = 0.5 * " << gravity_leak << " * 1.0 = " << pos_error << " m\n"
+         << endl;
 
     cout << "  ────────────────────────────────\n" << endl;
 
@@ -136,22 +141,20 @@ void problem2_solution() {
     cout << "    → VINS는 td를 온라인 추정으로 해결" << endl;
 }
 
-void problem3_solution() {
+void problem3_solution()
+{
     cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 3 풀이: 간단한 핸드-아이 문제" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
 
-    Matrix3d R_ci_true = expSO3(Vector3d(0, 0, M_PI/4));
+    Matrix3d R_ci_true = expSO3(Vector3d(0, 0, M_PI / 4));
 
-    vector<Vector3d> imu_rotations = {
-        {0.3, 0.0, 0.0},
-        {0.0, 0.2, 0.0},
-        {0.0, 0.0, 0.15}
-    };
+    vector<Vector3d> imu_rotations = {{0.3, 0.0, 0.0}, {0.0, 0.2, 0.0}, {0.0, 0.0, 0.15}};
 
     // 회전 쌍 생성
     vector<Matrix3d> A_list, B_list;
-    for (const auto& omega : imu_rotations) {
+    for (const auto& omega : imu_rotations)
+    {
         Matrix3d B = expSO3(omega);
         Matrix3d A = R_ci_true * B * R_ci_true.transpose();
         A_list.push_back(A);
@@ -163,13 +166,14 @@ void problem3_solution() {
     Matrix3d X_init = Matrix3d::Identity();
 
     double total_residual_I = 0;
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++)
+    {
         Matrix3d AX = A_list[i] * X_init;
         Matrix3d XB = X_init * B_list[i];
         double residual = (AX - XB).norm();  // Frobenius norm
         total_residual_I += residual;
 
-        cout << "    쌍 " << i+1 << ": ||A*X - X*B||_F = " << residual << endl;
+        cout << "    쌍 " << i + 1 << ": ||A*X - X*B||_F = " << residual << endl;
     }
     cout << "    합계: " << total_residual_I << "\n" << endl;
 
@@ -178,13 +182,14 @@ void problem3_solution() {
     Matrix3d X_true = R_ci_true;
 
     double total_residual_true = 0;
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++)
+    {
         Matrix3d AX = A_list[i] * X_true;
         Matrix3d XB = X_true * B_list[i];
         double residual = (AX - XB).norm();
         total_residual_true += residual;
 
-        cout << "    쌍 " << i+1 << ": ||A*X - X*B||_F = " << residual << endl;
+        cout << "    쌍 " << i + 1 << ": ||A*X - X*B||_F = " << residual << endl;
     }
     cout << "    합계: " << total_residual_true << "\n" << endl;
 
@@ -203,7 +208,8 @@ void problem3_solution() {
     cout << "    → 3축 회전이 모두 필요 (관측성 확보)" << endl;
 }
 
-int main() {
+int main()
+{
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "Week 13 Quiz Medium - 풀이" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;

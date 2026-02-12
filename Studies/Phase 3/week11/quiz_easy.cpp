@@ -4,7 +4,8 @@
 
 #include <iostream>
 
-void problem1_ceres_vs_g2o() {
+void problem1_ceres_vs_g2o()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: Ceres vs g2o" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -21,7 +22,8 @@ void problem1_ceres_vs_g2o() {
     std::cout << "   - 둘 다 비선형 최적화 + Robust Kernel 지원" << std::endl;
 }
 
-void problem2_autodiff_template() {
+void problem2_autodiff_template()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: AutoDiffCostFunction 템플릿 파라미터" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -36,7 +38,8 @@ void problem2_autodiff_template() {
     std::cout << "   - 3: 두 번째 파라미터 블록 차원 = 3D 점 (x, y, z)" << std::endl;
 }
 
-void problem3_dense_schur() {
+void problem3_dense_schur()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: DENSE_SCHUR" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -51,7 +54,8 @@ void problem3_dense_schur() {
     std::cout << "   - g2o에서는 setMarginalized(true)와 동일한 효과" << std::endl;
 }
 
-void problem4_huber_loss() {
+void problem4_huber_loss()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4: HuberLoss" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -66,7 +70,8 @@ void problem4_huber_loss() {
     std::cout << "   - 실제 데이터에서 잘못된 매칭의 영향을 억제" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 11 Quiz - Easy (Ceres 실습)" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

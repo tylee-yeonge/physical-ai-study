@@ -8,7 +8,8 @@
 #include <iostream>
 #include <string>
 
-int main() {
+int main()
+{
     std::cout << std::string(35, '=') << std::endl;
     std::cout << "Week 6 Quiz - Easy 정답" << std::endl;
     std::cout << std::string(35, '=') << std::endl;

@@ -6,7 +6,8 @@
 #include <Eigen/Dense>
 #include <cmath>
 
-void problem1_kalman_gain_computation() {
+void problem1_kalman_gain_computation()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: 칼만 게인 계산" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -28,13 +29,14 @@ void problem1_kalman_gain_computation() {
     Eigen::Vector2d K = P * H.transpose() * S.inverse();
 
     std::cout << "💡 풀이:" << std::endl;
-    std::cout << "   S = H·P·Hᵀ + R = " << S(0,0) << std::endl;
+    std::cout << "   S = H·P·Hᵀ + R = " << S(0, 0) << std::endl;
     std::cout << "   K = P·Hᵀ·S⁻¹ = [" << K(0) << ", " << K(1) << "]ᵀ" << std::endl;
     std::cout << "   → 위치: K=0.8 (측정 크게 반영)" << std::endl;
     std::cout << "   → 속도: K=0.0 (측정에 속도 정보 없음)" << std::endl;
 }
 
-void problem2_update_step() {
+void problem2_update_step()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: 업데이트 계산" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -61,7 +63,8 @@ void problem2_update_step() {
     std::cout << "   → 속도: 2.0 + 0×2 = 2.0m/s (변화 없음)" << std::endl;
 }
 
-void problem3_convergence() {
+void problem3_convergence()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: 칼만 필터 수렴" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -69,14 +72,15 @@ void problem3_convergence() {
     std::cout << "1D 칼만 필터에서 K와 P의 수렴을 관찰\n" << std::endl;
 
     // 1D 간단 버전
-    double P = 100.0;   // 초기 불확실성 (매우 큼)
-    double Q = 0.01;    // 프로세스 노이즈
-    double R = 1.0;     // 측정 노이즈
+    double P = 100.0;  // 초기 불확실성 (매우 큼)
+    double Q = 0.01;   // 프로세스 노이즈
+    double R = 1.0;    // 측정 노이즈
 
     std::cout << "  Step |   P(예측) |   K    |  P(업데이트)" << std::endl;
     std::cout << "  -----|----------|--------|------------" << std::endl;
 
-    for (int i = 0; i < 15; i++) {
+    for (int i = 0; i < 15; i++)
+    {
         // 예측
         double P_pred = P + Q;
 
@@ -86,9 +90,12 @@ void problem3_convergence() {
         // 업데이트
         P = (1 - K) * P_pred;
 
-        if (i < 5 || i >= 12) {
-            printf("  %4d |  %6.3f  | %.4f | %6.4f\n", i+1, P_pred, K, P);
-        } else if (i == 5) {
+        if (i < 5 || i >= 12)
+        {
+            printf("  %4d |  %6.3f  | %.4f | %6.4f\n", i + 1, P_pred, K, P);
+        }
+        else if (i == 5)
+        {
             std::cout << "   ... |   ...    |  ...   |  ..." << std::endl;
         }
     }
@@ -100,7 +107,8 @@ void problem3_convergence() {
     std::cout << "   → 안정값은 Q와 R의 비율에 의존" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 3 Quiz - Medium" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

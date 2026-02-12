@@ -6,7 +6,8 @@
 #include <Eigen/Dense>
 #include <cmath>
 
-void problem1_solution() {
+void problem1_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1 풀이: 칼만 게인 계산" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -24,7 +25,7 @@ void problem1_solution() {
     Eigen::Matrix<double, 1, 1> S = H * P * H.transpose() + R;
     std::cout << "  H·P = [1,0]·[[4,0],[0,2]] = [4, 0]" << std::endl;
     std::cout << "  H·P·Hᵀ = [4,0]·[1,0]ᵀ = 4" << std::endl;
-    std::cout << "  S = 4 + 1 = " << S(0,0) << "\n" << std::endl;
+    std::cout << "  S = 4 + 1 = " << S(0, 0) << "\n" << std::endl;
 
     std::cout << "Step 2: K = P·Hᵀ·S⁻¹" << std::endl;
     Eigen::Vector2d K = P * H.transpose() * S.inverse();
@@ -37,7 +38,8 @@ void problem1_solution() {
     std::cout << "  → H가 [1,0]이므로 위치만 관측, 속도는 간접 추정" << std::endl;
 }
 
-void problem2_solution() {
+void problem2_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2 풀이: 업데이트 계산" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -66,14 +68,15 @@ void problem2_solution() {
 
     std::cout << "Step 3: 공분산 업데이트" << std::endl;
     std::cout << "  P = (I - K·H)·P⁻" << std::endl;
-    std::cout << "  P(0,0) = " << P_updated(0,0) << " (4.0에서 감소!)" << std::endl;
-    std::cout << "  P(1,1) = " << P_updated(1,1) << " (변화 없음)\n" << std::endl;
+    std::cout << "  P(0,0) = " << P_updated(0, 0) << " (4.0에서 감소!)" << std::endl;
+    std::cout << "  P(1,1) = " << P_updated(1, 1) << " (변화 없음)\n" << std::endl;
 
     std::cout << "핵심: 위치 불확실성이 4.0 → 0.8로 감소" << std::endl;
     std::cout << "  → 측정값 하나로 5배나 확실해짐!" << std::endl;
 }
 
-void problem3_solution() {
+void problem3_solution()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3 풀이: 칼만 필터 수렴" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -86,14 +89,18 @@ void problem3_solution() {
     std::cout << "  Q = 0.01 (프로세스 노이즈)" << std::endl;
     std::cout << "  R = 1.0 (측정 노이즈)\n" << std::endl;
 
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 20; i++)
+    {
         double P_pred = P + Q;
         double K = P_pred / (P_pred + R);
         P = (1 - K) * P_pred;
 
-        if (i < 5 || i >= 17) {
-            printf("  Step %2d: P_pred=%7.4f, K=%6.4f, P=%7.4f\n", i+1, P_pred, K, P);
-        } else if (i == 5) {
+        if (i < 5 || i >= 17)
+        {
+            printf("  Step %2d: P_pred=%7.4f, K=%6.4f, P=%7.4f\n", i + 1, P_pred, K, P);
+        }
+        else if (i == 5)
+        {
             std::cout << "  ...  (수렴 중)" << std::endl;
         }
     }
@@ -103,13 +110,14 @@ void problem3_solution() {
     std::cout << "  2. P: 100 → ~0.01 로 빠르게 감소" << std::endl;
     std::cout << "  3. 정상상태에서 K와 P는 Q, R에만 의존" << std::endl;
     std::cout << "\n정상상태 공식 (Ricatti 방정식 해):" << std::endl;
-    double P_ss = (-R + std::sqrt(R*R + 4*R*Q)) / 2;
+    double P_ss = (-R + std::sqrt(R * R + 4 * R * Q)) / 2;
     double K_ss = P_ss / (P_ss + R);
     std::cout << "  P_ss = (-R + √(R² + 4RQ)) / 2 = " << P_ss << std::endl;
     std::cout << "  K_ss = P_ss / (P_ss + R) = " << K_ss << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 3 Quiz Medium - 풀이" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

@@ -9,65 +9,74 @@
 #include <algorithm>
 
 // Keyframe
-Keyframe::Keyframe(int id, const cv::Mat& img)
-    : id(id), image(img.clone()), num_tracked(0) {
+Keyframe::Keyframe(int id, const cv::Mat& img) : id(id), image(img.clone()), num_tracked(0)
+{
     R = Eigen::Matrix3d::Identity();
     t = Eigen::Vector3d::Zero();
 }
 
-void Keyframe::addCovisibility(Keyframe* other, int num_shared) {
+void Keyframe::addCovisibility(Keyframe* other, int num_shared)
+{
     // TODO: covisible_keyframes에 추가
 }
 
-std::vector<Keyframe*> Keyframe::getCovisibleKeyframes(int min_shared) {
+std::vector<Keyframe*> Keyframe::getCovisibleKeyframes(int min_shared)
+{
     // TODO: min_shared 이상 공유하는 keyframe 반환
     return {};
 }
 
 // KeyframeSelector
-KeyframeSelector::KeyframeSelector(int min_frames, int max_frames,
-                                    double min_tracked_ratio, double min_parallax)
-    : min_frames_(min_frames), max_frames_(max_frames),
-      min_tracked_ratio_(min_tracked_ratio), min_parallax_(min_parallax) {}
+KeyframeSelector::KeyframeSelector(int min_frames, int max_frames, double min_tracked_ratio,
+                                   double min_parallax)
+    : min_frames_(min_frames),
+      max_frames_(max_frames),
+      min_tracked_ratio_(min_tracked_ratio),
+      min_parallax_(min_parallax)
+{
+}
 
-bool KeyframeSelector::needNewKeyframe(int num_frames_since_last,
-                                        int num_tracked,
-                                        int total_map_points,
-                                        double avg_parallax) {
+bool KeyframeSelector::needNewKeyframe(int num_frames_since_last, int num_tracked,
+                                       int total_map_points, double avg_parallax)
+{
     // TODO: 새 keyframe 필요 여부 판단
     return false;
 }
 
 // KeyframeCuller
 KeyframeCuller::KeyframeCuller(double redundancy_threshold)
-    : redundancy_threshold_(redundancy_threshold) {}
+    : redundancy_threshold_(redundancy_threshold)
+{
+}
 
 void KeyframeCuller::cullRedundantKeyframes(std::vector<Keyframe*>& keyframes,
-                                             const std::vector<MapPoint>& map_points) {
+                                            const std::vector<MapPoint>& map_points)
+{
     // TODO: 중복 keyframe 제거
 }
 
-bool KeyframeCuller::isRedundant(const Keyframe* kf,
-                                  const std::vector<MapPoint>& map_points) {
+bool KeyframeCuller::isRedundant(const Keyframe* kf, const std::vector<MapPoint>& map_points)
+{
     // TODO: keyframe 중복 판단
     return false;
 }
 
 // CovisibilityGraph
-void CovisibilityGraph::updateCovisibility(Keyframe* kf1,
-                                            Keyframe* kf2,
-                                            const std::vector<MapPoint>& map_points) {
+void CovisibilityGraph::updateCovisibility(Keyframe* kf1, Keyframe* kf2,
+                                           const std::vector<MapPoint>& map_points)
+{
     // TODO: covisibility 업데이트
 }
 
-std::vector<Keyframe*> CovisibilityGraph::getLocalKeyframes(Keyframe* curr_kf,
-                                                             int max_keyframes) {
+std::vector<Keyframe*> CovisibilityGraph::getLocalKeyframes(Keyframe* curr_kf, int max_keyframes)
+{
     // TODO: local keyframes 반환
     return {};
 }
 
 #ifndef MY_BASIC_LIB_ONLY
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "  [내 구현] Keyframe 관리 데모" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;

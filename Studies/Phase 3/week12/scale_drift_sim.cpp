@@ -21,9 +21,11 @@ using namespace Eigen;
  * @param radius     원 반지름 (미터)
  * @return           각 프레임의 위치 (x, y)
  */
-vector<Vector2d> generateCircularTrajectory(int n_frames, double radius) {
+vector<Vector2d> generateCircularTrajectory(int n_frames, double radius)
+{
     vector<Vector2d> trajectory;
-    for (int i = 0; i < n_frames; i++) {
+    for (int i = 0; i < n_frames; i++)
+    {
         double theta = 2.0 * M_PI * i / n_frames;
         double x = radius * cos(theta);
         double y = radius * sin(theta);
@@ -43,16 +45,17 @@ vector<Vector2d> generateCircularTrajectory(int n_frames, double radius) {
  * @param seed            랜덤 시드
  * @return                드리프트가 포함된 추정 궤적
  */
-vector<Vector2d> simulateScaleDrift(const vector<Vector2d>& gt_trajectory,
-                                     double scale_noise_std,
-                                     int seed = 42) {
+vector<Vector2d> simulateScaleDrift(const vector<Vector2d>& gt_trajectory, double scale_noise_std,
+                                    int seed = 42)
+{
     default_random_engine gen(seed);
     normal_distribution<double> noise(1.0, scale_noise_std);
 
     vector<Vector2d> estimated;
     estimated.push_back(gt_trajectory[0]);  // 시작점은 동일
 
-    for (size_t i = 1; i < gt_trajectory.size(); i++) {
+    for (size_t i = 1; i < gt_trajectory.size(); i++)
+    {
         // Ground truth 이동 벡터
         Vector2d delta = gt_trajectory[i] - gt_trajectory[i - 1];
 
@@ -72,9 +75,8 @@ vector<Vector2d> simulateScaleDrift(const vector<Vector2d>& gt_trajectory,
 /**
  * 궤적 분석: 드리프트 통계 출력
  */
-void analyzeTrajectory(const vector<Vector2d>& gt,
-                       const vector<Vector2d>& est,
-                       const string& label) {
+void analyzeTrajectory(const vector<Vector2d>& gt, const vector<Vector2d>& est, const string& label)
+{
     int n = gt.size();
 
     // 최종 위치 오차
@@ -83,7 +85,8 @@ void analyzeTrajectory(const vector<Vector2d>& gt,
     // 평균 위치 오차
     double total_error = 0.0;
     double max_error = 0.0;
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++)
+    {
         double err = (gt[i] - est[i]).norm();
         total_error += err;
         max_error = max(max_error, err);
@@ -105,32 +108,41 @@ void analyzeTrajectory(const vector<Vector2d>& gt,
 /**
  * ASCII 궤적 시각화 (간단 버전)
  */
-void visualizeTrajectory(const vector<Vector2d>& gt,
-                         const vector<Vector2d>& est,
-                         int grid_size = 40) {
+void visualizeTrajectory(const vector<Vector2d>& gt, const vector<Vector2d>& est,
+                         int grid_size = 40)
+{
     // 전체 범위 계산
     double min_x = 1e9, max_x = -1e9;
     double min_y = 1e9, max_y = -1e9;
 
-    for (const auto& p : gt) {
-        min_x = min(min_x, p.x()); max_x = max(max_x, p.x());
-        min_y = min(min_y, p.y()); max_y = max(max_y, p.y());
+    for (const auto& p : gt)
+    {
+        min_x = min(min_x, p.x());
+        max_x = max(max_x, p.x());
+        min_y = min(min_y, p.y());
+        max_y = max(max_y, p.y());
     }
-    for (const auto& p : est) {
-        min_x = min(min_x, p.x()); max_x = max(max_x, p.x());
-        min_y = min(min_y, p.y()); max_y = max(max_y, p.y());
+    for (const auto& p : est)
+    {
+        min_x = min(min_x, p.x());
+        max_x = max(max_x, p.x());
+        min_y = min(min_y, p.y());
+        max_y = max(max_y, p.y());
     }
 
     // 여유 공간
     double margin = 0.5;
-    min_x -= margin; max_x += margin;
-    min_y -= margin; max_y += margin;
+    min_x -= margin;
+    max_x += margin;
+    min_y -= margin;
+    max_y += margin;
 
     // 그리드 초기화
     vector<string> grid(grid_size, string(grid_size * 2, ' '));
 
     // Ground truth 그리기 (.)
-    for (const auto& p : gt) {
+    for (const auto& p : gt)
+    {
         int gx = (int)((p.x() - min_x) / (max_x - min_x) * (grid_size * 2 - 1));
         int gy = (int)((p.y() - min_y) / (max_y - min_y) * (grid_size - 1));
         gy = grid_size - 1 - gy;  // y축 반전
@@ -139,7 +151,8 @@ void visualizeTrajectory(const vector<Vector2d>& gt,
     }
 
     // 추정 궤적 그리기 (*)
-    for (const auto& p : est) {
+    for (const auto& p : est)
+    {
         int gx = (int)((p.x() - min_x) / (max_x - min_x) * (grid_size * 2 - 1));
         int gy = (int)((p.y() - min_y) / (max_y - min_y) * (grid_size - 1));
         gy = grid_size - 1 - gy;
@@ -159,14 +172,16 @@ void visualizeTrajectory(const vector<Vector2d>& gt,
     // 출력
     cout << "  궤적 시각화 ( . = GT,  * = 추정,  S = 시작점 )" << endl;
     cout << "  " << string(grid_size * 2 + 2, '-') << endl;
-    for (const auto& row : grid) {
+    for (const auto& row : grid)
+    {
         cout << "  |" << row << "|" << endl;
     }
     cout << "  " << string(grid_size * 2 + 2, '-') << endl;
     cout << endl;
 }
 
-int main() {
+int main()
+{
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "Week 12: 스케일 드리프트 시뮬레이션" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
@@ -174,8 +189,8 @@ int main() {
     // ============================================
     // 파라미터 설정
     // ============================================
-    const int n_frames = 100;         // 100 프레임 (원 한 바퀴)
-    const double radius = 5.0;        // 반지름 5m
+    const int n_frames = 100;   // 100 프레임 (원 한 바퀴)
+    const double radius = 5.0;  // 반지름 5m
 
     cout << "설정:" << endl;
     cout << "  프레임 수: " << n_frames << endl;
@@ -200,7 +215,8 @@ int main() {
 
     vector<double> noise_levels = {0.001, 0.005, 0.01, 0.02, 0.05};
 
-    for (double noise_std : noise_levels) {
+    for (double noise_std : noise_levels)
+    {
         auto est = simulateScaleDrift(gt, noise_std);
         char label[64];
         snprintf(label, sizeof(label), "노이즈 %.1f%%", noise_std * 100);
@@ -221,10 +237,10 @@ int main() {
     cout << "  프레임  | GT 위치          | 추정 위치        | 오차(m)" << endl;
     cout << "  --------|-----------------|-----------------|--------" << endl;
 
-    for (int i = 0; i < n_frames; i += 10) {
+    for (int i = 0; i < n_frames; i += 10)
+    {
         double err = (gt[i] - est_1pct[i]).norm();
-        printf("    %3d   | (%5.2f, %5.2f)  | (%5.2f, %5.2f)  | %6.3f\n",
-               i, gt[i].x(), gt[i].y(),
+        printf("    %3d   | (%5.2f, %5.2f)  | (%5.2f, %5.2f)  | %6.3f\n", i, gt[i].x(), gt[i].y(),
                est_1pct[i].x(), est_1pct[i].y(), err);
     }
     cout << endl;

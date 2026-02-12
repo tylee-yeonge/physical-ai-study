@@ -4,7 +4,8 @@
 
 #include <iostream>
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 11 Easy Quiz - 정답 및 해설" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -17,7 +18,8 @@ int main() {
     std::cout << "해설:" << std::endl;
     std::cout << "  Ceres의 가장 큰 장점은 자동 미분(Auto-differentiation)입니다." << std::endl;
     std::cout << "  operator()에서 순방향 계산만 정의하면, Ceres가 내부적으로" << std::endl;
-    std::cout << "  Jet<double, N> 타입을 사용하여 정확한 Jacobian을 자동 계산합니다.\n" << std::endl;
+    std::cout << "  Jet<double, N> 타입을 사용하여 정확한 Jacobian을 자동 계산합니다.\n"
+              << std::endl;
     std::cout << "  g2o에서는 linearizeOplus()에서 Jacobian을 직접 계산해야 합니다." << std::endl;
     std::cout << "  다만, g2o도 표준 SLAM 문제(EdgeProjectXYZ2UV 등)에 대해서는" << std::endl;
     std::cout << "  이미 Jacobian이 구현되어 있으므로 직접 작성할 일은 적습니다.\n" << std::endl;

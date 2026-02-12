@@ -5,7 +5,8 @@
 #include <iostream>
 #include <cmath>
 
-void problem1_sfm_scale() {
+void problem1_sfm_scale()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: Vision-only SfM의 한계" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -21,7 +22,8 @@ void problem1_sfm_scale() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-void problem2_bias_estimation_order() {
+void problem2_bias_estimation_order()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: 바이어스 추정 순서" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -36,25 +38,28 @@ void problem2_bias_estimation_order() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-void problem3_gravity_constraint() {
+void problem3_gravity_constraint()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: 중력 제약 조건" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    std::cout << "선형 Alignment 후 중력 벡터가 g = [0.2, -0.1, -9.75]로 추정되었습니다." << std::endl;
+    std::cout << "선형 Alignment 후 중력 벡터가 g = [0.2, -0.1, -9.75]로 추정되었습니다."
+              << std::endl;
     std::cout << "이 결과를 어떻게 검증하고 정제하는가?\n" << std::endl;
     std::cout << "  (A) 그대로 사용 (충분히 정확)" << std::endl;
     std::cout << "  (B) ||g|| = 9.81 제약을 적용하여 방향만 보정" << std::endl;
     std::cout << "  (C) z축 성분만 -9.81로 교체" << std::endl;
     std::cout << "  (D) g = [0, 0, -9.81]로 고정\n" << std::endl;
 
-    double g_norm = std::sqrt(0.2*0.2 + 0.1*0.1 + 9.75*9.75);
+    double g_norm = std::sqrt(0.2 * 0.2 + 0.1 * 0.1 + 9.75 * 9.75);
     std::cout << "  현재 ||g|| = " << g_norm << " (참값: 9.81)" << std::endl;
     std::cout << "  힌트: 중력의 크기는 알지만 방향은 미지수" << std::endl;
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-void problem4_initialization_failure() {
+void problem4_initialization_failure()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 4: 초기화 실패 조건" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -70,7 +75,8 @@ void problem4_initialization_failure() {
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Week 12 Quiz - Easy (VIO 초기화 과정)" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

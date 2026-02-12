@@ -6,7 +6,8 @@
 #include <Eigen/Dense>
 #include <cmath>
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Phase 4 Week 1 Quiz Solutions (Medium)" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
@@ -17,9 +18,7 @@ int main() {
 
     double angle = M_PI / 4.0;  // 45도
     Eigen::Matrix3d R_wb;
-    R_wb << 1, 0, 0,
-            0, cos(angle), -sin(angle),
-            0, sin(angle), cos(angle);
+    R_wb << 1, 0, 0, 0, cos(angle), -sin(angle), 0, sin(angle), cos(angle);
 
     Eigen::Vector3d g_world(0, 0, -9.81);
     Eigen::Vector3d g_body = R_wb.transpose() * g_world;
@@ -61,8 +60,8 @@ int main() {
     std::cout << "문제 3: 바이어스에 의한 위치 드리프트" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    double bias = 0.05;   // m/s²
-    double t = 10.0;      // 초
+    double bias = 0.05;  // m/s²
+    double t = 10.0;     // 초
     double drift = 0.5 * bias * t * t;
 
     std::cout << "풀이:" << std::endl;
