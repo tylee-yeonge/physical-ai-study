@@ -21,15 +21,16 @@
  *
  * TODO: 큐브를 투영하고 cv::line으로 연결하세요.
  */
-void problem1_cube_projection() {
+void problem1_cube_projection()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 1: 큐브 투영 시각화" << std::endl;
-    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+              << std::endl;
 
-    cv::Mat K = (cv::Mat_<double>(3, 3) <<
-        600.0, 0.0, 400.0,
-        0.0, 600.0, 300.0,
-        0.0, 0.0, 1.0);
+    cv::Mat K = (cv::Mat_<double>(3, 3) << 600.0, 0.0, 400.0,
+                 0.0, 600.0, 300.0,
+                 0.0, 0.0, 1.0);
 
     // R = I, t = 0
     cv::Mat R = cv::Mat::eye(3, 3, CV_64F);
@@ -37,19 +38,15 @@ void problem1_cube_projection() {
 
     // 큐브 꼭짓점 (중심 (0,0,5), 한 변 2)
     std::vector<cv::Point3d> cube = {
-        {-1, -1, 4}, { 1, -1, 4}, { 1,  1, 4}, {-1,  1, 4},  // 앞면
-        {-1, -1, 6}, { 1, -1, 6}, { 1,  1, 6}, {-1,  1, 6}   // 뒷면
+        {-1, -1, 4}, {1, -1, 4}, {1, 1, 4}, {-1, 1, 4}, // 앞면
+        {-1, -1, 6},
+        {1, -1, 6},
+        {1, 1, 6},
+        {-1, 1, 6} // 뒷면
     };
 
     // TODO: 각 3D 점을 2D로 투영
     std::vector<cv::Point2d> pixels;
-    // 힌트:
-    // for (const auto& pt : cube) {
-    //     Xc = pt.x, Yc = pt.y, Zc = pt.z  (R=I, t=0이므로)
-    //     u = fx * Xc/Zc + cx
-    //     v = fy * Yc/Zc + cy
-    //     pixels.push_back(cv::Point2d(u, v));
-    // }
 
     // TODO: 이미지에 큐브 그리기
     cv::Mat image = cv::Mat::zeros(600, 800, CV_8UC3);
@@ -72,15 +69,16 @@ void problem1_cube_projection() {
  *
  * TODO: 오차의 평균과 표준편차를 구하세요.
  */
-void problem2_reprojection_error() {
+void problem2_reprojection_error()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: 재투영 오차 시뮬레이션" << std::endl;
-    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+              << std::endl;
 
-    cv::Mat K = (cv::Mat_<double>(3, 3) <<
-        600.0, 0.0, 400.0,
-        0.0, 600.0, 300.0,
-        0.0, 0.0, 1.0);
+    cv::Mat K = (cv::Mat_<double>(3, 3) << 600.0, 0.0, 400.0,
+                 0.0, 600.0, 300.0,
+                 0.0, 0.0, 1.0);
 
     double fx = 600.0, fy = 600.0;
     double cx = 400.0, cy = 300.0;
@@ -90,10 +88,11 @@ void problem2_reprojection_error() {
     std::vector<cv::Point2d> observed_2d;
 
     srand(42);
-    for (int i = 0; i < 20; i++) {
-        double x = (rand() % 100 - 50) / 25.0;  // -2 ~ 2
+    for (int i = 0; i < 20; i++)
+    {
+        double x = (rand() % 100 - 50) / 25.0; // -2 ~ 2
         double y = (rand() % 100 - 50) / 25.0;
-        double z = 3.0 + (rand() % 70) / 10.0;  // 3 ~ 10
+        double z = 3.0 + (rand() % 70) / 10.0; // 3 ~ 10
         points_3d.push_back(cv::Point3d(x, y, z));
 
         // 투영 (R=I, t=0)
@@ -116,8 +115,8 @@ void problem2_reprojection_error() {
     // }
 
     // TODO: 평균과 표준편차 계산
-    double mean_error = 0.0;  // TODO
-    double std_error = 0.0;   // TODO
+    double mean_error = 0.0; // TODO
+    double std_error = 0.0;  // TODO
 
     std::cout << "📊 재투영 오차 결과:" << std::endl;
     std::cout << "   점 개수: " << points_3d.size() << std::endl;
@@ -140,27 +139,30 @@ void problem2_reprojection_error() {
  *
  * TODO: 각 시나리오에서 점 (0, 0, 5)의 투영 결과를 비교하세요.
  */
-void problem3_extrinsic_effect() {
+void problem3_extrinsic_effect()
+{
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: 외부 파라미터 변화 효과" << std::endl;
-    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+              << std::endl;
 
     double fx = 600.0, fy = 600.0;
     double cx = 400.0, cy = 300.0;
 
     cv::Point3d P(0, 0, 5);
 
-    std::cout << "3D 점: (" << P.x << ", " << P.y << ", " << P.z << ")\n" << std::endl;
+    std::cout << "3D 점: (" << P.x << ", " << P.y << ", " << P.z << ")\n"
+              << std::endl;
 
     // 기본: R=I, t=0
     // TODO: 기본 투영 계산
-    double u0 = 0.0, v0 = 0.0;  // TODO
+    double u0 = 0.0, v0 = 0.0; // TODO
     std::cout << "기본 (R=I, t=0): (" << u0 << ", " << v0 << ")" << std::endl;
 
     // 시나리오 1: t = [1, 0, 0] (카메라가 오른쪽으로 1m)
     // TODO: Pc = R*P + t = P + [1,0,0] = (1, 0, 5) 투영
     // 힌트: 카메라가 오른쪽으로 이동하면, 물체는 왼쪽으로 보임
-    double u1 = 0.0, v1 = 0.0;  // TODO
+    double u1 = 0.0, v1 = 0.0; // TODO
     std::cout << "시나리오 1 (t=[1,0,0]): (" << u1 << ", " << v1 << ")" << std::endl;
 
     // 시나리오 2: Y축 15° 회전
@@ -174,7 +176,7 @@ void problem3_extrinsic_effect() {
     // 힌트: cv::Mat R = (cv::Mat_<double>(3,3) << ...);
     // Pc = R * [0, 0, 5]^T
 
-    double u2 = 0.0, v2 = 0.0;  // TODO
+    double u2 = 0.0, v2 = 0.0; // TODO
     std::cout << "시나리오 2 (Y축 15° 회전): (" << u2 << ", " << v2 << ")" << std::endl;
 
     std::cout << "\n💡 핵심 관찰:" << std::endl;
@@ -183,7 +185,8 @@ void problem3_extrinsic_effect() {
     std::cout << "   - 이것이 SLAM에서 매 프레임 추정하는 것!" << std::endl;
 }
 
-int main() {
+int main()
+{
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Phase 2 Week 1 Quiz - Medium" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
