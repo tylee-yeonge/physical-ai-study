@@ -11,6 +11,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <numeric>
 
 /**
  * 문제 1: 다중 점 투영 및 시각화
