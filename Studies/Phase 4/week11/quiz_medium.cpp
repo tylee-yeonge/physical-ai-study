@@ -12,7 +12,8 @@
 using namespace Eigen;
 using namespace std;
 
-void problem1_gravity_error_propagation() {
+void problem1_gravity_error_propagation()
+{
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 1: 중력 방향 오차 전파" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
@@ -37,16 +38,16 @@ void problem1_gravity_error_propagation() {
     cout << "     위치 오차 = 0.5 * ||delta_g|| * t^2  (t=5초)\n" << endl;
 
     // TODO: 여기에 코드를 작성하세요
-    // for (double theta_deg : thetas_deg) {
-    //     double theta_rad = theta_deg * M_PI / 180.0;
-    //     Vector3d g_wrong = ???;
-    //     Vector3d delta_g = ???;
-    //     double pos_error = ???;
-    // }
+    // 각 theta_deg에 대해:
+    //   1. theta를 라디안으로 변환
+    //   2. 위에 주어진 g_wrong 공식으로 잘못된 중력 벡터 계산
+    //   3. delta_g = g_wrong - g_true
+    //   4. 위치 오차 = 0.5 * ||delta_g|| * t^2 (t=5초)
 
     cout << "  theta (°) │ delta_g (m/s²) │ 5초 후 위치 오차 (m)" << endl;
     cout << "  ──────────┼───────────────┼─────────────────────" << endl;
-    for (double theta_deg : thetas_deg) {
+    for (double theta_deg : thetas_deg)
+    {
         cout << "    " << setw(4) << fixed << setprecision(1) << theta_deg
              << "     │    _________   │      ___________" << endl;
     }
@@ -56,7 +57,8 @@ void problem1_gravity_error_propagation() {
     cout << "  5초 후 위치 오차는 몇 cm인가?\n" << endl;
 }
 
-void problem2_scale_alignment() {
+void problem2_scale_alignment()
+{
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 2: 스케일 추정 (최소자승법)" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
@@ -66,26 +68,21 @@ void problem2_scale_alignment() {
 
     // SfM 상대 이동 (up-to-scale)
     MatrixXd sfm_displacements(5, 3);
-    sfm_displacements << 0.30, 0.00, 0.02,
-                          0.28, 0.05, -0.01,
-                          0.32, -0.03, 0.01,
-                          0.15, 0.20, 0.00,
-                          0.25, 0.10, -0.02;
+    sfm_displacements << 0.30, 0.00, 0.02, 0.28, 0.05, -0.01, 0.32, -0.03, 0.01, 0.15, 0.20, 0.00,
+        0.25, 0.10, -0.02;
 
     // IMU 기반 실제 이동 (미터)
     MatrixXd imu_displacements(5, 3);
-    imu_displacements << 0.90, 0.01, 0.06,
-                          0.85, 0.14, -0.02,
-                          0.95, -0.08, 0.04,
-                          0.45, 0.61, 0.01,
-                          0.76, 0.29, -0.05;
+    imu_displacements << 0.90, 0.01, 0.06, 0.85, 0.14, -0.02, 0.95, -0.08, 0.04, 0.45, 0.61, 0.01,
+        0.76, 0.29, -0.05;
 
     cout << "  SfM 이동 (up-to-scale)    │  IMU 이동 (미터)" << endl;
     cout << "  ──────────────────────────┼───────────────────────────" << endl;
-    for (int i = 0; i < 5; i++) {
-        printf("  [%5.2f, %5.2f, %5.2f]    │  [%5.2f, %5.2f, %5.2f]\n",
-               sfm_displacements(i,0), sfm_displacements(i,1), sfm_displacements(i,2),
-               imu_displacements(i,0), imu_displacements(i,1), imu_displacements(i,2));
+    for (int i = 0; i < 5; i++)
+    {
+        printf("  [%5.2f, %5.2f, %5.2f]    │  [%5.2f, %5.2f, %5.2f]\n", sfm_displacements(i, 0),
+               sfm_displacements(i, 1), sfm_displacements(i, 2), imu_displacements(i, 0),
+               imu_displacements(i, 1), imu_displacements(i, 2));
     }
 
     cout << "\n과제: 스케일 s를 최소자승법으로 추정하세요.\n" << endl;
@@ -94,15 +91,10 @@ void problem2_scale_alignment() {
     cout << "  해석적 해: s = Σ(sfm_i · imu_i) / Σ(sfm_i · sfm_i)\n" << endl;
 
     // TODO: 여기에 코드를 작성하세요
-    // double numerator = 0.0;   // Σ(sfm_i · imu_i)
-    // double denominator = 0.0; // Σ(sfm_i · sfm_i)
-    // for (int i = 0; i < 5; i++) {
-    //     Vector3d sfm_i = sfm_displacements.row(i).transpose();
-    //     Vector3d imu_i = imu_displacements.row(i).transpose();
-    //     numerator += ???;
-    //     denominator += ???;
-    // }
-    // double s = numerator / denominator;
+    // 위에 주어진 해석적 해를 구현하세요:
+    //   numerator = Σ(sfm_i · imu_i),  denominator = Σ(sfm_i · sfm_i)
+    //   각 행을 Vector3d로 추출하여 dot product 계산
+    //   s = numerator / denominator
 
     cout << "  추정된 스케일 s = _____\n" << endl;
     cout << "  💡 힌트: Eigen의 dot product를 사용하세요: v1.dot(v2)\n" << endl;
@@ -111,7 +103,8 @@ void problem2_scale_alignment() {
     cout << "  residual_i = ||imu_i - s * sfm_i||\n" << endl;
 }
 
-void problem3_bias_estimation_simulation() {
+void problem3_bias_estimation_simulation()
+{
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 3: 자이로 바이어스 추정" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
@@ -123,22 +116,16 @@ void problem3_bias_estimation_simulation() {
     // 정지 상태 자이로 측정값 (실제 b_g + 노이즈)
     // 실제 바이어스: b_g = [0.002, -0.001, 0.0015]
     MatrixXd gyro_measurements(10, 3);
-    gyro_measurements <<  0.0023, -0.0008,  0.0018,
-                           0.0018, -0.0013,  0.0012,
-                           0.0021, -0.0009,  0.0016,
-                           0.0019, -0.0011,  0.0014,
-                           0.0022, -0.0007,  0.0017,
-                           0.0017, -0.0012,  0.0013,
-                           0.0024, -0.0010,  0.0019,
-                           0.0020, -0.0009,  0.0015,
-                           0.0021, -0.0011,  0.0016,
-                           0.0016, -0.0010,  0.0010;
+    gyro_measurements << 0.0023, -0.0008, 0.0018, 0.0018, -0.0013, 0.0012, 0.0021, -0.0009, 0.0016,
+        0.0019, -0.0011, 0.0014, 0.0022, -0.0007, 0.0017, 0.0017, -0.0012, 0.0013, 0.0024, -0.0010,
+        0.0019, 0.0020, -0.0009, 0.0015, 0.0021, -0.0011, 0.0016, 0.0016, -0.0010, 0.0010;
 
     cout << "  측정 │   ω_x (rad/s)  │   ω_y (rad/s)  │   ω_z (rad/s)" << endl;
     cout << "  ─────┼────────────────┼────────────────┼────────────────" << endl;
-    for (int i = 0; i < 10; i++) {
-        printf("   %2d   │    %8.4f     │    %8.4f     │    %8.4f\n",
-               i+1, gyro_measurements(i,0), gyro_measurements(i,1), gyro_measurements(i,2));
+    for (int i = 0; i < 10; i++)
+    {
+        printf("   %2d   │    %8.4f     │    %8.4f     │    %8.4f\n", i + 1,
+               gyro_measurements(i, 0), gyro_measurements(i, 1), gyro_measurements(i, 2));
     }
 
     cout << "\n과제:" << endl;
@@ -148,11 +135,9 @@ void problem3_bias_estimation_simulation() {
     cout << "  3. 추정된 바이어스의 크기 ||b_g_hat||를 구하세요.\n" << endl;
 
     // TODO: 여기에 코드를 작성하세요
-    // Vector3d b_g_hat = Vector3d::Zero();
-    // for (int i = 0; i < 10; i++) {
-    //     b_g_hat += gyro_measurements.row(i).transpose();
-    // }
-    // b_g_hat /= 10.0;
+    // 1. b_g_hat을 Zero로 초기화
+    // 2. 10개 측정값을 모두 더한 뒤 N으로 나누어 평균(바이어스) 추정
+    // 3. 각 축별 표준편차도 계산하세요
 
     cout << "  추정된 바이어스: b_g_hat = [_____, _____, _____] rad/s" << endl;
     cout << "  표준편차:        σ      = [_____, _____, _____] rad/s" << endl;
@@ -165,7 +150,8 @@ void problem3_bias_estimation_simulation() {
     cout << "  얼마나 작아지는지 확인하세요.\n" << endl;
 }
 
-int main() {
+int main()
+{
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "Week 11 Quiz - Medium" << endl;
     cout << "VIO 초기화 문제" << endl;

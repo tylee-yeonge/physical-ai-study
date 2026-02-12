@@ -11,7 +11,8 @@
 using namespace Eigen;
 using namespace std;
 
-void problem1_noise_propagation() {
+void problem1_noise_propagation()
+{
     cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 1: 노이즈 전파 시뮬레이션" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
@@ -29,25 +30,22 @@ void problem1_noise_propagation() {
     double T = 5.0;
 
     double sigma_p_theory = sigma_a * sqrt(dt) * pow(T, 1.5) / sqrt(3.0);
-    cout << "  이론값 σ_p = " << sigma_a << " × " << sqrt(dt) << " × "
-         << pow(T, 1.5) << " / " << sqrt(3.0) << " = _____ m\n" << endl;
+    cout << "  이론값 σ_p = " << sigma_a << " × " << sqrt(dt) << " × " << pow(T, 1.5) << " / "
+         << sqrt(3.0) << " = _____ m\n"
+         << endl;
 
     // TODO: 학생이 구현
-    // default_random_engine gen(42);
-    // normal_distribution<double> noise(0, sigma_a);
-    // double v = 0, p = 0;
-    // for (int i = 0; i < (int)(T/dt); i++) {
-    //     double a = noise(gen);
-    //     v += a * dt;
-    //     p += v * dt;
-    // }
+    // 1. 난수 생성기로 평균 0, 표준편차 sigma_a인 노이즈 생성
+    // 2. v=0, p=0 초기화 후 T/dt 스텝만큼 반복
+    // 3. 매 스텝: 노이즈를 가속도로 사용, v += a*dt, p += v*dt
 
     cout << "  시뮬레이션 결과: p = _____ m" << endl;
     cout << "  이론값:          σ_p = _____ m\n" << endl;
     cout << "  정답은 quiz_solutions/medium_sol.cpp 참고" << endl;
 }
 
-void problem2_bias_vs_noise_growth() {
+void problem2_bias_vs_noise_growth()
+{
     cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 2: 바이어스 vs 노이즈 성장률" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
@@ -73,7 +71,8 @@ void problem2_bias_vs_noise_growth() {
     cout << "  ────────┼───────────────────┼────────────────┼────────────────" << endl;
 
     // TODO: 학생이 구현
-    for (double t : {1.0, 5.0, 10.0, 30.0}) {
+    for (double t : {1.0, 5.0, 10.0, 30.0})
+    {
         // double sigma_p = sigma_a * sqrt(dt) * pow(t, 1.5) / sqrt(3.0);
         // double p_bias = 0.5 * b_a * t * t;
         cout << "    " << setw(4) << fixed << setprecision(0) << t
@@ -84,7 +83,8 @@ void problem2_bias_vs_noise_growth() {
     cout << "  정답은 quiz_solutions/medium_sol.cpp 참고" << endl;
 }
 
-void problem3_discrete_noise() {
+void problem3_discrete_noise()
+{
     cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 3: 연속-이산 노이즈 변환" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
@@ -112,7 +112,8 @@ void problem3_discrete_noise() {
     cout << "  정답은 quiz_solutions/medium_sol.cpp 참고" << endl;
 }
 
-int main() {
+int main()
+{
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "Week 2 Quiz - Medium (IMU 노이즈 모델)" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;

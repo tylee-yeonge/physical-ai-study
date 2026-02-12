@@ -12,7 +12,8 @@
 using namespace Eigen;
 using namespace std;
 
-void problem1_stereo_depth_calculation() {
+void problem1_stereo_depth_calculation()
+{
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 1: Stereo Depth 계산" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
@@ -26,7 +27,7 @@ void problem1_stereo_depth_calculation() {
     Eigen::VectorXd left_x(5);   // 좌 카메라 x좌표
     Eigen::VectorXd right_x(5);  // 우 카메라 x좌표
 
-    left_x  << 320.0, 250.0, 400.0, 310.0, 350.0;
+    left_x << 320.0, 250.0, 400.0, 310.0, 350.0;
     right_x << 310.0, 220.0, 395.0, 280.0, 348.0;
 
     double f = 500.0;  // 초점 거리
@@ -35,8 +36,9 @@ void problem1_stereo_depth_calculation() {
     cout << "5개 특징점의 좌우 카메라 x좌표:" << endl;
     cout << "  점 │ 좌 카메라 (pixel) │ 우 카메라 (pixel)" << endl;
     cout << "  ───┼──────────────────┼──────────────────" << endl;
-    for (int i = 0; i < 5; i++) {
-        printf("   %d  │      %6.1f       │      %6.1f\n", i+1, left_x(i), right_x(i));
+    for (int i = 0; i < 5; i++)
+    {
+        printf("   %d  │      %6.1f       │      %6.1f\n", i + 1, left_x(i), right_x(i));
     }
     cout << endl;
 
@@ -52,15 +54,17 @@ void problem1_stereo_depth_calculation() {
     cout << "  ───┼──────────────────┼──────────" << endl;
 
     // TODO: 결과를 출력하세요
-    for (int i = 0; i < 5; i++) {
-        cout << "   " << i+1 << "  │      _____        │   _____" << endl;
+    for (int i = 0; i < 5; i++)
+    {
+        cout << "   " << i + 1 << "  │      _____        │   _____" << endl;
     }
 
     cout << "\n  💡 힌트: disparity가 작은 점일수록 멀리 있습니다.\n" << endl;
     cout << "  추가 질문: disparity = 0이면 무슨 일이 일어나나요?\n" << endl;
 }
 
-void problem2_imu_integration() {
+void problem2_imu_integration()
+{
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 2: IMU 가속도 적분" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
@@ -76,8 +80,9 @@ void problem2_imu_integration() {
 
     cout << "  스텝 │ 시간 (초) │ 가속도 (m/s²)" << endl;
     cout << "  ─────┼──────────┼──────────────" << endl;
-    for (int i = 0; i < 10; i++) {
-        printf("    %2d  │   %4.1f    │    %5.2f\n", i+1, (i+1)*dt, accel(i));
+    for (int i = 0; i < 10; i++)
+    {
+        printf("    %2d  │   %4.1f    │    %5.2f\n", i + 1, (i + 1) * dt, accel(i));
     }
 
     cout << "\n과제: 가속도를 적분하여 각 스텝의 속도와 위치를 구하세요." << endl;
@@ -88,18 +93,15 @@ void problem2_imu_integration() {
     cout << "    p(k+1) = p(k) + v(k) * dt + 0.5 * a(k) * dt²\n" << endl;
 
     // TODO: 여기에 코드를 작성하세요
-    // Eigen::VectorXd velocity(11);  // 0~10
-    // Eigen::VectorXd position(11);  // 0~10
-    // velocity(0) = 0.0;
-    // position(0) = 0.0;
-    // for (int i = 0; i < 10; i++) { ... }
+    // 1. velocity(11), position(11) 벡터를 선언하고 초기값 0으로 설정
+    // 2. 10 스텝 반복하며 위 적분 공식으로 속도와 위치를 누적 계산
 
     cout << "  스텝 │ 시간 (초) │ 속도 (m/s) │ 위치 (m)" << endl;
     cout << "  ─────┼──────────┼────────────┼─────────" << endl;
     cout << "    0   │    0.0    │    0.000   │   0.000" << endl;
-    for (int i = 0; i < 10; i++) {
-        cout << "   " << setw(2) << i+1 << "   │   "
-             << fixed << setprecision(1) << (i+1)*dt
+    for (int i = 0; i < 10; i++)
+    {
+        cout << "   " << setw(2) << i + 1 << "   │   " << fixed << setprecision(1) << (i + 1) * dt
              << "    │    _____   │   _____" << endl;
     }
 
@@ -108,7 +110,8 @@ void problem2_imu_integration() {
     cout << "  최종 위치가 얼마나 달라지나요?\n" << endl;
 }
 
-void problem3_sensor_comparison() {
+void problem3_sensor_comparison()
+{
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 3: 센서 융합 비교 분석" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
@@ -119,9 +122,9 @@ void problem3_sensor_comparison() {
     double true_distance = 10.0;
 
     // 각 방법의 추정 결과 (시뮬레이션 데이터)
-    Eigen::Vector3d mono_estimate(12.5, 0.3, -0.1);    // Monocular: 스케일 드리프트
-    Eigen::Vector3d stereo_estimate(10.1, 0.05, 0.02); // Stereo: 안정적
-    Eigen::Vector3d vio_estimate(10.3, 0.1, -0.05);    // VIO: 양호
+    Eigen::Vector3d mono_estimate(12.5, 0.3, -0.1);     // Monocular: 스케일 드리프트
+    Eigen::Vector3d stereo_estimate(10.1, 0.05, 0.02);  // Stereo: 안정적
+    Eigen::Vector3d vio_estimate(10.3, 0.1, -0.05);     // VIO: 양호
 
     cout << "  실제 경로: (10.0, 0.0, 0.0) m" << endl;
     cout << "  Monocular 추정: (" << mono_estimate.transpose() << ") m" << endl;
@@ -153,7 +156,8 @@ void problem3_sensor_comparison() {
     cout << "  스케일 모호성과 연결하여 설명하세요.\n" << endl;
 }
 
-int main() {
+int main()
+{
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "Week 13 Quiz - Medium" << endl;
     cout << "스케일 복구 방법" << endl;

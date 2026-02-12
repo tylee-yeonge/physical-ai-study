@@ -10,33 +10,36 @@
 using namespace Eigen;
 using namespace std;
 
-Matrix3d skew(const Vector3d& v) {
+Matrix3d skew(const Vector3d& v)
+{
     Matrix3d m;
-    m <<    0, -v.z(),  v.y(),
-         v.z(),     0, -v.x(),
-        -v.y(),  v.x(),     0;
+    m << 0, -v.z(), v.y(), v.z(), 0, -v.x(), -v.y(), v.x(), 0;
     return m;
 }
 
-Matrix3d expSO3(const Vector3d& omega) {
+Matrix3d expSO3(const Vector3d& omega)
+{
     double angle = omega.norm();
-    if (angle < 1e-10) return Matrix3d::Identity();
+    if (angle < 1e-10)
+        return Matrix3d::Identity();
     Vector3d axis = omega / angle;
     Matrix3d K = skew(axis);
-    return Matrix3d::Identity()
-         + sin(angle) * K + (1.0 - cos(angle)) * K * K;
+    return Matrix3d::Identity() + sin(angle) * K + (1.0 - cos(angle)) * K * K;
 }
 
-Vector3d logSO3(const Matrix3d& R) {
+Vector3d logSO3(const Matrix3d& R)
+{
     double cos_angle = (R.trace() - 1.0) / 2.0;
     cos_angle = max(-1.0, min(1.0, cos_angle));
     double angle = acos(cos_angle);
-    if (angle < 1e-10) return Vector3d::Zero();
+    if (angle < 1e-10)
+        return Vector3d::Zero();
     Matrix3d log_R = (angle / (2.0 * sin(angle))) * (R - R.transpose());
-    return Vector3d(log_R(2,1), log_R(0,2), log_R(1,0));
+    return Vector3d(log_R(2, 1), log_R(0, 2), log_R(1, 0));
 }
 
-void problem1_gyro_bias_estimation() {
+void problem1_gyro_bias_estimation()
+{
     cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 1: 자이로 바이어스 추정" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
@@ -77,17 +80,17 @@ void problem1_gyro_bias_estimation() {
     cout << "  여기서 J ≈ -I * dt (단순화)\n" << endl;
 
     // TODO: 학생이 구현
-    // Vector3d r0 = logSO3(DR_01.transpose() * R0.transpose() * R1);
-    // Vector3d r1 = logSO3(DR_12.transpose() * R1.transpose() * R2);
-    // J = -I * dt
-    // [J; J] * b_g = [r0; r1]
+    // 1. 잔차 계산: r_k = logSO3(DR_ij^T * R_i^T * R_j)  (k=0,1)
+    // 2. 야코비안 J = -I * dt (단순화)
+    // 3. 선형 시스템 [J; J] * b_g = [r0; r1]을 최소자승법으로 풀기
 
     cout << "  추정된 b_g = [_____, _____, _____] rad/s" << endl;
     cout << "  (참값: [0.003, -0.002, 0.001])\n" << endl;
     cout << "  정답은 quiz_solutions/medium_sol.cpp 참고" << endl;
 }
 
-void problem2_scale_gravity_estimation() {
+void problem2_scale_gravity_estimation()
+{
     cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 2: 스케일과 중력 동시 추정" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
@@ -101,8 +104,8 @@ void problem2_scale_gravity_estimation() {
 
     // Vision 위치 (up-to-scale, s로 나눈 값)
     Vector3d p0_v(0.0, 0.0, 0.0);
-    Vector3d p1_v(0.4, 0.0, 0.0);    // 실제: 1.0m → /2.5 = 0.4
-    Vector3d p2_v(0.8, 0.2, 0.0);    // 실제: 2.0, 0.5 → /2.5
+    Vector3d p1_v(0.4, 0.0, 0.0);  // 실제: 1.0m → /2.5 = 0.4
+    Vector3d p2_v(0.8, 0.2, 0.0);  // 실제: 2.0, 0.5 → /2.5
 
     // Vision 회전 (정확하다고 가정)
     Matrix3d R0 = Matrix3d::Identity();
@@ -118,9 +121,9 @@ void problem2_scale_gravity_estimation() {
     Vector3d v0_true(2.0, 0.0, 0.0);
     Vector3d v1_true(2.0, 1.0, 0.0);
 
-    Vector3d Dp_01 = s_true*(p1_v - p0_v) - v0_true*dt01 + 0.5*g_true*dt01*dt01;
+    Vector3d Dp_01 = s_true * (p1_v - p0_v) - v0_true * dt01 + 0.5 * g_true * dt01 * dt01;
     Vector3d Dv_01 = v1_true - v0_true + g_true * dt01;
-    Vector3d Dp_12 = s_true*(p2_v - p1_v) - v1_true*dt12 + 0.5*g_true*dt12*dt12;
+    Vector3d Dp_12 = s_true * (p2_v - p1_v) - v1_true * dt12 + 0.5 * g_true * dt12 * dt12;
 
     cout << "  Vision 위치 (up-to-scale):" << endl;
     cout << "    p0 = [" << p0_v.transpose() << "]" << endl;
@@ -151,7 +154,8 @@ void problem2_scale_gravity_estimation() {
     cout << "\n  정답은 quiz_solutions/medium_sol.cpp 참고" << endl;
 }
 
-void problem3_gravity_refinement() {
+void problem3_gravity_refinement()
+{
     cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "문제 3: 중력 정제" << endl;
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
@@ -174,8 +178,8 @@ void problem3_gravity_refinement() {
     cout << "     (수평 성분은 어떻게 변하는가?)\n" << endl;
 
     // TODO: 학생이 구현
-    // Vector3d g_hat = g_est.normalized();
-    // Vector3d g_refined = g_norm_true * g_hat;
+    // 1. g_hat = g_est를 정규화(단위 벡터)
+    // 2. g_refined = 9.81 * g_hat (크기를 알려진 중력 상수로 고정)
 
     cout << "  g_hat     = [_____, _____, _____]" << endl;
     cout << "  g_refined = [_____, _____, _____]" << endl;
@@ -185,7 +189,8 @@ void problem3_gravity_refinement() {
     cout << "\n  정답은 quiz_solutions/medium_sol.cpp 참고" << endl;
 }
 
-int main() {
+int main()
+{
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
     cout << "Week 12 Quiz - Medium" << endl;
     cout << "VIO 초기화 과정" << endl;
