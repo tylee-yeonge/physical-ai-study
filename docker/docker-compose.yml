@@ -1,0 +1,29 @@
+# =============================================================================
+# Visual SLAM & Perception Learning - DS224+ Docker Compose
+# =============================================================================
+# 사용법:
+#   cd /volume1/docker/slam/visual-slam-and-perception-learning/docker
+#   sudo docker compose up -d
+#   sudo docker logs slam-dev        # tunnel 인증 URL 확인
+# =============================================================================
+
+services:
+  slam-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: slam-dev
+    volumes:
+      # NAS 프로젝트 디렉토리 → 컨테이너 /workspace
+      - /volume1/docker/slam/visual-slam-and-perception-learning:/workspace
+    working_dir: /workspace
+    deploy:
+      resources:
+        limits:
+          memory: 4608M    # 4.5GB (6GB 중 DSM에 1.5GB 여유)
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+    # VS Code Remote Tunnel 자동 시작
+    command: >
+      bash -c "code tunnel --accept-server-license-terms"
