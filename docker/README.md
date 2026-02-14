@@ -283,6 +283,42 @@ NAS의 DNS 설정 확인:
 
 ---
 
+## Claude Code 설정
+
+VS Code의 Claude Code 확장은 컨테이너 내부에서 실행됩니다. Docker 환경 전용 설정 파일들이 `docker/` 디렉토리에 포함되어 있으며, 이미지 빌드 시 `/root/.claude/`(사용자 레벨)로 복사됩니다.
+
+### 설정 파일 구조
+
+```
+docker/
+├── CLAUDE.md       → /root/.claude/CLAUDE.md    (환경 정보, 빌드 규칙)
+├── settings.json   → /root/.claude/settings.json (권한 모드 등)
+└── rules/          → /root/.claude/rules/        (코드 스타일, Git 규칙)
+    ├── code-style.md
+    ├── cpp-cmake.md
+    ├── git-workflow.md
+    ├── python.md
+    └── security.md
+```
+
+### 왜 /root/.claude/ 인가?
+
+- `/workspace`는 볼륨 마운트로 호스트 디렉토리에 덮어쓰이므로, Dockerfile에서 `/workspace/`에 파일을 복사해도 컨테이너 시작 시 사라짐
+- `/root/.claude/`는 사용자 레벨 설정으로, 볼륨 마운트에 영향을 받지 않음
+- Claude Code는 사용자 레벨 설정(`~/.claude/`)을 자동으로 인식
+
+### 설정 수정 후 반영
+
+설정 파일을 수정한 뒤에는 이미지를 다시 빌드해야 합니다:
+
+```bash
+cd /volume1/docker/Learning/visual-slam-and-perception-learning/docker
+sudo docker compose down
+sudo docker compose up -d --build
+```
+
+---
+
 ## 검증 체크리스트
 
 - [ ] `docker compose build` 성공

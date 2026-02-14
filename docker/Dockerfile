@@ -90,12 +90,25 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && rm -rf /var/lib/apt/lists/*
 
 # -----------------------------------------------------------------------------
-# 7단계: VS Code CLI (Remote Tunnel용)
+# 7단계: Claude Code CLI
+# -----------------------------------------------------------------------------
+RUN npm install -g @anthropic-ai/claude-code
+
+# -----------------------------------------------------------------------------
+# 8단계: VS Code CLI (Remote Tunnel용)
 # -----------------------------------------------------------------------------
 RUN curl -fSL 'https://update.code.visualstudio.com/latest/cli-linux-x64/stable' \
     --output /tmp/vscode_cli.tar.gz \
     && tar -xzf /tmp/vscode_cli.tar.gz -C /usr/local/bin \
     && rm /tmp/vscode_cli.tar.gz
+
+# -----------------------------------------------------------------------------
+# 9단계: Claude Code 설정 (사용자 레벨)
+# /workspace는 볼륨 마운트로 덮어쓰이므로 /root/.claude/에 복사
+# -----------------------------------------------------------------------------
+COPY CLAUDE.md /root/.claude/CLAUDE.md
+COPY settings.json /root/.claude/settings.json
+COPY rules/ /root/.claude/rules/
 
 # -----------------------------------------------------------------------------
 # 작업 디렉토리 (볼륨 마운트 지점)
