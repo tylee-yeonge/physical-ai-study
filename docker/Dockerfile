@@ -92,7 +92,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
 # -----------------------------------------------------------------------------
 # 7단계: VS Code CLI (Remote Tunnel용)
 # -----------------------------------------------------------------------------
-RUN curl -Lk 'https://code.visualstudio.com/sha/download?build=stable&os=cli-linux-x64' \
+RUN curl -fSL 'https://update.code.visualstudio.com/latest/cli-linux-x64/stable' \
     --output /tmp/vscode_cli.tar.gz \
     && tar -xzf /tmp/vscode_cli.tar.gz -C /usr/local/bin \
     && rm /tmp/vscode_cli.tar.gz
