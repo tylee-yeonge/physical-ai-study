@@ -117,20 +117,20 @@ ssh -T git@github.com
 ### 프로젝트 클론
 
 ```bash
-sudo mkdir -p /volume1/docker/slam
-cd /volume1/docker/slam
+sudo mkdir -p /volume1/docker/Learning
+cd /volume1/docker/Learning
 sudo git clone git@github.com:<사용자명>/visual-slam-and-perception-learning.git
 ```
 
 > 디렉토리 소유권 설정 (필요 시):
 > ```bash
-> sudo chown -R $(whoami) /volume1/docker/slam
+> sudo chown -R $(whoami) /volume1/docker/Learning
 > ```
 
 ## 5단계: Docker 이미지 빌드
 
 ```bash
-cd /volume1/docker/slam/visual-slam-and-perception-learning/docker
+cd /volume1/docker/Learning/visual-slam-and-perception-learning/docker
 sudo docker compose build
 ```
 
@@ -223,7 +223,7 @@ python3 quiz_easy.py
 sudo docker ps
 
 # 컨테이너 중지
-cd /volume1/docker/slam/visual-slam-and-perception-learning/docker
+cd /volume1/docker/Learning/visual-slam-and-perception-learning/docker
 sudo docker compose stop
 
 # 컨테이너 재시작
