@@ -4,15 +4,15 @@
 # 사용법:
 #   cd /volume1/docker/slam/visual-slam-and-perception-learning/docker
 #   sudo docker compose up -d
-#   sudo docker logs slam-dev        # tunnel 인증 URL 확인
+#   sudo docker logs vsp-dev        # tunnel 인증 URL 확인
 # =============================================================================
 
 services:
-  slam-dev:
+  vsp-dev:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: slam-dev
+    container_name: vsp-dev
     volumes:
       # NAS 프로젝트 디렉토리 → 컨테이너 /workspace
       - /volume1/docker/slam/visual-slam-and-perception-learning:/workspace

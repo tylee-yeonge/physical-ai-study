@@ -147,7 +147,7 @@ sudo docker compose up -d
 컨테이너 로그를 확인하여 GitHub 인증 URL을 찾습니다:
 
 ```bash
-sudo docker logs slam-dev
+sudo docker logs vsp-dev
 ```
 
 출력에서 아래와 같은 URL이 표시됩니다:
@@ -234,7 +234,7 @@ sudo docker compose down
 sudo docker compose up -d
 
 # 컨테이너 셸 직접 접속
-sudo docker exec -it slam-dev bash
+sudo docker exec -it vsp-dev bash
 ```
 
 ---
@@ -253,7 +253,7 @@ make -j1
 컨테이너 재시작 후 tunnel 인증이 풀린 경우:
 
 ```bash
-sudo docker exec -it slam-dev code tunnel --accept-server-license-terms
+sudo docker exec -it vsp-dev code tunnel --accept-server-license-terms
 ```
 
 로그에서 새 인증 URL을 확인하여 다시 인증합니다.
@@ -263,7 +263,7 @@ sudo docker exec -it slam-dev code tunnel --accept-server-license-terms
 g2o가 `/usr/local/lib/cmake/g2o`에 설치되어 있는지 확인:
 
 ```bash
-sudo docker exec -it slam-dev ls /usr/local/lib/cmake/g2o/
+sudo docker exec -it vsp-dev ls /usr/local/lib/cmake/g2o/
 ```
 
 CMake에서 찾지 못하면 `CMAKE_PREFIX_PATH`를 설정:
@@ -286,7 +286,7 @@ NAS의 DNS 설정 확인:
 ## 검증 체크리스트
 
 - [ ] `docker compose build` 성공
-- [ ] `docker compose up -d` 후 `docker logs slam-dev`에서 tunnel URL 출력
+- [ ] `docker compose up -d` 후 `docker logs vsp-dev`에서 tunnel URL 출력
 - [ ] VS Code Remote Tunnel 접속 성공
 - [ ] Phase 2 week1: cmake → make → ./basic → ctest 성공
 - [ ] Phase 1 week8: ceres_example 빌드/실행 성공
