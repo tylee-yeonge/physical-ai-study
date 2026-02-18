@@ -134,6 +134,13 @@ int main()
     std::cout << "   fx = " << camera.getFx() << ", fy = " << camera.getFy() << std::endl;
     std::cout << "   cx = " << camera.getCx() << ", cy = " << camera.getCy() << "\n" << std::endl;
 
+    // 💡 K 행렬 요소 접근법 (quiz에서 이렇게 접근!)
+    std::cout << "💡 [K 행렬 접근법] quiz에서 이렇게 접근합니다:" << std::endl;
+    std::cout << "   K.at<double>(0,0) = fx = " << K.at<double>(0, 0) << std::endl;
+    std::cout << "   K.at<double>(1,1) = fy = " << K.at<double>(1, 1) << std::endl;
+    std::cout << "   K.at<double>(0,2) = cx = " << K.at<double>(0, 2) << std::endl;
+    std::cout << "   K.at<double>(1,2) = cy = " << K.at<double>(1, 2) << "\n" << std::endl;
+
     // 3D 점 정의 (큐브 꼭짓점)
     std::vector<cv::Point3d> cube_points = {
         {-1, -1, 5}, {1, -1, 5}, {1, 1, 5}, {-1, 1, 5},  // 앞면
@@ -157,11 +164,47 @@ int main()
                   << (visible ? " ✅" : " ❌ 이미지 밖") << std::endl;
     }
 
+    // 💡 투영 수학 단계별 시연
+    {
+        cv::Point3d demo_pt = cube_points[0];  // (-1, -1, 5)
+        // R=I, t=0 이므로 카메라 좌표 = 월드 좌표
+        double Xc = demo_pt.x, Yc = demo_pt.y, Zc = demo_pt.z;
+        double x_norm = Xc / Zc;
+        double y_norm = Yc / Zc;
+        double fx = K.at<double>(0, 0), fy = K.at<double>(1, 1);
+        double cx = K.at<double>(0, 2), cy = K.at<double>(1, 2);
+        double u = fx * x_norm + cx;
+        double v = fy * y_norm + cy;
+
+        std::cout << "\n💡 [투영 수학] 점 (" << demo_pt.x << "," << demo_pt.y << ","
+                  << demo_pt.z << ")의 투영 과정:" << std::endl;
+        std::cout << "   Step 1. 월드→카메라: Pc = R*Pw + t = (" << Xc << "," << Yc << "," << Zc
+                  << ")  (R=I, t=0)" << std::endl;
+        std::cout << "   Step 2. 정규화: x = Xc/Zc = " << Xc << "/" << Zc << " = " << x_norm
+                  << std::endl;
+        std::cout << "                   y = Yc/Zc = " << Yc << "/" << Zc << " = " << y_norm
+                  << std::endl;
+        std::cout << "   Step 3. 픽셀:  u = fx*x + cx = " << fx << "*" << x_norm << " + " << cx
+                  << " = " << u << std::endl;
+        std::cout << "                  v = fy*y + cy = " << fy << "*" << y_norm << " + " << cy
+                  << " = " << v << std::endl;
+        std::cout << "   → 위 테이블에서 (" << demo_pt.x << "," << demo_pt.y << "," << demo_pt.z
+                  << ") → (" << (int)u << "," << (int)v << ") 확인!" << std::endl;
+        std::cout << "   💡 이 3단계가 quiz_easy 문제 2!" << std::endl;
+    }
+
     // 2. FOV 계산
     std::cout << "\n📐 시야각 (FOV):" << std::endl;
     cv::Size2d fov = camera.computeFOV(imageSize);
     std::cout << "   수평 FOV: " << fov.width << "°" << std::endl;
     std::cout << "   수직 FOV: " << fov.height << "°" << std::endl;
+
+    // 💡 FOV ↔ 초점거리 관계
+    std::cout << "\n💡 [FOV 공식] FOV = 2 * atan(이미지크기 / (2*초점거리))" << std::endl;
+    std::cout << "   수평: 2 * atan(" << imageSize.width << " / (2*" << K.at<double>(0, 0)
+              << ")) = " << fov.width << "°" << std::endl;
+    std::cout << "   fx 크면 → FOV 작음 (망원), fx 작으면 → FOV 큼 (광각)" << std::endl;
+    std::cout << "   💡 이 계산이 quiz_easy 문제 3!" << std::endl;
 
     // 3. 역투영
     std::cout << "\n🔄 역투영 테스트:" << std::endl;
@@ -180,6 +223,13 @@ int main()
     std::cout << "   좌상단 (0, 0)"
               << " → ray [" << ray_corner[0] << ", " << ray_corner[1] << ", " << ray_corner[2]
               << "]" << std::endl;
+
+    // 💡 역투영 의미 설명
+    std::cout << "\n💡 [역투영 핵심] 픽셀 → 3D 광선 방향 (깊이는 알 수 없음!)" << std::endl;
+    std::cout << "   공식: x' = (u-cx)/fx, y' = (v-cy)/fy, ray = [x',y',1]" << std::endl;
+    std::cout << "   중심 픽셀 (" << camera.getCx() << "," << camera.getCy()
+              << ") → ray [0,0,1] = 카메라 정면" << std::endl;
+    std::cout << "   💡 이 계산이 quiz_easy 문제 4!" << std::endl;
 
     // 4. 재투영 오차
     std::cout << "\n📏 재투영 오차:" << std::endl;
@@ -211,10 +261,11 @@ int main()
     std::cout << "  ✅ 데모 완료!" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    std::cout << "💡 다음 단계:" << std::endl;
-    std::cout << "   1. quiz_easy.cpp로 기초 개념 확인" << std::endl;
-    std::cout << "   2. quiz_medium.cpp로 실전 문제 풀이" << std::endl;
-    std::cout << "   3. PRACTICE.md에서 심화 실습\n" << std::endl;
+    std::cout << "💡 다음 단계 (README.md 학습 순서 참고):" << std::endl;
+    std::cout << "   1. README.md에서 K 행렬/투영 이론 읽기 → quiz_easy 문제 1~3" << std::endl;
+    std::cout << "   2. my_basic.cpp Step 1~4 구현 → quiz_easy 문제 4~5" << std::endl;
+    std::cout << "   3. my_basic.cpp Step 5~6 구현 → quiz_medium 문제 1~5" << std::endl;
+    std::cout << "   4. PRACTICE.md에서 실제 카메라 실습\n" << std::endl;
 
     return 0;
 }

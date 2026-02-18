@@ -280,13 +280,35 @@ int main()
     std::cout << "   초점거리: " << K.at<double>(0, 0) << " 픽셀" << std::endl;
     std::cout << "   베이스라인: " << cv::norm(t) << " m\n" << std::endl;
 
-    // 전체 파이프라인 실행
-    demoPipeline(K, R, t);
+    // 💡 [교육] 삼각측량이란?
+    std::cout << "💡 [교육] 삼각측량이란? (quiz 문제 2에서 사용!)" << std::endl;
+    std::cout << "   두 카메라에서 같은 3D 점을 관측 → 각 카메라의 광선 교차점 = 3D 점" << std::endl;
+    std::cout << "   실제로는 노이즈 때문에 교차 안 함 → DLT로 최적 3D 점 추정\n" << std::endl;
 
-    std::cout << "\n💡 다음 단계:" << std::endl;
-    std::cout << "   1. quiz_easy.cpp - 삼각측량 개념 확인" << std::endl;
-    std::cout << "   2. quiz_medium.cpp - 재투영 오차 최소화" << std::endl;
-    std::cout << "   3. Week 7 - PnP로 카메라 포즈 추정\n" << std::endl;
+    // 💡 [교육] Stereo Depth: 시차 → 깊이
+    std::cout << "💡 [교육] Stereo Depth (quiz 문제 1에서 사용!):" << std::endl;
+    std::cout << "   depth = baseline × focal / disparity" << std::endl;
+    double demo_depth = (cv::norm(t) * K.at<double>(0, 0)) / 30.0;
+    std::cout << "   예: baseline=" << cv::norm(t) << "m, focal=" << K.at<double>(0, 0)
+              << ", disparity=30px → depth=" << std::fixed << std::setprecision(2) << demo_depth
+              << "m" << std::endl;
+    std::cout << "   시차↑ → 가까움, 시차↓ → 멀리, 시차=0 → 무한대\n" << std::endl;
+
+    // 💡 [교육] Baseline과 정확도
+    std::cout << "💡 [교육] Baseline과 정확도 (quiz 문제 4에서 사용!):" << std::endl;
+    std::cout << "   Baseline ↑ → 시차 커짐 → 깊이 정확도 ↑ (but 매칭 어려워짐)" << std::endl;
+    std::cout << "   Baseline ↓ → 시차 작음 → 깊이 정확도 ↓ (but 매칭 쉬움)" << std::endl;
+    std::cout << "   💡 실내: 5-10cm, 자율주행: 30-60cm\n" << std::endl;
+
+    // 전체 파이프라인 실행
+    TriangulationBasic::demoPipeline(K, R, t);
+
+    std::cout << "\n💡 다음 단계 (README.md 학습 순서 참고):" << std::endl;
+    std::cout << "   1. README.md 이론 읽기 (삼각측량, DLT, 재투영 오차)" << std::endl;
+    std::cout << "   2. quiz_easy.cpp — Stereo Depth, 삼각측량, Baseline" << std::endl;
+    std::cout << "   3. my_basic.cpp — Step 1~9 순서대로 직접 구현" << std::endl;
+    std::cout << "   4. quiz_medium.cpp — 삼각측량 구현, E 분해, Bundle Adjustment" << std::endl;
+    std::cout << "   5. PRACTICE.md — 삼각측량 실습\n" << std::endl;
 
     return 0;
 }

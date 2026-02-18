@@ -210,8 +210,26 @@ int main()
     std::cout << "📸 테스트 이미지 생성 완료 (800x600)" << std::endl;
     std::cout << "   - 체커보드 패턴 + 원형 객체\n" << std::endl;
 
+    // 💡 이미지 속 특징점 후보 설명
+    std::cout << "💡 [교육] 이 이미지의 특징점 후보:" << std::endl;
+    std::cout << "   - 체커보드 교차점: 모든 방향으로 밝기 변화 → 코너 ✅" << std::endl;
+    std::cout << "   - 체커보드 경계선: 한 방향만 변화 → 에지 (특징점 X)" << std::endl;
+    std::cout << "   - 균일한 흰/검 영역: 변화 없음 → 플랫 (특징점 X)\n" << std::endl;
+
     // 검출기 비교
     FeatureDetectionBasic::compareDetectors(test_image);
+
+    // 💡 FAST 원리 + ORB 디스크립터 설명
+    std::cout << "💡 [교육] FAST 코너 검출 원리 (quiz 문제 1에서 사용!):" << std::endl;
+    std::cout << "   중심 픽셀 주위 16개 픽셀(Bresenham 원) 검사:" << std::endl;
+    std::cout << "   → 연속 9~12개가 모두 밝거나 어두우면 코너!" << std::endl;
+    std::cout << "   threshold↑ → 강한 코너만 (적은 수)" << std::endl;
+    std::cout << "   threshold↓ → 약한 코너도 포함 (많은 수)\n" << std::endl;
+
+    std::cout << "💡 [교육] ORB 디스크립터 (quiz 문제 2에서 사용!):" << std::endl;
+    std::cout << "   = FAST 검출 + BRIEF 이진 디스크립터 + 회전 불변성" << std::endl;
+    std::cout << "   디스크립터 크기: 32 바이트 (256비트 / 8)" << std::endl;
+    std::cout << "   매칭: 해밍 거리 (XOR 연산) → 매우 빠름\n" << std::endl;
 
     // NMS 데모
     FeatureDetectionBasic::demoNMS(test_image);
@@ -228,6 +246,18 @@ int main()
     std::cout << "   - 특징점 개수: " << keypoints.size() << std::endl;
     std::cout << "   - 검출 시간: " << time << " ms" << std::endl;
 
+    // 💡 KeyPoint 속성 설명
+    if (!keypoints.empty())
+    {
+        const auto& kp = keypoints[0];
+        std::cout << "\n💡 [교육] KeyPoint 속성 (첫 번째 점):" << std::endl;
+        std::cout << "   pt: (" << kp.pt.x << ", " << kp.pt.y << ") — 픽셀 위치" << std::endl;
+        std::cout << "   response: " << kp.response << " — 코너 강도 (높을수록 강함)" << std::endl;
+        std::cout << "   size: " << kp.size << " — 특징점 크기" << std::endl;
+        std::cout << "   angle: " << kp.angle
+                  << " — 방향 (FAST는 -1 = 방향 없음, ORB는 계산됨)" << std::endl;
+    }
+
     // 분포 분석
     cv::Mat distribution =
         FeatureDetectionBasic::analyzeDistribution(keypoints, test_image.size(), 8);
@@ -243,6 +273,12 @@ int main()
         std::cout << std::endl;
     }
 
+    // 💡 균등 분포의 중요성 (quiz medium 문제 1에서 사용!)
+    std::cout << "\n💡 [교육] 균등한 분포가 SLAM에서 중요한 이유:" << std::endl;
+    std::cout << "   - 한 곳에 몰리면 → 나머지 영역 정보 없음" << std::endl;
+    std::cout << "   - 넓게 분포 → 더 안정적인 포즈 추정" << std::endl;
+    std::cout << "   - VINS-Fusion: setMask()로 최소 간격 보장\n" << std::endl;
+
     // 시각화 (저장)
     cv::Mat output;
     FeatureDetectionBasic::visualizeKeypoints(test_image, keypoints, output);
@@ -254,10 +290,12 @@ int main()
     std::cout << "✅ Week 3 데모 완료!" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    std::cout << "💡 다음 단계:" << std::endl;
-    std::cout << "   1. quiz_easy.cpp로 기초 개념 확인" << std::endl;
-    std::cout << "   2. quiz_medium.cpp로 실전 문제 풀이" << std::endl;
-    std::cout << "   3. PRACTICE.md로 실제 카메라 영상 처리\n" << std::endl;
+    std::cout << "💡 다음 단계 (README.md 학습 순서 참고):" << std::endl;
+    std::cout << "   1. README.md 이론 읽기 (Harris, FAST, ORB)" << std::endl;
+    std::cout << "   2. quiz_easy.cpp — FAST 파라미터, ORB, NMS, Harris" << std::endl;
+    std::cout << "   3. my_basic.cpp — Step 1~6 순서대로 직접 구현" << std::endl;
+    std::cout << "   4. quiz_medium.cpp — 균등 분포, 멀티스케일, NMS 구현" << std::endl;
+    std::cout << "   5. PRACTICE.md — 실제 카메라 영상 처리\n" << std::endl;
 
     return 0;
 }

@@ -25,13 +25,16 @@
 
 ## 📋 학습 순서
 
-| 순서 | 단계 | 파일 | 설명 |
-|:----:|------|------|------|
-| 1 | 데모 실행 | `basic.cpp` | 빌드 후 `./basic` 실행, 결과 먼저 관찰 |
-| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 3 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | K 행렬, 좌표계 기본 확인 |
-| 4 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | 역투영, 재투영 오차 응용 |
-| 5 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 실습 가이드 |
+| 순서 | 활동 | 파일 | 마치면 풀 퀴즈 |
+|:----:|------|------|:-------------:|
+| 1 | 데모 실행 — `./basic` 출력 전체 읽기 | `basic.cpp` | - |
+| 2 | K 행렬 이해 — README 핵심 개념 + basic 출력 대조 | `README.md` | **easy 문제 1**: K 행렬 분석 |
+| 3 | 투영 과정 이해 — basic 출력의 "투영 수학" 블록 확인 | `README.md` | **easy 문제 2**: 투영 단계별 계산 |
+| 4 | `my_basic.cpp` Step 1~2 구현 (isInImage, FOV) | `my_basic.cpp` | **easy 문제 3**: FOV 계산 |
+| 5 | `my_basic.cpp` Step 3~4 구현 (project, backProject) | `my_basic.cpp` | **easy 문제 4**: 역투영, **문제 5**: 가시성 |
+| 6 | `my_basic.cpp` Step 5~6 구현 (projectMultiple, reprojectionError) | `my_basic.cpp` | - |
+| 7 | 중급 퀴즈 풀기 | `quiz_medium.cpp` | **medium 문제 1~5** |
+| 8 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | - |
 
 ---
 

@@ -32,13 +32,16 @@
 
 ## 📋 학습 순서
 
-| 순서 | 단계 | 파일 | 설명 |
-|:----:|------|------|------|
-| 1 | 데모 실행 | `basic.cpp` | 빌드 후 `./basic` 실행, 결과 먼저 관찰 |
-| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 3 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | 삼각측량 기본, PnP 개념 |
-| 4 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | 베이스라인 효과, RANSAC |
-| 5 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 삼각측량/PnP 실습 |
+| 순서 | 활동 | 연결 퀴즈 |
+|:----:|------|:--------:|
+| 1 | `./basic` 실행, PnP/VO 파이프라인 출력 전체 읽기 | - |
+| 2 | PnP 정의 이해 (3D-2D → 포즈) | **easy 1**: PnP란?, **easy 2**: PnP vs Essential |
+| 3 | RANSAC 필요성 이해 | **easy 3**: 왜 RANSAC? |
+| 4 | `my_basic.cpp` Step 1~4 (rodrigues, PnP, RANSAC, eval) | **easy 4**: VO 흐름 |
+| 5 | DLT/삼각측량 개념 복습 | **easy 5**: DLT 삼각측량 |
+| 6 | `my_basic.cpp` Step 5~8 (vis, compare, VO, pipeline) | - |
+| 7 | 중급 퀴즈 | **medium 1**: PnP 구현, **medium 2**: RANSAC 횟수, **medium 3**: 포즈 최적화, **medium 4**: DLT 삼각측량 구현, **medium 5**: PnP DLT 구현 |
+| 8 | PnP/삼각측량 실습 | [PRACTICE.md](./PRACTICE.md) |
 
 ---
 

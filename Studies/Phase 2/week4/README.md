@@ -32,13 +32,17 @@
 
 ## 📋 학습 순서
 
-| 순서 | 단계 | 파일 | 설명 |
-|:----:|------|------|------|
-| 1 | 데모 실행 | `basic.cpp` | 빌드 후 `./basic` 실행, 결과 먼저 관찰 |
-| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 3 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | 해밍 거리, 매칭 기본 |
-| 4 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | RANSAC, 성능 비교 |
-| 5 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 실시간 매칭 실습 |
+| 순서 | 단계 | 파일 | 연결 퀴즈 |
+|:----:|------|------|-----------|
+| 1 | 데모 실행 — `./basic` 출력 전체 읽기 | `basic.cpp` | - |
+| 2 | 매칭 이론 (BF, FLANN, 거리 측정) | `README.md` | **easy 문제 1**: 해밍 vs 유클리드, **문제 4**: Cross-Check |
+| 3 | 필터링 이론 (Ratio Test, RANSAC) | `README.md` | **easy 문제 2**: Ratio Test, **문제 3**: RANSAC |
+| 4 | my_basic Step 1~3 (BF, 품질평가, FLANN) | `my_basic.cpp` | - |
+| 5 | my_basic Step 4~5 (Ratio Test, 시각화) | `my_basic.cpp` | **easy 문제 5**: Homography 이해 |
+| 6 | my_basic Step 6~7 (RANSAC, 파이프라인) | `my_basic.cpp` | - |
+| 7 | 초급 퀴즈 풀기 | `quiz_easy.cpp` | **easy 문제 1~5** |
+| 8 | 중급 퀴즈 풀기 | `quiz_medium.cpp` | **medium 문제 1~5** |
+| 9 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 실시간 매칭 실습 |
 ---
 
 ## 🚀 Step 1: 먼저 돌려보기

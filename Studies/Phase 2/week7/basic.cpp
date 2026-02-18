@@ -318,19 +318,40 @@ int main()
 
     std::cout << "카메라 파라미터 K:\n" << K << "\n" << std::endl;
 
+    // 💡 [교육] PnP란?
+    std::cout << "💡 [교육] PnP란? (quiz 문제 1에서 사용!)" << std::endl;
+    std::cout << "   입력: N개의 3D 점(맵) + 2D 관측(이미지) + K" << std::endl;
+    std::cout << "   출력: 카메라 포즈 (R, t) ← 6 DoF" << std::endl;
+    std::cout << "   최소 3점 필요 (P3P), 실제로는 RANSAC + 수십 개 사용\n" << std::endl;
+
+    // 💡 [교육] Rodrigues 변환
+    std::cout << "💡 [교육] Rodrigues 변환:" << std::endl;
+    std::cout << "   rvec (3×1 회전 벡터) ↔ R (3×3 회전 행렬)" << std::endl;
+    std::cout << "   |rvec| = 회전 각도 (라디안)" << std::endl;
+    std::cout << "   rvec/|rvec| = 회전 축 (단위 벡터)" << std::endl;
+    std::cout << "   OpenCV: cv::Rodrigues(rvec, R)\n" << std::endl;
+
+    // 💡 [교육] PnP vs Essential
+    std::cout << "💡 [교육] PnP vs Essential (quiz 문제 2에서 사용!):" << std::endl;
+    std::cout << "   2D-2D (Essential): 스케일 모호성 O → VO 초기화용" << std::endl;
+    std::cout << "   3D-2D (PnP): 절대 스케일 복원! → VO tracking용" << std::endl;
+    std::cout << "   💡 SLAM: Frame 0-1은 E, Frame 1~N은 PnP\n" << std::endl;
+
     // 전체 파이프라인
-    demoPipeline(K);
+    PnPBasic::demoPipeline(K);
 
     // Visual Odometry 시뮬레이션
-    demoVisualOdometry(K);
+    PnPBasic::demoVisualOdometry(K);
 
     // 방법 비교
-    compareMethods();
+    PnPBasic::compareMethods();
 
-    std::cout << "\n💡 다음 단계:" << std::endl;
-    std::cout << "   1. quiz_easy.cpp - PnP 개념 확인" << std::endl;
-    std::cout << "   2. quiz_medium.cpp - RANSAC 구현" << std::endl;
-    std::cout << "   3. Week 8 - Optical Flow\n" << std::endl;
+    std::cout << "\n💡 다음 단계 (README.md 학습 순서 참고):" << std::endl;
+    std::cout << "   1. README.md 이론 읽기 (PnP, DLT, RANSAC)" << std::endl;
+    std::cout << "   2. quiz_easy.cpp — PnP 정의, VO 흐름, DLT 개념" << std::endl;
+    std::cout << "   3. my_basic.cpp — Step 1~8 순서대로 직접 구현" << std::endl;
+    std::cout << "   4. quiz_medium.cpp — PnP 구현, RANSAC 횟수, DLT 구현" << std::endl;
+    std::cout << "   5. PRACTICE.md — PnP/삼각측량 실습\n" << std::endl;
 
     return 0;
 }

@@ -288,14 +288,48 @@ int main()
     std::cout << "  Optical Flow 기본 데모 (Week 8)" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
+    // ── 교육 블록 A: 밝기 항상성 가정 ──────────────
+    // 💡 quiz_easy 문제 1 (OF 가정), 문제 5 (LK 방정식)에서 이 수식 사용!
+    std::cout << "📖 [개념] 밝기 항상성 (Brightness Constancy)" << std::endl;
+    std::cout << "   핵심 가정: I(x, y, t) = I(x+dx, y+dy, t+dt)" << std::endl;
+    std::cout << "   \"같은 점은 시간이 지나도 밝기가 변하지 않는다\"" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   테일러 전개:" << std::endl;
+    std::cout << "     Ix*u + Iy*v + It = 0" << std::endl;
+    std::cout << "     (Ix, Iy: 공간 그래디언트, It: 시간 그래디언트)" << std::endl;
+    std::cout << "     (u, v: 광류 — 구하려는 값!)" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   ⚠️ 1개 방정식, 2개 미지수 → 조리개 문제 (Aperture Problem)!" << std::endl;
+    std::cout << "   → LK 해결: 윈도우 내 모든 픽셀이 같은 (u,v)라고 가정" << std::endl;
+    std::cout << "   → [u,v]^T = (A^T A)^{-1} A^T b  (최소제곱 해)\n" << std::endl;
+
+    // ── 교육 블록 B: 피라미드 LK ──────────────────
+    // 💡 quiz_easy 문제 3 (Pyramidal OF)에서 이 개념 출제!
+    std::cout << "📖 [개념] 피라미드 Lucas-Kanade" << std::endl;
+    std::cout << "   LK는 작은 움직임만 추적 가능 → 피라미드로 확장" << std::endl;
+    std::cout << "   Level 2 (1/4): 움직임 5px → 추적!" << std::endl;
+    std::cout << "   Level 1 (1/2): 결과 전파 + 정제" << std::endl;
+    std::cout << "   Level 0 (원본): 최종 결과" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   calcOpticalFlowPyrLK 파라미터:" << std::endl;
+    std::cout << "     winSize = (21, 21)  ← 추적 윈도우" << std::endl;
+    std::cout << "     maxLevel = 3        ← 피라미드 레벨 수\n" << std::endl;
+
+    // ── 교육 블록 C: Sparse vs Dense ─────────────
+    // 💡 quiz_easy 문제 4 (SLAM 활용), quiz_medium 문제 3 (Flow vs Matching)!
+    std::cout << "📖 [개념] Sparse vs Dense Optical Flow" << std::endl;
+    std::cout << "   Sparse (LK): 특정 점만 추적 → 빠름 (~1ms)" << std::endl;
+    std::cout << "   Dense (Farneback): 모든 픽셀 → 느림 (~50ms)" << std::endl;
+    std::cout << "   SLAM에서는 Sparse 사용! (VINS = FAST + Pyramid LK)\n" << std::endl;
+
     // 전체 파이프라인
-    demoPipeline();
+    OpticalFlowBasic::demoPipeline();
 
     // Feature Tracking 데모
-    demoFeatureTracking();
+    OpticalFlowBasic::demoFeatureTracking();
 
     // 비교
-    compareSparseVsDense();
+    OpticalFlowBasic::compareSparseVsDense();
 
     std::cout << "\n💡 Week 8 핵심 내용:" << std::endl;
     std::cout << "   - Optical Flow = 픽셀 움직임 추적" << std::endl;
@@ -303,6 +337,16 @@ int main()
     std::cout << "   - Farneback = Dense (느림)" << std::endl;
     std::cout << "   - SLAM에서는 Sparse 사용\n" << std::endl;
 
+    // ── 다음 단계 ─────────────────────────────────
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "  📋 다음 단계" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "  1. README.md 이론 학습 (위 출력과 대조)" << std::endl;
+    std::cout << "  2. quiz_easy.cpp 초급 퀴즈" << std::endl;
+    std::cout << "  3. my_basic.cpp 직접 구현 (8단계)" << std::endl;
+    std::cout << "  4. quiz_medium.cpp 중급 퀴즈" << std::endl;
+    std::cout << "  5. PRACTICE.md 실시간 추적 실습" << std::endl;
+    std::cout << std::endl;
     std::cout << "🎉 Phase 2 (Computer Vision 기초) 완성!" << std::endl;
     std::cout << "   다음: Phase 3 (SLAM 기초 이론)\n" << std::endl;
 

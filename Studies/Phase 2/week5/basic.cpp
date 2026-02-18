@@ -313,13 +313,38 @@ int main()
     std::cout << "📸 테스트 이미지 생성 완료" << std::endl;
     std::cout << "   카메라 이동: 회전 10° + 이동 (50, 30)\n" << std::endl;
 
-    // 전체 파이프라인 실행
-    demoPipeline(img1, img2, K);
+    // 💡 [교육] 에피폴라 제약이란?
+    std::cout << "💡 [교육] 에피폴라 제약이란? (quiz 문제 1에서 사용!)" << std::endl;
+    std::cout << "   두 이미지에서 같은 3D 점을 보면:" << std::endl;
+    std::cout << "   p2^T * E * p1 = 0 (정규화 좌표)" << std::endl;
+    std::cout << "   p2^T * F * p1 = 0 (픽셀 좌표)" << std::endl;
+    std::cout << "   → 0에 가까우면 올바른 대응점!\n" << std::endl;
 
-    std::cout << "\n💡 다음 단계:" << std::endl;
-    std::cout << "   1. quiz_easy.cpp - 에피폴라 개념 확인" << std::endl;
-    std::cout << "   2. quiz_medium.cpp - E/F 추정 실습" << std::endl;
-    std::cout << "   3. PRACTICE.md - 실제 스테레오 카메라 사용\n" << std::endl;
+    // 💡 [교육] E vs F 선택 가이드
+    std::cout << "💡 [교육] E vs F 선택 가이드 (quiz 문제 2에서 사용!):" << std::endl;
+    std::cout << "   캘리브레이션 됨 (K 있음) → Essential Matrix (E)" << std::endl;
+    std::cout << "     - 정규화 좌표 사용, 5 DOF" << std::endl;
+    std::cout << "     - R, t 직접 분해 가능 → SLAM에서 주로 사용" << std::endl;
+    std::cout << "   캘리브레이션 안 됨 → Fundamental Matrix (F)" << std::endl;
+    std::cout << "     - 픽셀 좌표 사용, 7 DOF" << std::endl;
+    std::cout << "     - 관계: F = K'^-T * E * K^-1\n" << std::endl;
+
+    // 💡 [교육] 포즈 복원: 4가지 해 → Cheirality Check
+    std::cout << "💡 [교육] 포즈 복원 (quiz 문제 4에서 사용!):" << std::endl;
+    std::cout << "   E를 SVD 분해 → (R1,t), (R1,-t), (R2,t), (R2,-t)" << std::endl;
+    std::cout << "   → 삼각측량 후 Z > 0인 점이 가장 많은 해 선택 (Cheirality Check)" << std::endl;
+    std::cout << "   💡 스케일 모호성: t의 방향만 알 수 있고, 크기는 모름!" << std::endl;
+    std::cout << "   → Monocular SLAM의 근본적 한계\n" << std::endl;
+
+    // 전체 파이프라인 실행
+    EpipolarGeometryBasic::demoPipeline(img1, img2, K);
+
+    std::cout << "\n💡 다음 단계 (README.md 학습 순서 참고):" << std::endl;
+    std::cout << "   1. README.md 이론 읽기 (에피폴라 제약, E vs F, 8-point)" << std::endl;
+    std::cout << "   2. quiz_easy.cpp — 에피폴라 제약, E vs F, 포즈 복원" << std::endl;
+    std::cout << "   3. my_basic.cpp — Step 1~8 순서대로 직접 구현" << std::endl;
+    std::cout << "   4. quiz_medium.cpp — 제약 검증 구현, 8-Point 직접 구현" << std::endl;
+    std::cout << "   5. PRACTICE.md — 에피폴라 기하학 실습\n" << std::endl;
 
     return 0;
 }

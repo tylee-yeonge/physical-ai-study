@@ -27,13 +27,17 @@
 
 ## 📋 학습 순서
 
-| 순서 | 단계 | 파일 | 설명 |
-|:----:|------|------|------|
-| 1 | 데모 실행 | `basic.cpp` | 빌드 후 `./basic` 실행, 결과 먼저 관찰 |
-| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 3 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | 코너 검출 기본 확인 |
-| 4 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | 파라미터 튜닝, NMS |
-| 5 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 실시간 특징점 검출 실습 |
+| 순서 | 단계 | 파일 | 연결 퀴즈 |
+|:----:|------|------|-----------|
+| 1 | 데모 실행 — `./basic` 출력 전체 읽기 | `basic.cpp` | - |
+| 2 | 특징점 이론 (Harris, FAST 원리) | `README.md` | **easy 문제 1**: FAST 파라미터, **문제 5**: Harris 응답 |
+| 3 | 디스크립터 이론 (BRIEF, ORB) | `README.md` | **easy 문제 2**: ORB 디스크립터 분석 |
+| 4 | my_basic Step 1~2 (FAST, ORB 검출) | `my_basic.cpp` | **easy 문제 4**: 검출기 속도 비교 |
+| 5 | my_basic Step 3~4 (시각화, 분포 분석) | `my_basic.cpp` | **easy 문제 3**: NMS 효과 분석 |
+| 6 | my_basic Step 5~6 (비교, NMS 데모) | `my_basic.cpp` | - |
+| 7 | 초급 퀴즈 풀기 | `quiz_easy.cpp` | **easy 문제 1~5** |
+| 8 | 중급 퀴즈 풀기 | `quiz_medium.cpp` | **medium 문제 1~5** |
+| 9 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 실시간 특징점 검출 |
 
 ---
 

@@ -31,13 +31,16 @@
 
 ## 📋 학습 순서
 
-| 순서 | 단계 | 파일 | 설명 |
-|:----:|------|------|------|
-| 1 | 데모 실행 | `basic.cpp` | 빌드 후 `./basic` 실행, 결과 먼저 관찰 |
-| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 3 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | 에피폴라 제약 기본 확인 |
-| 4 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | 8-point, 제약 검증 |
-| 5 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 에피폴라 기하학 실습 |
+| 순서 | 활동 | 연결 퀴즈 |
+|:----:|------|:--------:|
+| 1 | `./basic` 실행, 에피폴라 파이프라인 출력 전체 읽기 | - |
+| 2 | 에피폴라 제약 이해 (README §2 + basic 출력 대조) | **easy 1**: 에피폴라 제약 |
+| 3 | E vs F 이해 (정규화 좌표 vs 픽셀 좌표) | **easy 2**: E vs F, **easy 3**: 8-Point |
+| 4 | `my_basic.cpp` Step 1~4 (에피폴라 선, E, F, 제약 검증) | **easy 5**: 에피폴 계산 |
+| 5 | 포즈 복원 이해 (4가지 해, Cheirality Check) | **easy 4**: 포즈 복원 |
+| 6 | `my_basic.cpp` Step 5~8 (포즈, EF 관계, 시각화, 파이프라인) | - |
+| 7 | 중급 퀴즈 | **medium 1**: 제약 검증 구현, **medium 2**: F 추정, **medium 3**: E→R,t, **medium 4**: 8-Point 구현, **medium 5**: 노이즈 분석 |
+| 8 | 에피폴라 기하학 실습 | [PRACTICE.md](./PRACTICE.md) |
 
 ---
 

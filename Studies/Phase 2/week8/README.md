@@ -32,13 +32,16 @@
 
 ## 📋 학습 순서
 
-| 순서 | 단계 | 파일 | 설명 |
-|:----:|------|------|------|
-| 1 | 데모 실행 | `basic.cpp` | 빌드 후 `./basic` 실행, 결과 먼저 관찰 |
-| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 3 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | 밝기 항상성, 광류 기본 |
-| 4 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | 파라미터 분석, LK 구현 |
-| 5 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 실시간 KLT 트래킹 실습 |
+| 순서 | 활동 | 연결 퀴즈 |
+|:----:|------|:--------:|
+| 1 | `./basic` 실행, 광류 시각화 출력 전체 읽기 | - |
+| 2 | 밝기 항상성/Aperture Problem 이해 | **easy 1**: OF 가정, **easy 2**: Aperture Problem |
+| 3 | 피라미드 LK 이해 | **easy 3**: Pyramidal OF |
+| 4 | `my_basic.cpp` Step 1~3 (LK, Farneback, evaluate) | **easy 4**: SLAM 활용 |
+| 5 | LK 수학 이해 (A^T A, Structure Tensor) | **easy 5**: LK 방정식, **easy 6**: 추적 가능성 |
+| 6 | `my_basic.cpp` Step 4~8 (시각화, 비교, tracking, pipeline) | - |
+| 7 | 중급 퀴즈 | **medium 1**: LK 구현, **medium 2**: 추적 품질, **medium 3**: Flow vs Matching, **medium 4**: LK 단일점, **medium 5**: 윈도우 크기 |
+| 8 | 실시간 추적 실습 | [PRACTICE.md](./PRACTICE.md) |
 
 ---
 

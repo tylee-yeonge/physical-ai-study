@@ -259,17 +259,41 @@ int main()
     std::cout << "   이미지1: 원본 체커보드 (600x400)" << std::endl;
     std::cout << "   이미지2: 회전(15°) + 이동 + 노이즈\n" << std::endl;
 
+    // 💡 매칭이란?
+    std::cout << "💡 [교육] 특징점 매칭이란?" << std::endl;
+    std::cout << "   두 이미지에서 '같은 3D 점'에 해당하는 특징점 쌍 찾기" << std::endl;
+    std::cout << "   디스크립터 벡터의 거리가 작으면 → 같은 점!" << std::endl;
+    std::cout << "   - ORB (이진): 해밍 거리 (XOR 비트 수)" << std::endl;
+    std::cout << "   - SIFT (실수): 유클리드 거리 (L2 노름)\n" << std::endl;
+
     // 전체 파이프라인 실행
     FeatureMatchingBasic::demoPipeline(img1, img2);
 
-    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    // 💡 Ratio Test 원리 (quiz 문제 2에서 사용!)
+    std::cout << "\n💡 [교육] Lowe's Ratio Test 원리 (quiz 문제 2에서 사용!):" << std::endl;
+    std::cout << "   kNN(k=2)로 최근접 2개 매칭을 찾은 뒤:" << std::endl;
+    std::cout << "   best_dist / second_dist < 0.7 이면 좋은 매칭" << std::endl;
+    std::cout << "   → 두 번째 후보와 차이가 클수록 확실한 매칭!" << std::endl;
+    std::cout << "   임계값↑(0.8): 더 많이 통과 (recall↑, precision↓)" << std::endl;
+    std::cout << "   임계값↓(0.6): 더 적게 통과 (recall↓, precision↑)\n" << std::endl;
+
+    // 💡 RANSAC 원리 (quiz 문제 3에서 사용!)
+    std::cout << "💡 [교육] RANSAC 원리 (quiz 문제 3에서 사용!):" << std::endl;
+    std::cout << "   1) 랜덤으로 4개 점 선택 → 호모그래피 계산" << std::endl;
+    std::cout << "   2) 나머지 점들이 이 모델에 맞는지 확인 (inlier)" << std::endl;
+    std::cout << "   3) N회 반복 → 가장 많은 inlier를 가진 모델 선택" << std::endl;
+    std::cout << "   → outlier(잘못된 매칭)에 강건한 추정!\n" << std::endl;
+
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "✅ Week 4 데모 완료!" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    std::cout << "💡 다음 단계:" << std::endl;
-    std::cout << "   1. quiz_easy.cpp - 기초 개념 확인" << std::endl;
-    std::cout << "   2. quiz_medium.cpp - 실전 응용" << std::endl;
-    std::cout << "   3. Week 3 PRACTICE.md - 실제 스테레오 매칭\n" << std::endl;
+    std::cout << "💡 다음 단계 (README.md 학습 순서 참고):" << std::endl;
+    std::cout << "   1. README.md 이론 읽기 (BF/FLANN, Ratio Test, RANSAC)" << std::endl;
+    std::cout << "   2. quiz_easy.cpp — 해밍 거리, Ratio Test, RANSAC" << std::endl;
+    std::cout << "   3. my_basic.cpp — Step 1~7 순서대로 직접 구현" << std::endl;
+    std::cout << "   4. quiz_medium.cpp — Essential Matrix, Homography DLT" << std::endl;
+    std::cout << "   5. PRACTICE.md — 실제 스테레오 매칭 실습\n" << std::endl;
 
     return 0;
 }

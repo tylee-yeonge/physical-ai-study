@@ -201,6 +201,17 @@ int main()
     // 15개 이미지 시뮬레이션
     std::vector<cv::Point3f> objectPoints = calib.generateObjectPoints();
 
+    // 💡 objectPoints = 체커보드의 물리적 3D 좌표 (모든 이미지에서 동일)
+    std::cout << "\n💡 [교육] 3D 객체 점 (objectPoints):" << std::endl;
+    std::cout << "   체커보드 9×6 = " << objectPoints.size() << "개 코너" << std::endl;
+    std::cout << "   첫 점: (" << objectPoints[0].x << ", " << objectPoints[0].y
+              << ", " << objectPoints[0].z << ") mm" << std::endl;
+    std::cout << "   마지막: (" << objectPoints.back().x << ", " << objectPoints.back().y
+              << ", " << objectPoints.back().z << ") mm" << std::endl;
+    std::cout << "   → 모든 이미지에서 동일! (체커보드는 물리적으로 고정)" << std::endl;
+    std::cout << "   → 변하는 건 카메라 위치(tvec)와 자세(rvec) 뿐" << std::endl;
+    std::cout << "   💡 quiz 문제 4에서 이 개념이 나옵니다!\n" << std::endl;
+
     // 노이즈 생성용 난수 엔진
     constexpr double kNoiseStdDev = 0.5;  // 시뮬레이션 노이즈 표준편차 (픽셀)
     std::mt19937 rng(42);
@@ -229,6 +240,13 @@ int main()
 
     std::cout << "   ✅ " << imagePoints.size() << "개 이미지 생성 완료\n" << std::endl;
 
+    // 💡 rvec/tvec = 각 이미지에서의 카메라 포즈
+    std::cout << "💡 [교육] rvec/tvec의 의미:" << std::endl;
+    std::cout << "   rvec = 회전 벡터 (3×1), Rodrigues로 3×3 회전행렬 변환 가능" << std::endl;
+    std::cout << "   tvec = 이동 벡터 (3×1), 카메라→체커보드 거리" << std::endl;
+    std::cout << "   → 이미지마다 다른 rvec/tvec = 다른 각도에서 촬영" << std::endl;
+    std::cout << "   → calibrateCamera()가 K, dist와 함께 이것도 출력!\n" << std::endl;
+
     // 캘리브레이션 수행
     cv::Mat K_estimated, dist_estimated;
     double rms = calib.calibrate(imagePoints, imageSize, K_estimated, dist_estimated);
@@ -241,8 +259,57 @@ int main()
     std::cout << "📐 카메라 행렬 K:" << std::endl;
     std::cout << K_estimated << "\n" << std::endl;
 
+    // 💡 K 행렬 요소별 접근 (quiz 문제 1에서 사용!)
+    std::cout << "💡 [교육] K 행렬 요소별 접근:" << std::endl;
+    std::cout << "   K.at<double>(0,0) = fx = " << K_estimated.at<double>(0, 0) << std::endl;
+    std::cout << "   K.at<double>(1,1) = fy = " << K_estimated.at<double>(1, 1) << std::endl;
+    std::cout << "   K.at<double>(0,2) = cx = " << K_estimated.at<double>(0, 2) << std::endl;
+    std::cout << "   K.at<double>(1,2) = cy = " << K_estimated.at<double>(1, 2) << std::endl;
+    std::cout << "   → fx≈fy이면 픽셀이 정사각형 (보통의 카메라)\n" << std::endl;
+
     std::cout << "📉 왜곡 계수 [k1, k2, p1, p2, k3]:" << std::endl;
     std::cout << dist_estimated << "\n" << std::endl;
+
+    // 💡 왜곡 계수 부호의 의미 (quiz 문제 2에서 사용!)
+    {
+        double k1_est = dist_estimated.at<double>(0);
+        double k2_est = dist_estimated.at<double>(1);
+        std::cout << "💡 [교육] 왜곡 계수 해석:" << std::endl;
+        std::cout << "   k1 = " << k1_est
+                  << (k1_est < 0 ? " → 배럴(Barrel) 왜곡: 가장자리가 바깥으로"
+                                 : " → 핀쿠션(Pincushion) 왜곡: 가장자리가 안쪽으로")
+                  << std::endl;
+        std::cout << "   k2 = " << k2_est << " → k1의 고차 보정항" << std::endl;
+        std::cout << "   p1, p2 ≈ 0 → 접선 왜곡 작음 (렌즈-센서 정렬 양호)\n" << std::endl;
+    }
+
+    // 💡 왜곡 수학 단계별 시연 (quiz medium 문제 2에서 직접 구현!)
+    {
+        double fx_k = K_estimated.at<double>(0, 0);
+        double fy_k = K_estimated.at<double>(1, 1);
+        double cx_k = K_estimated.at<double>(0, 2);
+        double cy_k = K_estimated.at<double>(1, 2);
+        double k1_k = dist_estimated.at<double>(0);
+        double k2_k = dist_estimated.at<double>(1);
+        // 좌상단 구석 (0,0) — 왜곡이 가장 큰 위치
+        double x_n = (0 - cx_k) / fx_k;
+        double y_n = (0 - cy_k) / fy_k;
+        double r_sq = x_n * x_n + y_n * y_n;
+        double radial = 1 + k1_k * r_sq + k2_k * r_sq * r_sq;
+        double u_d = fx_k * (x_n * radial) + cx_k;
+        double v_d = fy_k * (y_n * radial) + cy_k;
+
+        std::cout << "💡 [교육] 왜곡 수학 시연 — 좌상단 구석 (0,0):" << std::endl;
+        std::cout << "   ① 정규화: x=(0-cx)/fx=" << x_n
+                  << ", y=(0-cy)/fy=" << y_n << std::endl;
+        std::cout << "   ② r² = x²+y² = " << r_sq
+                  << " (중심에서 먼 점 → r² 큼)" << std::endl;
+        std::cout << "   ③ radial = 1 + k1·r² + k2·r⁴ = " << radial << std::endl;
+        std::cout << "   ④ 픽셀 복원: (" << u_d << ", " << v_d << ")" << std::endl;
+        std::cout << "   → 변위: Δu=" << (u_d - 0) << ", Δv=" << (v_d - 0)
+                  << " 픽셀" << std::endl;
+        std::cout << "   → 중심(cx,cy)에서는 왜곡≈0, 가장자리일수록 ↑\n" << std::endl;
+    }
 
     // 참값과 비교
     std::cout << "🎯 실제 값 (참조):" << std::endl;
@@ -259,6 +326,13 @@ int main()
     std::cout << "   fx 오차: " << fx_error << " 픽셀" << std::endl;
     std::cout << "   k1 오차: " << k1_error << std::endl;
 
+    // 💡 RMS 체감 기준 (quiz 문제 3에서 사용!)
+    std::cout << "\n💡 [교육] RMS 재투영 오차 체감:" << std::endl;
+    std::cout << "   < 0.3 px: 매우 우수 — 서브픽셀 수준" << std::endl;
+    std::cout << "   < 0.5 px: 우수 — 대부분의 SLAM에 충분" << std::endl;
+    std::cout << "   < 1.0 px: 양호 — 사용 가능하나 주의" << std::endl;
+    std::cout << "   ≥ 1.0 px: 불량 — 재캘리브레이션 필요" << std::endl;
+
     // 결과 저장
     calib.saveCalibration("calibration_result.yaml", K_estimated, dist_estimated, imageSize);
 
@@ -266,10 +340,12 @@ int main()
     std::cout << "  ✅ 데모 완료!" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    std::cout << "💡 다음 단계:" << std::endl;
-    std::cout << "   1. PRACTICE.md에서 실제 카메라 캘리브레이션 실습" << std::endl;
-    std::cout << "   2. quiz_easy.cpp로 기초 개념 확인" << std::endl;
-    std::cout << "   3. quiz_medium.cpp로 실전 문제 풀이\n" << std::endl;
+    std::cout << "💡 다음 단계 (README.md 학습 순서 참고):" << std::endl;
+    std::cout << "   1. README.md 이론 읽기 (왜곡 수학, 캘리브레이션 과정)" << std::endl;
+    std::cout << "   2. quiz_easy.cpp — K 분석, 왜곡 판별, RMS 평가" << std::endl;
+    std::cout << "   3. my_basic.cpp — Step 1~7 순서대로 직접 구현" << std::endl;
+    std::cout << "   4. quiz_medium.cpp — 왜곡 보정 구현, 캘리브 시뮬레이션" << std::endl;
+    std::cout << "   5. PRACTICE.md — 실제 카메라 캘리브레이션 실습\n" << std::endl;
 
     return 0;
 }
