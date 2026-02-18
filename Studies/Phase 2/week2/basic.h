@@ -65,15 +65,15 @@ class CameraCalibrationBasic
      */
     static std::string evaluateQuality(double rms);
 
-   private:
-    cv::Size boundSize_;  ///< 체커보드 크기 (내부 코너 개수)
-    float squareSize_;    ///< 한 칸 크기 (mm)
-
     /**
      * @brief 3D 객체 점 생성
      * @return 체커보드의 3D 좌표 (Z=0 평면)
      */
     std::vector<cv::Point3f> generateObjectPoints();
+
+   private:
+    cv::Size boardSize_;  ///< 체커보드 크기 (내부 코너 개수)
+    float squareSize_;    ///< 한 칸 크기 (mm)
 };
 
 #endif  // CAMERA_CALIBRATION_BASIC_H

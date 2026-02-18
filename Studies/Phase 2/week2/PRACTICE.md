@@ -20,8 +20,38 @@
 
 **공통:**
 - [ ] 체커보드 패턴 준비 (8×6, 30mm 정사각형)
-  - A3 용지에 출력 또는 아이패드/태블릿에 체커보드 이미지 표시
-  - 태블릿 사용 시: 화면 밝기 최대, 반사/글레어 주의
+  - **방법 1**: A3 용지에 출력 (평평한 면에 부착)
+  - **방법 2**: 아이패드/태블릿에 체커보드 이미지 표시
+
+### 아이패드로 체커보드 띄우기 (MacBook 카메라 사용 시)
+
+1. 아래 명령으로 체커보드 이미지를 생성:
+   ```bash
+   python3 -c "
+   from PIL import Image
+   # 8x6 내부 코너 → 9x7 칸 + 사방 흰색 경계 1칸
+   rows, cols, sq = 7, 9, 100
+   margin = sq
+   w, h = cols * sq + 2 * margin, rows * sq + 2 * margin
+   img = Image.new('L', (w, h), 255)
+   px = img.load()
+   for i in range(rows):
+       for j in range(cols):
+           if (i + j) % 2 == 0:
+               for y in range(margin + i*sq, margin + (i+1)*sq):
+                   for x in range(margin + j*sq, margin + (j+1)*sq):
+                       px[x, y] = 0
+   img.save('checkerboard_8x6.png')
+   print('checkerboard_8x6.png 생성 완료')
+   "
+   ```
+   > PIL이 없으면: `pip install Pillow`
+2. 생성된 `checkerboard_8x6.png`를 아이패드로 AirDrop 또는 iCloud로 전송
+3. 아이패드에서 이미지를 전체 화면으로 표시
+4. 촬영 시 주의사항:
+   - 화면 밝기 **최대**, 자동 잠금 **해제**
+   - 화면 반사/글레어가 없도록 간접 조명 환경에서 촬영
+   - 아이패드를 다양한 각도로 기울이며 20장 이상 캡처
 
 ### 소프트웨어
 
@@ -105,8 +135,9 @@ public:
     
     void saveCalibration(const std::string& filename,
                         const cv::Mat& K,
-                        const cv::Mat& dist);
-    
+                        const cv::Mat& dist,
+                        cv::Size imageSize);
+
 private:
     cv::Size boardSize_;
     float squareSize_;
@@ -194,15 +225,16 @@ double CameraCalibration::calibrate(
 void CameraCalibration::saveCalibration(
     const std::string& filename,
     const cv::Mat& K,
-    const cv::Mat& dist) {
-    
+    const cv::Mat& dist,
+    cv::Size imageSize) {
+
     cv::FileStorage fs(filename, cv::FileStorage::WRITE);
     fs << "camera_matrix" << K;
     fs << "distortion_coefficients" << dist;
-    fs << "image_width" << 800;
-    fs << "image_height" << 600;
+    fs << "image_width" << imageSize.width;
+    fs << "image_height" << imageSize.height;
     fs.release();
-    
+
     std::cout << "💾 Saved calibration to " << filename << std::endl;
 }
 ```
@@ -292,19 +324,22 @@ int main(int argc, char** argv) {
     }
     
     std::cout << "\n⚙️  캘리브레이션 수행 중..." << std::endl;
-    
+
+    // 실제 카메라 해상도 사용 (cap.set()이 요청대로 되지 않을 수 있음)
+    cv::Size imageSize(frame.cols, frame.rows);
+
     cv::Mat K, dist;
-    double rms = calib.calibrate(imagePoints, cv::Size(800, 600), K, dist);
-    
+    double rms = calib.calibrate(imagePoints, imageSize, K, dist);
+
     std::cout << "\n📊 결과:" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Camera Matrix K:\n" << K << std::endl;
     std::cout << "\nDistortion Coefficients:\n" << dist << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
-    
-    std::string filename = (camera_id == 0) ? 
+
+    std::string filename = (camera_id == 0) ?
         "camera_left_calib.yaml" : "camera_right_calib.yaml";
-    calib.saveCalibration(filename, K, dist);
+    calib.saveCalibration(filename, K, dist, imageSize);
     
     if (rms < 0.5) {
         std::cout << "✅ 우수한 캘리브레이션! (RMS < 0.5)" << std::endl;
