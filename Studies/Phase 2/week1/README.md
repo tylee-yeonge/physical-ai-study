@@ -29,11 +29,9 @@
 |:----:|------|------|------|
 | 1 | 데모 실행 | `basic.cpp` | 빌드 후 `./basic` 실행, 결과 먼저 관찰 |
 | 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 3 | Python 기초 실습 | `pinhole_basics.py` | 투영 함수 구현 및 시각화 |
-| 4 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | K 행렬, 좌표계 기본 확인 |
-| 5 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | 역투영, 재투영 오차 응용 |
-| 6 | Python 심화 퀴즈 | `pinhole_quiz.py` | 역투영, FOV, 재투영 오차 |
-| 7 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 실습 가이드 |
+| 3 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | K 행렬, 좌표계 기본 확인 |
+| 4 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | 역투영, 재투영 오차 응용 |
+| 5 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 실습 가이드 |
 
 ---
 
@@ -1047,14 +1045,7 @@ def reprojection_error(P_3d, observed_2d, R, t, K):
 
 ---
 
-## 💻 실습 파일
-
-| 파일 | 내용 | 난이도 |
-|------|------|--------|
-| `pinhole_basics.py` | 투영 함수 구현 및 시각화 | ⭐⭐ |
-| `pinhole_quiz.py` | 역투영, 재투영 오차 실습 | ⭐⭐⭐ |
-
-### 실습 내용 미리보기
+## 💻 실습 내용 미리보기
 
 1. 카메라 내부/외부 파라미터 설정
 2. 3D 점 → 2D 픽셀 투영

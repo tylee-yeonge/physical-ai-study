@@ -32,5 +32,32 @@ int main()
     std::cout << "문제 4:" << std::endl;
     std::cout << "   A→B: 0→3, B→A: 3→0 → 일치 → 통과\n" << std::endl;
 
+    // 문제 5: Homography 변환
+    std::cout << "문제 5: Homography 점 변환" << std::endl;
+    std::cout << "   동차좌표 변환 후 정규화:" << std::endl;
+    std::cout << "   [u']       [x]" << std::endl;
+    std::cout << "   [v'] = H * [y]" << std::endl;
+    std::cout << "   [w ]       [1]" << std::endl;
+    std::cout << "   결과: (u'/w, v'/w)\n" << std::endl;
+
+    double theta = 15.0 * M_PI / 180.0;
+    double scale = 1.1;
+    double tx = 50.0, ty = 30.0;
+
+    // 점 (100, 100) 변환 예시
+    double x = 100.0, y = 100.0;
+    double u = scale * cos(theta) * x + (-scale * sin(theta)) * y + tx;
+    double v = scale * sin(theta) * x + scale * cos(theta) * y + ty;
+    // w = 1 (마지막 행이 [0, 0, 1])
+    std::cout << "   (100, 100) → (" << u << ", " << v << ")" << std::endl;
+
+    x = 200.0; y = 200.0;
+    u = scale * cos(theta) * x + (-scale * sin(theta)) * y + tx;
+    v = scale * sin(theta) * x + scale * cos(theta) * y + ty;
+    std::cout << "   (200, 200) → (" << u << ", " << v << ")\n" << std::endl;
+
+    std::cout << "   핵심: h31=h32=0, h33=1이면 w=1 → 정규화 불필요" << std::endl;
+    std::cout << "   일반적인 H에서는 w≠1이므로 반드시 정규화 필요!" << std::endl;
+
     return 0;
 }

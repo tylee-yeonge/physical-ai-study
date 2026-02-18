@@ -154,6 +154,78 @@ void problem4_3d_2d_correspondence()
     std::cout << "\n✅ 정답입니다!" << std::endl;
 }
 
+/**
+ * @brief 문제 5 정답: 왜곡 크기 분포 분석
+ *
+ * 정규화 좌표에서 r^2를 구하고, 방사 왜곡 변위를 계산하여
+ * 중심과 모서리의 왜곡 차이를 확인합니다.
+ */
+void problem5_distortion_magnitude()
+{
+    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "문제 5: 왜곡 크기 분포 분석 [정답]" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+
+    double fx = 500.0, fy = 500.0;
+    double cx = 320.0, cy = 240.0;
+    double k1 = -0.3, k2 = 0.1;
+
+    struct GridPoint
+    {
+        double u, v;
+        std::string location;
+    };
+
+    std::vector<GridPoint> grid_points = {
+        {320, 240, "중심"},
+        {160, 120, "좌상 1/4"},
+        {480, 360, "우하 1/4"},
+        {0, 0, "좌상 모서리"},
+        {640, 480, "우하 모서리"},
+        {320, 0, "상단 중앙"},
+        {0, 240, "좌측 중앙"},
+    };
+
+    std::cout << "  위치              |  (u, v)       | r^2    | 변위(px)" << std::endl;
+    std::cout << std::string(65, '-') << std::endl;
+
+    for (const auto& pt : grid_points)
+    {
+        // 정규화 좌표
+        double x = (pt.u - cx) / fx;
+        double y = (pt.v - cy) / fy;
+
+        // r^2
+        double r2 = x * x + y * y;
+
+        // 방사 왜곡 계수
+        double radial = 1.0 + k1 * r2 + k2 * r2 * r2;
+
+        // 왜곡된 정규화 좌표
+        double x_dist = x * radial;
+        double y_dist = y * radial;
+
+        // 왜곡된 픽셀 좌표
+        double u_dist = fx * x_dist + cx;
+        double v_dist = fy * y_dist + cy;
+
+        // 변위 크기
+        double du = u_dist - pt.u;
+        double dv = v_dist - pt.v;
+        double displacement = std::sqrt(du * du + dv * dv);
+
+        std::cout << "  " << pt.location;
+        for (size_t i = pt.location.size(); i < 18; i++)
+        {
+            std::cout << " ";
+        }
+        std::cout << "| (" << (int)pt.u << ", " << (int)pt.v << ")"
+                  << "\t| " << r2 << "\t | " << displacement << std::endl;
+    }
+
+    std::cout << "\n✅ 중심에서 변위=0, 모서리에서 최대 변위 확인!" << std::endl;
+}
+
 int main()
 {
     std::cout << "\n╔═══════════════════════════════════════════════╗" << std::endl;
@@ -164,6 +236,7 @@ int main()
     problem2_distortion_type();
     problem3_rms_evaluation();
     problem4_3d_2d_correspondence();
+    problem5_distortion_magnitude();
 
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "🎓 모든 문제 정답 확인 완료!" << std::endl;

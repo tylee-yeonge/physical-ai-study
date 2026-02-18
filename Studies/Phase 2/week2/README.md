@@ -28,11 +28,9 @@
 |:----:|------|------|------|
 | 1 | 데모 실행 | `basic.cpp` | 빌드 후 `./basic` 실행, 결과 먼저 관찰 |
 | 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 3 | Python 기초 실습 | `distortion_basics.py` | 왜곡 모델 구현 및 시각화 |
-| 4 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | K 행렬, 왜곡 유형, RMS 판별 |
-| 5 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | 캘리브레이션 정확도, 왜곡 보정 구현 |
-| 6 | Python 심화 퀴즈 | `calibration_quiz.py` | 캘리브레이션 시뮬레이션 |
-| 7 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 실제 카메라 캘리브레이션 |
+| 3 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | K 행렬, 왜곡 유형, RMS 판별 |
+| 4 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | 캘리브레이션 정확도, 왜곡 보정 구현 |
+| 5 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 실제 카메라 캘리브레이션 |
 
 ---
 
@@ -367,6 +365,9 @@ cam0:
 
 ### 6. Stereo 카메라 (선택)
 
+> **⚠️ 스테레오 캘리브레이션은 지금 하지 않아도 됩니다.**
+> Jetson Orin Nano + ELP 스테레오 카메라가 필요하며, Phase 4 Week 14 (Kalibr 실습) 전에 수행하면 됩니다.
+
 #### Stereo의 장점
 
 단일 카메라의 문제:
@@ -417,11 +418,6 @@ body_T_cam1:
 ---
 
 ## 💻 실습 파일
-
-| 파일 | 내용 | 난이도 |
-|------|------|--------|
-| `distortion_basics.py` | 왜곡 모델 구현 및 시각화 | ⭐⭐ |
-| `calibration_quiz.py` | 캘리브레이션 시뮬레이션 | ⭐⭐⭐ |
 
 ---
 

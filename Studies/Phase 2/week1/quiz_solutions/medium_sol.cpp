@@ -153,6 +153,90 @@ void problem3_solution()
               << " → Pc=(" << Xc2 << ", " << Yc2 << ", " << Zc2 << ")" << std::endl;
 }
 
+/**
+ * @brief 문제 4 정답: 다중 카메라 가시 영역 분석
+ *
+ * 3대 카메라(정면, 좌측 30도, 우측 30도)에서 10개 점의 가시 여부와
+ * 특정 거리에서의 가시 영역 크기를 계산합니다.
+ */
+void problem4_solution()
+{
+    std::cout << "\n━━━ 문제 4 정답: 다중 카메라 가시 영역 ━━━\n" << std::endl;
+
+    double fx = 500.0, fy = 500.0;
+    double cx = 320.0, cy = 240.0;
+    int image_width = 640, image_height = 480;
+
+    // Y축 회전 행렬 생성
+    double angle_30 = 30.0 * CV_PI / 180.0;
+
+    struct Camera
+    {
+        std::string name;
+        cv::Mat R;
+        cv::Mat t;
+    };
+
+    std::vector<Camera> cameras = {
+        {"정면 카메라", cv::Mat::eye(3, 3, CV_64F), cv::Mat::zeros(3, 1, CV_64F)},
+        {"좌측 30도",
+         (cv::Mat_<double>(3, 3) << std::cos(-angle_30), 0, std::sin(-angle_30), 0, 1, 0,
+          -std::sin(-angle_30), 0, std::cos(-angle_30)),
+         cv::Mat::zeros(3, 1, CV_64F)},
+        {"우측 30도",
+         (cv::Mat_<double>(3, 3) << std::cos(angle_30), 0, std::sin(angle_30), 0, 1, 0,
+          -std::sin(angle_30), 0, std::cos(angle_30)),
+         cv::Mat::zeros(3, 1, CV_64F)},
+    };
+
+    std::vector<cv::Point3d> points = {
+        {0, 0, 5},   {2, 0, 5},   {-2, 0, 5},  {0, 2, 5},   {0, -2, 5},
+        {5, 0, 5},   {-5, 0, 5},  {3, 3, 10},  {0, 0, 20},  {10, 0, 10},
+    };
+
+    for (const auto& cam : cameras)
+    {
+        std::cout << cam.name << ":" << std::endl;
+
+        for (size_t i = 0; i < points.size(); i++)
+        {
+            cv::Mat Pw = (cv::Mat_<double>(3, 1) << points[i].x, points[i].y, points[i].z);
+            cv::Mat Pc = cam.R * Pw + cam.t;
+
+            double Xc = Pc.at<double>(0);
+            double Yc = Pc.at<double>(1);
+            double Zc = Pc.at<double>(2);
+
+            if (Zc <= 0)
+            {
+                std::cout << "   점 " << i << ": 카메라 뒤 (보이지 않음)" << std::endl;
+                continue;
+            }
+
+            double u = fx * Xc / Zc + cx;
+            double v = fy * Yc / Zc + cy;
+            bool visible = (u >= 0 && u < image_width && v >= 0 && v < image_height);
+
+            std::cout << "   점 " << i << " → (" << (int)u << ", " << (int)v << ") "
+                      << (visible ? "보임" : "범위 밖") << std::endl;
+        }
+        std::cout << std::endl;
+    }
+
+    // 거리별 가시 영역
+    double fov_x = 2.0 * std::atan2(image_width, 2.0 * fx);
+    double fov_y = 2.0 * std::atan2(image_height, 2.0 * fy);
+
+    std::cout << "거리별 가시 영역 (단일 카메라):" << std::endl;
+    std::vector<double> distances = {1, 5, 10, 20, 50};
+    for (double d : distances)
+    {
+        double vw = 2.0 * d * std::tan(fov_x / 2.0);
+        double vh = 2.0 * d * std::tan(fov_y / 2.0);
+        std::cout << "   거리 " << d << "m: " << vw << " x " << vh << " m" << std::endl;
+    }
+}
+
 int main()
 {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -162,6 +246,7 @@ int main()
     problem1_solution();
     problem2_solution();
     problem3_solution();
+    problem4_solution();
 
     return 0;
 }

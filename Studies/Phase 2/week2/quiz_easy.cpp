@@ -159,17 +159,99 @@ void problem4_3d_2d_correspondence()
     }
 }
 
+/**
+ * @brief 문제 5: 왜곡 크기 분포 분석
+ *
+ * 이미지 격자 점들에 대해 왜곡 변위 크기를 계산하고,
+ * 중심 근처 vs 가장자리의 왜곡 크기를 비교합니다.
+ *
+ * K = [500, 0, 320; 0, 500, 240; 0, 0, 1]
+ * dist = [k1=-0.3, k2=0.1, p1=0, p2=0, k3=0]
+ *
+ * TODO: 정규화 좌표에서 r^2를 계산하고 방사 왜곡 변위를 출력하세요.
+ */
+void problem5_distortion_magnitude()
+{
+    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "문제 5: 왜곡 크기 분포 분석" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+
+    double fx = 500.0, fy = 500.0;
+    double cx = 320.0, cy = 240.0;
+    double k1 = -0.3, k2 = 0.1;
+
+    // 이미지 격자 점 (5x5)
+    struct GridPoint
+    {
+        double u, v;
+        std::string location;
+    };
+
+    std::vector<GridPoint> grid_points = {
+        {320, 240, "중심"},    {160, 120, "좌상 1/4"},    {480, 360, "우하 1/4"},
+        {0, 0, "좌상 모서리"}, {640, 480, "우하 모서리"}, {320, 0, "상단 중앙"},
+        {0, 240, "좌측 중앙"},
+    };
+
+    std::cout << "왜곡 변위 분석 (k1=" << k1 << ", k2=" << k2 << "):\n" << std::endl;
+    std::cout << "  위치              |  (u, v)       | r^2    | 변위(px)" << std::endl;
+    std::cout << std::string(65, '-') << std::endl;
+
+    for (const auto& pt : grid_points)
+    {
+        // TODO: 정규화 좌표 계산
+        // x = (u - cx) / fx, y = (v - cy) / fy
+        double x = 0.0;  // TODO
+        double y = 0.0;  // TODO
+
+        // TODO: r^2 계산
+        double r2 = 0.0;  // TODO
+
+        // TODO: 방사 왜곡 계수 계산
+        // radial = 1 + k1 * r2 + k2 * r2 * r2
+        double radial = 0.0;  // TODO
+
+        // TODO: 왜곡된 정규화 좌표 계산
+        // x_dist = x * radial, y_dist = y * radial
+        double x_dist = 0.0;  // TODO
+        double y_dist = 0.0;  // TODO
+
+        // TODO: 왜곡된 픽셀 좌표 계산
+        double u_dist = 0.0;  // TODO
+        double v_dist = 0.0;  // TODO
+
+        // TODO: 변위 크기 계산 (원본 픽셀과 왜곡 픽셀의 거리)
+        double displacement = 0.0;  // TODO
+
+        std::cout << "  " << pt.location;
+        // 정렬을 위한 패딩
+        for (size_t i = pt.location.size(); i < 18; i++)
+        {
+            std::cout << " ";
+        }
+        std::cout << "| (" << (int)pt.u << ", " << (int)pt.v << ")"
+                  << "\t| " << r2 << "\t | " << displacement << std::endl;
+    }
+
+    std::cout << "\n💡 관찰 포인트:" << std::endl;
+    std::cout << "   - 중심(r=0)에서 왜곡은 0" << std::endl;
+    std::cout << "   - 모서리로 갈수록 r^2이 커지고 왜곡도 증가" << std::endl;
+    std::cout << "   - k1 < 0이므로 배럴 왜곡 (바깥으로 밀림)" << std::endl;
+}
+
 int main()
 {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Phase 2 Week 2 Quiz - Easy" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
 
-    problem1_camera_matrix() problem2_distortion_type() problem3_rms_evaluation()
-            problem4_3d_2d_correspondence()
+    problem1_camera_matrix();
+    problem2_distortion_type();
+    problem3_rms_evaluation();
+    problem4_3d_2d_correspondence();
+    problem5_distortion_magnitude();
 
-                std::cout
-        << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
 

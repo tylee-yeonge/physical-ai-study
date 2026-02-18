@@ -96,6 +96,78 @@ void problem4_solution()
               << " → 왼쪽 위 방향" << std::endl;
 }
 
+/**
+ * @brief 문제 5 정답: 3D 점의 가시성 판별
+ *
+ * 3가지 조건으로 3D 점이 카메라에 보이는지 판별합니다.
+ * (1) Zc > 0, (2) 이미지 경계 내, (3) FOV 범위 이내
+ */
+void problem5_solution()
+{
+    std::cout << "\n━━━ 문제 5 정답 ━━━\n" << std::endl;
+
+    double fx = 500.0, fy = 500.0;
+    double cx = 320.0, cy = 240.0;
+    int image_width = 640, image_height = 480;
+
+    double half_fov_x_rad = std::atan2(image_width, 2.0 * fx);
+    double half_fov_y_rad = std::atan2(image_height, 2.0 * fy);
+
+    struct TestPoint
+    {
+        double x, y, z;
+        std::string description;
+    };
+
+    std::vector<TestPoint> test_points = {
+        {0, 0, 5, "정면 중앙"},
+        {3, 0, 5, "오른쪽"},
+        {10, 0, 5, "멀리 오른쪽"},
+        {0, 0, -5, "카메라 뒤"},
+        {0, 5, 5, "위쪽 멀리"},
+    };
+
+    for (const auto& pt : test_points)
+    {
+        std::cout << "점 (" << pt.x << ", " << pt.y << ", " << pt.z
+                  << ") - " << pt.description << ":" << std::endl;
+
+        // 조건 1: Zc > 0
+        bool cond1 = pt.z > 0;
+
+        // 조건 2: 이미지 경계 내
+        double u = 0.0, v = 0.0;
+        bool cond2 = false;
+        if (cond1)
+        {
+            u = fx * pt.x / pt.z + cx;
+            v = fy * pt.y / pt.z + cy;
+            cond2 = (u >= 0 && u < image_width && v >= 0 && v < image_height);
+        }
+
+        // 조건 3: FOV 범위 이내
+        bool cond3 = false;
+        if (cond1)
+        {
+            double angle_x = std::atan2(std::abs(pt.x), pt.z);
+            double angle_y = std::atan2(std::abs(pt.y), pt.z);
+            cond3 = (angle_x < half_fov_x_rad && angle_y < half_fov_y_rad);
+        }
+
+        std::cout << "   조건1 (Zc>0):     " << (cond1 ? "PASS" : "FAIL") << std::endl;
+        std::cout << "   조건2 (경계 내):   " << (cond2 ? "PASS" : "FAIL");
+        if (cond1)
+        {
+            std::cout << "  (u=" << u << ", v=" << v << ")";
+        }
+        std::cout << std::endl;
+        std::cout << "   조건3 (FOV 이내): " << (cond3 ? "PASS" : "FAIL") << std::endl;
+
+        bool visible = cond1 && cond2 && cond3;
+        std::cout << "   → 결과: " << (visible ? "보임" : "보이지 않음") << "\n" << std::endl;
+    }
+}
+
 int main()
 {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -106,6 +178,7 @@ int main()
     problem2_solution();
     problem3_solution();
     problem4_solution();
+    problem5_solution();
 
     return 0;
 }

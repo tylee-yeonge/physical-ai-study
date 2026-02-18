@@ -46,7 +46,8 @@ class CameraCalibrationBasic
      * @param K 카메라 행렬
      * @param dist 왜곡 계수
      */
-    void saveCalibration(const std::string& filename, const cv::Mat& K, const cv::Mat& dist);
+    void saveCalibration(const std::string& filename, const cv::Mat& K, const cv::Mat& dist,
+                         cv::Size imageSize);
 
     /**
      * @brief 왜곡 보정 적용

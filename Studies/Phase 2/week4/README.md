@@ -36,12 +36,9 @@
 |:----:|------|------|------|
 | 1 | 데모 실행 | `basic.cpp` | 빌드 후 `./basic` 실행, 결과 먼저 관찰 |
 | 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 3 | Python 기초 실습 | `feature_matching_basics.py` | BF 매칭, Ratio Test 구현 |
-| 4 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | 해밍 거리, 매칭 기본 |
-| 5 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | RANSAC, 성능 비교 |
-| 6 | Python 심화 퀴즈 | `matching_quiz.py` | RANSAC, outlier 제거 |
-| 7 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 실시간 매칭 실습 |
-
+| 3 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | 해밍 거리, 매칭 기본 |
+| 4 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | RANSAC, 성능 비교 |
+| 5 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 실시간 매칭 실습 |
 ---
 
 ## 🚀 Step 1: 먼저 돌려보기
@@ -318,13 +315,6 @@ VINS는 매칭 대신 **추적(Tracking)**:
 - Week 8에서 자세히!
 
 ---
-
-## 💻 실습 파일
-
-| 파일 | 내용 | 난이도 |
-|------|------|--------|
-| `feature_matching_basics.py` | BF, Ratio Test 구현 | ⭐⭐ |
-| `matching_quiz.py` | RANSAC, 성능 비교 | ⭐⭐⭐ |
 
 ---
 

@@ -29,9 +29,10 @@ double CameraCalibrationBasic::calibrate(const std::vector<std::vector<cv::Point
 }
 
 void CameraCalibrationBasic::saveCalibration(const std::string& filename, const cv::Mat& K,
-                                             const cv::Mat& dist)
+                                             const cv::Mat& dist, cv::Size imageSize)
 {
     // TODO: cv::FileStorage로 저장
+    // imageSize.width, imageSize.height도 함께 저장할 것
 }
 
 void CameraCalibrationBasic::undistortImage(const cv::Mat& distorted, cv::Mat& undistorted,

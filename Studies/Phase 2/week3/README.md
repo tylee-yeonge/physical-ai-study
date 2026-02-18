@@ -31,11 +31,9 @@
 |:----:|------|------|------|
 | 1 | 데모 실행 | `basic.cpp` | 빌드 후 `./basic` 실행, 결과 먼저 관찰 |
 | 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 3 | Python 기초 실습 | `feature_detection_basics.py` | Harris, FAST, ORB 구현 |
-| 4 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | 코너 검출 기본 확인 |
-| 5 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | 파라미터 튜닝, NMS |
-| 6 | Python 심화 퀴즈 | `feature_detection_quiz.py` | 파라미터 비교, 성능 분석 |
-| 7 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 실시간 특징점 검출 실습 |
+| 3 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | 코너 검출 기본 확인 |
+| 4 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | 파라미터 튜닝, NMS |
+| 5 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 실시간 특징점 검출 실습 |
 
 ---
 
@@ -368,13 +366,6 @@ keypoints, descriptors = orb.detectAndCompute(gray_image, None)
 ```
 
 ---
-
-## 💻 실습 파일
-
-| 파일 | 내용 | 난이도 |
-|------|------|--------|
-| `feature_detection_basics.py` | Harris, FAST, ORB 구현 | ⭐⭐ |
-| `feature_detection_quiz.py` | 파라미터 튜닝, 비교 | ⭐⭐⭐ |
 
 ---
 

@@ -172,6 +172,95 @@ void problem3_extrinsic_effect()
     std::cout << "   - 이것이 SLAM에서 매 프레임 추정하는 것!" << std::endl;
 }
 
+/**
+ * @brief 문제 4: 다중 카메라 가시 영역 분석
+ *
+ * 3대의 카메라(정면, 좌측 30도, 우측 30도)를 설정하고,
+ * 10개의 3D 점에 대해 각 카메라에서의 가시 여부와 투영 좌표를 계산합니다.
+ * 특정 거리에서의 가시 영역 크기(너비 x 높이)도 계산합니다.
+ *
+ * K = [500, 0, 320; 0, 500, 240; 0, 0, 1]
+ * 이미지 크기: 640 x 480
+ *
+ * TODO: 각 카메라에 대해 투영 및 가시성을 판별하세요.
+ */
+void problem4_multi_camera_visibility()
+{
+    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "문제 4: 다중 카메라 가시 영역" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+
+    double fx = 500.0, fy = 500.0;
+    double cx = 320.0, cy = 240.0;
+    int image_width = 640, image_height = 480;
+
+    // 3대 카메라 설정 (정면, 좌측 30도, 우측 30도)
+    // Y축 회전 행렬: Ry(θ) = [cos(θ), 0, sin(θ); 0, 1, 0; -sin(θ), 0, cos(θ)]
+    struct Camera
+    {
+        std::string name;
+        cv::Mat R;
+        cv::Mat t;
+    };
+
+    double angle_30 = 30.0 * CV_PI / 180.0;
+
+    std::vector<Camera> cameras;
+
+    // TODO: 정면 카메라 (R=I, t=0) 추가
+    // TODO: 좌측 30도 카메라 (Y축 -30도 회전) 추가
+    // TODO: 우측 30도 카메라 (Y축 +30도 회전) 추가
+    // 힌트: cv::Mat R = (cv::Mat_<double>(3,3) << cos, 0, sin, 0, 1, 0, -sin, 0, cos);
+    //        cv::Mat t = cv::Mat::zeros(3, 1, CV_64F);
+
+    // 10개 3D 점
+    std::vector<cv::Point3d> points = {
+        {0, 0, 5},   {2, 0, 5},   {-2, 0, 5},  {0, 2, 5},   {0, -2, 5},
+        {5, 0, 5},   {-5, 0, 5},  {3, 3, 10},  {0, 0, 20},  {10, 0, 10},
+    };
+
+    // TODO: 각 카메라에 대해 각 점을 투영하고, 가시 여부를 판별
+    // 힌트:
+    // 1. Pc = R * Pw + t
+    // 2. Zc > 0 확인
+    // 3. u = fx * Xc/Zc + cx, v = fy * Yc/Zc + cy
+    // 4. 0 <= u < width && 0 <= v < height 확인
+
+    for (size_t c = 0; c < cameras.size(); c++)
+    {
+        std::cout << cameras[c].name << ":" << std::endl;
+
+        for (size_t i = 0; i < points.size(); i++)
+        {
+            // TODO: Pc = R * Pw + t 계산
+            // TODO: 가시성 판별 및 투영 좌표 출력
+            std::cout << "   점 " << i << " (" << points[i].x << ", " << points[i].y
+                      << ", " << points[i].z << "): TODO" << std::endl;
+        }
+        std::cout << std::endl;
+    }
+
+    // TODO: 특정 거리에서의 가시 영역 크기 계산
+    // visible_width = 2 * distance * tan(FOV_x / 2)
+    // visible_height = 2 * distance * tan(FOV_y / 2)
+    std::cout << "\n거리별 가시 영역 (단일 카메라):" << std::endl;
+    std::cout << std::string(45, '-') << std::endl;
+
+    std::vector<double> distances = {1, 5, 10, 20, 50};
+    for (double d : distances)
+    {
+        double visible_width = 0.0;   // TODO
+        double visible_height = 0.0;  // TODO
+
+        std::cout << "   거리 " << d << "m: " << visible_width << " x " << visible_height
+                  << " m" << std::endl;
+    }
+
+    std::cout << "\n💡 힌트:" << std::endl;
+    std::cout << "   다중 카메라는 단일 카메라보다 넓은 영역을 커버합니다." << std::endl;
+    std::cout << "   Visual SLAM에서 다중 카메라 시스템이 유리한 이유!" << std::endl;
+}
+
 int main()
 {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -181,6 +270,7 @@ int main()
     problem1_cube_projection();
     problem2_reprojection_error();
     problem3_extrinsic_effect();
+    problem4_multi_camera_visibility();
 
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "정답은 quiz_solutions/medium_sol.cpp 참고" << std::endl;

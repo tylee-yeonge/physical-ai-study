@@ -101,17 +101,125 @@ void problem4_slam_application()
     std::cout << "   - Drift 누적" << std::endl;
 }
 
+/**
+ * @brief 3x3 패치에서 이미지 그래디언트 수동 계산과 LK 방정식 설명
+ *
+ * Sobel 커널로 Ix, Iy를 구하고 프레임 차이로 It을 계산하는 과정,
+ * 그리고 A^T A 행렬(Structure Tensor)을 구성하여 LK 방정식을 세우는
+ * 과정을 단계별로 설명한다.
+ */
+void problem5_gradient_and_lk_equation()
+{
+    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "문제 5: 이미지 그래디언트와 LK 방정식" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+
+    std::cout << "3x3 패치 예제:\n" << std::endl;
+
+    std::cout << "프레임 1:          프레임 2:" << std::endl;
+    std::cout << "  [100 100 100]     [100 100 100]" << std::endl;
+    std::cout << "  [100 200 100]     [100 100 200]" << std::endl;
+    std::cout << "  [100 100 100]     [100 100 100]\n" << std::endl;
+
+    std::cout << "Sobel 커널 (x 방향):" << std::endl;
+    std::cout << "   [-1  0  1]" << std::endl;
+    std::cout << "   [-2  0  2]  / 8" << std::endl;
+    std::cout << "   [-1  0  1]\n" << std::endl;
+
+    std::cout << "Sobel 커널 (y 방향):" << std::endl;
+    std::cout << "   [-1 -2 -1]" << std::endl;
+    std::cout << "   [ 0  0  0]  / 8" << std::endl;
+    std::cout << "   [ 1  2  1]\n" << std::endl;
+
+    std::cout << "그래디언트 계산:" << std::endl;
+    std::cout << "   Ix: x 방향 밝기 변화 (Sobel_x * I)" << std::endl;
+    std::cout << "   Iy: y 방향 밝기 변화 (Sobel_y * I)" << std::endl;
+    std::cout << "   It: 시간 변화 (Frame2 - Frame1)\n" << std::endl;
+
+    std::cout << "LK 방정식:" << std::endl;
+    std::cout << "   윈도우 내 N개 픽셀에서:" << std::endl;
+    std::cout << "   A = [Ix_1  Iy_1]     b = [-It_1]" << std::endl;
+    std::cout << "       [Ix_2  Iy_2]         [-It_2]" << std::endl;
+    std::cout << "       [ ...   ... ]         [ ... ]" << std::endl;
+    std::cout << "       [Ix_N  Iy_N]         [-It_N]\n" << std::endl;
+
+    std::cout << "A^T A (2x2 Structure Tensor):" << std::endl;
+    std::cout << "   [sum(Ix^2)     sum(Ix*Iy)]" << std::endl;
+    std::cout << "   [sum(Ix*Iy)    sum(Iy^2) ]\n" << std::endl;
+
+    std::cout << "해: [u, v]^T = (A^T A)^-1 * A^T * b\n" << std::endl;
+
+    std::cout << "질문: 왜 A^T A가 역행렬이 존재해야 하나요?\n" << std::endl;
+
+    std::cout << "💡 답:" << std::endl;
+    std::cout << "   A^T A가 특이(singular)하면 해를 구할 수 없음" << std::endl;
+    std::cout << "   → 두 고유값이 모두 충분히 커야 함" << std::endl;
+    std::cout << "   → 코너(Corner) 영역에서만 안정적 추적 가능" << std::endl;
+}
+
+/**
+ * @brief Structure Tensor 고유값 기반 추적 가능성 판별 설명
+ *
+ * 코너/에지/평면 영역에서 고유값 패턴이 다른 것을 설명하고
+ * 조리개 문제(Aperture Problem)와의 관계를 다룬다.
+ */
+void problem6_trackability()
+{
+    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "문제 6: 추적 가능성 판별" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+
+    std::cout << "Structure Tensor M = A^T A 의 고유값 분석:\n" << std::endl;
+
+    std::cout << "코너 (Corner):" << std::endl;
+    std::cout << "   λ1 >> 0, λ2 >> 0 (둘 다 큼)" << std::endl;
+    std::cout << "   → 모든 방향으로 밝기 변화" << std::endl;
+    std::cout << "   → 추적 가능!\n" << std::endl;
+
+    std::cout << "에지 (Edge):" << std::endl;
+    std::cout << "   λ1 >> 0, λ2 ≈ 0 (하나만 큼)" << std::endl;
+    std::cout << "   → 한 방향으로만 밝기 변화" << std::endl;
+    std::cout << "   → 조리개 문제 (Aperture Problem)!\n" << std::endl;
+
+    std::cout << "평면 (Flat):" << std::endl;
+    std::cout << "   λ1 ≈ 0, λ2 ≈ 0 (둘 다 작음)" << std::endl;
+    std::cout << "   → 밝기 변화 없음" << std::endl;
+    std::cout << "   → 추적 불가!\n" << std::endl;
+
+    std::cout << "시각화:" << std::endl;
+    std::cout << "   ┌──── λ2 ────┐" << std::endl;
+    std::cout << "   │ Corner     │" << std::endl;
+    std::cout << "   │ (추적 OK)  │" << std::endl;
+    std::cout << "   │            │ λ1" << std::endl;
+    std::cout << "   │Edge Edge   │" << std::endl;
+    std::cout << "   │(불안정)    │" << std::endl;
+    std::cout << "   │Flat        │" << std::endl;
+    std::cout << "   │(추적 불가) │" << std::endl;
+    std::cout << "   └────────────┘\n" << std::endl;
+
+    std::cout << "질문: Harris 코너 검출과 어떤 관계인가요?\n" << std::endl;
+
+    std::cout << "💡 답:" << std::endl;
+    std::cout << "   Harris M = Structure Tensor = A^T A" << std::endl;
+    std::cout << "   Harris 응답: R = det(M) - k*trace(M)^2" << std::endl;
+    std::cout << "   → 코너에서 R 큼 = 추적 가능" << std::endl;
+    std::cout << "   → goodFeaturesToTrack()이 바로 이것!" << std::endl;
+}
+
 int main()
 {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Phase 2 Week 8 Quiz - Easy" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
 
-    problem1_optical_flow_assumptions() problem2_aperture_problem() problem3_pyramidal_flow()
-            problem4_slam_application()
+    problem1_optical_flow_assumptions();
+    problem2_aperture_problem();
+    problem3_pyramidal_flow();
+    problem4_slam_application();
+    problem5_gradient_and_lk_equation();
+    problem6_trackability();
 
-                std::cout
-        << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
 

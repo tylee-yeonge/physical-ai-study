@@ -17,6 +17,8 @@ int main()
     std::cout << "추정된 t: " << tvec.t() << std::endl;
     std::cout << "\nRANSAC 반복: Inlier 70% → ~16회" << std::endl;
     std::cout << "최적화: cv::solvePnPRefineLM()" << std::endl;
+    std::cout << "\n문제 4: DLT 삼각측량 → A 행렬(4x4) 구성 후 SVD, 노이즈 없으면 정확 복원" << std::endl;
+    std::cout << "문제 5: DLT PnP → 2N x 12 행렬 SVD, K^-1*P로 [R|t] 분리, Outlier에 취약" << std::endl;
 
     return 0;
 }

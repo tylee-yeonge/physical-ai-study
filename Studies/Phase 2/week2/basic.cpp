@@ -1,6 +1,7 @@
 #include "basic.h"
 #include <iostream>
 #include <chrono>
+#include <random>
 
 CameraCalibrationBasic::CameraCalibrationBasic(cv::Size boardSize, float squareSize)
     : boardSize_(boardSize), squareSize_(squareSize)
@@ -36,7 +37,7 @@ bool CameraCalibrationBasic::detectChessboard(const cv::Mat& image,
         // 11x11 윈도우 내에서 코너를 더 정확히 찾음
         cv::TermCriteria criteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER,
                                   30,  // 최대 반복 횟수
-                                  0.1  // 정확도 epsilon
+                                  0.001  // 정확도 epsilon
         );
 
         cv::cornerSubPix(gray, corners, cv::Size(11, 11), cv::Size(-1, -1), criteria);
@@ -112,7 +113,7 @@ double CameraCalibrationBasic::calibrate(const std::vector<std::vector<cv::Point
 }
 
 void CameraCalibrationBasic::saveCalibration(const std::string& filename, const cv::Mat& K,
-                                             const cv::Mat& dist)
+                                             const cv::Mat& dist, cv::Size imageSize)
 {
     // OpenCV FileStorage (YAML 형식)
     cv::FileStorage fs(filename, cv::FileStorage::WRITE);
@@ -130,8 +131,8 @@ void CameraCalibrationBasic::saveCalibration(const std::string& filename, const 
     fs << "calibration_time" << asctime(localtime(&rawtime));
     fs << "camera_matrix" << K;
     fs << "distortion_coefficients" << dist;
-    fs << "image_width" << 800;  // 예시 값
-    fs << "image_height" << 600;
+    fs << "image_width" << imageSize.width;
+    fs << "image_height" << imageSize.height;
 
     fs.release();
 
@@ -195,6 +196,10 @@ int main()
     // 15개 이미지 시뮬레이션
     std::vector<cv::Point3f> objectPoints = calib.generateObjectPoints();
 
+    // 노이즈 생성용 난수 엔진
+    std::mt19937 rng(42);
+    std::normal_distribution<double> noise(0.0, 0.5);  // 표준편차 0.5px
+
     for (int i = 0; i < 15; i++)
     {
         std::vector<cv::Point2f> projected;
@@ -209,8 +214,8 @@ int main()
         // 노이즈 추가 (실제 측정 오차 시뮬레이션)
         for (auto& point : projected)
         {
-            point.x += (rand() % 100 - 50) / 100.0;
-            point.y += (rand() % 100 - 50) / 100.0;
+            point.x += static_cast<float>(noise(rng));
+            point.y += static_cast<float>(noise(rng));
         }
 
         imagePoints.push_back(projected);
@@ -249,7 +254,7 @@ int main()
     std::cout << "   k1 오차: " << k1_error << std::endl;
 
     // 결과 저장
-    calib.saveCalibration("calibration_result.yaml", K_estimated, dist_estimated);
+    calib.saveCalibration("calibration_result.yaml", K_estimated, dist_estimated, imageSize);
 
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "  ✅ 데모 완료!" << std::endl;

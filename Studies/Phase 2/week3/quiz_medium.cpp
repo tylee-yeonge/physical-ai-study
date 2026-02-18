@@ -148,15 +148,178 @@ void problem3_multiscale_detection()
     std::cout << "   - ORB, SIFT는 자동으로 수행" << std::endl;
 }
 
+/**
+ * @brief Harris 코너 검출 직접 구현
+ *
+ * Sobel로 Ix, Iy 그래디언트를 구하고 Structure Tensor 요소(Ix^2, Iy^2, IxIy)에
+ * 가우시안 블러를 적용한 후 Harris 응답 R을 계산하세요.
+ * OpenCV cornerHarris() 결과와 비교합니다.
+ */
+void problem4_harris_implementation()
+{
+    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "문제 4: Harris 코너 검출 직접 구현" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+
+    // 테스트 이미지 생성 (체커보드)
+    cv::Mat image = cv::Mat::zeros(400, 400, CV_8UC1);
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            if ((i + j) % 2 == 0)
+            {
+                cv::rectangle(image, cv::Point(j * 50, i * 50),
+                              cv::Point((j + 1) * 50, (i + 1) * 50), cv::Scalar(255), -1);
+            }
+        }
+    }
+
+    cv::Mat image_f;
+    image.convertTo(image_f, CV_32F);
+
+    // TODO: 1. Sobel 필터로 Ix, Iy 계산
+    cv::Mat Ix, Iy;
+    // cv::Sobel(image_f, Ix, CV_32F, 1, 0, 3);
+    // cv::Sobel(image_f, Iy, CV_32F, 0, 1, 3);
+
+    // TODO: 2. Structure Tensor 요소 계산
+    cv::Mat Ixx, Iyy, Ixy;
+    // Ixx = Ix.mul(Ix);
+    // Iyy = Iy.mul(Iy);
+    // Ixy = Ix.mul(Iy);
+
+    // TODO: 3. 가우시안 블러 적용
+    int ksize = 5;
+    // cv::GaussianBlur(Ixx, Ixx, cv::Size(ksize, ksize), 0);
+    // cv::GaussianBlur(Iyy, Iyy, cv::Size(ksize, ksize), 0);
+    // cv::GaussianBlur(Ixy, Ixy, cv::Size(ksize, ksize), 0);
+
+    // TODO: 4. Harris 응답 R = det(M) - k * trace(M)^2
+    double k = 0.04;
+    cv::Mat harris_response;
+    // cv::Mat det = Ixx.mul(Iyy) - Ixy.mul(Ixy);
+    // cv::Mat trace = Ixx + Iyy;
+    // harris_response = det - k * trace.mul(trace);
+
+    // OpenCV cornerHarris로 비교
+    cv::Mat harris_cv;
+    cv::cornerHarris(image_f, harris_cv, 2, 3, k);
+
+    std::cout << "📊 직접 구현 결과:" << std::endl;
+    if (!harris_response.empty())
+    {
+        double min_val, max_val;
+        cv::minMaxLoc(harris_response, &min_val, &max_val);
+        std::cout << "   응답 범위: [" << min_val << ", " << max_val << "]" << std::endl;
+    }
+    else
+    {
+        std::cout << "   (TODO를 구현하세요)" << std::endl;
+    }
+
+    std::cout << "\n📊 OpenCV cornerHarris 결과:" << std::endl;
+    double cv_min, cv_max;
+    cv::minMaxLoc(harris_cv, &cv_min, &cv_max);
+    std::cout << "   응답 범위: [" << cv_min << ", " << cv_max << "]\n" << std::endl;
+
+    std::cout << "💡 구현 파이프라인:" << std::endl;
+    std::cout << "   Sobel(Ix, Iy) → Ix^2, Iy^2, IxIy → GaussianBlur → R 계산" << std::endl;
+    std::cout << "   직접 구현 결과와 OpenCV 결과가 유사해야 합니다." << std::endl;
+}
+
+/**
+ * @brief Non-Maximum Suppression 직접 구현
+ *
+ * Harris 응답 맵에서 지역 최대값만 남기는 NMS를 구현하세요.
+ * 적용 전/후 키포인트 수를 비교하고 제거 비율을 계산합니다.
+ */
+void problem5_nms_implementation()
+{
+    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "문제 5: NMS 직접 구현" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+
+    // 테스트 이미지 + Harris 응답 계산
+    cv::Mat image = cv::Mat::zeros(400, 400, CV_8UC1);
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            if ((i + j) % 2 == 0)
+            {
+                cv::rectangle(image, cv::Point(j * 50, i * 50),
+                              cv::Point((j + 1) * 50, (i + 1) * 50), cv::Scalar(255), -1);
+            }
+        }
+    }
+
+    cv::Mat image_f;
+    image.convertTo(image_f, CV_32F);
+
+    cv::Mat response;
+    cv::cornerHarris(image_f, response, 2, 3, 0.04);
+
+    // NMS 전: 임계값만 적용
+    double threshold_ratio = 0.01;
+    double r_min, r_max;
+    cv::minMaxLoc(response, &r_min, &r_max);
+    double thresh_value = threshold_ratio * r_max;
+
+    int count_before = 0;
+    for (int y = 0; y < response.rows; y++)
+    {
+        for (int x = 0; x < response.cols; x++)
+        {
+            if (response.at<float>(y, x) > thresh_value)
+            {
+                count_before++;
+            }
+        }
+    }
+
+    // TODO: NMS 구현
+    // 윈도우 크기
+    int window_size = 7;
+    int half_win = window_size / 2;
+    int count_after = 0;
+
+    // 힌트:
+    //   1. 이미지의 각 픽셀 (y, x)에 대해 순회
+    //   2. response.at<float>(y, x) > thresh_value 인지 확인
+    //   3. (y, x) 주변 window_size x window_size 윈도우에서 최대값을 찾기
+    //   4. 현재 값이 윈도우 내 최대값과 같으면 → 지역 최대 → 유지 (count_after++)
+    //   5. 경계 처리에 주의 (half_win만큼 안쪽에서 순회)
+
+    std::cout << "NMS 결과 (window=" << window_size << "):" << std::endl;
+    std::cout << "   NMS 전: " << count_before << "개" << std::endl;
+    std::cout << "   NMS 후: " << count_after << "개" << std::endl;
+
+    if (count_before > 0)
+    {
+        double reduction = 100.0 * (1.0 - double(count_after) / count_before);
+        std::cout << "   제거 비율: " << reduction << "%\n" << std::endl;
+    }
+
+    std::cout << "💡 NMS 핵심:" << std::endl;
+    std::cout << "   - 지역 윈도우 내 최대값만 남김" << std::endl;
+    std::cout << "   - 같은 코너에 대한 중복 검출 제거" << std::endl;
+    std::cout << "   - 윈도우 크기 ↑ → 더 희소한 결과" << std::endl;
+}
+
 int main()
 {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Phase 2 Week 3 Quiz - Medium" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
 
-    problem1_uniform_distribution() problem2_adaptive_threshold() problem3_multiscale_detection()
+    problem1_uniform_distribution();
+    problem2_adaptive_threshold();
+    problem3_multiscale_detection();
+    problem4_harris_implementation();
+    problem5_nms_implementation();
 
-            std::cout
+    std::cout
         << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "정답은 quiz_solutions/medium_sol.cpp 참고" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

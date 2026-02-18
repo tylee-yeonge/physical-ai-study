@@ -196,6 +196,93 @@ void problem4_back_projection()
     std::cout << "   좌상단 → 음의 X, 음의 Y → 왼쪽 위를 가리킴" << std::endl;
 }
 
+/**
+ * @brief 문제 5: 3D 점의 가시성 판별 (Visibility Check)
+ *
+ * 3D 점이 카메라 이미지에 보이려면 3가지 조건을 모두 만족해야 합니다:
+ *   (1) 카메라 앞에 있어야 함 (Zc > 0)
+ *   (2) 투영된 픽셀이 이미지 경계 내 (0 <= u < width && 0 <= v < height)
+ *   (3) FOV 범위 이내
+ *
+ * K = [500, 0, 320; 0, 500, 240; 0, 0, 1]
+ * 이미지 크기: 640 x 480
+ * R = I, t = [0, 0, 0]
+ *
+ * TODO: 각 테스트 점에 대해 3가지 조건의 통과/실패를 출력하세요.
+ */
+void problem5_visibility_check()
+{
+    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "문제 5: 가시성 판별 (Visibility)" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+
+    double fx = 500.0, fy = 500.0;
+    double cx = 320.0, cy = 240.0;
+    int image_width = 640, image_height = 480;
+
+    // FOV 계산
+    double fov_x = 2.0 * std::atan2(image_width, 2.0 * fx) * 180.0 / CV_PI;
+    double fov_y = 2.0 * std::atan2(image_height, 2.0 * fy) * 180.0 / CV_PI;
+    double half_fov_x_rad = std::atan2(image_width, 2.0 * fx);
+    double half_fov_y_rad = std::atan2(image_height, 2.0 * fy);
+
+    std::cout << "카메라 설정:" << std::endl;
+    std::cout << "   이미지 크기: " << image_width << " x " << image_height << std::endl;
+    std::cout << "   FOV: " << fov_x << "° x " << fov_y << "°\n" << std::endl;
+
+    // 테스트 점 (R=I, t=0이므로 카메라 좌표 = 월드 좌표)
+    struct TestPoint
+    {
+        double x, y, z;
+        std::string description;
+    };
+
+    std::vector<TestPoint> test_points = {
+        {0, 0, 5, "정면 중앙"},
+        {3, 0, 5, "오른쪽"},
+        {10, 0, 5, "멀리 오른쪽"},
+        {0, 0, -5, "카메라 뒤"},
+        {0, 5, 5, "위쪽 멀리"},
+    };
+
+    std::cout << "가시성 테스트:" << std::endl;
+    std::cout << std::string(70, '-') << std::endl;
+
+    for (const auto& pt : test_points)
+    {
+        std::cout << "점 (" << pt.x << ", " << pt.y << ", " << pt.z
+                  << ") - " << pt.description << ":" << std::endl;
+
+        // TODO: 조건 1 - Zc > 0
+        bool cond1 = false;  // TODO
+
+        // TODO: 조건 2 - 이미지 경계 내
+        // 힌트: u = fx * (Xc/Zc) + cx, v = fy * (Yc/Zc) + cy
+        bool cond2 = false;  // TODO
+        double u = 0.0, v = 0.0;  // TODO: 투영 좌표 계산
+
+        // TODO: 조건 3 - FOV 범위 이내
+        // 힌트: atan2(|Xc|, Zc) < half_fov_x_rad
+        bool cond3 = false;  // TODO
+
+        std::cout << "   조건1 (Zc>0):     " << (cond1 ? "PASS" : "FAIL") << std::endl;
+        std::cout << "   조건2 (경계 내):   " << (cond2 ? "PASS" : "FAIL");
+        if (cond1)
+        {
+            std::cout << "  (u=" << u << ", v=" << v << ")";
+        }
+        std::cout << std::endl;
+        std::cout << "   조건3 (FOV 이내): " << (cond3 ? "PASS" : "FAIL") << std::endl;
+
+        bool visible = cond1 && cond2 && cond3;
+        std::cout << "   → 결과: " << (visible ? "보임" : "보이지 않음") << "\n" << std::endl;
+    }
+
+    std::cout << "💡 힌트:" << std::endl;
+    std::cout << "   SLAM에서 가시성 체크는 특징점 추적 시 필수!" << std::endl;
+    std::cout << "   3가지 조건 중 하나라도 실패하면 해당 점은 무시" << std::endl;
+}
+
 int main()
 {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -206,6 +293,7 @@ int main()
     problem2_projection_steps();
     problem3_fov_calculation();
     problem4_back_projection();
+    problem5_visibility_check();
 
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;

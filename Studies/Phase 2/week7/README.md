@@ -36,11 +36,9 @@
 |:----:|------|------|------|
 | 1 | 데모 실행 | `basic.cpp` | 빌드 후 `./basic` 실행, 결과 먼저 관찰 |
 | 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 3 | Python 기초 실습 | `triangulation_basics.py` | DLT 삼각측량, 정확도 분석 |
-| 4 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | 삼각측량 기본, PnP 개념 |
-| 5 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | 베이스라인 효과, RANSAC |
-| 6 | Python 심화 퀴즈 | `pnp_quiz.py` | PnP 구현, RANSAC |
-| 7 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 삼각측량/PnP 실습 |
+| 3 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | 삼각측량 기본, PnP 개념 |
+| 4 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | 베이스라인 효과, RANSAC |
+| 5 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 삼각측량/PnP 실습 |
 
 ---
 
@@ -306,8 +304,8 @@ bool GlobalSFM::solveFrameByPnP(...)
 
 | 파일 | 내용 | 난이도 |
 |------|------|--------|
-| `triangulation_basics.py` | DLT 삼각측량, 정확도 분석 | ⭐⭐⭐ |
-| `pnp_quiz.py` | PnP 구현, RANSAC | ⭐⭐⭐ |
+| `quiz_easy.cpp` | DLT 삼각측량 개념, PnP 기초 | ⭐⭐ |
+| `quiz_medium.cpp` | DLT 삼각측량/PnP 구현, RANSAC | ⭐⭐⭐ |
 
 ---
 

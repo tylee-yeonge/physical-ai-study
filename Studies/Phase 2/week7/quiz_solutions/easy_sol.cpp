@@ -10,6 +10,7 @@ int main()
     std::cout << "문제 2: PnP는 절대 스케일 복원!" << std::endl;
     std::cout << "문제 3: RANSAC으로 outlier 제거" << std::endl;
     std::cout << "문제 4: VO는 drift 문제 (Loop Closure 필요)" << std::endl;
+    std::cout << "문제 5: A 행렬의 각 행 = 한 카메라의 한 좌표 제약, 3뷰 이상이면 과잉결정" << std::endl;
 
     return 0;
 }

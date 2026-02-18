@@ -36,11 +36,9 @@
 |:----:|------|------|------|
 | 1 | 데모 실행 | `basic.cpp` | 빌드 후 `./basic` 실행, 결과 먼저 관찰 |
 | 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 3 | Python 기초 실습 | `optical_flow_basics.py` | LK 구현, 시각화 |
-| 4 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | 밝기 항상성, 광류 기본 |
-| 5 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | 파라미터 분석, Dense Flow |
-| 6 | Python 심화 퀴즈 | `optical_flow_quiz.py` | 파라미터 분석, Dense Flow |
-| 7 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 실시간 KLT 트래킹 실습 |
+| 3 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | 밝기 항상성, 광류 기본 |
+| 4 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | 파라미터 분석, LK 구현 |
+| 5 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 실시간 KLT 트래킹 실습 |
 
 ---
 
@@ -326,8 +324,8 @@ F_threshold: 1.0      # Fundamental matrix 임계값
 
 | 파일 | 내용 | 난이도 |
 |------|------|--------|
-| `optical_flow_basics.py` | LK 구현, 시각화 | ⭐⭐⭐ |
-| `optical_flow_quiz.py` | 파라미터 분석, Dense Flow | ⭐⭐⭐ |
+| `quiz_easy.cpp` | 그래디언트, LK 방정식, 추적 가능성 | ⭐⭐ |
+| `quiz_medium.cpp` | LK 구현, 윈도우 크기 분석 | ⭐⭐⭐ |
 
 ---
 

@@ -181,16 +181,90 @@ void problem4_speed_comparison()
     std::cout << "\n힌트: FAST는 이름처럼 매우 빠름, ORB는 디스크립터 계산 추가" << std::endl;
 }
 
+/**
+ * @brief Harris 응답 함수 R = det(M) - k * trace(M)^2 수동 계산
+ *
+ * 주어진 2x2 Structure Tensor M의 고유값과 Harris 응답 R을 계산하고,
+ * k 값에 따라 코너/에지/평면을 판별하세요.
+ */
+void problem5_harris_response()
+{
+    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "문제 5: Harris 응답 함수 계산" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+
+    std::cout << "Structure Tensor M의 의미:" << std::endl;
+    std::cout << "       [ Ix^2   IxIy ]" << std::endl;
+    std::cout << "   M = [ IxIy   Iy^2 ]" << std::endl;
+    std::cout << "\n   R = det(M) - k * trace(M)^2" << std::endl;
+    std::cout << "     = lambda1*lambda2 - k*(lambda1+lambda2)^2\n" << std::endl;
+
+    // 케이스 1: 코너 (두 고유값 모두 큼)
+    // M = [500, 10; 10, 480]
+    double m11_a = 500.0, m12_a = 10.0, m22_a = 480.0;
+
+    // 케이스 2: 에지 (한 고유값만 큼)
+    // M = [800, 5; 5, 10]
+    double m11_b = 800.0, m12_b = 5.0, m22_b = 10.0;
+
+    // 케이스 3: 평면 (두 고유값 모두 작음)
+    // M = [3, 1; 1, 2]
+    double m11_c = 3.0, m12_c = 1.0, m22_c = 2.0;
+
+    double k = 0.04;
+
+    // TODO: 각 케이스에 대해 det, trace, R 계산
+    // 힌트: det(M) = m11*m22 - m12*m12
+    //        trace(M) = m11 + m22
+    //        R = det - k * trace * trace
+    double det_a = 0.0, trace_a = 0.0, R_a = 0.0;  // TODO
+    double det_b = 0.0, trace_b = 0.0, R_b = 0.0;  // TODO
+    double det_c = 0.0, trace_c = 0.0, R_c = 0.0;  // TODO
+
+    std::cout << "k = " << k << "\n" << std::endl;
+    std::cout << "케이스 1 (코너): M = [500, 10; 10, 480]" << std::endl;
+    std::cout << "   det = " << det_a << ", trace = " << trace_a << ", R = " << R_a << std::endl;
+    std::cout << "   판별: " << (R_a > 0 ? "코너" : (R_a < 0 ? "에지" : "평면")) << "\n" << std::endl;
+
+    std::cout << "케이스 2 (에지): M = [800, 5; 5, 10]" << std::endl;
+    std::cout << "   det = " << det_b << ", trace = " << trace_b << ", R = " << R_b << std::endl;
+    std::cout << "   판별: " << (R_b > 0 ? "코너" : (R_b < 0 ? "에지" : "평면")) << "\n" << std::endl;
+
+    std::cout << "케이스 3 (평면): M = [3, 1; 1, 2]" << std::endl;
+    std::cout << "   det = " << det_c << ", trace = " << trace_c << ", R = " << R_c << std::endl;
+    std::cout << "   판별: " << (R_c > 0 ? "코너" : (R_c < 0 ? "에지" : "평면")) << "\n" << std::endl;
+
+    // 추가: k 값 변화에 따른 영향
+    std::cout << "--- k 값 변화에 따른 케이스 1 (코너)의 R 변화 ---\n" << std::endl;
+    std::vector<double> k_values = {0.02, 0.04, 0.06, 0.10};
+    for (double kv : k_values)
+    {
+        // TODO: 케이스 1에 대해 각 k로 R 계산
+        double R_k = 0.0;  // TODO
+        std::cout << "   k = " << kv << " → R = " << R_k
+                  << (R_k > 0 ? " (코너)" : " (코너 아님)") << std::endl;
+    }
+
+    std::cout << "\n💡 결론:" << std::endl;
+    std::cout << "   - R >> 0: 코너 (두 고유값 모두 큼)" << std::endl;
+    std::cout << "   - R << 0: 에지 (한 고유값만 큼)" << std::endl;
+    std::cout << "   - |R| ≈ 0: 평면 (두 고유값 모두 작음)" << std::endl;
+    std::cout << "   - k가 커지면 코너 판별 기준이 엄격해짐 (R 감소)" << std::endl;
+}
+
 int main()
 {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Phase 2 Week 3 Quiz - Easy" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
 
-    problem1_fast_threshold() problem2_orb_descriptor() problem3_nms_effect()
-            problem4_speed_comparison()
+    problem1_fast_threshold();
+    problem2_orb_descriptor();
+    problem3_nms_effect();
+    problem4_speed_comparison();
+    problem5_harris_response();
 
-                std::cout
+    std::cout
         << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

@@ -106,17 +106,115 @@ void problem4_baseline_vs_accuracy()
     std::cout << "   - VINS: 연속 프레임 (작은 baseline)" << std::endl;
 }
 
+/**
+ * @brief 회전 행렬 유효성 검증
+ *
+ * 주어진 행렬이 유효한 회전 행렬인지 두 가지 조건으로 판별한다:
+ * 1. 직교성: R^T * R = I
+ * 2. 행렬식: det(R) = 1
+ *
+ * 유효하지 않은 R을 SVD로 가장 가까운 회전 행렬로 복구한다.
+ */
+void problem5_validate_rotation()
+{
+    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "문제 5: 회전 행렬 유효성 검증" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+
+    // 유효한 회전 행렬 (Y축 15도)
+    double angle = 15.0 * CV_PI / 180.0;
+    cv::Mat R_valid = (cv::Mat_<double>(3, 3) <<
+        cos(angle), 0, sin(angle),
+        0, 1, 0,
+        -sin(angle), 0, cos(angle));
+
+    // 노이즈로 손상된 행렬
+    cv::Mat noise = cv::Mat::zeros(3, 3, CV_64F);
+    cv::RNG rng(42);
+    rng.fill(noise, cv::RNG::NORMAL, 0, 0.01);
+    cv::Mat R_noisy = R_valid + noise;
+
+    std::cout << "R_valid:" << std::endl << R_valid << std::endl;
+    std::cout << "\nR_noisy (노이즈 추가):" << std::endl << R_noisy << std::endl;
+
+    // TODO 1: R_valid와 R_noisy 각각에 대해 검증
+    //   조건 1: R^T * R ≈ I (직교성)
+    //     cv::Mat RtR = R.t() * R;
+    //     double ortho_error = cv::norm(RtR - cv::Mat::eye(3, 3, CV_64F));
+    //
+    //   조건 2: det(R) ≈ 1
+    //     double det = cv::determinant(R);
+
+    // TODO 2: R_noisy를 SVD로 가장 가까운 회전 행렬로 복구
+    //   힌트: SVD → R_fixed = U * Vt
+    //         det(R_fixed) < 0이면 → U * diag(1,1,-1) * Vt
+
+    std::cout << "\n올바른 회전 행렬 조건:" << std::endl;
+    std::cout << "   1. R^T * R = I (직교성)" << std::endl;
+    std::cout << "   2. det(R) = 1 (반사가 아닌 회전)" << std::endl;
+    std::cout << "   SVD 복구: R_fixed = U * Vt (가장 가까운 직교 행렬)" << std::endl;
+}
+
+/**
+ * @brief 스케일 모호성 이해
+ *
+ * t를 2배, 0.5배로 바꿔도 E = [t]_x R이 같은 방향인지 확인한다.
+ * 단안 SLAM에서 절대 스케일을 알 수 없는 이유를 설명한다.
+ */
+void problem6_scale_ambiguity()
+{
+    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "문제 6: 스케일 모호성" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+
+    // 회전 행렬 (10도 Y축)
+    double angle = 10.0 * CV_PI / 180.0;
+    cv::Mat R = (cv::Mat_<double>(3, 3) <<
+        cos(angle), 0, sin(angle),
+        0, 1, 0,
+        -sin(angle), 0, cos(angle));
+
+    // 기본 이동 벡터
+    cv::Mat t_base = (cv::Mat_<double>(3, 1) << 1.0, 0.0, 0.0);
+
+    std::cout << "t_base: " << t_base.t() << std::endl;
+
+    // TODO: 다양한 스케일에서 E를 구하고, 정규화 후 비교
+    // 스케일: 0.5, 1.0, 2.0, 5.0
+    //
+    // [t]_x (skew-symmetric) 구하는 법:
+    //   tx, ty, tz = t의 원소
+    //   t_skew = [0, -tz, ty; tz, 0, -tx; -ty, tx, 0]
+    //
+    // E = t_skew * R
+    // E_norm = E / cv::norm(E)
+    //
+    // 모든 스케일에서 E_norm이 같은지 확인!
+
+    std::cout << "\n스케일 모호성의 의미:" << std::endl;
+    std::cout << "   - t와 2t는 같은 방향의 E를 생성 (크기만 다름)" << std::endl;
+    std::cout << "   - 정규화 후 E는 동일 → 스케일 구분 불가" << std::endl;
+    std::cout << "   - 단안 SLAM에서 절대 스케일을 알 수 없는 이유!" << std::endl;
+    std::cout << "\n해결 방법:" << std::endl;
+    std::cout << "   - Stereo: 베이스라인 알려짐" << std::endl;
+    std::cout << "   - IMU 융합: 가속도로 스케일 추정 (VINS)" << std::endl;
+    std::cout << "   - 알려진 물체: 물체 크기로 추정" << std::endl;
+}
+
 int main()
 {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Phase 2 Week 6 Quiz - Easy" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
 
-    problem1_depth_from_disparity() problem2_triangulation_geometry() problem3_reprojection_error()
-            problem4_baseline_vs_accuracy()
+    problem1_depth_from_disparity();
+    problem2_triangulation_geometry();
+    problem3_reprojection_error();
+    problem4_baseline_vs_accuracy();
+    problem5_validate_rotation();
+    problem6_scale_ambiguity();
 
-                std::cout
-        << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
 

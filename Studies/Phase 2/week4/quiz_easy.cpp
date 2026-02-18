@@ -7,6 +7,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/features2d.hpp>
 #include <iostream>
+#include <cmath>
 
 /**
  * 문제 1: 해밍 거리 vs 유클리드 거리
@@ -161,16 +162,87 @@ void problem4_cross_check()
     std::cout << "   - OpenCV: crossCheck=true 옵션" << std::endl;
 }
 
+/**
+ * @brief Homography 변환 이해 (DOF 8, 최소 4점)
+ *
+ * 주어진 3x3 Homography 행렬 H로 점을 변환하고 결과를 검증하세요.
+ * 동차좌표 변환 후 정규화 과정을 이해합니다.
+ */
+void problem5_homography_understanding()
+{
+    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "문제 5: Homography 변환 이해" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+
+    std::cout << "Homography = 평면 → 평면 변환 (사영 변환)" << std::endl;
+    std::cout << "   - 8 DOF (자유도): h33=1로 정규화하면 8개 미지수" << std::endl;
+    std::cout << "   - 최소 4점 필요 (각 점이 2개 방정식 제공)\n" << std::endl;
+
+    // Homography 행렬 (회전 15도 + 이동 + 약간의 스케일)
+    double theta = 15.0 * CV_PI / 180.0;
+    double scale = 1.1;
+    double tx = 50.0, ty = 30.0;
+
+    cv::Mat H = (cv::Mat_<double>(3, 3) <<
+        scale * cos(theta), -scale * sin(theta), tx,
+        scale * sin(theta),  scale * cos(theta), ty,
+        0.0,                 0.0,                1.0);
+
+    std::cout << "Homography H:" << std::endl;
+    std::cout << H << "\n" << std::endl;
+
+    // 변환할 점들 (사각형의 4개 꼭짓점)
+    std::vector<cv::Point2d> src_pts = {
+        {100.0, 100.0}, {200.0, 100.0}, {200.0, 200.0}, {100.0, 200.0}
+    };
+
+    std::cout << "📊 점 변환 결과:" << std::endl;
+    for (size_t i = 0; i < src_pts.size(); i++)
+    {
+        // TODO: 동차좌표로 변환 후 H를 적용하세요
+        // 1. [x, y, 1]^T 동차좌표 벡터 생성
+        // 2. H * [x, y, 1]^T 행렬 곱셈
+        // 3. 결과를 w(3번째 원소)로 나누어 정규화
+        double x = src_pts[i].x;
+        double y = src_pts[i].y;
+
+        double dst_x = 0.0, dst_y = 0.0;  // TODO
+
+        std::cout << "   (" << x << ", " << y << ") → ("
+                  << dst_x << ", " << dst_y << ")" << std::endl;
+    }
+
+    // OpenCV perspectiveTransform으로 검증
+    std::vector<cv::Point2d> dst_pts;
+    cv::perspectiveTransform(src_pts, dst_pts, H);
+
+    std::cout << "\n📊 OpenCV perspectiveTransform 검증:" << std::endl;
+    for (size_t i = 0; i < dst_pts.size(); i++)
+    {
+        std::cout << "   (" << src_pts[i].x << ", " << src_pts[i].y << ") → ("
+                  << dst_pts[i].x << ", " << dst_pts[i].y << ")" << std::endl;
+    }
+
+    std::cout << "\n💡 핵심:" << std::endl;
+    std::cout << "   - 동차좌표: [x, y] → [x, y, 1]" << std::endl;
+    std::cout << "   - 변환: s*[u, v, 1]^T = H * [x, y, 1]^T" << std::endl;
+    std::cout << "   - 정규화: u = u'/w, v = v'/w (w = 3번째 원소)" << std::endl;
+    std::cout << "   - 4점이면 H를 유일하게 결정 가능 (DLT)" << std::endl;
+}
+
 int main()
 {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Phase 2 Week 4 Quiz - Easy" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
 
-    problem1_distance_metrics() problem2_ratio_test() problem3_ransac_iterations()
-            problem4_cross_check()
+    problem1_distance_metrics();
+    problem2_ratio_test();
+    problem3_ransac_iterations();
+    problem4_cross_check();
+    problem5_homography_understanding();
 
-                std::cout
+    std::cout
         << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

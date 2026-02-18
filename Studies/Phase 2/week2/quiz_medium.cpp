@@ -196,16 +196,163 @@ void problem3_performance_optimization()
     }
 }
 
+/**
+ * @brief 문제 4: 반복적 역왜곡 (Iterative Undistortion)
+ *
+ * Newton-like 반복법으로 왜곡된 좌표를 보정합니다.
+ * 왜곡 함수의 역함수는 해석적으로 구하기 어려우므로,
+ * 반복적으로 추정을 개선합니다.
+ *
+ * 알고리즘:
+ *   1. 초기 추정: 왜곡 좌표 = 보정 좌표
+ *   2. 현재 추정에 왜곡 적용 → 왜곡 좌표와 비교
+ *   3. 오차만큼 추정 업데이트
+ *   4. 수렴할 때까지 반복
+ *
+ * TODO: 반복 횟수에 따른 수렴 과정을 출력하세요.
+ */
+void problem4_iterative_undistortion()
+{
+    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "문제 4: 반복적 역왜곡" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+
+    double fx = 600.0, fy = 600.0;
+    double cx = 400.0, cy = 300.0;
+    double k1 = -0.3, k2 = 0.1;
+
+    // 원본 정규화 좌표 (왜곡 전)
+    double x_orig = 0.4;
+    double y_orig = 0.3;
+
+    // 왜곡 적용 (forward)
+    double r2 = x_orig * x_orig + y_orig * y_orig;
+    double radial = 1.0 + k1 * r2 + k2 * r2 * r2;
+    double x_distorted = x_orig * radial;
+    double y_distorted = y_orig * radial;
+
+    std::cout << "원본 정규화 좌표: (" << x_orig << ", " << y_orig << ")" << std::endl;
+    std::cout << "왜곡된 정규화 좌표: (" << x_distorted << ", " << y_distorted << ")\n"
+              << std::endl;
+
+    // TODO: 반복적으로 역왜곡 수행
+    // 초기 추정: 왜곡 좌표를 그대로 사용
+    double x_est = x_distorted;
+    double y_est = y_distorted;
+
+    int max_iterations = 10;
+
+    std::cout << "반복 수렴 과정:" << std::endl;
+    std::cout << "  반복 |  x_est   |  y_est   |  오차" << std::endl;
+    std::cout << std::string(50, '-') << std::endl;
+
+    for (int iter = 0; iter < max_iterations; iter++)
+    {
+        // TODO: 현재 추정에 왜곡 적용
+        // r2_est = x_est^2 + y_est^2
+        // radial_est = 1 + k1 * r2_est + k2 * r2_est^2
+        // x_redist = x_est * radial_est
+        // y_redist = y_est * radial_est
+
+        // TODO: 오차 계산
+        // err_x = x_distorted - x_redist
+        // err_y = y_distorted - y_redist
+
+        // TODO: 추정 업데이트
+        // x_est = x_est + err_x
+        // y_est = y_est + err_y
+
+        double error = 0.0;  // TODO: sqrt(err_x^2 + err_y^2)
+
+        std::cout << "  " << iter << "     | " << x_est << " | " << y_est << " | " << error
+                  << std::endl;
+    }
+
+    double final_error =
+        std::sqrt((x_est - x_orig) * (x_est - x_orig) + (y_est - y_orig) * (y_est - y_orig));
+    std::cout << "\n최종 복원 오차: " << final_error << std::endl;
+    std::cout << "복원된 좌표: (" << x_est << ", " << y_est << ")" << std::endl;
+    std::cout << "원본 좌표:   (" << x_orig << ", " << y_orig << ")" << std::endl;
+
+    std::cout << "\n💡 관찰:" << std::endl;
+    std::cout << "   보통 5-10회 반복이면 충분히 수렴합니다." << std::endl;
+    std::cout << "   OpenCV의 undistortPoints도 내부적으로 이 방법을 사용합니다." << std::endl;
+}
+
+/**
+ * @brief 문제 5: 캘리브레이션 시뮬레이션
+ *
+ * 가상 체커보드 데이터를 생성하고, cv::calibrateCamera()로
+ * 카메라 파라미터를 추정한 뒤, 보정 정확도를 측정합니다.
+ *
+ * 과정:
+ *   1. 3D 체커보드 점 생성
+ *   2. 여러 포즈에서 cv::projectPoints로 2D 투영
+ *   3. cv::calibrateCamera로 K, dist 추정
+ *   4. 추정값과 실제값 비교
+ *
+ * TODO: 캘리브레이션을 수행하고 mean/max 오차를 계산하세요.
+ */
+void problem5_calibration_simulation()
+{
+    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "문제 5: 캘리브레이션 시뮬레이션" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+
+    // 실제 카메라 파라미터 (ground truth)
+    cv::Mat K_true =
+        (cv::Mat_<double>(3, 3) << 525.0, 0.0, 319.5, 0.0, 525.0, 239.5, 0.0, 0.0, 1.0);
+    cv::Mat dist_true = (cv::Mat_<double>(1, 5) << -0.28, 0.09, 0.0005, -0.0002, 0.0);
+    cv::Size image_size(640, 480);
+
+    // 체커보드 설정
+    cv::Size board_size(9, 6);
+    float square_size = 30.0f;  // mm
+
+    // TODO: 3D 객체 점 생성
+    std::vector<cv::Point3f> objp;
+    // 힌트: 이중 for문으로 (j * square_size, i * square_size, 0) 생성
+
+    // TODO: 여러 포즈에서 2D 이미지 점 생성
+    // 힌트: cv::projectPoints(objp, rvec, tvec, K_true, dist_true, img_points)
+    std::vector<std::vector<cv::Point3f>> all_obj_points;
+    std::vector<std::vector<cv::Point2f>> all_img_points;
+
+    // 다양한 포즈 생성 (10장)
+    // 힌트: rvec = 작은 회전, tvec = (tx, ty, tz) with tz = 400~600
+
+    // TODO: 캘리브레이션 수행
+    // cv::Mat K_estimated, dist_estimated;
+    // std::vector<cv::Mat> rvecs, tvecs;
+    // double rms = cv::calibrateCamera(all_obj_points, all_img_points,
+    //     image_size, K_estimated, dist_estimated, rvecs, tvecs);
+
+    // TODO: 결과 비교
+    // mean/max 왜곡 보정 오차 계산
+
+    std::cout << "💡 힌트:" << std::endl;
+    std::cout << "   1. cv::projectPoints()로 가상 관측 데이터 생성" << std::endl;
+    std::cout << "   2. 노이즈 추가 (0.3 픽셀 정도)" << std::endl;
+    std::cout << "   3. cv::calibrateCamera()로 파라미터 추정" << std::endl;
+    std::cout << "   4. 추정된 K, dist와 실제값 비교\n" << std::endl;
+
+    std::cout << "📊 기대 결과:" << std::endl;
+    std::cout << "   - RMS 재투영 오차: < 0.5 픽셀" << std::endl;
+    std::cout << "   - fx, fy 오차: < 5 픽셀" << std::endl;
+    std::cout << "   - cx, cy 오차: < 2 픽셀" << std::endl;
+}
+
 int main()
 {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Phase 2 Week 2 Quiz - Medium" << std::endl;
-    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                 " << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
 
-        problem1_calibration_accuracy();
+    problem1_calibration_accuracy();
     problem2_manual_undistortion();
     problem3_performance_optimization();
+    problem4_iterative_undistortion();
+    problem5_calibration_simulation();
 
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "정답은 quiz_solutions/medium_sol.cpp 참고" << std::endl;

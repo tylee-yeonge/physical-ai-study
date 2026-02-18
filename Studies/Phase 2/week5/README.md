@@ -35,11 +35,9 @@
 |:----:|------|------|------|
 | 1 | 데모 실행 | `basic.cpp` | 빌드 후 `./basic` 실행, 결과 먼저 관찰 |
 | 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 3 | Python 기초 실습 | `epipolar_basics.py` | E/F 행렬 계산, 에피폴라 선 |
-| 4 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | 에피폴라 제약 기본 확인 |
-| 5 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | 8-point, 제약 검증 |
-| 6 | Python 심화 퀴즈 | `epipolar_quiz.py` | E/F 행렬 심화 분석 |
-| 7 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 에피폴라 기하학 실습 |
+| 3 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | 에피폴라 제약 기본 확인 |
+| 4 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | 8-point, 제약 검증 |
+| 5 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 에피폴라 기하학 실습 |
 
 ---
 
@@ -321,8 +319,8 @@ def draw_epipolar_line(img, line, color=(0, 255, 0)):
 
 | 파일 | 내용 | 난이도 |
 |------|------|--------|
-| `epipolar_basics.py` | E/F 행렬 계산, 에피폴라 선 | ⭐⭐⭐ |
-| `epipolar_quiz.py` | 8-point, 제약 검증 | ⭐⭐⭐ |
+| `quiz_easy.cpp` | 에피폴라 제약, E vs F, 에피폴 | ⭐⭐ |
+| `quiz_medium.cpp` | 제약 검증, F 추정, 8-point, 노이즈 | ⭐⭐⭐ |
 
 ---
 
