@@ -1,8 +1,8 @@
 # Week 2: 카메라 캘리브레이션 실습 (C++)
 
-> 🎯 **목표**: ELP 스테레오 카메라의 내부/외부 파라미터를 C++로 측정  
-> 💻 **언어**: C++ (OpenCV 4.x)  
-> 🛠️ **하드웨어**: Jetson Orin Nano + ELP 800P Stereo Monochrome  
+> 🎯 **목표**: 카메라의 내부 파라미터를 C++로 측정
+> 💻 **언어**: C++ (OpenCV 4.x)
+> 🛠️ **하드웨어**: Jetson Orin Nano + ELP 800P Stereo 또는 MacBook (내장 카메라)
 > ⏰ **예상 시간**: 6-8시간
 
 ---
@@ -10,11 +10,22 @@
 ## 📋 준비사항
 
 ### 하드웨어
+
+**Jetson Orin Nano의 경우:**
 - [ ] Jetson Orin Nano 세팅 완료
 - [ ] ELP 스테레오 카메라 연결 (USB)
-- [ ] 체커보드 패턴 출력 (8×6, 30mm 정사각형, A3 용지 권장)
+
+**MacBook의 경우:**
+- [ ] 내장 FaceTime 카메라 사용 (camera_id = 0)
+
+**공통:**
+- [ ] 체커보드 패턴 준비 (8×6, 30mm 정사각형)
+  - A3 용지에 출력 또는 아이패드/태블릿에 체커보드 이미지 표시
+  - 태블릿 사용 시: 화면 밝기 최대, 반사/글레어 주의
 
 ### 소프트웨어
+
+**Jetson (Linux):**
 ```bash
 # OpenCV 4.x 확인
 pkg-config --modversion opencv4
@@ -27,6 +38,17 @@ sudo apt install v4l-utils libv4l-dev
 
 # 빌드 도구
 sudo apt install cmake build-essential
+```
+
+**MacBook (macOS):**
+```bash
+# Homebrew로 OpenCV, Eigen3 설치
+brew install opencv eigen
+
+# OpenCV 버전 확인
+pkg-config --modversion opencv4
+
+# 카메라 권한: 시스템 설정 → 개인 정보 보호 및 보안 → 카메라 → 터미널 허용
 ```
 
 ---
@@ -333,25 +355,26 @@ mkdir build && cd build
 cmake ..
 make -j4
 
-# Left 카메라 캘리브레이션
+# 카메라 캘리브레이션 (camera_id = 0)
 ./mono_calib 0
-
-# Right 카메라 캘리브레이션
-./mono_calib 1
 ```
+
+> **Jetson + ELP 스테레오**: Left/Right 카메라가 각각 camera_id 0, 1로 인식됨
+> → `./mono_calib 0` (Left), `./mono_calib 1` (Right) 각각 실행
+>
+> **MacBook**: 내장 카메라가 camera_id 0 → `./mono_calib 0`만 실행
 
 ---
 
 ## 🔧 실습 2: 스테레오 캘리브레이션
 
+> **MacBook 사용자**: 내장 카메라는 단일 카메라이므로 스테레오 캘리브레이션은 Jetson + ELP에서 수행합니다. 실습 1의 단일 카메라 캘리브레이션 결과를 분석하세요.
+
 ### 캘리브레이션 결과 검증
 
 ```bash
-# Left 카메라 결과 확인
+# 캘리브레이션 결과 확인
 cat camera_left_calib.yaml
-
-# Right 카메라 결과 확인
-cat camera_right_calib.yaml
 ```
 
 **기대 결과**:
@@ -374,17 +397,16 @@ distortion_coefficients: !!opencv-matrix
 
 ### 환경 세팅
 - [ ] OpenCV 4.x 설치 확인
-- [ ] 체커보드 패턴 출력
-- [ ] 카메라 연결 확인 (`v4l2-ctl --list-devices`)
+- [ ] 체커보드 패턴 준비 (출력 또는 태블릿)
+- [ ] 카메라 확인 (Jetson: `v4l2-ctl --list-devices` / MacBook: 시스템 설정에서 카메라 권한)
 
-### Left 카메라 캘리브레이션
+### 단일 카메라 캘리브레이션
 - [ ] 20장 이상 체커보드 이미지 캡처
 - [ ] RMS < 0.5 픽셀 달성
 - [ ] `camera_left_calib.yaml` 저장
 
-### Right 카메라 캘리브레이션
-- [ ] 20장 이상 체커보드 이미지 캡처
-- [ ] RMS < 0.5 픽셀 달성
+### 스테레오 캘리브레이션 (Jetson + ELP만 해당)
+- [ ] Right 카메라도 20장 이상 캡처
 - [ ] `camera_right_calib.yaml` 저장
 
 ### 결과 분석
@@ -405,7 +427,7 @@ distortion_coefficients: !!opencv-matrix
 ### 문제 해결
 - **체커보드 검출 실패**: 조명 개선, 체커보드 크기 확인
 - **RMS 큼 (>1.0)**: 더 많은 이미지 캡처, 흔들린 이미지 제거
-- **카메라 열리지 않음**: `ls /dev/video*`로 장치 확인
+- **카메라 열리지 않음**: Jetson은 `ls /dev/video*`로 장치 확인, MacBook은 시스템 설정에서 카메라 권한 확인
 
 ---
 

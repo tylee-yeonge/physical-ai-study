@@ -2,8 +2,25 @@
 
 > 🎯 **목표**: FAST, ORB 특징점 검출 실시간 구현
 > 💻 **언어**: C++ (OpenCV 4.x)
-> 🛠️ **하드웨어**: Jetson Orin Nano + ELP Stereo Camera
+> 🛠️ **하드웨어**: Jetson Orin Nano + ELP Stereo Camera 또는 MacBook (내장 카메라)
 > ⏰ **예상 시간**: 6-8시간
+
+---
+
+## 📋 준비사항
+
+**Jetson (Linux):**
+```bash
+sudo apt install libopencv-dev cmake build-essential
+```
+
+**MacBook (macOS):**
+```bash
+brew install opencv
+# 카메라 권한: 시스템 설정 → 개인 정보 보호 및 보안 → 카메라 → 터미널 허용
+```
+
+> 코드에서 `cv::VideoCapture(0)`은 MacBook 내장 FaceTime 카메라를 자동으로 사용합니다.
 
 ---
 
@@ -156,7 +173,7 @@ int main() {
 
 ---
 
-## 💡 성능 최적화 팁 (Jetson)
+## 💡 성능 최적화 팁 (Jetson 전용)
 
 ```cpp
 // 1. OpenCV CUDA 가속 (Jetson에서 매우 효과적)
