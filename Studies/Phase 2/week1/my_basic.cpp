@@ -9,6 +9,9 @@
 #include <cmath>
 #include <iostream>
 
+// 라디안 → 도(degree) 변환 계수
+constexpr double kRadToDeg = 180.0 / CV_PI;
+
 PinholeProjection::PinholeProjection(const cv::Mat &K, const cv::Mat &R, const cv::Mat &t)
     : K_(K.clone()), R_(R.clone()), t_(t.clone())
 {
@@ -91,8 +94,8 @@ cv::Size2d PinholeProjection::computeFOV(const cv::Size &imageSize) const
     double fx = K_.at<double>(0, 0);
     double fy = K_.at<double>(1, 1);
 
-    double fov_h = 2.0 * std::atan2(imageSize.width, 2.0 * fx) * 180.0 / CV_PI;
-    double fov_v = 2.0 * std::atan2(imageSize.height, 2.0 * fy) * 180.0 / CV_PI;
+    double fov_h = 2.0 * std::atan2(imageSize.width, 2.0 * fx) * kRadToDeg;
+    double fov_v = 2.0 * std::atan2(imageSize.height, 2.0 * fy) * kRadToDeg;
 
     return cv::Size2d(fov_h, fov_v);
 }

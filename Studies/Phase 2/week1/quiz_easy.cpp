@@ -9,6 +9,9 @@
 #include <iostream>
 #include <cmath>
 
+// 라디안 → 도(degree) 변환 계수
+constexpr double kRadToDeg = 180.0 / CV_PI;
+
 /**
  * 문제 1: 카메라 내부 파라미터 K 분석
  *
@@ -221,8 +224,8 @@ void problem5_visibility_check()
     int image_width = 640, image_height = 480;
 
     // FOV 계산
-    double fov_x = 2.0 * std::atan2(image_width, 2.0 * fx) * 180.0 / CV_PI;
-    double fov_y = 2.0 * std::atan2(image_height, 2.0 * fy) * 180.0 / CV_PI;
+    double fov_x = 2.0 * std::atan2(image_width, 2.0 * fx) * kRadToDeg;
+    double fov_y = 2.0 * std::atan2(image_height, 2.0 * fy) * kRadToDeg;
     double half_fov_x_rad = std::atan2(image_width, 2.0 * fx);
     double half_fov_y_rad = std::atan2(image_height, 2.0 * fy);
 

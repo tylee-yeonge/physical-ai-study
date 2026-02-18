@@ -6,6 +6,9 @@
 #include <vector>
 #include <string>
 
+// Lowe's Ratio Test 임계값 (SIFT 논문의 권장값)
+constexpr float kLoweRatioThreshold = 0.7f;
+
 /**
  * @brief 특징점 매칭 기본 클래스
  *
@@ -48,7 +51,7 @@ class FeatureMatchingBasic
      * @return 필터링 후 매칭 개수
      */
     static int ratioTest(const cv::Mat& descriptors1, const cv::Mat& descriptors2,
-                         std::vector<cv::DMatch>& good_matches, float ratio_thresh = 0.7f);
+                         std::vector<cv::DMatch>& good_matches, float ratio_thresh = kLoweRatioThreshold);
 
     /**
      * @brief RANSAC으로 outlier 제거

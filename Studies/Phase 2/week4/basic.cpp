@@ -2,7 +2,7 @@
 #include <iostream>
 #include <chrono>
 #include <iomanip>
-#include <algorithm>
+
 
 double FeatureMatchingBasic::matchBruteForce(const cv::Mat& descriptors1,
                                              const cv::Mat& descriptors2,
@@ -87,6 +87,7 @@ double FeatureMatchingBasic::filterRANSAC(const std::vector<cv::KeyPoint>& keypo
     if (matches.size() < 4)
     {
         // 호모그래피 계산에는 최소 4개 점 필요
+        homography = cv::Mat::eye(3, 3, CV_64F);
         return 0.0;
     }
 
@@ -180,7 +181,7 @@ void FeatureMatchingBasic::demoPipeline(const cv::Mat& img1, const cv::Mat& img2
     // Step 3: Ratio Test
     std::cout << "3️⃣  Lowe's Ratio Test (0.7)..." << std::endl;
     std::vector<cv::DMatch> good_matches;
-    int count_ratio = ratioTest(desc1, desc2, good_matches, 0.7f);
+    int count_ratio = ratioTest(desc1, desc2, good_matches, kLoweRatioThreshold);
 
     std::cout << "   필터링 전: " << matches.size() << "개" << std::endl;
     std::cout << "   필터링 후: " << count_ratio << "개" << std::endl;

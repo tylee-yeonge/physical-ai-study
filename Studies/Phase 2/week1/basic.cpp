@@ -2,6 +2,9 @@
 #include <iostream>
 #include <cmath>
 
+// 라디안 → 도(degree) 변환 계수
+constexpr double kRadToDeg = 180.0 / CV_PI;
+
 PinholeProjection::PinholeProjection(const cv::Mat& K, const cv::Mat& R, const cv::Mat& t)
     : K_(K.clone()), R_(R.clone()), t_(t.clone())
 {
@@ -82,9 +85,9 @@ cv::Size2d PinholeProjection::computeFOV(const cv::Size& imageSize) const
     // FOV = 2 * arctan(image_size / (2 * focal_length))
     // 2.0 * fx: 이미지 폭을 절반(W/2)으로 나누는 효과 → 반쪽 직각삼각형의 각도(θ) 계산
     // 바깥 2.0: 반쪽 각도 θ를 전체 시야각으로 복원
-    // * 180.0 / CV_PI: 라디안 → 도(degree) 변환
-    double fov_h = 2.0 * std::atan2(imageSize.width, 2.0 * fx) * 180.0 / CV_PI;
-    double fov_v = 2.0 * std::atan2(imageSize.height, 2.0 * fy) * 180.0 / CV_PI;
+    // * kRadToDeg: 라디안 → 도(degree) 변환
+    double fov_h = 2.0 * std::atan2(imageSize.width, 2.0 * fx) * kRadToDeg;
+    double fov_v = 2.0 * std::atan2(imageSize.height, 2.0 * fy) * kRadToDeg;
 
     return cv::Size2d(fov_h, fov_v);
 }

@@ -3,6 +3,11 @@
 #include <chrono>
 #include <random>
 
+// RMS 재투영 오차 품질 등급 임계값
+constexpr double kRmsExcellent = 0.3;  // 매우 우수
+constexpr double kRmsGood = 0.5;       // 우수
+constexpr double kRmsFair = 1.0;       // 양호 (이상이면 불량)
+
 CameraCalibrationBasic::CameraCalibrationBasic(cv::Size boardSize, float squareSize)
     : boardSize_(boardSize), squareSize_(squareSize)
 {
@@ -151,15 +156,15 @@ void CameraCalibrationBasic::undistortImage(const cv::Mat& distorted, cv::Mat& u
 
 std::string CameraCalibrationBasic::evaluateQuality(double rms)
 {
-    if (rms < 0.3)
+    if (rms < kRmsExcellent)
     {
         return "✅ 매우 우수 (Excellent)";
     }
-    else if (rms < 0.5)
+    else if (rms < kRmsGood)
     {
         return "✅ 우수 (Good)";
     }
-    else if (rms < 1.0)
+    else if (rms < kRmsFair)
     {
         return "⚠️  양호 (Fair) - 사용 가능";
     }
@@ -197,8 +202,9 @@ int main()
     std::vector<cv::Point3f> objectPoints = calib.generateObjectPoints();
 
     // 노이즈 생성용 난수 엔진
+    constexpr double kNoiseStdDev = 0.5;  // 시뮬레이션 노이즈 표준편차 (픽셀)
     std::mt19937 rng(42);
-    std::normal_distribution<double> noise(0.0, 0.5);  // 표준편차 0.5px
+    std::normal_distribution<double> noise(0.0, kNoiseStdDev);
 
     for (int i = 0; i < 15; i++)
     {

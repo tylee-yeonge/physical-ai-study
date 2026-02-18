@@ -163,7 +163,11 @@ void FeatureDetectionBasic::demoNMS(const cv::Mat& image)
     std::cout << "   NMS 적용: " << kp_with_nms.size() << "개 특징점, " << time2 << " ms"
               << std::endl;
 
-    double reduction = 100.0 * (1.0 - (double)kp_with_nms.size() / kp_without_nms.size());
+    double reduction = 0.0;
+    if (!kp_without_nms.empty())
+    {
+        reduction = 100.0 * (1.0 - (double)kp_with_nms.size() / kp_without_nms.size());
+    }
     std::cout << "   → " << std::fixed << std::setprecision(1) << reduction << "% 감소\n"
               << std::endl;
 
