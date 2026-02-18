@@ -6,6 +6,17 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 2 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | White Noise와 Bias Random Walk 구분 문제 |
+| 3 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | 노이즈 파라미터 계산 및 Allan Variance 분석 |
+| 4 | 실습 | [PRACTICE.md](./PRACTICE.md) | IMU 노이즈 모델링과 바이어스 영향 실습 |
+
+---
+
 ## 🌟 시작하기 전에
 
 ### Week 1 복습: IMU 측정 모델

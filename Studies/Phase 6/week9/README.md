@@ -6,6 +6,18 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 환경 설정 | `requirements.txt` | `pip install -r requirements.txt` |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | Python 퀴즈 (초급) | `quiz_easy.py` | BEV Query 커버 범위, Spatial/Temporal Attention |
+| 4 | Python 퀴즈 (중급) | `quiz_medium.py` | BEV Query 파라미터 수 계산, Reference Point 투영 코드 실습 |
+| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | BEVFormer 논문 분석, Attention 메커니즘 구현 실습 |
+
+---
+
 ## 🌟 시작하기 전에
 
 ### Week 8에서 배운 것

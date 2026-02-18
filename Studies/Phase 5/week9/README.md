@@ -6,6 +6,17 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 2 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | ONNX-TensorRT 변환, FP16 최적화 개념 확인 |
+| 3 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | Depth 모델 TensorRT 엔진 빌드 심화 |
+| 4 | 실습 | [PRACTICE.md](./PRACTICE.md) | ONNX & TensorRT 변환 - Depth 모델 (C++) |
+
+---
+
 ## 🌟 시작하기 전에
 
 ### Week 8에서 배운 것

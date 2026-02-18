@@ -6,6 +6,18 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 환경 설정 | `requirements.txt` | `pip install -r requirements.txt` |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | Python 퀴즈 (초급) | `quiz_easy.py` | nuScenes 핵심 특징, 데이터 구조, NDS 지표 |
+| 4 | Python 퀴즈 (중급) | `quiz_medium.py` | 좌표계 변환, Quaternion 회전, Devkit 활용 코드 실습 |
+| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | nuScenes 데이터 탐색, 6대 카메라 시각화, BEV 어노테이션 |
+
+---
+
 ## 시작하기 전에
 
 ### Week 5-6에서 배운 것

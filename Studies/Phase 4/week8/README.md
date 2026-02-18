@@ -8,6 +8,17 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 2 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | IMU/Visual Factor 잔차 개념 기초 문제 |
+| 3 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | IMU Factor 잔차 계산 및 Factor Graph 구성 |
+| 4 | 실습 | [PRACTICE.md](./PRACTICE.md) | VIO Factor Graph 구조와 잔차 계산 실습 |
+
+---
+
 ## 🌟 시작하기 전에
 
 ### Week 7 복습: Pre-integration 결과물

@@ -32,6 +32,16 @@ Week 1에서 3Blue1Brown 영상을 통해 선형대수의 **직관**을 얻었�
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 2 | Python 기초 실습 | `linear_algebra_practice_basics.py` | 행렬곱, 역행렬, 고유값, 행렬식, 회전행렬, 공분산 종합 실습 |
+| 3 | Python 심화 퀴즈 | `linear_algebra_practice_quiz.py` | 10문제 주관식 퀴즈 (문제/답안 분리) |
+
+---
+
 ## 📖 핵심 개념
 
 ### 1. 행렬 곱셈 (Matrix Multiplication)

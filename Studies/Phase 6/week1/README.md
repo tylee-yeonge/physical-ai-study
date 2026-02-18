@@ -6,6 +6,18 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 환경 설정 | `requirements.txt` | `pip install -r requirements.txt` |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | Python 퀴즈 (초급) | `quiz_easy.py` | 3D BBox 파라미터, Detection 방법론 분류 |
+| 4 | Python 퀴즈 (중급) | `quiz_medium.py` | 3D BBox Corners 계산, Depth Ambiguity 코드 실습 |
+| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | 3D Detection 개념 종합 실습 |
+
+---
+
 ## 🌟 시작하기 전에
 
 ### Phase 6은 커리어 준비의 핵심입니다

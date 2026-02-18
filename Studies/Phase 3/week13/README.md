@@ -6,6 +6,17 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 2 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | Stereo depth 공식, Vision-IMU 상호 보완 확인 |
+| 3 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | Stereo depth 계산, IMU 드리프트 시뮬레이션 |
+| 4 | 실습 | [PRACTICE.md](./PRACTICE.md) | 스케일 복구 방법 비교 및 VIO 필요성 분석 |
+
+---
+
 ## 🌟 시작하기 전에
 
 ### Week 12에서 배운 것

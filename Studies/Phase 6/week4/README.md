@@ -6,6 +6,18 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 환경 설정 | `requirements.txt` | `pip install -r requirements.txt` |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | Python 퀴즈 (초급) | `quiz_easy.py` | SMOKE 핵심 아이디어, FCOS3D 구조, Depth 추정 |
+| 4 | Python 퀴즈 (중급) | `quiz_medium.py` | sin/cos 인코딩/디코딩, Multi-task Loss 코드 실습 |
+| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | Monocular 3D Detection 모델 분석 및 구현 실습 |
+
+---
+
 ## 시작하기 전에
 
 ### Week 1-3 복습

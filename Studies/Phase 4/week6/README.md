@@ -8,6 +8,17 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 2 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | 단순 적분과 Pre-integration 개념 비교 문제 |
+| 3 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | IMU 단순 적분 구현 및 재적분 비용 분석 |
+| 4 | 실습 | [PRACTICE.md](./PRACTICE.md) | 단순 적분 vs Pre-integration 비교 실습 |
+
+---
+
 ## 🌟 시작하기 전에
 
 ### Pre-integration이 뭐죠?

@@ -6,6 +6,17 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 2 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | 희소 구조, Schur Complement, Local vs Global BA 확인 |
+| 3 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | Schur 계산량 분석, VINS sliding window 이해 |
+| 4 | 실습 | [PRACTICE.md](./PRACTICE.md) | Schur Complement 직접 계산 및 옵션 비교 실험 |
+
+---
+
 ## 🌟 시작하기 전에
 
 ### Week 7/8에서 배운 것

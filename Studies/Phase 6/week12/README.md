@@ -6,6 +6,18 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 환경 설정 | `requirements.txt` | `pip install -r requirements.txt` |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | Python 퀴즈 (초급) | `quiz_easy.py` | 블로그 구조, Demo 영상 기획, LinkedIn 활용 |
+| 4 | Python 퀴즈 (중급) | `quiz_medium.py` | 블로그 아웃라인 작성, 면접 답변 구조화 실습 |
+| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | 블로그 포스팅 작성, Demo 영상 제작, LinkedIn 공유 |
+
+---
+
 ## 🌟 시작하기 전에
 
 ### 왜 블로그와 영상이 중요한가?

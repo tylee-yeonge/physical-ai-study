@@ -30,7 +30,21 @@
 
 ---
 
-## 🚀 먼저 돌려보기 (원칙 1: 역순 학습)
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 데모 실행 | `basic.cpp` | 빌드 후 `./basic` 실행, 결과 먼저 관찰 |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | Python 기초 실습 | `optical_flow_basics.py` | LK 구현, 시각화 |
+| 4 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | 밝기 항상성, 광류 기본 |
+| 5 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | 파라미터 분석, Dense Flow |
+| 6 | Python 심화 퀴즈 | `optical_flow_quiz.py` | 파라미터 분석, Dense Flow |
+| 7 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 실시간 KLT 트래킹 실습 |
+
+---
+
+## 🚀 Step 1: 먼저 돌려보기
 
 > **이론을 읽기 전에 먼저 코드를 돌려보세요!**
 
@@ -41,9 +55,6 @@ cmake .. && make
 ```
 
 실행 결과를 관찰한 후, 아래 이론을 읽으며 "아, 이게 이 뜻이었구나" 하고 채워갑니다.
-
-- 📂 [PRACTICE.md](./PRACTICE.md) - 실습 가이드
-- 📝 `quiz_easy.cpp` → `quiz_medium.cpp` 순서로 풀기
 
 ---
 

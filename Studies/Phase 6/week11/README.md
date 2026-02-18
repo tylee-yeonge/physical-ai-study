@@ -6,6 +6,18 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 환경 설정 | `requirements.txt` | `pip install -r requirements.txt` |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | Python 퀴즈 (초급) | `quiz_easy.py` | README 필수 요소, Git 커밋 메시지, 코드 품질 |
+| 4 | Python 퀴즈 (중급) | `quiz_medium.py` | 코드 리팩토링, Docstring/Type Hint 실습 |
+| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | GitHub 저장소 구조 설계, README 작성, 코드 정리 |
+
+---
+
 ## 🌟 시작하기 전에
 
 ### 왜 코드 정리가 중요한가?

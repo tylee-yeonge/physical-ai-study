@@ -6,6 +6,17 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 2 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | TensorRT 최적화, Layer Fusion 개념 확인 |
+| 3 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | TensorRT 엔진 빌드, FP16 추론 심화 |
+| 4 | 실습 | [PRACTICE.md](./PRACTICE.md) | TensorRT C++ 추론 파이프라인 구축 |
+
+---
+
 ## 🌟 시작하기 전에
 
 ### Week 5 복습

@@ -6,6 +6,18 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 환경 설정 | `requirements.txt` | 첫 실행 시 `pip install -r requirements.txt` |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | Python 퀴즈 (초급) | `quiz_easy.py` | 파이프라인 병목 분석, 최적화 개념 확인 |
+| 4 | Python 퀴즈 (중급) | `quiz_medium.py` | 성능 프로파일링, 포트폴리오 정리 심화 |
+| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | 최종 데모 최적화 및 포트폴리오 작성 |
+
+---
+
 ## 🌟 시작하기 전에
 
 ### Phase 5 전체 여정 돌아보기

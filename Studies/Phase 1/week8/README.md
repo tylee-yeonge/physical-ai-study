@@ -28,6 +28,16 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 2 | Python 기초 실습 | `nonlinear_basics.py` | Gauss-Newton, 곡선 피팅 실습 |
+| 3 | Python 심화 퀴즈 | `nonlinear_quiz.py` | LM 알고리즘, scipy 활용 퀴즈 |
+
+---
+
 ## 📖 핵심 개념
 
 ### 1. 비선형 vs 선형

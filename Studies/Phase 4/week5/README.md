@@ -6,6 +6,17 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 2 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | Nominal/Error State 분리와 ESKF 개념 문제 |
+| 3 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | ESKF 3단계 알고리즘 구현 및 Reset 적용 |
+| 4 | 실습 | [PRACTICE.md](./PRACTICE.md) | ESKF 기반 IMU+Vision 융합 실습 |
+
+---
+
 ## 🌟 시작하기 전에
 
 ### Week 4 복습: EKF의 문제

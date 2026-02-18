@@ -6,6 +6,18 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 환경 설정 | `requirements.txt` | `pip install -r requirements.txt` |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | Python 퀴즈 (초급) | `quiz_easy.py` | Camera 좌표계, KITTI 레이블 순서 |
+| 4 | Python 퀴즈 (중급) | `quiz_medium.py` | 3D→2D 투영 계산, BEV 변환 코드 실습 |
+| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | 좌표 변환 및 3D bbox 투영 실습 |
+
+---
+
 ## 시작하기 전에
 
 ### Week 1 복습

@@ -6,6 +6,17 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 2 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | BA 목적함수, g2o Vertex/Edge 개념 확인 |
+| 3 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | Schur Complement, setMarginalized 동작 분석 |
+| 4 | 실습 | [PRACTICE.md](./PRACTICE.md) | g2o로 간단한 BA 구현 및 Robust Kernel 적용 |
+
+---
+
 ## 🌟 시작하기 전에
 
 ### Week 1-6의 문제점

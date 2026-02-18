@@ -6,6 +6,18 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 환경 설정 | `requirements.txt` | 첫 실행 시 `pip install -r requirements.txt` |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | Python 퀴즈 (초급) | `quiz_easy.py` | Depth 추정 방식, MiDaS, ViT 개념 확인 |
+| 4 | Python 퀴즈 (중급) | `quiz_medium.py` | Depth 모델 구조, Teacher-Student 학습 심화 |
+| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | Monocular Depth Estimation 이론 및 모델 탐구 |
+
+---
+
 ## 🌟 시작하기 전에
 
 ### Week 6 복습

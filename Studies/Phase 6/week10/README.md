@@ -6,6 +6,18 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 환경 설정 | `requirements.txt` | `pip install -r requirements.txt` |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | Python 퀴즈 (초급) | `quiz_easy.py` | NDS 구성 요소, mAP 매칭 기준, BEV Feature |
+| 4 | Python 퀴즈 (중급) | `quiz_medium.py` | NDS 직접 계산, BEV Feature 시각화 코드 실습 |
+| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | BEVFormer 추론, 결과 시각화, 성능 지표 분석 |
+
+---
+
 ## 🌟 시작하기 전에
 
 ### Week 9에서 배운 것

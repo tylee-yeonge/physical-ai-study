@@ -6,6 +6,18 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 환경 설정 | `requirements.txt` | `pip install -r requirements.txt` |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | Python 퀴즈 (초급) | `quiz_easy.py` | BEV 정의, IPM 원리, Lift-Splat-Shoot 개념 |
+| 4 | Python 퀴즈 (중급) | `quiz_medium.py` | BEV 그리드 설계, IPM Homography 변환 코드 실습 |
+| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | IPM 구현, BEV 시각화, 3가지 방법론 비교 정리 |
+
+---
+
 ## 시작하기 전에
 
 ### Week 7에서 배운 것

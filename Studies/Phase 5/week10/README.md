@@ -6,6 +6,18 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 환경 설정 | `requirements.txt` | 첫 실행 시 `pip install -r requirements.txt` |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | Python 퀴즈 (초급) | `quiz_easy.py` | Depth 평가 지표, Ground Truth 생성 개념 확인 |
+| 4 | Python 퀴즈 (중급) | `quiz_medium.py` | AbsRel 계산, FP16 정밀도 비교 심화 |
+| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | Depth 정확도 검증 (Python) |
+
+---
+
 ## 🌟 시작하기 전에
 
 ### Week 9에서 배운 것

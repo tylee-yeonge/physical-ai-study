@@ -8,6 +8,17 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 2 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | IMU 측정 모델 수식과 Pre-integration 기초 문제 |
+| 3 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | Pre-integration 업데이트 공식 및 자코비안 구현 |
+| 4 | 실습 | [PRACTICE.md](./PRACTICE.md) | Pre-integration 수식 단계별 구현 실습 |
+
+---
+
 ## 🌟 시작하기 전에
 
 ### 수식이 왜 필요한가요?

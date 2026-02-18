@@ -6,6 +6,18 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 환경 설정 | `requirements.txt` | `pip install -r requirements.txt` |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | Python 퀴즈 (초급) | `quiz_easy.py` | openmim 역할, Config 시스템, AP3D 평가 기준 |
+| 4 | Python 퀴즈 (중급) | `quiz_medium.py` | FCOS3D Multi-task Learning, Config 분석 코드 실습 |
+| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | MMDetection3D 환경 세팅, FCOS3D 학습 및 추론 |
+
+---
+
 ## 🌟 시작하기 전에
 
 ### Week 3-4에서 배운 것

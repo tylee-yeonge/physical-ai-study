@@ -6,6 +6,18 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 환경 설정 | `requirements.txt` | `pip install -r requirements.txt` |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | Python 퀴즈 (초급) | `quiz_easy.py` | 오류 유형 분류, Depth 오류 영향, Augmentation |
+| 4 | Python 퀴즈 (중급) | `quiz_medium.py` | Ablation Study 해석, 거리별 성능 분석 코드 실습 |
+| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | 오류 분석, Augmentation 적용, AP3D 개선 실험 |
+
+---
+
 ## 시작하기 전에
 
 ### Week 5에서 배운 것

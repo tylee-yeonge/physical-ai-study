@@ -6,6 +6,18 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 환경 설정 | `requirements.txt` | 첫 실행 시 `pip install -r requirements.txt` |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | Python 퀴즈 (초급) | `quiz_easy.py` | Albumentations, W&B, torchvision 개념 확인 |
+| 4 | Python 퀴즈 (중급) | `quiz_medium.py` | Augmentation 파이프라인 코드 작성 |
+| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | CV 라이브러리 파이프라인 구축 |
+
+---
+
 ## 🌟 시작하기 전에
 
 ### Week 1과의 연결

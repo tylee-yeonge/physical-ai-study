@@ -6,6 +6,18 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 환경 설정 | `requirements.txt` | 첫 실행 시 `pip install -r requirements.txt` |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | Python 퀴즈 (초급) | `quiz_easy.py` | Ultralytics 사용법, 데이터셋 구조 개념 확인 |
+| 4 | Python 퀴즈 (중급) | `quiz_medium.py` | Hyperparameter 튜닝, 학습 결과 분석 |
+| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | YOLOv8 학습 파이프라인 구축 |
+
+---
+
 ## 🌟 시작하기 전에
 
 ### Week 3과의 연결

@@ -29,7 +29,21 @@ E를 알면 → R, t를 추정할 수 있다!
 
 ---
 
-## 🚀 먼저 돌려보기 (원칙 1: 역순 학습)
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 데모 실행 | `basic.cpp` | 빌드 후 `./basic` 실행, 결과 먼저 관찰 |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | Python 기초 실습 | `pose_estimation_basics.py` | E -> R, t 분해, Cheirality |
+| 4 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | SVD, 회전 행렬 기본 |
+| 5 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | 4가지 해 비교, 스케일 분석 |
+| 6 | Python 심화 퀴즈 | `pose_estimation_quiz.py` | 포즈 추정 심화 |
+| 7 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 포즈 추정 실습 |
+
+---
+
+## 🚀 Step 1: 먼저 돌려보기
 
 > **이론을 읽기 전에 먼저 코드를 돌려보세요!**
 
@@ -40,9 +54,6 @@ cmake .. && make
 ```
 
 실행 결과를 관찰한 후, 아래 이론을 읽으며 "아, 이게 이 뜻이었구나" 하고 채워갑니다.
-
-- 📂 [PRACTICE.md](./PRACTICE.md) - 실습 가이드
-- 📝 `quiz_easy.cpp` → `quiz_medium.cpp` 순서로 풀기
 
 ---
 

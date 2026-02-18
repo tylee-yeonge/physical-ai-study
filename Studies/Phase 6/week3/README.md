@@ -6,6 +6,18 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 환경 설정 | `requirements.txt` | `pip install -r requirements.txt` |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | Python 퀴즈 (초급) | `quiz_easy.py` | KITTI 레이블 포맷, 난이도 기준 |
+| 4 | Python 퀴즈 (중급) | `quiz_medium.py` | KITTI 레이블 파싱 및 3D bbox 시각화 코드 실습 |
+| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | KITTI 데이터 로드, 레이블 파싱, 2D/3D/BEV 시각화 |
+
+---
+
 ## 시작하기 전에
 
 ### Week 2 복습

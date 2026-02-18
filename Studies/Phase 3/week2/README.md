@@ -7,6 +7,18 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 데모 실행 | `basic.cpp` | 빌드 후 `./basic` 실행, 결과 먼저 관찰 |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | Essential vs Fundamental, 5-Point 등 개념 확인 |
+| 4 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | Pure Rotation, Degenerate Case 등 특수 상황 분석 |
+| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | Essential Matrix 추정 및 포즈 복원 직접 구현 |
+
+---
+
 ## 🌟 시작하기 전에
 
 ### 

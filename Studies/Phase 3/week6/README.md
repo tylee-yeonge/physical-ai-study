@@ -6,6 +6,18 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 데모 실행 | `basic.cpp` | 빌드 후 `./basic` 실행, 결과 먼저 관찰 |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | Keyframe 목적, 선택 조건, Culling 기준 확인 |
+| 4 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | ORB-SLAM vs VINS 비교, Covisibility 분석 |
+| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | Keyframe 선택/제거 로직 구현 및 VO 통합 |
+
+---
+
 ## 🌟 시작하기 전에
 
 ### Week 5의 문제점

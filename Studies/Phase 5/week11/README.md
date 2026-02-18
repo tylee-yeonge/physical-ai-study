@@ -6,6 +6,18 @@
 
 ---
 
+## 📋 학습 순서
+
+| 순서 | 단계 | 파일 | 설명 |
+|:----:|------|------|------|
+| 1 | 환경 설정 | `requirements.txt` | 첫 실행 시 `pip install -r requirements.txt` |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | Python 퀴즈 (초급) | `quiz_easy.py` | 2D-3D 역투영, 카메라 내부 파라미터 개념 확인 |
+| 4 | Python 퀴즈 (중급) | `quiz_medium.py` | Detection + Depth 융합 파이프라인 심화 |
+| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | Detection + Depth 융합 및 ROS2 통합 |
+
+---
+
 ## 🌟 시작하기 전에
 
 ### Week 10에서 배운 것
