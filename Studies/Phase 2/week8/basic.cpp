@@ -41,23 +41,25 @@ void OpticalFlowBasic::farneback(const cv::Mat& prev_img, const cv::Mat& curr_im
     );
 }
 
-void OpticalFlowBasic::visualizeFlow(const cv::Mat& flow, cv::Mat& output, int step)
+double OpticalFlowBasic::evaluateFlow(const std::vector<cv::Point2f>& prev_pts,
+                                      const std::vector<cv::Point2f>& curr_pts,
+                                      const std::vector<uchar>& status)
 {
-    output = cv::Mat::zeros(flow.size(), CV_8UC3);
+    double total_dist = 0.0;
+    int count = 0;
 
-    for (int y = 0; y < flow.rows; y += step)
+    for (size_t i = 0; i < status.size(); i++)
     {
-        for (int x = 0; x < flow.cols; x += step)
+        if (status[i])
         {
-            const cv::Point2f& fxy = flow.at<cv::Point2f>(y, x);
-
-            cv::Point2f start(x, y);
-            cv::Point2f end(x + fxy.x, y + fxy.y);
-
-            // 화살표 그리기
-            cv::arrowedLine(output, start, end, cv::Scalar(0, 255, 0), 1, cv::LINE_AA, 0, 0.3);
+            double dx = curr_pts[i].x - prev_pts[i].x;
+            double dy = curr_pts[i].y - prev_pts[i].y;
+            total_dist += std::sqrt(dx * dx + dy * dy);
+            count++;
         }
     }
+
+    return count > 0 ? total_dist / count : 0.0;
 }
 
 void OpticalFlowBasic::visualizeSparseFlow(const cv::Mat& img,
@@ -85,6 +87,50 @@ void OpticalFlowBasic::visualizeSparseFlow(const cv::Mat& img,
             cv::circle(output, curr_pts[i], 5, cv::Scalar(0, 0, 255), -1);
         }
     }
+}
+
+void OpticalFlowBasic::visualizeFlow(const cv::Mat& flow, cv::Mat& output, int step)
+{
+    output = cv::Mat::zeros(flow.size(), CV_8UC3);
+
+    for (int y = 0; y < flow.rows; y += step)
+    {
+        for (int x = 0; x < flow.cols; x += step)
+        {
+            const cv::Point2f& fxy = flow.at<cv::Point2f>(y, x);
+
+            cv::Point2f start(x, y);
+            cv::Point2f end(x + fxy.x, y + fxy.y);
+
+            // 화살표 그리기
+            cv::arrowedLine(output, start, end, cv::Scalar(0, 255, 0), 1, cv::LINE_AA, 0, 0.3);
+        }
+    }
+}
+
+void OpticalFlowBasic::compareSparseVsDense()
+{
+    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "Sparse vs Dense Optical Flow 비교" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+
+    std::cout << "1️⃣  Sparse Optical Flow (Lucas-Kanade)" << std::endl;
+    std::cout << "   - 선택된 특징점만 추적" << std::endl;
+    std::cout << "   - 빠름 (수백 개 점)" << std::endl;
+    std::cout << "   - SLAM에 적합 (특징점 기반)\n" << std::endl;
+
+    std::cout << "2️⃣  Dense Optical Flow (Farneback)" << std::endl;
+    std::cout << "   - 모든 픽셀의 움직임" << std::endl;
+    std::cout << "   - 느림 (수십만 픽셀)" << std::endl;
+    std::cout << "   - 비디오 안정화, 배경 분리에 사용\n" << std::endl;
+
+    std::cout << "💡 SLAM에서는 Sparse 사용!" << std::endl;
+    std::cout << "   - ORB-SLAM: 특징점 추적" << std::endl;
+    std::cout << "   - VINS: Optical Flow + 특징점\n" << std::endl;
+
+    std::cout << "속도 비교 (640x480 이미지):" << std::endl;
+    std::cout << "   Sparse (100점): ~1ms" << std::endl;
+    std::cout << "   Dense (전체): ~50ms" << std::endl;
 }
 
 void OpticalFlowBasic::demoFeatureTracking(const std::string& video_path)
@@ -156,52 +202,6 @@ void OpticalFlowBasic::demoFeatureTracking(const std::string& video_path)
     }
 
     std::cout << "\n✅ Feature Tracking 완료!" << std::endl;
-}
-
-double OpticalFlowBasic::evaluateFlow(const std::vector<cv::Point2f>& prev_pts,
-                                      const std::vector<cv::Point2f>& curr_pts,
-                                      const std::vector<uchar>& status)
-{
-    double total_dist = 0.0;
-    int count = 0;
-
-    for (size_t i = 0; i < status.size(); i++)
-    {
-        if (status[i])
-        {
-            double dx = curr_pts[i].x - prev_pts[i].x;
-            double dy = curr_pts[i].y - prev_pts[i].y;
-            total_dist += std::sqrt(dx * dx + dy * dy);
-            count++;
-        }
-    }
-
-    return count > 0 ? total_dist / count : 0.0;
-}
-
-void OpticalFlowBasic::compareSparseVsDense()
-{
-    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
-    std::cout << "Sparse vs Dense Optical Flow 비교" << std::endl;
-    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
-
-    std::cout << "1️⃣  Sparse Optical Flow (Lucas-Kanade)" << std::endl;
-    std::cout << "   - 선택된 특징점만 추적" << std::endl;
-    std::cout << "   - 빠름 (수백 개 점)" << std::endl;
-    std::cout << "   - SLAM에 적합 (특징점 기반)\n" << std::endl;
-
-    std::cout << "2️⃣  Dense Optical Flow (Farneback)" << std::endl;
-    std::cout << "   - 모든 픽셀의 움직임" << std::endl;
-    std::cout << "   - 느림 (수십만 픽셀)" << std::endl;
-    std::cout << "   - 비디오 안정화, 배경 분리에 사용\n" << std::endl;
-
-    std::cout << "💡 SLAM에서는 Sparse 사용!" << std::endl;
-    std::cout << "   - ORB-SLAM: 특징점 추적" << std::endl;
-    std::cout << "   - VINS: Optical Flow + 특징점\n" << std::endl;
-
-    std::cout << "속도 비교 (640x480 이미지):" << std::endl;
-    std::cout << "   Sparse (100점): ~1ms" << std::endl;
-    std::cout << "   Dense (전체): ~50ms" << std::endl;
 }
 
 void OpticalFlowBasic::demoPipeline()

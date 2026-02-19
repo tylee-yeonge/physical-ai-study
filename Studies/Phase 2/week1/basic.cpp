@@ -10,6 +10,26 @@ PinholeProjection::PinholeProjection(const cv::Mat& K, const cv::Mat& R, const c
 {
 }
 
+bool PinholeProjection::isInImage(const cv::Point2d& pixel, const cv::Size& imageSize)
+{
+    return pixel.x >= 0 && pixel.x < imageSize.width && pixel.y >= 0 && pixel.y < imageSize.height;
+}
+
+cv::Size2d PinholeProjection::computeFOV(const cv::Size& imageSize) const
+{
+    double fx = K_.at<double>(0, 0);
+    double fy = K_.at<double>(1, 1);
+
+    // FOV = 2 * arctan(image_size / (2 * focal_length))
+    // 2.0 * fx: 이미지 폭을 절반(W/2)으로 나누는 효과 → 반쪽 직각삼각형의 각도(θ) 계산
+    // 바깥 2.0: 반쪽 각도 θ를 전체 시야각으로 복원
+    // * kRadToDeg: 라디안 → 도(degree) 변환
+    double fov_h = 2.0 * std::atan2(imageSize.width, 2.0 * fx) * kRadToDeg;
+    double fov_v = 2.0 * std::atan2(imageSize.height, 2.0 * fy) * kRadToDeg;
+
+    return cv::Size2d(fov_h, fov_v);
+}
+
 cv::Point2d PinholeProjection::project(const cv::Point3d& P_world) const
 {
     // Step 1: 월드 → 카메라 좌표 변환
@@ -43,20 +63,6 @@ cv::Point2d PinholeProjection::project(const cv::Point3d& P_world) const
     return cv::Point2d(u, v);
 }
 
-std::vector<cv::Point2d> PinholeProjection::projectMultiple(
-    const std::vector<cv::Point3d>& points_3d) const
-{
-    std::vector<cv::Point2d> pixels;
-    pixels.reserve(points_3d.size());
-
-    for (const auto& pt : points_3d)
-    {
-        pixels.push_back(project(pt));
-    }
-
-    return pixels;
-}
-
 cv::Vec3d PinholeProjection::backProject(const cv::Point2d& pixel) const
 {
     double fx = K_.at<double>(0, 0);
@@ -77,19 +83,18 @@ cv::Vec3d PinholeProjection::backProject(const cv::Point2d& pixel) const
     return ray / norm;
 }
 
-cv::Size2d PinholeProjection::computeFOV(const cv::Size& imageSize) const
+std::vector<cv::Point2d> PinholeProjection::projectMultiple(
+    const std::vector<cv::Point3d>& points_3d) const
 {
-    double fx = K_.at<double>(0, 0);
-    double fy = K_.at<double>(1, 1);
+    std::vector<cv::Point2d> pixels;
+    pixels.reserve(points_3d.size());
 
-    // FOV = 2 * arctan(image_size / (2 * focal_length))
-    // 2.0 * fx: 이미지 폭을 절반(W/2)으로 나누는 효과 → 반쪽 직각삼각형의 각도(θ) 계산
-    // 바깥 2.0: 반쪽 각도 θ를 전체 시야각으로 복원
-    // * kRadToDeg: 라디안 → 도(degree) 변환
-    double fov_h = 2.0 * std::atan2(imageSize.width, 2.0 * fx) * kRadToDeg;
-    double fov_v = 2.0 * std::atan2(imageSize.height, 2.0 * fy) * kRadToDeg;
+    for (const auto& pt : points_3d)
+    {
+        pixels.push_back(project(pt));
+    }
 
-    return cv::Size2d(fov_h, fov_v);
+    return pixels;
 }
 
 double PinholeProjection::reprojectionError(const cv::Point3d& P_world,
@@ -106,11 +111,6 @@ double PinholeProjection::reprojectionError(const cv::Point3d& P_world,
     double dy = projected.y - observed_pixel.y;
 
     return std::sqrt(dx * dx + dy * dy);
-}
-
-bool PinholeProjection::isInImage(const cv::Point2d& pixel, const cv::Size& imageSize)
-{
-    return pixel.x >= 0 && pixel.x < imageSize.width && pixel.y >= 0 && pixel.y < imageSize.height;
 }
 
 #ifndef PINHOLE_LIB_ONLY

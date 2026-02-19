@@ -28,6 +28,41 @@
 #include <iomanip>
 #include <cmath>
 
+double TriangulationBasic::disparityToDepth(double disparity, double baseline, double focal_length)
+{
+    // [Step 1] 시차 → 깊이 변환 (가장 먼저 구현!)
+    // depth = (baseline * focal_length) / disparity
+    // disparity가 0에 가까우면 0.0 반환
+    // 참고: basic.cpp의 disparityToDepth()
+    // 기대값: d=60, b=0.12, f=600 → 1.2m
+    return 0.0;
+}
+
+bool TriangulationBasic::isInFrontOfCamera(const cv::Point3f& point3d, const cv::Mat& R,
+                                           const cv::Mat& t)
+{
+    // [Step 2] Cheirality Check
+    // 1) pt = [X, Y, Z]^T
+    // 2) pt_cam = R * pt + t (카메라 좌표계로 변환)
+    // 3) pt_cam의 Z > 0이면 true
+    // 참고: basic.cpp의 isInFrontOfCamera()
+    // 기대값: Z=5 → true, Z=-1 → false
+    return false;
+}
+
+double TriangulationBasic::reprojectionError(const cv::Point3f& point3d, const cv::Point2f& point2d,
+                                             const cv::Mat& P)
+{
+    // [Step 3] 재투영 오차 계산
+    // 1) pt3d = [X, Y, Z, 1]^T (4×1 동차 좌표)
+    // 2) projected = P * pt3d (3×1)
+    // 3) 정규화: u = proj[0]/proj[2], v = proj[1]/proj[2]
+    // 4) 유클리드 거리: sqrt((u-u_obs)² + (v-v_obs)²)
+    // 참고: basic.cpp의 reprojectionError()
+    // 기대값: 정확한 투영 → ~0 픽셀
+    return -1.0;
+}
+
 bool TriangulationBasic::triangulatePoint(const cv::Point2f& pt1, const cv::Point2f& pt2,
                                           const cv::Mat& P1, const cv::Mat& P2,
                                           cv::Point3f& point3d)
@@ -55,19 +90,6 @@ void TriangulationBasic::triangulatePoints(const std::vector<cv::Point2f>& point
     // 기대값: points3d.size() == points1.size()
 }
 
-double TriangulationBasic::reprojectionError(const cv::Point3f& point3d, const cv::Point2f& point2d,
-                                             const cv::Mat& P)
-{
-    // [Step 3] 재투영 오차 계산
-    // 1) pt3d = [X, Y, Z, 1]^T (4×1 동차 좌표)
-    // 2) projected = P * pt3d (3×1)
-    // 3) 정규화: u = proj[0]/proj[2], v = proj[1]/proj[2]
-    // 4) 유클리드 거리: sqrt((u-u_obs)² + (v-v_obs)²)
-    // 참고: basic.cpp의 reprojectionError()
-    // 기대값: 정확한 투영 → ~0 픽셀
-    return -1.0;
-}
-
 double TriangulationBasic::averageReprojectionError(const std::vector<cv::Point3f>& points3d,
                                                     const std::vector<cv::Point2f>& points2d,
                                                     const cv::Mat& P)
@@ -77,28 +99,6 @@ double TriangulationBasic::averageReprojectionError(const std::vector<cv::Point3
     // 참고: basic.cpp의 averageReprojectionError()
     // 기대값: 노이즈 없으면 ~0
     return -1.0;
-}
-
-double TriangulationBasic::disparityToDepth(double disparity, double baseline, double focal_length)
-{
-    // [Step 1] 시차 → 깊이 변환 (가장 먼저 구현!)
-    // depth = (baseline * focal_length) / disparity
-    // disparity가 0에 가까우면 0.0 반환
-    // 참고: basic.cpp의 disparityToDepth()
-    // 기대값: d=60, b=0.12, f=600 → 1.2m
-    return 0.0;
-}
-
-bool TriangulationBasic::isInFrontOfCamera(const cv::Point3f& point3d, const cv::Mat& R,
-                                           const cv::Mat& t)
-{
-    // [Step 2] Cheirality Check
-    // 1) pt = [X, Y, Z]^T
-    // 2) pt_cam = R * pt + t (카메라 좌표계로 변환)
-    // 3) pt_cam의 Z > 0이면 true
-    // 참고: basic.cpp의 isInFrontOfCamera()
-    // 기대값: Z=5 → true, Z=-1 → false
-    return false;
 }
 
 void TriangulationBasic::evaluateTriangulation(const std::vector<cv::Point3f>& points3d,

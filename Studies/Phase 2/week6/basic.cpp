@@ -3,6 +3,47 @@
 #include <iomanip>
 #include <cmath>
 
+double TriangulationBasic::disparityToDepth(double disparity, double baseline, double focal_length)
+{
+    // Depth = (baseline * focal_length) / disparity
+    if (std::abs(disparity) < 1e-6)
+        return 0.0;
+
+    return (baseline * focal_length) / disparity;
+}
+
+bool TriangulationBasic::isInFrontOfCamera(const cv::Point3f& point3d, const cv::Mat& R,
+                                           const cv::Mat& t)
+{
+    // 카메라 좌표계로 변환
+    cv::Mat pt = (cv::Mat_<double>(3, 1) << point3d.x, point3d.y, point3d.z);
+    cv::Mat pt_cam = R * pt + t;
+
+    // Z > 0이면 카메라 앞
+    return pt_cam.at<double>(2) > 0;
+}
+
+double TriangulationBasic::reprojectionError(const cv::Point3f& point3d, const cv::Point2f& point2d,
+                                             const cv::Mat& P)
+{
+    // 3D 점을 카메라로 투영
+    cv::Mat pt3d = (cv::Mat_<double>(4, 1) << point3d.x, point3d.y, point3d.z, 1.0);
+    cv::Mat projected = P * pt3d;
+
+    // 동차 좌표 정규화
+    double w = projected.at<double>(2);
+    if (std::abs(w) < 1e-6)
+        return 1e6;
+
+    cv::Point2f proj_pt(projected.at<double>(0) / w, projected.at<double>(1) / w);
+
+    // 유클리드 거리
+    double dx = proj_pt.x - point2d.x;
+    double dy = proj_pt.y - point2d.y;
+
+    return std::sqrt(dx * dx + dy * dy);
+}
+
 bool TriangulationBasic::triangulatePoint(const cv::Point2f& pt1, const cv::Point2f& pt2,
                                           const cv::Mat& P1, const cv::Mat& P2,
                                           cv::Point3f& point3d)
@@ -51,27 +92,6 @@ void TriangulationBasic::triangulatePoints(const std::vector<cv::Point2f>& point
     }
 }
 
-double TriangulationBasic::reprojectionError(const cv::Point3f& point3d, const cv::Point2f& point2d,
-                                             const cv::Mat& P)
-{
-    // 3D 점을 카메라로 투영
-    cv::Mat pt3d = (cv::Mat_<double>(4, 1) << point3d.x, point3d.y, point3d.z, 1.0);
-    cv::Mat projected = P * pt3d;
-
-    // 동차 좌표 정규화
-    double w = projected.at<double>(2);
-    if (std::abs(w) < 1e-6)
-        return 1e6;
-
-    cv::Point2f proj_pt(projected.at<double>(0) / w, projected.at<double>(1) / w);
-
-    // 유클리드 거리
-    double dx = proj_pt.x - point2d.x;
-    double dy = proj_pt.y - point2d.y;
-
-    return std::sqrt(dx * dx + dy * dy);
-}
-
 double TriangulationBasic::averageReprojectionError(const std::vector<cv::Point3f>& points3d,
                                                     const std::vector<cv::Point2f>& points2d,
                                                     const cv::Mat& P)
@@ -88,26 +108,6 @@ double TriangulationBasic::averageReprojectionError(const std::vector<cv::Point3
     }
 
     return total_error / points3d.size();
-}
-
-double TriangulationBasic::disparityToDepth(double disparity, double baseline, double focal_length)
-{
-    // Depth = (baseline * focal_length) / disparity
-    if (std::abs(disparity) < 1e-6)
-        return 0.0;
-
-    return (baseline * focal_length) / disparity;
-}
-
-bool TriangulationBasic::isInFrontOfCamera(const cv::Point3f& point3d, const cv::Mat& R,
-                                           const cv::Mat& t)
-{
-    // 카메라 좌표계로 변환
-    cv::Mat pt = (cv::Mat_<double>(3, 1) << point3d.x, point3d.y, point3d.z);
-    cv::Mat pt_cam = R * pt + t;
-
-    // Z > 0이면 카메라 앞
-    return pt_cam.at<double>(2) > 0;
 }
 
 void TriangulationBasic::evaluateTriangulation(const std::vector<cv::Point3f>& points3d,

@@ -2,6 +2,34 @@
 #include <iostream>
 #include <iomanip>
 
+cv::Vec3f EpipolarGeometryBasic::computeEpipolarLine(const cv::Point2f& point,
+                                                     const cv::Mat& fundamental, bool for_image2)
+{
+    // 에피폴라 선: l = F * p (image2) 또는 l = F^T * p (image1)
+    cv::Mat p = (cv::Mat_<double>(3, 1) << point.x, point.y, 1.0);
+    cv::Mat line;
+
+    if (for_image2)
+    {
+        line = fundamental * p;  // l' = F * p
+    }
+    else
+    {
+        line = fundamental.t() * p;  // l = F^T * p'
+    }
+
+    // 정규화 (거리 계산 편의)
+    double norm = std::sqrt(line.at<double>(0) * line.at<double>(0) +
+                            line.at<double>(1) * line.at<double>(1));
+
+    if (norm > 1e-6)
+    {
+        line /= norm;
+    }
+
+    return cv::Vec3f(line.at<double>(0), line.at<double>(1), line.at<double>(2));
+}
+
 int EpipolarGeometryBasic::estimateEssential(const std::vector<cv::Point2f>& points1,
                                              const std::vector<cv::Point2f>& points2,
                                              cv::Mat& essential, int method)
@@ -38,6 +66,20 @@ int EpipolarGeometryBasic::estimateFundamental(const std::vector<cv::Point2f>& p
     return 0;
 }
 
+double EpipolarGeometryBasic::verifyEpipolarConstraint(const cv::Point2f& point1,
+                                                       const cv::Point2f& point2,
+                                                       const cv::Mat& essential_or_fundamental)
+{
+    // 에피폴라 제약: p2^T * E * p1 = 0
+    cv::Mat p1 = (cv::Mat_<double>(3, 1) << point1.x, point1.y, 1.0);
+    cv::Mat p2 = (cv::Mat_<double>(3, 1) << point2.x, point2.y, 1.0);
+
+    cv::Mat result = p2.t() * essential_or_fundamental * p1;
+    double error = std::abs(result.at<double>(0));
+
+    return error;
+}
+
 bool EpipolarGeometryBasic::recoverPose(const cv::Mat& essential,
                                         const std::vector<cv::Point2f>& points1,
                                         const std::vector<cv::Point2f>& points2, const cv::Mat& K,
@@ -53,46 +95,21 @@ bool EpipolarGeometryBasic::recoverPose(const cv::Mat& essential,
     return inliers > 0;
 }
 
-cv::Vec3f EpipolarGeometryBasic::computeEpipolarLine(const cv::Point2f& point,
-                                                     const cv::Mat& fundamental, bool for_image2)
+double EpipolarGeometryBasic::verifyEF_Relationship(const cv::Mat& K, const cv::Mat& essential,
+                                                    const cv::Mat& fundamental)
 {
-    // 에피폴라 선: l = F * p (image2) 또는 l = F^T * p (image1)
-    cv::Mat p = (cv::Mat_<double>(3, 1) << point.x, point.y, 1.0);
-    cv::Mat line;
+    // F = K'^-T * E * K^-1 (같은 카메라면 K' = K)
+    cv::Mat K_inv = K.inv();
+    cv::Mat F_from_E = K_inv.t() * essential * K_inv;
 
-    if (for_image2)
-    {
-        line = fundamental * p;  // l' = F * p
-    }
-    else
-    {
-        line = fundamental.t() * p;  // l = F^T * p'
-    }
+    // 정규화 (F의 스케일은 임의)
+    F_from_E /= F_from_E.at<double>(2, 2);
+    cv::Mat F_normalized = fundamental / fundamental.at<double>(2, 2);
 
-    // 정규화 (거리 계산 편의)
-    double norm = std::sqrt(line.at<double>(0) * line.at<double>(0) +
-                            line.at<double>(1) * line.at<double>(1));
+    // 차이 계산
+    double diff = cv::norm(F_from_E - F_normalized);
 
-    if (norm > 1e-6)
-    {
-        line /= norm;
-    }
-
-    return cv::Vec3f(line.at<double>(0), line.at<double>(1), line.at<double>(2));
-}
-
-double EpipolarGeometryBasic::verifyEpipolarConstraint(const cv::Point2f& point1,
-                                                       const cv::Point2f& point2,
-                                                       const cv::Mat& essential_or_fundamental)
-{
-    // 에피폴라 제약: p2^T * E * p1 = 0
-    cv::Mat p1 = (cv::Mat_<double>(3, 1) << point1.x, point1.y, 1.0);
-    cv::Mat p2 = (cv::Mat_<double>(3, 1) << point2.x, point2.y, 1.0);
-
-    cv::Mat result = p2.t() * essential_or_fundamental * p1;
-    double error = std::abs(result.at<double>(0));
-
-    return error;
+    return diff;
 }
 
 void EpipolarGeometryBasic::visualizeEpipolarLines(const cv::Mat& img1, const cv::Mat& img2,
@@ -146,23 +163,6 @@ void EpipolarGeometryBasic::visualizeEpipolarLines(const cv::Mat& img1, const cv
     // 정보 추가
     cv::putText(output, "Epipolar Lines", cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX, 1.0,
                 cv::Scalar(0, 255, 0), 2);
-}
-
-double EpipolarGeometryBasic::verifyEF_Relationship(const cv::Mat& K, const cv::Mat& essential,
-                                                    const cv::Mat& fundamental)
-{
-    // F = K'^-T * E * K^-1 (같은 카메라면 K' = K)
-    cv::Mat K_inv = K.inv();
-    cv::Mat F_from_E = K_inv.t() * essential * K_inv;
-
-    // 정규화 (F의 스케일은 임의)
-    F_from_E /= F_from_E.at<double>(2, 2);
-    cv::Mat F_normalized = fundamental / fundamental.at<double>(2, 2);
-
-    // 차이 계산
-    double diff = cv::norm(F_from_E - F_normalized);
-
-    return diff;
 }
 
 void EpipolarGeometryBasic::demoPipeline(const cv::Mat& img1, const cv::Mat& img2, const cv::Mat& K)

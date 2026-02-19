@@ -26,6 +26,20 @@
 #include <iostream>
 #include <iomanip>
 
+cv::Vec3f EpipolarGeometryBasic::computeEpipolarLine(const cv::Point2f& point,
+                                                     const cv::Mat& fundamental, bool for_image2)
+{
+    // [Step 1] 에피폴라 선 계산 (가장 먼저 구현!)
+    // 1) p = [point.x, point.y, 1.0]^T (3×1 행렬)
+    // 2) for_image2이면: line = F * p (image2의 에피폴라 선)
+    //    아니면:         line = F^T * p (image1의 에피폴라 선)
+    // 3) 정규화: norm = sqrt(a² + b²), line /= norm
+    // 4) cv::Vec3f(a, b, c) 반환 (ax + by + c = 0)
+    // 참고: basic.cpp의 computeEpipolarLine()
+    // 기대값: 정규화된 (a,b,c) 벡터
+    return cv::Vec3f(0, 0, 0);
+}
+
 int EpipolarGeometryBasic::estimateEssential(const std::vector<cv::Point2f>& points1,
                                              const std::vector<cv::Point2f>& points2,
                                              cv::Mat& essential, int method)
@@ -52,6 +66,20 @@ int EpipolarGeometryBasic::estimateFundamental(const std::vector<cv::Point2f>& p
     return 0;
 }
 
+double EpipolarGeometryBasic::verifyEpipolarConstraint(const cv::Point2f& point1,
+                                                       const cv::Point2f& point2,
+                                                       const cv::Mat& essential_or_fundamental)
+{
+    // [Step 4] 에피폴라 제약 검증: p2^T * E * p1 = 0
+    // 1) p1 = [point1.x, point1.y, 1.0]^T
+    // 2) p2 = [point2.x, point2.y, 1.0]^T
+    // 3) result = p2.t() * E * p1
+    // 4) |result| 반환 (0에 가까울수록 정확)
+    // 참고: basic.cpp의 verifyEpipolarConstraint()
+    // 기대값: 정확한 대응점이면 ~0
+    return -1.0;
+}
+
 bool EpipolarGeometryBasic::recoverPose(const cv::Mat& essential,
                                         const std::vector<cv::Point2f>& points1,
                                         const std::vector<cv::Point2f>& points2, const cv::Mat& K,
@@ -67,31 +95,17 @@ bool EpipolarGeometryBasic::recoverPose(const cv::Mat& essential,
     return false;
 }
 
-cv::Vec3f EpipolarGeometryBasic::computeEpipolarLine(const cv::Point2f& point,
-                                                     const cv::Mat& fundamental, bool for_image2)
+double EpipolarGeometryBasic::verifyEF_Relationship(const cv::Mat& K, const cv::Mat& essential,
+                                                    const cv::Mat& fundamental)
 {
-    // [Step 1] 에피폴라 선 계산 (가장 먼저 구현!)
-    // 1) p = [point.x, point.y, 1.0]^T (3×1 행렬)
-    // 2) for_image2이면: line = F * p (image2의 에피폴라 선)
-    //    아니면:         line = F^T * p (image1의 에피폴라 선)
-    // 3) 정규화: norm = sqrt(a² + b²), line /= norm
-    // 4) cv::Vec3f(a, b, c) 반환 (ax + by + c = 0)
-    // 참고: basic.cpp의 computeEpipolarLine()
-    // 기대값: 정규화된 (a,b,c) 벡터
-    return cv::Vec3f(0, 0, 0);
-}
-
-double EpipolarGeometryBasic::verifyEpipolarConstraint(const cv::Point2f& point1,
-                                                       const cv::Point2f& point2,
-                                                       const cv::Mat& essential_or_fundamental)
-{
-    // [Step 4] 에피폴라 제약 검증: p2^T * E * p1 = 0
-    // 1) p1 = [point1.x, point1.y, 1.0]^T
-    // 2) p2 = [point2.x, point2.y, 1.0]^T
-    // 3) result = p2.t() * E * p1
-    // 4) |result| 반환 (0에 가까울수록 정확)
-    // 참고: basic.cpp의 verifyEpipolarConstraint()
-    // 기대값: 정확한 대응점이면 ~0
+    // [Step 6] E와 F의 관계 검증
+    // 1) K_inv = K.inv()
+    // 2) F_from_E = K_inv.t() * essential * K_inv
+    // 3) 스케일 정규화: F_from_E /= F_from_E.at<double>(2,2)
+    //                  F_norm = fundamental / fundamental.at<double>(2,2)
+    // 4) cv::norm(F_from_E - F_norm) 반환
+    // 참고: basic.cpp의 verifyEF_Relationship()
+    // 기대값: 차이 < 0.1 (이상적으로 ~0)
     return -1.0;
 }
 
@@ -106,20 +120,6 @@ void EpipolarGeometryBasic::visualizeEpipolarLines(const cv::Mat& img1, const cv
     // 3) 각 점에 원 그리기 + computeEpipolarLine()으로 선 그리기
     // 참고: basic.cpp의 visualizeEpipolarLines()
     // 기대값: output.empty() == false
-}
-
-double EpipolarGeometryBasic::verifyEF_Relationship(const cv::Mat& K, const cv::Mat& essential,
-                                                    const cv::Mat& fundamental)
-{
-    // [Step 6] E와 F의 관계 검증
-    // 1) K_inv = K.inv()
-    // 2) F_from_E = K_inv.t() * essential * K_inv
-    // 3) 스케일 정규화: F_from_E /= F_from_E.at<double>(2,2)
-    //                  F_norm = fundamental / fundamental.at<double>(2,2)
-    // 4) cv::norm(F_from_E - F_norm) 반환
-    // 참고: basic.cpp의 verifyEF_Relationship()
-    // 기대값: 차이 < 0.1 (이상적으로 ~0)
-    return -1.0;
 }
 
 void EpipolarGeometryBasic::demoPipeline(const cv::Mat& img1, const cv::Mat& img2, const cv::Mat& K)

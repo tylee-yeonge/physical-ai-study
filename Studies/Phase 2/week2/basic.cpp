@@ -13,6 +13,56 @@ CameraCalibrationBasic::CameraCalibrationBasic(cv::Size boardSize, float squareS
 {
 }
 
+std::string CameraCalibrationBasic::evaluateQuality(double rms)
+{
+    if (rms < kRmsExcellent)
+    {
+        return "✅ 매우 우수 (Excellent)";
+    }
+    else if (rms < kRmsGood)
+    {
+        return "✅ 우수 (Good)";
+    }
+    else if (rms < kRmsFair)
+    {
+        return "⚠️  양호 (Fair) - 사용 가능";
+    }
+    else
+    {
+        return "❌ 불량 (Poor) - 재캘리브레이션 권장";
+    }
+}
+
+std::vector<cv::Point3f> CameraCalibrationBasic::generateObjectPoints()
+{
+    std::vector<cv::Point3f> objectPoints;
+
+    // 체커보드를 3D 공간의 Z=0 평면에 배치
+    // (0,0,0), (30,0,0), (60,0,0), ... (단위: mm)
+    for (int i = 0; i < boardSize_.height; i++)
+    {
+        for (int j = 0; j < boardSize_.width; j++)
+        {
+            objectPoints.push_back(cv::Point3f(j * squareSize_,  // X 좌표
+                                               i * squareSize_,  // Y 좌표
+                                               0.0f              // Z 좌표 (평면)
+                                               ));
+        }
+    }
+
+    return objectPoints;
+}
+
+void CameraCalibrationBasic::undistortImage(const cv::Mat& distorted, cv::Mat& undistorted,
+                                            const cv::Mat& K, const cv::Mat& dist)
+{
+    // OpenCV의 왜곡 보정 함수
+    // 내부적으로 다음을 수행:
+    // 1. 각 픽셀에 대해 왜곡 모델 적용
+    // 2. 원본 이미지에서 보간(interpolation)
+    cv::undistort(distorted, undistorted, K, dist);
+}
+
 bool CameraCalibrationBasic::detectChessboard(const cv::Mat& image,
                                               std::vector<cv::Point2f>& corners)
 {
@@ -51,24 +101,31 @@ bool CameraCalibrationBasic::detectChessboard(const cv::Mat& image,
     return found;
 }
 
-std::vector<cv::Point3f> CameraCalibrationBasic::generateObjectPoints()
+void CameraCalibrationBasic::saveCalibration(const std::string& filename, const cv::Mat& K,
+                                             const cv::Mat& dist, cv::Size imageSize)
 {
-    std::vector<cv::Point3f> objectPoints;
+    // OpenCV FileStorage (YAML 형식)
+    cv::FileStorage fs(filename, cv::FileStorage::WRITE);
 
-    // 체커보드를 3D 공간의 Z=0 평면에 배치
-    // (0,0,0), (30,0,0), (60,0,0), ... (단위: mm)
-    for (int i = 0; i < boardSize_.height; i++)
+    if (!fs.isOpened())
     {
-        for (int j = 0; j < boardSize_.width; j++)
-        {
-            objectPoints.push_back(cv::Point3f(j * squareSize_,  // X 좌표
-                                               i * squareSize_,  // Y 좌표
-                                               0.0f              // Z 좌표 (평면)
-                                               ));
-        }
+        std::cerr << "❌ 파일 저장 실패: " << filename << std::endl;
+        return;
     }
 
-    return objectPoints;
+    // 현재 시간 저장
+    time_t rawtime;
+    time(&rawtime);
+
+    fs << "calibration_time" << asctime(localtime(&rawtime));
+    fs << "camera_matrix" << K;
+    fs << "distortion_coefficients" << dist;
+    fs << "image_width" << imageSize.width;
+    fs << "image_height" << imageSize.height;
+
+    fs.release();
+
+    std::cout << "💾 캘리브레이션 결과 저장: " << filename << std::endl;
 }
 
 double CameraCalibrationBasic::calibrate(const std::vector<std::vector<cv::Point2f>>& imagePoints,
@@ -115,63 +172,6 @@ double CameraCalibrationBasic::calibrate(const std::vector<std::vector<cv::Point
     std::cout << "   → " << evaluateQuality(rms) << std::endl;
 
     return rms;
-}
-
-void CameraCalibrationBasic::saveCalibration(const std::string& filename, const cv::Mat& K,
-                                             const cv::Mat& dist, cv::Size imageSize)
-{
-    // OpenCV FileStorage (YAML 형식)
-    cv::FileStorage fs(filename, cv::FileStorage::WRITE);
-
-    if (!fs.isOpened())
-    {
-        std::cerr << "❌ 파일 저장 실패: " << filename << std::endl;
-        return;
-    }
-
-    // 현재 시간 저장
-    time_t rawtime;
-    time(&rawtime);
-
-    fs << "calibration_time" << asctime(localtime(&rawtime));
-    fs << "camera_matrix" << K;
-    fs << "distortion_coefficients" << dist;
-    fs << "image_width" << imageSize.width;
-    fs << "image_height" << imageSize.height;
-
-    fs.release();
-
-    std::cout << "💾 캘리브레이션 결과 저장: " << filename << std::endl;
-}
-
-void CameraCalibrationBasic::undistortImage(const cv::Mat& distorted, cv::Mat& undistorted,
-                                            const cv::Mat& K, const cv::Mat& dist)
-{
-    // OpenCV의 왜곡 보정 함수
-    // 내부적으로 다음을 수행:
-    // 1. 각 픽셀에 대해 왜곡 모델 적용
-    // 2. 원본 이미지에서 보간(interpolation)
-    cv::undistort(distorted, undistorted, K, dist);
-}
-
-std::string CameraCalibrationBasic::evaluateQuality(double rms)
-{
-    if (rms < kRmsExcellent)
-    {
-        return "✅ 매우 우수 (Excellent)";
-    }
-    else if (rms < kRmsGood)
-    {
-        return "✅ 우수 (Good)";
-    }
-    else if (rms < kRmsFair)
-    {
-        return "⚠️  양호 (Fair) - 사용 가능";
-    }
-    else
-    {
-        return "❌ 불량 (Poor) - 재캘리브레이션 권장";
-    }
 }
 
 // 메인 함수 (데모)

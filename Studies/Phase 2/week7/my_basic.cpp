@@ -27,6 +27,14 @@
 #include <iomanip>
 #include <cmath>
 
+void PnPBasic::rodrigues(const cv::Mat& rvec, cv::Mat& R)
+{
+    // [Step 1] 회전 벡터 → 회전 행렬 (가장 먼저 구현!)
+    // cv::Rodrigues(rvec, R)
+    // 참고: basic.cpp의 rodrigues()
+    // 기대값: R(3×3), det(R)≈1
+}
+
 bool PnPBasic::solvePnP(const std::vector<cv::Point3f>& points3d,
                         const std::vector<cv::Point2f>& points2d, const cv::Mat& K, cv::Mat& rvec,
                         cv::Mat& tvec, int method)
@@ -54,14 +62,6 @@ int PnPBasic::solvePnPRansac(const std::vector<cv::Point3f>& points3d,
     return 0;
 }
 
-void PnPBasic::rodrigues(const cv::Mat& rvec, cv::Mat& R)
-{
-    // [Step 1] 회전 벡터 → 회전 행렬 (가장 먼저 구현!)
-    // cv::Rodrigues(rvec, R)
-    // 참고: basic.cpp의 rodrigues()
-    // 기대값: R(3×3), det(R)≈1
-}
-
 double PnPBasic::evaluatePose(const std::vector<cv::Point3f>& points3d,
                               const std::vector<cv::Point2f>& points2d, const cv::Mat& K,
                               const cv::Mat& rvec, const cv::Mat& tvec)
@@ -85,18 +85,18 @@ void PnPBasic::visualizePnP(const cv::Mat& img, const std::vector<cv::Point3f>& 
     // 기대값: output.empty() == false
 }
 
+void PnPBasic::compareMethods()
+{
+    // [Step 6] 2D-2D (Essential) vs 3D-2D (PnP) vs 3D-3D (ICP) 비교
+    // 참고: basic.cpp의 compareMethods()
+}
+
 void PnPBasic::demoVisualOdometry(const cv::Mat& K)
 {
     // [Step 7] Visual Odometry 시뮬레이션
     // 10프레임 동안 카메라 이동, 3D 랜드마크 추적
     // 각 프레임에서 PnP로 포즈 추정 → GT와 비교
     // 참고: basic.cpp의 demoVisualOdometry()
-}
-
-void PnPBasic::compareMethods()
-{
-    // [Step 6] 2D-2D (Essential) vs 3D-2D (PnP) vs 3D-3D (ICP) 비교
-    // 참고: basic.cpp의 compareMethods()
 }
 
 void PnPBasic::demoPipeline(const cv::Mat& K)

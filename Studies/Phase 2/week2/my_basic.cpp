@@ -35,54 +35,6 @@ CameraCalibrationBasic::CameraCalibrationBasic(cv::Size boardSize, float squareS
     // 기대값: boardSize_ = boardSize, squareSize_ = squareSize
 }
 
-bool CameraCalibrationBasic::detectChessboard(const cv::Mat& image,
-                                              std::vector<cv::Point2f>& corners)
-{
-    // [Step 5] 체커보드 코너 검출
-    // 1) 그레이스케일 변환 (image.channels() == 3이면)
-    // 2) cv::findChessboardCorners(gray, boardSize_, corners, flags)
-    //    flags: CALIB_CB_ADAPTIVE_THRESH | CALIB_CB_NORMALIZE_IMAGE | CALIB_CB_FAST_CHECK
-    // 3) 검출 성공 시 cv::cornerSubPix()로 서브픽셀 정확도 개선
-    // 참고: basic.cpp의 detectChessboard()
-    // 기대값: 체커보드 이미지→true, 빈 이미지→false
-    return false;
-}
-
-double CameraCalibrationBasic::calibrate(const std::vector<std::vector<cv::Point2f>>& imagePoints,
-                                         cv::Size imageSize, cv::Mat& cameraMatrix,
-                                         cv::Mat& distCoeffs)
-{
-    // [Step 7] 캘리브레이션 수행 (가장 어려운 단계!)
-    // 1) generateObjectPoints()로 3D 점 생성
-    // 2) 모든 이미지에 동일한 objectPoints 배열 구성
-    // 3) cv::calibrateCamera(objectPoints, imagePoints, imageSize,
-    //                        cameraMatrix, distCoeffs, rvecs, tvecs)
-    // 참고: basic.cpp의 calibrate()
-    // 기대값: 시뮬레이션 데이터에서 RMS < 1.0
-    return -1.0;
-}
-
-void CameraCalibrationBasic::saveCalibration(const std::string& filename, const cv::Mat& K,
-                                             const cv::Mat& dist, cv::Size imageSize)
-{
-    // [Step 6] 캘리브레이션 결과를 YAML 파일로 저장
-    // 1) cv::FileStorage fs(filename, cv::FileStorage::WRITE)
-    // 2) fs << "camera_matrix" << K
-    // 3) fs << "distortion_coefficients" << dist
-    // 4) imageSize.width, imageSize.height도 저장
-    // 참고: basic.cpp의 saveCalibration()
-    // 기대값: YAML 파일 생성됨
-}
-
-void CameraCalibrationBasic::undistortImage(const cv::Mat& distorted, cv::Mat& undistorted,
-                                            const cv::Mat& K, const cv::Mat& dist)
-{
-    // [Step 4] 왜곡 보정 (한 줄!)
-    // 힌트: cv::undistort(distorted, undistorted, K, dist)
-    // 참고: basic.cpp의 undistortImage()
-    // 기대값: 출력 이미지 크기 = 입력 이미지 크기
-}
-
 std::string CameraCalibrationBasic::evaluateQuality(double rms)
 {
     // [Step 2] RMS 값에 따라 품질 등급 반환
@@ -100,6 +52,54 @@ std::vector<cv::Point3f> CameraCalibrationBasic::generateObjectPoints()
     // 참고: basic.cpp의 generateObjectPoints()
     // 기대값: 9×6=54개 점, 첫 점=(0,0,0), 간격=squareSize_
     return {};
+}
+
+void CameraCalibrationBasic::undistortImage(const cv::Mat& distorted, cv::Mat& undistorted,
+                                            const cv::Mat& K, const cv::Mat& dist)
+{
+    // [Step 4] 왜곡 보정 (한 줄!)
+    // 힌트: cv::undistort(distorted, undistorted, K, dist)
+    // 참고: basic.cpp의 undistortImage()
+    // 기대값: 출력 이미지 크기 = 입력 이미지 크기
+}
+
+bool CameraCalibrationBasic::detectChessboard(const cv::Mat& image,
+                                              std::vector<cv::Point2f>& corners)
+{
+    // [Step 5] 체커보드 코너 검출
+    // 1) 그레이스케일 변환 (image.channels() == 3이면)
+    // 2) cv::findChessboardCorners(gray, boardSize_, corners, flags)
+    //    flags: CALIB_CB_ADAPTIVE_THRESH | CALIB_CB_NORMALIZE_IMAGE | CALIB_CB_FAST_CHECK
+    // 3) 검출 성공 시 cv::cornerSubPix()로 서브픽셀 정확도 개선
+    // 참고: basic.cpp의 detectChessboard()
+    // 기대값: 체커보드 이미지→true, 빈 이미지→false
+    return false;
+}
+
+void CameraCalibrationBasic::saveCalibration(const std::string& filename, const cv::Mat& K,
+                                             const cv::Mat& dist, cv::Size imageSize)
+{
+    // [Step 6] 캘리브레이션 결과를 YAML 파일로 저장
+    // 1) cv::FileStorage fs(filename, cv::FileStorage::WRITE)
+    // 2) fs << "camera_matrix" << K
+    // 3) fs << "distortion_coefficients" << dist
+    // 4) imageSize.width, imageSize.height도 저장
+    // 참고: basic.cpp의 saveCalibration()
+    // 기대값: YAML 파일 생성됨
+}
+
+double CameraCalibrationBasic::calibrate(const std::vector<std::vector<cv::Point2f>>& imagePoints,
+                                         cv::Size imageSize, cv::Mat& cameraMatrix,
+                                         cv::Mat& distCoeffs)
+{
+    // [Step 7] 캘리브레이션 수행 (가장 어려운 단계!)
+    // 1) generateObjectPoints()로 3D 점 생성
+    // 2) 모든 이미지에 동일한 objectPoints 배열 구성
+    // 3) cv::calibrateCamera(objectPoints, imagePoints, imageSize,
+    //                        cameraMatrix, distCoeffs, rvecs, tvecs)
+    // 참고: basic.cpp의 calibrate()
+    // 기대값: 시뮬레이션 데이터에서 RMS < 1.0
+    return -1.0;
 }
 
 #ifndef MY_BASIC_LIB_ONLY
@@ -129,11 +129,9 @@ int main()
                                                                           : " ❌ 기대: 우수")
               << std::endl;
     std::cout << "   RMS 0.80 → " << q3
-              << (q3.find("양호") != std::string::npos ? " ✅" : " ❌ 기대: 양호")
-              << std::endl;
+              << (q3.find("양호") != std::string::npos ? " ✅" : " ❌ 기대: 양호") << std::endl;
     std::cout << "   RMS 1.50 → " << q4
-              << (q4.find("불량") != std::string::npos ? " ✅" : " ❌ 기대: 불량")
-              << std::endl;
+              << (q4.find("불량") != std::string::npos ? " ✅" : " ❌ 기대: 불량") << std::endl;
 
     // ── Step 3: generateObjectPoints ────────────
     std::cout << "\nStep 3: generateObjectPoints" << std::endl;
@@ -150,8 +148,8 @@ int main()
         {
             auto& second = obj_pts[1];
             bool gap_ok = (std::abs(second.x - 30.0f) < 0.01f);
-            std::cout << "   둘째 점: (" << second.x << ", " << second.y << ", " << second.z
-                      << ")" << (gap_ok ? " ✅ 간격=30mm" : " ❌ 기대: (30,0,0)") << std::endl;
+            std::cout << "   둘째 점: (" << second.x << ", " << second.y << ", " << second.z << ")"
+                      << (gap_ok ? " ✅ 간격=30mm" : " ❌ 기대: (30,0,0)") << std::endl;
         }
     }
 
@@ -183,8 +181,7 @@ int main()
     std::ifstream check_file(test_file);
     bool file_ok = check_file.good();
     check_file.close();
-    std::cout << "   파일 생성: " << test_file << (file_ok ? " ✅" : " ❌ 파일 없음")
-              << std::endl;
+    std::cout << "   파일 생성: " << test_file << (file_ok ? " ✅" : " ❌ 파일 없음") << std::endl;
     if (file_ok)
     {
         std::remove(test_file.c_str());
@@ -209,10 +206,8 @@ int main()
             for (int i = 0; i < 15; i++)
             {
                 std::vector<cv::Point2f> projected;
-                cv::Mat rvec =
-                    (cv::Mat_<double>(3, 1) << 0.1 * (i - 7), 0.05 * (i - 7), 0.02 * i);
-                cv::Mat tvec =
-                    (cv::Mat_<double>(3, 1) << 10 * (i - 7), 10 * (i - 7), 500 + 50 * i);
+                cv::Mat rvec = (cv::Mat_<double>(3, 1) << 0.1 * (i - 7), 0.05 * (i - 7), 0.02 * i);
+                cv::Mat tvec = (cv::Mat_<double>(3, 1) << 10 * (i - 7), 10 * (i - 7), 500 + 50 * i);
                 cv::projectPoints(objp, rvec, tvec, K_true, dist_true, projected);
                 for (auto& pt : projected)
                 {

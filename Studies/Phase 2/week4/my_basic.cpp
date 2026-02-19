@@ -39,6 +39,15 @@ double FeatureMatchingBasic::matchBruteForce(const cv::Mat& descriptors1,
     return 0.0;
 }
 
+double FeatureMatchingBasic::evaluateMatchQuality(const std::vector<cv::DMatch>& matches)
+{
+    // [Step 2] 매칭 품질 평가 (평균 거리)
+    // 모든 매칭의 distance 합 / 매칭 수
+    // 참고: basic.cpp의 evaluateMatchQuality()
+    // 기대값: 동일 디스크립터 매칭 → 평균 거리 = 0
+    return 0.0;
+}
+
 double FeatureMatchingBasic::matchFLANN(const cv::Mat& descriptors1, const cv::Mat& descriptors2,
                                         std::vector<cv::DMatch>& matches)
 {
@@ -63,6 +72,18 @@ int FeatureMatchingBasic::ratioTest(const cv::Mat& descriptors1, const cv::Mat& 
     return 0;
 }
 
+void FeatureMatchingBasic::visualizeMatches(const cv::Mat& img1,
+                                            const std::vector<cv::KeyPoint>& kp1,
+                                            const cv::Mat& img2,
+                                            const std::vector<cv::KeyPoint>& kp2,
+                                            const std::vector<cv::DMatch>& matches, cv::Mat& output)
+{
+    // [Step 5] 매칭 시각화
+    // cv::drawMatches(img1, kp1, img2, kp2, matches, output, ...)
+    // 참고: basic.cpp의 visualizeMatches()
+    // 기대값: output.empty() == false
+}
+
 double FeatureMatchingBasic::filterRANSAC(const std::vector<cv::KeyPoint>& keypoints1,
                                           const std::vector<cv::KeyPoint>& keypoints2,
                                           const std::vector<cv::DMatch>& matches,
@@ -76,27 +97,6 @@ double FeatureMatchingBasic::filterRANSAC(const std::vector<cv::KeyPoint>& keypo
     // 4) inlier 비율 반환
     // 참고: basic.cpp의 filterRANSAC()
     // 기대값: inlier_ratio > 0
-    return 0.0;
-}
-
-void FeatureMatchingBasic::visualizeMatches(const cv::Mat& img1,
-                                            const std::vector<cv::KeyPoint>& kp1,
-                                            const cv::Mat& img2,
-                                            const std::vector<cv::KeyPoint>& kp2,
-                                            const std::vector<cv::DMatch>& matches, cv::Mat& output)
-{
-    // [Step 5] 매칭 시각화
-    // cv::drawMatches(img1, kp1, img2, kp2, matches, output, ...)
-    // 참고: basic.cpp의 visualizeMatches()
-    // 기대값: output.empty() == false
-}
-
-double FeatureMatchingBasic::evaluateMatchQuality(const std::vector<cv::DMatch>& matches)
-{
-    // [Step 2] 매칭 품질 평가 (평균 거리)
-    // 모든 매칭의 distance 합 / 매칭 수
-    // 참고: basic.cpp의 evaluateMatchQuality()
-    // 기대값: 동일 디스크립터 매칭 → 평균 거리 = 0
     return 0.0;
 }
 

@@ -3,6 +3,11 @@
 #include <iomanip>
 #include <cmath>
 
+void PnPBasic::rodrigues(const cv::Mat& rvec, cv::Mat& R)
+{
+    cv::Rodrigues(rvec, R);
+}
+
 bool PnPBasic::solvePnP(const std::vector<cv::Point3f>& points3d,
                         const std::vector<cv::Point2f>& points2d, const cv::Mat& K, cv::Mat& rvec,
                         cv::Mat& tvec, int method)
@@ -53,11 +58,6 @@ int PnPBasic::solvePnPRansac(const std::vector<cv::Point3f>& points3d,
     }
 
     return inliers.size();
-}
-
-void PnPBasic::rodrigues(const cv::Mat& rvec, cv::Mat& R)
-{
-    cv::Rodrigues(rvec, R);
 }
 
 double PnPBasic::evaluatePose(const std::vector<cv::Point3f>& points3d,
@@ -117,6 +117,33 @@ void PnPBasic::visualizePnP(const cv::Mat& img, const std::vector<cv::Point3f>& 
     std::string info = "Reprojection Error: " + std::to_string(error).substr(0, 5) + " px";
     cv::putText(output, info, cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX, 0.8,
                 cv::Scalar(0, 255, 0), 2);
+}
+
+void PnPBasic::compareMethods()
+{
+    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "포즈 추정 방법 비교" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+
+    std::cout << "1️⃣  2D-2D (Essential Matrix)" << std::endl;
+    std::cout << "   입력: 두 이미지의 2D 대응점" << std::endl;
+    std::cout << "   출력: 상대 포즈 (R, t) ← 스케일 모호성!" << std::endl;
+    std::cout << "   사용: VO 초기화, 처음 두 프레임\n" << std::endl;
+
+    std::cout << "2️⃣  3D-2D (PnP)" << std::endl;
+    std::cout << "   입력: 3D 점 + 2D 관측" << std::endl;
+    std::cout << "   출력: 절대 포즈 (R, t) ← 스케일 복원!" << std::endl;
+    std::cout << "   사용: VO tracking, 매 프레임\n" << std::endl;
+
+    std::cout << "3️⃣  3D-3D (ICP)" << std::endl;
+    std::cout << "   입력: 두 3D 점군" << std::endl;
+    std::cout << "   출력: 상대 변환 (R, t)" << std::endl;
+    std::cout << "   사용: RGB-D SLAM, LiDAR\n" << std::endl;
+
+    std::cout << "💡 SLAM에서의 전형적인 흐름:" << std::endl;
+    std::cout << "   Frame 0-1: 2D-2D (Essential) → 초기화" << std::endl;
+    std::cout << "   Frame 1-2: 3D-2D (PnP) → Tracking" << std::endl;
+    std::cout << "   Frame 2-N: 계속 PnP..." << std::endl;
 }
 
 void PnPBasic::demoVisualOdometry(const cv::Mat& K)
@@ -182,33 +209,6 @@ void PnPBasic::demoVisualOdometry(const cv::Mat& K)
     }
 
     std::cout << "\n✅ Visual Odometry 완료!" << std::endl;
-}
-
-void PnPBasic::compareMethods()
-{
-    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
-    std::cout << "포즈 추정 방법 비교" << std::endl;
-    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
-
-    std::cout << "1️⃣  2D-2D (Essential Matrix)" << std::endl;
-    std::cout << "   입력: 두 이미지의 2D 대응점" << std::endl;
-    std::cout << "   출력: 상대 포즈 (R, t) ← 스케일 모호성!" << std::endl;
-    std::cout << "   사용: VO 초기화, 처음 두 프레임\n" << std::endl;
-
-    std::cout << "2️⃣  3D-2D (PnP)" << std::endl;
-    std::cout << "   입력: 3D 점 + 2D 관측" << std::endl;
-    std::cout << "   출력: 절대 포즈 (R, t) ← 스케일 복원!" << std::endl;
-    std::cout << "   사용: VO tracking, 매 프레임\n" << std::endl;
-
-    std::cout << "3️⃣  3D-3D (ICP)" << std::endl;
-    std::cout << "   입력: 두 3D 점군" << std::endl;
-    std::cout << "   출력: 상대 변환 (R, t)" << std::endl;
-    std::cout << "   사용: RGB-D SLAM, LiDAR\n" << std::endl;
-
-    std::cout << "💡 SLAM에서의 전형적인 흐름:" << std::endl;
-    std::cout << "   Frame 0-1: 2D-2D (Essential) → 초기화" << std::endl;
-    std::cout << "   Frame 1-2: 3D-2D (PnP) → Tracking" << std::endl;
-    std::cout << "   Frame 2-N: 계속 PnP..." << std::endl;
 }
 
 void PnPBasic::demoPipeline(const cv::Mat& K)

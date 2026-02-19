@@ -33,6 +33,30 @@ PinholeProjection::PinholeProjection(const cv::Mat &K, const cv::Mat &R, const c
 {
 }
 
+bool PinholeProjection::isInImage(const cv::Point2d &pixel, const cv::Size &imageSize)
+{
+    // [Step 1] 픽셀이 이미지 범위 안에 있는지 확인
+    // 힌트: 0 <= x < width && 0 <= y < height
+    // 참고: basic.cpp의 isInImage()
+    return pixel.x >= 0 && pixel.x < imageSize.width && pixel.y >= 0 && pixel.y < imageSize.height;
+}
+
+cv::Size2d PinholeProjection::computeFOV(const cv::Size &imageSize) const
+{
+    // [Step 2] 수평/수직 시야각 계산
+    // 공식: FOV = 2 * atan(image_size / (2 * focal_length))
+    // 힌트: std::atan2() 사용, 결과를 kRadToDeg로 변환
+    // 참고: basic.cpp의 computeFOV()
+    // 기대값: fx=600, width=800 → 약 67°
+    double fx = K_.at<double>(0, 0);
+    double fy = K_.at<double>(1, 1);
+
+    double fov_h = 2.0 * std::atan2(imageSize.width, 2.0 * fx) * kRadToDeg;
+    double fov_v = 2.0 * std::atan2(imageSize.height, 2.0 * fy) * kRadToDeg;
+
+    return cv::Size2d(fov_h, fov_v);
+}
+
 cv::Point2d PinholeProjection::project(const cv::Point3d &P_world) const
 {
     // [Step 3] 3D 월드 좌표 → 2D 픽셀 좌표 투영 (핵심!)
@@ -69,22 +93,6 @@ cv::Point2d PinholeProjection::project(const cv::Point3d &P_world) const
     return cv::Point2d(u, v);
 }
 
-std::vector<cv::Point2d> PinholeProjection::projectMultiple(
-    const std::vector<cv::Point3d> &points_3d) const
-{
-    // [Step 5] 여러 점을 한번에 투영
-    // 힌트: project()를 반복 호출
-    // 참고: basic.cpp의 projectMultiple()
-    std::vector<cv::Point2d> pixels;
-    pixels.reserve(points_3d.size());
-
-    for (const auto &pt : points_3d)
-    {
-        pixels.push_back(project(pt));
-    }
-    return pixels;
-}
-
 cv::Vec3d PinholeProjection::backProject(const cv::Point2d &pixel) const
 {
     // [Step 4] 2D 픽셀 → 3D 광선 방향 (정규화된 단위 벡터)
@@ -106,20 +114,20 @@ cv::Vec3d PinholeProjection::backProject(const cv::Point2d &pixel) const
     return ray / norm;
 }
 
-cv::Size2d PinholeProjection::computeFOV(const cv::Size &imageSize) const
+std::vector<cv::Point2d> PinholeProjection::projectMultiple(
+    const std::vector<cv::Point3d> &points_3d) const
 {
-    // [Step 2] 수평/수직 시야각 계산
-    // 공식: FOV = 2 * atan(image_size / (2 * focal_length))
-    // 힌트: std::atan2() 사용, 결과를 kRadToDeg로 변환
-    // 참고: basic.cpp의 computeFOV()
-    // 기대값: fx=600, width=800 → 약 67°
-    double fx = K_.at<double>(0, 0);
-    double fy = K_.at<double>(1, 1);
+    // [Step 5] 여러 점을 한번에 투영
+    // 힌트: project()를 반복 호출
+    // 참고: basic.cpp의 projectMultiple()
+    std::vector<cv::Point2d> pixels;
+    pixels.reserve(points_3d.size());
 
-    double fov_h = 2.0 * std::atan2(imageSize.width, 2.0 * fx) * kRadToDeg;
-    double fov_v = 2.0 * std::atan2(imageSize.height, 2.0 * fy) * kRadToDeg;
-
-    return cv::Size2d(fov_h, fov_v);
+    for (const auto &pt : points_3d)
+    {
+        pixels.push_back(project(pt));
+    }
+    return pixels;
 }
 
 double PinholeProjection::reprojectionError(const cv::Point3d &P_world,
@@ -139,14 +147,6 @@ double PinholeProjection::reprojectionError(const cv::Point3d &P_world,
     double dy = projected.y - observed_pixel.y;
 
     return std::sqrt(dx * dx + dy * dy);
-}
-
-bool PinholeProjection::isInImage(const cv::Point2d &pixel, const cv::Size &imageSize)
-{
-    // [Step 1] 픽셀이 이미지 범위 안에 있는지 확인
-    // 힌트: 0 <= x < width && 0 <= y < height
-    // 참고: basic.cpp의 isInImage()
-    return pixel.x >= 0 && pixel.x < imageSize.width && pixel.y >= 0 && pixel.y < imageSize.height;
 }
 
 #ifndef MY_BASIC_LIB_ONLY

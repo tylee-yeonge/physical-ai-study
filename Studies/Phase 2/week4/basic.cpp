@@ -22,6 +22,20 @@ double FeatureMatchingBasic::matchBruteForce(const cv::Mat& descriptors1,
     return duration.count() / 1000.0;  // ms
 }
 
+double FeatureMatchingBasic::evaluateMatchQuality(const std::vector<cv::DMatch>& matches)
+{
+    if (matches.empty())
+        return 0.0;
+
+    double total_distance = 0.0;
+    for (const auto& match : matches)
+    {
+        total_distance += match.distance;
+    }
+
+    return total_distance / matches.size();
+}
+
 double FeatureMatchingBasic::matchFLANN(const cv::Mat& descriptors1, const cv::Mat& descriptors2,
                                         std::vector<cv::DMatch>& matches)
 {
@@ -78,6 +92,23 @@ int FeatureMatchingBasic::ratioTest(const cv::Mat& descriptors1, const cv::Mat& 
     return good_matches.size();
 }
 
+void FeatureMatchingBasic::visualizeMatches(const cv::Mat& img1,
+                                            const std::vector<cv::KeyPoint>& kp1,
+                                            const cv::Mat& img2,
+                                            const std::vector<cv::KeyPoint>& kp2,
+                                            const std::vector<cv::DMatch>& matches, cv::Mat& output)
+{
+    // 매칭 선 그리기
+    cv::drawMatches(img1, kp1, img2, kp2, matches, output, cv::Scalar(0, 255, 0),  // 매칭 선: 녹색
+                    cv::Scalar(255, 0, 0),                                         // 특징점: 파란색
+                    std::vector<char>(), cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
+
+    // 정보 텍스트
+    std::string info = "Matches: " + std::to_string(matches.size());
+    cv::putText(output, info, cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX, 1.0,
+                cv::Scalar(0, 255, 0), 2);
+}
+
 double FeatureMatchingBasic::filterRANSAC(const std::vector<cv::KeyPoint>& keypoints1,
                                           const std::vector<cv::KeyPoint>& keypoints2,
                                           const std::vector<cv::DMatch>& matches,
@@ -117,37 +148,6 @@ double FeatureMatchingBasic::filterRANSAC(const std::vector<cv::KeyPoint>& keypo
     double inlier_ratio = (double)inlier_matches.size() / matches.size();
 
     return inlier_ratio;
-}
-
-void FeatureMatchingBasic::visualizeMatches(const cv::Mat& img1,
-                                            const std::vector<cv::KeyPoint>& kp1,
-                                            const cv::Mat& img2,
-                                            const std::vector<cv::KeyPoint>& kp2,
-                                            const std::vector<cv::DMatch>& matches, cv::Mat& output)
-{
-    // 매칭 선 그리기
-    cv::drawMatches(img1, kp1, img2, kp2, matches, output, cv::Scalar(0, 255, 0),  // 매칭 선: 녹색
-                    cv::Scalar(255, 0, 0),                                         // 특징점: 파란색
-                    std::vector<char>(), cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
-
-    // 정보 텍스트
-    std::string info = "Matches: " + std::to_string(matches.size());
-    cv::putText(output, info, cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX, 1.0,
-                cv::Scalar(0, 255, 0), 2);
-}
-
-double FeatureMatchingBasic::evaluateMatchQuality(const std::vector<cv::DMatch>& matches)
-{
-    if (matches.empty())
-        return 0.0;
-
-    double total_distance = 0.0;
-    for (const auto& match : matches)
-    {
-        total_distance += match.distance;
-    }
-
-    return total_distance / matches.size();
 }
 
 void FeatureMatchingBasic::demoPipeline(const cv::Mat& img1, const cv::Mat& img2)
