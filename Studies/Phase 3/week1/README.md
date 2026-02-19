@@ -13,8 +13,22 @@
 | 1 | 데모 실행 | `basic.cpp` | 빌드 후 `./basic` 실행, 결과 먼저 관찰 |
 | 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
 | 3 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | VO 데이터 구조와 파이프라인 단계 구현 |
-| 4 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | 포즈 합성과 스케일 모호성 시뮬레이션 |
-| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | VO 파이프라인 직접 구현 및 검증 |
+| 4 | 내 구현 (Step 1~2) | `my_basic.cpp` | Camera/Pose 생성 + 합성 연습 |
+| 5 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | 포즈 합성과 스케일 모호성 시뮬레이션 |
+| 6 | 내 구현 (Step 3~4) | `my_basic.cpp` | Frame/MapPoint + 드리프트 시뮬레이션 |
+| 7 | 실습 | [PRACTICE.md](./PRACTICE.md) | VO 파이프라인 직접 구현 및 검증 |
+
+### 퀴즈 매핑
+
+| 퀴즈 | 문제 | 주제 | 관련 basic.cpp 함수 |
+|------|------|------|---------------------|
+| easy | 문제 1 | VO vs SLAM | `demoVOvsSLAM()` |
+| easy | 문제 2 | 스케일 모호성 | `demoScaleAmbiguity()` |
+| easy | 문제 3 | VO 파이프라인 | `demoPipeline()` |
+| easy | 문제 4 | VO 유형 | `demoVOTypes()` |
+| medium | 문제 1 | 드리프트 분석 | `demoVOvsSLAM()` |
+| medium | 문제 2 | Frontend vs Backend | `demoPipeline()` |
+| medium | 문제 3 | 실시간 VO | `demoPipeline()` |
 
 ---
 

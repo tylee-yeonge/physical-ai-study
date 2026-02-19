@@ -14,7 +14,22 @@
 | 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
 | 3 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | Keyframe 목적, 선택 조건, Culling 기준 확인 |
 | 4 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | ORB-SLAM vs VINS 비교, Covisibility 분석 |
-| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | Keyframe 선택/제거 로직 구현 및 VO 통합 |
+| 5 | 직접 구현 (Step 1-2) | `my_basic.cpp` | addCovisibility, getCovisibleKeyframes 구현 |
+| 6 | 직접 구현 (Step 3-5) | `my_basic.cpp` | needNewKeyframe, isRedundant, cullRedundant 구현 |
+| 7 | 실습 | [PRACTICE.md](./PRACTICE.md) | Keyframe 선택/제거 로직 구현 및 VO 통합 |
+
+### 퀴즈 ↔ basic.cpp 매핑
+
+| 퀴즈 | 문제 | basic.cpp 교육 블록 |
+|:----:|------|-------------------|
+| easy Q1 | Keyframe 사용 이유 3가지 | `demoKeyframeSelection()` — Keyframe 정의 |
+| easy Q2 | ORB-SLAM 기본 조건 (20프레임) | `demoKeyframeSelection()` — 조건별 판단 시연 |
+| easy Q3 | Culling 목적 | `demoCullingRule()` — 90% Rule 소개 |
+| easy Q4 | 90% rule 설명 | `demoCullingRule()` — 수치 예시 |
+| easy Q5 | Covisibility graph 용도 | `demoCovisibility()` — 3가지 용도 |
+| medium Q1 | ORB-SLAM vs VINS 차이 | `demoKeyframeSelection()` — 두 방식 비교 |
+| medium Q3 | Covisibility가 높은 KF | `demoCovisibility()` — 그래프 시연 |
+| medium Q4 | 첫 KF 보호 이유 | `demoCullingRule()` — 좌표계 원점 |
 
 ---
 

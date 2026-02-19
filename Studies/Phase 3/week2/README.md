@@ -14,8 +14,22 @@
 | 1 | 데모 실행 | `basic.cpp` | 빌드 후 `./basic` 실행, 결과 먼저 관찰 |
 | 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
 | 3 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | Essential vs Fundamental, 5-Point 등 개념 확인 |
-| 4 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | Pure Rotation, Degenerate Case 등 특수 상황 분석 |
-| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | Essential Matrix 추정 및 포즈 복원 직접 구현 |
+| 4 | 내 구현 (Step 1~3) | `my_basic.cpp` | E 추정 + 포즈 복원 + 좌표 정규화 |
+| 5 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | Pure Rotation, Degenerate Case 등 특수 상황 분석 |
+| 6 | 내 구현 (Step 4~5) | `my_basic.cpp` | 삼각측량 + 전체 파이프라인 |
+| 7 | 실습 | [PRACTICE.md](./PRACTICE.md) | Essential Matrix 추정 및 포즈 복원 직접 구현 |
+
+### 퀴즈 매핑
+
+| 퀴즈 | 문제 | 주제 | 관련 basic.cpp 블록 |
+|------|------|------|---------------------|
+| easy | 문제 1 | Essential vs Fundamental | `[Essential vs Fundamental]` 블록 |
+| easy | 문제 2 | 5-Point Algorithm | `[5-Point Algorithm]` 블록 |
+| easy | 문제 3 | Cheirality Check | `[Cheirality Check]` 블록 |
+| easy | 문제 4 | 스케일 모호성 | `demo()` 스케일 출력 |
+| medium | 문제 1 | Pure Rotation | `demo()` 이론 연결 |
+| medium | 문제 2 | Degenerate Case | `demo()` 이론 연결 |
+| medium | 문제 3 | Cheirality 구현 | `recoverPose()` |
 
 ---
 

@@ -10,10 +10,25 @@
 
 | 순서 | 단계 | 파일 | 설명 |
 |:----:|------|------|------|
-| 1 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 2 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | Stereo depth 공식, Vision-IMU 상호 보완 확인 |
-| 3 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | Stereo depth 계산, IMU 드리프트 시뮬레이션 |
-| 4 | 실습 | [PRACTICE.md](./PRACTICE.md) | 스케일 복구 방법 비교 및 VIO 필요성 분석 |
+| 1 | 데모 실행 | `basic.cpp` | 빌드 후 `./basic` 실행, Stereo/IMU/VIO 비교 |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | Stereo depth 공식, Vision-IMU 보완, VIO 정의 |
+| 4 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | Depth 계산, IMU 적분, 센서 비교 |
+| 5 | 직접 구현 (Step 1-2) | `my_basic.cpp` | compute_stereo_depth, simulate_imu |
+| 6 | 직접 구현 (Step 3-5) | `my_basic.cpp` | compare_methods, fuse_vision_imu, analyze |
+| 7 | 실습 | [PRACTICE.md](./PRACTICE.md) | 스케일 복구 방법 비교 및 VIO 필요성 분석 |
+
+### 퀴즈 ↔ basic.cpp 매핑
+
+| 퀴즈 | 문제 | basic.cpp 교육 블록 |
+|:----:|------|-------------------|
+| easy Q1 | Stereo Depth 공식 | `demoStereoDepth()` — depth = f*b/d |
+| easy Q2 | Vision-IMU 상호 보완 | `demoIMUIntegration()` — 바이어스 보정 |
+| easy Q3 | GPS 실내 한계 | `demoMethodComparison()` — 센서 비교 |
+| easy Q4 | VIO 정의 | `demoMethodComparison()` — VIO 설명 |
+| medium Q1 | Stereo depth 계산 | `demoStereoDepth()` — disparity별 깊이 |
+| medium Q2 | IMU 적분 | `demoIMUIntegration()` — 적분 수식 + 바이어스 |
+| medium Q3 | 센서 비교 분석 | `demoMethodComparison()` — Mono/Stereo/VIO |
 
 ---
 
@@ -342,17 +357,17 @@ Stereo → 비용 허용 시 가장 간단한 해결책
 
 | 주차 | 주제 | 핵심 개념 |
 |------|------|----------|
-| **Week 1** | 특징점 검출 (ORB) | Keypoint, Descriptor, ORB 알고리즘 |
-| **Week 2** | 특징점 매칭 | BF Matcher, FLANN, 비율 테스트 |
-| **Week 3** | Epipolar Geometry | Essential Matrix, Fundamental Matrix |
-| **Week 4** | 포즈 복원 | R, t 분해, 삼각측량 |
-| **Week 5** | Visual Odometry | 프레임 간 추적, 궤적 추정 |
-| **Week 6** | Bundle Adjustment 이론 | 비선형 최적화, Gauss-Newton |
-| **Week 7** | BA 실습 (g2o) | Vertex, Edge, g2o 구현 |
-| **Week 8** | BA 실습 (Ceres) | 자동 미분, Cost Function |
-| **Week 9** | BA 최적화 기법 | Schur Complement, 희소 구조 |
-| **Week 10** | g2o 심화 | Solver 구조, 내부 동작 |
-| **Week 11** | Ceres 심화 | 파라미터화, Manifold |
+| **Week 1** | VO 개요 | VO 파이프라인, 스케일 모호성, VO vs SLAM |
+| **Week 2** | 2D-2D 모션 추정 | Essential Matrix, 5-Point, Cheirality Check |
+| **Week 3** | 3D-2D PnP | P3P, EPnP, RANSAC, 스케일 복원 |
+| **Week 4** | 3D-3D ICP | SVD 정합, 반복 ICP, 최근접점 |
+| **Week 5** | Mini VO | Week 2+3 통합, 초기화→추적 파이프라인 |
+| **Week 6** | Keyframe Management | 키프레임 선택, Culling, Covisibility |
+| **Week 7** | BA 개념 (g2o) | Vertex, Edge, Gauge Freedom, RobustKernel |
+| **Week 8** | BA (Ceres) | 자동 미분, Cost Function, DENSE_SCHUR |
+| **Week 9** | BA 최적화 기법 | Schur Complement, 희소 구조, Hessian |
+| **Week 10** | g2o 심화 | Solver 구조, BlockSolver, Marginalization |
+| **Week 11** | Ceres 실습 | BAL 모델, Snavely 카메라, 수렴 관찰 |
 | **Week 12** | 스케일 모호성 | 단안 카메라의 한계, 스케일 드리프트 |
 | **Week 13** | 스케일 복구 방법 | Stereo, IMU 융합, VIO 필요성 |
 

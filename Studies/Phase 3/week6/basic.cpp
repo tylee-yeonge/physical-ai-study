@@ -197,6 +197,126 @@ std::vector<Keyframe*> CovisibilityGraph::getLocalKeyframes(Keyframe* curr_kf, i
 }
 
 // ====================
+// 교육 블록
+// ====================
+
+// 💡 quiz_easy Q1: Keyframe을 사용하는 주요 이유 3가지
+// 💡 quiz_easy Q2: ORB-SLAM 기본 조건 (20프레임)
+// 💡 quiz_medium Q1: ORB-SLAM vs VINS 차이
+void demoKeyframeSelection()
+{
+    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "📖 Keyframe 선택 기준 4가지" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+
+    std::cout << "Keyframe = 맵 구축/최적화에 사용되는 '중요한 프레임'\n" << std::endl;
+
+    std::cout << "ORB-SLAM 선택 기준:" << std::endl;
+    std::cout << "  기본: num_frames >= 20 AND Local Mapping idle" << std::endl;
+    std::cout << "  조건A: num_frames >= 30    (최대 간격)" << std::endl;
+    std::cout << "  조건B: tracked < 0.5       (추적 품질 저하)" << std::endl;
+    std::cout << "  조건C: parallax > 10px     (충분한 시차)\n" << std::endl;
+
+    std::cout << "VINS-Mono 선택 기준:" << std::endl;
+    std::cout << "  avg_parallax > 10px  (시차 기반)\n" << std::endl;
+
+    // 수치 시연: 조건별 판단
+    KeyframeSelector selector(20, 30, 0.5, 10.0);
+
+    struct TestCase
+    {
+        const char* desc;
+        int frames;
+        int tracked;
+        int total;
+        double parallax;
+    };
+
+    TestCase cases[] = {
+        {"너무 이른 프레임", 5, 80, 100, 5.0},
+        {"최대 간격 도달", 30, 80, 100, 5.0},
+        {"추적 품질 저하", 25, 30, 100, 3.0},
+        {"시차 충분", 22, 80, 100, 15.0},
+        {"양호 (KF 불필요)", 22, 80, 100, 5.0},
+    };
+
+    for (auto& tc : cases)
+    {
+        bool need = selector.needNewKeyframe(tc.frames, tc.tracked, tc.total, tc.parallax);
+        std::cout << "  " << tc.desc << ": " << (need ? "KF 필요!" : "불필요") << std::endl;
+    }
+}
+
+// 💡 quiz_easy Q3: Culling 목적
+// 💡 quiz_easy Q4: 90% rule
+// 💡 quiz_medium Q4: 첫 KF를 제거하지 않는 이유
+void demoCullingRule()
+{
+    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "📖 90% Culling Rule 수치 예시" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+
+    std::cout << "기준: KF의 맵 포인트 중 90%가 다른 3+ KF에서도 관측\n" << std::endl;
+
+    // 수치 예시
+    std::cout << "예시: Keyframe A가 10개 맵 포인트를 관측" << std::endl;
+    std::cout << "  Point 1: 4개 KF에서 관측  → 중복" << std::endl;
+    std::cout << "  Point 2: 3개 KF에서 관측  → 중복" << std::endl;
+    std::cout << "  Point 3: 5개 KF에서 관측  → 중복" << std::endl;
+    std::cout << "  Point 4: 1개 KF에서 관측  → 고유!" << std::endl;
+    std::cout << "  ..." << std::endl;
+    std::cout << "  중복 9/10 = 90%  → KF A 제거!" << std::endl;
+    std::cout << "  중복 8/10 = 80%  → KF A 유지\n" << std::endl;
+
+    std::cout << "💡 첫 KF는 절대 제거하지 않음" << std::endl;
+    std::cout << "   → 좌표계 원점, 전체 맵의 기준점!" << std::endl;
+}
+
+// 💡 quiz_easy Q5: Covisibility graph 용도
+// 💡 quiz_medium Q3: Covisibility가 높은 KF란
+void demoCovisibility()
+{
+    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "📖 Covisibility Graph 활용" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+
+    std::cout << "Covisibility = 같은 맵 포인트를 공유하는 KF 관계\n" << std::endl;
+
+    // 실제 그래프 생성 시연
+    cv::Mat dummy_img = cv::Mat::zeros(480, 640, CV_8UC1);
+    Keyframe kf0(0, dummy_img), kf1(1, dummy_img), kf2(2, dummy_img), kf3(3, dummy_img);
+
+    kf0.addCovisibility(&kf1, 25);
+    kf0.addCovisibility(&kf2, 15);
+    kf1.addCovisibility(&kf0, 25);
+    kf1.addCovisibility(&kf2, 10);
+    kf1.addCovisibility(&kf3, 20);
+    kf2.addCovisibility(&kf0, 15);
+    kf2.addCovisibility(&kf1, 10);
+    kf3.addCovisibility(&kf1, 20);
+
+    std::cout << "그래프:" << std::endl;
+    std::cout << "  KF0 --25-- KF1 --20-- KF3" << std::endl;
+    std::cout << "   \\         /" << std::endl;
+    std::cout << "   15      10" << std::endl;
+    std::cout << "     \\   /" << std::endl;
+    std::cout << "      KF2\n" << std::endl;
+
+    // Local BA 범위 결정
+    auto local = kf1.getCovisibleKeyframes(15);
+    std::cout << "KF1의 Local BA 대상 (>=15 공유):" << std::endl;
+    for (auto* kf : local)
+    {
+        std::cout << "  KF" << kf->id << std::endl;
+    }
+
+    std::cout << "\n💡 Covisibility 용도:" << std::endl;
+    std::cout << "  1. Local BA 범위 결정" << std::endl;
+    std::cout << "  2. Loop Closure 후보 탐색" << std::endl;
+    std::cout << "  3. Relocalization 재시도" << std::endl;
+}
+
+// ====================
 // Demo
 // ====================
 
@@ -264,15 +384,22 @@ int main()
     std::cout << "  Phase 3 Week 6: Keyframe Management" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
+    // 교육 블록
+    demoKeyframeSelection();
+    demoCullingRule();
+    demoCovisibility();
+
+    // 시뮬레이션 데모
     demoKeyframeManagement();
 
-    std::cout << "\n💡 핵심 내용:" << std::endl;
-    std::cout << "   - Keyframe 선택 (시차, 품질, 간격)" << std::endl;
-    std::cout << "   - Culling (90% redundancy rule)" << std::endl;
-    std::cout << "   - Covisibility graph 관리" << std::endl;
-    std::cout << "   - 맵 크기 제어\n" << std::endl;
-
-    std::cout << "다음: Week 7 - Local Bundle Adjustment\n" << std::endl;
+    // 다음 단계 안내
+    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "📌 다음 단계:" << std::endl;
+    std::cout << "  1. quiz_easy    → Keyframe 목적, 선택 조건, Culling" << std::endl;
+    std::cout << "  2. quiz_medium  → ORB-SLAM vs VINS, Covisibility" << std::endl;
+    std::cout << "  3. my_basic.cpp → 직접 구현 (5 Step)" << std::endl;
+    std::cout << "  4. Week 7       → Local Bundle Adjustment" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
     return 0;
 }

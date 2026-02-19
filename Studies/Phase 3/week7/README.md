@@ -8,12 +8,31 @@
 
 ## 📋 학습 순서
 
+> ⚠️ **빌드 환경**: basic / my_basic은 Ubuntu + g2o 필요. macOS에서는 quiz만 실행 가능.
+> 설치: `sudo apt install libg2o-dev` 또는 소스 빌드 참고
+
 | 순서 | 단계 | 파일 | 설명 |
 |:----:|------|------|------|
 | 1 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 2 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | BA 목적함수, g2o Vertex/Edge 개념 확인 |
-| 3 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | Schur Complement, setMarginalized 동작 분석 |
-| 4 | 실습 | [PRACTICE.md](./PRACTICE.md) | g2o로 간단한 BA 구현 및 Robust Kernel 적용 |
+| 2 | 데모 실행 | `basic.cpp` | `./basic` — BA 구조, Robust Kernel, Gauge Freedom 시연 |
+| 3 | 직접 구현 | `my_basic.cpp` | Step 1-6 TODO 채우기 → `./my_basic`로 검증 |
+| 4 | 헤더 참조 | `ba_basic.h` | 함수 시그니처 + Doxygen 주석 확인 |
+| 5 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | BA 목적함수, g2o Vertex/Edge 개념 확인 |
+| 6 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | Schur Complement, setMarginalized 동작 분석 |
+| 7 | 실습 | [PRACTICE.md](./PRACTICE.md) | g2o로 간단한 BA 구현 및 Robust Kernel 적용 |
+
+### 퀴즈 ↔ basic.cpp 매핑
+
+| 퀴즈 | 문제 | basic.cpp 블록 |
+|------|------|---------------|
+| easy Q1 | BA 최소화 대상 (재투영 오차) | 블록 1: BA 구조 |
+| easy Q2 | g2o Vertex = 최적화 변수 | 블록 1: BA 구조 |
+| easy Q3 | Edge = 제약 조건 | 블록 1: BA 구조 |
+| easy Q4 | Huber Loss 목적 | 블록 2: Robust Kernel |
+| easy Q5 | Schur Complement 장점 | 블록 3: Gauge Freedom |
+| medium Q1 | Schur에서 먼저 최적화 | 블록 3: Gauge Freedom |
+| medium Q2 | setMarginalized 대상 | 블록 3: Gauge Freedom |
+| medium Q3 | setFixed 이유 | 블록 3: Gauge Freedom |
 
 ---
 

@@ -66,9 +66,11 @@ int main()
     std::cout << "Week 1 Quiz - Medium" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
 
-    problem1_drift() problem2_frontend_vs_backend() problem3_vo_realtime()
+    problem1_drift();
+    problem2_frontend_vs_backend();
+    problem3_vo_realtime();
 
-            std::cout
+    std::cout
         << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "정답은 quiz_solutions/medium_sol.cpp 참고" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

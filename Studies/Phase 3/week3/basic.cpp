@@ -118,6 +118,22 @@ void Motion3D2D::demo()
     std::cout << "3D-2D 모션 추정 (PnP) 데모" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
+    // 💡 교육 블록: PnP 정의 + P3P vs EPnP
+    std::cout << "💡 [PnP 개요]" << std::endl;
+    std::cout << "   입력: n개의 {3D 점 Xᵢ, 2D 관측 xᵢ} 대응" << std::endl;
+    std::cout << "   출력: 카메라 포즈 [R|t] (실제 스케일!)" << std::endl;
+    std::cout << "   💡 이 정의가 quiz_easy 문제 1!\n" << std::endl;
+
+    std::cout << "💡 [P3P vs EPnP]" << std::endl;
+    std::cout << "   P3P: 최소 3점, 4해, RANSAC용" << std::endl;
+    std::cout << "   EPnP: n점 O(n), 안정적, OpenCV 기본" << std::endl;
+    std::cout << "   💡 이 비교가 quiz_easy 문제 2!\n" << std::endl;
+
+    std::cout << "💡 [스케일 복원]" << std::endl;
+    std::cout << "   2D-2D: ||t||=1 (정규화) → 스케일 모호" << std::endl;
+    std::cout << "   3D-2D: 3D 점의 절대 크기 알고 있음 → 실제 t!" << std::endl;
+    std::cout << "   💡 이 개념이 quiz_easy 문제 3!\n" << std::endl;
+
     // 카메라 파라미터
     cv::Mat K = (cv::Mat_<double>(3, 3) << 600.0, 0.0, 400.0, 0.0, 600.0, 300.0, 0.0, 0.0, 1.0);
 
@@ -164,7 +180,14 @@ void Motion3D2D::demo()
 
     // 재투영 오차
     double reproj_error = computeReprojectionError(map_points, observations, K, rvec_est, tvec_est);
-    std::cout << "재투영 오차: " << std::setprecision(2) << reproj_error << " px\n" << std::endl;
+    std::cout << "재투영 오차: " << std::setprecision(2) << reproj_error << " px" << std::endl;
+    std::cout << "   💡 이 오차 개념이 quiz_medium 문제 2!\n" << std::endl;
+
+    std::cout << "💡 [Inlier Ratio 해석]" << std::endl;
+    double inlier_ratio = (double)inlier_count / map_points.size();
+    std::cout << "   현재: " << std::setprecision(1) << inlier_ratio * 100 << "%" << std::endl;
+    std::cout << "   > 70%: 양호 / > 50%: 보통 / < 30%: 추적 실패" << std::endl;
+    std::cout << "   💡 이 기준이 quiz_easy 문제 4!\n" << std::endl;
 
     // VO 추적 시뮬레이션
     simulateTracking(map_points, K, 5);
@@ -188,6 +211,12 @@ int main()
     std::cout << "   - RANSAC으로 Outlier 제거" << std::endl;
     std::cout << "   - ✅ 절대 스케일 복원!" << std::endl;
     std::cout << "   - VO 추적의 핵심 방법\n" << std::endl;
+
+    std::cout << "💡 다음 단계 (README.md 학습 순서 참고):" << std::endl;
+    std::cout << "   1. README.md에서 PnP 이론 읽기 → quiz_easy 문제 1~3" << std::endl;
+    std::cout << "   2. my_basic.cpp Step 1~3 구현 → quiz_easy 문제 4" << std::endl;
+    std::cout << "   3. my_basic.cpp Step 4~6 구현 → quiz_medium 문제 1~3" << std::endl;
+    std::cout << "   4. PRACTICE.md에서 추가 실습\n" << std::endl;
 
     std::cout << "다음: Week 4 - 3D-3D 모션 추정 (ICP)\n" << std::endl;
 

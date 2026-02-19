@@ -74,10 +74,12 @@ int main()
     std::cout << "Week 2 Quiz - Easy" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
 
-    problem1_essential_vs_fundamental() problem2_five_point() problem3_cheirality()
-            problem4_scale_ambiguity()
+    problem1_essential_vs_fundamental();
+    problem2_five_point();
+    problem3_cheirality();
+    problem4_scale_ambiguity();
 
-                std::cout
+    std::cout
         << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

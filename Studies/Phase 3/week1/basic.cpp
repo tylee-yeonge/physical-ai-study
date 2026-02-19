@@ -41,6 +41,11 @@ void demoPipeline()
     std::cout << "6️⃣  포즈 출력" << std::endl;
     std::cout << "   - 카메라 위치 (R, t)" << std::endl;
     std::cout << "   - 궤적 저장/시각화\n" << std::endl;
+
+    std::cout << "💡 VINS-Mono 연결:" << std::endl;
+    std::cout << "   위 1~4단계 = VINS의 프론트엔드 (VO)" << std::endl;
+    std::cout << "   5단계 = VINS의 백엔드 (BA + Marginalization)" << std::endl;
+    std::cout << "   💡 이 파이프라인이 quiz_easy 문제 3!\n" << std::endl;
 }
 
 void demoDataStructures()
@@ -103,6 +108,8 @@ void demoVOTypes()
     std::cout << "   ✅ 빠른 처리" << std::endl;
     std::cout << "   ⚠️  실외/햇빛 약함" << std::endl;
     std::cout << "   사용: 실내 AR\n" << std::endl;
+
+    std::cout << "💡 이 비교가 quiz_easy 문제 4!\n" << std::endl;
 }
 
 void demoScaleAmbiguity()
@@ -128,6 +135,41 @@ void demoScaleAmbiguity()
     std::cout << "   1. IMU와 결합 (VIO)" << std::endl;
     std::cout << "   2. 스테레오 카메라" << std::endl;
     std::cout << "   3. 알려진 물체 크기" << std::endl;
+
+    std::cout << "\n💡 이 개념이 quiz_easy 문제 2, quiz_medium 문제 1!\n" << std::endl;
+}
+
+void demoVOvsSLAM()
+{
+    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "VO vs SLAM 비교" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+
+    std::cout << "┌────────────┬───────────┬────────────┐" << std::endl;
+    std::cout << "│   항목      │    VO     │    SLAM    │" << std::endl;
+    std::cout << "├────────────┼───────────┼────────────┤" << std::endl;
+    std::cout << "│ Loop Close │    ❌     │     ✅     │" << std::endl;
+    std::cout << "│ 오차 누적   │  계속 증가 │  보정 가능  │" << std::endl;
+    std::cout << "│ 지도 생성   │    ❌     │     ✅     │" << std::endl;
+    std::cout << "│ 계산량      │   가벼움   │   무거움   │" << std::endl;
+    std::cout << "│ 메모리      │ 적음(로컬) │ 많음(전역) │" << std::endl;
+    std::cout << "└────────────┴───────────┴────────────┘\n" << std::endl;
+
+    // 드리프트 수치 시연
+    std::cout << "📊 드리프트 누적 시연 (매 프레임 1% 오차):" << std::endl;
+    double cum_error = 1.0;
+    constexpr int kFrameStep = 20;
+    constexpr int kMaxFrame = 100;
+    for (int frame = 0; frame <= kMaxFrame; frame += kFrameStep)
+    {
+        if (frame > 0)
+            cum_error *= std::pow(1.01, kFrameStep);
+        std::cout << "   Frame " << std::setw(3) << frame << ": "
+                  << std::fixed << std::setprecision(2) << cum_error << "x" << std::endl;
+    }
+
+    std::cout << "\n💡 VO는 드리프트를 막을 수 없음 → SLAM의 Loop Closure 필요!" << std::endl;
+    std::cout << "   💡 이 내용이 quiz_easy 문제 1, quiz_medium 문제 2!\n" << std::endl;
 }
 
 #ifndef BASIC_LIB_ONLY
@@ -141,6 +183,7 @@ int main()
     demoDataStructures();
     demoVOTypes();
     demoScaleAmbiguity();
+    demoVOvsSLAM();
 
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "✅ Week 1 완료!" << std::endl;
@@ -150,6 +193,12 @@ int main()
     std::cout << "   - VO = 연속 이미지로 포즈 추정" << std::endl;
     std::cout << "   - SLAM의 프론트엔드" << std::endl;
     std::cout << "   - Monocular VO의 스케일 모호성\n" << std::endl;
+
+    std::cout << "💡 다음 단계 (README.md 학습 순서 참고):" << std::endl;
+    std::cout << "   1. README.md에서 VO/SLAM 이론 읽기 → quiz_easy 문제 1~2" << std::endl;
+    std::cout << "   2. my_basic.cpp Step 1~2 구현 → quiz_easy 문제 3~4" << std::endl;
+    std::cout << "   3. my_basic.cpp Step 3~4 구현 → quiz_medium 문제 1~3" << std::endl;
+    std::cout << "   4. PRACTICE.md에서 추가 실습\n" << std::endl;
 
     std::cout << "다음: Week 2 - 2D-2D 모션 추정\n" << std::endl;
 

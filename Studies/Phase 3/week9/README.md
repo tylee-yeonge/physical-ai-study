@@ -10,10 +10,27 @@
 
 | 순서 | 단계 | 파일 | 설명 |
 |:----:|------|------|------|
-| 1 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 2 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | 희소 구조, Schur Complement, Local vs Global BA 확인 |
-| 3 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | Schur 계산량 분석, VINS sliding window 이해 |
-| 4 | 실습 | [PRACTICE.md](./PRACTICE.md) | Schur Complement 직접 계산 및 옵션 비교 실험 |
+| 1 | 데모 실행 | `basic.cpp` | 빌드 후 `./basic` 실행, Schur 과정 관찰 |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | 희소 구조, Schur Complement, Local vs Global BA |
+| 4 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | Schur 계산량 분석, VINS sliding window |
+| 5 | 직접 구현 (Step 1-2) | `my_basic.cpp` | build_hessian, extract_blocks 구현 |
+| 6 | 직접 구현 (Step 3-5) | `my_basic.cpp` | schur_complement, solve_reduced, back_substitute |
+| 7 | 실습 | [PRACTICE.md](./PRACTICE.md) | Schur Complement 직접 계산 및 옵션 비교 실험 |
+
+### 퀴즈 ↔ basic.cpp 매핑
+
+| 퀴즈 | 문제 | basic.cpp 교육 블록 |
+|:----:|------|-------------------|
+| easy Q1 | 자코비안이 희소한 이유 | `demoSparseStructure()` — 관측 구조 |
+| easy Q2 | Schur에서 먼저 소거하는 변수 | `demoSchurComplement()` — 점 소거 |
+| easy Q3 | Local BA vs Global BA | `demoLocalVsGlobal()` — 범위 비교 |
+| easy Q4 | Hpp 블록 대각 특징 | `demoSparseStructure()` — 비대각 norm |
+| easy Q5 | g2o setMarginalized | `demoGaugeAndMarginalize()` — Schur 연결 |
+| easy Q6 | Gauge freedom | `demoGaugeAndMarginalize()` — 7 DoF |
+| medium Q1 | Schur 계산량 감소 원리 | `demoSchurComplement()` — 크기 비교 |
+| medium Q2 | Local BA 장단점 | `demoLocalVsGlobal()` — 실시간성 vs 드리프트 |
+| medium Q3 | VINS sliding window | `demoLocalVsGlobal()` — Local BA 변형 |
 
 ---
 

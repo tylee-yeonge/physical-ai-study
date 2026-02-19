@@ -13,8 +13,22 @@
 | 1 | 데모 실행 | `basic.cpp` | 빌드 후 `./basic` 실행, 결과 먼저 관찰 |
 | 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
 | 3 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | PnP 정의, P3P vs EPnP 비교 등 개념 확인 |
-| 4 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | RANSAC 반복 횟수 계산, 재투영 오차 분석 |
-| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | PnP 포즈 추정과 스케일 복원 직접 구현 |
+| 4 | 내 구현 (Step 1~3) | `my_basic.cpp` | solvePnP + RANSAC + 재투영 오차 |
+| 5 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | RANSAC 반복 횟수 계산, 재투영 오차 분석 |
+| 6 | 내 구현 (Step 4~6) | `my_basic.cpp` | 투영 + 추적 시뮬레이션 + 데모 |
+| 7 | 실습 | [PRACTICE.md](./PRACTICE.md) | PnP 포즈 추정과 스케일 복원 직접 구현 |
+
+### 퀴즈 매핑
+
+| 퀴즈 | 문제 | 주제 | 관련 basic.cpp 블록 |
+|------|------|------|---------------------|
+| easy | 문제 1 | PnP 정의 | `[PnP 개요]` 블록 |
+| easy | 문제 2 | P3P vs EPnP | `[P3P vs EPnP]` 블록 |
+| easy | 문제 3 | 스케일 복원 | `[스케일 복원]` 블록 |
+| easy | 문제 4 | Inlier Ratio | `[Inlier Ratio 해석]` 블록 |
+| medium | 문제 1 | RANSAC 반복 횟수 | `solvePnPRansac()` |
+| medium | 문제 2 | 재투영 오차 | `computeReprojectionError()` |
+| medium | 문제 3 | VO 추적 전략 | `simulateTracking()` |
 
 ---
 

@@ -129,6 +129,18 @@ void Motion2D2D::demo()
     std::cout << "2D-2D 모션 추정 데모" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
+    // 💡 교육 블록: Essential vs Fundamental
+    std::cout << "💡 [Essential vs Fundamental]" << std::endl;
+    std::cout << "   Essential (E): 정규화 좌표, K 필요, p'^T E p = 0" << std::endl;
+    std::cout << "   Fundamental (F): 픽셀 좌표, K 불필요, F = K₂⁻ᵀ E K₁⁻¹" << std::endl;
+    std::cout << "   💡 이 비교가 quiz_easy 문제 1!\n" << std::endl;
+
+    // 💡 교육 블록: 5-Point Algorithm
+    std::cout << "💡 [5-Point Algorithm]" << std::endl;
+    std::cout << "   E의 자유도 = 5 (회전 3 + 이동 방향 2)" << std::endl;
+    std::cout << "   → 최소 5개 대응점 필요 (8-Point는 과결정)" << std::endl;
+    std::cout << "   💡 이 개념이 quiz_easy 문제 2!\n" << std::endl;
+
     // 카메라 파라미터
     cv::Mat K = (cv::Mat_<double>(3, 3) << 600.0, 0.0, 400.0, 0.0, 600.0, 300.0, 0.0, 0.0, 1.0);
 
@@ -190,6 +202,12 @@ void Motion2D2D::demo()
 
     bool success = pipeline(K, points1, points2, R_est, t_est, points3d_est);
 
+    // 💡 교육 블록: Cheirality Check
+    std::cout << "\n💡 [Cheirality Check]" << std::endl;
+    std::cout << "   E 분해 → 4가지 (R,t) 해" << std::endl;
+    std::cout << "   3D 점이 두 카메라 앞(depth > 0)인 해 선택" << std::endl;
+    std::cout << "   💡 이 과정이 quiz_easy 문제 3!\n" << std::endl;
+
     if (success)
     {
         std::cout << "✅ 추정 성공!" << std::endl;
@@ -203,7 +221,8 @@ void Motion2D2D::demo()
         std::cout << "⚠️  주의: 스케일 모호성!" << std::endl;
         std::cout << "   - GT: ||t|| = " << cv::norm(t_gt) << std::endl;
         std::cout << "   - Est: ||t|| = " << cv::norm(t_est) << std::endl;
-        std::cout << "   - 정규화되어 둘 다 1.0\n" << std::endl;
+        std::cout << "   - 정규화되어 둘 다 1.0" << std::endl;
+        std::cout << "   💡 이 현상이 quiz_easy 문제 4!\n" << std::endl;
     }
 
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -225,6 +244,12 @@ int main()
     std::cout << "   - R, t 복원 (Cheirality check)" << std::endl;
     std::cout << "   - 삼각측량으로 초기 3D 맵" << std::endl;
     std::cout << "   - ⚠️ 스케일 모호성 존재!\n" << std::endl;
+
+    std::cout << "💡 다음 단계 (README.md 학습 순서 참고):" << std::endl;
+    std::cout << "   1. README.md에서 E/F 이론 읽기 → quiz_easy 문제 1~2" << std::endl;
+    std::cout << "   2. my_basic.cpp Step 1~3 구현 → quiz_easy 문제 3~4" << std::endl;
+    std::cout << "   3. my_basic.cpp Step 4~5 구현 → quiz_medium 문제 1~3" << std::endl;
+    std::cout << "   4. PRACTICE.md에서 추가 실습\n" << std::endl;
 
     std::cout << "다음: Week 3 - 3D-2D 모션 추정 (PnP)\n" << std::endl;
 

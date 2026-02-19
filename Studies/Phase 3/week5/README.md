@@ -11,7 +11,11 @@
 | 순서 | 단계 | 파일 | 설명 |
 |:----:|------|------|------|
 | 1 | 이론 학습 | `README.md` | 아래 Mini VO 시스템 구조와 구현 디테일 읽기 |
-| 2 | 실습 | [PRACTICE.md](./PRACTICE.md) | Week 2+3을 통합한 완전한 VO 시스템 구현 |
+| 2 | 데모 실행 | `basic.cpp` | `./basic` — VO 파이프라인, 드리프트, 삼각측량 시연 |
+| 3 | 직접 구현 | `my_basic.cpp` | Step 1-7 TODO 채우기 → `./my_basic`로 검증 |
+| 4 | 헤더 참조 | `mini_vo.h` | 함수 시그니처 + Doxygen 주석 확인 |
+| 5 | 심화 실습 | [PRACTICE.md](./PRACTICE.md) | Week 2+3을 통합한 완전한 VO 시스템 구현 |
+| 6 | 빌드 | `CMakeLists.txt` | `mkdir -p build && cd build && cmake .. && make` |
 
 ---
 

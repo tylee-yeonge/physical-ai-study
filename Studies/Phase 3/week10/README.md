@@ -11,7 +11,13 @@
 | 순서 | 단계 | 파일 | 설명 |
 |:----:|------|------|------|
 | 1 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 2 | 실습 | [PRACTICE.md](./PRACTICE.md) | Solver 조합 비교, setMarginalized 효과 실험 |
+| 2 | 데모 실행 | `basic.cpp` | `./basic` — Solver 비교, 희소성, Marginalization 시연 |
+| 3 | 직접 구현 | `my_basic.cpp` | TODO 채우기 → `./my_basic` 으로 검증 |
+| 4 | 심화 실습 | [PRACTICE.md](./PRACTICE.md) | Solver 조합 비교, setMarginalized 효과 실험 |
+| 5 | 헤더 참고 | `g2o_advanced.h` | 함수 시그니처 + Doxygen 주석 확인 |
+
+> ⚠️ **빌드 환경**: Ubuntu + g2o 필요. macOS에서는 이론 학습만 가능.
+> 설치: `sudo apt install libg2o-dev` 또는 소스 빌드 참고
 
 ---
 

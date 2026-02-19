@@ -65,9 +65,12 @@ int main()
     std::cout << "Week 1 Quiz - Easy" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
 
-    problem1_vo_vs_slam() problem2_scale_ambiguity() problem3_vo_pipeline() problem4_vo_types()
+    problem1_vo_vs_slam();
+    problem2_scale_ambiguity();
+    problem3_vo_pipeline();
+    problem4_vo_types();
 
-            std::cout
+    std::cout
         << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

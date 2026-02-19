@@ -55,9 +55,11 @@ int main()
     std::cout << "Week 2 Quiz - Medium" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
 
-    problem1_pure_rotation() problem2_degenerate_case() problem3_implement_check()
+    problem1_pure_rotation();
+    problem2_degenerate_case();
+    problem3_implement_check();
 
-            std::cout
+    std::cout
         << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "정답은 quiz_solutions/medium_sol.cpp 참고" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

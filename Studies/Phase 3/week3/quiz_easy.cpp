@@ -71,10 +71,12 @@ int main()
     std::cout << "Week 3 Quiz - Easy" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
 
-    problem1_pnp_definition() problem2_p3p_vs_epnp() problem3_scale_recovery()
-            problem4_inlier_ratio()
+    problem1_pnp_definition();
+    problem2_p3p_vs_epnp();
+    problem3_scale_recovery();
+    problem4_inlier_ratio();
 
-                std::cout
+    std::cout
         << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "정답은 quiz_solutions/easy_sol.cpp 참고" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

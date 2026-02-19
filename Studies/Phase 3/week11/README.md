@@ -11,9 +11,15 @@
 | 순서 | 단계 | 파일 | 설명 |
 |:----:|------|------|------|
 | 1 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 2 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | Ceres vs g2o 차이, AutoDiff 템플릿 파라미터 확인 |
-| 3 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | 잔차 차원 분석, 자코비안 크기 계산 |
-| 4 | 실습 | [PRACTICE.md](./PRACTICE.md) | BAL 데이터셋으로 Ceres BA 실행 및 수렴 관찰 |
+| 2 | 데모 실행 | `basic.cpp` | `./basic` — BAL 모델, 수렴 관찰, Solver 비교 시연 |
+| 3 | 직접 구현 | `my_basic.cpp` | TODO 채우기 → `./my_basic` 으로 검증 |
+| 4 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | Ceres vs g2o, AutoDiff, DENSE_SCHUR, HuberLoss |
+| 5 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | 잔차 차원, Schur Complement, 수렴 분석 |
+| 6 | 심화 실습 | [PRACTICE.md](./PRACTICE.md) | BAL 데이터셋으로 Ceres BA 실행 및 수렴 관찰 |
+| 7 | 헤더 참고 | `ceres_practice.h` | 함수 시그니처 + Doxygen 주석 확인 |
+
+> ⚠️ **빌드 환경**: Ubuntu + Ceres 필요. macOS에서는 quiz만 실행 가능.
+> 설치: `sudo apt install libceres-dev` 또는 소스 빌드 참고
 
 ---
 

@@ -1,28 +1,30 @@
 cmake_minimum_required(VERSION 3.10)
 project(Phase3_Week9_Schur)
 
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Eigen3
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 
-# Step 1: Schur Complement Demo (Eigen only)
-add_executable(schur_demo schur_demo.cpp)
+add_executable(basic basic.cpp)
+target_link_libraries(basic Eigen3::Eigen)
 
-# Step 2: g2o option comparison (requires g2o)
-find_package(G2O QUIET)
-if(G2O_FOUND)
-    include_directories(${G2O_INCLUDE_DIR})
-    add_executable(compare_options compare_options.cpp)
-    target_link_libraries(compare_options
-        ${G2O_CORE_LIBRARY}
-        ${G2O_STUFF_LIBRARY}
-        ${G2O_TYPES_SBA}
-        ${G2O_SOLVER_EIGEN}
-    )
-    message(STATUS "g2o found, compare_options will be built")
-else()
-    message(STATUS "g2o not found, skipping compare_options")
+add_executable(my_basic my_basic.cpp)
+target_link_libraries(my_basic Eigen3::Eigen)
+
+# Quizzes
+add_executable(quiz_easy quiz_easy.cpp)
+add_executable(quiz_medium quiz_medium.cpp)
+
+# Quiz solutions
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/quiz_solutions/easy_sol.cpp)
+    add_executable(easy_sol quiz_solutions/easy_sol.cpp)
 endif()
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/quiz_solutions/medium_sol.cpp)
+    add_executable(medium_sol quiz_solutions/medium_sol.cpp)
+endif()
+
+message(STATUS "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+message(STATUS "Phase 3 Week 9: Schur Complement")
+message(STATUS "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")

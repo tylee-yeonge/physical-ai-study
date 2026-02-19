@@ -8,6 +8,12 @@ find_package(Eigen3 REQUIRED)
 
 include_directories(${EIGEN3_INCLUDE_DIR})
 
+add_executable(basic basic.cpp)
+target_link_libraries(basic Eigen3::Eigen)
+
+add_executable(my_basic my_basic.cpp)
+target_link_libraries(my_basic Eigen3::Eigen)
+
 add_executable(quiz_easy quiz_easy.cpp)
 target_link_libraries(quiz_easy Eigen3::Eigen)
 

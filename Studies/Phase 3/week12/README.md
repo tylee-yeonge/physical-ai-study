@@ -10,10 +10,25 @@
 
 | 순서 | 단계 | 파일 | 설명 |
 |:----:|------|------|------|
-| 1 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 2 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | 스케일 모호성 원인, t 정규화, 드리프트 개념 확인 |
-| 3 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | lambda 스케일링 증명, 스케일 드리프트 시뮬레이션 |
-| 4 | 실습 | [PRACTICE.md](./PRACTICE.md) | 스케일 모호성과 Sim(3) 정렬 실습 |
+| 1 | 데모 실행 | `basic.cpp` | 빌드 후 `./basic` 실행, 스케일 드리프트 관찰 |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | 스케일 모호성 원인, t 정규화, 드리프트 개념 |
+| 4 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | λ 증명, 드리프트 시뮬, Sim(3) vs SE(3) |
+| 5 | 직접 구현 (Step 1-3) | `my_basic.cpp` | 궤적 생성, 드리프트 적용, ATE 계산 |
+| 6 | 직접 구현 (Step 4-5) | `my_basic.cpp` | Sim(3) 정렬, 통계 분석 |
+| 7 | 실습 | [PRACTICE.md](./PRACTICE.md) | 스케일 모호성과 Sim(3) 정렬 실습 |
+
+### 퀴즈 ↔ basic.cpp 매핑
+
+| 퀴즈 | 문제 | basic.cpp 교육 블록 |
+|:----:|------|-------------------|
+| easy Q1 | 스케일 모호성 원인 | `demoScaleAmbiguity()` — λX 투영 증명 |
+| easy Q2 | \|\|t\|\| = 1 정규화 | `demoScaleAmbiguity()` — E 행렬 설명 |
+| easy Q3 | 스케일 드리프트 정의 | `demoScaleDrift()` — 노이즈별 비교 |
+| easy Q4 | 스케일 결정 가능 경우 | `demoSim3Alignment()` — SE(3) vs Sim(3) |
+| medium Q1 | λ 스케일링 증명 | `demoScaleAmbiguity()` — 수치 시연 |
+| medium Q2 | 드리프트 누적 시뮬 | `demoScaleDrift()` — 1%, 2%, 5% 비교 |
+| medium Q3 | Sim(3) vs SE(3) | `demoSim3Alignment()` — 정렬 전후 ATE |
 
 ---
 

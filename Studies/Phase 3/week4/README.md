@@ -10,8 +10,12 @@
 
 | 순서 | 단계 | 파일 | 설명 |
 |:----:|------|------|------|
-| 1 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 2 | 실습 | [PRACTICE.md](./PRACTICE.md) | ICP 알고리즘과 SVD 기반 정합 직접 구현 |
+| 1 | 데모 실행 | `basic.cpp` | 빌드 후 `./basic` 실행, SVD 정합 + ICP 수렴 관찰 |
+| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
+| 3 | 직접 구현 (Step 1-2) | `my_basic.cpp` | compute_centroid, compute_h 구현 |
+| 4 | 직접 구현 (Step 3) | `my_basic.cpp` | svd_decompose 구현 (핵심) |
+| 5 | 직접 구현 (Step 4-5) | `my_basic.cpp` | iterative_icp, evaluate_alignment 구현 |
+| 6 | 실습 | [PRACTICE.md](./PRACTICE.md) | ICP 알고리즘과 SVD 기반 정합 직접 구현 |
 
 ---
 

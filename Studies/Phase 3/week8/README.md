@@ -8,12 +8,32 @@
 
 ## 📋 학습 순서
 
+> ⚠️ **빌드 환경**: basic / my_basic은 Ubuntu + Ceres 필요. macOS에서는 quiz만 실행 가능.
+> 설치: `sudo apt install libceres-dev` 또는 소스 빌드 참고
+
 | 순서 | 단계 | 파일 | 설명 |
 |:----:|------|------|------|
 | 1 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 2 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | Ceres 자동 미분, AutoDiffCostFunction 개념 확인 |
-| 3 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | Jet 타입, DENSE_SCHUR, g2o vs Ceres 비교 분석 |
-| 4 | 실습 | [PRACTICE.md](./PRACTICE.md) | Ceres로 BA 구현 및 HuberLoss 적용 |
+| 2 | 데모 실행 | `basic.cpp` | `./basic` — 자동 미분, Ceres BA, Solver 비교 시연 |
+| 3 | 직접 구현 | `my_basic.cpp` | Step 1-5 TODO 채우기 → `./my_basic`로 검증 |
+| 4 | 헤더 참조 | `ceres_ba.h` | 함수 시그니처 + Doxygen 주석 확인 |
+| 5 | C++ 퀴즈 (초급) | `quiz_easy.cpp` | Ceres 자동 미분, AutoDiffCostFunction 개념 확인 |
+| 6 | C++ 퀴즈 (중급) | `quiz_medium.cpp` | Jet 타입, DENSE_SCHUR, g2o vs Ceres 비교 분석 |
+| 7 | 실습 | [PRACTICE.md](./PRACTICE.md) | Ceres로 BA 구현 및 HuberLoss 적용 |
+
+### 퀴즈 ↔ basic.cpp 매핑
+
+| 퀴즈 | 문제 | basic.cpp 블록 |
+|------|------|---------------|
+| easy Q1 | Ceres 자동 미분 장점 | 블록 1: 자동 미분 |
+| easy Q2 | AutoDiffCostFunction 템플릿 | 블록 1: 자동 미분 |
+| easy Q3 | template T 타입 | 블록 1: 자동 미분 |
+| easy Q4 | HuberLoss(1.0) 의미 | 블록 2: Ceres BA |
+| easy Q5 | g2o 대비 Ceres 단점 | 블록 3: Solver 비교 |
+| easy Q6 | SetParameterBlockConstant | 블록 2: Ceres BA |
+| medium Q1 | Jet 타입 저장 내용 | 블록 3: Solver 비교 |
+| medium Q2 | DENSE_SCHUR 이유 | 블록 3: Solver 비교 |
+| medium Q3 | Ceres vs g2o 사용 시기 | 블록 3: Solver 비교 |
 
 ---
 
