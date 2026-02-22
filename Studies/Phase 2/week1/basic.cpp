@@ -5,35 +5,74 @@
 // 라디안 → 도(degree) 변환 계수
 constexpr double kRadToDeg = 180.0 / CV_PI;
 
+// 생성자 — 카메라 파라미터 저장
+//   K: 3×3 내부 행렬 [fx 0 cx; 0 fy cy; 0 0 1]
+//   R: 3×3 회전 행렬 (월드→카메라 좌표 변환)
+//   t: 3×1 이동 벡터 (월드→카메라 좌표 변환)
+//   clone()으로 독립 복사 — 원본이 바뀌어도 이 객체는 영향받지 않음
 PinholeProjection::PinholeProjection(const cv::Mat& K, const cv::Mat& R, const cv::Mat& t)
     : K_(K.clone()), R_(R.clone()), t_(t.clone())
 {
 }
 
+// 투영된 픽셀이 이미지 영역 안에 있는지 확인
+//   이미지 밖에 투영되면 실제로 관측 불가능한 점.
+//   SLAM에서 가시성(visibility) 체크에 사용.
 bool PinholeProjection::isInImage(const cv::Point2d& pixel, const cv::Size& imageSize)
 {
     return pixel.x >= 0 && pixel.x < imageSize.width && pixel.y >= 0 && pixel.y < imageSize.height;
 }
 
+// 시야각(Field of View) 계산 — 카메라가 얼마나 넓은 영역을 촬영하는지
+//
+// 원리: 이미지 센서의 가장자리 픽셀이 광축과 이루는 각도의 2배
+//
+//       |<-- W/2 -->|
+//       +-----------+
+//        \     θ   /
+//         \   |   /        FOV = 2θ
+//          \  |  /
+//           \ | /  ← fx (초점거리, 픽셀 단위)
+//            \|/
+//             카메라 중심
+//
+//   tan(θ) = (W/2) / fx  →  θ = atan(W / (2·fx))  →  FOV = 2θ
+//
+// fx가 크면(망원) → FOV 작음 (좁은 영역을 확대)
+// fx가 작으면(광각) → FOV 큼 (넓은 영역 촬영)
 cv::Size2d PinholeProjection::computeFOV(const cv::Size& imageSize) const
 {
     double fx = K_.at<double>(0, 0);
     double fy = K_.at<double>(1, 1);
 
-    // FOV = 2 * arctan(image_size / (2 * focal_length))
-    // 2.0 * fx: 이미지 폭을 절반(W/2)으로 나누는 효과 → 반쪽 직각삼각형의 각도(θ) 계산
-    // 바깥 2.0: 반쪽 각도 θ를 전체 시야각으로 복원
-    // * kRadToDeg: 라디안 → 도(degree) 변환
     double fov_h = 2.0 * std::atan2(imageSize.width, 2.0 * fx) * kRadToDeg;
     double fov_v = 2.0 * std::atan2(imageSize.height, 2.0 * fy) * kRadToDeg;
 
     return cv::Size2d(fov_h, fov_v);
 }
 
+// 3D 월드 좌표 → 2D 픽셀 좌표 투영 (핀홀 카메라 모델의 핵심)
+//
+// 수식: p = K · [R|t] · P_world
+//   이를 3단계로 분해하면:
+//
+// Step 1: 월드→카메라 좌표 변환 (외부 파라미터)
+//   Pc = R · Pw + t
+//   R: 3×3 회전 행렬 — 월드 좌표계의 축을 카메라 좌표계로 변환
+//   t: 3×1 이동 벡터 — 월드 원점에서 카메라까지의 변위
+//
+// Step 2: 원근 투영 (정규화 좌표)
+//   x = Xc/Zc, y = Yc/Zc
+//   3D를 2D로 축소하는 핵심 — 깊이(Zc)로 나누어 원근 효과 생성
+//   ★ 이 나눗셈이 "가까운 물체는 크게, 먼 물체는 작게" 만듦
+//
+// Step 3: 정규화→픽셀 좌표 변환 (내부 파라미터)
+//   u = fx·x + cx, v = fy·y + cy
+//   fx,fy: 초점거리 (미터→픽셀 스케일링)
+//   cx,cy: 주점 오프셋 (원점을 이미지 좌상단으로 이동)
 cv::Point2d PinholeProjection::project(const cv::Point3d& P_world) const
 {
     // Step 1: 월드 → 카메라 좌표 변환
-    // Pc = R * Pw + t
     cv::Mat Pw = (cv::Mat_<double>(3, 1) << P_world.x, P_world.y, P_world.z);
     cv::Mat Pc = R_ * Pw + t_;
 
@@ -41,17 +80,17 @@ cv::Point2d PinholeProjection::project(const cv::Point3d& P_world) const
     double Yc = Pc.at<double>(1);
     double Zc = Pc.at<double>(2);
 
-    // Zc가 0 이하면 카메라 뒤에 있음 → 투영 불가
+    // Zc ≤ 0 → 카메라 뒤의 점은 투영 불가 (핀홀 모델의 물리적 한계)
     if (Zc <= 0)
     {
         return cv::Point2d(-1, -1);
     }
 
-    // Step 2: 원근 투영 (정규화 좌표)
+    // Step 2: 원근 투영 (깊이 Zc로 나누어 정규화 좌표 생성)
     double x_norm = Xc / Zc;
     double y_norm = Yc / Zc;
 
-    // Step 3: 정규화 → 픽셀 좌표
+    // Step 3: K 행렬 적용 — 정규화 좌표를 픽셀 좌표로 변환
     double fx = K_.at<double>(0, 0);
     double fy = K_.at<double>(1, 1);
     double cx = K_.at<double>(0, 2);
@@ -63,6 +102,21 @@ cv::Point2d PinholeProjection::project(const cv::Point3d& P_world) const
     return cv::Point2d(u, v);
 }
 
+// 2D 픽셀 좌표 → 3D 광선 방향 (역투영, back-projection)
+//
+// 투영의 역과정이지만, 깊이 정보를 복원할 수 없다는 점이 핵심 차이.
+// 투영 시 Zc로 나누면서 깊이 정보가 소실되기 때문.
+// → 복원 가능한 것은 "방향"뿐, "거리"는 알 수 없음.
+//
+// 수식: K⁻¹ · [u, v, 1]ᵀ = [x_norm, y_norm, 1]ᵀ
+//   x_norm = (u - cx) / fx
+//   y_norm = (v - cy) / fy
+//   → 카메라 좌표계에서 (x_norm, y_norm, 1) 방향의 광선
+//
+// 활용:
+//   - 삼각측량: 두 카메라의 광선 교차점 = 3D 점
+//   - SLAM 초기화: 깊이 미지의 특징점을 광선으로 표현
+//   - 3D 복원: 광선 + 깊이 값 → 3D 점 복원
 cv::Vec3d PinholeProjection::backProject(const cv::Point2d& pixel) const
 {
     double fx = K_.at<double>(0, 0);
@@ -70,19 +124,22 @@ cv::Vec3d PinholeProjection::backProject(const cv::Point2d& pixel) const
     double cx = K_.at<double>(0, 2);
     double cy = K_.at<double>(1, 2);
 
-    // K⁻¹ 적용: 픽셀 좌표에서 주점을 빼고 초점거리로 나눠 정규화 좌표로 변환
+    // K⁻¹ 적용: 주점을 빼고 초점거리로 나누어 정규화 좌표로 변환
     double x_norm = (pixel.x - cx) / fx;
     double y_norm = (pixel.y - cy) / fy;
 
-    // 카메라 원점에서 해당 픽셀 방향으로 뻗어나가는 3D 광선 벡터
-    // (x_norm, y_norm) = 정면(z=1) 기준 좌우/상하 기울기, 1.0 = 카메라 정면 방향
+    // 카메라 원점에서 해당 픽셀 방향으로 뻗어나가는 3D 광선
+    //   z=1 평면 위의 점 (x_norm, y_norm, 1)을 가리키는 벡터
+    //   중심 픽셀(cx,cy) → (0, 0, 1) = 카메라 정면 방향
     cv::Vec3d ray(x_norm, y_norm, 1.0);
 
-    // 단위 벡터로 정규화
+    // 단위 벡터로 정규화 → 방향만 남기고 크기를 1로
     double norm = cv::norm(ray);
     return ray / norm;
 }
 
+// 여러 3D 점을 한 번에 투영 — project()를 반복 호출
+//   reserve()로 메모리를 미리 확보하여 push_back 시 재할당 방지
 std::vector<cv::Point2d> PinholeProjection::projectMultiple(
     const std::vector<cv::Point3d>& points_3d) const
 {
@@ -97,13 +154,25 @@ std::vector<cv::Point2d> PinholeProjection::projectMultiple(
     return pixels;
 }
 
+// 재투영 오차 계산 — 3D 점을 투영한 결과와 실제 관측 픽셀의 거리
+//
+// 재투영 오차(reprojection error)란?
+//   "추정된 3D 점을 카메라 모델로 다시 투영했을 때,
+//    실제 이미지에서 관측된 위치와 얼마나 차이나는가"
+//
+//   error = ||project(P_world) - observed_pixel||₂  (유클리드 거리, 픽셀 단위)
+//
+// 이 값이 작을수록:
+//   - 카메라 파라미터(K, R, t)가 정확
+//   - 3D 점 위치가 정확
+//   - 캘리브레이션, 삼각측량, PnP, Bundle Adjustment 모든 곳에서
+//     최적화 목표(cost function)로 사용
 double PinholeProjection::reprojectionError(const cv::Point3d& P_world,
                                             const cv::Point2d& observed_pixel) const
 {
     cv::Point2d projected = project(P_world);
 
-    // project()가 Zc ≤ 0 (카메라 뒤)이면 (-1,-1)을 반환하므로,
-    // x < 0 으로 투영 실패 여부를 감지
+    // project()가 카메라 뒤의 점에 대해 (-1,-1)을 반환하므로 실패 감지
     if (projected.x < 0)
         return -1.0;
 
@@ -176,8 +245,8 @@ int main()
         double u = fx * x_norm + cx;
         double v = fy * y_norm + cy;
 
-        std::cout << "\n💡 [투영 수학] 점 (" << demo_pt.x << "," << demo_pt.y << ","
-                  << demo_pt.z << ")의 투영 과정:" << std::endl;
+        std::cout << "\n💡 [투영 수학] 점 (" << demo_pt.x << "," << demo_pt.y << "," << demo_pt.z
+                  << ")의 투영 과정:" << std::endl;
         std::cout << "   Step 1. 월드→카메라: Pc = R*Pw + t = (" << Xc << "," << Yc << "," << Zc
                   << ")  (R=I, t=0)" << std::endl;
         std::cout << "   Step 2. 정규화: x = Xc/Zc = " << Xc << "/" << Zc << " = " << x_norm

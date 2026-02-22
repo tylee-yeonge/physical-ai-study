@@ -3,10 +3,33 @@
 #include <chrono>
 #include <iomanip>
 
+// FAST 코너 검출 — 가장 빠른 코너 검출기 중 하나
+//
+// 원리: 중심 픽셀 p 주위 16개 픽셀(반지름 3의 Bresenham 원)을 검사하여,
+//   연속 N개(FAST-9이면 9개, FAST-12이면 12개)가 모두
+//   p보다 threshold 이상 밝거나, threshold 이상 어두우면 코너로 판정.
+//
+//        16 1  2
+//     15         3
+//   14             4
+//   13    center   5    ← 16개 원형 픽셀
+//   12             6
+//     11         7
+//        10 9  8
+//
+// 고속화 비결:
+//   1) 1, 5, 9, 13번 픽셀만 먼저 검사 (4개 중 3개 이상 통과해야 진행)
+//   2) 세그먼트 테스트로 대부분의 비코너를 즉시 제거 → O(1) 수준
+//
+// 파라미터:
+//   threshold: 밝기 차이 임계값 (↑ 강한 코너만, ↓ 약한 코너도 포함)
+//   nonmaxSuppression: NMS 적용 여부 (인접 코너 중 최대 응답만 유지)
+//
+// 반환: 검출 시간 (ms)
 double FeatureDetectionBasic::detectFAST(const cv::Mat& image, std::vector<cv::KeyPoint>& keypoints,
                                          int threshold, bool nonmaxSuppression)
 {
-    // 그레이스케일 변환
+    // 그레이스케일 변환 — FAST는 밝기 값만 사용
     cv::Mat gray;
     if (image.channels() == 3)
     {
@@ -17,54 +40,86 @@ double FeatureDetectionBasic::detectFAST(const cv::Mat& image, std::vector<cv::K
         gray = image.clone();
     }
 
-    // 성능 측정
     auto start = std::chrono::high_resolution_clock::now();
 
-    // FAST 검출 (OpenCV는 FAST-9, FAST-12 등 제공)
+    // OpenCV의 FAST 구현은 기본적으로 FAST-9 사용
     cv::FAST(gray, keypoints, threshold, nonmaxSuppression);
 
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
 
-    return duration.count() / 1000.0;  // ms로 변환
+    return duration.count() / 1000.0;
 }
 
+// ORB 검출 — FAST 검출 + BRIEF 디스크립터 + 회전 불변성
+//
+// ORB = Oriented FAST and Rotated BRIEF
+//
+// 동작 3단계:
+//   ① FAST로 코너 검출 (고속)
+//   ② Harris 코너 응답으로 상위 nfeatures개 선별 (품질 보장)
+//   ③ Intensity Centroid로 방향 계산 → 회전 불변 BRIEF 디스크립터 생성
+//
+// 디스크립터:
+//   256비트 이진 벡터 (32바이트) — 주변 픽셀 쌍 비교 (밝으면 1, 어두우면 0)
+//   매칭: 해밍 거리 (XOR → popcount) → L2 거리보다 수십 배 빠름
+//
+// SLAM에서 ORB를 사용하는 이유:
+//   - FAST 수준으로 빠른 검출
+//   - 이진 디스크립터로 빠른 매칭
+//   - 회전/스케일 불변 → 카메라 움직임에 강건
+//   - ORB-SLAM2/3가 이 검출기 사용
+//
+// 반환: 검출+디스크립터 계산 시간 (ms)
 double FeatureDetectionBasic::detectORB(const cv::Mat& image, std::vector<cv::KeyPoint>& keypoints,
                                         cv::Mat& descriptors, int nfeatures)
 {
-    // ORB 검출기 생성
+    // nfeatures: 검출할 최대 특징점 수 (Harris 점수 상위 N개)
     cv::Ptr<cv::ORB> orb = cv::ORB::create(nfeatures);
 
-    // 성능 측정
     auto start = std::chrono::high_resolution_clock::now();
 
-    // 특징점 검출 및 디스크립터 계산
+    // detectAndCompute: 검출과 디스크립터 계산을 한 번에 수행
+    //   별도로 detect() → compute() 호출하는 것보다 효율적
+    //   (내부적으로 피라미드를 한 번만 구성)
     orb->detectAndCompute(image, cv::noArray(), keypoints, descriptors);
 
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
 
-    return duration.count() / 1000.0;  // ms
+    return duration.count() / 1000.0;
 }
 
+// 특징점 시각화 — 검출된 특징점의 위치, 크기, 방향을 이미지 위에 표시
+//
+// DRAW_RICH_KEYPOINTS 플래그:
+//   - 원의 크기 = keypoint.size (특징점의 스케일)
+//   - 원 안의 선 = keypoint.angle (특징점의 방향)
+//   → 단순 점 대신 원+방향을 그려 스케일/회전 정보를 시각적으로 확인
 void FeatureDetectionBasic::visualizeKeypoints(const cv::Mat& image,
                                                const std::vector<cv::KeyPoint>& keypoints,
                                                cv::Mat& output, const std::string& title)
 {
-    // 특징점 그리기
-    cv::drawKeypoints(image, keypoints, output, cv::Scalar(0, 255, 0),  // 녹색
-                      cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);       // 방향과 크기 표시
+    cv::drawKeypoints(image, keypoints, output, cv::Scalar(0, 255, 0),
+                      cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 
-    // 정보 텍스트 추가
     std::string info = "Keypoints: " + std::to_string(keypoints.size());
     cv::putText(output, info, cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX, 1.0,
                 cv::Scalar(0, 255, 0), 2);
 }
 
+// 특징점 공간 분포 분석 — 이미지를 gridSize×gridSize 격자로 나누어 각 셀의 특징점 수 카운트
+//
+// 균등 분포가 SLAM에서 중요한 이유:
+//   - 한 곳에 특징점이 몰리면 → 그 영역의 깊이/움직임만 추정 가능
+//   - 넓게 분포하면 → 이미지 전체의 3D 정보 활용 → 더 정확한 포즈 추정
+//   - ORB-SLAM은 quadtree로 균등 분포 강제
+//   - VINS-Fusion은 setMask()로 인접 특징점 간 최소 거리 보장
+//
+// 반환: gridSize×gridSize 행렬 (각 셀의 특징점 개수)
 cv::Mat FeatureDetectionBasic::analyzeDistribution(const std::vector<cv::KeyPoint>& keypoints,
                                                    cv::Size imageSize, int gridSize)
 {
-    // 그리드별 특징점 개수 카운트
     cv::Mat distribution = cv::Mat::zeros(gridSize, gridSize, CV_32S);
 
     int cellWidth = imageSize.width / gridSize;
@@ -75,7 +130,6 @@ cv::Mat FeatureDetectionBasic::analyzeDistribution(const std::vector<cv::KeyPoin
         int gridX = static_cast<int>(kp.pt.x / cellWidth);
         int gridY = static_cast<int>(kp.pt.y / cellHeight);
 
-        // 범위 체크
         if (gridX >= 0 && gridX < gridSize && gridY >= 0 && gridY < gridSize)
         {
             distribution.at<int>(gridY, gridX)++;

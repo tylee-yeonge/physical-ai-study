@@ -4,24 +4,41 @@
 #include <iomanip>
 
 
+// Brute-Force 매칭 — 모든 디스크립터 쌍을 비교하여 가장 가까운 것을 찾음
+//
+// 동작: desc1의 각 디스크립터에 대해 desc2의 모든 디스크립터와 거리를 계산,
+//   가장 거리가 작은 것을 매칭 결과로 반환.
+//   시간 복잡도: O(N × M × D)  (N,M: 각 이미지 특징점 수, D: 디스크립터 차원)
+//
+// normType에 따른 거리 계산:
+//   NORM_HAMMING: XOR 후 1의 개수 (이진 디스크립터용 — ORB, BRIEF)
+//     → 해밍 거리. CPU에서 popcount 명령어로 매우 빠름
+//   NORM_L2: 유클리드 거리 (실수 디스크립터용 — SIFT, SURF)
+//
+// crossCheck=false: desc1→desc2 단방향 매칭
+//   true로 하면 desc2→desc1도 같은 결과인 경우만 유지 (더 정확하지만 2배 느림)
 double FeatureMatchingBasic::matchBruteForce(const cv::Mat& descriptors1,
                                              const cv::Mat& descriptors2,
                                              std::vector<cv::DMatch>& matches, int normType)
 {
-    // Brute-Force 매처 생성
-    cv::BFMatcher matcher(normType, false);  // crossCheck=false
+    cv::BFMatcher matcher(normType, false);
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    // 매칭 수행
+    // match(): desc1의 각 디스크립터에 대해 desc2에서 최근접 1개를 찾음
     matcher.match(descriptors1, descriptors2, matches);
 
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
 
-    return duration.count() / 1000.0;  // ms
+    return duration.count() / 1000.0;
 }
 
+// 매칭 품질 평가 — 평균 디스크립터 거리 계산
+//   거리가 작을수록 디스크립터가 유사 → 좋은 매칭
+//   DMatch.distance: 매칭된 두 디스크립터 간의 거리
+//     ORB(HAMMING): 0~256 범위 (비트 차이 수)
+//     SIFT(L2): 연속 값
 double FeatureMatchingBasic::evaluateMatchQuality(const std::vector<cv::DMatch>& matches)
 {
     if (matches.empty())
@@ -36,10 +53,23 @@ double FeatureMatchingBasic::evaluateMatchQuality(const std::vector<cv::DMatch>&
     return total_distance / matches.size();
 }
 
+// FLANN 매칭 — 근사 최근접 이웃 탐색으로 BF보다 빠른 매칭
+//
+// FLANN = Fast Library for Approximate Nearest Neighbors
+//   BF가 모든 쌍을 비교하는 반면, FLANN은 KD-tree/K-means tree 등의
+//   공간 분할 자료구조를 사용하여 O(N log N) 수준으로 탐색.
+//   특징점이 수천 개 이상일 때 BF 대비 수 배~수십 배 빠름.
+//
+// 주의: FLANN의 기본 인덱스는 float 타입만 지원하므로,
+//   ORB 같은 이진 디스크립터(CV_8U)는 float으로 변환 필요.
+//   이진 디스크립터에는 LSH(Locality-Sensitive Hashing) 인덱스가 더 적합.
+//
+// BF vs FLANN 선택:
+//   - 특징점 < 1000: BF가 충분히 빠름 (오버헤드 적음)
+//   - 특징점 > 1000: FLANN이 유리 (인덱스 구축 비용을 상쇄)
 double FeatureMatchingBasic::matchFLANN(const cv::Mat& descriptors1, const cv::Mat& descriptors2,
                                         std::vector<cv::DMatch>& matches)
 {
-    // FLANN은 float 타입 필요
     cv::Mat desc1_float, desc2_float;
 
     if (descriptors1.type() != CV_32F)
@@ -53,36 +83,47 @@ double FeatureMatchingBasic::matchFLANN(const cv::Mat& descriptors1, const cv::M
         desc2_float = descriptors2;
     }
 
-    // FLANN 매처 (LSH for binary descriptors)
     cv::FlannBasedMatcher matcher;
 
     auto start = std::chrono::high_resolution_clock::now();
-
     matcher.match(desc1_float, desc2_float, matches);
-
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
 
     return duration.count() / 1000.0;
 }
 
+// Lowe's Ratio Test — 모호한 매칭을 제거하는 핵심 필터
+//
+// 원리 (David Lowe, 2004):
+//   kNN(k=2)으로 각 특징점에 대해 가장 가까운 2개의 후보를 찾고,
+//   최근접(best) / 차근접(second-best) 거리의 비율이 작을수록 확실한 매칭.
+//
+//   best_distance / second_distance < ratio_thresh → 좋은 매칭
+//
+// 직관: 독보적으로 가까운 후보가 있으면 확실한 매칭,
+//   비슷한 거리의 후보가 여럿이면 모호한 매칭 → 제거
+//
+// ratio_thresh 선택:
+//   0.7: Lowe의 권장값. 잘못된 매칭의 90%를 제거하면서 좋은 매칭의 95% 유지
+//   0.6: 더 엄격 (precision↑, recall↓)
+//   0.8: 더 느슨 (precision↓, recall↑)
 int FeatureMatchingBasic::ratioTest(const cv::Mat& descriptors1, const cv::Mat& descriptors2,
                                     std::vector<cv::DMatch>& good_matches, float ratio_thresh)
 {
-    // kNN 매칭 (k=2, 최근접 2개)
+    // kNN 매칭 — 각 디스크립터에 대해 가장 가까운 k=2개를 찾음
     cv::BFMatcher matcher(cv::NORM_HAMMING);
     std::vector<std::vector<cv::DMatch>> knn_matches;
 
     matcher.knnMatch(descriptors1, descriptors2, knn_matches, 2);
 
-    // Lowe's Ratio Test
     good_matches.clear();
     for (const auto& match_pair : knn_matches)
     {
         if (match_pair.size() < 2)
             continue;
 
-        // 최근접 거리 / 차근접 거리 < ratio_thresh
+        // 비율이 임계값보다 작으면 독보적인 매칭 → 유지
         if (match_pair[0].distance < ratio_thresh * match_pair[1].distance)
         {
             good_matches.push_back(match_pair[0]);
@@ -109,6 +150,23 @@ void FeatureMatchingBasic::visualizeMatches(const cv::Mat& img1,
                 cv::Scalar(0, 255, 0), 2);
 }
 
+// RANSAC으로 기하학적 outlier 제거 — 호모그래피 모델에 맞지 않는 매칭 제거
+//
+// RANSAC (Random Sample Consensus):
+//   ① 매칭 중 4개를 랜덤 선택 → 호모그래피 H 계산 (4점 → 8 DOF 결정)
+//   ② 나머지 매칭에 H 적용 → 재투영 오차 < ransac_thresh면 inlier
+//   ③ N번 반복 → inlier가 가장 많은 H를 최종 모델로 선택
+//   ④ 최종 H의 inlier만 남기고 outlier 제거
+//
+// 호모그래피(H)란?
+//   같은 평면 위의 점들에 대해 두 이미지 간 변환: p2 = H · p1
+//   평면 가정이 성립하면 (벽면, 바닥 등) 효과적.
+//   비평면 장면에서는 Essential Matrix(E) 기반 RANSAC이 더 적합.
+//
+// ransac_thresh: 재투영 오차 허용치 (픽셀)
+//   3.0: 일반적인 값. ↓ 엄격, ↑ 느슨
+//
+// 반환: inlier 비율 (0.0~1.0). 0.5 이상이면 대체로 양호한 매칭.
 double FeatureMatchingBasic::filterRANSAC(const std::vector<cv::KeyPoint>& keypoints1,
                                           const std::vector<cv::KeyPoint>& keypoints2,
                                           const std::vector<cv::DMatch>& matches,
@@ -117,12 +175,12 @@ double FeatureMatchingBasic::filterRANSAC(const std::vector<cv::KeyPoint>& keypo
 {
     if (matches.size() < 4)
     {
-        // 호모그래피 계산에는 최소 4개 점 필요
         homography = cv::Mat::eye(3, 3, CV_64F);
         return 0.0;
     }
 
-    // 매칭된 점들 추출
+    // DMatch에서 2D 점 좌표 추출
+    //   queryIdx: desc1의 인덱스, trainIdx: desc2의 인덱스
     std::vector<cv::Point2f> points1, points2;
     for (const auto& match : matches)
     {
@@ -130,11 +188,11 @@ double FeatureMatchingBasic::filterRANSAC(const std::vector<cv::KeyPoint>& keypo
         points2.push_back(keypoints2[match.trainIdx].pt);
     }
 
-    // RANSAC으로 호모그래피 계산
+    // RANSAC으로 호모그래피 추정 + inlier/outlier 분류
     std::vector<uchar> inlier_mask;
     homography = cv::findHomography(points1, points2, cv::RANSAC, ransac_thresh, inlier_mask);
 
-    // Inlier 매칭만 선택
+    // inlier만 추출
     inlier_matches.clear();
     for (size_t i = 0; i < matches.size(); i++)
     {
@@ -144,7 +202,6 @@ double FeatureMatchingBasic::filterRANSAC(const std::vector<cv::KeyPoint>& keypo
         }
     }
 
-    // Inlier 비율 계산
     double inlier_ratio = (double)inlier_matches.size() / matches.size();
 
     return inlier_ratio;
