@@ -139,15 +139,14 @@ void problem5_validate_rotation()
 
     // TODO 1: R_valid와 R_noisy 각각에 대해 검증
     //   조건 1: R^T * R ≈ I (직교성)
-    //     cv::Mat RtR = R.t() * R;
-    //     double ortho_error = cv::norm(RtR - cv::Mat::eye(3, 3, CV_64F));
+    //     힌트: R의 전치와 R을 곱한 결과가 단위행렬에 얼마나 가까운지 측정하세요
     //
     //   조건 2: det(R) ≈ 1
-    //     double det = cv::determinant(R);
+    //     힌트: 행렬식을 계산하여 1에 가까운지 확인하세요
 
     // TODO 2: R_noisy를 SVD로 가장 가까운 회전 행렬로 복구
-    //   힌트: SVD → R_fixed = U * Vt
-    //         det(R_fixed) < 0이면 → U * diag(1,1,-1) * Vt
+    //   힌트: SVD 분해 후 U와 V^T를 곱하면 가장 가까운 직교 행렬을 얻습니다
+    //         행렬식이 -1이면 반사 행렬이므로 부호를 조정하세요
 
     std::cout << "\n올바른 회전 행렬 조건:" << std::endl;
     std::cout << "   1. R^T * R = I (직교성)" << std::endl;

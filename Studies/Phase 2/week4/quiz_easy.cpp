@@ -25,7 +25,7 @@ void problem1_distance_metrics()
     cv::Mat orb_desc2 = (cv::Mat_<uchar>(1, 4) << 0b10110001, 0b11001100, 0b00111000, 0b11110000);
 
     // TODO: 해밍 거리 계산
-    // int hamming_dist = cv::norm(orb_desc1, orb_desc2, cv::NORM_HAMMING);
+    // 힌트: OpenCV의 norm 함수에 해밍 거리 옵션을 사용하세요
     int hamming_dist = 0;  // TODO
 
     std::cout << "ORB 디스크립터 (이진):" << std::endl;
@@ -38,7 +38,7 @@ void problem1_distance_metrics()
     cv::Mat sift_desc2 = (cv::Mat_<float>(1, 4) << 0.6, 0.7, 0.4, 0.8);
 
     // TODO: 유클리드 거리 계산
-    // double euclidean_dist = cv::norm(sift_desc1, sift_desc2, cv::NORM_L2);
+    // 힌트: OpenCV의 norm 함수에 L2 노름 옵션을 사용하세요
     double euclidean_dist = 0.0;  // TODO
 
     std::cout << "SIFT 디스크립터 (실수):" << std::endl;

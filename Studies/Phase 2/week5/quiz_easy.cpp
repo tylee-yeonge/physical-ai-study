@@ -109,9 +109,8 @@ void problem5_epipole_from_F()
     std::cout << F << std::endl;
 
     // TODO: SVD로 F의 오른쪽 null space 구하기
-    // 힌트: cv::SVD::compute(F, w, u, vt)
-    //        Vt의 마지막 행 = 가장 작은 특이값에 대응하는 벡터
-    //        e1 = Vt.row(2) → 동차 좌표를 정규화 (w=1)
+    // 힌트: F를 SVD 분해한 뒤, 가장 작은 특이값에 대응하는 V의 열이 null space입니다
+    //       구한 벡터의 마지막 원소로 나누어 동차 좌표를 정규화하세요
 
     // TODO: F^T의 오른쪽 null space로 e2 구하기
 

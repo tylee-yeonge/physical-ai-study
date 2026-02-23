@@ -65,21 +65,12 @@ void problem2_essential_matrix()
     // 시뮬레이션 데이터 생성...
 
     // TODO: Essential Matrix 추정
-    /*
-    cv::Mat E = cv::findEssentialMat(
-        points1, points2, K,
-        cv::RANSAC, 0.999, 1.0
-    );
-    */
+    // 힌트: findEssentialMat 함수에 대응점, K, RANSAC 옵션을 전달하세요
 
     std::cout << "Essential Matrix E:" << std::endl;
-    // std::cout << E << "\n" << std::endl;
 
     // TODO: R, t 복원
-    /*
-    cv::Mat R, t;
-    cv::recoverPose(E, points1, points2, K, R, t);
-    */
+    // 힌트: recoverPose 함수로 E를 분해하여 회전과 이동 벡터를 추출하세요
 
     std::cout << "💡 SLAM에서의 의미:" << std::endl;
     std::cout << "   - E를 분해 → R (회전), t (이동)" << std::endl;
@@ -178,30 +169,15 @@ void problem4_homography_dlt()
     {
         double x = src_pts[i].x, y = src_pts[i].y;
         double u = dst_pts[i].x, v = dst_pts[i].y;
-        (void)x; (void)y; (void)u; (void)v;  // TODO: 아래 주석 해제
-
-        // TODO: A 행렬 채우기
-        // A.at<double>(2*i, 0) = -x;
-        // A.at<double>(2*i, 1) = -y;
-        // A.at<double>(2*i, 2) = -1;
-        // A.at<double>(2*i, 6) = u * x;
-        // A.at<double>(2*i, 7) = u * y;
-        // A.at<double>(2*i, 8) = u;
-        // A.at<double>(2*i+1, 3) = -x;
-        // A.at<double>(2*i+1, 4) = -y;
-        // A.at<double>(2*i+1, 5) = -1;
-        // A.at<double>(2*i+1, 6) = v * x;
-        // A.at<double>(2*i+1, 7) = v * y;
-        // A.at<double>(2*i+1, 8) = v;
+        // TODO: 위의 행 배치 규칙에 따라 A 행렬을 채우세요
+        // 힌트: 짝수 행(2i)은 u 방정식, 홀수 행(2i+1)은 v 방정식에 해당합니다
+        //       at<double>(행, 열) 으로 각 위치에 값을 대입하세요
     }
 
     // TODO: SVD 분해 후 H 추출
     cv::Mat H_dlt = cv::Mat::eye(3, 3, CV_64F);
-    // cv::Mat w, u_mat, vt;
-    // cv::SVD::compute(A, w, u_mat, vt);
-    // cv::Mat h = vt.row(vt.rows - 1);  // 마지막 행 = V의 마지막 열
-    // H_dlt = h.reshape(1, 3);
-    // H_dlt /= H_dlt.at<double>(2, 2);  // h33=1로 정규화
+    // 힌트: A를 SVD 분해하고, V^T의 마지막 행(가장 작은 특이값에 대응)을
+    //       3x3으로 재배열하세요. h33=1이 되도록 전체를 h33으로 나누어 정규화하세요
 
     // OpenCV findHomography로 비교
     cv::Mat H_cv = cv::findHomography(src_pts, dst_pts);

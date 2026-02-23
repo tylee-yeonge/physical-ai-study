@@ -314,7 +314,7 @@ void problem5_calibration_simulation()
     // 힌트: 이중 for문으로 (j * square_size, i * square_size, 0) 생성
 
     // TODO: 여러 포즈에서 2D 이미지 점 생성
-    // 힌트: cv::projectPoints(objp, rvec, tvec, K_true, dist_true, img_points)
+    // 힌트: projectPoints 함수로 3D 점을 각 포즈에서 2D로 투영하세요
     std::vector<std::vector<cv::Point3f>> all_obj_points;
     std::vector<std::vector<cv::Point2f>> all_img_points;
 
@@ -322,10 +322,8 @@ void problem5_calibration_simulation()
     // 힌트: rvec = 작은 회전, tvec = (tx, ty, tz) with tz = 400~600
 
     // TODO: 캘리브레이션 수행
-    // cv::Mat K_estimated, dist_estimated;
-    // std::vector<cv::Mat> rvecs, tvecs;
-    // double rms = cv::calibrateCamera(all_obj_points, all_img_points,
-    //     image_size, K_estimated, dist_estimated, rvecs, tvecs);
+    // 힌트: calibrateCamera 함수에 객체 점과 이미지 점을 전달하여
+    //       K, dist, rvecs, tvecs를 추정하세요. 반환값이 RMS입니다.
 
     // TODO: 결과 비교
     // mean/max 왜곡 보정 오차 계산

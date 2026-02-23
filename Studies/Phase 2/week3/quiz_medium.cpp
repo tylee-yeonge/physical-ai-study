@@ -180,27 +180,20 @@ void problem4_harris_implementation()
 
     // TODO: 1. Sobel 필터로 Ix, Iy 계산
     cv::Mat Ix, Iy;
-    // cv::Sobel(image_f, Ix, CV_32F, 1, 0, 3);
-    // cv::Sobel(image_f, Iy, CV_32F, 0, 1, 3);
+    // 힌트: Sobel 함수로 x방향, y방향 그래디언트를 각각 구하세요 (커널 크기 3)
 
     // TODO: 2. Structure Tensor 요소 계산
     cv::Mat Ixx, Iyy, Ixy;
-    // Ixx = Ix.mul(Ix);
-    // Iyy = Iy.mul(Iy);
-    // Ixy = Ix.mul(Iy);
+    // 힌트: 각 그래디언트의 요소별 곱으로 Ix², Iy², Ix·Iy 행렬을 만드세요
 
     // TODO: 3. 가우시안 블러 적용
     int ksize = 5;
-    // cv::GaussianBlur(Ixx, Ixx, cv::Size(ksize, ksize), 0);
-    // cv::GaussianBlur(Iyy, Iyy, cv::Size(ksize, ksize), 0);
-    // cv::GaussianBlur(Ixy, Ixy, cv::Size(ksize, ksize), 0);
+    // 힌트: 각 Structure Tensor 요소에 가우시안 블러를 적용하여 윈도우 내 가중 합산하세요
 
     // TODO: 4. Harris 응답 R = det(M) - k * trace(M)^2
     double k = 0.04;
     cv::Mat harris_response;
-    // cv::Mat det = Ixx.mul(Iyy) - Ixy.mul(Ixy);
-    // cv::Mat trace = Ixx + Iyy;
-    // harris_response = det - k * trace.mul(trace);
+    // 힌트: det(M)과 trace(M)을 구한 뒤 Harris 응답 공식을 적용하세요
 
     // OpenCV cornerHarris로 비교
     cv::Mat harris_cv;

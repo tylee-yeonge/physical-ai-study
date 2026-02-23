@@ -160,8 +160,7 @@ void problem3_extrinsic_effect()
     // [   0     1    0   ]
     // [-sin(θ)  0  cos(θ)]
     //
-    // 힌트: cv::Mat R = (cv::Mat_<double>(3,3) << ...);
-    // Pc = R * [0, 0, 5]^T
+    // 힌트: 위 행렬을 3x3 Mat으로 생성한 뒤 3D 점에 곱하세요
 
     double u2 = 0.0, v2 = 0.0;  // TODO
     std::cout << "시나리오 2 (Y축 15° 회전): (" << u2 << ", " << v2 << ")" << std::endl;
@@ -210,8 +209,7 @@ void problem4_multi_camera_visibility()
     // TODO: 정면 카메라 (R=I, t=0) 추가
     // TODO: 좌측 30도 카메라 (Y축 -30도 회전) 추가
     // TODO: 우측 30도 카메라 (Y축 +30도 회전) 추가
-    // 힌트: cv::Mat R = (cv::Mat_<double>(3,3) << cos, 0, sin, 0, 1, 0, -sin, 0, cos);
-    //        cv::Mat t = cv::Mat::zeros(3, 1, CV_64F);
+    // 힌트: Y축 회전 행렬을 3x3 Mat으로 생성하고, 이동 벡터는 영벡터로 설정하세요
 
     // 10개 3D 점
     std::vector<cv::Point3d> points = {
