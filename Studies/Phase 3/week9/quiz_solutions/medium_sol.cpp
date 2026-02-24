@@ -1,106 +1,136 @@
 /**
- * Quiz Solutions - Medium
+ * Quiz Medium - Week 9: BA 최적화 기법 (Schur Complement) (정답)
+ *
+ * 이 퀴즈에서 다루는 개념:
+ *   1. Schur Complement의 계산량 절감 원리
+ *   2. Local BA의 장단점 — 실시간성 vs 전역 일관성
+ *   3. VINS Sliding Window — Local BA + IMU 융합
+ *
+ * Schur Complement 계산량 비교:
+ *
+ *   Full BA: N_p개 포즈, N_l개 3D 점
+ *     전체 시스템 크기: (6·N_p + 3·N_l) × (6·N_p + 3·N_l)
+ *     예: 100 포즈, 10000 점 → 30600 × 30600 → O(30600³) ≈ 불가능
+ *
+ *   Schur 소거 후:
+ *     reduced 크기: 6·N_p × 6·N_p = 600 × 600 → O(600³) ≈ 실시간 가능
+ *     + Hll⁻¹ 계산: O(N_l) (블록 대각이므로 3×3 역행렬 N_l번)
+ *
+ * Local BA vs Global BA:
+ *
+ *   Local BA:  현재 KF + covisible KF (~20개) → 수십 ms
+ *   Global BA: 모든 KF + 모든 점 → 수 초~분
+ *
+ *   ORB-SLAM2 구조:
+ *     Tracking → Local Mapping (Local BA) → Loop Closing (Global BA)
+ *                     ↑ 매 KF마다               ↑ Loop 발견 시에만
+ *
+ * 난이도: ★★☆ (서술형)
+ * 선수 지식: quiz_easy (Schur, Local/Global BA 개념)
  */
 
 #include <iostream>
 
+// Q1: Schur Complement의 계산량 절감 원리
+//
+// 핵심 포인트:
+//
+// 1. Hll이 블록 대각:
+//    3D 점끼리 직접 연결 안 됨 → Hll = diag(H_l1, ..., H_ln)
+//    → Hll⁻¹ = diag(H_l1⁻¹, ..., H_ln⁻¹) — O(N_l)
+//
+// 2. 문제 크기 축소:
+//    원래: (6N_p + 3N_l) 크기의 선형 시스템
+//    Schur 후: 6N_p 크기의 reduced system
+//    N_l >> N_p이므로 극적인 크기 감소
+//
+// 3. 풀이 순서:
+//    ① Hll⁻¹ 계산 (블록 대각 → O(N_l))
+//    ② reduced system 구성 및 풀이 (Δp)
+//    ③ 역대입으로 Δl 계산
+//
+// ★ 수치 예시:
+//    100 포즈, 10000 점:
+//    원래: 30600 × 30600 → 축소: 600 × 600 (51배 축소)
+//    O(n³) 기준: 51³ ≈ 130000배 속도 향상
+void problem1_schur_savings()
+{
+    std::cout << "Q1. Schur Complement가 계산량을 줄이는 원리를 설명하세요.\n";
+    std::cout << "   힌트: Hpp의 구조, 문제 크기 변화\n";
+    // ✅ 정답: Hll이 블록 대각 → O(N_l)로 역행렬, 문제 크기 극적 축소
+    std::cout << "   답: Hll이 블록 대각이라 O(N_l)로 역행렬 계산 가능\n";
+    std::cout << "   (6N_p+3N_l) → 6N_p로 축소 (예: 30600→600, 51배)\n" << std::endl;
+}
+
+// Q2: Local BA의 장단점
+//
+// 장점:
+//   1. 실시간 가능: covisible KF ~20개만 최적화 → 수십 ms
+//   2. 메모리 효율: 전체 맵을 메모리에 올릴 필요 없음
+//   3. 점진적 개선: 매 KF마다 주변 맵을 정제
+//   4. 멀티스레드 호환: Tracking과 병렬 실행 가능
+//
+// 단점:
+//   1. 전역 일관성 부재: 먼 KF 간 오차 보정 불가
+//   2. 드리프트 누적: Local 영역 밖의 오차가 남음
+//      → Loop Closure + Global BA로 해결
+//   3. 경계 효과: Local 영역 경계의 KF은 제약 부족
+//
+// ★ ORB-SLAM2의 해법:
+//   Local BA (실시간 정밀화) + Global BA (Loop 후 전역 보정)
+void problem2_local_ba()
+{
+    std::cout << "Q2. Local BA의 장단점을 시스템 관점에서 설명하세요.\n";
+    std::cout << "   힌트: 실시간성, 정확도, 드리프트\n";
+    // ✅ 정답:
+    std::cout << "   장점: 실시간 가능(~20 KF, 수십ms), 메모리 효율, 멀티스레드 호환\n";
+    std::cout << "   단점: 전역 일관성 부재, 드리프트 누적 → Loop+Global BA로 해결\n" << std::endl;
+}
+
+// Q3: VINS Sliding Window와 Local BA
+//
+// VINS-Mono의 Sliding Window:
+//   고정 크기(~10개 KF)의 윈도우를 유지
+//   새 KF 추가 시 → 가장 오래된 KF를 marginalize하여 제거
+//
+// Local BA를 사용하는 이유:
+//
+//   1. 실시간 요구:
+//      VIO는 200Hz+ IMU + 30Hz 카메라 → 실시간 처리 필수
+//      Global BA는 너무 느림
+//
+//   2. 메모리 제한:
+//      모바일/드론 환경 → 제한된 메모리
+//      고정 크기 윈도우로 메모리 사용량 일정하게 유지
+//
+//   3. IMU 융합:
+//      IMU pre-integration이 인접 KF 간 제약 제공
+//      → Local 영역에서 IMU + Vision 동시 최적화
+//      → 멀리 떨어진 KF과의 관계는 IMU가 아닌 Loop Closure로 처리
+//
+// ★ VINS의 marginalization:
+//   제거되는 KF의 정보를 "사전 정보(prior)"로 변환하여 보존
+//   → 정보 손실 최소화 (단순 삭제와 다름)
+void problem3_vins_sliding_window()
+{
+    std::cout << "Q3. VINS의 sliding window optimization이 Local BA를 사용하는 이유는?\n";
+    std::cout << "   힌트: 실시간, 메모리, IMU\n";
+    // ✅ 정답: 실시간 요구 + 메모리 제한 + IMU가 인접 KF 간 제약 제공
+    std::cout << "   답: 1) VIO 실시간 요구, 2) 모바일/드론 메모리 제한,\n";
+    std::cout << "   3) IMU pre-integration이 인접 KF 간 제약 → Local이면 충분\n" << std::endl;
+}
+
 int main()
 {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
-    std::cout << "Week 9 Quiz Solutions (Medium)" << std::endl;
+    std::cout << "Week 9 Quiz - Medium (정답)" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    std::cout << "Q1. Schur Complement가 계산량을 줄이는 원리\n";
-    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-    std::cout << "정답:\n\n";
+    problem1_schur_savings();
+    problem2_local_ba();
+    problem3_vins_sliding_window();
 
-    std::cout << "1. Hpp의 특수 구조 활용\n";
-    std::cout << "   - Hpp는 블록 대각 행렬\n";
-    std::cout << "   - 각 점이 독립적이므로 3x3 블록만 대각선에 존재\n";
-    std::cout << "   - Hpp 역행렬 = 각 블록의 역행렬 (O(M))\n\n";
-
-    std::cout << "2. 문제 크기 감소\n";
-    std::cout << "   원래 시스템:\n";
-    std::cout << "   [Hcc  Hcp][Δc]   [bc]\n";
-    std::cout << "   [Hpc  Hpp][Δp] = [bp]\n\n";
-
-    std::cout << "   Schur Complement 적용:\n";
-    std::cout << "   S = Hcc - Hcp * Hpp^(-1) * Hpc\n";
-    std::cout << "   S * Δc = bc - Hcp * Hpp^(-1) * bp\n\n";
-
-    std::cout << "   크기 변화:\n";
-    std::cout << "   - 원래: (6N + 3M) x (6N + 3M)\n";
-    std::cout << "   - Schur 후: 6N x 6N\n";
-    std::cout << "   - 예: 30,600 → 600 (점 10,000개 기준)\n\n";
-
-    std::cout << "3. 계산량\n";
-    std::cout << "   - 일반 해법: O((N+M)^3) ≈ O(M^3)\n";
-    std::cout << "   - Schur: O(N^3) + O(M)\n";
-    std::cout << "   - M >> N이므로 훨씬 빠름!\n\n";
-
-    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-    std::cout << "Q2. Local BA의 장단점 (시스템 관점)\n";
-    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-    std::cout << "정답:\n\n";
-
-    std::cout << "장점:\n";
-    std::cout << "  1. 실시간 처리 가능\n";
-    std::cout << "     - 변수 수가 제한됨 (최근 N개 키프레임)\n";
-    std::cout << "     - 일정한 계산 시간 보장\n";
-    std::cout << "     - 30fps 처리 가능\n\n";
-
-    std::cout << "  2. 메모리 효율\n";
-    std::cout << "     - 오래된 키프레임 제거\n";
-    std::cout << "     - 무한한 맵에서도 메모리 제한\n\n";
-
-    std::cout << "  3. 최신 정보 반영\n";
-    std::cout << "     - 최근 관측에 집중\n";
-    std::cout << "     - 빠른 수렴\n\n";
-
-    std::cout << "단점:\n";
-    std::cout << "  1. 드리프트 누적\n";
-    std::cout << "     - 과거 오차가 수정되지 않음\n";
-    std::cout << "     - 긴 경로에서 오차 증가\n\n";
-
-    std::cout << "  2. 전역 일관성 부족\n";
-    std::cout << "     - Loop closure 없이는 맵이 틀어짐\n";
-    std::cout << "     - 시작점으로 돌아와도 맞지 않음\n\n";
-
-    std::cout << "  3. 정보 손실\n";
-    std::cout << "     - Marginalization으로 정보 압축\n";
-    std::cout << "     - 선형화 오차 누적 가능\n\n";
-
-    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-    std::cout << "Q3. VINS가 Local BA를 사용하는 이유\n";
-    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-    std::cout << "정답:\n\n";
-
-    std::cout << "1. 실시간 VIO 요구사항\n";
-    std::cout << "   - 드론, 로봇은 실시간 제어 필요\n";
-    std::cout << "   - 30Hz 이상 처리 필수\n";
-    std::cout << "   - Global BA는 너무 느림\n\n";
-
-    std::cout << "2. 메모리 제약\n";
-    std::cout << "   - 임베디드 시스템 (드론, 모바일)\n";
-    std::cout << "   - 무한 맵 저장 불가\n";
-    std::cout << "   - Sliding window로 제한\n\n";
-
-    std::cout << "3. IMU와의 긴밀한 결합\n";
-    std::cout << "   - IMU pre-integration은 최근 데이터만 사용\n";
-    std::cout << "   - 과거 IMU 데이터 재처리 비효율\n";
-    std::cout << "   - Sliding window에 자연스럽게 맞음\n\n";
-
-    std::cout << "4. Marginalization 활용\n";
-    std::cout << "   - 오래된 정보를 prior로 요약\n";
-    std::cout << "   - 정보 손실 최소화\n";
-    std::cout << "   - 계산 효율 + 정확도 균형\n\n";
-
-    std::cout << "5. Loop Closure는 별도 처리\n";
-    std::cout << "   - 전역 일관성은 pose graph로\n";
-    std::cout << "   - Local BA와 역할 분리\n";
-    std::cout << "   - 효율적인 시스템 구조\n";
-
-    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
 
     return 0;
 }

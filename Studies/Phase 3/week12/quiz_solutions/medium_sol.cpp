@@ -1,6 +1,33 @@
 /**
- * Quiz Solutions - Medium
- * Week 12: Monocular 스케일 모호성 (Eigen 활용)
+ * Quiz Medium - Week 12: Monocular 스케일 모호성 (정답)
+ *
+ * 이 퀴즈에서 다루는 개념:
+ *   1. λ 스케일링 증명 — 투영 방정식에서 스케일이 소거되는 것을 코드로 확인
+ *   2. 스케일 드리프트 누적 — 노이즈가 있는 스케일 추정의 누적 오차 시뮬레이션
+ *   3. Sim(3) vs SE(3) — 스케일 자유도를 포함한 변환군의 차이
+ *
+ * 투영에서 스케일이 소거되는 원리:
+ *
+ *   x_proj = K · (R · X + t)  (3D → 동차 좌표)
+ *   u = x_proj(0) / x_proj(2)  (동차 → 픽셀)
+ *
+ *   X → λX, t → λt로 바꾸면:
+ *   K · (R · λX + λt) = λ · K · (R · X + t)
+ *   → 동차 좌표의 λ배 → 나눗셈에서 소거!
+ *
+ * Sim(3) — 스케일을 포함한 유사 변환:
+ *
+ *   SE(3): [R  t]  (6 DoF: 회전 3 + 이동 3)
+ *          [0  1]
+ *
+ *   Sim(3): [sR  t]  (7 DoF: 회전 3 + 이동 3 + 스케일 1)
+ *           [0   1]
+ *
+ *   ★ ORB-SLAM2 Loop Closure에서 Sim(3) 정합 사용
+ *     → 루프 양쪽의 스케일 차이를 보정
+ *
+ * 난이도: ★★☆ (수치 계산, Eigen 활용)
+ * 선수 지식: quiz_easy (스케일 모호성 기본), Week 2 (Essential Matrix)
  */
 
 #include <iostream>
@@ -8,17 +35,34 @@
 #include <random>
 #include <Eigen/Dense>
 
-using namespace std;
 using namespace Eigen;
 
 /**
- * Q1 풀이: λ 스케일링 증명
+ * 문제 1: λ 스케일링 증명
+ *
+ * 투영 방정식: x = K · (R · X + t)
+ *   동차 좌표 [x, y, z]^T → 픽셀 좌표 (x/z, y/z)
+ *
+ * X → λX (동시에 t → λt) 치환:
+ *   K · (R · λX + λt) = λ · K · (R · X + t) = λ · [x, y, z]^T
+ *   → 픽셀 좌표: (λx/λz, λy/λz) = (x/z, y/z) — 동일!
+ *
+ * ★ 이것이 단안 카메라에서 절대 크기를 알 수 없는 수학적 근거
+ *   코드로 λ = 2, 5, 10에 대해 실제로 같은 픽셀에 투영되는지 확인
+ *
+ * TODO:
+ *   1. 카메라 내부 파라미터 K, 포즈 [R|t], 3D 점 X 정의
+ *   2. X를 투영하여 픽셀 좌표 (u1, v1) 계산
+ *   3. λ=2, λ=5, λ=10 으로 스케일한 점 λX를 투영
+ *   4. (u1, v1)과 동일한지 확인
  */
-void solution1_lambda_scaling()
+void problem1_lambda_scaling()
 {
-    cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
-    cout << "Q1 풀이: λ 스케일링 증명" << endl;
-    cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "Q1. λ 스케일링 증명" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+
+    std::cout << "3D 점 X와 λX가 같은 픽셀에 투영됨을 확인하세요.\n" << std::endl;
 
     // 카메라 내부 파라미터
     Matrix3d K;
@@ -31,62 +75,78 @@ void solution1_lambda_scaling()
     // 3D 점
     Vector3d X(1.0, 2.0, 5.0);
 
-    cout << "카메라 K:\n" << K << "\n" << endl;
-    cout << "3D 점 X = " << X.transpose() << "\n" << endl;
+    // ─── TODO 시작 ───
 
-    // 원본 투영
+    // ✅ 정답: 원본 X 투영
     Vector3d x_proj = K * (R * X + t);
     double u1 = x_proj(0) / x_proj(2);
     double v1 = x_proj(1) / x_proj(2);
-    cout << "원본 X   → 투영: (" << u1 << ", " << v1 << ")" << endl;
+    std::cout << "원본 X:  u = " << u1 << ", v = " << v1 << std::endl;
 
-    // 다양한 λ로 스케일
-    for (double lambda : {2.0, 5.0, 10.0, 0.1})
+    // 여러 λ에 대해 스케일한 점 투영
+    double lambdas[] = {2.0, 5.0, 10.0};
+    for (double lambda : lambdas)
     {
         Vector3d X_scaled = lambda * X;
-        // 핵심: 이동도 λ배 스케일 (t=0이므로 여기서는 상관없음)
-        // 일반적인 경우: t_scaled = lambda * t
-        Vector3d x_proj_scaled = K * (R * X_scaled + lambda * t);
-        double u2 = x_proj_scaled(0) / x_proj_scaled(2);
-        double v2 = x_proj_scaled(1) / x_proj_scaled(2);
-
-        cout << "λ=" << lambda << " → X_s = " << X_scaled.transpose() << " → 투영: (" << u2 << ", "
-             << v2 << ")";
-
-        if (abs(u1 - u2) < 1e-10 && abs(v1 - v2) < 1e-10)
-        {
-            cout << "  [동일!]";
-        }
-        cout << endl;
+        Vector3d t_scaled = lambda * t;
+        Vector3d x_proj_s = K * (R * X_scaled + t_scaled);
+        double u2 = x_proj_s(0) / x_proj_s(2);
+        double v2 = x_proj_s(1) / x_proj_s(2);
+        std::cout << "λ=" << lambda << " X: u = " << u2 << ", v = " << v2
+                  << " (차이: " << std::abs(u1 - u2) + std::abs(v1 - v2) << ")" << std::endl;
     }
 
-    cout << "\n결론: 어떤 λ를 곱해도 투영 결과는 동일!" << endl;
-    cout << "  → 단안 카메라는 X와 λX를 구분할 수 없음" << endl;
-    cout << "  → 이것이 스케일 모호성의 근본 원인\n" << endl;
+    // ─── TODO 끝 ───
+
+    std::cout << "\n결과: 모든 λ에 대해 동일한 (u, v) → 스케일 소거 확인!\n" << std::endl;
 }
 
 /**
- * Q2 풀이: 스케일 드리프트 누적
+ * 문제 2: 스케일 드리프트 누적 시뮬레이션
+ *
+ * Monocular VO에서 매 프레임 스케일 추정:
+ *   실제: ||t_k|| = 1.0m (매 프레임 1m 이동)
+ *   추정: ||t_k|| = s_k = 1.0 + ε_k (ε_k ~ N(0, σ²))
+ *
+ * n프레임 후 추정 위치:
+ *   p_est = Σ s_k · Δt = Σ (1 + ε_k) · Δt
+ *   오차 = |p_est - p_gt| = |Σ ε_k| · ||Δt||
+ *
+ * 기대 오차 (Random Walk):
+ *   E[|Σ ε_k|] ≈ σ · √n
+ *   σ=0.01, n=100 → 기대 오차 ≈ 0.1m (1% 노이즈)
+ *   σ=0.05, n=100 → 기대 오차 ≈ 0.5m (5% 노이즈)
+ *
+ * ★ 실제 VO에서는 회전 오차도 누적되어 더 심각
+ *   → 이 시뮬레이션은 이동 스케일만의 최소한의 오차
+ *
+ * TODO:
+ *   1. 실제 이동: 매 프레임 [1, 0, 0] (1m 전진)
+ *   2. 추정 이동: scale * [1, 0, 0] (scale = 1 + noise)
+ *   3. 100프레임 누적 후 위치 비교
+ *   4. noise_std = 0.01 (1%), 0.02 (2%), 0.05 (5%) 각각 시도
  */
-void solution2_drift_accumulation()
+void problem2_drift_accumulation()
 {
-    cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
-    cout << "Q2 풀이: 스케일 드리프트 누적" << endl;
-    cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "Q2. 스케일 드리프트 누적" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+
+    std::cout << "직선 궤적 (100프레임, 매 프레임 1m 전진)에서\n";
+    std::cout << "스케일 노이즈에 따른 최종 위치 오차를 계산하세요.\n" << std::endl;
 
     const int n_frames = 100;
     Vector3d true_delta(1.0, 0.0, 0.0);  // 매 프레임 1m 전진
 
-    cout << "설정: " << n_frames << "프레임, 매 프레임 1m 전진" << endl;
-    cout << "GT 최종 위치: " << n_frames * 1.0 << "m\n" << endl;
+    // ─── TODO 시작 ───
 
-    cout << "노이즈(%) | 추정 위치(m) | 절대 오차(m) | 상대 오차(%)" << endl;
-    cout << "----------|-------------|-------------|------------" << endl;
+    // ✅ 정답:
+    double noise_stds[] = {0.01, 0.02, 0.05};
+    std::mt19937 gen(42);
 
-    for (double noise_std : {0.001, 0.005, 0.01, 0.02, 0.05})
+    for (double noise_std : noise_stds)
     {
-        default_random_engine gen(42);
-        normal_distribution<double> noise(1.0, noise_std);
+        std::normal_distribution<double> dist(1.0, noise_std);
 
         Vector3d gt_position = Vector3d::Zero();
         Vector3d est_position = Vector3d::Zero();
@@ -94,54 +154,59 @@ void solution2_drift_accumulation()
         for (int i = 0; i < n_frames; i++)
         {
             gt_position += true_delta;
-
-            double scale = noise(gen);
+            double scale = dist(gen);
             est_position += scale * true_delta;
         }
 
         double error = (gt_position - est_position).norm();
-        double relative_error = error / gt_position.norm() * 100.0;
-
-        printf("  %5.1f   |   %7.2f   |    %6.3f   |    %5.2f\n", noise_std * 100, est_position.x(),
-               error, relative_error);
+        std::cout << "noise_std=" << noise_std
+                  << ": GT=(" << gt_position.transpose()
+                  << "), Est=(" << est_position.transpose()
+                  << "), 오차=" << error << "m" << std::endl;
     }
 
-    cout << "\n분석:" << endl;
-    cout << "  - 1% 노이즈: ~1m 오차 (100m 중)" << endl;
-    cout << "  - 5% 노이즈: ~5m 오차 (100m 중)" << endl;
-    cout << "  - 노이즈가 sqrt(n)에 비례하여 누적 (랜덤 워크)" << endl;
-    cout << "  - 바이어스가 있으면 n에 비례하여 누적 (더 심각!)\n" << endl;
+    // ─── TODO 끝 ───
 
-    // 바이어스가 있는 경우 추가 분석
-    cout << "참고: 바이어스가 있는 경우 (평균 = 0.99)" << endl;
-    {
-        default_random_engine gen(42);
-        normal_distribution<double> noise(0.99, 0.01);  // 평균 0.99 (1% 바이어스)
-
-        Vector3d gt_position = Vector3d::Zero();
-        Vector3d est_position = Vector3d::Zero();
-
-        for (int i = 0; i < n_frames; i++)
-        {
-            gt_position += true_delta;
-            double scale = noise(gen);
-            est_position += scale * true_delta;
-        }
-
-        double error = (gt_position - est_position).norm();
-        printf("  바이어스 1%%: 추정 %.2fm, 오차 %.3fm\n", est_position.x(), error);
-        cout << "  → 바이어스가 있으면 오차가 n에 비례하여 훨씬 심각!\n" << endl;
-    }
+    std::cout << "\n결과: 노이즈가 커질수록 드리프트 오차 증가 (Random Walk)\n" << std::endl;
 }
 
 /**
- * Q3 풀이: Sim(3) vs SE(3) 비교
+ * 문제 3: Sim(3) vs SE(3) 비교
+ *
+ * SE(3) (Special Euclidean):
+ *   T · X = R · X + t     (6 DoF)
+ *   거리와 각도를 보존 → 강체 변환
+ *
+ * Sim(3) (Similarity):
+ *   S · X = s · R · X + t  (7 DoF)
+ *   각도만 보존, 거리는 s배 → 유사 변환
+ *
+ * Monocular SLAM에서 Sim(3)가 필요한 이유:
+ *   Loop Closure 시 루프 양 끝의 맵 스케일이 다를 수 있음
+ *   SE(3)로는 스케일 차이를 보정할 수 없음
+ *   Sim(3)의 s 파라미터로 스케일 차이를 흡수
+ *
+ * ★ ORB-SLAM2:
+ *   Monocular → Sim(3) Loop Closure
+ *   Stereo/RGB-D → SE(3) Loop Closure (스케일이 이미 결정됨)
+ *
+ * TODO:
+ *   1. SE(3) 변환 행렬 구성: [R t; 0 1] (4x4)
+ *   2. Sim(3) 변환 행렬 구성: [sR t; 0 1] (4x4)
+ *   3. 같은 3D 점에 두 변환을 적용
+ *   4. 결과 비교 (스케일 s의 효과 관찰)
  */
-void solution3_sim3_vs_se3()
+void problem3_sim3_vs_se3()
 {
-    cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
-    cout << "Q3 풀이: Sim(3) vs SE(3) 비교" << endl;
-    cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "Q3. Sim(3) vs SE(3) 변환 비교" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+
+    std::cout << "SE(3)와 Sim(3)의 차이를 확인하세요.\n" << std::endl;
+    std::cout << "SE(3):  T = [R  t]    (6 자유도)\n";
+    std::cout << "            [0  1]\n" << std::endl;
+    std::cout << "Sim(3): S = [sR t]    (7 자유도)\n";
+    std::cout << "            [0  1]\n" << std::endl;
 
     // 회전: Z축 30도
     double angle = M_PI / 6.0;
@@ -149,78 +214,49 @@ void solution3_sim3_vs_se3()
     R << cos(angle), -sin(angle), 0, sin(angle), cos(angle), 0, 0, 0, 1;
 
     Vector3d t(1.0, 0.5, 0.0);
+
+    // 3D 점
     Vector3d X(2.0, 3.0, 4.0);
 
-    cout << "회전: Z축 30도" << endl;
-    cout << "이동: " << t.transpose() << endl;
-    cout << "3D 점: " << X.transpose() << "\n" << endl;
+    // ─── TODO 시작 ───
 
-    // SE(3) 변환
+    // ✅ 정답:
+    // 1. SE(3) 변환
     Vector3d X_se3 = R * X + t;
-    cout << "SE(3) 변환 결과: " << X_se3.transpose() << "\n" << endl;
+    std::cout << "SE(3) 결과: (" << X_se3.transpose() << ")\n" << std::endl;
 
-    // Sim(3) 변환 (다양한 스케일)
-    cout << "Sim(3) 변환 결과:" << endl;
-    cout << "  s   | 변환 결과             | SE(3)과의 차이" << endl;
-    cout << "------|----------------------|------------------" << endl;
-
-    for (double s : {0.5, 1.0, 2.0, 3.0})
+    // 2. Sim(3) 변환 (s = 0.5, 1.0, 2.0)
+    double scales[] = {0.5, 1.0, 2.0};
+    for (double s : scales)
     {
         Vector3d X_sim3 = s * R * X + t;
-        Vector3d diff = X_se3 - X_sim3;
-
-        printf("  %.1f | (%6.2f, %6.2f, %6.2f) | (%6.2f, %6.2f, %6.2f)\n", s, X_sim3(0), X_sim3(1),
-               X_sim3(2), diff(0), diff(1), diff(2));
+        Vector3d diff = X_sim3 - X_se3;
+        std::cout << "Sim(3) s=" << s << ": (" << X_sim3.transpose()
+                  << "), SE(3)와 차이: (" << diff.transpose() << ")" << std::endl;
     }
 
-    cout << "\n분석:" << endl;
-    cout << "  1. s=1일 때 SE(3)와 Sim(3)는 완전히 동일" << endl;
-    cout << "     → SE(3)는 Sim(3)의 특수 경우 (s=1)" << endl;
-    cout << endl;
-    cout << "  2. s가 변하면 회전된 좌표가 스케일됨" << endl;
-    cout << "     → 이동(t)은 스케일 영향 없음" << endl;
-    cout << "     → 3D 구조의 크기만 변화" << endl;
-    cout << endl;
-    cout << "  3. Loop Closure에서 Sim(3)가 필요한 이유:" << endl;
-    cout << "     → 단안 SLAM에서 맵의 스케일이 드리프트" << endl;
-    cout << "     → 같은 장소를 재방문했을 때 스케일이 다름" << endl;
-    cout << "     → SE(3)로는 정렬 불가 (스케일 자유도 없음)" << endl;
-    cout << "     → Sim(3)로 스케일 + 포즈 동시 정렬" << endl;
+    // 3. 관찰:
+    // - s=1일 때 SE(3)와 Sim(3)는 동일
+    // - s가 변하면 회전 후 거리가 s배 스케일됨
+    // - Loop Closure에서 루프 양쪽 스케일 차이를 Sim(3)의 s로 흡수
 
-    // 4x4 행렬 표현
-    cout << "\n4x4 행렬 표현:" << endl;
+    // ─── TODO 끝 ───
 
-    cout << "\nSE(3):" << endl;
-    Matrix4d T_se3 = Matrix4d::Identity();
-    T_se3.block<3, 3>(0, 0) = R;
-    T_se3.block<3, 1>(0, 3) = t;
-    cout << T_se3 << endl;
-
-    double s = 2.0;
-    cout << "\nSim(3) (s=2):" << endl;
-    Matrix4d T_sim3 = Matrix4d::Identity();
-    T_sim3.block<3, 3>(0, 0) = s * R;
-    T_sim3.block<3, 1>(0, 3) = t;
-    cout << T_sim3 << endl;
-
-    cout << "\n자유도 비교:" << endl;
-    cout << "  SE(3):  6 DoF (회전 3 + 이동 3)" << endl;
-    cout << "  Sim(3): 7 DoF (회전 3 + 이동 3 + 스케일 1)" << endl;
-
-    cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
-
-    return;
+    std::cout << "\n결과: s=1일 때 SE(3)=Sim(3), s!=1일 때 스케일 차이 관찰\n" << std::endl;
 }
 
 int main()
 {
-    cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
-    cout << "Week 12 Quiz Solutions (Medium)" << endl;
-    cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "Week 12 Quiz - Medium (정답)" << std::endl;
+    std::cout << "Monocular 스케일 모호성 (Eigen 활용)" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    solution1_lambda_scaling();
-    solution2_drift_accumulation();
-    solution3_sim3_vs_se3();
+    problem1_lambda_scaling();
+    problem2_drift_accumulation();
+    problem3_sim3_vs_se3();
+
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
 
     return 0;
 }
