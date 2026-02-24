@@ -1,5 +1,20 @@
 /**
  * Phase 2 Week 8 - Optical Flow 중급 퀴즈
+ *
+ * 다루는 개념:
+ *   - cv::calcOpticalFlowPyrLK 사용법 (Pyramidal LK)
+ *   - 추적 품질 평가 (status, error, backward check)
+ *   - Optical Flow vs Feature Matching 비교
+ *   - LK 단일 점 직접 구현 (Sobel → AᵀA → 역행렬)
+ *   - 윈도우 크기별 LK 정확도 트레이드오프 분석
+ *
+ * 선수 지식: week8 easy (LK 이론, Aperture Problem, Pyramid)
+ *
+ * LK Optical Flow 구현의 핵심 단계:
+ *   1. Sobel로 Ix, Iy 계산 → It = Frame2 - Frame1
+ *   2. 윈도우 내 (Ix, Iy, It) 수집 → A 행렬, b 벡터 구성
+ *   3. Structure Tensor AᵀA (2×2) 구성
+ *   4. [u, v]ᵀ = (AᵀA)⁻¹ · Aᵀb 로 flow 계산
  */
 
 #include <opencv2/opencv.hpp>
@@ -8,6 +23,21 @@
 #include <cmath>
 #include <cstdio>
 
+// cv::calcOpticalFlowPyrLK 기본 사용 — Pyramidal Lucas-Kanade
+//
+// 함수 시그니처:
+//   calcOpticalFlowPyrLK(prevImg, nextImg, prevPts, nextPts,
+//                        status, err, winSize, maxLevel)
+//   - prevImg, nextImg: 그레이스케일 입력 이미지
+//   - prevPts: 추적할 점들 (vector<Point2f>)
+//   - nextPts: 출력 — 추적된 점 위치
+//   - status: 각 점의 추적 성공 여부 (1=성공, 0=실패)
+//   - err: 각 점의 추적 오차
+//   - winSize: LK 윈도우 크기 (기본 Size(21,21))
+//   - maxLevel: 피라미드 레벨 수 (기본 3)
+//
+// 이 문제에서는 합성 이미지(원 이동)로 추적 정확도를 확인한다.
+// ★ OpenCV 내부적으로 Pyramid + 반복 LK + 서브픽셀 보간 수행
 void problem1_implement_lk()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -40,6 +70,27 @@ void problem1_implement_lk()
     std::cout << "\n💡 OpenCV가 Pyramidal LK 자동 수행" << std::endl;
 }
 
+// 추적 품질 평가 — 언제 추적이 실패하는지 감지하는 방법
+//
+// LK 추적이 실패하는 경우:
+//   - 물체가 가려짐 (occlusion)
+//   - 급격한 조명 변화
+//   - 빠른 움직임 (피라미드 레벨 초과)
+//   - 텍스처 없는 영역
+//
+// 실패 감지 3가지 방법:
+//   1. status 확인: status[i] == 0이면 추적 실패
+//   2. error 임계값: err[i] > threshold이면 품질 불량
+//   3. Backward Check (역방향 확인):
+//      pts1 → pts2 추적 후, pts2 → pts1' 역추적
+//      ||pts1 - pts1'|| > threshold이면 신뢰 불가
+//
+// 실전 팁:
+//   - 일정 프레임마다 goodFeaturesToTrack으로 특징점 재검출
+//   - 이미지 경계 근처 점은 제거 (윈도우가 잘림)
+//   - 추적 점 수가 임계값 이하로 떨어지면 전체 재초기화
+//
+// ★ VINS-Mono에서는 Forward-Backward Error < 1px 기준 사용
 void problem2_track_quality()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -60,6 +111,24 @@ void problem2_track_quality()
     std::cout << "   - 이미지 경계 점 제거" << std::endl;
 }
 
+// Optical Flow vs Feature Matching — 두 추적 방법의 비교
+//
+// ┌──────────────┬──────────────────┬──────────────────┐
+// │   항목        │  Optical Flow    │ Feature Matching │
+// ├──────────────┼──────────────────┼──────────────────┤
+// │ 속도          │ 빠름 ✓          │ 느림 (descriptor)│
+// │ 큰 움직임     │ 제한적 (Pyramid) │ OK ✓            │
+// │ 조명 변화     │ 민감 ✗          │ 강건 ✓          │
+// │ 텍스처 필요   │ 적음            │ 많음             │
+// │ 정확도        │ 서브픽셀 ✓      │ 정수 픽셀        │
+// │ 넓은 베이스라인│ 불가 ✗         │ 가능 ✓          │
+// │ 드리프트      │ 누적됨 ✗       │ 독립적 ✓        │
+// └──────────────┴──────────────────┴──────────────────┘
+//
+// ★ 최적 조합 (Hybrid 전략):
+//   - 일반 Tracking: Optical Flow (빠른 프레임 간 추적)
+//   - Relocalization: Feature Matching (추적 실패 시 복구)
+//   - Loop Closure: Feature Matching (과거 프레임 인식)
 void problem3_flow_vs_matching()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -79,13 +148,31 @@ void problem3_flow_vs_matching()
     std::cout << "   - Relocalization: Feature Matching (robust)" << std::endl;
 }
 
-/**
- * @brief Lucas-Kanade 단일 점 광류를 직접 구현하고 OpenCV 결과와 비교
- *
- * Sobel로 Ix, Iy를 계산하고 프레임 차이로 It을 구한 후,
- * 윈도우 내 A 행렬과 b 벡터를 구성하여 (A^T A)^-1 A^T b로
- * (u, v) 광류를 계산한다. OpenCV calcOpticalFlowPyrLK 결과와 비교한다.
- */
+// LK 단일 점 직접 구현 — Sobel 그래디언트부터 AᵀA 역행렬까지
+//
+// 구현 단계:
+//   1. 그래디언트 계산:
+//      Ix = Sobel_x(I₁+I₂)/2  (두 프레임 평균으로 안정화)
+//      Iy = Sobel_y(I₁+I₂)/2
+//      It = I₂ - I₁  (시간 변화)
+//
+//   2. 윈도우 내 데이터 수집:
+//      추적점 주변 21×21 윈도우에서 (Ix, Iy, It) 값 수집
+//
+//   3. Structure Tensor 구성:
+//      AᵀA = [ ΣIx²    ΣIxIy ]    Aᵀb = [ -ΣIxIt ]
+//            [ ΣIxIy   ΣIy²  ]          [ -ΣIyIt ]
+//
+//   4. Flow 계산:
+//      [u, v]ᵀ = (AᵀA)⁻¹ · Aᵀb
+//
+//   5. 고유값 확인:
+//      AᵀA의 고유값으로 추적 가능성 판별
+//      λ₁, λ₂ 모두 크면 코너 = 추적 안정
+//
+// ★ OpenCV LK와 차이가 나는 이유:
+//   OpenCV는 피라미드 + 반복 최적화 + 서브픽셀 보간 적용
+//   직접 구현은 단일 레벨, 1회 계산
 void problem4_lk_single_point()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -195,12 +282,27 @@ void problem4_lk_single_point()
     std::cout << "   차이가 있다면: OpenCV는 피라미드 + 반복 최적화 사용" << std::endl;
 }
 
-/**
- * @brief 윈도우 크기별 LK 결과를 비교하여 트레이드오프 분석
- *
- * 윈도우 크기 5, 11, 21, 41로 변화시키며 LK 결과의 정확도를 비교하고
- * 작은 윈도우 vs 큰 윈도우의 트레이드오프를 확인한다.
- */
+// 윈도우 크기별 LK 정확도 분석 — Spatial Coherence 범위의 트레이드오프
+//
+// LK는 윈도우 내 모든 픽셀이 같은 flow를 가진다고 가정한다.
+// 윈도우 크기가 이 가정의 유효 범위를 결정한다.
+//
+// 작은 윈도우 (5×5):
+//   + 정밀한 추적 (서로 다른 움직임 구분 가능)
+//   + 작은 물체/근접 경계면 추적 가능
+//   - 제약식 부족 → 노이즈에 민감
+//   - AᵀA의 조건수 나빠짐
+//   - 큰 이동에 대응 불가
+//
+// 큰 윈도우 (41×41):
+//   + 많은 제약식 → 노이즈에 강건
+//   + 큰 이동도 처리 가능 (윈도우 내에 들어옴)
+//   - 서로 다른 움직임이 혼합됨 (물체 경계에서 부정확)
+//   - Spatial Coherence 가정이 깨지기 쉬움
+//   - 계산량 증가
+//
+// ★ 실전 권장: 15~31 (VINS-Mono 기본값: 21×21)
+//   피라미드를 사용하면 작은 윈도우로도 큰 이동 대응 가능
 void problem5_window_size_analysis()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━" << std::endl;

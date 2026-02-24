@@ -1,10 +1,42 @@
 /**
  * Phase 2 Week 5 - 에피폴라 기하학 기초 퀴즈
+ *
+ * 다루는 개념:
+ *   - 에피폴라 제약 (Epipolar Constraint): p2^T · E · p1 = 0
+ *   - Essential Matrix (E) vs Fundamental Matrix (F)
+ *   - 8-Point Algorithm의 원리
+ *   - E에서 R, t 복원 (포즈 분해)
+ *   - 에피폴 (Epipole) 추출
+ *
+ * 에피폴라 기하학은 두 카메라 뷰 사이의 기하학적 관계를 다룬다.
+ * SLAM에서 카메라 포즈 추정의 수학적 기초가 되는 핵심 이론이다.
+ *
+ *        카메라1          카메라2
+ *          O1 ─────────── O2
+ *         /|\             /|\
+ *        / | \           / | \
+ *       /  |  \         /  |  \
+ *      e1  |   \       /   |  e2     ← 에피폴 (상대 카메라 중심의 투영)
+ *     ─────┼────      ────┼─────
+ *   이미지1 |  p1     p2  | 이미지2
+ *           |             |
+ *           └─────X───────┘          ← 3D 점
+ *
+ *   에피폴라 선: p1을 지나는 에피폴라 선 위에 p2가 반드시 존재
+ *   → 2D 탐색을 1D 탐색으로 줄여줌 (매칭 효율화)
  */
 
 #include <opencv2/opencv.hpp>
 #include <iostream>
 
+// 에피폴라 제약 검증 — 두 대응점이 올바른 매칭인지 확인
+//
+// 에피폴라 제약: p2^T · E · p1 = 0
+//   - E: 3×3 Essential Matrix (두 카메라 간 기하 관계 인코딩)
+//   - p1, p2: 정규화 좌표 (K^-1 · [u, v, 1]^T)
+//
+// 이 값이 0에 가까울수록 올바른 대응점.
+// SLAM에서 RANSAC으로 outlier를 제거할 때 이 제약을 사용한다.
 void problem1_epipolar_constraint()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -19,13 +51,31 @@ void problem1_epipolar_constraint()
     cv::Point2f p2(120, 165);
 
     // TODO: p2^T * E * p1 계산
-    // 힌트: 0에 가까워야 함
+    // 1. p1, p2를 동차 좌표 벡터로 변환: [x, y, 1]^T
+    // 2. 행렬곱: result = p2^T · E · p1  (1×3 · 3×3 · 3×1 = 스칼라)
+    // 3. |result|가 0에 가까우면 올바른 대응
 
     std::cout << "💡 에피폴라 제약: p2^T * E * p1 = 0" << std::endl;
     std::cout << "   - 이 제약을 만족하는 점들만 올바른 대응" << std::endl;
     std::cout << "   - RANSAC outlier 제거에 사용" << std::endl;
 }
 
+// Essential Matrix vs Fundamental Matrix — 언제 무엇을 쓰는가
+//
+// Essential Matrix (E):
+//   - 정규화 좌표에서 동작: x'^T · E · x = 0
+//   - E = [t]_× · R  (카메라 간 R, t로 구성)
+//   - 5 자유도 (3 회전 + 2 이동방향, 스케일 제외)
+//   - ★ 카메라 캘리브레이션(K)이 필요
+//
+// Fundamental Matrix (F):
+//   - 픽셀 좌표에서 동작: p'^T · F · p = 0
+//   - F = K'^-T · E · K^-1  (K로 E를 감싼 형태)
+//   - 7 자유도 (9원소 - 스케일 - rank2 제약)
+//   - ★ 카메라 캘리브레이션 불필요
+//
+// SLAM에서는 보통 캘리브레이션된 카메라를 사용하므로 E를 선호한다.
+// E에서 직접 R, t를 분해할 수 있어 포즈 추정에 유리하다.
 void problem2_essential_vs_fundamental()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -47,6 +97,20 @@ void problem2_essential_vs_fundamental()
     std::cout << "   - 카메라 캘리브레이션 불필요" << std::endl;
 }
 
+// 8-Point Algorithm — F 또는 E를 추정하는 기본 알고리즘
+//
+// F는 3×3 행렬 = 9개 원소, 하지만:
+//   - 스케일 자유도 1개 제거 → 8개 미지수
+//   - 각 대응점 (p1, p2)는 1개 방정식 제공: p2^T · F · p1 = 0
+//   - 따라서 최소 8개 대응점 필요
+//
+// 알고리즘:
+//   1. 각 대응점에서 방정식 생성 → A 행렬 (N×9) 구성
+//   2. SVD로 A 분해 → V의 마지막 열 = f 벡터
+//   3. f를 3×3으로 reshape → F̃
+//   4. Rank-2 강제: SVD(F̃)에서 가장 작은 특이값을 0으로 → F
+//
+// ★ Rank-2 강제가 중요: F는 반드시 rank 2여야 에피폴라 선이 한 점(에피폴)에서 만남
 void problem3_eight_point()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -62,6 +126,22 @@ void problem3_eight_point()
     std::cout << "\n💡 실제로는 RANSAC으로 더 많은 점 사용!" << std::endl;
 }
 
+// E에서 R, t 복원 — SVD 분해로 카메라 포즈 추출
+//
+// E를 SVD 분해하면: E = U · diag(1, 1, 0) · V^T
+//
+//   W = [0 -1 0; 1 0 0; 0 0 1]  (90도 회전 행렬)
+//
+//   4가지 해:
+//     R1 = U · W · V^T,    t1 = +U의 3번째 열
+//     R1 = U · W · V^T,    t2 = -U의 3번째 열
+//     R2 = U · W^T · V^T,  t1 = +U의 3번째 열
+//     R2 = U · W^T · V^T,  t2 = -U의 3번째 열
+//
+// ★ Cheirality Check로 올바른 해 1개 선택:
+//   - 삼각측량으로 3D 점 복원
+//   - 두 카메라 모두에서 Z > 0인 해 = 올바른 해
+//   - (카메라 앞에 점이 있어야 물리적으로 유효)
 void problem4_pose_recovery()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -88,10 +168,21 @@ void problem4_pose_recovery()
  * @brief F 행렬에서 에피폴(epipole) 추출
  *
  * 에피폴은 F의 null space에서 구한다.
- * Fe₁ = 0 (오른쪽 null space) → e₁ = 이미지 1의 에피폴
- * Fᵀe₂ = 0 (왼쪽 null space) → e₂ = 이미지 2의 에피폴
+ *   F · e₁ = 0  (오른쪽 null space) → e₁ = 이미지 1의 에피폴
+ *   F^T · e₂ = 0 (왼쪽 null space) → e₂ = 이미지 2의 에피폴
  *
  * SVD를 이용해 null space를 구하고, 기하학적 의미를 설명한다.
+ *
+ * 에피폴의 기하학적 의미:
+ *   - 에피폴 = 상대 카메라 중심이 이 이미지에 투영된 점
+ *   - 모든 에피폴라 선은 에피폴을 지남 (방사형 패턴)
+ *   - 에피폴이 이미지 밖이면 에피폴라 선이 거의 평행
+ *     (= 전진 운동, 자동차 주행 시)
+ *
+ * SVD로 null space 구하기:
+ *   F = U · S · V^T 분해 후,
+ *   V의 마지막 열 = 가장 작은 특이값(≈0)에 대응 = null space
+ *   동차 좌표를 마지막 원소로 나누어 정규화
  */
 void problem5_epipole_from_F()
 {
@@ -109,10 +200,14 @@ void problem5_epipole_from_F()
     std::cout << F << std::endl;
 
     // TODO: SVD로 F의 오른쪽 null space 구하기
-    // 힌트: F를 SVD 분해한 뒤, 가장 작은 특이값에 대응하는 V의 열이 null space입니다
-    //       구한 벡터의 마지막 원소로 나누어 동차 좌표를 정규화하세요
+    // 1. cv::SVD::compute(F, w, u, vt) 로 SVD 분해
+    // 2. Vt의 마지막 행 = V의 마지막 열 = 가장 작은 특이값에 대응
+    // 3. 동차 좌표 정규화: e1 = [v[0]/v[2], v[1]/v[2], 1]
+    //
+    // F · e1 = 0 → e1이 null space에 있으므로, F에 곱하면 0벡터가 됨
 
     // TODO: F^T의 오른쪽 null space로 e2 구하기
+    // F^T · e2 = 0 → F를 전치한 뒤 같은 방법으로 SVD 분해
 
     std::cout << "\n기하학적 의미:" << std::endl;
     std::cout << "   - 에피폴 = 다른 카메라 중심이 이미지에 투영된 점" << std::endl;

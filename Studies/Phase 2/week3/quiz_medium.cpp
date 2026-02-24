@@ -1,7 +1,18 @@
 /**
  * Phase 2 Week 3 - 특징점 검출 중급 퀴즈
  *
- * 실전 응용 문제: 특징점 분포 개선, 스케일 불변성 등
+ * 다루는 개념:
+ *   - 균등한 특징점 분포 (Grid-based detection, VINS-Fusion 방식)
+ *   - 적응형 임계값 (목표 개수 달성을 위한 이진 탐색)
+ *   - 멀티스케일 검출 (이미지 피라미드, 스케일 불변성)
+ *   - Harris 코너 검출 직접 구현 (Sobel → Structure Tensor → R)
+ *   - NMS 직접 구현 (지역 최대값 필터링)
+ *
+ * 선수 지식: week3 easy (FAST, ORB, NMS, Harris 이론)
+ *
+ * 이 퀴즈는 특징점 검출의 실전 최적화 기법을 다룬다.
+ * 단순히 "검출"만이 아닌, "얼마나 좋은 특징점을 선택하느냐"가
+ * SLAM 성능을 결정하는 핵심 요소이다.
  */
 
 #include <opencv2/opencv.hpp>
@@ -9,12 +20,26 @@
 #include <iostream>
 #include <chrono>
 
-/**
- * 문제 1: 균등한 특징점 분포 구현
- *
- * 이미지를 그리드로 나누고 각 셀에서 일정 개수의 특징점을 검출하여
- * 균등한 분포를 만드세요. (VINS-Fusion 방식)
- */
+// 균등한 특징점 분포 구현 — Grid-based Detection (VINS-Fusion 방식)
+//
+// 문제: 텍스처가 풍부한 영역에 특징점이 몰리고,
+//       텍스처 없는 영역에는 특징점이 거의 없음
+//       → 한쪽으로 편중되면 포즈 추정이 특정 방향에서만 제약됨
+//
+// 해결: Grid-based Uniform Distribution
+//   1. 이미지를 grid_rows × grid_cols 격자로 분할
+//   2. 각 셀에서 독립적으로 FAST 검출
+//   3. response 기준 정렬 후 상위 max_per_cell개만 선택
+//   4. 전역 좌표로 변환하여 합침
+//
+// 장점:
+//   - 이미지 전체에 골고루 특징점 분포
+//   - 포즈 추정의 기하학적 제약이 균등해짐
+//   - 추적 안정성 향상
+//
+// ★ ORB-SLAM은 Quadtree 기반, VINS-Fusion은 Grid 기반 분포 사용
+//
+// TODO: 6×8 그리드에서 셀당 10개씩 검출하세요
 void problem1_uniform_distribution()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -59,12 +84,25 @@ void problem1_uniform_distribution()
     std::cout << "   - VINS-Fusion은 6x4 그리드 사용" << std::endl;
 }
 
-/**
- * 문제 2: Adaptive Threshold
- *
- * 이미지 밝기에 따라 FAST 임계값을 자동으로 조정하여
- * 목표 특징점 개수를 달성하세요.
- */
+// 적응형 임계값 — 이진 탐색으로 목표 특징점 수 달성
+//
+// 문제: FAST 임계값이 고정되면 환경에 따라 검출 수가 크게 변동
+//   - 밝은 고대비 장면: 너무 많은 특징점 → 처리 시간 초과
+//   - 어두운 저대비 장면: 너무 적은 특징점 → 추적 실패
+//
+// 해결: 이진 탐색(Binary Search)으로 임계값 자동 조정
+//   목표: 200개 특징점 달성
+//   1. min_thresh=1, max_thresh=100 범위 설정
+//   2. mid = (min + max) / 2
+//   3. threshold=mid로 FAST 검출
+//   4. 검출 수 > 목표 → 임계값 높이기 (min = mid + 1)
+//      검출 수 < 목표 → 임계값 낮추기 (max = mid - 1)
+//   5. 수렴할 때까지 반복 (log2(100) ≈ 7회)
+//
+// ★ ORB-SLAM에서는 octave별로 목표 특징점 수를 배분하여
+//   전체 목표(예: 2000개)를 달성하는 전략 사용
+//
+// TODO: 이진 탐색으로 200개에 가까운 임계값을 찾으세요
 void problem2_adaptive_threshold()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -104,12 +142,29 @@ void problem2_adaptive_threshold()
     std::cout << "   - 실시간으로 조정하여 일정한 개수 유지" << std::endl;
 }
 
-/**
- * 문제 3: 멀티스케일 검출
- *
- * 이미지 피라미드를 만들고 여러 스케일에서 특징점을 검출하세요.
- * ORB는 이미 내부적으로 구현되어 있습니다.
- */
+// 멀티스케일 검출 — 이미지 피라미드로 스케일 불변성 확보
+//
+// 문제: FAST는 단일 스케일에서만 검출
+//   - 가까운 물체의 큰 코너: 검출 ✓
+//   - 먼 물체의 작은 코너: 검출 ✗ (너무 작아서)
+//   - 물체가 가까워지면: 이전 코너와 매칭 실패
+//
+// 해결: Image Pyramid (다중 해상도 검출)
+//   Level 0: 원본 (1×)
+//   Level 1: 1/1.2× 축소
+//   Level 2: 1/1.44× 축소
+//   Level 3: 1/1.728× 축소
+//
+// 각 레벨에서:
+//   1. 이미지를 scale = 1.2^level 비율로 축소
+//   2. 축소된 이미지에서 FAST 검출
+//   3. 검출된 keypoint의 좌표에 scale을 곱하여 원본 크기로 복원
+//   4. keypoint.octave에 레벨 정보 저장
+//
+// ★ ORB::create(nFeatures, scaleFactor, nLevels)에서
+//   scaleFactor=1.2, nLevels=8이 기본값으로 자동 수행
+//
+// TODO: 4레벨 피라미드에서 FAST 검출을 직접 구현하세요
 void problem3_multiscale_detection()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -148,13 +203,30 @@ void problem3_multiscale_detection()
     std::cout << "   - ORB, SIFT는 자동으로 수행" << std::endl;
 }
 
-/**
- * @brief Harris 코너 검출 직접 구현
- *
- * Sobel로 Ix, Iy 그래디언트를 구하고 Structure Tensor 요소(Ix^2, Iy^2, IxIy)에
- * 가우시안 블러를 적용한 후 Harris 응답 R을 계산하세요.
- * OpenCV cornerHarris() 결과와 비교합니다.
- */
+// Harris 코너 검출 직접 구현 — Sobel부터 응답 R까지
+//
+// Harris 코너 검출 파이프라인:
+//
+//   원본 이미지 I
+//        ↓
+//   1. Sobel 필터 → Ix, Iy (x, y 방향 그래디언트)
+//        ↓
+//   2. Structure Tensor 요소:
+//      Ixx = Ix · Ix,  Iyy = Iy · Iy,  Ixy = Ix · Iy
+//        ↓
+//   3. 가우시안 블러 (윈도우 내 가중 합산):
+//      Sxx = G * Ixx,  Syy = G * Iyy,  Sxy = G * Ixy
+//      (블러가 "윈도우" 역할 → 주변 그래디언트를 부드럽게 합산)
+//        ↓
+//   4. Harris 응답:
+//      R = det(M) - k · trace(M)²
+//      = Sxx·Syy - Sxy² - k·(Sxx + Syy)²
+//        ↓
+//   5. R > threshold인 점 = 코너
+//
+// ★ cornerHarris 한 줄이 이 전체 과정을 수행한다
+//
+// TODO: 위 파이프라인을 직접 구현하고 cornerHarris 결과와 비교하세요
 void problem4_harris_implementation()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -221,12 +293,27 @@ void problem4_harris_implementation()
     std::cout << "   직접 구현 결과와 OpenCV 결과가 유사해야 합니다." << std::endl;
 }
 
-/**
- * @brief Non-Maximum Suppression 직접 구현
- *
- * Harris 응답 맵에서 지역 최대값만 남기는 NMS를 구현하세요.
- * 적용 전/후 키포인트 수를 비교하고 제거 비율을 계산합니다.
- */
+// NMS (Non-Maximum Suppression) 직접 구현 — 지역 최대값 필터링
+//
+// NMS 알고리즘:
+//   각 픽셀 (y, x)에 대해:
+//   1. response(y, x) > threshold 확인
+//   2. 주변 window × window 영역의 최대값 찾기
+//   3. response(y, x) == 최대값이면 → 지역 최대 → 코너로 유지
+//   4. 그렇지 않으면 → 더 강한 이웃이 있음 → 제거
+//
+// 윈도우 크기의 영향:
+//   - 작은 윈도우 (3×3): 미세한 차이만 제거 → 많은 점 유지
+//   - 큰 윈도우 (11×11): 넓은 범위에서 최강만 유지 → 희소한 결과
+//   - 적정 크기: 7×7 ~ 9×9
+//
+// 경계 처리:
+//   - 이미지 경계에서 half_win만큼 안쪽부터 순회
+//   - 또는 copyMakeBorder로 패딩 후 처리
+//
+// ★ FAST의 nonmaxSuppression=true가 이 과정을 내부적으로 수행
+//
+// TODO: 7×7 윈도우 NMS를 직접 구현하고 전후 개수를 비교하세요
 void problem5_nms_implementation()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

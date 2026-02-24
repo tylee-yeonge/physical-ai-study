@@ -1,10 +1,19 @@
 /**
  * Phase 2 Week 2 - 카메라 캘리브레이션 중급 퀴즈
  *
- * 이 퀴즈는 캘리브레이션의 실전 응용을 다룹니다.
+ * 다루는 개념:
+ *   - 캘리브레이션 이미지 다양성과 정확도의 관계
+ *   - 왜곡 보정 직접 구현 (정규화→왜곡 역산→복원)
+ *   - undistort vs remap 성능 비교 (실시간 최적화)
+ *   - 반복적 역왜곡 (Iterative Undistortion) 알고리즘
+ *   - 전체 캘리브레이션 시뮬레이션 (가상 데이터 → calibrateCamera)
  *
- * 난이도: ⭐⭐
- * 예상 소요 시간: 30-60분
+ * 선수 지식: week2 easy (K 행렬, 왜곡 모델, RMS)
+ *
+ * 역왜곡의 핵심 문제:
+ *   왜곡 함수 f(x) = x·(1 + k1·r² + k2·r⁴)는 알지만,
+ *   역함수 f⁻¹은 해석적으로 구할 수 없다.
+ *   → 반복법(Newton-like)으로 수치적 역산 필요
  */
 
 #include <opencv2/opencv.hpp>
@@ -14,17 +23,25 @@
 #include <cmath>
 #include <chrono>
 
-/**
- * 문제 1: 캘리브레이션 정확도 향상
- *
- * 다음 두 캘리브레이션 시나리오를 비교하고,
- * 어떤 것이 더 정확한 결과를 낼지 예측한 후 실제로 테스트하세요.
- *
- * 시나리오 A: 10장의 이미지, 모두 정면에서 촬영
- * 시나리오 B: 10장의 이미지, 다양한 각도에서 촬영
- *
- * TODO: 두 시나리오를 시뮬레이션하고 RMS를 비교하세요.
- */
+// 캘리브레이션 정확도 — 이미지 다양성이 결과에 미치는 영향
+//
+// 캘리브레이션 품질을 결정하는 핵심 요소:
+//   1. 이미지 수: 많을수록 좋음 (최소 10-20장 권장)
+//   2. 각도 다양성: 다양한 기울기에서 촬영해야 모든 파라미터 관측 가능
+//   3. 이미지 내 위치: 체커보드가 이미지 전 영역을 커버해야 함
+//   4. 노이즈: 흔들림, 블러 최소화
+//
+// 왜 각도 다양성이 중요한가?
+//   - 정면 촬영만: cx, cy 결정 어려움 (체커보드가 항상 비슷한 위치)
+//   - 기울어진 촬영: 원근 변형이 fx, fy 분리에 도움
+//   - 다양한 거리: 왜곡 계수 k1, k2 추정에 필수 (다양한 r 값 필요)
+//
+// ★ 좋은 캘리브레이션을 위한 실전 가이드:
+//   - 체커보드를 이미지 모서리까지 포함하도록 촬영
+//   - ±30° 이상 기울인 이미지 포함
+//   - 가까운 거리 + 먼 거리 모두 포함
+//
+// TODO: 정면 촬영만(시나리오A)과 다양한 각도(시나리오B)의 RMS를 비교하세요
 void problem1_calibration_accuracy()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -69,17 +86,30 @@ void problem1_calibration_accuracy()
     std::cout << "   - 시나리오 B: 다양한 각도로 더 robust한 캘리브레이션" << std::endl;
 }
 
-/**
- * 문제 2: 왜곡 보정 구현
- *
- * cv::undistort() 함수 없이 직접 왜곡 보정을 구현하세요.
- *
- * 왜곡 모델:
- *   x_corrected = x(1 + k1·r² + k2·r⁴)
- *   y_corrected = y(1 + k1·r² + k2·r⁴)
- *
- * TODO: 픽셀별로 왜곡 보정을 적용하는 함수를 작성하세요.
- */
+// 왜곡 보정 직접 구현 — undistort의 내부 동작 이해
+//
+// 왜곡 보정 = 왜곡된 좌표에서 보정된(정상) 좌표를 복원하는 과정
+//
+// 단계:
+//   1. 왜곡된 픽셀 → 정규화 좌표:
+//      x = (u - cx) / fx,  y = (v - cy) / fy
+//
+//   2. 방사 거리 계산:
+//      r² = x² + y²
+//
+//   3. 왜곡 계수 (이 값으로 좌표가 얼마나 왜곡되었는지 계산):
+//      radial = 1 + k1·r² + k2·r⁴
+//
+//   4. 보정된 정규화 좌표 (역산):
+//      x' = x / radial,  y' = y / radial
+//      (★ 이것은 근사해: 정확한 역산은 반복법 필요 → problem4)
+//
+//   5. 다시 픽셀 좌표로:
+//      u' = fx·x' + cx,  v' = fy·y' + cy
+//
+// OpenCV cv::undistortPoints와 비교하여 정확도 확인
+//
+// TODO: 이미지 모서리 점(700, 500)의 왜곡 보정을 직접 구현하세요
 void problem2_manual_undistortion()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -134,14 +164,27 @@ void problem2_manual_undistortion()
     std::cout << "오차: " << error << " 픽셀" << std::endl;
 }
 
-/**
- * 문제 3: 성능 최적화
- *
- * cv::undistort()와 cv::remap()의 성능을 비교하세요.
- * remap은 맵을 미리 계산하여 재사용할 수 있어 반복 사용 시 훨씬 빠릅니다.
- *
- * TODO: 1000번 왜곡 보정을 수행하고 실행 시간을 비교하세요.
- */
+// 왜곡 보정 성능 최적화 — undistort vs remap
+//
+// cv::undistort():
+//   - 호출할 때마다 모든 픽셀의 왜곡 맵핑을 재계산
+//   - 간단하지만 반복 호출 시 비효율적
+//
+// cv::remap() + initUndistortRectifyMap():
+//   - 맵(map1, map2)을 한 번만 미리 계산하여 저장
+//   - 이후에는 map만 참조하여 빠르게 보정
+//   - 실시간 처리에 필수적
+//
+// initUndistortRectifyMap(K, dist, R, newK, size, CV_32FC1, map1, map2)
+//   - 각 출력 픽셀이 입력 이미지의 어디에서 값을 가져올지 미리 계산
+//   - map1: x 좌표 맵, map2: y 좌표 맵
+//
+// remap(src, dst, map1, map2, INTER_LINEAR)
+//   - 미리 계산된 맵으로 픽셀 재배치 (보간 포함)
+//
+// ★ 실시간 SLAM에서는 remap() 필수 — 30fps 처리 시 undistort는 병목
+//
+// TODO: 1000번 반복 실행으로 두 방법의 시간을 비교하세요
 void problem3_performance_optimization()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -196,21 +239,30 @@ void problem3_performance_optimization()
     }
 }
 
-/**
- * @brief 문제 4: 반복적 역왜곡 (Iterative Undistortion)
- *
- * Newton-like 반복법으로 왜곡된 좌표를 보정합니다.
- * 왜곡 함수의 역함수는 해석적으로 구하기 어려우므로,
- * 반복적으로 추정을 개선합니다.
- *
- * 알고리즘:
- *   1. 초기 추정: 왜곡 좌표 = 보정 좌표
- *   2. 현재 추정에 왜곡 적용 → 왜곡 좌표와 비교
- *   3. 오차만큼 추정 업데이트
- *   4. 수렴할 때까지 반복
- *
- * TODO: 반복 횟수에 따른 수렴 과정을 출력하세요.
- */
+// 반복적 역왜곡 (Iterative Undistortion) — 정확한 역산 방법
+//
+// 문제: 왜곡 함수 f(x) = x · (1 + k1·r² + k2·r⁴)의 역함수를
+//       해석적으로 구할 수 없다 (다항식의 역함수는 일반해 없음)
+//
+// 해결: Fixed-Point Iteration (고정점 반복법)
+//
+//   알고리즘:
+//   x_est₀ = x_distorted              ← 초기 추정 (왜곡 좌표 그대로)
+//   반복:
+//     r² = x_est² + y_est²
+//     radial = 1 + k1·r² + k2·r⁴
+//     x_redist = x_est · radial        ← 현재 추정에 왜곡 적용
+//     err = x_distorted - x_redist     ← 실제 왜곡 좌표와의 차이
+//     x_est = x_est + err              ← 오차만큼 추정 보정
+//   수렴 시 종료
+//
+// 수렴 속도:
+//   - 일반적으로 5-10회 반복이면 10⁻¹⁰ 이하 오차 달성
+//   - 왜곡이 크면 (k1이 크면) 더 많은 반복 필요
+//
+// ★ OpenCV undistortPoints 내부에서 동일한 반복법 사용
+//
+// TODO: 10회 반복 과정에서 오차가 줄어드는 과정을 관찰하세요
 void problem4_iterative_undistortion()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -279,20 +331,32 @@ void problem4_iterative_undistortion()
     std::cout << "   OpenCV의 undistortPoints도 내부적으로 이 방법을 사용합니다." << std::endl;
 }
 
-/**
- * @brief 문제 5: 캘리브레이션 시뮬레이션
- *
- * 가상 체커보드 데이터를 생성하고, cv::calibrateCamera()로
- * 카메라 파라미터를 추정한 뒤, 보정 정확도를 측정합니다.
- *
- * 과정:
- *   1. 3D 체커보드 점 생성
- *   2. 여러 포즈에서 cv::projectPoints로 2D 투영
- *   3. cv::calibrateCamera로 K, dist 추정
- *   4. 추정값과 실제값 비교
- *
- * TODO: 캘리브레이션을 수행하고 mean/max 오차를 계산하세요.
- */
+// 전체 캘리브레이션 시뮬레이션 — 가상 데이터로 end-to-end 테스트
+//
+// 시뮬레이션 과정:
+//   1. Ground Truth K, dist 설정
+//   2. 체커보드 3D 점 생성 (9×6, 30mm 간격)
+//   3. 여러 포즈(rvec, tvec)에서 projectPoints → 가상 2D 관측
+//   4. 노이즈 추가 (실제 환경 시뮬레이션, σ≈0.3px)
+//   5. calibrateCamera(objPoints, imgPoints, ...) 호출
+//   6. 추정된 K, dist와 Ground Truth 비교
+//
+// cv::calibrateCamera 반환값:
+//   - 반환값: RMS 재투영 오차
+//   - K: 추정된 내부 파라미터
+//   - dist: 추정된 왜곡 계수
+//   - rvecs, tvecs: 각 이미지의 외부 파라미터
+//
+// 기대 정확도 (10장, σ=0.3px):
+//   - RMS < 0.5 px
+//   - fx, fy 오차 < 5 px
+//   - cx, cy 오차 < 2 px
+//   - k1 오차 < 0.05
+//
+// ★ 실제 캘리브레이션도 동일한 과정이지만,
+//   2D 점은 findChessboardCorners로 자동 검출한다
+//
+// TODO: 전체 캘리브레이션 파이프라인을 구현하세요
 void problem5_calibration_simulation()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

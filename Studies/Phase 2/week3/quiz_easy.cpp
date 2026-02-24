@@ -1,19 +1,41 @@
 /**
  * Phase 2 Week 3 - 특징점 검출 기초 퀴즈
  *
- * FAST, ORB 등의 특징점 검출 개념을 확인합니다.
+ * 다루는 개념:
+ *   - FAST 검출기: 임계값과 특징점 개수의 관계
+ *   - ORB 디스크립터: 이진 256비트 = 32바이트, 해밍 거리 매칭
+ *   - NMS (Non-Maximum Suppression): 중복 제거, 균등 분포
+ *   - 검출기 속도 비교: FAST vs ORB
+ *   - Harris 응답 함수: R = det(M) - k·trace(M)²
+ *
+ * 특징점 검출은 SLAM 프론트엔드의 첫 단계이다.
+ * 이미지에서 추적 가능한 점(코너, blob)을 찾아내야
+ * 매칭, 포즈 추정, 삼각측량으로 이어질 수 있다.
+ *
+ * SLAM에서 자주 쓰이는 특징점 검출기:
+ *   - FAST: 속도 최우선 (ORB-SLAM의 기반)
+ *   - ORB: FAST + 회전 불변 + BRIEF 디스크립터
+ *   - Harris: 이론적 기초 (Structure Tensor 기반)
  */
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/features2d.hpp>
 #include <iostream>
 
-/**
- * 문제 1: FAST 파라미터 이해
- *
- * FAST 검출기의 임계값(threshold)을 변경하면서
- * 검출되는 특징점 개수의 변화를 관찰하세요.
- */
+// FAST 임계값과 특징점 개수 — 속도와 반복성의 트레이드오프
+//
+// FAST (Features from Accelerated Segment Test):
+//   중심 픽셀 p 주위의 Bresenham 원(16픽셀) 검사
+//   연속 N개(보통 12개)가 p보다 threshold 이상 밝거나 어두우면 코너
+//
+//   임계값 효과:
+//     threshold ↑ → 더 강한 코너만 검출 → 개수 ↓, 반복성 ↑
+//     threshold ↓ → 약한 코너도 검출 → 개수 ↑, 노이즈 민감 ↑
+//
+// ★ 실시간 SLAM에서는 threshold를 동적으로 조정하여
+//   목표 특징점 수(~1000개)를 유지하는 전략 사용 (ORB-SLAM)
+//
+// TODO: threshold = {10, 20, 30, 40, 50}에서 특징점 개수 변화를 관찰하세요
 void problem1_fast_threshold()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -60,12 +82,26 @@ void problem1_fast_threshold()
     std::cout << "\n힌트: 임계값 ↑ → 더 강한 코너만 검출 → 개수 ↓" << std::endl;
 }
 
-/**
- * 문제 2: ORB 디스크립터 크기
- *
- * ORB 디스크립터의 크기를 확인하고,
- * 이진 디스크립터의 특징을 이해하세요.
- */
+// ORB 디스크립터 분석 — 이진 디스크립터의 구조와 장점
+//
+// ORB (Oriented FAST and Rotated BRIEF):
+//   검출: FAST + 방향(orientation) 계산 (intensity centroid 방법)
+//   기술: rBRIEF (Rotated BRIEF) = 회전 불변 이진 디스크립터
+//
+// 디스크립터 구조:
+//   - 256비트 = 32바이트 (CV_8UC1, 32열)
+//   - 각 비트: 특정 픽셀 쌍의 밝기 비교 결과 (0 또는 1)
+//   - 총 256번의 밝기 비교 → 256비트 벡터
+//
+// 이진 디스크립터 vs 실수 디스크립터 (SIFT):
+//   - 저장: 32 bytes vs 512 bytes (16배 차이)
+//   - 매칭: 해밍 거리(XOR + popcount) vs L2 거리(곱셈+덧셈)
+//   - 속도: 해밍 거리가 CPU 명령어 1개로 가능 → 훨씬 빠름
+//
+// ★ SLAM에서 ORB가 압도적으로 선호되는 이유:
+//   빠른 검출 + 빠른 매칭 + 충분한 정확도 = 실시간 처리 가능
+//
+// TODO: ORB 검출 후 디스크립터의 크기와 타입을 확인하세요
 void problem2_orb_descriptor()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -103,11 +139,27 @@ void problem2_orb_descriptor()
     std::cout << "\n힌트: ORB = 256 bits = 32 bytes, 해밍거리로 빠른 매칭" << std::endl;
 }
 
-/**
- * 문제 3: NMS(Non-Maximum Suppression) 효과
- *
- * NMS 적용 전후의 특징점 개수와 분포를 비교하세요.
- */
+// NMS 효과 — 중복 특징점 제거로 균등한 분포 확보
+//
+// NMS (Non-Maximum Suppression):
+//   같은 코너 근처에서 여러 픽셀이 코너로 검출될 수 있음
+//   → 가장 강한 응답(response)만 남기고 나머지 제거
+//
+// NMS 없이 검출 시 문제:
+//   - 하나의 코너에 수십 개의 중복 특징점
+//   - 이미지 전체에 불균등한 분포
+//   - 매칭 시 혼란 (비슷한 위치의 여러 점)
+//   - 포즈 추정의 기하학적 제약이 약해짐
+//
+// NMS 적용 후:
+//   - 각 코너에 하나의 대표 특징점만 남음
+//   - 더 균등한 공간 분포
+//   - 매칭 정확도 향상
+//
+// ★ SLAM에서는 NMS 외에도 Grid 기반 분포 강제를 사용:
+//   이미지를 격자로 나누어 각 칸에서 최대 N개만 유지
+//
+// TODO: NMS 적용 전후의 특징점 개수와 감소율을 비교하세요
 void problem3_nms_effect()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -149,11 +201,28 @@ void problem3_nms_effect()
     std::cout << "\n힌트: 중복 특징점 제거 → 더 균등한 분포 → 더 나은 포즈 추정" << std::endl;
 }
 
-/**
- * 문제 4: 검출기 속도 비교
- *
- * FAST와 ORB의 검출 시간을 측정하고 비교하세요.
- */
+// 검출기 속도 비교 — FAST vs ORB 실행 시간 측정
+//
+// FAST:
+//   - 검출만 수행 (키포인트 위치)
+//   - 디스크립터 없음
+//   - 매우 빠름 (~1ms)
+//
+// ORB:
+//   - 검출 (FAST 기반) + 방향 계산 + 디스크립터(rBRIEF) 계산
+//   - 디스크립터 포함이므로 FAST보다 느림 (~5-15ms)
+//   - 하지만 디스크립터가 있어야 매칭 가능
+//
+// 실시간 SLAM 시간 예산 (30 FPS = 33ms/프레임):
+//   - 특징점 검출: ~5ms
+//   - 매칭: ~10ms
+//   - 포즈 추정: ~5ms
+//   - 맵 관리: ~5ms
+//   - 여유: ~8ms
+//
+// ★ 속도가 중요한 이유: 검출이 느리면 전체 파이프라인이 실시간 불가
+//
+// TODO: FAST와 ORB의 검출 시간을 chrono로 측정하세요
 void problem4_speed_comparison()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -181,12 +250,31 @@ void problem4_speed_comparison()
     std::cout << "\n힌트: FAST는 이름처럼 매우 빠름, ORB는 디스크립터 계산 추가" << std::endl;
 }
 
-/**
- * @brief Harris 응답 함수 R = det(M) - k * trace(M)^2 수동 계산
- *
- * 주어진 2x2 Structure Tensor M의 고유값과 Harris 응답 R을 계산하고,
- * k 값에 따라 코너/에지/평면을 판별하세요.
- */
+// Harris 응답 함수 — 코너/에지/평면 판별의 수학적 기초
+//
+// Structure Tensor M (= 이미지 그래디언트의 2차 모멘트 행렬):
+//   M = Σ_window [ Ix²    IxIy ]
+//                [ IxIy   Iy²  ]
+//
+// Harris 응답 함수:
+//   R = det(M) - k · trace(M)²
+//   = λ₁·λ₂ - k·(λ₁ + λ₂)²
+//
+// 판별 기준:
+//   R >> 0: 코너 — λ₁, λ₂ 모두 큼 → 모든 방향으로 밝기 변화
+//   R << 0: 에지 — 하나만 큼 → det 작고 trace 큼 → R 음수
+//   |R| ≈ 0: 평면 — 둘 다 작음 → det ≈ 0, trace ≈ 0
+//
+// k 파라미터 (보통 0.04~0.06):
+//   k ↑ → 코너 판별 기준 엄격 (R 감소) → 더 적은 코너 검출
+//   k ↓ → 코너 판별 기준 느슨 → 더 많은 코너 검출
+//
+// ★ Harris와 Shi-Tomasi의 차이:
+//   Harris: R = det(M) - k·trace(M)²
+//   Shi-Tomasi: R = min(λ₁, λ₂) → 이론적으로 더 안정적
+//   goodFeaturesToTrack()는 Shi-Tomasi 기본 사용
+//
+// TODO: 3개 케이스(코너, 에지, 평면)에 대해 det, trace, R을 계산하세요
 void problem5_harris_response()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;

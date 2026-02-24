@@ -2,6 +2,23 @@
  * Phase 2 Week 4 - 특징점 매칭 중급 퀴즈
  *
  * 실전 응용: 매칭 성능 개선, Essential Matrix 추정
+ *
+ * 다루는 개념:
+ *   1. Ratio Test 임계값 최적화 — Precision vs Recall 트레이드오프
+ *   2. Essential Matrix 추정 — 매칭점 → 카메라 포즈 복원
+ *   3. BF vs FLANN 벤치마크 — 매칭 알고리즘 속도 비교
+ *   4. Homography DLT 구현 — A행렬(2N×9) 구성 + SVD 분해
+ *   5. RANSAC Homography 구현 — 랜덤 샘플링으로 robust 추정
+ *
+ * 매칭에서 포즈 복원까지의 전체 파이프라인:
+ *   매칭 필터링 (문제1) → Essential Matrix (문제2)
+ *        ↓                        ↓
+ *   속도 최적화 (문제3)    R, t 분해 → Visual Odometry
+ *        ↓
+ *   기하학적 검증 (문제4,5) — Homography DLT + RANSAC
+ *
+ * 선수 지식: Phase 2 Week 4 Easy (거리 측정, Ratio Test, RANSAC 개념)
+ * 난이도: ★★★☆☆
  */
 
 #include <opencv2/opencv.hpp>
@@ -12,12 +29,22 @@
 #include <cmath>
 #include <random>
 
-/**
- * 문제 1: 최적의 Ratio 임계값 찾기
- *
- * 다양한 ratio threshold를 시도하여
- * precision-recall 트레이드오프를 관찰하세요.
- */
+// 문제 1: Ratio 임계값 최적화 — Precision vs Recall 트레이드오프
+//
+// ★ 핵심: 임계값을 낮추면 품질↑ 수량↓, 높이면 수량↑ 품질↓
+//
+// Precision-Recall 트레이드오프:
+//   ratio=0.5: 매우 엄격 → 고품질 소수 매칭 (높은 precision, 낮은 recall)
+//   ratio=0.7: 균형점   → Lowe 권장 (precision ≈ recall 균형)
+//   ratio=0.9: 느슨     → 많은 매칭 포함, 오매칭도 포함 (높은 recall, 낮은 precision)
+//
+//   Precision = TP / (TP + FP) — 선택한 것 중 맞는 비율
+//   Recall    = TP / (TP + FN) — 전체 맞는 것 중 선택된 비율
+//
+// SLAM에서의 선택:
+//   초기화(Initialize): recall 중요 → ratio=0.8 (충분한 매칭 확보)
+//   트래킹(Tracking):  precision 중요 → ratio=0.6~0.7 (정확한 포즈)
+//   루프 클로징(Loop):  precision 매우 중요 → ratio=0.5~0.6
 void problem1_optimal_ratio()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -45,32 +72,47 @@ void problem1_optimal_ratio()
     std::cout << "   - 0.7은 좋은 균형점 (Lowe 논문)" << std::endl;
 }
 
-/**
- * 문제 2: Essential Matrix 추정
- *
- * 매칭된 점들로부터 Essential Matrix를 구하고
- * 카메라 포즈를 복원하세요. (SLAM의 핵심!)
- */
+// 문제 2: Essential Matrix 추정 — 매칭점으로 카메라 상대 포즈 복원
+//
+// ★ 핵심: E = [t]× · R (두 카메라 간의 기하학적 관계)
+//
+// Essential Matrix:
+//   p2^T · E · p1 = 0  (정규화 좌표에서의 에피폴라 제약)
+//   E는 5 DOF (회전 3 + 이동 방향 2, 스케일 미지)
+//
+// 파이프라인:
+//   1. 대응점 수집 (매칭 결과)
+//   2. findEssentialMat(pts1, pts2, K, RANSAC) → E
+//   3. recoverPose(E, pts1, pts2, K, R, t) → 상대 포즈
+//
+// Fundamental Matrix vs Essential Matrix:
+//   F: 픽셀 좌표 기반 (K 불필요) — p2^T · F · p1 = 0
+//   E: 정규화 좌표 기반 (K 필요) — E = K^T · F · K
+//   캘리브레이션이 있으면 E가 더 안정적
+//
+// SLAM 관점: Visual Odometry의 핵심 — 프레임 간 R, t 추정
 void problem2_essential_matrix()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 2: Essential Matrix 추정" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    // 카메라 행렬 (캘리브레이션 결과)
+    // 카메라 내부 파라미터 (캘리브레이션으로 미리 구한 값)
     cv::Mat K = (cv::Mat_<double>(3, 3) << 600.0, 0.0, 400.0, 0.0, 600.0, 300.0, 0.0, 0.0, 1.0);
 
-    // TODO: 매칭된 점들 (실제로는 특징점 매칭 결과)
+    // TODO: 매칭된 점들 생성 (실제로는 특징점 검출+매칭 결과)
     std::vector<cv::Point2f> points1, points2;
     // 시뮬레이션 데이터 생성...
 
     // TODO: Essential Matrix 추정
-    // 힌트: findEssentialMat 함수에 대응점, K, RANSAC 옵션을 전달하세요
+    // cv::findEssentialMat(points1, points2, K, cv::RANSAC, 0.999, 1.0, mask)
+    // 반환값: 3x3 Essential Matrix E
 
     std::cout << "Essential Matrix E:" << std::endl;
 
     // TODO: R, t 복원
-    // 힌트: recoverPose 함수로 E를 분해하여 회전과 이동 벡터를 추출하세요
+    // cv::recoverPose(E, points1, points2, K, R, t, mask)
+    // R: 3x3 회전 행렬, t: 3x1 단위 이동 벡터 (스케일 미지)
 
     std::cout << "💡 SLAM에서의 의미:" << std::endl;
     std::cout << "   - E를 분해 → R (회전), t (이동)" << std::endl;
@@ -78,29 +120,48 @@ void problem2_essential_matrix()
     std::cout << "   - Visual Odometry의 핵심" << std::endl;
 }
 
-/**
- * 문제 3: 매칭 성능 벤치마크
- *
- * BF vs FLANN의 속도와 정확도를 비교하세요.
- */
+// 문제 3: BF vs FLANN 매칭 벤치마크 — 속도와 정확도 비교
+//
+// ★ 핵심: BF는 정확하지만 O(N²), FLANN은 근사이지만 O(N log N)
+//
+// Brute-Force (BF) 매칭:
+//   모든 디스크립터 쌍을 비교 → 정확한 최근접 보장
+//   시간: O(N × M × D)  (N,M: 특징점 수, D: 디스크립터 차원)
+//   특징점 < 1000이면 충분히 빠름
+//
+// FLANN (Fast Library for Approximate Nearest Neighbors):
+//   KD-tree 등의 공간 분할로 빠른 근사 탐색
+//   시간: O(N log N) 수준 (인덱스 구축 비용 별도)
+//   특징점 > 1000이면 BF 대비 수 배~수십 배 빠름
+//
+// 비교표:
+//   방식    | 정확도 | 속도    | 적합한 경우
+//   --------+--------+---------+---------------------------
+//   BF      | 100%   | 느림    | 소수 특징점, 정밀 매칭
+//   FLANN   | ~99%   | 빠름    | 대량 특징점, 실시간 SLAM
+//
+// SLAM 관점: ORB-SLAM은 이진 디스크립터+BF, 대규모에는 FLANN/LSH
 void problem3_matching_benchmark()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "문제 3: 매칭 성능 벤치마크" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    // TODO: 대량의 특징점으로 테스트
+    // 대량의 특징점으로 테스트 — 2000개에서 BF와 FLANN의 속도 차이 관찰
     int num_features = 2000;
 
     std::cout << "특징점 개수: " << num_features << "개\n" << std::endl;
 
     // TODO: BF 매칭 시간 측정
-    // auto start_bf = ...
-    // auto end_bf = ...
+    // 1. ORB 디스크립터 2000개 생성 (또는 랜덤 CV_8U Mat)
+    // 2. BFMatcher(NORM_HAMMING) 생성
+    // 3. chrono::high_resolution_clock으로 시간 측정
+    // 4. matcher.match(desc1, desc2, matches)
 
     // TODO: FLANN 매칭 시간 측정
-    // auto start_flann = ...
-    // auto end_flann = ...
+    // 1. 이진 디스크립터를 CV_32F로 변환 (FLANN은 float만 지원)
+    // 2. FlannBasedMatcher 생성
+    // 3. 동일하게 시간 측정
 
     std::cout << "매칭 알고리즘  |  시간 (ms)  |  속도비" << std::endl;
     std::cout << "---------------+-------------+---------" << std::endl;
@@ -113,13 +174,29 @@ void problem3_matching_benchmark()
     std::cout << "   - 실시간 SLAM: FLANN 또는 NN 기반" << std::endl;
 }
 
-/**
- * @brief Homography DLT(Direct Linear Transform) 직접 구현
- *
- * 4개 이상의 대응점으로 A 행렬(2N x 9)을 구성하고,
- * SVD로 분해하여 마지막 V 열에서 H를 추출하세요.
- * OpenCV findHomography() 결과와 비교합니다.
- */
+// 문제 4: Homography DLT 직접 구현 — A행렬 구성 + SVD 분해
+//
+// ★ 핵심: 대응점으로 연립방정식 Ah=0을 만들고, SVD로 최소 노름 해를 구함
+//
+// DLT(Direct Linear Transform) 알고리즘:
+//   각 대응점 (x,y) ↔ (u,v)에서 2개 방정식을 유도:
+//
+//   [-x  -y  -1   0   0   0  ux  uy  u] [h1]   [0]
+//   [ 0   0   0  -x  -y  -1  vx  vy  v] [h2] = [0]
+//                                        [..]
+//                                        [h9]
+//
+//   N개 대응점 → 2N×9 행렬 A, 미지수 벡터 h (9×1)
+//   Ah = 0 의 비자명 해 → SVD(A)의 V^T 마지막 행
+//
+// SVD 분해:
+//   A = U · S · V^T
+//   V^T의 마지막 행 (가장 작은 특이값에 대응) → h 벡터
+//   h를 3×3으로 reshape → Homography H
+//   H를 h33으로 나누어 정규화 (h33 = 1)
+//
+// 최소 점 수: 4 (2×4=8 방정식, 미지수 8개 — h33=1 정규화)
+// N > 4: 과결정 시스템 → 최소제곱 해 (노이즈에 강건)
 void problem4_homography_dlt()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -162,22 +239,24 @@ void problem4_homography_dlt()
     int N = (int)src_pts.size();
     cv::Mat A = cv::Mat::zeros(2 * N, 9, CV_64F);
 
-    // 힌트: 각 대응점 (x,y)↔(u,v)에 대해 2행 추가
-    //   행 2i:   [-x, -y, -1,  0,  0,  0, u*x, u*y, u]
-    //   행 2i+1: [ 0,  0,  0, -x, -y, -1, v*x, v*y, v]
+    // 각 대응점 (x,y)↔(u,v)에 대해 2행 추가
+    //   행 2i:   [-x, -y, -1,  0,  0,  0, u*x, u*y, u]  ← u 방정식
+    //   행 2i+1: [ 0,  0,  0, -x, -y, -1, v*x, v*y, v]  ← v 방정식
     for (int i = 0; i < N; i++)
     {
         double x = src_pts[i].x, y = src_pts[i].y;
         double u = dst_pts[i].x, v = dst_pts[i].y;
-        // TODO: 위의 행 배치 규칙에 따라 A 행렬을 채우세요
-        // 힌트: 짝수 행(2i)은 u 방정식, 홀수 행(2i+1)은 v 방정식에 해당합니다
-        //       at<double>(행, 열) 으로 각 위치에 값을 대입하세요
+        // TODO: A.at<double>(2*i, 열) 으로 짝수 행(u 방정식) 채우기
+        //       A.at<double>(2*i+1, 열) 으로 홀수 행(v 방정식) 채우기
+        //       위 행 배치 규칙의 9개 값을 열 0~8에 대입
     }
 
     // TODO: SVD 분해 후 H 추출
     cv::Mat H_dlt = cv::Mat::eye(3, 3, CV_64F);
-    // 힌트: A를 SVD 분해하고, V^T의 마지막 행(가장 작은 특이값에 대응)을
-    //       3x3으로 재배열하세요. h33=1이 되도록 전체를 h33으로 나누어 정규화하세요
+    // Step 1: cv::SVD::compute(A, S, U, Vt) 또는 cv::SVDecomp(A, S, U, Vt)
+    // Step 2: Vt의 마지막 행 (Vt.row(8)) → h 벡터 (1×9)
+    // Step 3: h.reshape(1, 3) → 3×3 행렬 → H_dlt
+    // Step 4: H_dlt /= H_dlt.at<double>(2,2) → h33=1 정규화
 
     // OpenCV findHomography로 비교
     cv::Mat H_cv = cv::findHomography(src_pts, dst_pts);
@@ -197,12 +276,28 @@ void problem4_homography_dlt()
     std::cout << "   - 노이즈가 있으면 RANSAC과 함께 사용" << std::endl;
 }
 
-/**
- * @brief RANSAC Homography 직접 구현
- *
- * 아웃라이어가 섞인 매칭에서 랜덤 4점 선택 → DLT → 인라이어 카운트를
- * 반복하여 최적의 Homography를 찾으세요.
- */
+// 문제 5: RANSAC Homography 직접 구현 — 아웃라이어에 강건한 추정
+//
+// ★ 핵심: 랜덤 최소 샘플 → 모델 추정 → 합의 검증을 반복
+//
+// RANSAC (RANdom SAmple Consensus) 알고리즘:
+//   for iter = 1 to max_iters:
+//     1. 랜덤으로 4개 대응점 선택 (Homography 최소 점 수)
+//     2. DLT로 H 추정 (문제4의 알고리즘)
+//     3. 모든 점에 H 적용: p' = H * p, 재투영 오차 계산
+//     4. 오차 < threshold인 점 = inlier
+//     5. inlier 수가 최대이면 best_H 갱신
+//   최종: best_H의 inlier로 다시 DLT → refined H
+//
+// 재투영 오차:
+//   e = || dst_i - H * src_i ||₂  (유클리드 거리)
+//   threshold: 보통 1~5 픽셀
+//
+// 이 문제의 데이터:
+//   inlier 40개 (H_true + 노이즈) + outlier 15개 (완전 랜덤)
+//   → outlier 비율 ≈ 27% → 약 16회 반복이면 99% 성공
+//
+// SLAM 관점: findHomography(pts, pts, RANSAC)가 내부적으로 이 알고리즘 수행
 void problem5_ransac_homography()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -233,7 +328,7 @@ void problem5_ransac_homography()
     std::vector<cv::Point2d> src_pts, dst_pts;
     std::vector<bool> gt_mask;
 
-    // Inlier: H_true로 정확하게 변환 + 약간 노이즈
+    // Inlier 생성: H_true로 정확하게 변환 + 가우시안 노이즈 (σ=1 픽셀)
     for (int i = 0; i < n_inliers; i++)
     {
         cv::Point2d pt(dist(rng), dist(rng));
@@ -247,7 +342,7 @@ void problem5_ransac_homography()
         gt_mask.push_back(true);
     }
 
-    // Outlier: 랜덤
+    // Outlier 생성: src, dst 모두 랜덤 → H_true와 무관한 점
     for (int i = 0; i < n_outliers; i++)
     {
         src_pts.push_back(cv::Point2d(dist(rng), dist(rng)));
@@ -262,26 +357,28 @@ void problem5_ransac_homography()
     std::cout << "   실제 outlier: " << n_outliers << "\n" << std::endl;
 
     // TODO: RANSAC 구현
-    int max_iters = 500;
-    double threshold = 5.0;
+    int max_iters = 500;      // 충분한 반복 횟수 (실제로는 공식으로 계산)
+    double threshold = 5.0;   // 재투영 오차 임계값 (픽셀)
     int best_inlier_count = 0;
     cv::Mat best_H;
 
-    // 힌트:
+    // 구현 가이드:
     //   for (int iter = 0; iter < max_iters; iter++) {
-    //     1. 랜덤 4개 인덱스 선택 (std::shuffle 또는 random_choice)
-    //     2. 4개 점으로 DLT (cv::findHomography 또는 직접 구현)
-    //     3. 모든 점에 H 적용하여 재투영 오차 계산
-    //        cv::perspectiveTransform(src_pts, projected, H)
-    //        오차 = norm(projected[i] - dst_pts[i])
-    //     4. 오차 < threshold인 점 개수 세기
-    //     5. 최다 inlier이면 best_H 갱신
+    //     Step 1. 랜덤 4개 인덱스 선택
+    //             → std::vector<int> indices(total), iota, shuffle, 앞 4개
+    //     Step 2. 4개 점으로 H 추정
+    //             → cv::findHomography(src_4pts, dst_4pts, 0) (RANSAC 없이)
+    //     Step 3. 모든 점에 H 적용
+    //             → cv::perspectiveTransform(src_pts, projected, H)
+    //     Step 4. 재투영 오차 계산 및 inlier 카운트
+    //             → cv::norm(projected[i] - dst_pts[i]) < threshold
+    //     Step 5. best_inlier_count보다 많으면 best_H 갱신
     //   }
 
     std::cout << "📊 RANSAC 결과:" << std::endl;
     std::cout << "   검출된 inlier: " << best_inlier_count << " / " << total << std::endl;
 
-    // 성능 평가
+    // 성능 평가 — True Positive(올바른 inlier 검출), False Positive(outlier 오검출)
     if (!best_H.empty())
     {
         std::vector<cv::Point2d> projected;

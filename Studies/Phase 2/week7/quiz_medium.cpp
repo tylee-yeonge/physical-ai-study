@@ -1,11 +1,42 @@
 /**
- * Phase 2 Week 7 - PnP 중급 퀴즈
+ * Phase 2 Week 7 - PnP (Perspective-n-Point) 중급 퀴즈
+ *
+ * 다루는 개념:
+ *   - cv::solvePnP 사용법 (기본 PnP 구현)
+ *   - RANSAC 반복 횟수 공식: N = log(1-p) / log(1-w^s)
+ *   - 포즈 최적화: Linear PnP → Levenberg-Marquardt refinement
+ *   - DLT 삼각측량 직접 구현 (A 행렬 구성, SVD, 베이스라인 실험)
+ *   - DLT PnP 직접 구현 (2N×12 행렬, outlier 영향 실험)
+ *
+ * 선수 지식: week7 easy (PnP 이론), week5 (에피폴라 기하학), week6 (삼각측량)
+ *
+ * PnP DLT의 핵심 아이디어:
+ *   투영 방정식 λ·[u, v, 1]ᵀ = P · [X, Y, Z, 1]ᵀ 에서
+ *   외적 소거로 λ를 제거하면 각 대응점마다 2개 선형 방정식 생성.
+ *   n개 점 → 2n×12 시스템 → SVD로 P의 12개 원소 추정.
  */
 
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <cmath>
 
+// cv::solvePnP 기본 사용 — 3D-2D 대응에서 카메라 포즈 추정
+//
+// 흐름:
+//   1. 3D 월드 점과 카메라 내부 파라미터 준비
+//   2. projectPoints로 Ground Truth 2D 투영 생성
+//   3. solvePnP로 포즈 (rvec, tvec) 추정
+//   4. Ground Truth와 비교하여 정확도 확인
+//
+// cv::solvePnP(objectPoints, imagePoints, K, distCoeffs, rvec, tvec)
+//   - objectPoints: 3D 월드 좌표 (vector<Point3f>)
+//   - imagePoints: 대응 2D 이미지 좌표 (vector<Point2f>)
+//   - K: 3×3 카메라 내부 행렬
+//   - distCoeffs: 왜곡 계수 (없으면 cv::Mat())
+//   - rvec: 출력 — Rodrigues 회전 벡터 (3×1)
+//   - tvec: 출력 — 이동 벡터 (3×1)
+//
+// ★ 노이즈 없는 이상적 조건에서는 정확히 복원됨
 void problem1_implement_pnp()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -38,6 +69,25 @@ void problem1_implement_pnp()
     std::cout << "💡 정확히 복원됨!" << std::endl;
 }
 
+// RANSAC 반복 횟수 공식 — 성공 확률 p를 보장하는 최소 반복 수
+//
+// 공식: N = log(1 - p) / log(1 - w^s)
+//   - p: 원하는 성공 확률 (보통 0.99)
+//   - w: inlier 비율 (0~1)
+//   - s: 모델 추정에 필요한 최소 점 수 (PnP: s=4)
+//   - N: 필요한 반복 횟수
+//
+// 직관:
+//   - w^s = 한 번 샘플링에서 모든 점이 inlier일 확률
+//   - 1 - w^s = 한 번 샘플링이 실패할 확률
+//   - (1 - w^s)^N = N번 모두 실패할 확률
+//   - 1 - (1 - w^s)^N ≥ p → N 도출
+//
+// 예시 (s=4, p=0.99):
+//   w=50% → w^s=6.25% → N≈72회  (outlier 많으면 반복 많이 필요)
+//   w=90% → w^s=65.6% → N≈6회   (inlier 많으면 빠르게 수렴)
+//
+// ★ RANSAC의 반복 횟수는 outlier 비율에 지수적으로 증가한다
 void problem2_ransac_iterations()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -64,6 +114,27 @@ void problem2_ransac_iterations()
     std::cout << "\n💡 Inlier 많을수록 반복 적게 필요" << std::endl;
 }
 
+// 포즈 최적화 — Linear PnP의 한계와 비선형 refinement
+//
+// Linear PnP (DLT)의 한계:
+//   - A·x = 0 형태의 대수적(algebraic) 오차를 최소화
+//   - 기하학적으로 의미 있는 재투영 오차를 직접 최소화하지 않음
+//   - 노이즈에 민감하고, 최적해가 아닐 수 있음
+//
+// 비선형 최적화 (Refinement):
+//   - 목적함수: min Σᵢ ||pᵢ_obs - π(R, t, Xᵢ)||²
+//     (π: 3D→2D 투영 함수, ||·||: 유클리드 거리)
+//   - 재투영 오차(reprojection error)를 직접 최소화
+//   - Levenberg-Marquardt (LM) 알고리즘으로 반복 최적화
+//   - DLT 결과를 초기값으로 사용하여 수렴 보장
+//
+// OpenCV 함수:
+//   - cv::solvePnPRefineLM(): LM으로 rvec, tvec 정밀화
+//   - cv::solvePnP(..., SOLVEPNP_ITERATIVE): 내부적으로 LM 적용
+//
+// ★ SLAM에서의 활용:
+//   PnP → 초기 포즈 추정 (빠름)
+//   BA (Bundle Adjustment) → 전체 포즈+맵 동시 최적화 (정확)
 void problem3_pose_optimization()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -84,12 +155,25 @@ void problem3_pose_optimization()
     std::cout << "   - BA (Bundle Adjustment) → 최적화" << std::endl;
 }
 
-/**
- * @brief DLT 삼각측량을 직접 구현하고 OpenCV 결과와 비교
- *
- * 2개 뷰의 투영 행렬과 대응점으로 4x4 A 행렬을 구성하고
- * SVD로 3D 점을 복원한다. 베이스라인 크기별 정확도도 측정한다.
- */
+// DLT 삼각측량 직접 구현 — A 행렬 구성부터 SVD까지
+//
+// 알고리즘:
+//   1. 투영 행렬 P₁, P₂ 계산: Pᵢ = K · [Rᵢ|tᵢ]
+//   2. Ground Truth 3D 점을 두 카메라에 투영 → (u₁,v₁), (u₂,v₂)
+//   3. A 행렬 구성 (4×4):
+//        A[0] = u₁·P₁₃ᵀ - P₁₁ᵀ    ← 카메라1의 x 제약
+//        A[1] = v₁·P₁₃ᵀ - P₁₂ᵀ    ← 카메라1의 y 제약
+//        A[2] = u₂·P₂₃ᵀ - P₂₁ᵀ    ← 카메라2의 x 제약
+//        A[3] = v₂·P₂₃ᵀ - P₂₂ᵀ    ← 카메라2의 y 제약
+//   4. SVD(A) → V의 마지막 열 = 3D 점 (동차 좌표)
+//   5. 동차→유클리드 변환: X₃ₐ = X[:3] / X[3]
+//
+// 추가 실험: 베이스라인 크기별 정확도 비교
+//   - 좁은 베이스라인: 삼각형 꼭지각 작음 → 깊이 불확실성 증가
+//   - 넓은 베이스라인: 교차각 큼 → 깊이 정확도 향상
+//   - 노이즈 없이는 차이 없지만, 노이즈 시 좁은 베이스라인에서 오차 급증
+//
+// ★ OpenCV cv::triangulatePoints와 동일한 원리
 void problem4_dlt_triangulation()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -222,12 +306,30 @@ void problem4_dlt_triangulation()
     std::cout << "   노이즈 추가 시 좁은 베이스라인에서 오차 급증!" << std::endl;
 }
 
-/**
- * @brief PnP DLT를 직접 구현하고 OpenCV solvePnP와 비교
- *
- * N개 3D-2D 대응점으로 투영 행렬 P를 SVD로 추정한 후
- * K^-1 * P로 [R|t]를 분리한다. 아웃라이어 추가 시 정확도 변화도 확인한다.
- */
+// PnP DLT 직접 구현 — 투영 행렬 P를 SVD로 추정
+//
+// PnP DLT 알고리즘:
+//   투영: λ·[u, v, 1]ᵀ = P · [X, Y, Z, 1]ᵀ
+//   외적 소거로 각 대응점에서 2개 방정식:
+//
+//   행 2i:   [X Y Z 1  0 0 0 0  -uX -uY -uZ -u] · p = 0
+//   행 2i+1: [0 0 0 0  X Y Z 1  -vX -vY -vZ -v] · p = 0
+//
+//   여기서 p = vec(P) (P의 12개 원소를 벡터로)
+//   n개 점 → 2n×12 행렬 A 구성 → SVD → V의 마지막 열 = p
+//   p를 3×4로 reshape → P
+//
+// P에서 [R|t] 분리:
+//   [R|t] = K⁻¹ · P
+//   R이 정확한 회전 행렬이 아닐 수 있음 → SVD로 직교화:
+//     SVD(R_est) = U·S·Vᵀ → R = U·Vᵀ
+//     det(R) < 0이면 부호 반전 (반사 방지)
+//     t는 S의 평균 스케일로 나눠 정규화
+//
+// Outlier 실험:
+//   - 20개 점 중 5개에 100px 노이즈 추가
+//   - DLT는 모든 점에 동일 가중치 → outlier에 매우 취약
+//   - ★ 실전에서는 반드시 RANSAC (cv::solvePnPRansac) 사용
 void problem5_pnp_dlt()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━" << std::endl;
