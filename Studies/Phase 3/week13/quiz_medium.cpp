@@ -1,7 +1,31 @@
 /**
  * Quiz Medium - Week 13: 스케일 복구 방법
  *
- * Eigen을 사용한 계산 문제
+ * 이 퀴즈에서 다루는 개념:
+ *   1. Stereo Depth 계산 — disparity로 깊이를 구하는 실습
+ *   2. IMU 가속도 적분 — 이중 적분의 오차 누적 이해
+ *   3. 센서 융합 비교 — Mono/Stereo/VIO 추정 정확도 비교
+ *
+ * IMU 이중 적분 (Dead Reckoning):
+ *
+ *   가속도 a(t) → 1차 적분 → 속도 v(t) → 2차 적분 → 위치 p(t)
+ *
+ *   이산화:
+ *     v(k+1) = v(k) + a(k) · dt
+ *     p(k+1) = p(k) + v(k) · dt + 0.5 · a(k) · dt²
+ *
+ *   바이어스 b가 있으면:
+ *     a_meas = a_true + b
+ *     위치 오차 ∝ 0.5 · b · t² → 시간의 제곱에 비례하여 발산!
+ *
+ * Stereo vs Monocular vs VIO 비교:
+ *
+ *   Monocular: 스케일 모호 → 드리프트 심함 (25% 이상 오차 가능)
+ *   Stereo:    절대 스케일 → 가장 정확 (~1% 오차)
+ *   VIO:       IMU로 스케일 보정 → 양호 (~3% 오차)
+ *
+ * 난이도: ★★☆ (수치 계산, Eigen 활용)
+ * 선수 지식: quiz_easy (스케일 복구 개념), Week 12 (스케일 모호성)
  */
 
 #include <iostream>
@@ -12,6 +36,25 @@
 using namespace Eigen;
 using namespace std;
 
+// 문제 1: Stereo Depth 계산 실습
+//
+// 깊이 공식: Z = f · b / d
+//   f = 500 pixel (초점 거리)
+//   b = 0.12 m (baseline)
+//   d = left_x - right_x (disparity)
+//
+// disparity와 depth의 관계:
+//   d가 크면 → 가까운 물체 (Z 작음)
+//   d가 작으면 → 먼 물체 (Z 큼)
+//   d = 0이면 → Z = ∞ (무한 원점, 0으로 나누기!)
+//
+// 정밀도 한계:
+//   disparity 1 pixel 변화 → depth 크게 변동 (특히 먼 거리에서)
+//   예: f=500, b=0.12일 때
+//       d=10 → Z=6.0m, d=9 → Z=6.67m (차이 0.67m)
+//       d=2 → Z=30m, d=1 → Z=60m (차이 30m!)
+//
+// ★ Stereo 깊이 추정은 가까운 거리에서 정확, 먼 거리에서 부정확
 void problem1_stereo_depth_calculation()
 {
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
@@ -63,6 +106,22 @@ void problem1_stereo_depth_calculation()
     cout << "  추가 질문: disparity = 0이면 무슨 일이 일어나나요?\n" << endl;
 }
 
+// 문제 2: IMU 가속도 적분 실습
+//
+// IMU 이중 적분 (Euler 방법):
+//   v(k+1) = v(k) + a(k) · dt         (1차 적분: 가속도 → 속도)
+//   p(k+1) = p(k) + v(k) · dt + 0.5 · a(k) · dt²  (2차 적분: 속도 → 위치)
+//
+// 바이어스의 영향:
+//   a_meas = a_true + b (b = 바이어스, 상수 오차)
+//   속도 오차: Δv = b · t (시간에 비례)
+//   위치 오차: Δp = 0.5 · b · t² (시간의 제곱에 비례!)
+//
+//   b = 0.01 m/s², t = 1초 → Δp = 0.005m (무시 가능)
+//   b = 0.01 m/s², t = 100초 → Δp = 50m (심각!)
+//
+// ★ 이것이 IMU 단독으로는 장시간 위치 추정이 불가능한 이유
+//   → 카메라 등 다른 센서와 융합 필수 (VIO)
 void problem2_imu_integration()
 {
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
@@ -110,6 +169,26 @@ void problem2_imu_integration()
     cout << "  최종 위치가 얼마나 달라지나요?\n" << endl;
 }
 
+// 문제 3: 센서 융합 비교 분석
+//
+// 3가지 방법으로 10m 직선 경로 추정:
+//
+// Monocular (12.5, 0.3, -0.1):
+//   X축 25% 과대 추정 → 스케일 모호성 때문
+//   Y, Z 축 소량 오차 → 방향은 비교적 정확
+//
+// Stereo (10.1, 0.05, 0.02):
+//   전체적으로 매우 정확 → baseline으로 절대 스케일 복원
+//   잔여 오차는 매칭 노이즈와 캘리브레이션 오차
+//
+// VIO (10.3, 0.1, -0.05):
+//   스케일은 Mono보다 훨씬 정확 → IMU의 스케일 보정 효과
+//   Stereo보다는 약간 부정확 → IMU 바이어스의 잔여 영향
+//
+// 절대 오차 = ||estimate - true||₂
+// 스케일 오차 = |estimate_x - true_x| / true_x × 100%
+//
+// ★ Mono의 25% 스케일 오차 = Week 12에서 배운 스케일 모호성의 직접적 결과
 void problem3_sensor_comparison()
 {
     cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;

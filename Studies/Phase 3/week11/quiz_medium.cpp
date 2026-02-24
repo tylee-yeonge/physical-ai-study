@@ -1,11 +1,59 @@
 /**
  * Phase 3 Week 11 - Ceres 중급 퀴즈
+ *
+ * 이 퀴즈에서 다루는 개념:
+ *   1. 잔차 차원 분석 — BA에서 자코비안 크기와 희소성
+ *   2. Schur Complement 크기 비교 — 적용 전후 행렬 크기
+ *   3. 수렴 행동 분석 — LM 알고리즘의 전형적인 수렴 패턴
+ *
+ * BA의 자코비안 희소성:
+ *
+ *   자코비안 J: (2·N_obs) × (9·N_cam + 3·N_pts)
+ *   각 관측은 카메라 1개 + 점 1개에만 의존
+ *   → J의 대부분이 0
+ *   → 비영 비율: (9+3)·2·N_obs / (total_rows × total_cols) ≈ 3%
+ *
+ * LM(Levenberg-Marquardt) 수렴 패턴:
+ *
+ *   Cost
+ *   ↑  |
+ *   |  |\
+ *   |  | \
+ *   |  |  \___________  ← 수렴
+ *   |  |
+ *   └──┼──────────── → Iteration
+ *     0  1  2  3  ...
+ *
+ *   초기: 급격한 감소 (Gradient Descent에 가까움)
+ *   후반: 미세 조정 (Gauss-Newton에 가까움)
+ *
+ * 난이도: ★★☆ (수치 분석, 코드 포함)
+ * 선수 지식: quiz_easy, Week 8 (Ceres BA), Week 9 (Schur Complement)
  */
 
 #include <iostream>
 #include <Eigen/Dense>
 #include <cmath>
 
+// 문제 1: Cost Function 잔차 차원 분석
+//
+// BA 설정: 카메라 10대, 3D 점 100개, 관측 500개
+//
+// 잔차 차원:
+//   각 관측 = 2D 재투영 오차 (Δu, Δv) → 2차원
+//   전체 잔차 = 500 × 2 = 1000
+//
+// 파라미터 차원:
+//   카메라: 10 × 9(Snavely) = 90
+//   3D 점: 100 × 3 = 300
+//   전체: 90 + 300 = 390
+//
+// 자코비안 J: 1000 × 390 행렬
+//   전체 원소: 390,000
+//   비영 원소: 500 × (9+3) × 2 = 12,000 (약 3%)
+//
+// ★ 이 희소성이 BA를 효율적으로 풀 수 있게 하는 핵심
+//   밀집(dense)이었다면 O(390³) ≈ 불가능
 void problem1_residual_dimension()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -43,6 +91,22 @@ void problem1_residual_dimension()
     std::cout << "   → 전체 원소: 390,000개 중 3%만 비영!" << std::endl;
 }
 
+// 문제 2: Schur Complement 적용 전후 행렬 크기 비교
+//
+// 조건: 카메라 50대 (9 param), 3D 점 10,000개 (3 param)
+//
+// Schur 적용 전 (전체 Hessian H):
+//   크기: (50×9 + 10000×3) = 30,450 × 30,450
+//   메모리(dense): ~7 GB → 메모리에 올릴 수도 없음!
+//
+// Schur 적용 후 (카메라만의 Schur complement S):
+//   크기: 50×9 = 450 × 450
+//   메모리(dense): ~1.5 MB → 순식간에 풀림
+//
+// 크기 비율: 30450² / 450² ≈ 4577배 감소!
+//
+// ★ 점이 많을수록 Schur Complement의 효과가 극적
+//   실제 BA: 점 수만~수십만 → Schur 없이는 풀 수 없음
 void problem2_parameter_blocks()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -87,6 +151,28 @@ void problem2_parameter_blocks()
     std::cout << "\n   핵심: 점이 많을수록 Schur Complement 효과가 큼!" << std::endl;
 }
 
+// 문제 3: LM 수렴 행동 분석
+//
+// Levenberg-Marquardt (LM) 알고리즘:
+//   λ가 크면 → Gradient Descent (큰 step, 탐색적)
+//   λ가 작으면 → Gauss-Newton (작은 step, 정밀)
+//
+// 전형적인 수렴 패턴:
+//   Iter 0-1: 급격한 cost 감소 (~95%)
+//     → 초기 추정이 많이 틀릴 때, 큰 보정
+//   Iter 2-4: 중간 감소 (~30%)
+//     → 점점 좋은 방향으로 수렴
+//   Iter 5+: 미세 변화 (<1%)
+//     → 거의 수렴, 미세 조정
+//
+// Ceres 수렴 조건:
+//   function_tolerance = 1e-6: (cost_k - cost_{k+1}) / cost_k < 1e-6
+//   gradient_tolerance = 1e-10: ||gradient||_∞ < 1e-10
+//   parameter_tolerance = 1e-8: ||Δx|| / ||x|| < 1e-8
+//
+// ★ 과도한 iteration은 시간 낭비
+//   Ceres는 수렴 조건 충족 시 자동 종료
+//   max_num_iterations(기본 50)로 상한 설정
 void problem3_convergence_analysis()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
