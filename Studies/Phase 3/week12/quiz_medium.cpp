@@ -35,7 +35,6 @@
 #include <random>
 #include <Eigen/Dense>
 
-using namespace std;
 using namespace Eigen;
 
 /**
@@ -59,11 +58,11 @@ using namespace Eigen;
  */
 void problem1_lambda_scaling()
 {
-    cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
-    cout << "Q1. λ 스케일링 증명" << endl;
-    cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "Q1. λ 스케일링 증명" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    cout << "3D 점 X와 λX가 같은 픽셀에 투영됨을 확인하세요.\n" << endl;
+    std::cout << "3D 점 X와 λX가 같은 픽셀에 투영됨을 확인하세요.\n" << std::endl;
 
     // 카메라 내부 파라미터
     Matrix3d K;
@@ -89,8 +88,8 @@ void problem1_lambda_scaling()
 
     // ─── TODO 끝 ───
 
-    cout << "TODO: 위 코드의 주석을 해제하고 완성하세요.\n" << endl;
-    cout << "기대 결과: 모든 λ에 대해 동일한 (u, v) 출력\n" << endl;
+    std::cout << "TODO: 위 코드의 주석을 해제하고 완성하세요.\n" << std::endl;
+    std::cout << "기대 결과: 모든 λ에 대해 동일한 (u, v) 출력\n" << std::endl;
 }
 
 /**
@@ -120,12 +119,12 @@ void problem1_lambda_scaling()
  */
 void problem2_drift_accumulation()
 {
-    cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
-    cout << "Q2. 스케일 드리프트 누적" << endl;
-    cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "Q2. 스케일 드리프트 누적" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    cout << "직선 궤적 (100프레임, 매 프레임 1m 전진)에서\n";
-    cout << "스케일 노이즈에 따른 최종 위치 오차를 계산하세요.\n" << endl;
+    std::cout << "직선 궤적 (100프레임, 매 프레임 1m 전진)에서\n";
+    std::cout << "스케일 노이즈에 따른 최종 위치 오차를 계산하세요.\n" << std::endl;
 
     const int n_frames = 100;
     Vector3d true_delta(1.0, 0.0, 0.0);  // 매 프레임 1m 전진
@@ -142,8 +141,8 @@ void problem2_drift_accumulation()
 
     // ─── TODO 끝 ───
 
-    cout << "TODO: 위 코드의 주석을 해제하고 완성하세요.\n" << endl;
-    cout << "기대 결과: 노이즈가 커질수록 오차도 커짐\n" << endl;
+    std::cout << "TODO: 위 코드의 주석을 해제하고 완성하세요.\n" << std::endl;
+    std::cout << "기대 결과: 노이즈가 커질수록 오차도 커짐\n" << std::endl;
 }
 
 /**
@@ -174,15 +173,15 @@ void problem2_drift_accumulation()
  */
 void problem3_sim3_vs_se3()
 {
-    cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
-    cout << "Q3. Sim(3) vs SE(3) 변환 비교" << endl;
-    cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "Q3. Sim(3) vs SE(3) 변환 비교" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    cout << "SE(3)와 Sim(3)의 차이를 확인하세요.\n" << endl;
-    cout << "SE(3):  T = [R  t]    (6 자유도)\n";
-    cout << "            [0  1]\n" << endl;
-    cout << "Sim(3): S = [sR t]    (7 자유도)\n";
-    cout << "            [0  1]\n" << endl;
+    std::cout << "SE(3)와 Sim(3)의 차이를 확인하세요.\n" << std::endl;
+    std::cout << "SE(3):  T = [R  t]    (6 자유도)\n";
+    std::cout << "            [0  1]\n" << std::endl;
+    std::cout << "Sim(3): S = [sR t]    (7 자유도)\n";
+    std::cout << "            [0  1]\n" << std::endl;
 
     // 회전: Z축 30도
     double angle = M_PI / 6.0;
@@ -209,24 +208,24 @@ void problem3_sim3_vs_se3()
 
     // ─── TODO 끝 ───
 
-    cout << "TODO: 위 코드의 주석을 해제하고 완성하세요.\n" << endl;
-    cout << "기대 결과: s=1일 때 SE(3)=Sim(3), s!=1일 때 스케일 차이 관찰\n" << endl;
+    std::cout << "TODO: 위 코드의 주석을 해제하고 완성하세요.\n" << std::endl;
+    std::cout << "기대 결과: s=1일 때 SE(3)=Sim(3), s!=1일 때 스케일 차이 관찰\n" << std::endl;
 }
 
 int main()
 {
-    cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
-    cout << "Week 12 Quiz - Medium" << endl;
-    cout << "Monocular 스케일 모호성 (Eigen 활용)" << endl;
-    cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "Week 12 Quiz - Medium" << std::endl;
+    std::cout << "Monocular 스케일 모호성 (Eigen 활용)" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
     problem1_lambda_scaling();
     problem2_drift_accumulation();
     problem3_sim3_vs_se3();
 
-    cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
-    cout << "정답은 quiz_solutions/medium_sol.cpp 참고" << endl;
-    cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "정답은 quiz_solutions/medium_sol.cpp 참고" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
 
     return 0;
 }
