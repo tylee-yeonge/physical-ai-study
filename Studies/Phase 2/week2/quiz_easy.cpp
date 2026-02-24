@@ -270,7 +270,6 @@ void problem5_distortion_magnitude()
     for (const auto& pt : grid_points)
     {
         // TODO: 정규화 좌표 계산
-        // x = (u - cx) / fx, y = (v - cy) / fy
         double x = 0.0;  // TODO
         double y = 0.0;  // TODO
 
@@ -278,11 +277,9 @@ void problem5_distortion_magnitude()
         double r2 = 0.0;  // TODO
 
         // TODO: 방사 왜곡 계수 계산
-        // radial = 1 + k1 * r2 + k2 * r2 * r2
         double radial = 0.0;  // TODO
 
         // TODO: 왜곡된 정규화 좌표 계산
-        // x_dist = x * radial, y_dist = y * radial
         double x_dist = 0.0;  // TODO
         double y_dist = 0.0;  // TODO
 

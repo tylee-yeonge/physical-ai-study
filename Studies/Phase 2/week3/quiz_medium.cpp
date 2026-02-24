@@ -262,7 +262,7 @@ void problem4_harris_implementation()
     int ksize = 5;
     // 힌트: 각 Structure Tensor 요소에 가우시안 블러를 적용하여 윈도우 내 가중 합산하세요
 
-    // TODO: 4. Harris 응답 R = det(M) - k * trace(M)^2
+    // TODO: 4. Harris 응답 계산
     double k = 0.04;
     cv::Mat harris_response;
     // 힌트: det(M)과 trace(M)을 구한 뒤 Harris 응답 공식을 적용하세요

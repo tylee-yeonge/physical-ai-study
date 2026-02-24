@@ -124,7 +124,7 @@ void problem2_projection_steps()
     double cx = 400.0, cy = 300.0;
 
     // Step 1: 월드 → 카메라 (R=I, t=0이므로 동일)
-    // TODO: Pc = R * Pw + t 계산
+    // TODO: 월드 → 카메라 좌표 변환
     double Xc = 0.0;  // TODO
     double Yc = 0.0;  // TODO
     double Zc = 0.0;  // TODO
@@ -133,14 +133,14 @@ void problem2_projection_steps()
               << std::endl;
 
     // Step 2: 원근 투영 (정규화 좌표)
-    // TODO: x' = Xc/Zc, y' = Yc/Zc
+    // TODO: 정규화 좌표 계산
     double x_norm = 0.0;  // TODO
     double y_norm = 0.0;  // TODO
 
     std::cout << "Step 2 (원근 투영): x'=" << x_norm << ", y'=" << y_norm << std::endl;
 
     // Step 3: 정규화 → 픽셀
-    // TODO: u = fx * x' + cx, v = fy * y' + cy
+    // TODO: 픽셀 좌표 계산
     double u = 0.0;  // TODO
     double v = 0.0;  // TODO
 
@@ -184,7 +184,7 @@ void problem3_fov_calculation()
 
     // 카메라 A
     double fx_A = 300.0;
-    // TODO: FOV = 2 * arctan(width / (2 * fx)) * 180 / PI
+    // TODO: FOV 계산
     double fov_A = 0.0;  // TODO
 
     // 카메라 B
@@ -244,8 +244,6 @@ void problem4_back_projection()
     double u1 = 400.0, v1 = 300.0;
 
     // TODO: 정규화 좌표 계산
-    // x' = (u - cx) / fx
-    // y' = (v - cy) / fy
     double x1_norm = 0.0;  // TODO
     double y1_norm = 0.0;  // TODO
 
@@ -338,12 +336,12 @@ void problem5_visibility_check()
         bool cond1 = false;  // TODO
 
         // TODO: 조건 2 - 이미지 경계 내
-        // 힌트: u = fx * (Xc/Zc) + cx, v = fy * (Yc/Zc) + cy
+        // 힌트: 3D 점을 투영하여 픽셀 좌표를 계산하세요
         bool cond2 = false;  // TODO
         double u = 0.0, v = 0.0;  // TODO: 투영 좌표 계산
 
         // TODO: 조건 3 - FOV 범위 이내
-        // 힌트: atan2(|Xc|, Zc) < half_fov_x_rad
+        // 힌트: FOV 범위 내에 있는지 확인하세요
         bool cond3 = false;  // TODO
 
         std::cout << "   조건1 (Zc>0):     " << (cond1 ? "PASS" : "FAIL") << std::endl;

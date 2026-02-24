@@ -58,13 +58,12 @@ void problem1_depth_from_disparity()
     std::cout << "   초점거리: " << focal << " 픽셀\n" << std::endl;
 
     // TODO: 시차에서 깊이 계산
-    // Z = (baseline * focal) / disparity
 
     double disparity1 = 60.0;  // 픽셀
-    double depth1 = 0.0;       // TODO: (baseline * focal) / disparity1
+    double depth1 = 0.0;  // TODO
 
     double disparity2 = 30.0;
-    double depth2 = 0.0;  // TODO: (baseline * focal) / disparity2
+    double depth2 = 0.0;  // TODO
 
     std::cout << "시차 " << disparity1 << " 픽셀 → 깊이 ??? m" << std::endl;
     std::cout << "시차 " << disparity2 << " 픽셀 → 깊이 ??? m\n" << std::endl;

@@ -302,9 +302,6 @@ void problem5_harris_response()
     double k = 0.04;
 
     // TODO: 각 케이스에 대해 det, trace, R 계산
-    // 힌트: det(M) = m11*m22 - m12*m12
-    //        trace(M) = m11 + m22
-    //        R = det - k * trace * trace
     double det_a = 0.0, trace_a = 0.0, R_a = 0.0;  // TODO
     double det_b = 0.0, trace_b = 0.0, R_b = 0.0;  // TODO
     double det_c = 0.0, trace_c = 0.0, R_c = 0.0;  // TODO

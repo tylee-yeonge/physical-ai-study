@@ -301,20 +301,12 @@ void problem4_iterative_undistortion()
     for (int iter = 0; iter < max_iterations; iter++)
     {
         // TODO: 현재 추정에 왜곡 적용
-        // r2_est = x_est^2 + y_est^2
-        // radial_est = 1 + k1 * r2_est + k2 * r2_est^2
-        // x_redist = x_est * radial_est
-        // y_redist = y_est * radial_est
 
         // TODO: 오차 계산
-        // err_x = x_distorted - x_redist
-        // err_y = y_distorted - y_redist
 
         // TODO: 추정 업데이트
-        // x_est = x_est + err_x
-        // y_est = y_est + err_y
 
-        double error = 0.0;  // TODO: sqrt(err_x^2 + err_y^2)
+        double error = 0.0;  // TODO
 
         std::cout << "  " << iter << "     | " << x_est << " | " << y_est << " | " << error
                   << std::endl;

@@ -184,13 +184,13 @@ void problem3_extrinsic_effect()
     std::cout << "기본 (R=I, t=0): (" << u0 << ", " << v0 << ")" << std::endl;
 
     // 시나리오 1: t = [1, 0, 0] (카메라가 오른쪽으로 1m)
-    // TODO: Pc = R*P + t = P + [1,0,0] = (1, 0, 5) 투영
+    // TODO: 카메라 좌표 변환 후 투영
     // 힌트: 카메라가 오른쪽으로 이동하면, 물체는 왼쪽으로 보임
     double u1 = 0.0, v1 = 0.0;  // TODO
     std::cout << "시나리오 1 (t=[1,0,0]): (" << u1 << ", " << v1 << ")" << std::endl;
 
     // 시나리오 2: Y축 15° 회전
-    // TODO: 회전 행렬 생성 후 Pc = R*P + t
+    // TODO: 회전 행렬 생성 후 투영
     double angle_rad = 15.0 * CV_PI / 180.0;
     // Y축 회전 행렬:
     // [ cos(θ)  0  sin(θ)]
@@ -277,7 +277,7 @@ void problem4_multi_camera_visibility()
 
         for (size_t i = 0; i < points.size(); i++)
         {
-            // TODO: Pc = R * Pw + t 계산
+            // TODO: 카메라 좌표 변환
             // TODO: 가시성 판별 및 투영 좌표 출력
             std::cout << "   점 " << i << " (" << points[i].x << ", " << points[i].y
                       << ", " << points[i].z << "): TODO" << std::endl;
@@ -286,8 +286,6 @@ void problem4_multi_camera_visibility()
     }
 
     // TODO: 특정 거리에서의 가시 영역 크기 계산
-    // visible_width = 2 * distance * tan(FOV_x / 2)
-    // visible_height = 2 * distance * tan(FOV_y / 2)
     std::cout << "\n거리별 가시 영역 (단일 카메라):" << std::endl;
     std::cout << std::string(45, '-') << std::endl;
 

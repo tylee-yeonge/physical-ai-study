@@ -177,31 +177,15 @@ void problem4_eight_point_algorithm()
     int n = static_cast<int>(pts1.size());
 
     // TODO 1: Hartley 정규화
-    // 각 점 집합의 중심을 (0,0)으로, 평균 거리를 sqrt(2)로 정규화
-    //   (1) 중심 계산: cx = mean(u), cy = mean(v)
-    //   (2) 평균 거리 계산: mean(sqrt((u-cx)^2 + (v-cy)^2))
-    //   (3) 스케일: s = sqrt(2) / mean_dist
-    //   (4) T = [s 0 -s*cx; 0 s -s*cy; 0 0 1]
-    //   (5) 정규화된 좌표: p_norm = T * [u, v, 1]^T
 
     // TODO 2: A 행렬 (N×9) 구성
-    // 정규화된 좌표 (u1',v1') ↔ (u2',v2') 사용
-    // A[i] = [u2'*u1', u2'*v1', u2', v2'*u1', v2'*v1', v2', u1', v1', 1]
-    //
-    // 유도: p2'^T · F · p1' = 0 을 전개하면 위 형태가 됨
-    //   [u2' v2' 1] · F · [u1' v1' 1]^T = 0
-    //   → f 벡터(F의 9개 원소)에 대한 선형 방정식
 
     // TODO 3: SVD로 f 벡터 → F_norm (3×3) 재구성
-    // A = U·S·V^T, V의 마지막 열(가장 작은 특이값) = f
-    // f를 3×3으로 reshape
 
     // TODO 4: Rank-2 강제 (F의 필수 성질)
-    // F̃ = U·diag(s1, s2, s3)·V^T 에서 s3=0으로 설정
     // ★ rank(F) = 2여야 에피폴라 선들이 한 점(에피폴)에서 교차
 
-    // TODO 5: 역정규화: F = T2^T · F_norm · T1
-    // 정규화를 풀어서 원래 픽셀 좌표계의 F로 복원
+    // TODO 5: 역정규화
 
     // OpenCV 결과와 비교
     cv::Mat F_opencv = cv::findFundamentalMat(pts1, pts2, cv::FM_8POINT);

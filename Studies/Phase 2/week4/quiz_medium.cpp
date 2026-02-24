@@ -246,9 +246,7 @@ void problem4_homography_dlt()
     {
         double x = src_pts[i].x, y = src_pts[i].y;
         double u = dst_pts[i].x, v = dst_pts[i].y;
-        // TODO: A.at<double>(2*i, 열) 으로 짝수 행(u 방정식) 채우기
-        //       A.at<double>(2*i+1, 열) 으로 홀수 행(v 방정식) 채우기
-        //       위 행 배치 규칙의 9개 값을 열 0~8에 대입
+        // TODO: 각 대응점에 대해 위 행 배치 규칙으로 A 행렬 채우기
     }
 
     // TODO: SVD 분해 후 H 추출

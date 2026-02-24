@@ -51,9 +51,6 @@ void problem1_epipolar_constraint()
     cv::Point2f p2(120, 165);
 
     // TODO: p2^T * E * p1 계산
-    // 1. p1, p2를 동차 좌표 벡터로 변환: [x, y, 1]^T
-    // 2. 행렬곱: result = p2^T · E · p1  (1×3 · 3×3 · 3×1 = 스칼라)
-    // 3. |result|가 0에 가까우면 올바른 대응
 
     std::cout << "💡 에피폴라 제약: p2^T * E * p1 = 0" << std::endl;
     std::cout << "   - 이 제약을 만족하는 점들만 올바른 대응" << std::endl;

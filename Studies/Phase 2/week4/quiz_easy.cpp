@@ -53,7 +53,6 @@ void problem1_distance_metrics()
     cv::Mat orb_desc2 = (cv::Mat_<uchar>(1, 4) << 0b10110001, 0b11001100, 0b00111000, 0b11110000);
 
     // TODO: 해밍 거리 계산
-    // cv::norm(desc1, desc2, cv::NORM_HAMMING) → XOR 후 비트 1 개수
     int hamming_dist = 0;  // TODO
 
     std::cout << "ORB 디스크립터 (이진):" << std::endl;
@@ -66,7 +65,6 @@ void problem1_distance_metrics()
     cv::Mat sift_desc2 = (cv::Mat_<float>(1, 4) << 0.6, 0.7, 0.4, 0.8);
 
     // TODO: 유클리드 거리 계산
-    // cv::norm(desc1, desc2, cv::NORM_L2) → sqrt(Σ(a_i - b_i)²)
     double euclidean_dist = 0.0;  // TODO
 
     std::cout << "SIFT 디스크립터 (실수):" << std::endl;
@@ -116,8 +114,8 @@ void problem2_ratio_test()
     std::cout << "   차근접 거리: " << distance_second1 << std::endl;
     std::cout << "   비율: " << ratio1 << std::endl;
 
-    // TODO: 비율이 0.7 이하인가? (ratio1 < 0.7이면 수락)
-    bool accept1 = false;  // TODO: ratio1 < 0.7
+    // TODO: 비율 테스트로 수락/거절 판단
+    bool accept1 = false;  // TODO
     std::cout << "   결과: " << (accept1 ? "✅ 수락" : "❌ 거절") << "\n" << std::endl;
 
     // 시나리오 2: 모호한 매칭
@@ -130,7 +128,7 @@ void problem2_ratio_test()
     std::cout << "   차근접 거리: " << distance_second2 << std::endl;
     std::cout << "   비율: " << ratio2 << std::endl;
 
-    // TODO: 비율이 0.7 이하인가? (ratio2 < 0.7이면 수락)
+    // TODO: 비율 테스트로 수락/거절 판단
     bool accept2 = false;  // TODO
     std::cout << "   결과: " << (accept2 ? "✅ 수락" : "❌ 거절") << "\n" << std::endl;
 
@@ -181,7 +179,6 @@ void problem3_ransac_iterations()
     for (double w : inlier_ratios)
     {
         // TODO: 필요 반복 횟수 계산
-        // N = log(1-p) / log(1-w^s) → std::log() 사용, ceil로 올림
         double N = 0;  // TODO
 
         std::cout << "Inlier 비율 " << (int)(w * 100) << "%:" << std::endl;
@@ -288,9 +285,6 @@ void problem5_homography_understanding()
     for (size_t i = 0; i < src_pts.size(); i++)
     {
         // TODO: 동차좌표로 변환 후 H를 적용하세요
-        // Step 1. [x, y, 1]^T 동차좌표 벡터 생성 (cv::Mat 3x1)
-        // Step 2. result = H * [x, y, 1]^T 행렬 곱셈
-        // Step 3. dst_x = result(0)/result(2), dst_y = result(1)/result(2) 정규화
         double x = src_pts[i].x;
         double y = src_pts[i].y;
 
