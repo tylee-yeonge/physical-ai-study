@@ -68,10 +68,10 @@ void problem1_calibration_accuracy()
     cv::Mat dist_true = (cv::Mat_<double>(1, 5) << -0.25, 0.05, 0.0, 0.0, 0.0);
     cv::Size image_size(800, 600);
 
-    // ✅ 정답: 시나리오 A - 정면 촬영만
+    // ✅ 정답: 시나리오 A - 정면 촬영만 (z=500, 회전 거의 없음)
     cv::RNG rng(42);
-    std::vector<std::vector<cv::Point3f>> all_obj_A;
-    std::vector<std::vector<cv::Point2f>> all_img_A;
+    std::vector<std::vector<cv::Point3f>> obj_points_all_A;
+    std::vector<std::vector<cv::Point2f>> image_points_A;
     for (int v = 0; v < 10; v++)
     {
         cv::Mat rvec = (cv::Mat_<double>(3, 1) << rng.uniform(-0.05, 0.05),
@@ -85,13 +85,13 @@ void problem1_calibration_accuracy()
             p.x += rng.gaussian(0.3);
             p.y += rng.gaussian(0.3);
         }
-        all_obj_A.push_back(obj_points);
-        all_img_A.push_back(img_pts);
+        obj_points_all_A.push_back(obj_points);
+        image_points_A.push_back(img_pts);
     }
 
-    // ✅ 정답: 시나리오 B - 다양한 각도
-    std::vector<std::vector<cv::Point3f>> all_obj_B;
-    std::vector<std::vector<cv::Point2f>> all_img_B;
+    // ✅ 정답: 시나리오 B - 다양한 각도 (z=400~600, 회전 -30°~30°)
+    std::vector<std::vector<cv::Point3f>> obj_points_all_B;
+    std::vector<std::vector<cv::Point2f>> image_points_B;
     for (int v = 0; v < 10; v++)
     {
         cv::Mat rvec = (cv::Mat_<double>(3, 1) << rng.uniform(-0.5, 0.5),
@@ -105,18 +105,18 @@ void problem1_calibration_accuracy()
             p.x += rng.gaussian(0.3);
             p.y += rng.gaussian(0.3);
         }
-        all_obj_B.push_back(obj_points);
-        all_img_B.push_back(img_pts);
+        obj_points_all_B.push_back(obj_points);
+        image_points_B.push_back(img_pts);
     }
 
     // ✅ 정답: 캘리브레이션 비교
     cv::Mat K_A, dist_A;
     std::vector<cv::Mat> rvecs_A, tvecs_A;
-    double rms_A = cv::calibrateCamera(all_obj_A, all_img_A, image_size, K_A, dist_A, rvecs_A, tvecs_A);
+    double rms_A = cv::calibrateCamera(obj_points_all_A, image_points_A, image_size, K_A, dist_A, rvecs_A, tvecs_A);
 
     cv::Mat K_B, dist_B;
     std::vector<cv::Mat> rvecs_B, tvecs_B;
-    double rms_B = cv::calibrateCamera(all_obj_B, all_img_B, image_size, K_B, dist_B, rvecs_B, tvecs_B);
+    double rms_B = cv::calibrateCamera(obj_points_all_B, image_points_B, image_size, K_B, dist_B, rvecs_B, tvecs_B);
 
     std::cout << "📊 시나리오 A (정면만):" << std::endl;
     std::cout << "   RMS: " << rms_A << " 픽셀" << std::endl;

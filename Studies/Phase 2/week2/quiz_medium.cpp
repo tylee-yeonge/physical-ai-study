@@ -68,22 +68,35 @@ void problem1_calibration_accuracy()
     cv::Mat dist_true = (cv::Mat_<double>(1, 5) << -0.25, 0.05, 0.0, 0.0, 0.0);
     cv::Size image_size(800, 600);
 
+    cv::RNG rng(42);
+
     // TODO: 시나리오 A - 정면 촬영만 (z=500, 회전 거의 없음)
+    std::vector<std::vector<cv::Point3f>> obj_points_all_A;
     std::vector<std::vector<cv::Point2f>> image_points_A;
     // 힌트: for문으로 10장 생성, 각도 변화는 매우 작게
 
     // TODO: 시나리오 B - 다양한 각도 (z=400~600, 회전 -30°~30°)
+    std::vector<std::vector<cv::Point3f>> obj_points_all_B;
     std::vector<std::vector<cv::Point2f>> image_points_B;
     // 힌트: for문으로 10장 생성, 각도 변화는 크게
 
-    std::cout << "💡 힌트:" << std::endl;
-    std::cout << "   - cv::projectPoints()로 3D → 2D 투영" << std::endl;
-    std::cout << "   - cv::calibrateCamera()로 캘리브레이션" << std::endl;
-    std::cout << "   - 노이즈 추가로 실제 상황 시뮬레이션\n" << std::endl;
+    // TODO: 두 시나리오의 캘리브레이션 결과 비교
+    cv::Mat K_A, dist_A;
+    std::vector<cv::Mat> rvecs_A, tvecs_A;
+    double rms_A = 0.0;  // TODO: 시나리오 A 캘리브레이션
 
-    std::cout << "📊 예상 결과:" << std::endl;
-    std::cout << "   - 시나리오 A: RMS는 낮을 수 있으나 일반화 능력 떨어짐" << std::endl;
-    std::cout << "   - 시나리오 B: 다양한 각도로 더 robust한 캘리브레이션" << std::endl;
+    cv::Mat K_B, dist_B;
+    std::vector<cv::Mat> rvecs_B, tvecs_B;
+    double rms_B = 0.0;  // TODO: 시나리오 B 캘리브레이션
+
+    std::cout << "📊 시나리오 A (정면만):" << std::endl;
+    std::cout << "   RMS: " << rms_A << " 픽셀" << std::endl;
+    std::cout << "   fx 오차: " << std::abs(K_A.at<double>(0, 0) - 600.0) << std::endl;
+
+    std::cout << "\n📊 시나리오 B (다양한 각도):" << std::endl;
+    std::cout << "   RMS: " << rms_B << " 픽셀" << std::endl;
+    std::cout << "   fx 오차: " << std::abs(K_B.at<double>(0, 0) - 600.0) << std::endl;
+    std::cout << "\n→ 다양한 각도가 더 정확한 캘리브레이션 결과를 줌" << std::endl;
 }
 
 // 왜곡 보정 직접 구현 — undistort의 내부 동작 이해
@@ -141,11 +154,11 @@ void problem2_manual_undistortion()
 
     // TODO: 왜곡 보정 구현
     // 단계:
-    // 1. 정규화 좌표로 변환: x = (u - cx) / fx
-    // 2. 방사 거리 계산: r² = x² + y²
-    // 3. 왜곡 계수 적용: radial_dist = 1 + k1·r² + k2·r⁴
-    // 4. 보정된 정규화 좌표: x' = x / radial_dist
-    // 5. 픽셀 좌표로 복원: u' = fx·x' + cx
+    // 1. 정규화 좌표로 변환
+    // 2. 방사 거리 계산
+    // 3. 왜곡 계수 적용
+    // 4. 보정된 정규화 좌표
+    // 5. 픽셀 좌표로 복원
 
     cv::Point2f undistorted_point(0, 0);  // TODO: 계산
 
@@ -200,25 +213,25 @@ void problem3_performance_optimization()
 
     int iterations = 1000;
 
-    // TODO: Method 1 - cv::undistort() 직접 호출
+    // TODO: Method 1 - 매 프레임마다 왜곡 보정을 직접 수행하는 방식
     auto start1 = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < iterations; i++)
     {
         cv::Mat undistorted;
-        // TODO: cv::undistort() 호출
+        // TODO: 왜곡된 이미지를 보정하여 결과를 저장
     }
     auto end1 = std::chrono::high_resolution_clock::now();
     auto duration1 = std::chrono::duration_cast<std::chrono::milliseconds>(end1 - start1);
 
-    // TODO: Method 2 - cv::remap() 사용 (맵 미리 계산)
+    // TODO: Method 2 - 픽셀 매핑 테이블을 미리 계산해두고 재사용하는 방식
     cv::Mat map1, map2;
-    // TODO: cv::initUndistortRectifyMap() 호출
+    // TODO: 왜곡 보정용 픽셀 매핑 테이블(map1, map2)을 미리 계산
 
     auto start2 = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < iterations; i++)
     {
         cv::Mat undistorted;
-        // TODO: cv::remap() 호출
+        // TODO: 미리 계산한 매핑 테이블로 이미지를 보정하여 결과를 저장
     }
     auto end2 = std::chrono::high_resolution_clock::now();
     auto duration2 = std::chrono::duration_cast<std::chrono::milliseconds>(end2 - start2);
@@ -306,7 +319,7 @@ void problem4_iterative_undistortion()
 
         // TODO: 추정 업데이트
 
-        double error = 0.0;  // TODO
+        double error = 0.0;  // TODO: sqrt(err_x^2 + err_y^2)
 
         std::cout << "  " << iter << "     | " << x_est << " | " << y_est << " | " << error
                   << std::endl;
