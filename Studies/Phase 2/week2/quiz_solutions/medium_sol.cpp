@@ -63,6 +63,9 @@ void problem1_calibration_accuracy()
     }
 
     // 실제 카메라 파라미터 (ground truth)
+    // cv::Mat_<T>는 cv::Mat의 타입 지정 템플릿 버전
+    // 일반 cv::Mat은 << 초기화 문법을 지원하지 않으므로,
+    // 소규모 행렬을 리터럴로 만들 때 cv::Mat_<T>를 사용한다
     cv::Mat K_true =
         (cv::Mat_<double>(3, 3) << 600.0, 0.0, 400.0, 0.0, 600.0, 300.0, 0.0, 0.0, 1.0);
     cv::Mat dist_true = (cv::Mat_<double>(1, 5) << -0.25, 0.05, 0.0, 0.0, 0.0);
@@ -74,12 +77,20 @@ void problem1_calibration_accuracy()
     std::vector<std::vector<cv::Point2f>> image_points_A;
     for (int v = 0; v < 10; v++)
     {
+        // rvec: Rodrigues 회전 벡터 (축-각 방식)
+        // ±0.05 rad (~3°) → 거의 정면에서 촬영한 것을 시뮬레이션
         cv::Mat rvec = (cv::Mat_<double>(3, 1) << rng.uniform(-0.05, 0.05),
                         rng.uniform(-0.05, 0.05), rng.uniform(-0.02, 0.02));
+        // tvec: 카메라에서 체커보드까지의 상대 위치
+        // X,Y는 소폭 변동, Z는 500으로 고정 → 일정 거리에서 촬영
         cv::Mat tvec = (cv::Mat_<double>(3, 1) << rng.uniform(-10.0, 10.0),
                         rng.uniform(-10.0, 10.0), 500.0);
         std::vector<cv::Point2f> img_pts;
+        // projectPoints(3D점, 회전벡터, 이동벡터, 내부파라미터, 왜곡계수, 출력 2D점)
+        // 3D 월드 좌표 → [R|t]로 카메라 좌표 변환 → 왜곡 적용 → K로 픽셀 좌표 변환
         cv::projectPoints(obj_points, rvec, tvec, K_true, dist_true, img_pts);
+        // 가우시안 노이즈 추가 (표준편차 0.3 픽셀)
+        // 실제 카메라의 센서 노이즈, 코너 검출 오차를 시뮬레이션
         for (auto& p : img_pts)
         {
             p.x += rng.gaussian(0.3);
@@ -94,8 +105,10 @@ void problem1_calibration_accuracy()
     std::vector<std::vector<cv::Point2f>> image_points_B;
     for (int v = 0; v < 10; v++)
     {
+        // ±0.5 rad (~30°) → 다양한 각도에서 촬영
         cv::Mat rvec = (cv::Mat_<double>(3, 1) << rng.uniform(-0.5, 0.5),
                         rng.uniform(-0.5, 0.5), rng.uniform(-0.3, 0.3));
+        // Z도 400~600으로 랜덤 → 거리도 다양하게
         cv::Mat tvec = (cv::Mat_<double>(3, 1) << rng.uniform(-30.0, 30.0),
                         rng.uniform(-30.0, 30.0), rng.uniform(400.0, 600.0));
         std::vector<cv::Point2f> img_pts;
