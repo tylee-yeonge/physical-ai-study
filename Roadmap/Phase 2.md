@@ -36,24 +36,24 @@
 - [x] 3D 점을 이미지에 투영할 때 K 사용
 - [x] 재투영 오차 계산의 기초
 
-### Week 2: 왜곡과 캘리브레이션 🔥 (2/12 ~, 진행 중)
+### Week 2: 왜곡과 캘리브레이션 ✅ (2/12 ~ 3/2)
 
 > 💻 **C++ 실습**: [PRACTICE.md](../Studies/Phase%202/week2/PRACTICE.md)  
 > 🛠️ **하드웨어**: Jetson Orin Nano + ELP Stereo Camera  
 > ⏰ **실습 시간**: 6-8시간
 
 #### 렌즈 왜곡 (이론)
-- [ ] 방사 왜곡 (Radial Distortion) - 배럴/핀쿠션
-- [ ] 접선 왜곡 (Tangential Distortion)
-- [ ] 왜곡 계수 (k1, k2, p1, p2, k3)
-- [ ] Fisheye 왜곡 모델 (선택 - VINS는 지원)
+- [x] 방사 왜곡 (Radial Distortion) - 배럴/핀쿠션
+- [x] 접선 왜곡 (Tangential Distortion)
+- [x] 왜곡 계수 (k1, k2, p1, p2, k3)
+- [x] Fisheye 왜곡 모델 (선택 - VINS는 지원)
 
 #### 카메라 캘리브레이션 개념
-- [ ] 체커보드 패턴 사용 이유
-- [ ] 캘리브레이션 과정 이해
-- [ ] 재투영 오차 (Reprojection Error) 의미
+- [x] 체커보드 패턴 사용 이유
+- [x] 캘리브레이션 과정 이해
+- [x] 재투영 오차 (Reprojection Error) 의미
 
-#### 실습: OpenCV C++ 캘리브레이션 ⭐
+#### 실습: OpenCV C++ 캘리브레이션 ⭐ (→ 나중에 수행)
 - [ ] **단일 카메라**: Left/Right 각각 캘리브레이션
   - [ ] `CameraCalibration` 클래스 구현
   - [ ] 체커보드 이미지 20장 캡처
@@ -64,7 +64,7 @@
   - [ ] `stereo_calib.yaml` 저장
 - [ ] **결과 분석**: fx, fy, cx, cy 값 검증
 
-#### Kalibr 캘리브레이션 (선택 - Phase 4 준비)
+#### Kalibr 캘리브레이션 (선택 - Phase 4 준비, → 나중에 수행)
 - [ ] Kalibr 설치 (Docker 권장)
 - [ ] AprilGrid 타겟 준비
 - [ ] Camera-only 캘리브레이션 실행
@@ -72,7 +72,7 @@
 
 > 💡 Kalibr는 Phase 4에서 Camera-IMU 캘리브레이션에도 사용됨. 미리 익혀두면 좋음.
 
-#### Stereo 카메라 특화
+#### Stereo 카메라 특화 (→ 나중에 수행)
 - [ ] ✅ Stereo의 장점 (스케일 복원 가능 - Monocular 대비)
 - [ ] Baseline 개념 및 측정
 - [ ] VINS-Fusion Stereo 모드 config 파일 확인
