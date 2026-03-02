@@ -45,6 +45,8 @@
    print('checkerboard_8x6.png 생성 완료')
    "
    ```
+   > **macOS + Miniconda 사용 시**: `python3`가 Homebrew Python을 가리켜 Pillow를 못 찾을 수 있음. `python3` 대신 `python`으로 실행하거나, `conda activate base` 후 실행할 것.
+   >
    > PIL이 없으면: `pip install Pillow`
 2. 생성된 `checkerboard_8x6.png`를 아이패드로 AirDrop 또는 iCloud로 전송
 3. 아이패드에서 이미지를 전체 화면으로 표시
