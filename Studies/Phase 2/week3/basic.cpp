@@ -294,7 +294,7 @@ int main()
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
     std::vector<cv::KeyPoint> keypoints;
-    double time = FeatureDetectionBasic::detectFAST(test_image, keypoints, 20, true);
+    double time = FeatureDetectionBasic::detectFAST(test_image, keypoints, 10, true);
 
     std::cout << "✅ 검출 완료:" << std::endl;
     std::cout << "   - 특징점 개수: " << keypoints.size() << std::endl;
@@ -308,8 +308,8 @@ int main()
         std::cout << "   pt: (" << kp.pt.x << ", " << kp.pt.y << ") — 픽셀 위치" << std::endl;
         std::cout << "   response: " << kp.response << " — 코너 강도 (높을수록 강함)" << std::endl;
         std::cout << "   size: " << kp.size << " — 특징점 크기" << std::endl;
-        std::cout << "   angle: " << kp.angle
-                  << " — 방향 (FAST는 -1 = 방향 없음, ORB는 계산됨)" << std::endl;
+        std::cout << "   angle: " << kp.angle << " — 방향 (FAST는 -1 = 방향 없음, ORB는 계산됨)"
+                  << std::endl;
     }
 
     // 분포 분석
