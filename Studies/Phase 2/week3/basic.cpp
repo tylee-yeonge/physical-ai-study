@@ -261,6 +261,12 @@ int main()
     cv::circle(test_image, cv::Point(400, 300), 80, cv::Scalar(200, 100, 50), -1);
     cv::circle(test_image, cv::Point(200, 200), 50, cv::Scalar(100, 200, 150), -1);
 
+    // 미세한 노이즈 추가 — 완벽한 인공 이미지에서 NMS가 동일 응답값을
+    // 전부 제거하는 엣지 케이스 방지 (실제 카메라에는 센서 노이즈가 존재)
+    cv::Mat noise = cv::Mat::zeros(test_image.size(), test_image.type());
+    cv::randn(noise, 0, 2);
+    cv::add(test_image, noise, test_image);
+
     std::cout << "📸 테스트 이미지 생성 완료 (800x600)" << std::endl;
     std::cout << "   - 체커보드 패턴 + 원형 객체\n" << std::endl;
 
