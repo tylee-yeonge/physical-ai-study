@@ -77,10 +77,20 @@ void problem1_fast_threshold()
                   << std::endl;
     }
 
-    std::cout << "\n💡 질문:" << std::endl;
-    std::cout << "   1. 임계값이 증가하면 특징점 개수는 어떻게 변하나요?" << std::endl;
-    std::cout << "   2. 실시간 SLAM에 적합한 임계값은?" << std::endl;
-    std::cout << "\n힌트: 임계값 ↑ → 더 강한 코너만 검출 → 개수 ↓" << std::endl;
+    std::cout << "\n💡 정답:" << std::endl;
+    std::cout << "   Q1. 임계값이 증가하면 특징점 개수는 어떻게 변하나요?" << std::endl;
+    std::cout << "   A1. 감소합니다." << std::endl;
+    std::cout << "       임계값이 높아지면 '밝기 차이가 큰 강한 코너'만 통과합니다." << std::endl;
+    std::cout << "       즉, 기준이 엄격해지므로 약한 코너는 걸러지고 개수가 줄어듭니다." << std::endl;
+    std::cout << "       반대로 임계값을 낮추면 약한 코너도 검출되어 개수가 많아지지만," << std::endl;
+    std::cout << "       노이즈에 의한 거짓 검출(false positive)도 함께 증가합니다." << std::endl;
+    std::cout << std::endl;
+    std::cout << "   Q2. 실시간 SLAM에 적합한 임계값은?" << std::endl;
+    std::cout << "   A2. 고정된 하나의 값이 아니라, 동적으로 조정하는 것이 좋습니다." << std::endl;
+    std::cout << "       보통 20~40 범위에서 시작하되, 프레임마다 검출된 특징점 수를 확인하여" << std::endl;
+    std::cout << "       목표 개수(~1000개)에 맞게 임계값을 올리거나 내립니다." << std::endl;
+    std::cout << "       ORB-SLAM에서는 이 '적응형 임계값' 전략을 실제로 사용합니다." << std::endl;
+    std::cout << "       (이유: 밝은 장면에서는 특징이 많고, 어두운 장면에서는 적기 때문)" << std::endl;
 }
 
 // ORB 디스크립터 분석 — 이진 디스크립터의 구조와 장점
@@ -112,10 +122,19 @@ void problem2_orb_descriptor()
     cv::Mat image = cv::Mat::zeros(400, 600, CV_8UC1);
     cv::circle(image, cv::Point(300, 200), 100, cv::Scalar(255), -1);
 
+    // ORB 검출기 생성 — nfeatures=100: 최대 100개의 특징점만 검출
+    //   nfeatures 설정 기준 (정답은 없고, 용도에 따라 결정):
+    //     - 실습/테스트: 100~500 (빠르게 결과 확인)
+    //     - 실시간 SLAM: 500~1000 (속도와 정확도 균형, ORB-SLAM2 기본값=1000)
+    //     - 오프라인 매칭: 1000~5000 (정확도 우선)
+    //   값이 클수록 매칭 정확도 ↑ but 계산량 ↑
+    //   값이 작을수록 속도 ↑ but 매칭 실패 가능성 ↑
+    //   create()의 디폴트는 500
     cv::Ptr<cv::ORB> orb = cv::ORB::create(100);
     std::vector<cv::KeyPoint> keypoints;
     cv::Mat descriptors;
 
+    // ✅ 정답: ORB 검출기로 특징점과 디스크립터를 동시에 검출
     orb->detectAndCompute(image, cv::noArray(), keypoints, descriptors);
 
     std::cout << "검출 결과:" << std::endl;
@@ -134,10 +153,22 @@ void problem2_orb_descriptor()
         std::cout << "..." << std::endl;
     }
 
-    std::cout << "\n💡 질문:" << std::endl;
-    std::cout << "   1. ORB 디스크립터는 몇 바이트인가요?" << std::endl;
-    std::cout << "   2. 이진 디스크립터의 장점은?" << std::endl;
-    std::cout << "\n힌트: ORB = 256 bits = 32 bytes, 해밍거리로 빠른 매칭" << std::endl;
+    std::cout << "\n💡 정답:" << std::endl;
+    std::cout << "   Q1. ORB 디스크립터는 몇 바이트인가요?" << std::endl;
+    std::cout << "   A1. 32바이트 (= 256비트)입니다." << std::endl;
+    std::cout << "       위 출력에서 디스크립터 크기가 [N x 32]로 나오는 것을 확인할 수 있습니다." << std::endl;
+    std::cout << "       각 행이 하나의 특징점을 기술하고, 32열 = 32바이트 = 256비트입니다." << std::endl;
+    std::cout << "       각 비트는 '특정 픽셀 쌍을 비교한 결과(0 or 1)'로," << std::endl;
+    std::cout << "       총 256번의 비교 결과를 하나의 벡터로 압축한 것입니다." << std::endl;
+    std::cout << std::endl;
+    std::cout << "   Q2. 이진 디스크립터의 장점은?" << std::endl;
+    std::cout << "   A2. 속도와 메모리 모두에서 유리합니다." << std::endl;
+    std::cout << "       ① 메모리: ORB=32바이트 vs SIFT=512바이트 → 16배 절약" << std::endl;
+    std::cout << "       ② 매칭 속도: 해밍 거리(XOR + popcount)로 비교" << std::endl;
+    std::cout << "          - 해밍 거리: 두 비트 벡터를 XOR하면 다른 비트만 1이 됨" << std::endl;
+    std::cout << "            → 1의 개수(popcount)를 세면 '얼마나 다른지' 알 수 있음" << std::endl;
+    std::cout << "          - CPU가 한 명령어로 처리 가능 → SIFT의 L2 거리보다 훨씬 빠름" << std::endl;
+    std::cout << "       SLAM에서는 매 프레임 수천 개의 매칭을 해야 하므로 이 속도 차이가 중요합니다." << std::endl;
 }
 
 // NMS 효과 — 중복 특징점 제거로 균등한 분포 확보
@@ -198,10 +229,20 @@ void problem3_nms_effect()
         std::cout << "   → 감소율: " << reduction << "%\n" << std::endl;
     }
 
-    std::cout << "💡 질문:" << std::endl;
-    std::cout << "   1. NMS는 왜 필요한가요?" << std::endl;
-    std::cout << "   2. SLAM에서 NMS를 안 하면 어떤 문제가 생기나요?" << std::endl;
-    std::cout << "\n힌트: 중복 특징점 제거 → 더 균등한 분포 → 더 나은 포즈 추정" << std::endl;
+    std::cout << "💡 정답:" << std::endl;
+    std::cout << "   Q1. NMS는 왜 필요한가요?" << std::endl;
+    std::cout << "   A1. 같은 코너 주변에서 여러 픽셀이 동시에 코너로 검출되기 때문입니다." << std::endl;
+    std::cout << "       예: 하나의 코너에서 3~5픽셀이 모두 '코너'로 판정될 수 있음" << std::endl;
+    std::cout << "       → NMS는 그 중 응답(response)이 가장 강한 하나만 남기고 나머지를 제거합니다." << std::endl;
+    std::cout << "       이렇게 하면 각 코너당 딱 하나의 대표점만 남아서 깔끔해집니다." << std::endl;
+    std::cout << std::endl;
+    std::cout << "   Q2. SLAM에서 NMS를 안 하면 어떤 문제가 생기나요?" << std::endl;
+    std::cout << "   A2. 두 가지 핵심 문제가 발생합니다:" << std::endl;
+    std::cout << "       ① 매칭 혼란: 같은 코너에 여러 점이 있으면, 다음 프레임에서" << std::endl;
+    std::cout << "          어떤 점과 매칭해야 할지 모호해짐 → 잘못된 매칭 증가" << std::endl;
+    std::cout << "       ② 불균등 분포: 텍스처 풍부한 영역에 점이 몰리고, 텍스처 없는 영역은 비게 됨" << std::endl;
+    std::cout << "          → 포즈 추정 시 특정 방향에서만 제약이 걸려 불안정해짐" << std::endl;
+    std::cout << "       (위 실행 결과에서 감소율이 높을수록 NMS가 많은 중복을 제거한 것입니다)" << std::endl;
 }
 
 // 검출기 속도 비교 — FAST vs ORB 실행 시간 측정
@@ -260,10 +301,20 @@ void problem4_speed_comparison()
     double orb_ms = std::chrono::duration<double, std::milli>(t4 - t3).count();
     std::cout << "   ORB: " << orb_kp.size() << "개 검출, " << orb_ms << " ms" << std::endl;
 
-    std::cout << "💡 질문:" << std::endl;
-    std::cout << "   1. 어떤 검출기가 더 빠른가요?" << std::endl;
-    std::cout << "   2. 실시간 SLAM (30 FPS)에 적합한 것은?" << std::endl;
-    std::cout << "\n힌트: FAST는 이름처럼 매우 빠름, ORB는 디스크립터 계산 추가" << std::endl;
+    std::cout << "💡 정답:" << std::endl;
+    std::cout << "   Q1. 어떤 검출기가 더 빠른가요?" << std::endl;
+    std::cout << "   A1. FAST가 훨씬 빠릅니다 (보통 5~10배 이상)." << std::endl;
+    std::cout << "       FAST는 '키포인트 위치 검출'만 수행하므로 ~1ms 이내에 끝납니다." << std::endl;
+    std::cout << "       ORB는 FAST 검출 + 방향 계산 + rBRIEF 디스크립터 계산까지 해서 ~5-15ms 걸립니다." << std::endl;
+    std::cout << "       (위 결과에서 실제 시간 차이를 직접 확인해보세요)" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   Q2. 실시간 SLAM (30 FPS)에 적합한 것은?" << std::endl;
+    std::cout << "   A2. 둘 다 사용합니다 — 역할이 다르기 때문입니다." << std::endl;
+    std::cout << "       - FAST: 빠르게 '어디에' 특징점이 있는지 검출" << std::endl;
+    std::cout << "       - ORB: 검출된 점에 디스크립터를 붙여서 '어떤' 특징점인지 기술" << std::endl;
+    std::cout << "       ORB-SLAM은 내부적으로 FAST로 검출 후 ORB 디스크립터를 계산합니다." << std::endl;
+    std::cout << "       30FPS = 33ms/프레임이므로, 검출+매칭+포즈추정을 모두 이 안에 끝내야 합니다." << std::endl;
+    std::cout << "       FAST 단독(~1ms) + 디스크립터(~5ms) = 충분히 실시간 가능합니다." << std::endl;
 }
 
 // Harris 응답 함수 — 코너/에지/평면 판별의 수학적 기초

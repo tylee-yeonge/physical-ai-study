@@ -196,15 +196,12 @@ void problem5_epipole_from_F()
     std::cout << "Fundamental Matrix F:" << std::endl;
     std::cout << F << std::endl;
 
-    // TODO: SVD로 F의 오른쪽 null space 구하기
-    // 1. cv::SVD::compute(F, w, u, vt) 로 SVD 분해
-    // 2. Vt의 마지막 행 = V의 마지막 열 = 가장 작은 특이값에 대응
-    // 3. 동차 좌표 정규화: e1 = [v[0]/v[2], v[1]/v[2], 1]
-    //
-    // F · e1 = 0 → e1이 null space에 있으므로, F에 곱하면 0벡터가 됨
+    // TODO: SVD로 F의 오른쪽 null space 구하기 → e1 (이미지 1의 에피폴)
+    // 힌트: F · e1 = 0을 만족하는 벡터를 SVD 분해로 구할 수 있습니다
+    //       위 Doxygen 주석의 방법을 참고하세요
 
-    // TODO: F^T의 오른쪽 null space로 e2 구하기
-    // F^T · e2 = 0 → F를 전치한 뒤 같은 방법으로 SVD 분해
+    // TODO: F^T의 오른쪽 null space로 e2 구하기 → e2 (이미지 2의 에피폴)
+    // 힌트: F를 전치하면 같은 원리로 e2를 구할 수 있습니다
 
     std::cout << "\n기하학적 의미:" << std::endl;
     std::cout << "   - 에피폴 = 다른 카메라 중심이 이미지에 투영된 점" << std::endl;

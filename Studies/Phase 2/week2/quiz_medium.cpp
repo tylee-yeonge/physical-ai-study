@@ -73,12 +73,12 @@ void problem1_calibration_accuracy()
     // TODO: 시나리오 A - 정면 촬영만 (z=500, 회전 거의 없음)
     std::vector<std::vector<cv::Point3f>> obj_points_all_A;
     std::vector<std::vector<cv::Point2f>> image_points_A;
-    // 힌트: for문으로 10장 생성, 각도 변화는 매우 작게
+    // 힌트: 거의 같은 포즈에서 반복 촬영한 상황을 시뮬레이션하세요
 
     // TODO: 시나리오 B - 다양한 각도 (z=400~600, 회전 -30°~30°)
     std::vector<std::vector<cv::Point3f>> obj_points_all_B;
     std::vector<std::vector<cv::Point2f>> image_points_B;
-    // 힌트: for문으로 10장 생성, 각도 변화는 크게
+    // 힌트: 다양한 거리와 각도에서 촬영한 상황을 시뮬레이션하세요
 
     // TODO: 두 시나리오의 캘리브레이션 결과 비교
     cv::Mat K_A, dist_A;
@@ -380,28 +380,26 @@ void problem5_calibration_simulation()
 
     // TODO: 3D 객체 점 생성
     std::vector<cv::Point3f> objp;
-    // 힌트: 이중 for문으로 (j * square_size, i * square_size, 0) 생성
+    // 힌트: 체커보드의 각 내부 코너를 Z=0 평면 위의 좌표로 표현하세요
 
     // TODO: 여러 포즈에서 2D 이미지 점 생성
-    // 힌트: projectPoints 함수로 3D 점을 각 포즈에서 2D로 투영하세요
+    // 힌트: 알려진 카메라 파라미터로 3D 점을 2D로 투영하여 가상 관측 데이터를 만드세요
     std::vector<std::vector<cv::Point3f>> all_obj_points;
     std::vector<std::vector<cv::Point2f>> all_img_points;
 
     // 다양한 포즈 생성 (10장)
-    // 힌트: rvec = 작은 회전, tvec = (tx, ty, tz) with tz = 400~600
+    // 힌트: 체커보드까지의 거리와 카메라 각도를 다양하게 설정하세요
 
     // TODO: 캘리브레이션 수행
-    // 힌트: calibrateCamera 함수에 객체 점과 이미지 점을 전달하여
-    //       K, dist, rvecs, tvecs를 추정하세요. 반환값이 RMS입니다.
+    // 힌트: OpenCV의 캘리브레이션 함수에 3D-2D 대응점을 전달하세요
 
     // TODO: 결과 비교
     // mean/max 왜곡 보정 오차 계산
 
     std::cout << "💡 힌트:" << std::endl;
-    std::cout << "   1. cv::projectPoints()로 가상 관측 데이터 생성" << std::endl;
-    std::cout << "   2. 노이즈 추가 (0.3 픽셀 정도)" << std::endl;
-    std::cout << "   3. cv::calibrateCamera()로 파라미터 추정" << std::endl;
-    std::cout << "   4. 추정된 K, dist와 실제값 비교\n" << std::endl;
+    std::cout << "   1. 가상 관측 데이터 생성 (투영 + 노이즈)" << std::endl;
+    std::cout << "   2. 캘리브레이션 함수로 파라미터 추정" << std::endl;
+    std::cout << "   3. 추정된 K, dist와 실제값 비교\n" << std::endl;
 
     std::cout << "📊 기대 결과:" << std::endl;
     std::cout << "   - RMS 재투영 오차: < 0.5 픽셀" << std::endl;

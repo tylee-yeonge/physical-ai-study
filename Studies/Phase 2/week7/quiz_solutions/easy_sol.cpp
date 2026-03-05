@@ -58,15 +58,17 @@ void problem1_pnp_definition()
 
     std::cout << "질문: 최소 몇 개 점이 필요한가요?\n" << std::endl;
 
-    std::cout << "💡 답:" << std::endl;
-    std::cout << "   - P3P: 최소 3개 (4개 해 → 1개 더로 선택)" << std::endl;
-    std::cout << "   - 일반적으로 4개 이상 권장" << std::endl;
-    std::cout << "   - 실제로는 수십~수백 개 사용 (RANSAC)\n" << std::endl;
-
-    std::cout << "포즈 자유도:" << std::endl;
-    std::cout << "   - 회전 3 DoF + 이동 3 DoF = 6 DoF" << std::endl;
-    std::cout << "   - 각 대응점 → 2개 제약 (x, y)" << std::endl;
-    std::cout << "   - 3개 점 → 6개 제약 (충분!)" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [정답] 최소 3개 (P3P), 실전에서는 4개 이상 + RANSAC" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [왜 3개면 충분한가?]" << std::endl;
+    std::cout << "   포즈 자유도: 회전 3 DoF + 이동 3 DoF = 6 DoF" << std::endl;
+    std::cout << "   각 대응점 → 2개 제약 (u, v 좌표)" << std::endl;
+    std::cout << "   3개 점 → 6개 제약 = 6 미지수 → 풀 수 있음" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [P3P의 한계]" << std::endl;
+    std::cout << "   3점으로 풀면 최대 4개 해가 나옴 → 추가 1점으로 disambiguation" << std::endl;
+    std::cout << "   실전에서는 수십~수백 점 + RANSAC으로 outlier에 강건하게 추정" << std::endl;
 }
 
 // PnP vs Essential Matrix — 두 포즈 추정 방법의 비교
@@ -103,10 +105,25 @@ void problem2_pnp_vs_essential()
     std::cout << "   장점: 절대 스케일 복원!" << std::endl;
     std::cout << "   단점: 3D 점 필요 (이전 프레임에서 삼각측량)\n" << std::endl;
 
-    std::cout << "💡 SLAM 전략:" << std::endl;
-    std::cout << "   1. Frame 0-1: E로 초기화 (스케일 = 1)" << std::endl;
-    std::cout << "   2. 삼각측량으로 3D 맵 생성" << std::endl;
-    std::cout << "   3. Frame 2~: PnP로 tracking" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [핵심 차이]" << std::endl;
+    std::cout << "   ┌──────────────┬────────────────┬────────────────┐" << std::endl;
+    std::cout << "   │              │ Essential (E)  │ PnP            │" << std::endl;
+    std::cout << "   ├──────────────┼────────────────┼────────────────┤" << std::endl;
+    std::cout << "   │ 입력         │ 2D ↔ 2D       │ 3D ↔ 2D       │" << std::endl;
+    std::cout << "   │ 스케일       │ 모호 (방향만)  │ 절대 스케일!   │" << std::endl;
+    std::cout << "   │ 3D 맵 필요?  │ 불필요         │ 필요           │" << std::endl;
+    std::cout << "   │ 용도         │ 초기화         │ 매 프레임 추적 │" << std::endl;
+    std::cout << "   └──────────────┴────────────────┴────────────────┘\n" << std::endl;
+    std::cout << "   [SLAM 전략 — 왜 둘 다 필요한가?]" << std::endl;
+    std::cout << "   1. Frame 0-1: 3D 점이 없으므로 E로 초기화 (스케일=1)" << std::endl;
+    std::cout << "   2. 삼각측량 → 초기 3D 맵 생성" << std::endl;
+    std::cout << "   3. Frame 2~: 3D 맵이 있으므로 PnP로 tracking" << std::endl;
+    std::cout << "      → 절대 스케일 유지, 3D 점 매칭만으로 빠르게 포즈 추정" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [왜 E로만 하면 안 되나?]" << std::endl;
+    std::cout << "   E는 매 프레임 스케일이 달라짐 → 궤적이 뒤틀림" << std::endl;
+    std::cout << "   PnP는 실제 3D 좌표 기반 → 일관된 스케일 유지" << std::endl;
 }
 
 // RANSAC의 필요성 — outlier에 강건한 포즈 추정
@@ -144,10 +161,21 @@ void problem3_ransac_necessity()
     std::cout << "   - 하나만 있어도 포즈 추정 실패" << std::endl;
     std::cout << "   - 재투영 오차 폭증\n" << std::endl;
 
-    std::cout << "💡 해결: RANSAC" << std::endl;
-    std::cout << "   - 랜덤 샘플링으로 가설 생성" << std::endl;
-    std::cout << "   - Inlier 개수로 최적 선택" << std::endl;
-    std::cout << "   - Outlier에 robust!" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [왜 DLT만으로 안 되나?]" << std::endl;
+    std::cout << "   DLT(최소자승법)는 모든 점을 동등하게 취급" << std::endl;
+    std::cout << "   → outlier 1개가 전체 결과를 크게 왜곡시킴" << std::endl;
+    std::cout << "   예: 100개 inlier + 1개 outlier → 포즈 추정 실패 가능\n" << std::endl;
+    std::cout << "   [RANSAC 동작 과정]" << std::endl;
+    std::cout << "   1. 랜덤으로 최소 점 선택 (P3P: 4점)" << std::endl;
+    std::cout << "   2. 해당 점들로 포즈(R,t) 추정" << std::endl;
+    std::cout << "   3. 나머지 점들의 재투영 오차 계산" << std::endl;
+    std::cout << "   4. 오차 < 임계값 → inlier로 분류" << std::endl;
+    std::cout << "   5. 반복 → inlier 최다인 모델 채택" << std::endl;
+    std::cout << "   6. 최종: 모든 inlier로 모델 재추정 (refinement)\n" << std::endl;
+    std::cout << "   [OpenCV에서의 사용]" << std::endl;
+    std::cout << "   cv::solvePnPRansac()이 위 과정을 한 번에 수행" << std::endl;
+    std::cout << "   반환값: rvec, tvec (포즈) + inliers (유효한 점 인덱스)" << std::endl;
 }
 
 // Visual Odometry 파이프라인 — 카메라로 자기 위치 추정
@@ -195,9 +223,21 @@ void problem4_vo_pipeline()
     std::cout << "   4. 삼각측량으로 새 3D 점" << std::endl;
     std::cout << "   5. 다음 프레임으로...\n" << std::endl;
 
-    std::cout << "💡 문제점:" << std::endl;
-    std::cout << "   - Drift (오차 누적)" << std::endl;
-    std::cout << "   - Loop Closure로 보정 필요 → SLAM!" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [VO 파이프라인 5단계 정리]" << std::endl;
+    std::cout << "   ① 특징점 검출: ORB/FAST로 각 프레임에서 키포인트 추출" << std::endl;
+    std::cout << "   ② 특징점 매칭: BF/FLANN + Ratio Test로 대응점 찾기" << std::endl;
+    std::cout << "   ③ 포즈 추정: 초기화=Essential, 이후=PnP+RANSAC" << std::endl;
+    std::cout << "   ④ 삼각측량: 새 매칭점 → 3D 맵에 점 추가" << std::endl;
+    std::cout << "   ⑤ 반복: 다음 프레임에서 ①부터 반복\n" << std::endl;
+    std::cout << "   [VO의 핵심 한계: Drift]" << std::endl;
+    std::cout << "   매 프레임 포즈에 미세한 오차 존재" << std::endl;
+    std::cout << "   → 오차가 누적되어 궤적이 실제와 점점 어긋남" << std::endl;
+    std::cout << "   예: 프레임당 0.1도 오차 → 1000프레임 후 100도 틀어짐\n" << std::endl;
+    std::cout << "   [VO → SLAM으로 발전]" << std::endl;
+    std::cout << "   VO + Loop Closure(같은 장소 재방문 감지)" << std::endl;
+    std::cout << "   + 전역 최적화(Bundle Adjustment/Pose Graph)" << std::endl;
+    std::cout << "   = SLAM (drift를 보정하여 일관된 맵 유지)" << std::endl;
 }
 
 // DLT 삼각측량 개념 — 외적 소거법으로 3D 점 복원
@@ -270,10 +310,20 @@ void problem5_dlt_triangulation_concept()
 
     std::cout << "질문: A 행렬의 각 행이 무엇을 의미하나요?\n" << std::endl;
 
-    std::cout << "💡 답:" << std::endl;
-    std::cout << "   각 행 = 한 카메라의 한 좌표(u 또는 v) 제약" << std::endl;
-    std::cout << "   2개 뷰 x 2개 제약 = 4개 방정식" << std::endl;
-    std::cout << "   3뷰 이상이면 6행 이상 → 과잉결정, 더 정확" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [A 행렬의 각 행 의미]" << std::endl;
+    std::cout << "   행 1: 카메라1의 u좌표 제약 → u₁(P₁₃ᵀX) - P₁₁ᵀX = 0" << std::endl;
+    std::cout << "   행 2: 카메라1의 v좌표 제약 → v₁(P₁₃ᵀX) - P₁₂ᵀX = 0" << std::endl;
+    std::cout << "   행 3: 카메라2의 u좌표 제약 → u₂(P₂₃ᵀX) - P₂₁ᵀX = 0" << std::endl;
+    std::cout << "   행 4: 카메라2의 v좌표 제약 → v₂(P₂₃ᵀX) - P₂₂ᵀX = 0\n" << std::endl;
+    std::cout << "   [핵심 정리]" << std::endl;
+    std::cout << "   - 1개 뷰 → 2개 방정식 (u, v 각각 1개씩)" << std::endl;
+    std::cout << "   - 2개 뷰 → 4개 방정식 → 미지수 4개(동차 X) → 풀 수 있음" << std::endl;
+    std::cout << "   - 3개 뷰 → 6개 방정식 → 과잉결정 → 노이즈에 더 강건\n" << std::endl;
+    std::cout << "   [SVD로 푸는 이유]" << std::endl;
+    std::cout << "   AX = 0에서 X ≠ 0인 해가 필요" << std::endl;
+    std::cout << "   → SVD의 마지막 열(가장 작은 특이값) = 최소 오차 해" << std::endl;
+    std::cout << "   → X[3]으로 나누어 동차→유클리드 변환: [X,Y,Z]" << std::endl;
 }
 
 int main()

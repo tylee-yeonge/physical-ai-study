@@ -293,10 +293,16 @@ void problem3_performance_optimization()
         double speedup = (double)duration1.count() / duration2.count();
         std::cout << "   → 가속비: " << speedup << "x\n" << std::endl;
 
-        std::cout << "💡 결론:" << std::endl;
-        std::cout << "   remap()은 맵을 한 번만 계산하므로 반복 사용 시 훨씬 효율적입니다."
-                  << std::endl;
-        std::cout << "   실시간 SLAM에서는 remap() 사용이 필수적입니다!" << std::endl;
+        std::cout << "💡 정답 해설:" << std::endl;
+        std::cout << "   [두 방법의 차이]" << std::endl;
+        std::cout << "   undistort(): 매 호출마다 '각 픽셀의 왜곡 좌표'를 처음부터 다시 계산" << std::endl;
+        std::cout << "   remap(): initUndistortRectifyMap()에서 맵을 한 번만 계산 후 재사용" << std::endl;
+        std::cout << "   → remap은 '어디서 픽셀을 가져올지'를 룩업 테이블로 미리 만들어두므로" << std::endl;
+        std::cout << "     실제 보정 시에는 테이블 참조 + 보간만 하면 됨 → 훨씬 빠름" << std::endl;
+        std::cout << std::endl;
+        std::cout << "   [실시간 SLAM에서의 중요성]" << std::endl;
+        std::cout << "   30FPS에서 매 프레임 왜곡 보정을 해야 하므로," << std::endl;
+        std::cout << "   초기화 시 맵을 한 번 계산하고 remap()으로 재사용하는 것이 필수입니다." << std::endl;
     }
 }
 
@@ -385,9 +391,18 @@ void problem4_iterative_undistortion()
     std::cout << "복원된 좌표: (" << x_est << ", " << y_est << ")" << std::endl;
     std::cout << "원본 좌표:   (" << x_orig << ", " << y_orig << ")" << std::endl;
 
-    std::cout << "\n💡 관찰:" << std::endl;
-    std::cout << "   보통 5-10회 반복이면 충분히 수렴합니다." << std::endl;
-    std::cout << "   OpenCV의 undistortPoints도 내부적으로 이 방법을 사용합니다." << std::endl;
+    std::cout << "\n💡 정답 해설:" << std::endl;
+    std::cout << "   [알고리즘 핵심 — Fixed-Point Iteration]" << std::endl;
+    std::cout << "   왜곡 함수의 역함수를 직접 구할 수 없으므로, 반복적으로 근사합니다:" << std::endl;
+    std::cout << "   ① 초기 추정 = 왜곡된 좌표 그대로 (왜곡이 없었다고 가정)" << std::endl;
+    std::cout << "   ② 현재 추정에 왜곡 함수를 적용 → 실제 왜곡 좌표와 비교" << std::endl;
+    std::cout << "   ③ 차이(오차)만큼 추정을 보정 → 다시 ②로" << std::endl;
+    std::cout << "   ④ 5-10회면 오차가 10⁻¹⁰ 이하로 수렴" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [왜 역함수를 못 구하나?]" << std::endl;
+    std::cout << "   x_dist = x · (1 + k1·r² + k2·r⁴)에서 r²도 x에 의존하므로" << std::endl;
+    std::cout << "   이 다항식의 역함수는 해석적(공식)으로 존재하지 않습니다." << std::endl;
+    std::cout << "   → OpenCV의 undistortPoints()도 내부적으로 동일한 반복법을 사용합니다." << std::endl;
 }
 
 // 전체 캘리브레이션 시뮬레이션 — 가상 데이터로 end-to-end 테스트

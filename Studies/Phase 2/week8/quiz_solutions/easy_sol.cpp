@@ -67,10 +67,19 @@ void problem1_optical_flow_assumptions()
     std::cout << "   - 이웃 픽셀은 비슷하게 움직임" << std::endl;
     std::cout << "   - 윈도우 내에서 flow 일정\n" << std::endl;
 
-    std::cout << "💡 이 가정이 깨지면?" << std::endl;
-    std::cout << "   - 조명 변화 → Brightness 깨짐" << std::endl;
-    std::cout << "   - 빠른 움직임 → Small Motion 깨짐" << std::endl;
-    std::cout << "   - 경계면 → Spatial Coherence 깨짐" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [각 가정이 깨지는 상황과 대처법]\n" << std::endl;
+    std::cout << "   ① Brightness Constancy 깨짐:" << std::endl;
+    std::cout << "      원인: 조명 변화, 그림자, 반사" << std::endl;
+    std::cout << "      대처: 밝기 정규화, 그래디언트 기반 비교\n" << std::endl;
+    std::cout << "   ② Small Motion 깨짐:" << std::endl;
+    std::cout << "      원인: 빠른 카메라 회전, 고속 물체" << std::endl;
+    std::cout << "      대처: Pyramidal LK (다중 해상도로 큰 움직임 처리)\n" << std::endl;
+    std::cout << "   ③ Spatial Coherence 깨짐:" << std::endl;
+    std::cout << "      원인: 물체 경계면 (서로 다른 속도의 물체 접촉)" << std::endl;
+    std::cout << "      대처: 작은 윈도우 사용, 경계 감지 후 분리 추적\n" << std::endl;
+    std::cout << "   [핵심] 3가지 가정은 LK의 전제조건이므로," << std::endl;
+    std::cout << "   실전에서는 이 가정이 잘 성립하는 '코너점'만 추적한다" << std::endl;
 }
 
 // 조리개 문제 (Aperture Problem) — 1개 방정식, 2개 미지수
@@ -104,10 +113,19 @@ void problem2_aperture_problem()
     std::cout << "   - 좌우 이동은 감지 가능" << std::endl;
     std::cout << "   - 상하 이동은 감지 불가\n" << std::endl;
 
-    std::cout << "💡 해결:" << std::endl;
-    std::cout << "   - 코너 점 사용 (Harris, FAST)" << std::endl;
-    std::cout << "   - 큰 윈도우 사용" << std::endl;
-    std::cout << "   - Pyramidal approach" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [Aperture Problem이 생기는 수학적 이유]" << std::endl;
+    std::cout << "   Optical Flow Constraint: Ix·u + Iy·v + It = 0" << std::endl;
+    std::cout << "   미지수 2개(u,v), 방정식 1개 → 해가 무한히 많음" << std::endl;
+    std::cout << "   에지: Ix 또는 Iy 중 하나만 큼 → 수직 방향 flow만 결정 가능\n" << std::endl;
+    std::cout << "   [해결 방법 3가지]" << std::endl;
+    std::cout << "   ① 코너점 사용 (Harris, Shi-Tomasi)" << std::endl;
+    std::cout << "      → Ix, Iy 모두 큼 → 두 방향 모두 결정 가능" << std::endl;
+    std::cout << "   ② 윈도우 확대: 더 많은 픽셀 → 과잉결정 시스템" << std::endl;
+    std::cout << "   ③ Pyramidal approach: 큰 움직임도 다룰 수 있음\n" << std::endl;
+    std::cout << "   [SLAM에서의 의미]" << std::endl;
+    std::cout << "   goodFeaturesToTrack()으로 코너만 선택 → LK로 추적" << std::endl;
+    std::cout << "   → Aperture Problem 없이 안정적 flow 추정" << std::endl;
 }
 
 // Pyramidal Optical Flow — 큰 움직임 대응을 위한 다중 해상도 전략
@@ -150,9 +168,20 @@ void problem3_pyramidal_flow()
     std::cout << "   2. 작은 이미지에서 먼저 추정" << std::endl;
     std::cout << "   3. 결과를 큰 이미지로 전파\n" << std::endl;
 
-    std::cout << "💡 효과:" << std::endl;
-    std::cout << "   - 큰 움직임 → 작은 이미지에서 작게 보임" << std::endl;
-    std::cout << "   - 성공률 ↑, 정확도 ↑" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [Pyramid가 큰 움직임을 해결하는 원리]" << std::endl;
+    std::cout << "   예: 원본에서 32픽셀 이동 (윈도우 밖 → LK 실패)" << std::endl;
+    std::cout << "   Level 1 (1/2): 16px 이동" << std::endl;
+    std::cout << "   Level 2 (1/4): 8px 이동" << std::endl;
+    std::cout << "   Level 3 (1/8): 4px 이동 → LK 가능!\n" << std::endl;
+    std::cout << "   [Coarse-to-Fine 과정]" << std::endl;
+    std::cout << "   ① 최상위(작은 이미지)에서 대략적 flow 추정" << std::endl;
+    std::cout << "   ② flow를 2배 업샘플 → 하위 레벨로 전파" << std::endl;
+    std::cout << "   ③ 잔여(residual) flow만 추가 추정" << std::endl;
+    std::cout << "   ④ 원본까지 누적 → 최종 정밀 flow\n" << std::endl;
+    std::cout << "   [OpenCV 사용법]" << std::endl;
+    std::cout << "   calcOpticalFlowPyrLK(prev, next, pts, ..., maxLevel=3)" << std::endl;
+    std::cout << "   maxLevel: 피라미드 레벨 수 (보통 3~4)" << std::endl;
 }
 
 // SLAM에서의 Optical Flow 활용 — 특징점 추적과 직접법
@@ -198,12 +227,22 @@ void problem4_slam_application()
     std::cout << "   - Dense flow로 depth 추정" << std::endl;
     std::cout << "   - GPU 가속 필요\n" << std::endl;
 
-    std::cout << "💡 장점:" << std::endl;
-    std::cout << "   - 특징 없는 영역도 추적" << std::endl;
-    std::cout << "   - 부드러운 trajectory" << std::endl;
-    std::cout << "\n단점:" << std::endl;
-    std::cout << "   - 조명 변화에 약함" << std::endl;
-    std::cout << "   - Drift 누적" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [Feature 기반 vs Flow 기반 비교]" << std::endl;
+    std::cout << "   ┌─────────────┬──────────────────┬──────────────────┐" << std::endl;
+    std::cout << "   │             │ Feature 기반     │ Flow 기반        │" << std::endl;
+    std::cout << "   ├─────────────┼──────────────────┼──────────────────┤" << std::endl;
+    std::cout << "   │ 속도        │ 중간             │ 빠름             │" << std::endl;
+    std::cout << "   │ 조명 변화   │ 강건(descriptor) │ 약함(밝기 기반)  │" << std::endl;
+    std::cout << "   │ 베이스라인  │ 넓어도 OK        │ 좁아야 함        │" << std::endl;
+    std::cout << "   │ 대표 SLAM   │ ORB-SLAM         │ VINS-Mono        │" << std::endl;
+    std::cout << "   └─────────────┴──────────────────┴──────────────────┘\n" << std::endl;
+    std::cout << "   [Flow 기반의 장점]" << std::endl;
+    std::cout << "   - descriptor 계산 불필요 → 매우 빠름" << std::endl;
+    std::cout << "   - 부드러운 궤적 (연속적 추적)\n" << std::endl;
+    std::cout << "   [Flow 기반의 단점]" << std::endl;
+    std::cout << "   - 조명 변화에 약함 (Brightness Constancy 의존)" << std::endl;
+    std::cout << "   - 오차 누적(drift) → Loop Closure로 보정 필요" << std::endl;
 }
 
 // 이미지 그래디언트와 LK 방정식 — Optical Flow의 수학적 기초
@@ -274,10 +313,20 @@ void problem5_gradient_and_lk_equation()
 
     std::cout << "질문: 왜 A^T A가 역행렬이 존재해야 하나요?\n" << std::endl;
 
-    std::cout << "💡 답:" << std::endl;
-    std::cout << "   A^T A가 특이(singular)하면 해를 구할 수 없음" << std::endl;
-    std::cout << "   → 두 고유값이 모두 충분히 커야 함" << std::endl;
-    std::cout << "   → 코너(Corner) 영역에서만 안정적 추적 가능" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [왜 AᵀA의 역행렬이 필요한가?]" << std::endl;
+    std::cout << "   해 공식: [u,v] = (AᵀA)⁻¹ · Aᵀb" << std::endl;
+    std::cout << "   → AᵀA가 역행렬이 없으면(singular) flow를 구할 수 없음\n" << std::endl;
+    std::cout << "   [AᵀA가 singular한 경우]" << std::endl;
+    std::cout << "   - 평면 영역: Ix≈0, Iy≈0 → AᵀA ≈ 영행렬" << std::endl;
+    std::cout << "   - 에지 영역: 한 방향만 그래디언트 → det(AᵀA) ≈ 0\n" << std::endl;
+    std::cout << "   [고유값으로 판별]" << std::endl;
+    std::cout << "   AᵀA의 고유값 λ1, λ2:" << std::endl;
+    std::cout << "   - λ1 큼, λ2 큼 → 코너 → 추적 가능" << std::endl;
+    std::cout << "   - λ1 큼, λ2≈0 → 에지 → Aperture Problem" << std::endl;
+    std::cout << "   - λ1≈0, λ2≈0 → 평면 → 추적 불가\n" << std::endl;
+    std::cout << "   [실전] goodFeaturesToTrack(): min(λ1,λ2) > threshold" << std::endl;
+    std::cout << "   → AᵀA가 잘 역행렬이 되는 점만 골라서 추적!" << std::endl;
 }
 
 // Structure Tensor 고유값 기반 추적 가능성 판별
@@ -342,11 +391,20 @@ void problem6_trackability()
 
     std::cout << "질문: Harris 코너 검출과 어떤 관계인가요?\n" << std::endl;
 
-    std::cout << "💡 답:" << std::endl;
-    std::cout << "   Harris M = Structure Tensor = A^T A" << std::endl;
-    std::cout << "   Harris 응답: R = det(M) - k*trace(M)^2" << std::endl;
-    std::cout << "   → 코너에서 R 큼 = 추적 가능" << std::endl;
-    std::cout << "   → goodFeaturesToTrack()이 바로 이것!" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [Harris 코너 = Structure Tensor 분석]" << std::endl;
+    std::cout << "   Harris에서 쓰는 M 행렬 = LK에서 쓰는 AᵀA = 같은 행렬!" << std::endl;
+    std::cout << "   → Harris 코너 = LK로 추적 가능한 점\n" << std::endl;
+    std::cout << "   [Harris 응답값 해석]" << std::endl;
+    std::cout << "   R = det(M) - k·trace(M)² = λ1·λ2 - k·(λ1+λ2)²" << std::endl;
+    std::cout << "   - R >> 0: 코너 → 두 고유값 모두 큼 → 추적 가능" << std::endl;
+    std::cout << "   - R < 0:  에지 → 한 고유값만 큼 → Aperture Problem" << std::endl;
+    std::cout << "   - R ≈ 0:  평면 → 밝기 변화 없음 → 추적 불가\n" << std::endl;
+    std::cout << "   [Shi-Tomasi vs Harris]" << std::endl;
+    std::cout << "   Harris: R = λ1·λ2 - k·(λ1+λ2)² (근사식)" << std::endl;
+    std::cout << "   Shi-Tomasi: min(λ1, λ2) > threshold (직접 비교)" << std::endl;
+    std::cout << "   → Shi-Tomasi가 더 직관적이고 LK에 최적화됨" << std::endl;
+    std::cout << "   → OpenCV: goodFeaturesToTrack()이 Shi-Tomasi 사용" << std::endl;
 }
 
 int main()

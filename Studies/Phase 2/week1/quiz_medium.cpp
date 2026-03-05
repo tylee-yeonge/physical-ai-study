@@ -60,9 +60,8 @@ void problem1_cube_projection()
     // TODO: 이미지에 큐브 그리기
     cv::Mat image = cv::Mat::zeros(600, 800, CV_8UC3);
 
-    // 힌트: 앞면 연결 (0-1-2-3-0), 뒷면 연결 (4-5-6-7-4)
-    // 앞뒤 연결 (0-4, 1-5, 2-6, 3-7)
-    // cv::line으로 인접 꼭짓점을 연결하세요
+    // 힌트: 큐브의 앞면·뒷면·깊이 방향 모서리를 그리세요
+    //       연결 규칙은 함수 위 주석을 참고하세요
 
     std::cout << "💡 힌트: cv::imshow로 결과를 확인하세요" << std::endl;
     std::cout << "   앞면(Z=4)의 점은 뒷면(Z=6)보다 크게 투영됩니다" << std::endl;
@@ -124,10 +123,7 @@ void problem2_reprojection_error()
 
     // TODO: 각 점의 재투영 오차 계산
     std::vector<double> errors;
-    // 힌트:
-    //   1. points_3d 각 점을 투영하여 projected_2d 계산
-    //   2. projected_2d와 observed_2d의 유클리드 거리 = error
-    //   3. errors 벡터에 누적
+    // 힌트: 각 3D 점을 투영하고, 관측값과의 거리를 계산하세요
 
     // TODO: 평균과 표준편차 계산
     double mean_error = 0.0;  // TODO
@@ -192,12 +188,7 @@ void problem3_extrinsic_effect()
     // 시나리오 2: Y축 15° 회전
     // TODO: 회전 행렬 생성 후 투영
     double angle_rad = 15.0 * CV_PI / 180.0;
-    // Y축 회전 행렬:
-    // [ cos(θ)  0  sin(θ)]
-    // [   0     1    0   ]
-    // [-sin(θ)  0  cos(θ)]
-    //
-    // 힌트: 위 행렬을 3x3 Mat으로 생성한 뒤 3D 점에 곱하세요
+    // 힌트: 위 주석의 Y축 회전 행렬 공식을 참고하세요
 
     double u2 = 0.0, v2 = 0.0;  // TODO
     std::cout << "시나리오 2 (Y축 15° 회전): (" << u2 << ", " << v2 << ")" << std::endl;
@@ -241,7 +232,6 @@ void problem4_multi_camera_visibility()
     int image_width = 640, image_height = 480;
 
     // 3대 카메라 설정 (정면, 좌측 30도, 우측 30도)
-    // Y축 회전 행렬: Ry(θ) = [cos(θ), 0, sin(θ); 0, 1, 0; -sin(θ), 0, cos(θ)]
     struct Camera
     {
         std::string name;
@@ -256,7 +246,7 @@ void problem4_multi_camera_visibility()
     // TODO: 정면 카메라 (R=I, t=0) 추가
     // TODO: 좌측 30도 카메라 (Y축 -30도 회전) 추가
     // TODO: 우측 30도 카메라 (Y축 +30도 회전) 추가
-    // 힌트: Y축 회전 행렬을 3x3 Mat으로 생성하고, 이동 벡터는 영벡터로 설정하세요
+    // 힌트: 각 카메라는 방향만 다르고 위치는 동일합니다
 
     // 10개 3D 점
     std::vector<cv::Point3d> points = {
@@ -265,11 +255,7 @@ void problem4_multi_camera_visibility()
     };
 
     // TODO: 각 카메라에 대해 각 점을 투영하고, 가시 여부를 판별
-    // 힌트:
-    // 1. Pc = R * Pw + t
-    // 2. Zc > 0 확인
-    // 3. u = fx * Xc/Zc + cx, v = fy * Yc/Zc + cy
-    // 4. 0 <= u < width && 0 <= v < height 확인
+    // 힌트: Easy 문제 5의 가시성 판별 로직을 각 카메라에 적용하세요
 
     for (size_t c = 0; c < cameras.size(); c++)
     {

@@ -66,7 +66,15 @@ void problem1_implement_triangulation()
 
     std::cout << "복원된 3D 점: (" << pt3d.x << ", " << pt3d.y << ", " << pt3d.z << ")"
               << std::endl;
-    std::cout << "\n💡 시차 60픽셀 → 깊이 약 1m" << std::endl;
+    std::cout << "\n💡 정답 해설:" << std::endl;
+    std::cout << "   [코드 핵심]" << std::endl;
+    std::cout << "   1. 투영 행렬 P1, P2 구성: P = K · [R|t]" << std::endl;
+    std::cout << "   2. triangulatePoints(P1, P2, pts1, pts2, points4D)" << std::endl;
+    std::cout << "   3. 동차좌표 → 유클리드: [X/W, Y/W, Z/W]" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [결과] 시차 60px, baseline 0.1m, focal 600" << std::endl;
+    std::cout << "   Z ≈ 0.1 × 600 / 60 = 1.0m (이론값과 일치)" << std::endl;
+    std::cout << "   → triangulatePoints가 DLT 기반으로 3D 점을 정확히 복원" << std::endl;
 }
 
 // Bundle Adjustment 개념 — 삼각측량의 한계와 비선형 최적화
@@ -101,7 +109,18 @@ void problem2_optimize_reconstruction()
     std::cout << "   Σ ||p_observed - π(P, X)||²" << std::endl;
     std::cout << "   (모든 관측에 대한 재투영 오차 합)\n" << std::endl;
 
-    std::cout << "💡 SLAM에서는 Ceres나 g2o 라이브러리 사용" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [Linear Triangulation vs Bundle Adjustment]" << std::endl;
+    std::cout << "   Linear: 대수적 오차 최소화 → 빠르지만 기하학적 의미 약함" << std::endl;
+    std::cout << "   BA: 재투영 오차(기하학적 오차) 직접 최소화 → 정확하지만 느림" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [BA가 비선형인 이유]" << std::endl;
+    std::cout << "   투영 함수 π(R,t,X)가 나눗셈(Z로 나누기)을 포함하여 비선형" << std::endl;
+    std::cout << "   → Levenberg-Marquardt 같은 반복 최적화 알고리즘 필요" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [SLAM에서의 역할]" << std::endl;
+    std::cout << "   ORB-SLAM: Local BA(근처 키프레임) + Global BA(전체)" << std::endl;
+    std::cout << "   라이브러리: Ceres Solver (Google), g2o (그래프 최적화)" << std::endl;
 }
 
 // Stereo Matching 알고리즘 — 밀집 깊이 맵 생성
@@ -132,7 +151,19 @@ void problem3_stereo_matching()
     std::cout << "   2. Semi-Global Matching (SGM)" << std::endl;
     std::cout << "   3. Deep Learning (PSMNet, RAFT-Stereo)\n" << std::endl;
 
-    std::cout << "💡 OpenCV: cv::StereoBM, cv::StereoSGBM" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [알고리즘 비교]" << std::endl;
+    std::cout << "   Block Matching (BM): 윈도우 기반 SAD/SSD 비교" << std::endl;
+    std::cout << "     → 빠르지만 텍스처 없는 영역에서 실패" << std::endl;
+    std::cout << "   Semi-Global Matching (SGM): 8/16방향에서 비용 집계" << std::endl;
+    std::cout << "     → 품질/속도 균형, 자율주행에서 실전 사용" << std::endl;
+    std::cout << "   Deep Learning: PSMNet, RAFT-Stereo 등" << std::endl;
+    std::cout << "     → 최고 품질이지만 GPU 필요" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [Rectification이 핵심인 이유]" << std::endl;
+    std::cout << "   Rectification 후 에피폴라 선이 수평 → 같은 y좌표에서만 매칭" << std::endl;
+    std::cout << "   2D 검색 → 1D 수평 검색으로 축소 → 속도 대폭 향상" << std::endl;
+    std::cout << "   OpenCV: cv::StereoBM, cv::StereoSGBM 클래스 제공" << std::endl;
 }
 
 /**

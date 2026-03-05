@@ -172,10 +172,17 @@ void problem3_rms_evaluation()
         std::cout << "   → 품질: " << quality << "\n" << std::endl;
     }
 
-    std::cout << "💡 일반적인 기준:" << std::endl;
-    std::cout << "   - RMS < 0.5: 매우 우수, 대부분의 응용에 적합" << std::endl;
-    std::cout << "   - 0.5 ≤ RMS < 1.0: 양호, 일반적인 SLAM에 사용 가능" << std::endl;
-    std::cout << "   - RMS ≥ 1.0: 불량, 재캘리브레이션 필요" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [코드 핵심]" << std::endl;
+    std::cout << "   if-else로 RMS 범위에 따라 EXCELLENT / GOOD / POOR를 분류합니다." << std::endl;
+    std::cout << "   - 시나리오 A (RMS=0.35): EXCELLENT → 정밀 측정에도 충분한 수준" << std::endl;
+    std::cout << "   - 시나리오 B (RMS=0.85): GOOD → 일반적인 Visual SLAM에 적합" << std::endl;
+    std::cout << "   - 시나리오 C (RMS=1.25): POOR → 캘리브레이션을 다시 해야 함" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [RMS가 뭘 의미하나?]" << std::endl;
+    std::cout << "   '3D 점을 카메라 모델로 투영한 위치'와 '실제 관측된 위치'의 평균 차이입니다." << std::endl;
+    std::cout << "   RMS가 작을수록 카메라 모델(K, 왜곡 계수)이 실제 카메라를 잘 표현한다는 뜻입니다." << std::endl;
+    std::cout << "   cv::calibrateCamera()의 반환값이 바로 이 RMS입니다." << std::endl;
 }
 
 // 체커보드 3D-2D 대응점 — 캘리브레이션의 입력 데이터 생성
@@ -317,10 +324,21 @@ void problem5_distortion_magnitude()
                   << "\t| " << r2 << "\t | " << displacement << std::endl;
     }
 
-    std::cout << "\n💡 관찰 포인트:" << std::endl;
-    std::cout << "   - 중심(r=0)에서 왜곡은 0" << std::endl;
-    std::cout << "   - 모서리로 갈수록 r^2이 커지고 왜곡도 증가" << std::endl;
-    std::cout << "   - k1 < 0이므로 배럴 왜곡 (바깥으로 밀림)" << std::endl;
+    std::cout << "\n💡 정답 해설:" << std::endl;
+    std::cout << "   [코드 핵심 — 6단계 파이프라인]" << std::endl;
+    std::cout << "   ① 픽셀→정규화: x=(u-cx)/fx → K의 영향을 제거하여 렌즈 중심 기준 좌표로 변환" << std::endl;
+    std::cout << "   ② r²=x²+y² → 렌즈 중심으로부터의 거리(의 제곱)" << std::endl;
+    std::cout << "   ③ radial=1+k1·r²+k2·r⁴ → 이 계수만큼 좌표가 왜곡됨" << std::endl;
+    std::cout << "   ④ 왜곡 적용: x_dist = x·radial" << std::endl;
+    std::cout << "   ⑤ 다시 픽셀: u_dist = fx·x_dist + cx" << std::endl;
+    std::cout << "   ⑥ 변위 = |원래 픽셀 - 왜곡된 픽셀| (왜곡의 크기)" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [관찰 포인트]" << std::endl;
+    std::cout << "   - 중심(r=0): radial=1 → 왜곡 없음 (변위 0px)" << std::endl;
+    std::cout << "   - 가장자리: r² ≈ 0.3~0.6 → 변위 수~수십 px" << std::endl;
+    std::cout << "   - 모서리: r² 최대 → 변위 최대 (k1<0이므로 배럴 왜곡, 바깥으로 밀림)" << std::endl;
+    std::cout << "   → 왜곡 보정을 안 하면 이미지 가장자리에서 직선이 휘어지고," << std::endl;
+    std::cout << "     에피폴라 제약, PnP 등 모든 기하 연산이 부정확해집니다." << std::endl;
 }
 
 int main()

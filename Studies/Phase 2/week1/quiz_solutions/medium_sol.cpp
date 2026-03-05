@@ -81,9 +81,16 @@ void problem1_cube_projection()
     for (int i = 0; i < 4; i++)
         cv::line(image, pixels[i], pixels[i + 4], cv::Scalar(0, 0, 255), 1);
 
-    std::cout << "\n💡 앞면(Z=4)의 점이 뒷면(Z=6)보다 크게 투영됨 → 원근감!" << std::endl;
-    std::cout << "   앞면(Z=4)의 점은 뒷면(Z=6)보다 크게 투영됩니다" << std::endl;
-    std::cout << "   이것이 원근감 (perspective)입니다!" << std::endl;
+    std::cout << "\n💡 정답 해설:" << std::endl;
+    std::cout << "   [코드 핵심]" << std::endl;
+    std::cout << "   8개 꼭짓점을 투영한 뒤, cv::line으로 연결하여 큐브를 그립니다." << std::endl;
+    std::cout << "   - 앞면(Z=4): u = fx*X/4 + cx → Zc가 작으므로 픽셀 간격이 넓음 (크게 보임)" << std::endl;
+    std::cout << "   - 뒷면(Z=6): u = fx*X/6 + cx → Zc가 크므로 픽셀 간격이 좁음 (작게 보임)" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [원근감의 원리]" << std::endl;
+    std::cout << "   투영 공식 u = fx * (X/Z) + cx에서 Z로 나누는 것이 핵심입니다." << std::endl;
+    std::cout << "   같은 크기의 물체라도 Z(깊이)가 크면 X/Z가 작아져 → 이미지에서 작게 보입니다." << std::endl;
+    std::cout << "   이것이 '가까운 것은 크게, 먼 것은 작게' 보이는 원근감의 수학적 원리입니다." << std::endl;
 }
 
 // 재투영 오차 시뮬레이션 — SLAM 정확도 평가의 핵심 지표
@@ -163,10 +170,21 @@ void problem2_reprojection_error()
     std::cout << "   평균 오차: " << mean_error << " 픽셀" << std::endl;
     std::cout << "   표준편차: " << std_error << " 픽셀" << std::endl;
 
-    std::cout << "\n💡 SLAM에서의 기준:" << std::endl;
-    std::cout << "   < 0.5 픽셀: 매우 좋음" << std::endl;
-    std::cout << "   < 1.0 픽셀: 좋음" << std::endl;
-    std::cout << "   > 2.0 픽셀: 재캘리브레이션 필요" << std::endl;
+    std::cout << "\n💡 정답 해설:" << std::endl;
+    std::cout << "   [코드 핵심]" << std::endl;
+    std::cout << "   ① 3D 점을 투영하여 projected_2d를 구함 (노이즈 없는 정확한 투영)" << std::endl;
+    std::cout << "   ② observed_2d와의 유클리드 거리 = 재투영 오차 (sqrt(du² + dv²))" << std::endl;
+    std::cout << "   ③ 전체 평균과 표준편차로 시스템 정확도를 평가" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [재투영 오차란?]" << std::endl;
+    std::cout << "   '실제로 관측된 픽셀 위치'와 '3D 점을 투영한 예상 위치'의 차이입니다." << std::endl;
+    std::cout << "   이 오차가 작을수록 카메라 파라미터와 3D 점 위치가 정확하다는 뜻입니다." << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [SLAM에서의 기준]" << std::endl;
+    std::cout << "   < 0.5 픽셀: 매우 좋음 (잘 캘리브레이션된 시스템)" << std::endl;
+    std::cout << "   < 1.0 픽셀: 좋음 (일반적 Visual SLAM)" << std::endl;
+    std::cout << "   > 2.0 픽셀: 캘리브레이션 문제 또는 outlier 존재" << std::endl;
+    std::cout << "   Bundle Adjustment의 목적함수 = 이 재투영 오차의 합을 최소화하는 것!" << std::endl;
 }
 
 // 외부 파라미터 변화 효과 — 카메라 움직임이 투영에 미치는 영향
@@ -227,10 +245,20 @@ void problem3_extrinsic_effect()
     double v2 = fy * Pc.at<double>(1) / Pc.at<double>(2) + cy;
     std::cout << "시나리오 2 (Y축 15° 회전): (" << u2 << ", " << v2 << ")" << std::endl;
 
-    std::cout << "\n💡 핵심 관찰:" << std::endl;
-    std::cout << "   - K는 변하지 않음 (카메라 하드웨어 고유)" << std::endl;
-    std::cout << "   - R, t만 변함 (카메라 움직임)" << std::endl;
-    std::cout << "   - 이것이 SLAM에서 매 프레임 추정하는 것!" << std::endl;
+    std::cout << "\n💡 정답 해설:" << std::endl;
+    std::cout << "   [결과 분석]" << std::endl;
+    std::cout << "   기본 (R=I, t=0): (400, 300) → 점이 정면(0,0,5)이므로 이미지 중심에 투영" << std::endl;
+    std::cout << "   시나리오 1 (t=[1,0,0]): (520, 300) → 카메라가 오른쪽으로 1m 이동" << std::endl;
+    std::cout << "     → 물체는 카메라 기준 왼쪽으로 상대적 이동하지 않고," << std::endl;
+    std::cout << "       카메라 좌표에서 Xc=0+1=1이 되어 u가 증가함" << std::endl;
+    std::cout << "   시나리오 2 (Y축 15° 회전): u좌표가 변함" << std::endl;
+    std::cout << "     → Y축 회전은 물체를 좌우로 이동시키는 효과" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [핵심 포인트]" << std::endl;
+    std::cout << "   - K(내부 파라미터)는 카메라 하드웨어에 의해 고정됨" << std::endl;
+    std::cout << "   - R, t(외부 파라미터)만 매 프레임 변함 → 이것이 SLAM이 추정하는 것!" << std::endl;
+    std::cout << "   - 같은 3D 점이라도 카메라 포즈에 따라 투영 위치가 달라지며," << std::endl;
+    std::cout << "     이 차이를 이용해 역으로 카메라 포즈를 추정할 수 있음" << std::endl;
 }
 
 // 다중 카메라 가시 영역 분석 — 넓은 시야를 위한 다중 카메라 시스템
@@ -344,9 +372,21 @@ void problem4_multi_camera_visibility()
                   << " m" << std::endl;
     }
 
-    std::cout << "\n💡 힌트:" << std::endl;
-    std::cout << "   다중 카메라는 단일 카메라보다 넓은 영역을 커버합니다." << std::endl;
-    std::cout << "   Visual SLAM에서 다중 카메라 시스템이 유리한 이유!" << std::endl;
+    std::cout << "\n💡 정답 해설:" << std::endl;
+    std::cout << "   [코드 핵심]" << std::endl;
+    std::cout << "   ① Y축 회전 행렬로 좌/우 카메라를 생성 (각각 -30°, +30°)" << std::endl;
+    std::cout << "   ② 각 카메라에 대해 Pc = R * Pw + t로 카메라 좌표 변환" << std::endl;
+    std::cout << "   ③ Zc > 0이고 투영이 이미지 내면 '보임'" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [가시 영역 공식]" << std::endl;
+    std::cout << "   visible_width = 2 * d * tan(FOV_x / 2)" << std::endl;
+    std::cout << "   거리 d가 멀어질수록 보이는 영역이 넓어짐 (삼각형 확대)" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [다중 카메라의 장점]" << std::endl;
+    std::cout << "   - 정면 카메라만으로는 좌우 ±32° 정도만 커버" << std::endl;
+    std::cout << "   - 좌/우 30° 카메라 추가 → 약 ±62° 커버 가능" << std::endl;
+    std::cout << "   - 카메라 간 겹치는 영역에서는 스테레오 삼각측량도 가능" << std::endl;
+    std::cout << "   - 자율주행에서는 보통 6~8대로 360° 커버리지 확보" << std::endl;
 }
 
 int main()

@@ -54,7 +54,7 @@ constexpr double kRadToDeg = 180.0 / CV_PI;
 // ★ 이미지 크기 추정: cx ≈ width/2, cy ≈ height/2
 //   → width ≈ 2*cx, height ≈ 2*cy
 //
-// TODO: K.at<double>(row, col)로 각 요소를 추출하세요
+// TODO: K 행렬에서 내부 파라미터(fx, fy, cx, cy)를 추출하세요
 void problem1_intrinsic_analysis()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -67,7 +67,7 @@ void problem1_intrinsic_analysis()
     std::cout << K << "\n" << std::endl;
 
     // TODO: K 행렬에서 값을 추출하세요
-    // 힌트: K.at<double>(row, col)로 접근
+    // 힌트: cv::Mat에서 특정 위치의 값을 읽는 방법을 찾아보세요
     double fx = 0.0;  // TODO: fx 추출
     double fy = 0.0;  // TODO: fy 추출
     double cx = 0.0;  // TODO: cx 추출

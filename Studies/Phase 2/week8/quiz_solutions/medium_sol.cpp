@@ -67,7 +67,16 @@ void problem1_implement_lk()
                   << ")" << std::endl;
     }
 
-    std::cout << "\n💡 OpenCV가 Pyramidal LK 자동 수행" << std::endl;
+    std::cout << "\n💡 정답 해설:" << std::endl;
+    std::cout << "   [코드 핵심]" << std::endl;
+    std::cout << "   1. 합성 이미지 생성: 원이 (150,150)→(180,160) 이동" << std::endl;
+    std::cout << "   2. calcOpticalFlowPyrLK로 추적" << std::endl;
+    std::cout << "   3. 예상 결과: 이동 ≈ (30, 10)\n" << std::endl;
+    std::cout << "   [calcOpticalFlowPyrLK 내부 동작]" << std::endl;
+    std::cout << "   ① Image Pyramid 구성 (maxLevel=3)" << std::endl;
+    std::cout << "   ② 최상위 레벨에서 LK 시작 (coarse)" << std::endl;
+    std::cout << "   ③ 하위 레벨로 전파하며 정밀 보정 (fine)" << std::endl;
+    std::cout << "   ④ 각 레벨에서 반복 수렴 + 서브픽셀 보간" << std::endl;
 }
 
 // 추적 품질 평가 — 언제 추적이 실패하는지 감지하는 방법
@@ -106,9 +115,22 @@ void problem2_track_quality()
     std::cout << "   2. error > threshold" << std::endl;
     std::cout << "   3. Backward check (역방향 확인)\n" << std::endl;
 
-    std::cout << "💡 실전 팁:" << std::endl;
-    std::cout << "   - 주기적으로 특징점 재검출" << std::endl;
-    std::cout << "   - 이미지 경계 점 제거" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [3가지 실패 감지 방법 상세]\n" << std::endl;
+    std::cout << "   ① status 확인:" << std::endl;
+    std::cout << "      status[i]==0이면 추적 실패 (윈도우 밖 이탈 등)" << std::endl;
+    std::cout << "      → 해당 점 즉시 제거\n" << std::endl;
+    std::cout << "   ② error 임계값:" << std::endl;
+    std::cout << "      err[i] = 윈도우 내 밝기 차이의 평균" << std::endl;
+    std::cout << "      → 보통 err > 30~50이면 추적 불량으로 판단\n" << std::endl;
+    std::cout << "   ③ Backward Check (가장 신뢰도 높음):" << std::endl;
+    std::cout << "      pts1→pts2 순방향 추적 후, pts2→pts1' 역방향 추적" << std::endl;
+    std::cout << "      ||pts1 - pts1'|| > 1px이면 추적 실패" << std::endl;
+    std::cout << "      → VINS-Mono가 이 방법 사용 (F-B error < 1px)\n" << std::endl;
+    std::cout << "   [실전 관리 전략]" << std::endl;
+    std::cout << "   - 매 N프레임마다 goodFeaturesToTrack()으로 점 보충" << std::endl;
+    std::cout << "   - 이미지 경계 20px 이내 점 제거 (윈도우 잘림 방지)" << std::endl;
+    std::cout << "   - 추적 점 < 50개이면 전체 재초기화" << std::endl;
 }
 
 // Optical Flow vs Feature Matching — 두 추적 방법의 비교
@@ -143,9 +165,18 @@ void problem3_flow_vs_matching()
     std::cout << "   장점: 큰 움직임, robust" << std::endl;
     std::cout << "   단점: 느림, 텍스처 필요\n" << std::endl;
 
-    std::cout << "💡 최선의 조합:" << std::endl;
-    std::cout << "   - Tracking: Optical Flow (빠름)" << std::endl;
-    std::cout << "   - Relocalization: Feature Matching (robust)" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [왜 둘 다 필요한가? — Hybrid 전략]" << std::endl;
+    std::cout << "   Optical Flow 단독: 빠르지만 drift 누적, 조명 변화에 약함" << std::endl;
+    std::cout << "   Feature Matching 단독: robust하지만 느림\n" << std::endl;
+    std::cout << "   [최적 조합 — SLAM에서의 역할 분담]" << std::endl;
+    std::cout << "   ① 일반 Tracking: Optical Flow (프레임 간 빠른 추적)" << std::endl;
+    std::cout << "   ② Relocalization: Feature Matching (추적 실패 시 복구)" << std::endl;
+    std::cout << "   ③ Loop Closure: Feature Matching (과거 방문 장소 인식)\n" << std::endl;
+    std::cout << "   [드리프트 차이가 중요한 이유]" << std::endl;
+    std::cout << "   Flow: 프레임1→2→3→...→N 순차 추적 → 오차 누적" << std::endl;
+    std::cout << "   Matching: 매 프레임 독립적으로 매칭 → 오차 독립적" << std::endl;
+    std::cout << "   → Flow는 빠르지만 긴 시간 사용 시 drift 보정 필수" << std::endl;
 }
 
 // LK 단일 점 직접 구현 — Sobel 그래디언트부터 AᵀA 역행렬까지
@@ -278,8 +309,17 @@ void problem4_lk_single_point()
         std::cout << "   u=" << u_cv << ", v=" << v_cv << "\n" << std::endl;
     }
 
-    std::cout << "💡 직접 구현과 OpenCV 결과가 유사하면 정상!" << std::endl;
-    std::cout << "   차이가 있다면: OpenCV는 피라미드 + 반복 최적화 사용" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [코드 핵심 — LK 구현 5단계]" << std::endl;
+    std::cout << "   ① Sobel로 Ix, Iy 계산 (두 프레임 평균으로 안정화)" << std::endl;
+    std::cout << "   ② It = frame2 - frame1 (시간 변화)" << std::endl;
+    std::cout << "   ③ 21x21 윈도우에서 ΣIx², ΣIxIy, ΣIy², ΣIxIt, ΣIyIt 합산" << std::endl;
+    std::cout << "   ④ AᵀA(2x2) 역행렬 × Aᵀb → [u, v] flow 계산" << std::endl;
+    std::cout << "   ⑤ 고유값으로 추적 가능성 확인 (λ1,λ2 모두 크면 OK)\n" << std::endl;
+    std::cout << "   [직접 구현 vs OpenCV 차이 원인]" << std::endl;
+    std::cout << "   직접 구현: 단일 레벨, 1회 계산" << std::endl;
+    std::cout << "   OpenCV: 피라미드(다중 해상도) + 반복 수렴 + 서브픽셀 보간" << std::endl;
+    std::cout << "   → OpenCV가 더 정확하지만, 직접 구현으로 원리 이해가 핵심" << std::endl;
 }
 
 // 윈도우 크기별 LK 정확도 분석 — Spatial Coherence 범위의 트레이드오프
@@ -365,7 +405,21 @@ void problem5_window_size_analysis()
     std::cout << "     + 안정적, 큰 이동 처리 가능" << std::endl;
     std::cout << "     - 뭉뚱그려짐, 여러 움직임 혼합\n" << std::endl;
 
-    std::cout << "💡 실전 권장: 15~31 (VINS 기본값: 21x21)" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [실행 결과 해석]" << std::endl;
+    std::cout << "   작은 윈도우(5x5): 제약식 25개, 노이즈에 민감 → 오차 클 수 있음" << std::endl;
+    std::cout << "   중간 윈도우(21x21): 제약식 441개, 안정적 → 권장" << std::endl;
+    std::cout << "   큰 윈도우(41x41): 제약식 1681개, 강건하지만 경계 혼합\n" << std::endl;
+    std::cout << "   [트레이드오프 요약]" << std::endl;
+    std::cout << "   ┌──────────┬────────────┬────────────┬────────────┐" << std::endl;
+    std::cout << "   │          │ 노이즈     │ 경계 정밀  │ 큰 이동    │" << std::endl;
+    std::cout << "   ├──────────┼────────────┼────────────┼────────────┤" << std::endl;
+    std::cout << "   │ 작은 윈도│ 민감       │ 좋음       │ 불가       │" << std::endl;
+    std::cout << "   │ 큰 윈도우│ 강건       │ 나쁨       │ 가능       │" << std::endl;
+    std::cout << "   └──────────┴────────────┴────────────┴────────────┘\n" << std::endl;
+    std::cout << "   [실전 권장]" << std::endl;
+    std::cout << "   크기: 15~31 (VINS-Mono 기본값: 21x21)" << std::endl;
+    std::cout << "   피라미드 사용 시 작은 윈도우로도 큰 이동 대응 가능" << std::endl;
 }
 
 int main()

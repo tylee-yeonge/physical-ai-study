@@ -200,9 +200,18 @@ void problem3_fov_calculation()
     std::cout << "   카메라 A: " << camera_A_type << std::endl;
     std::cout << "   카메라 B: " << camera_B_type << std::endl;
 
-    std::cout << "\n💡 힌트:" << std::endl;
-    std::cout << "   fx 크다 → FOV 작다 → 망원" << std::endl;
-    std::cout << "   fx 작다 → FOV 크다 → 광각" << std::endl;
+    std::cout << "\n💡 정답 해설:" << std::endl;
+    std::cout << "   카메라 A (fx=300): FOV ≈ 93.7° → 광각 렌즈" << std::endl;
+    std::cout << "   카메라 B (fx=1200): FOV ≈ 29.9° → 망원 렌즈" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [왜 이렇게 되나?]" << std::endl;
+    std::cout << "   FOV = 2·arctan(width / (2·fx)) 공식에서:" << std::endl;
+    std::cout << "   - fx가 작으면 → width/(2·fx)가 큼 → arctan 값 큼 → FOV 넓음 (광각)" << std::endl;
+    std::cout << "   - fx가 크면 → width/(2·fx)가 작음 → arctan 값 작음 → FOV 좁음 (망원)" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [SLAM에서의 의미]" << std::endl;
+    std::cout << "   - 광각(FOV>90°): 한 프레임에 특징점이 많이 보여 추적이 안정적이지만, 렌즈 왜곡이 큼" << std::endl;
+    std::cout << "   - 망원(FOV<30°): 먼 물체를 자세히 볼 수 있지만, 시야가 좁아 빠른 회전에 약함" << std::endl;
 }
 
 // 역투영 (Back-projection) — 2D 픽셀에서 3D 광선 방향 복원
@@ -260,9 +269,19 @@ void problem4_back_projection()
     std::cout << "   정규화 좌표: (" << x2_norm << ", " << y2_norm << ")" << std::endl;
     std::cout << "   광선 방향: [" << x2_norm << ", " << y2_norm << ", 1]" << std::endl;
 
-    std::cout << "\n💡 힌트:" << std::endl;
-    std::cout << "   이미지 중심 → 정규화 좌표 (0, 0) → 카메라 정면 [0, 0, 1]" << std::endl;
-    std::cout << "   좌상단 → 음의 X, 음의 Y → 왼쪽 위를 가리킴" << std::endl;
+    std::cout << "\n💡 정답 해설:" << std::endl;
+    std::cout << "   픽셀 1 (400, 300) = 이미지 중심:" << std::endl;
+    std::cout << "   → x' = (400-400)/600 = 0, y' = (300-300)/600 = 0" << std::endl;
+    std::cout << "   → 광선 방향 [0, 0, 1] = 카메라 정면을 똑바로 바라봄" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   픽셀 2 (0, 0) = 좌상단:" << std::endl;
+    std::cout << "   → x' = (0-400)/600 = -0.667, y' = (0-300)/600 = -0.5" << std::endl;
+    std::cout << "   → 광선 방향 [-0.667, -0.5, 1] = 왼쪽 위를 비스듬히 바라봄" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [핵심 포인트]" << std::endl;
+    std::cout << "   역투영은 '이 픽셀이 3D 공간에서 어느 방향을 가리키는지'를 알려줍니다." << std::endl;
+    std::cout << "   깊이(거리) 정보는 알 수 없고, 방향만 복원됩니다." << std::endl;
+    std::cout << "   SLAM의 삼각측량은 '두 카메라의 역투영 광선이 만나는 점'을 구하는 것입니다." << std::endl;
 }
 
 // 가시성 판별 (Visibility Check) — SLAM에서 3D 점 관리의 기초
@@ -366,9 +385,22 @@ void problem5_visibility_check()
         std::cout << "   → 결과: " << (visible ? "보임" : "보이지 않음") << "\n" << std::endl;
     }
 
-    std::cout << "💡 힌트:" << std::endl;
-    std::cout << "   SLAM에서 가시성 체크는 특징점 추적 시 필수!" << std::endl;
-    std::cout << "   3가지 조건 중 하나라도 실패하면 해당 점은 무시" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   각 테스트 점의 예상 결과:" << std::endl;
+    std::cout << "   - (0,0,5) 정면 중앙: 3조건 모두 PASS → 보임" << std::endl;
+    std::cout << "   - (3,0,5) 오른쪽: 투영 u=620 → 이미지 내 → 보임" << std::endl;
+    std::cout << "   - (10,0,5) 멀리 오른쪽: 투영 u=1320 → 이미지 밖(640) → 보이지 않음" << std::endl;
+    std::cout << "   - (0,0,-5) 카메라 뒤: Zc=-5 < 0 → 조건1 FAIL → 보이지 않음" << std::endl;
+    std::cout << "   - (0,5,5) 위쪽: 투영 v=740 → 이미지 밖(480) → 보이지 않음" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [3가지 조건 정리]" << std::endl;
+    std::cout << "   조건1 Zc>0: 카메라 '앞'에 있어야 함 (뒤에 있으면 물리적으로 볼 수 없음)" << std::endl;
+    std::cout << "   조건2 경계 내: 투영 결과가 이미지 크기(640×480) 안에 있어야 함" << std::endl;
+    std::cout << "   조건3 FOV: 극단적 각도에서는 렌즈 왜곡이 심해 신뢰 불가" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [SLAM에서의 활용]" << std::endl;
+    std::cout << "   매 프레임마다 모든 맵 포인트에 대해 가시성을 체크하여," << std::endl;
+    std::cout << "   보이는 점만 매칭 후보로 사용합니다 → 계산 효율 + 정확도 향상" << std::endl;
 }
 
 int main()

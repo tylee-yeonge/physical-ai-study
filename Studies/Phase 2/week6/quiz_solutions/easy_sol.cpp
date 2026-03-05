@@ -68,10 +68,16 @@ void problem1_depth_from_disparity()
     std::cout << "시차 " << disparity1 << " 픽셀 → 깊이 " << depth1 << " m" << std::endl;
     std::cout << "시차 " << disparity2 << " 픽셀 → 깊이 " << depth2 << " m\n" << std::endl;
 
-    std::cout << "💡 관찰:" << std::endl;
-    std::cout << "   - 시차 ↑ → 깊이 ↓ (가까움)" << std::endl;
-    std::cout << "   - 시차 ↓ → 깊이 ↑ (멀리)" << std::endl;
-    std::cout << "   - 시차 = 0 → 무한대 (매칭 불가)" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [실행 결과] Z = baseline × focal / disparity" << std::endl;
+    std::cout << "   시차 60px → 깊이 = 0.12 × 600 / 60 = 1.2 m" << std::endl;
+    std::cout << "   시차 30px → 깊이 = 0.12 × 600 / 30 = 2.4 m" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [핵심 포인트]" << std::endl;
+    std::cout << "   시차와 깊이는 반비례: 시차 2배 → 깊이 1/2" << std::endl;
+    std::cout << "   깊이 오차 공식: ΔZ = Z²/(b·f) · Δd" << std::endl;
+    std::cout << "   → 먼 물체일수록 깊이 오차가 Z²에 비례하여 급증" << std::endl;
+    std::cout << "   → 이것이 스테레오 카메라의 유효 거리가 제한되는 이유" << std::endl;
 }
 
 // 삼각측량 기하학 — 두 카메라의 광선 교차로 3D 점 복원
@@ -103,14 +109,16 @@ void problem2_triangulation_geometry()
 
     std::cout << "질문: 왜 정확히 교차하지 않나요?\n" << std::endl;
 
-    std::cout << "💡 답:" << std::endl;
-    std::cout << "   - 픽셀 양자화 오차" << std::endl;
-    std::cout << "   - 특징점 검출 오차" << std::endl;
-    std::cout << "   - 카메라 캘리브레이션 오차" << std::endl;
-    std::cout << "   → 두 ray가 skew lines (꼬인 위치)\n" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [정답] 3가지 오차 원인으로 두 광선이 정확히 교차하지 않음" << std::endl;
+    std::cout << "   1. 픽셀 양자화 오차: 좌표가 정수 단위라 소수점 이하 정보 손실" << std::endl;
+    std::cout << "   2. 특징점 검출 오차: ORB/SIFT 검출 위치가 0.5~2px 부정확" << std::endl;
+    std::cout << "   3. 카메라 캘리브레이션 오차: K, 왜곡 계수 추정 오차" << std::endl;
+    std::cout << "   → 3D 공간에서 두 ray가 skew lines (꼬인 위치)이 됨\n" << std::endl;
 
-    std::cout << "해결: DLT (Direct Linear Transform)" << std::endl;
-    std::cout << "   - 최소제곱법으로 최적 3D 점 찾기" << std::endl;
+    std::cout << "   [해결법] DLT (Direct Linear Transform)" << std::endl;
+    std::cout << "   두 광선의 '가장 가까운 점'을 최소제곱법으로 추정" << std::endl;
+    std::cout << "   OpenCV: cv::triangulatePoints() 함수가 이를 수행" << std::endl;
 }
 
 // 재투영 오차 계산 — 삼각측량 결과의 품질 측정
@@ -144,9 +152,18 @@ void problem3_reprojection_error()
     std::cout << "3D 점: (" << pt3d.x << ", " << pt3d.y << ", " << pt3d.z << ")" << std::endl;
     std::cout << "투영된 2D 점: (" << u << ", " << v << ")\n" << std::endl;
 
-    std::cout << "💡 재투영 오차 = ||관측 - 투영|| (픽셀)" << std::endl;
-    std::cout << "   - 1 픽셀 이하: 매우 좋음" << std::endl;
-    std::cout << "   - 5 픽셀 이상: 문제 있음 (outlier)" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [코드 핵심] 투영 공식: u = fx*X/Z + cx, v = fy*Y/Z + cy" << std::endl;
+    std::cout << "   (1.0, 0.5, 3.0) → u = 600*1/3 + 400 = 600, v = 600*0.5/3 + 300 = 400" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [재투영 오차란?]" << std::endl;
+    std::cout << "   삼각측량으로 복원한 3D 점을 다시 카메라에 투영했을 때" << std::endl;
+    std::cout << "   원래 관측된 2D 위치와의 유클리드 거리 (픽셀 단위)" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [품질 기준]" << std::endl;
+    std::cout << "   < 1px: 매우 좋음 (정밀한 삼각측량)" << std::endl;
+    std::cout << "   1~5px: 양호 (일반적인 수준)" << std::endl;
+    std::cout << "   > 5px: outlier 의심 → RANSAC으로 제거" << std::endl;
 }
 
 // Baseline과 깊이 정확도의 관계 — 트레이드오프 분석
@@ -180,10 +197,18 @@ void problem4_baseline_vs_accuracy()
     std::cout << "   장점: 매칭 쉬움, 시야 겹침 ↑" << std::endl;
     std::cout << "   단점: 깊이 정확도 ↓ (시차 작음)\n" << std::endl;
 
-    std::cout << "💡 실제 응용:" << std::endl;
-    std::cout << "   - 실내 (가까움): 짧은 baseline (5-10cm)" << std::endl;
-    std::cout << "   - 자율주행 (멀리): 긴 baseline (30-60cm)" << std::endl;
-    std::cout << "   - VINS: 연속 프레임 (작은 baseline)" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [정답] Baseline이 클수록 깊이 정확도↑, 하지만 트레이드오프 존재" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [수학적 근거]" << std::endl;
+    std::cout << "   깊이 오차 ΔZ = Z²/(b·f) · Δd" << std::endl;
+    std::cout << "   b(baseline)가 클수록 ΔZ 감소 → 정확도 향상" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [실전 응용]" << std::endl;
+    std::cout << "   실내 (1~5m 거리): baseline 5~10cm (스마트폰, 소형 로봇)" << std::endl;
+    std::cout << "   자율주행 (10~100m): baseline 30~60cm (차량 루프)" << std::endl;
+    std::cout << "   단안 SLAM (VINS): 카메라 이동 자체가 baseline 역할" << std::endl;
+    std::cout << "   → 너무 크면 시야 겹침↓, 매칭 실패 → 적절한 균형 필요" << std::endl;
 }
 
 /**

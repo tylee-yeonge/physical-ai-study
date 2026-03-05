@@ -136,9 +136,7 @@ void problem3_reprojection_error()
     // 카메라 행렬 (R=I, t=0 가정)
     cv::Mat K = (cv::Mat_<double>(3, 3) << 600, 0, 400, 0, 600, 300, 0, 0, 1);
 
-    // TODO: 투영
-    // p = K · [X, Y, Z]^T → 동차 좌표
-    // u = p_x / p_z, v = p_y / p_z → 픽셀 좌표
+    // TODO: 3D 점을 카메라 행렬로 투영하여 픽셀 좌표 계산
 
     std::cout << "3D 점: (" << pt3d.x << ", " << pt3d.y << ", " << pt3d.z << ")" << std::endl;
     std::cout << "투영된 2D 점: (???, ???)\n" << std::endl;
@@ -221,18 +219,11 @@ void problem5_validate_rotation()
     std::cout << "R_valid:" << std::endl << R_valid << std::endl;
     std::cout << "\nR_noisy (노이즈 추가):" << std::endl << R_noisy << std::endl;
 
-    // TODO 1: R_valid와 R_noisy 각각에 대해 검증
-    //   조건 1: R^T · R ≈ I (직교성)
-    //     오차 측정: ||R^T·R - I||_F (프로베니우스 노름)
-    //     cv::norm(R.t() * R - cv::Mat::eye(3, 3, CV_64F))
-    //
-    //   조건 2: det(R) ≈ 1
-    //     cv::determinant(R)로 행렬식 계산
+    // TODO 1: R_valid와 R_noisy 각각에 대해 두 가지 조건을 검증하세요
+    //   힌트: Doxygen 주석의 직교성 조건과 행렬식 조건을 확인하세요
 
-    // TODO 2: R_noisy를 SVD로 가장 가까운 회전 행렬로 복구
-    //   (1) cv::SVD::compute(R_noisy, w, u, vt)
-    //   (2) R_fixed = U · V^T (특이값을 무시하고 직교 행렬 생성)
-    //   (3) det(R_fixed) < 0이면: V^T의 마지막 행에 -1을 곱한 후 다시 U·V^T
+    // TODO 2: R_noisy를 SVD로 가장 가까운 회전 행렬로 복구하세요
+    //   힌트: 위 Doxygen 주석의 SVD 복구 공식을 참고하세요
 
     std::cout << "\n올바른 회전 행렬 조건:" << std::endl;
     std::cout << "   1. R^T * R = I (직교성)" << std::endl;
@@ -278,16 +269,10 @@ void problem6_scale_ambiguity()
     // TODO: 다양한 스케일에서 E를 구하고, 정규화 후 비교
     // 스케일: 0.5, 1.0, 2.0, 5.0
     //
-    // [t]_x (skew-symmetric matrix) 구하는 법:
-    //   tx, ty, tz = t의 원소
-    //   t_skew = [ 0   -tz   ty ]
-    //            [ tz    0  -tx ]
-    //            [-ty   tx    0 ]
+    // 힌트: E = [t]_× · R 공식을 사용하세요
+    //       정규화 후 E가 스케일에 무관하게 동일한지 확인하세요
     //
-    // E = t_skew * R
-    // E_norm = E / cv::norm(E)  ← Frobenius 노름으로 정규화
-    //
-    // ★ 모든 스케일에서 E_norm이 동일한지 확인!
+    // ★ 모든 스케일에서 정규화된 E가 동일한지 확인!
     //   → 이것이 스케일 모호성의 수학적 증거
 
     std::cout << "\n스케일 모호성의 의미:" << std::endl;

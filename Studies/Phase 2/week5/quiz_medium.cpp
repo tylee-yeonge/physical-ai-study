@@ -265,11 +265,10 @@ void problem5_noise_analysis()
     for (double noise : noise_levels)
     {
         // TODO 1: pts1_clean, pts2_clean에 가우시안 노이즈 추가
-        //   각 점의 (x, y)에 N(0, noise) 노이즈를 더함
-        //   cv::RNG::gaussian(sigma)로 랜덤 값 생성
+        //   각 점의 (x, y)에 표준편차 noise인 랜덤 값을 더함
 
         // TODO 2: 노이즈 추가된 점으로 F 추정
-        //   cv::findFundamentalMat(pts1_noisy, pts2_noisy, cv::FM_8POINT)
+        //   힌트: 8-Point Algorithm으로 F를 구하세요
 
         // TODO 3: 깨끗한 원본 점으로 에피폴라 제약 오차 계산
         //   각 대응점에 대해: error_i = |p2^T · F · p1|

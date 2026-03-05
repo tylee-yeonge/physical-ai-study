@@ -65,10 +65,20 @@ void problem1_optimal_ratio()
         std::cout << " " << ratio << "  |  ratio↓=품질↑  |  ratio↑=수량↑" << std::endl;
     }
 
-    std::cout << "\n💡 관찰:" << std::endl;
-    std::cout << "   - Ratio ↓: 매칭 개수 ↓, 품질 ↑ (precision)" << std::endl;
-    std::cout << "   - Ratio ↑: 매칭 개수 ↑, 품질 ↓ (recall)" << std::endl;
-    std::cout << "   - 0.7은 좋은 균형점 (Lowe 논문)" << std::endl;
+    std::cout << "\n💡 정답 해설:" << std::endl;
+    std::cout << "   [코드 핵심] 여러 ratio 임계값에 따른 매칭 특성 비교" << std::endl;
+    std::cout << "   ratio ↓ → 엄격한 필터 → 소수의 고품질 매칭 (높은 precision)" << std::endl;
+    std::cout << "   ratio ↑ → 느슨한 필터 → 다수의 매칭 포함, 오매칭도 포함 (높은 recall)" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [Precision vs Recall 이해]" << std::endl;
+    std::cout << "   Precision: 내가 '맞다'고 한 것 중 실제로 맞는 비율" << std::endl;
+    std::cout << "   Recall: 실제 맞는 것 중 내가 찾아낸 비율" << std::endl;
+    std::cout << "   → 둘 다 높이기는 불가능 (트레이드오프)" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [SLAM 단계별 최적 ratio]" << std::endl;
+    std::cout << "   초기화: ratio=0.8 (recall↑, 충분한 매칭 확보가 중요)" << std::endl;
+    std::cout << "   트래킹: ratio=0.6~0.7 (precision↑, 정확한 포즈 추정)" << std::endl;
+    std::cout << "   루프 클로징: ratio=0.5~0.6 (precision 최우선, 오인식 방지)" << std::endl;
 }
 
 // 문제 2: Essential Matrix 추정 — 매칭점으로 카메라 상대 포즈 복원
@@ -117,10 +127,22 @@ void problem2_essential_matrix()
     std::cout << "Translation:\n" << t << std::endl;
     // R: 3x3 회전 행렬, t: 3x1 단위 이동 벡터 (스케일 미지)
 
-    std::cout << "💡 SLAM에서의 의미:" << std::endl;
-    std::cout << "   - E를 분해 → R (회전), t (이동)" << std::endl;
-    std::cout << "   - 두 프레임 간 상대 포즈!" << std::endl;
-    std::cout << "   - Visual Odometry의 핵심" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [코드 핵심]" << std::endl;
+    std::cout << "   1. findEssentialMat(pts1, pts2, K, RANSAC) → Essential Matrix E 추정" << std::endl;
+    std::cout << "   2. recoverPose(E, pts1, pts2, K, R, t) → 상대 회전/이동 복원" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [Essential vs Fundamental Matrix]" << std::endl;
+    std::cout << "   Essential: 정규화 좌표 기반, K 필요, 5 DOF → 더 안정적" << std::endl;
+    std::cout << "   Fundamental: 픽셀 좌표 기반, K 불필요, 7 DOF → 더 일반적" << std::endl;
+    std::cout << "   관계: E = K^T · F · K (캘리브레이션 있으면 E 사용)" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [중요한 제한] t는 단위 벡터 (방향만, 크기 미지)" << std::endl;
+    std::cout << "   실제 이동 거리를 알려면 별도의 스케일 정보 필요" << std::endl;
+    std::cout << "   (스테레오 카메라 기선, 알려진 물체 크기, IMU 등)" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [SLAM에서의 역할]" << std::endl;
+    std::cout << "   Visual Odometry: 매 프레임 E → R,t → 누적하여 경로 추정" << std::endl;
 }
 
 // 문제 3: BF vs FLANN 매칭 벤치마크 — 속도와 정확도 비교
@@ -185,10 +207,18 @@ void problem3_matching_benchmark()
     std::cout << "Brute-Force    |  " << bf_ms << "  |   1.0x" << std::endl;
     std::cout << "FLANN          |  " << flann_ms << "  |   " << bf_ms / flann_ms << "x" << std::endl;
 
-    std::cout << "\n💡 결론:" << std::endl;
-    std::cout << "   - BF: 정확하지만 느림 O(N²)" << std::endl;
-    std::cout << "   - FLANN: 빠른 근사 O(N log N)" << std::endl;
-    std::cout << "   - 실시간 SLAM: FLANN 또는 NN 기반" << std::endl;
+    std::cout << "\n💡 정답 해설:" << std::endl;
+    std::cout << "   [코드 핵심] chrono로 BF/FLANN 매칭 시간을 각각 측정하여 비교" << std::endl;
+    std::cout << "   BFMatcher: 모든 쌍을 비교 → 정확하지만 O(N²)" << std::endl;
+    std::cout << "   FlannBasedMatcher: KD-tree 근사 탐색 → 빠르지만 ~99% 정확" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [주의] FLANN은 CV_32F만 지원 → 이진 디스크립터 변환 필요" << std::endl;
+    std::cout << "   이진 디스크립터(ORB)에는 LSH 기반 FLANN을 사용할 수도 있음" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [언제 무엇을 쓸까?]" << std::endl;
+    std::cout << "   특징점 < 500: BF로도 충분히 빠름" << std::endl;
+    std::cout << "   특징점 > 1000: FLANN이 수 배~수십 배 빠름" << std::endl;
+    std::cout << "   ORB-SLAM: 이진 디스크립터 + BF (해밍 거리가 빠르므로 BF도 실용적)" << std::endl;
 }
 
 // 문제 4: Homography DLT 직접 구현 — A행렬 구성 + SVD 분해
@@ -297,10 +327,19 @@ void problem4_homography_dlt()
     std::cout << "📊 Ground Truth:" << std::endl;
     std::cout << H_true << "\n" << std::endl;
 
-    std::cout << "💡 핵심:" << std::endl;
-    std::cout << "   - DLT는 최소 4점, 더 많으면 최소제곱 해" << std::endl;
-    std::cout << "   - SVD의 마지막 V 열이 Ah=0의 최소 노름 해" << std::endl;
-    std::cout << "   - 노이즈가 있으면 RANSAC과 함께 사용" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [코드 핵심] DLT 구현 4단계:" << std::endl;
+    std::cout << "   1. 각 대응점에서 2행 생성 → A 행렬 (2N×9)" << std::endl;
+    std::cout << "      행 2i:   [-x, -y, -1,  0,  0,  0, ux, uy, u]" << std::endl;
+    std::cout << "      행 2i+1: [ 0,  0,  0, -x, -y, -1, vx, vy, v]" << std::endl;
+    std::cout << "   2. SVD::compute(A, S, U, Vt) 분해" << std::endl;
+    std::cout << "   3. Vt 마지막 행(가장 작은 특이값) → h 벡터 (1×9)" << std::endl;
+    std::cout << "   4. h를 3×3 reshape + h33으로 나누어 정규화" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [왜 SVD 마지막 행인가?]" << std::endl;
+    std::cout << "   Ah=0에서 ||h||=1 조건 하의 최소 ||Ah|| 해" << std::endl;
+    std::cout << "   = 가장 작은 특이값에 대응하는 오른쪽 특이벡터" << std::endl;
+    std::cout << "   점이 4개 초과면 과결정 → 최소제곱 해 (노이즈에 강건)" << std::endl;
 }
 
 // 문제 5: RANSAC Homography 직접 구현 — 아웃라이어에 강건한 추정
@@ -458,10 +497,22 @@ void problem5_ransac_homography()
     std::cout << "\n📊 OpenCV RANSAC 결과:" << std::endl;
     std::cout << "   inlier: " << cv_inliers << " / " << total << "\n" << std::endl;
 
-    std::cout << "💡 핵심:" << std::endl;
-    std::cout << "   - 아웃라이어가 있어도 robust하게 H 추정" << std::endl;
-    std::cout << "   - 반복 횟수: log(1-p)/log(1-w^4)" << std::endl;
-    std::cout << "   - threshold: 보통 1~5 픽셀" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [코드 핵심] RANSAC 루프 5단계:" << std::endl;
+    std::cout << "   1. indices를 shuffle → 앞 4개 선택 (랜덤 최소 샘플)" << std::endl;
+    std::cout << "   2. findHomography(4pts, 0) → DLT로 H 추정 (RANSAC 없이)" << std::endl;
+    std::cout << "   3. perspectiveTransform으로 전체 점 변환" << std::endl;
+    std::cout << "   4. ||변환점 - 실제점|| < threshold → inlier 카운트" << std::endl;
+    std::cout << "   5. 최다 inlier 모델을 best_H로 갱신" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [예상 결과]" << std::endl;
+    std::cout << "   40개 inlier + 15개 outlier (27%) → ~16회면 99% 성공" << std::endl;
+    std::cout << "   500회 반복이므로 충분 → inlier ~40개 검출, FP ~0개" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [threshold 선택 가이드]" << std::endl;
+    std::cout << "   1~3 픽셀: 엄격 (정밀한 매칭만)" << std::endl;
+    std::cout << "   3~5 픽셀: 일반적 (노이즈 허용)" << std::endl;
+    std::cout << "   5+ 픽셀: 느슨 (많은 inlier, 정확도↓)" << std::endl;
 }
 
 int main()

@@ -99,10 +99,19 @@ void problem1_uniform_distribution()
     std::cout << "   일반 검출: " << kp_normal.size() << "개" << std::endl;
     std::cout << "   균등 분포: " << kp_uniform.size() << "개\n" << std::endl;
 
-    std::cout << "💡 왜필요한가?" << std::endl;
-    std::cout << "   - 특징이 한쪽에 몰리면 포즈 추정 불안정" << std::endl;
-    std::cout << "   - 균등 분포 → 더 robust한 tracking" << std::endl;
-    std::cout << "   - VINS-Fusion은 6x4 그리드 사용" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [코드 핵심]" << std::endl;
+    std::cout << "   이미지를 격자(grid)로 나눈 뒤, 각 셀에서 독립적으로 FAST 검출 → 상위 N개만 선택" << std::endl;
+    std::cout << "   ① image(roi)로 셀 영역을 잘라냄" << std::endl;
+    std::cout << "   ② response 기준 내림차순 정렬 → 가장 강한 코너부터 선택" << std::endl;
+    std::cout << "   ③ 셀 내 좌표에 roi.x, roi.y를 더해 전역 좌표로 변환" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [왜 필요한가?]" << std::endl;
+    std::cout << "   - 일반 검출은 텍스처 풍부한 영역에만 점이 몰림" << std::endl;
+    std::cout << "   - 포즈 추정에는 이미지 '전체'에 걸친 대응점이 필요함" << std::endl;
+    std::cout << "     (한쪽에만 점이 있으면 회전/병진 중 일부 방향의 제약이 약해짐)" << std::endl;
+    std::cout << "   - 격자 분할로 모든 영역에서 최소한의 특징점을 확보 → 안정적인 추적" << std::endl;
+    std::cout << "   - 실제 시스템: VINS-Fusion(6×4), ORB-SLAM(Quadtree 기반)" << std::endl;
 }
 
 // 적응형 임계값 — 이진 탐색으로 목표 특징점 수 달성
@@ -163,10 +172,20 @@ void problem2_adaptive_threshold()
     std::cout << "   실제: " << keypoints.size() << "개" << std::endl;
     std::cout << "   임계값: " << threshold << "\n" << std::endl;
 
-    std::cout << "💡 응용:" << std::endl;
-    std::cout << "   - 밝은 환경: 임계값 ↑" << std::endl;
-    std::cout << "   - 어두운 환경: 임계값 ↓" << std::endl;
-    std::cout << "   - 실시간으로 조정하여 일정한 개수 유지" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [코드 핵심]" << std::endl;
+    std::cout << "   이진 탐색(Binary Search)으로 '목표 개수에 가장 가까운 임계값'을 자동으로 찾습니다." << std::endl;
+    std::cout << "   ① min=1, max=100에서 mid = (min+max)/2로 시작" << std::endl;
+    std::cout << "   ② mid로 FAST 검출 → 개수가 목표보다 많으면 min=mid+1 (임계값 올림)" << std::endl;
+    std::cout << "   ③ 개수가 목표보다 적으면 max=mid-1 (임계값 내림)" << std::endl;
+    std::cout << "   ④ log2(100) ≈ 7회 반복이면 수렴 → 매우 빠름" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [왜 필요한가?]" << std::endl;
+    std::cout << "   - 고정 임계값은 환경 변화에 취약함:" << std::endl;
+    std::cout << "     밝은 고대비 장면 → 특징점 폭증 → 처리 지연" << std::endl;
+    std::cout << "     어두운 저대비 장면 → 특징점 부족 → 추적 실패" << std::endl;
+    std::cout << "   - 적응형 임계값으로 매 프레임 일정한 특징점 수를 유지하면" << std::endl;
+    std::cout << "     계산량이 예측 가능하고, 추적 안정성도 확보됩니다." << std::endl;
 }
 
 // 멀티스케일 검출 — 이미지 피라미드로 스케일 불변성 확보
@@ -239,10 +258,20 @@ void problem3_multiscale_detection()
     std::cout << "   단일 스케일: " << kp_single.size() << "개" << std::endl;
     std::cout << "   멀티스케일: " << kp_multi.size() << "개\n" << std::endl;
 
-    std::cout << "💡 장점:" << std::endl;
-    std::cout << "   - 다양한 크기의 물체 검출" << std::endl;
-    std::cout << "   - 스케일 불변성 (물체가 가까워져도 추적 가능)" << std::endl;
-    std::cout << "   - ORB, SIFT는 자동으로 수행" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [코드 핵심]" << std::endl;
+    std::cout << "   이미지를 점점 축소하면서(피라미드) 각 레벨에서 FAST 검출합니다." << std::endl;
+    std::cout << "   ① scale = 1.2^level → level 0=원본, level 1=1/1.2배, level 2=1/1.44배..." << std::endl;
+    std::cout << "   ② 축소된 이미지에서 검출 → 작은 물체의 코너도 잡을 수 있음" << std::endl;
+    std::cout << "   ③ 검출된 좌표에 scale을 곱해 원본 크기로 복원" << std::endl;
+    std::cout << "   ④ octave에 레벨 번호 저장 → 나중에 어느 스케일에서 검출되었는지 알 수 있음" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [왜 필요한가?]" << std::endl;
+    std::cout << "   - FAST는 고정된 16픽셀 원으로 검출 → 단일 스케일에서만 동작" << std::endl;
+    std::cout << "   - 멀리 있는 작은 물체: 원본에서는 코너가 너무 작아 검출 불가" << std::endl;
+    std::cout << "     → 축소하면 상대적으로 코너가 커져서 검출 가능" << std::endl;
+    std::cout << "   - 물체가 다가올 때: 같은 코너가 다른 스케일에서도 검출되어야 추적 유지" << std::endl;
+    std::cout << "   - ORB::create()의 scaleFactor=1.2, nLevels=8이 이 과정을 자동으로 수행" << std::endl;
 }
 
 // Harris 코너 검출 직접 구현 — Sobel부터 응답 R까지
@@ -335,9 +364,20 @@ void problem4_harris_implementation()
     cv::minMaxLoc(harris_cv, &cv_min, &cv_max);
     std::cout << "   응답 범위: [" << cv_min << ", " << cv_max << "]\n" << std::endl;
 
-    std::cout << "💡 구현 파이프라인:" << std::endl;
-    std::cout << "   Sobel(Ix, Iy) → Ix^2, Iy^2, IxIy → GaussianBlur → R 계산" << std::endl;
-    std::cout << "   직접 구현 결과와 OpenCV 결과가 유사해야 합니다." << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [코드 핵심 — 4단계 파이프라인]" << std::endl;
+    std::cout << "   ① Sobel(Ix, Iy): x, y 방향 밝기 변화율(그래디언트)을 구함" << std::endl;
+    std::cout << "      → Ix가 크면 세로 에지, Iy가 크면 가로 에지가 있다는 의미" << std::endl;
+    std::cout << "   ② Ix², Iy², IxIy: Structure Tensor의 구성 요소" << std::endl;
+    std::cout << "      → 이 값들로 '각 픽셀 주변의 밝기 변화 패턴'을 행렬로 표현" << std::endl;
+    std::cout << "   ③ GaussianBlur: 윈도우 역할 — 주변 그래디언트를 부드럽게 합산" << std::endl;
+    std::cout << "      → 한 픽셀만 보면 노이즈에 민감하므로, 주변까지 고려해서 안정화" << std::endl;
+    std::cout << "   ④ R = det(M) - k·trace(M)²:" << std::endl;
+    std::cout << "      → R이 크면 코너, R이 음수면 에지, R≈0이면 평면" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [OpenCV와 차이가 나는 이유]" << std::endl;
+    std::cout << "   cornerHarris는 blockSize(윈도우 크기)와 Sobel ksize를 내부적으로 다르게 처리하므로" << std::endl;
+    std::cout << "   정확히 같지 않을 수 있습니다. 추세(코너 위치)가 일치하면 정상입니다." << std::endl;
 }
 
 // NMS (Non-Maximum Suppression) 직접 구현 — 지역 최대값 필터링
@@ -444,10 +484,23 @@ void problem5_nms_implementation()
         std::cout << "   제거 비율: " << reduction << "%\n" << std::endl;
     }
 
-    std::cout << "💡 NMS 핵심:" << std::endl;
-    std::cout << "   - 지역 윈도우 내 최대값만 남김" << std::endl;
-    std::cout << "   - 같은 코너에 대한 중복 검출 제거" << std::endl;
-    std::cout << "   - 윈도우 크기 ↑ → 더 희소한 결과" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [코드 핵심]" << std::endl;
+    std::cout << "   각 픽셀에서 주변 7×7 윈도우를 보고, 자신이 그 안에서 '최대값'인지 확인합니다." << std::endl;
+    std::cout << "   ① 먼저 response > threshold인지 확인 (약한 응답은 무시)" << std::endl;
+    std::cout << "   ② 주변 7×7 영역을 이중 루프로 순회하며 최대값과 비교" << std::endl;
+    std::cout << "   ③ 자신이 최대값이면 '지역 최대' → 코너로 유지" << std::endl;
+    std::cout << "   ④ 더 큰 이웃이 있으면 → 중복이므로 제거" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [왜 이렇게 하나?]" << std::endl;
+    std::cout << "   - Harris 응답은 코너 '주변'에서도 높은 값을 가짐 (뾰족한 피크가 아니라 완만한 언덕)" << std::endl;
+    std::cout << "   - NMS 없이는 하나의 코너에서 수십 개의 점이 검출됨" << std::endl;
+    std::cout << "   - 지역 최대만 남기면 각 코너당 딱 하나의 대표점이 남음" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [윈도우 크기의 영향]" << std::endl;
+    std::cout << "   - 작은 윈도우 (3×3): 가까운 중복만 제거 → 점이 많이 남음" << std::endl;
+    std::cout << "   - 큰 윈도우 (11×11): 넓은 범위에서 하나만 남김 → 매우 희소한 결과" << std::endl;
+    std::cout << "   - 7×7은 적절한 중간값으로, 대부분의 중복을 제거하면서 충분한 점을 유지합니다." << std::endl;
 }
 
 int main()

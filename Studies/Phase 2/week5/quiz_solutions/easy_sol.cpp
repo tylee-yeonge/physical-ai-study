@@ -58,9 +58,18 @@ void problem1_epipolar_constraint()
     std::cout << "   p2^T * E * p1 = " << epipolar_value << std::endl;
     std::cout << "   (0에 가까울수록 올바른 매칭)\n" << std::endl;
 
-    std::cout << "💡 에피폴라 제약: p2^T * E * p1 = 0" << std::endl;
-    std::cout << "   - 이 제약을 만족하는 점들만 올바른 대응" << std::endl;
-    std::cout << "   - RANSAC outlier 제거에 사용" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [코드 핵심]" << std::endl;
+    std::cout << "   p1, p2를 동차좌표 [x, y, 1]^T로 변환한 뒤" << std::endl;
+    std::cout << "   p2^T * E * p1 행렬곱으로 스칼라 값을 계산" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [결과 해석]" << std::endl;
+    std::cout << "   이 값이 0에 가까우면 → 올바른 대응점 (에피폴라 제약 만족)" << std::endl;
+    std::cout << "   이 값이 크면 → 잘못된 매칭 (outlier)" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [SLAM에서의 활용]" << std::endl;
+    std::cout << "   RANSAC에서 이 오차를 기준으로 inlier/outlier를 판정" << std::endl;
+    std::cout << "   보통 |p2^T * E * p1| < threshold이면 inlier로 분류" << std::endl;
 }
 
 // Essential Matrix vs Fundamental Matrix — 언제 무엇을 쓰는가
@@ -126,7 +135,16 @@ void problem3_eight_point()
     std::cout << "   - 9개 원소 - 1 (스케일) = 8 자유도" << std::endl;
     std::cout << "   - 각 대응점 → 1개 제약식" << std::endl;
     std::cout << "   - 따라서 최소 8개 점 필요" << std::endl;
-    std::cout << "\n💡 실제로는 RANSAC으로 더 많은 점 사용!" << std::endl;
+    std::cout << "\n💡 정답 해설:" << std::endl;
+    std::cout << "   [왜 8개?]" << std::endl;
+    std::cout << "   F는 3×3 = 9개 원소이지만 스케일 자유도 1개를 빼면 8개 미지수" << std::endl;
+    std::cout << "   대응점 1쌍 = 방정식 1개 → 최소 8쌍 필요" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [E는 왜 5개?]" << std::endl;
+    std::cout << "   E = [t]× · R → 회전 3 DOF + 이동 방향 2 DOF = 5 DOF" << std::endl;
+    std::cout << "   → 최소 5개 점으로 추정 가능 (5-Point Algorithm)" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [실전] 8개 이상의 점 + RANSAC으로 outlier에 강건하게 추정" << std::endl;
 }
 
 // E에서 R, t 복원 — SVD 분해로 카메라 포즈 추출
@@ -161,10 +179,19 @@ void problem4_pose_recovery()
 
     std::cout << "질문: 어떻게 올바른 해를 선택하나요?\n" << std::endl;
 
-    std::cout << "💡 Cheirality Check:" << std::endl;
-    std::cout << "   - 3D 점을 삼각측량" << std::endl;
-    std::cout << "   - 두 카메라 앞에 있는지 확인 (Z > 0)" << std::endl;
-    std::cout << "   - 대부분의 점이 앞에 있는 해 선택" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [정답] Cheirality Check (양안 검증)로 선택" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [방법]" << std::endl;
+    std::cout << "   1. 4가지 (R, t) 각각으로 대응점을 삼각측량 → 3D 점 복원" << std::endl;
+    std::cout << "   2. 복원된 3D 점이 두 카메라 모두에서 Z > 0인지 확인" << std::endl;
+    std::cout << "   3. Z > 0인 점이 가장 많은 (R, t)가 올바른 해" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [왜 Z > 0?]" << std::endl;
+    std::cout << "   카메라는 앞쪽(+Z)만 촬영 가능 → 카메라 뒤(Z<0)의 점은 물리적 불가능" << std::endl;
+    std::cout << "   4가지 해 중 정확히 1개만 두 카메라 앞에 점이 위치" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [OpenCV] cv::recoverPose()가 이 전 과정을 자동 수행" << std::endl;
 }
 
 /**

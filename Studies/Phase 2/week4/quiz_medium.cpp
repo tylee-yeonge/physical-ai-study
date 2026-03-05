@@ -105,14 +105,12 @@ void problem2_essential_matrix()
     // 시뮬레이션 데이터 생성...
 
     // TODO: Essential Matrix 추정
-    // cv::findEssentialMat(points1, points2, K, cv::RANSAC, 0.999, 1.0, mask)
-    // 반환값: 3x3 Essential Matrix E
+    // 힌트: OpenCV에서 대응점과 K 행렬로 E를 추정하는 함수를 찾아보세요
 
     std::cout << "Essential Matrix E:" << std::endl;
 
-    // TODO: R, t 복원
-    // cv::recoverPose(E, points1, points2, K, R, t, mask)
-    // R: 3x3 회전 행렬, t: 3x1 단위 이동 벡터 (스케일 미지)
+    // TODO: E에서 R, t 복원
+    // 힌트: E를 분해하여 회전과 이동을 복원하는 함수를 찾아보세요
 
     std::cout << "💡 SLAM에서의 의미:" << std::endl;
     std::cout << "   - E를 분해 → R (회전), t (이동)" << std::endl;
@@ -153,15 +151,11 @@ void problem3_matching_benchmark()
     std::cout << "특징점 개수: " << num_features << "개\n" << std::endl;
 
     // TODO: BF 매칭 시간 측정
-    // 1. ORB 디스크립터 2000개 생성 (또는 랜덤 CV_8U Mat)
-    // 2. BFMatcher(NORM_HAMMING) 생성
-    // 3. chrono::high_resolution_clock으로 시간 측정
-    // 4. matcher.match(desc1, desc2, matches)
+    // 힌트: 이진 디스크립터에 적합한 매처를 생성하고 시간을 측정하세요
 
     // TODO: FLANN 매칭 시간 측정
-    // 1. 이진 디스크립터를 CV_32F로 변환 (FLANN은 float만 지원)
-    // 2. FlannBasedMatcher 생성
-    // 3. 동일하게 시간 측정
+    // 힌트: 근사 최근접 탐색 기반 매처를 생성하고 비교하세요
+    //       FLANN은 입력 데이터 타입에 제약이 있습니다
 
     std::cout << "매칭 알고리즘  |  시간 (ms)  |  속도비" << std::endl;
     std::cout << "---------------+-------------+---------" << std::endl;
@@ -251,10 +245,8 @@ void problem4_homography_dlt()
 
     // TODO: SVD 분해 후 H 추출
     cv::Mat H_dlt = cv::Mat::eye(3, 3, CV_64F);
-    // Step 1: cv::SVD::compute(A, S, U, Vt) 또는 cv::SVDecomp(A, S, U, Vt)
-    // Step 2: Vt의 마지막 행 (Vt.row(8)) → h 벡터 (1×9)
-    // Step 3: h.reshape(1, 3) → 3×3 행렬 → H_dlt
-    // Step 4: H_dlt /= H_dlt.at<double>(2,2) → h33=1 정규화
+    // 힌트: Ah=0의 비자명 해는 SVD에서 가장 작은 특이값에 대응하는 벡터입니다
+    //       이 벡터를 3x3으로 재배열하고 정규화하면 H가 됩니다
 
     // OpenCV findHomography로 비교
     cv::Mat H_cv = cv::findHomography(src_pts, dst_pts);
@@ -360,18 +352,9 @@ void problem5_ransac_homography()
     int best_inlier_count = 0;
     cv::Mat best_H;
 
-    // 구현 가이드:
-    //   for (int iter = 0; iter < max_iters; iter++) {
-    //     Step 1. 랜덤 4개 인덱스 선택
-    //             → std::vector<int> indices(total), iota, shuffle, 앞 4개
-    //     Step 2. 4개 점으로 H 추정
-    //             → cv::findHomography(src_4pts, dst_4pts, 0) (RANSAC 없이)
-    //     Step 3. 모든 점에 H 적용
-    //             → cv::perspectiveTransform(src_pts, projected, H)
-    //     Step 4. 재투영 오차 계산 및 inlier 카운트
-    //             → cv::norm(projected[i] - dst_pts[i]) < threshold
-    //     Step 5. best_inlier_count보다 많으면 best_H 갱신
-    //   }
+    // 힌트: 위 주석의 RANSAC 알고리즘 5단계를 구현하세요
+    //       각 반복에서 최소 점 수로 모델을 추정하고,
+    //       전체 데이터에 대한 합의(consensus)를 평가합니다
 
     std::cout << "📊 RANSAC 결과:" << std::endl;
     std::cout << "   검출된 inlier: " << best_inlier_count << " / " << total << std::endl;

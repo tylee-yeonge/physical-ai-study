@@ -72,10 +72,22 @@ void problem1_distance_metrics()
     std::cout << "   디스크립터2: " << sift_desc2 << std::endl;
     std::cout << "   유클리드 거리: " << euclidean_dist << "\n" << std::endl;
 
-    std::cout << "💡 질문:" << std::endl;
-    std::cout << "   1. 왜 ORB는 해밍 거리를 사용하나요?" << std::endl;
-    std::cout << "   2. 어떤 것이 더 빠른가요?" << std::endl;
-    std::cout << "\n힌트: 이진 디스크립터 → XOR 연산 → 매우 빠름" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   Q1. 왜 ORB는 해밍 거리를 사용하나요?" << std::endl;
+    std::cout << "   A1. ORB는 이진 디스크립터(0과 1로 구성)이기 때문입니다." << std::endl;
+    std::cout << "       이진 데이터의 차이는 XOR 연산 → popcount로 측정하는 것이" << std::endl;
+    std::cout << "       가장 자연스럽고 효율적입니다." << std::endl;
+    std::cout << "       유클리드 거리는 실수 벡터(SIFT 등)에 적합합니다." << std::endl;
+    std::cout << std::endl;
+    std::cout << "   Q2. 어떤 것이 더 빠른가요?" << std::endl;
+    std::cout << "   A2. 해밍 거리가 훨씬 빠릅니다." << std::endl;
+    std::cout << "       - 해밍: XOR + popcount → CPU 1~2 사이클 (수 나노초)" << std::endl;
+    std::cout << "       - 유클리드: 뺄셈 + 제곱 + 합산 + 루트 → 수십 사이클" << std::endl;
+    std::cout << "       ORB-SLAM이 실시간 처리 가능한 핵심 이유 중 하나입니다." << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [이 코드의 실행 결과]" << std::endl;
+    std::cout << "   해밍 거리 = 2 bits (바이트1: bit1, 바이트3: bit2 차이)" << std::endl;
+    std::cout << "   유클리드 거리 ≈ 0.2 (4차원 float 벡터 간 L2 거리)" << std::endl;
 }
 
 // 문제 2: Lowe's Ratio Test — 최근접/차근접 비율로 모호한 매칭 제거
@@ -132,10 +144,18 @@ void problem2_ratio_test()
     bool accept2 = (ratio2 < 0.7f);
     std::cout << "   결과: " << (accept2 ? "✅ 수락" : "❌ 거절") << "\n" << std::endl;
 
-    std::cout << "💡 원리:" << std::endl;
-    std::cout << "   - 비율 낮음(< 0.7): 최근접이 확실히 가까움 → 좋은 매칭" << std::endl;
-    std::cout << "   - 비율 높음(≥ 0.7): 차이 없음 → 모호함 → 거절" << std::endl;
-    std::cout << "   - outlier 제거에 매우 효과적!" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [코드 핵심] ratio = best거리 / second_best거리" << std::endl;
+    std::cout << "   ratio < 0.7이면 수락, 아니면 거절" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [실행 결과]" << std::endl;
+    std::cout << "   시나리오 1: 25/80 = 0.3125 < 0.7 → ✅ 수락 (명확한 매칭)" << std::endl;
+    std::cout << "   시나리오 2: 60/65 = 0.923  ≥ 0.7 → ❌ 거절 (모호한 매칭)" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [왜 효과적인가?]" << std::endl;
+    std::cout << "   진짜 매칭: 최근접이 확실히 가까움 → ratio 낮음" << std::endl;
+    std::cout << "   가짜 매칭: 여러 후보가 비슷한 거리 → ratio 높음" << std::endl;
+    std::cout << "   → ratio로 모호한 매칭을 걸러내어 RANSAC 전에 오매칭 80%+ 제거" << std::endl;
 }
 
 // 문제 3: RANSAC 반복 횟수 — 아웃라이어 비율에 따른 최소 반복 계산
@@ -185,10 +205,17 @@ void problem3_ransac_iterations()
         std::cout << "   필요 반복: " << (int)N << "회\n" << std::endl;
     }
 
-    std::cout << "💡 결론:" << std::endl;
-    std::cout << "   - Inlier 많을수록 → 반복 적게 필요" << std::endl;
-    std::cout << "   - Outlier 많으면 → 반복 많이 필요" << std::endl;
-    std::cout << "   - Ratio Test로 미리 정제하면 효율적!" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [실행 결과] N = ceil(log(1-0.99) / log(1-w^4))" << std::endl;
+    std::cout << "   Inlier 50%: N = 72회 (절반이 outlier → 많은 시도 필요)" << std::endl;
+    std::cout << "   Inlier 70%: N = 16회 (양호한 매칭 품질)" << std::endl;
+    std::cout << "   Inlier 90%: N =  5회 (고품질 매칭 → 소수 반복으로 충분)" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [핵심 포인트]" << std::endl;
+    std::cout << "   공식의 직관: 4개를 뽑았을 때 전부 inlier일 확률 = w^4" << std::endl;
+    std::cout << "   w=0.5이면 0.5^4 = 6.25% → 한 번에 성공할 확률이 매우 낮음" << std::endl;
+    std::cout << "   w=0.9이면 0.9^4 = 65.6% → 몇 번이면 성공" << std::endl;
+    std::cout << "   → Ratio Test로 먼저 outlier를 걸러 w를 높이면 RANSAC이 빨라짐!" << std::endl;
 }
 
 // 문제 4: Cross-Check 매칭 — 양방향 일치로 신뢰도 향상
@@ -225,10 +252,21 @@ void problem4_cross_check()
 
     std::cout << "결과: " << (is_cross_check_pass ? "✅ 통과" : "❌ 실패") << "\n" << std::endl;
 
-    std::cout << "💡 Cross-Check:" << std::endl;
-    std::cout << "   - A→B와 B→A가 서로 일치하는 매칭만 선택" << std::endl;
-    std::cout << "   - 더 강한 필터링" << std::endl;
-    std::cout << "   - OpenCV: crossCheck=true 옵션" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [정답] Cross-Check ✅ 통과!" << std::endl;
+    std::cout << "   A→B: 특징점 0 → 특징점 3" << std::endl;
+    std::cout << "   B→A: 특징점 3 → 특징점 0 (원래 점으로 되돌아옴)" << std::endl;
+    std::cout << "   → 양방향 일치 = 신뢰할 수 있는 매칭" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [통과하지 못하는 예시]" << std::endl;
+    std::cout << "   A→B: 특징점 0 → 특징점 3" << std::endl;
+    std::cout << "   B→A: 특징점 3 → 특징점 2 (다른 점! 0이 아님)" << std::endl;
+    std::cout << "   → 불일치 = 일방적 매칭이므로 제거" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [Ratio Test와의 차이]" << std::endl;
+    std::cout << "   Ratio Test: 거리 비율로 모호함을 판단 (knnMatch 필요)" << std::endl;
+    std::cout << "   Cross-Check: 양방향 일치 여부로 판단 (match 2회 필요)" << std::endl;
+    std::cout << "   → 동시 사용 불가! OpenCV에서는 둘 중 하나 선택" << std::endl;
 }
 
 // 문제 5: Homography 변환 이해 — 평면 간 사영 변환
@@ -308,11 +346,20 @@ void problem5_homography_understanding()
                   << dst_pts[i].x << ", " << dst_pts[i].y << ")" << std::endl;
     }
 
-    std::cout << "\n💡 핵심:" << std::endl;
-    std::cout << "   - 동차좌표: [x, y] → [x, y, 1]" << std::endl;
-    std::cout << "   - 변환: s*[u, v, 1]^T = H * [x, y, 1]^T" << std::endl;
-    std::cout << "   - 정규화: u = u'/w, v = v'/w (w = 3번째 원소)" << std::endl;
-    std::cout << "   - 4점이면 H를 유일하게 결정 가능 (DLT)" << std::endl;
+    std::cout << "\n💡 정답 해설:" << std::endl;
+    std::cout << "   [코드 핵심] Homography 변환의 3단계:" << std::endl;
+    std::cout << "   1. 동차좌표 생성: (x, y) → [x, y, 1]^T" << std::endl;
+    std::cout << "   2. 행렬 곱: [x', y', w]^T = H * [x, y, 1]^T" << std::endl;
+    std::cout << "   3. 정규화: u = x'/w, v = y'/w (w로 나누어 유클리드 좌표 복원)" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [왜 w로 나누나?]" << std::endl;
+    std::cout << "   Homography는 사영 변환 → 결과가 동차좌표로 나옴" << std::endl;
+    std::cout << "   h31=h32=0이면 w=1 (아핀 변환), 0이 아니면 w≠1 (원근 변환)" << std::endl;
+    std::cout << "   이 예제는 h31=h32=0이므로 아핀이지만, 정규화 코드는 항상 필요" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [SLAM 응용]" << std::endl;
+    std::cout << "   평면 물체 인식, 이미지 스티칭(파노라마), AR 마커 추적에 사용" << std::endl;
+    std::cout << "   최소 4점이면 H를 유일하게 결정 (DLT 알고리즘)" << std::endl;
 }
 
 int main()

@@ -74,7 +74,17 @@ void problem2_estimate_F()
     cv::Mat F = cv::findFundamentalMat(pts1, pts2, cv::FM_8POINT);
 
     std::cout << "Fundamental Matrix:\n" << F << std::endl;
-    std::cout << "\n💡 이제 에피폴라 선을 그릴 수 있습니다!" << std::endl;
+    std::cout << "\n💡 정답 해설:" << std::endl;
+    std::cout << "   [코드 핵심] findFundamentalMat(pts1, pts2, FM_8POINT)" << std::endl;
+    std::cout << "   10개 대응점으로 8-Point Algorithm을 수행하여 F 추정" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [F로 할 수 있는 것]" << std::endl;
+    std::cout << "   에피폴라 선 계산: l2 = F · [u1, v1, 1]^T (이미지2의 선)" << std::endl;
+    std::cout << "   → p2는 반드시 이 선 위에 있음 (2D 탐색 → 1D 탐색으로 축소)" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [FM_8POINT vs FM_RANSAC]" << std::endl;
+    std::cout << "   8POINT: 모든 점 사용, outlier에 약함 (교육용)" << std::endl;
+    std::cout << "   RANSAC: outlier 제거하며 추정, 실전에서 사용" << std::endl;
 }
 
 // E → R, t 복원 — SVD 분해로 포즈 추출하는 수학적 과정
@@ -107,7 +117,16 @@ void problem3_e_to_pose()
     std::cout << "    [1  0  0]" << std::endl;
     std::cout << "    [0  0  1]" << std::endl;
 
-    std::cout << "\n💡 OpenCV: cv::recoverPose()가 자동 수행" << std::endl;
+    std::cout << "\n💡 정답 해설:" << std::endl;
+    std::cout << "   [E → R, t 복원 과정]" << std::endl;
+    std::cout << "   1. E를 SVD 분해: E = U · diag(σ1, σ2, 0) · V^T" << std::endl;
+    std::cout << "   2. W 행렬(90도 회전)을 사용하여 R, t 구성" << std::endl;
+    std::cout << "      R = U · W · V^T 또는 U · W^T · V^T (2개 R)" << std::endl;
+    std::cout << "      t = +U[:,2] 또는 -U[:,2] (2개 t)" << std::endl;
+    std::cout << "   3. 2×2 = 4가지 조합 → Cheirality Check로 1개 선택" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [OpenCV] cv::recoverPose(E, pts1, pts2, K, R, t)" << std::endl;
+    std::cout << "   → 4해 생성 + 삼각측량 + Z>0 검증을 모두 자동 수행" << std::endl;
 }
 
 /**

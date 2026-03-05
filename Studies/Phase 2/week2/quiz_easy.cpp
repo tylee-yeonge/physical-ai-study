@@ -36,7 +36,7 @@
 // ★ 캘리브레이션 없이 추정: cx ≈ width/2, cy ≈ height/2
 //   정밀한 SLAM에서는 반드시 캘리브레이션된 K 사용
 //
-// TODO: K.at<double>(row, col)로 fx, fy, cx, cy를 추출하세요
+// TODO: K 행렬에서 fx, fy, cx, cy를 추출하세요
 void problem1_camera_matrix()
 {
     std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -49,7 +49,7 @@ void problem1_camera_matrix()
     std::cout << K << "\n" << std::endl;
 
     // TODO: K 행렬에서 값을 추출하세요
-    // 힌트: K.at<double>(row, col)로 접근
+    // 힌트: cv::Mat에서 특정 위치의 값을 읽는 방법을 찾아보세요
     double fx = 0.0;  // TODO: fx 값 추출
     double fy = 0.0;  // TODO: fy 값 추출
     double cx = 0.0;  // TODO: cx 값 추출
@@ -106,9 +106,7 @@ void problem2_distortion_type()
     // TODO: k1의 부호로 왜곡 유형 판별
     std::string distortion_type = "UNKNOWN";  // "BARREL" 또는 "PINCUSHION"으로 변경
 
-    // 힌트:
-    // - k1 < 0: 배럴 왜곡 (광각 렌즈, 이미지 바깥으로 밀림)
-    // - k1 > 0: 핀쿠션 왜곡 (망원 렌즈, 이미지 안쪽으로 당김)
+    // 힌트: 위 주석에서 k1의 부호와 왜곡 유형의 관계를 확인하세요
 
     std::cout << "📋 판별 결과: " << distortion_type << " 왜곡" << std::endl;
 }
@@ -150,10 +148,7 @@ void problem3_rms_evaluation()
         // TODO: RMS 값에 따라 품질 평가
         std::string quality = "UNKNOWN";  // "EXCELLENT", "GOOD", "FAIR", "POOR" 중 선택
 
-        // 힌트:
-        // - RMS < 0.5: 우수 (EXCELLENT)
-        // - 0.5 <= RMS < 1.0: 양호 (GOOD)
-        // - RMS >= 1.0: 재캘리브레이션 권장 (POOR)
+        // 힌트: 위 주석의 품질 기준표를 참고하여 분류하세요
 
         std::cout << "   → 품질: " << quality << "\n" << std::endl;
     }
@@ -202,8 +197,8 @@ void problem4_3d_2d_correspondence()
     // TODO: 첫 번째 행 (y=0)의 3D 점들을 생성하세요
     std::vector<cv::Point3f> first_row;
 
-    // 힌트: (0, 0, 0), (30, 0, 0), (60, 0, 0), ..., (240, 0, 0)
-    // for 문을 사용하여 board_width 개의 점 생성
+    // 힌트: 체커보드는 Z=0 평면 위에 일정 간격으로 배치됩니다
+    //       위 주석의 좌표 생성 규칙을 참고하세요
 
     std::cout << "첫 번째 행의 3D 좌표:" << std::endl;
     for (size_t i = 0; i < first_row.size(); i++)

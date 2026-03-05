@@ -66,7 +66,16 @@ void problem1_implement_pnp()
     std::cout << "Estimated t:    " << tvec.t() << std::endl;
     std::cout << "Error: " << cv::norm(tvec_gt - tvec) << " m\n" << std::endl;
 
-    std::cout << "💡 정확히 복원됨!" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [코드 핵심]" << std::endl;
+    std::cout << "   1. projectPoints: GT 포즈로 3D→2D 투영 (관측값 생성)" << std::endl;
+    std::cout << "   2. solvePnP: 3D-2D 대응에서 포즈(rvec, tvec) 역추정" << std::endl;
+    std::cout << "   3. 노이즈 없는 이상적 조건 → 오차 ≈ 0 (정확히 복원)\n" << std::endl;
+    std::cout << "   [solvePnP 인자 설명]" << std::endl;
+    std::cout << "   - objectPoints: 3D 월드 좌표 (vector<Point3f>)" << std::endl;
+    std::cout << "   - imagePoints: 2D 이미지 좌표 (vector<Point2f>)" << std::endl;
+    std::cout << "   - K: 카메라 내부 행렬, distCoeffs: 왜곡 계수" << std::endl;
+    std::cout << "   - rvec: Rodrigues 회전 벡터 (3x1), tvec: 이동 벡터 (3x1)" << std::endl;
 }
 
 // RANSAC 반복 횟수 공식 — 성공 확률 p를 보장하는 최소 반복 수
@@ -111,7 +120,17 @@ void problem2_ransac_iterations()
         std::cout << "   " << (int)(w * 100) << "%       |    " << N << "회" << std::endl;
     }
 
-    std::cout << "\n💡 Inlier 많을수록 반복 적게 필요" << std::endl;
+    std::cout << "\n💡 정답 해설:" << std::endl;
+    std::cout << "   [공식] N = log(1-p) / log(1-w^s)" << std::endl;
+    std::cout << "   p=0.99(성공 확률), s=4(PnP 최소 점), w=inlier 비율\n" << std::endl;
+    std::cout << "   [실행 결과 해석]" << std::endl;
+    std::cout << "   w=50% → w^4=6.25% → N≈72회  (outlier 많으면 반복 많이 필요)" << std::endl;
+    std::cout << "   w=70% → w^4=24.0% → N≈16회  (중간)" << std::endl;
+    std::cout << "   w=90% → w^4=65.6% → N≈6회   (inlier 많으면 빠르게 수렴)\n" << std::endl;
+    std::cout << "   [직관적 이해]" << std::endl;
+    std::cout << "   w^s = 랜덤 4점이 모두 inlier일 확률" << std::endl;
+    std::cout << "   → outlier가 많으면 '좋은 4점'을 뽑기 어려움" << std::endl;
+    std::cout << "   → 반복 횟수가 지수적으로 증가" << std::endl;
 }
 
 // 포즈 최적화 — Linear PnP의 한계와 비선형 refinement
@@ -150,9 +169,20 @@ void problem3_pose_optimization()
     std::cout << "   - Levenberg-Marquardt" << std::endl;
     std::cout << "   - OpenCV: cv::solvePnPRefineLM()\n" << std::endl;
 
-    std::cout << "💡 SLAM에서:" << std::endl;
-    std::cout << "   - PnP → 초기값" << std::endl;
-    std::cout << "   - BA (Bundle Adjustment) → 최적화" << std::endl;
+    std::cout << "💡 정답 해설:" << std::endl;
+    std::cout << "   [Linear PnP(DLT)가 부정확한 이유]" << std::endl;
+    std::cout << "   DLT는 '대수적 오차(algebraic error)'를 최소화" << std::endl;
+    std::cout << "   → 이미지 상의 거리(픽셀)와 무관한 수학적 잔차" << std::endl;
+    std::cout << "   → 실제 재투영 오차(기하학적 의미)를 직접 줄이지 않음\n" << std::endl;
+    std::cout << "   [비선형 최적화(Refinement)란?]" << std::endl;
+    std::cout << "   목적함수: min Σ ||p_obs - π(R,t,X)||²" << std::endl;
+    std::cout << "   → 재투영 오차(픽셀 단위)를 직접 최소화" << std::endl;
+    std::cout << "   → Levenberg-Marquardt 알고리즘으로 반복 수렴" << std::endl;
+    std::cout << "   → DLT 결과를 초기값으로 사용 (수렴 보장)\n" << std::endl;
+    std::cout << "   [SLAM에서의 2단계 전략]" << std::endl;
+    std::cout << "   ① PnP(DLT) → 빠르게 초기 포즈 추정 (실시간성)" << std::endl;
+    std::cout << "   ② BA → 모든 포즈+3D점을 동시에 최적화 (정확성)" << std::endl;
+    std::cout << "   OpenCV: cv::solvePnPRefineLM()으로 ①→② 가능" << std::endl;
 }
 
 // DLT 삼각측량 직접 구현 — A 행렬 구성부터 SVD까지
@@ -302,8 +332,20 @@ void problem4_dlt_triangulation()
         std::cout << "   " << b << "        |  " << err_b << std::endl;
     }
 
-    std::cout << "\n💡 노이즈 없이는 모두 정확하지만," << std::endl;
-    std::cout << "   노이즈 추가 시 좁은 베이스라인에서 오차 급증!" << std::endl;
+    std::cout << "\n💡 정답 해설:" << std::endl;
+    std::cout << "   [코드 핵심]" << std::endl;
+    std::cout << "   1. A 행렬 구성: 각 뷰의 u,v 좌표에서 2개 방정식씩" << std::endl;
+    std::cout << "   2. SVD(A) → V 마지막 열 = 3D 점 (동차 좌표)" << std::endl;
+    std::cout << "   3. X[:3]/X[3] → 유클리드 좌표로 변환\n" << std::endl;
+    std::cout << "   [베이스라인과 정확도 관계]" << std::endl;
+    std::cout << "   노이즈 없음: 모든 베이스라인에서 오차 ≈ 0" << std::endl;
+    std::cout << "   노이즈 있을 때:" << std::endl;
+    std::cout << "   - 좁은 베이스라인(0.1m): 삼각형 꼭지각 작음 → 깊이 불확실성 ↑↑" << std::endl;
+    std::cout << "   - 넓은 베이스라인(2.0m): 교차각 큼 → 깊이 정확도 ↑\n" << std::endl;
+    std::cout << "   [실전 가이드]" << std::endl;
+    std::cout << "   깊이 오차 ∝ Z² / (f × baseline)" << std::endl;
+    std::cout << "   → 멀리 있는 점일수록, 베이스라인이 좁을수록 오차 급증" << std::endl;
+    std::cout << "   → SLAM에서 삼각측량 시 충분한 카메라 이동(베이스라인) 필요" << std::endl;
 }
 
 // PnP DLT 직접 구현 — 투영 행렬 P를 SVD로 추정
@@ -510,8 +552,19 @@ void problem5_pnp_dlt()
     std::cout << "  Outlier 포함 - R 오차: " << cv::norm(rvec_out - rvec_gt)
               << ", t 오차: " << cv::norm(t_out_est - t_gt) << std::endl;
 
-    std::cout << "\n💡 Outlier가 소수만 있어도 DLT 결과 크게 왜곡!" << std::endl;
-    std::cout << "   → solvePnPRansac() 필수" << std::endl;
+    std::cout << "\n💡 정답 해설:" << std::endl;
+    std::cout << "   [PnP DLT 코드 핵심]" << std::endl;
+    std::cout << "   1. 2N×12 A행렬: 각 점에서 2개 방정식 (u, v 제약)" << std::endl;
+    std::cout << "   2. SVD → V의 마지막 열 = P의 12개 원소" << std::endl;
+    std::cout << "   3. reshape(3,4) → 투영 행렬 P" << std::endl;
+    std::cout << "   4. K⁻¹·P = [R|t] → R 직교화(SVD) + det 체크\n" << std::endl;
+    std::cout << "   [왜 DLT는 outlier에 취약한가?]" << std::endl;
+    std::cout << "   DLT = 모든 점에 동일 가중치로 최소자승 풀이" << std::endl;
+    std::cout << "   → outlier(100px 오차)도 inlier(0px 오차)와 동등하게 취급" << std::endl;
+    std::cout << "   → 20개 중 5개(25%) outlier만으로도 결과 완전히 왜곡\n" << std::endl;
+    std::cout << "   [해결책: RANSAC]" << std::endl;
+    std::cout << "   solvePnPRansac(): 랜덤 샘플로 가설 생성 → inlier만 사용" << std::endl;
+    std::cout << "   → outlier 25%여도 안정적으로 정확한 포즈 추정 가능" << std::endl;
 }
 
 int main()
