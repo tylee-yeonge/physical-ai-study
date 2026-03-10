@@ -211,4 +211,28 @@ int main() {
 
 ---
 
+## 🏗️ mini_vo 구현 (이번 주 핵심)
+
+**구현 파일**: `Studies/Phase 2/mini_vo/src/feature_matcher.cpp`
+
+### 구현해야 할 내용
+
+| 함수 | 내용 |
+|------|------|
+| `match()` | BF 매칭 → Ratio Test(0.75) → RANSAC으로 outlier 제거 |
+
+### 완성 기준
+
+```bash
+./mini_vo
+
+# W4 출력 예시
+# [매칭 결과]
+#   원본 매칭:    300개
+#   Ratio Test 후: 180개
+#   RANSAC 후:    140개  ← inlier만 생존
+```
+
+---
+
 **다음 단계**: Week 5 - 에피폴라 기하학 + 스테레오 Rectification

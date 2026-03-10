@@ -546,4 +546,34 @@ struct ReprojectionError {
 
 ---
 
-**다음**: Phase 4에서 VIO 구현!
+## 🏗️ mini_slam 구현 (이번 주 핵심)
+
+> 이번 주는 mini_slam에 **Ceres 기반 로컬 BA**를 추가한다.
+> Week 7에서 설계한 BA 구조를 Ceres cost function으로 구현한다.
+
+**작업 내용**:
+
+| 작업 | 내용 |
+|------|------|
+| `local_ba_ceres.h` 구현 | Ceres cost function (ReprojectionError) 직접 작성 |
+| 로컬 BA 적용 | 최근 N개 키프레임 + 관측 맵 포인트 최적화 |
+| 2 키프레임 최적화 테스트 | 간단한 케이스에서 BA 수렴 확인 |
+| mini_slam 통합 | 키프레임 추가 시 로컬 BA 자동 실행 |
+
+**구현 파일**:
+- `Studies/Phase 3/mini_slam/include/local_ba_ceres.h`
+- `Studies/Phase 3/mini_slam/src/local_ba_ceres.cpp`
+
+### 완성 기준
+
+```bash
+cd Studies/Phase\ 3/mini_slam/build
+./mini_slam
+
+# Ceres로 2 키프레임 최적화 성공
+# BA 전후 재투영 오차 비교: 최소 50% 이상 감소
+```
+
+---
+
+**다음**: Week 9에서 Schur Complement 이해!

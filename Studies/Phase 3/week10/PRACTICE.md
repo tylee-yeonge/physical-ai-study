@@ -384,4 +384,35 @@ SLAM에서의 의미:
 
 ---
 
+## 🏗️ mini_slam 구현 (이번 주 핵심)
+
+> 이번 주는 Week 9에서 시작한 g2o 로컬 BA를 **완성**하고, mini_slam에 붙인다.
+> g2o 내부 solver 구조를 이해하고, 실제 키프레임 데이터로 LocalBA를 실행한다.
+
+**작업 내용**:
+
+| 작업 | 내용 |
+|------|------|
+| `local_ba_g2o.h` 완성 | BlockSolver_6_3 + LM + Robust Kernel 구성 |
+| mini_slam에 LocalBA 붙이기 | 키프레임 추가 시 최근 N개 키프레임에 대해 g2o BA 실행 |
+| BA 전후 비교 | 드리프트 감소량 정량 측정 |
+
+**구현 파일**:
+- `Studies/Phase 3/mini_slam/include/local_ba_g2o.h` (완성)
+- `Studies/Phase 3/mini_slam/src/local_ba_g2o.cpp` (완성)
+- `Studies/Phase 3/mini_slam/main.cpp` (LocalBA 호출 추가)
+
+### 완성 기준
+
+```bash
+cd Studies/Phase\ 3/mini_slam/build
+./mini_slam
+
+# mini_slam 파이프라인에 LocalBA 적용
+# BA 전: 드리프트 X m → BA 후: 드리프트 Y m (Y < X)
+# 최근 N개 키프레임 + 관측 맵 포인트 최적화 동작 확인
+```
+
+---
+
 **다음**: [Week 11 - Ceres 실습](../week11/README.md)

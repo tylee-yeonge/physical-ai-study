@@ -355,4 +355,11 @@ SLAM에서의 의미:
 
 ---
 
+## 🏗️ mini_slam 구현
+
+> Week 4는 ICP 개념 학습 주차로, mini_slam에 직접 코드를 추가하지 않는다.
+> 단, ICP와 PnP의 차이를 이해하고, mini_slam이 왜 3D-2D (PnP)를 사용하는지 정리한다.
+
+---
+
 **다음**: [Week 5 - Mini VO 프로젝트](../week5/README.md)

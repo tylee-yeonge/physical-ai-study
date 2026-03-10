@@ -553,4 +553,48 @@ double fused = 0.7 * vision_displacement + 0.3 * imu_displacement;
 
 ---
 
+## 🏗️ mini_slam 구현 (이번 주 핵심)
+
+> 이번 주는 mini_slam의 **최종 평가**를 수행한다.
+> mini_slam 경로와 GT를 비교하고, known-scale 물체로 스케일 보정을 실험한다.
+
+**작업 내용**:
+
+| 작업 | 내용 |
+|------|------|
+| mini_slam 경로 vs GT 비교 | ATE, RPE 지표로 정량 평가 |
+| 스케일 보정 실험 | IMU 없이 known-scale 물체(예: 체커보드 크기)로 보정 |
+| Phase 3 최종 데모 | 이미지 시퀀스 → 키프레임 경로 + 최적화된 3D 맵 출력 |
+
+**구현 파일**: `Studies/Phase 3/mini_slam/main.cpp` (최종 파이프라인)
+
+### Phase 3 최종 파이프라인
+
+```
+이미지 시퀀스 입력
+    ↓
+[Phase 2 재사용] FAST 검출 → LK 추적 → E → R,t → 삼각측량
+    ↓
+[W6] 키프레임 선택 (parallax > 5°, 추적 특징점 < 80%)
+    ↓
+[W9-W10] 로컬 BA (최근 N개 키프레임 + 관측 맵 포인트 최적화)
+    ↓
+키프레임 경로 + 최적화된 3D 맵 시각화
+    ↓
+GT 비교 → ATE, 스케일 drift 측정
+```
+
+### 완성 기준
+
+```bash
+cd Studies/Phase\ 3/mini_slam/build
+./mini_slam
+
+# Phase 3 최종 데모 실행
+# 키프레임 경로 + 3D 맵 출력
+# GT 대비 ATE 측정 결과 출력
+```
+
+---
+
 **다음**: Quiz로 개념 점검!

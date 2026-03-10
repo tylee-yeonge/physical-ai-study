@@ -435,4 +435,30 @@ normal_distribution<double> noise(0.99, 0.01);  // 평균적으로 1% 작게 추
 
 ---
 
+## 🏗️ mini_slam 구현 (이번 주 핵심)
+
+> 이번 주는 mini_slam의 출력을 분석하여 **스케일 드리프트를 정량 측정**한다.
+> Week 5에서 관찰한 드리프트가 BA(Week 8~10) 적용 후 얼마나 줄었는지 비교한다.
+
+**작업 내용**:
+
+| 작업 | 내용 |
+|------|------|
+| mini_slam 궤적 출력 | 카메라 경로를 TUM 형식으로 저장 |
+| GT 대비 비교 | ATE(Absolute Trajectory Error) 계산 |
+| BA 유무 비교 | BA 없는 VO vs BA 있는 mini_slam 드리프트 비교 |
+| 스케일 drift 정량 분석 | 거리 대비 드리프트 비율 (%) 측정 |
+
+### 완성 기준
+
+```bash
+cd Studies/Phase\ 3/mini_slam/build
+./mini_slam
+
+# mini_slam 경로 출력 → GT 비교
+# 드리프트 비율: BA 없이 X% → BA 적용 후 Y%
+```
+
+---
+
 **다음**: Quiz로 개념 점검!

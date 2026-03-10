@@ -609,4 +609,12 @@ std::normal_distribution<double> noise(0.0, 5.0);
 
 ---
 
+## 🏗️ mini_slam 구현
+
+> Week 11은 Ceres BAL 실습으로, mini_slam에 직접 코드를 추가하지 않는다.
+> 단, BAL 데이터셋의 대규모 BA 실행 경험이 mini_slam의 Ceres BA 구현(Week 8)을 보강한다.
+> Solver 타입(DENSE_SCHUR vs SPARSE_SCHUR) 비교 결과를 mini_slam에 반영할 수 있다.
+
+---
+
 **다음**: Week 12에서 Monocular 스케일 모호성을 다룹니다.

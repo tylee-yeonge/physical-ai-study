@@ -462,4 +462,48 @@ Error: 2.3e-15 (should be ~0)
 
 ---
 
+## 🏗️ mini_slam 구현 (이번 주 핵심)
+
+> 이 실습의 최종 목적은 `mini_slam` 프로젝트의 뼈대를 만드는 것이다.
+> Phase 2의 mini_vo 코드를 검토하고, mini_slam 프로젝트로 이식한다.
+
+**작업 내용**:
+
+| 작업 | 내용 |
+|------|------|
+| mini_vo 코드 검토 | Phase 2 mini_vo의 각 모듈(camera, feature_detector, tracker 등) 동작 확인 |
+| mini_slam 뼈대 생성 | `Studies/Phase 3/mini_slam/` 디렉토리 + CMakeLists.txt 생성 |
+| mini_vo 모듈 이식 | Phase 2 코드를 mini_slam/include, mini_slam/src로 복사 및 정리 |
+| Pose, MapPoint 타입 통일 | 이번 주 실습의 `Pose`, `MapPoint`를 mini_slam 공통 타입으로 사용 |
+
+**구현 파일**: `Studies/Phase 3/mini_slam/`
+
+```
+mini_slam/
+├── CMakeLists.txt
+├── main.cpp                  ← Phase 3 끝에 전체 파이프라인 실행
+├── include/
+│   ├── types.h               ← Pose, MapPoint (이번 주)
+│   ├── camera.h              ← Phase 2 재사용
+│   ├── feature_detector.h    ← Phase 2 재사용
+│   ├── feature_matcher.h     ← Phase 2 재사용
+│   ├── epipolar.h            ← Phase 2 재사용
+│   ├── pose_recovery.h       ← Phase 2 재사용
+│   ├── triangulator.h        ← Phase 2 재사용
+│   └── tracker.h             ← Phase 2 재사용
+└── src/
+    └── ...
+```
+
+### 완성 기준
+
+```bash
+cd Studies/Phase\ 3/mini_slam/build
+cmake .. && make
+
+# mini_slam 빌드 성공 + Phase 2 모듈 정상 동작 확인
+```
+
+---
+
 **다음**: Week 2에서 Essential Matrix로 모션 추정!

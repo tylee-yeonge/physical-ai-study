@@ -791,4 +791,44 @@ for (int i = 0; i < num_frames; i++) {
 
 ---
 
+## 🏗️ mini_slam 구현 (이번 주 핵심)
+
+> 이번 주는 Phase 2의 mini_vo 코드를 mini_slam으로 **완전히 통합**하는 주차다.
+> W1~W3에서 준비한 모듈들을 연결하여 연속 프레임 VO 파이프라인을 완성한다.
+
+**작업 내용**:
+
+| 작업 | 내용 |
+|------|------|
+| mini_vo → mini_slam 통합 | Phase 2 코드를 mini_slam 프로젝트로 최종 이식 |
+| VO 파이프라인 연결 | 초기화(2D-2D) → 추적(3D-2D) → 맵 관리 연결 |
+| 연속 프레임 테스트 | 합성 데이터 또는 KITTI에서 50+ 프레임 연속 추적 |
+| 드리프트 측정 | GT 대비 드리프트 정량 확인 |
+
+**구현 파일**: `Studies/Phase 3/mini_slam/main.cpp`
+
+### 파이프라인 흐름
+
+```
+이미지 시퀀스 입력
+    ↓
+[Phase 2 재사용] FAST 검출 → LK 추적 → E → R,t → 삼각측량
+    ↓
+연속 프레임에서 PnP 추적
+    ↓
+드리프트 측정 (BA 없이 얼마나 벌어지는지 확인)
+```
+
+### 완성 기준
+
+```bash
+cd Studies/Phase\ 3/mini_slam/build
+./mini_slam
+
+# 50프레임 이상 연속 추적 성공
+# 드리프트 관찰 → "BA가 왜 필요한가?" 체감
+```
+
+---
+
 **다음**: [Week 6 - Keyframe Management](../week6/README.md)

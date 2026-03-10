@@ -255,4 +255,30 @@ int main() {
 
 ---
 
+## 🏗️ mini_vo 구현 (이번 주 핵심)
+
+**구현 파일**: `Studies/Phase 2/mini_vo/src/triangulator.cpp`
+
+### 구현해야 할 내용
+
+| 함수 | 내용 |
+|------|------|
+| `triangulate()` | DLT 직접 구현: 크로스곱 → 4×4 A 행렬 구성 → SVD → 동차→유클리드 변환 |
+
+### 완성 기준
+
+```bash
+./mini_vo
+
+# W7 출력 예시
+# [삼각측량]
+#   복원된 3D 점: 142개
+#   평균 재투영 오차: 0.8 픽셀  ← 1.0 이하면 양호
+#   cv::triangulatePoints 오차: 0.7 픽셀
+```
+
+재투영 오차가 `cv::triangulatePoints`와 비슷하면 성공이다.
+
+---
+
 **다음 단계**: Week 8 - KLT Optical Flow 추적

@@ -425,4 +425,37 @@ if (frame_id_ % 50 == 0) {
 
 ---
 
+## 🏗️ mini_slam 구현 (이번 주 핵심)
+
+> 이번 주는 mini_slam에 **Keyframe + Map 관리**를 추가한다.
+> 모든 프레임을 저장하지 않고, 키프레임만 선택적으로 저장하여 맵을 관리한다.
+
+**작업 내용**:
+
+| 작업 | 내용 |
+|------|------|
+| `keyframe.h` 구현 | Keyframe 클래스 (포즈, 특징점, 맵 포인트 인덱스, covisibility) |
+| `map.h` 구현 | Map 클래스 (키프레임 저장, 맵 포인트 관리, 키프레임 선택/제거) |
+| 키프레임 선택 기준 | parallax > 5°, 추적 특징점 < 80%일 때 새 키프레임 생성 |
+| mini_slam 통합 | W5의 VO 파이프라인에 키프레임 관리 연결 |
+
+**구현 파일**:
+- `Studies/Phase 3/mini_slam/include/keyframe.h`
+- `Studies/Phase 3/mini_slam/include/map.h`
+- `Studies/Phase 3/mini_slam/src/keyframe.cpp`
+- `Studies/Phase 3/mini_slam/src/map.cpp`
+
+### 완성 기준
+
+```bash
+cd Studies/Phase\ 3/mini_slam/build
+./mini_slam
+
+# 키프레임만 저장하는 맵 관리 동작 확인
+# 50프레임 입력 → 키프레임 5~10개만 선택됨
+# Culling으로 중복 키프레임 제거
+```
+
+---
+
 **다음**: Week 7에서 Bundle Adjustment로 최적화!

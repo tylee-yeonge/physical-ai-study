@@ -123,4 +123,33 @@ void StereoMatcher::visualizeDisparity(const cv::Mat& disparity, cv::Mat& vis) {
 
 ---
 
+## 🏗️ mini_vo 구현 (이번 주 핵심)
+
+**구현 파일**: `Studies/Phase 2/mini_vo/src/pose_recovery.cpp`
+
+### 구현해야 할 내용
+
+| 함수 | 내용 |
+|------|------|
+| `recover()` | E → SVD → W 행렬 → 4가지 (R, t) → Cheirality Check → 올바른 해 반환 |
+
+### 완성 기준
+
+```bash
+./mini_vo
+
+# W6 출력 예시
+# [포즈 복원]
+#   Cheirality inlier: 142 / 150
+#   R (det=1.000):
+#     [0.999, -0.012, 0.034]
+#     [0.011,  0.999, 0.021]
+#     [-0.034, -0.021, 0.999]
+#   t: [0.98, 0.03, 0.19]  (단위 벡터)
+```
+
+`det(R) = 1.000`이고 Cheirality inlier 비율이 높으면 성공이다.
+
+---
+
 **다음 단계**: Week 7 - Depth Map 계산 + 실시간 데모

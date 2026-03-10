@@ -686,4 +686,33 @@ options.linear_solver_type = ceres::DENSE_SCHUR;
 
 ---
 
+## 🏗️ mini_slam 구현 (이번 주 핵심)
+
+> 이번 주는 mini_slam에 **g2o 기반 로컬 BA**를 시작한다.
+> Schur Complement 이해를 바탕으로 g2o Vertex/Edge 구조를 설계한다.
+
+**작업 내용**:
+
+| 작업 | 내용 |
+|------|------|
+| `local_ba_g2o.h` 시작 | g2o 정점(포즈 SE3 + 점 XYZ) + 엣지(재투영) 그래프 구성 |
+| `setMarginalized(true)` 적용 | 3D 점에 Schur Complement 적용 |
+| g2o 로컬 BA 테스트 | 작은 케이스(3 카메라, 10 점)에서 동작 확인 |
+
+**구현 파일**:
+- `Studies/Phase 3/mini_slam/include/local_ba_g2o.h`
+- `Studies/Phase 3/mini_slam/src/local_ba_g2o.cpp`
+
+### 완성 기준
+
+```bash
+cd Studies/Phase\ 3/mini_slam/build
+./mini_slam
+
+# g2o로 로컬 BA 동작 확인
+# setMarginalized(true) 적용 시 속도 향상 확인
+```
+
+---
+
 **다음**: Quiz로 개념 점검!

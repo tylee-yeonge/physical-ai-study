@@ -418,4 +418,34 @@ void FeatureTracker::trackImage(...) {
 
 ---
 
+## 🏗️ mini_vo 구현 (이번 주 핵심 + Phase 2 완성)
+
+**구현 파일**: `Studies/Phase 2/mini_vo/src/tracker.cpp`
+
+### 구현해야 할 내용
+
+| 함수 | 내용 |
+|------|------|
+| `track()` | LK 직접 구현: 이미지 피라미드 구성 → 레벨별 AᵀA(Structure Tensor) 계산 → 반복 최소제곱으로 (u, v) 추정 → 상위 레벨로 전파 |
+
+### 완성 기준
+
+```bash
+./mini_vo
+
+# W8 출력 예시 (전체 파이프라인)
+# [Phase 2 mini_vo 파이프라인]
+#   입력: 이미지 시퀀스 (N 프레임)
+#   W3  FAST 검출:      87개 특징점
+#   W8  LK 추적:        74개 추적 성공 (85%)
+#   W5  E Matrix 계산:  완료
+#   W6  R, t 복원:      inlier 68개
+#   W7  삼각측량:       68개 3D 점
+#   결과: w3_fast_result.png, pipeline_result.png 저장
+```
+
+tracker.cpp를 완성하면 Phase 2 전체 파이프라인이 동작한다.
+
+---
+
 **Phase 2 완료! 다음: Phase 3 - Visual Odometry & Bundle Adjustment**

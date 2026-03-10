@@ -123,4 +123,30 @@ void StereoRectifier::rectify(
 
 ---
 
+## 🏗️ mini_vo 구현 (이번 주 핵심)
+
+**구현 파일**: `Studies/Phase 2/mini_vo/src/epipolar.cpp`
+
+### 구현해야 할 내용
+
+| 함수 | 내용 |
+|------|------|
+| `computeF()` | 8-Point Algorithm 직접 구현 (Hartley 정규화 → A 행렬 → SVD → rank-2 강제 → 역정규화) |
+| `computeLines()` | F Matrix로 에피폴라 선 계산 |
+
+### 완성 기준
+
+```bash
+./mini_vo
+
+# W5 출력 예시
+# [에피폴라 검증]
+#   평균 에피폴라 제약 오차: 0.003  ← 0에 가까울수록 정확
+#   cv::findFundamentalMat 오차: 0.002
+```
+
+직접 구현한 F와 `cv::findFundamentalMat` 결과가 비슷하면 성공이다.
+
+---
+
 **다음 단계**: Week 6 - Disparity Map 생성

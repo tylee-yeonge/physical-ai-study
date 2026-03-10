@@ -378,4 +378,31 @@ make
 
 ---
 
+## 🏗️ mini_slam 구현 (이번 주 핵심)
+
+> 이번 주는 mini_slam의 **2D-2D 초기화 모듈**을 개선한다.
+> Phase 2의 Essential Matrix 코드를 기반으로 RANSAC 파라미터를 튜닝하여 정확도를 높인다.
+
+**작업 내용**:
+
+| 작업 | 내용 |
+|------|------|
+| E Matrix RANSAC 튜닝 | threshold, confidence, iteration 수 최적화 |
+| 초기화 품질 검증 | inlier ratio, 재투영 오차 기준 강화 |
+| mini_slam 초기화 통합 | `mini_slam/src/` 에서 개선된 2D-2D 초기화 사용 |
+
+**구현 파일**: `Studies/Phase 3/mini_slam/src/epipolar.cpp`
+
+### 완성 기준
+
+```bash
+cd Studies/Phase\ 3/mini_slam/build
+./mini_slam
+
+# 2프레임 간 포즈 추정 정확도 향상 확인
+# Inlier ratio > 80%, 재투영 오차 < 1px
+```
+
+---
+
 **다음**: Week 3에서 PnP로 추적 시작!

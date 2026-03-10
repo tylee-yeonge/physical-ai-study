@@ -359,4 +359,37 @@ target_link_libraries(pnp_demo ${OpenCV_LIBS})
 
 ---
 
+## 🏗️ mini_slam 구현 (이번 주 핵심)
+
+> 이번 주는 mini_slam에 **PnP RANSAC 직접 구현** 모듈을 추가한다.
+> OpenCV의 `solvePnPRansac`에 의존하지 않고, RANSAC 루프를 직접 작성한다.
+
+**작업 내용**:
+
+| 작업 | 내용 |
+|------|------|
+| PnP RANSAC 직접 구현 | RANSAC 루프 (랜덤 4점 샘플 → EPnP → inlier 판별) 직접 작성 |
+| N번째 프레임 포즈 추정 | 기존 3D 맵 포인트 + 현재 2D 관측으로 PnP 추적 |
+| mini_slam 추적 강화 | 직접 구현한 PnP RANSAC을 mini_slam 추적 모듈에 통합 |
+
+**구현 파일**: `Studies/Phase 3/mini_slam/src/motion_3d2d.cpp`
+
+| 함수 | 내용 |
+|------|------|
+| `solvePnPRansac()` | RANSAC 루프 직접 구현 (랜덤 샘플 → 모델 → inlier 수) |
+| `computeInliers()` | 재투영 오차 기반 inlier/outlier 분류 |
+| `refinePose()` | inlier만으로 포즈 재추정 |
+
+### 완성 기준
+
+```bash
+cd Studies/Phase\ 3/mini_slam/build
+./mini_slam
+
+# PnP RANSAC 직접 구현으로 N번째 프레임 포즈 추정
+# Inlier ratio > 70%, 재투영 오차 < 2px
+```
+
+---
+
 **다음**: Week 4에서 ICP 학습!
