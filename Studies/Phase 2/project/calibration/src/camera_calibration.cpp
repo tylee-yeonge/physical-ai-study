@@ -36,7 +36,7 @@ bool CameraCalibration::findChessboardCorners(const cv::Mat& image,
             cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::COUNT, 30, 0.1));
     }
 
-    return
+    return found;
 }
 
 void CameraCalibration::generateObjectPoints()
@@ -60,7 +60,7 @@ double CameraCalibration::calibrate(const std::vector<std::vector<cv::Point2f>>&
 {
     generateObjectPoints();
 
-    std::vector<std::vector<cv::Point3f>> allObjectPoihnts;
+    std::vector<std::vector<cv::Point3f>> allObjectPoints;
     for (size_t i = 0; i < imagePoints.size(); i++)
     {
         allObjectPoints.push_back(objectPoints_[0]);
@@ -76,11 +76,11 @@ double CameraCalibration::calibrate(const std::vector<std::vector<cv::Point2f>>&
 }
 
 void CameraCalibration::saveCalibration(const std::string& filename,
-                                        const cv::Mat& k,
+                                        const cv::Mat& K,
                                         const cv::Mat& dist,
                                         cv::Size imageSize)
 {
-    cv::FileStarage fs(filename, cv::FileStorage::WRITE);
+    cv::FileStorage fs(filename, cv::FileStorage::WRITE);
     fs << "camera_matrix" << K;
     fs << "distortion_coefficients" << dist;
     fs << "image_width" << imageSize.width;

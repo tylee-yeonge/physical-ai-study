@@ -10,7 +10,7 @@ class CameraCalibration
 public:
     CameraCalibration(cv::Size boardSize, float squareSize);
 
-    bool findChessboardCorners(const cv::Mat& image, std::vector<cv::Points2f>& corners);
+    bool findChessboardCorners(const cv::Mat& image, std::vector<cv::Point2f>& corners);
     double calibrate(const std::vector<std::vector<cv::Point2f>>& imagePoints,
                      cv::Size imgaeSize,
                      cv::Mat& cameraMatrix,
@@ -28,3 +28,5 @@ private:
 
     void generateObjectPoints();
 };
+
+#endif
