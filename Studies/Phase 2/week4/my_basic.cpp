@@ -30,8 +30,8 @@ double FeatureMatchingBasic::matchBruteForce(const cv::Mat& descriptors1,
                                              std::vector<cv::DMatch>& matches, int normType)
 {
     // [Step 1] Brute-Force 매칭 + 시간 측정
-    // 1) cv::BFMatcher matcher(normType, false)  // crossCheck=false
-    // 2) matcher.match(descriptors1, descriptors2, matches)
+    // 1) normType을 사용하여 BFMatcher 객체 생성 (crossCheck=false)
+    // 2) 두 디스크립터 집합 간 매칭 수행
     // 3) 시간 측정하여 ms로 반환
     // 참고: basic.cpp의 matchBruteForce()
     // 기대값: 동일 디스크립터 → 매칭 거리 = 0
@@ -52,8 +52,8 @@ double FeatureMatchingBasic::matchFLANN(const cv::Mat& descriptors1, const cv::M
 {
     // [Step 3] FLANN 매칭 (근사 최근접 이웃)
     // 1) float 타입으로 변환 (FLANN은 CV_32F 필요)
-    // 2) cv::FlannBasedMatcher matcher
-    // 3) matcher.match(desc1_float, desc2_float, matches)
+    // 2) FlannBasedMatcher 객체 생성
+    // 3) 두 디스크립터 간 매칭 수행
     // 참고: basic.cpp의 matchFLANN()
     // 기대값: 매칭 개수 > 0
     return 0.0;
@@ -63,8 +63,8 @@ int FeatureMatchingBasic::ratioTest(const cv::Mat& descriptors1, const cv::Mat& 
                                     std::vector<cv::DMatch>& good_matches, float ratio_thresh)
 {
     // [Step 4] Lowe's Ratio Test
-    // 1) cv::BFMatcher(cv::NORM_HAMMING)
-    // 2) matcher.knnMatch(desc1, desc2, knn_matches, 2)  // k=2
+    // 1) NORM_HAMMING을 사용하여 BFMatcher 객체 생성
+    // 2) 각 특징점마다 k=2 최근접 이웃 매칭 수행 (knnMatch)
     // 3) 각 쌍에서 best.distance < ratio_thresh * second.distance면 통과
     // 참고: basic.cpp의 ratioTest()
     // 기대값: good_matches.size() < 전체 매칭 수
@@ -78,7 +78,7 @@ void FeatureMatchingBasic::visualizeMatches(const cv::Mat& img1,
                                             const std::vector<cv::DMatch>& matches, cv::Mat& output)
 {
     // [Step 5] 매칭 시각화
-    // cv::drawMatches(img1, kp1, img2, kp2, matches, output, ...)
+    // drawMatches 함수를 사용하여 두 이미지의 매칭 결과를 시각화
     // 참고: basic.cpp의 visualizeMatches()
     // 기대값: output.empty() == false
 }
@@ -90,8 +90,8 @@ double FeatureMatchingBasic::filterRANSAC(const std::vector<cv::KeyPoint>& keypo
                                           cv::Mat& homography, double ransac_thresh)
 {
     // [Step 6] RANSAC으로 outlier 제거 (가장 어려운 단계!)
-    // 1) matches에서 Point2f 쌍 추출 (queryIdx, trainIdx)
-    // 2) cv::findHomography(pts1, pts2, cv::RANSAC, ransac_thresh, inlier_mask)
+    // 1) matches에서 queryIdx, trainIdx를 이용해 Point2f 쌍 추출
+    // 2) RANSAC 방식으로 Homography 추정 (임계값: ransac_thresh, inlier 마스크 포함)
     // 3) inlier_mask가 1인 매칭만 inlier_matches에 추가
     // 4) inlier 비율 반환
     // 참고: basic.cpp의 filterRANSAC()

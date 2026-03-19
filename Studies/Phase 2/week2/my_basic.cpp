@@ -58,7 +58,7 @@ void CameraCalibrationBasic::undistortImage(const cv::Mat& distorted, cv::Mat& u
                                             const cv::Mat& K, const cv::Mat& dist)
 {
     // [Step 4] 왜곡 보정 (한 줄!)
-    // 힌트: cv::undistort(distorted, undistorted, K, dist)
+    // 힌트: OpenCV 왜곡 보정 함수에 입력 이미지, 출력 이미지, K, 왜곡계수를 전달
     // 참고: basic.cpp의 undistortImage()
     // 기대값: 출력 이미지 크기 = 입력 이미지 크기
 }
@@ -68,9 +68,8 @@ bool CameraCalibrationBasic::detectChessboard(const cv::Mat& image,
 {
     // [Step 5] 체커보드 코너 검출
     // 1) 그레이스케일 변환 (image.channels() == 3이면)
-    // 2) cv::findChessboardCorners(gray, boardSize_, corners, flags)
-    //    flags: CALIB_CB_ADAPTIVE_THRESH | CALIB_CB_NORMALIZE_IMAGE | CALIB_CB_FAST_CHECK
-    // 3) 검출 성공 시 cv::cornerSubPix()로 서브픽셀 정확도 개선
+    // 2) 체커보드 코너 검출 함수 호출 (적응형 임계값 + 정규화 + 빠른 검사 플래그 사용)
+    // 3) 검출 성공 시 서브픽셀 정확도로 코너 위치 개선
     // 참고: basic.cpp의 detectChessboard()
     // 기대값: 체커보드 이미지→true, 빈 이미지→false
     return false;
@@ -80,10 +79,10 @@ void CameraCalibrationBasic::saveCalibration(const std::string& filename, const 
                                              const cv::Mat& dist, cv::Size imageSize)
 {
     // [Step 6] 캘리브레이션 결과를 YAML 파일로 저장
-    // 1) cv::FileStorage fs(filename, cv::FileStorage::WRITE)
-    // 2) fs << "camera_matrix" << K
-    // 3) fs << "distortion_coefficients" << dist
-    // 4) imageSize.width, imageSize.height도 저장
+    // 1) 파일 이름으로 쓰기 모드의 FileStorage 열기
+    // 2) "camera_matrix" 키로 K 저장
+    // 3) "distortion_coefficients" 키로 dist 저장
+    // 4) 이미지 너비와 높이도 저장
     // 참고: basic.cpp의 saveCalibration()
     // 기대값: YAML 파일 생성됨
 }
@@ -95,8 +94,7 @@ double CameraCalibrationBasic::calibrate(const std::vector<std::vector<cv::Point
     // [Step 7] 캘리브레이션 수행 (가장 어려운 단계!)
     // 1) generateObjectPoints()로 3D 점 생성
     // 2) 모든 이미지에 동일한 objectPoints 배열 구성
-    // 3) cv::calibrateCamera(objectPoints, imagePoints, imageSize,
-    //                        cameraMatrix, distCoeffs, rvecs, tvecs)
+    // 3) calibrateCamera 함수로 실제 캘리브레이션 수행
     // 참고: basic.cpp의 calibrate()
     // 기대값: 시뮬레이션 데이터에서 RMS < 1.0
     return -1.0;

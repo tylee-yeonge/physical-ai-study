@@ -68,11 +68,10 @@ bool TriangulationBasic::triangulatePoint(const cv::Point2f& pt1, const cv::Poin
                                           cv::Point3f& point3d)
 {
     // [Step 4] DLT 삼각측량 (단일 점)
-    // 1) pts1={pt1}, pts2={pt2} 벡터로 만들기
-    // 2) cv::triangulatePoints(P1, P2, pts1, pts2, points4D)
-    // 3) 동차 좌표 → 3D: w = points4D.at<float>(3,0)
-    //    point3d = (X/w, Y/w, Z/w)
-    // 4) |w| < 1e-6이면 false
+    // 1) 단일 점을 벡터 형태로 감싸기
+    // 2) triangulatePoints 함수로 4D 동차 좌표 계산
+    // 3) 4D 동차 좌표를 3D로 변환: 각 성분을 w로 나누기
+    // 4) |w| < 1e-6이면 false 반환 (수치 불안정)
     // 참고: basic.cpp의 triangulatePoint()
     // 기대값: GT와 비교하여 오차 < 0.1m
     return false;
@@ -84,8 +83,8 @@ void TriangulationBasic::triangulatePoints(const std::vector<cv::Point2f>& point
                                            std::vector<cv::Point3f>& points3d)
 {
     // [Step 5] 여러 점 삼각측량
-    // 1) cv::triangulatePoints(P1, P2, points1, points2, points4D)
-    // 2) 각 열에 대해 동차좌표 → 3D 변환
+    // 1) triangulatePoints 함수로 모든 점의 4D 동차 좌표 한 번에 계산
+    // 2) 각 열의 동차 좌표를 3D 좌표로 변환하여 저장
     // 참고: basic.cpp의 triangulatePoints()
     // 기대값: points3d.size() == points1.size()
 }

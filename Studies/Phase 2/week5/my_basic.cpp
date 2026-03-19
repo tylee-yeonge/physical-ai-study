@@ -45,8 +45,7 @@ int EpipolarGeometryBasic::estimateEssential(const std::vector<cv::Point2f>& poi
                                              cv::Mat& essential, int method)
 {
     // [Step 2] Essential Matrix 추정
-    // 1) cv::findEssentialMat(points1, points2, 1.0, cv::Point2d(0,0), method)
-    //    - focal=1.0, pp=(0,0): 정규화 좌표에서 동작
+    // 1) findEssentialMat 함수 호출 (focal=1.0, pp=(0,0): 정규화 좌표 기준)
     // 2) 결과가 비어있지 않으면 essential에 저장
     // 3) inlier 수 반환 (간략화: points1.size())
     // 참고: basic.cpp의 estimateEssential()
@@ -59,8 +58,8 @@ int EpipolarGeometryBasic::estimateFundamental(const std::vector<cv::Point2f>& p
                                                cv::Mat& fundamental, int method)
 {
     // [Step 3] Fundamental Matrix 추정
-    // 1) cv::findFundamentalMat(points1, points2, method, 3.0, 0.99, mask)
-    // 2) inlier 수 = cv::countNonZero(mask)
+    // 1) findFundamentalMat 함수로 F 행렬 추정 (임계값 3.0, 신뢰도 0.99, inlier 마스크 사용)
+    // 2) inlier 마스크에서 0이 아닌 값의 개수를 inlier 수로 반환
     // 참고: basic.cpp의 estimateFundamental()
     // 기대값: F가 3×3 행렬, inlier > 0
     return 0;
@@ -86,9 +85,9 @@ bool EpipolarGeometryBasic::recoverPose(const cv::Mat& essential,
                                         cv::Mat& R, cv::Mat& t)
 {
     // [Step 5] Essential Matrix에서 R, t 복원
-    // 1) focal = K.at<double>(0,0)
-    // 2) pp = cv::Point2d(K.at<double>(0,2), K.at<double>(1,2))
-    // 3) cv::recoverPose(essential, points1, points2, R, t, focal, pp)
+    // 1) K 행렬에서 focal length 추출
+    // 2) K 행렬에서 주점(principal point) 추출
+    // 3) recoverPose 함수로 Essential Matrix에서 R, t 복원
     // 4) inliers > 0이면 true 반환
     // 참고: basic.cpp의 recoverPose()
     // 기대값: R(3×3), t(3×1), det(R)≈1
@@ -99,11 +98,10 @@ double EpipolarGeometryBasic::verifyEF_Relationship(const cv::Mat& K, const cv::
                                                     const cv::Mat& fundamental)
 {
     // [Step 6] E와 F의 관계 검증
-    // 1) K_inv = K.inv()
-    // 2) F_from_E = K_inv.t() * essential * K_inv
-    // 3) 스케일 정규화: F_from_E /= F_from_E.at<double>(2,2)
-    //                  F_norm = fundamental / fundamental.at<double>(2,2)
-    // 4) cv::norm(F_from_E - F_norm) 반환
+    // 1) K의 역행렬 계산
+    // 2) F_from_E = K^{-T} * E * K^{-1} 공식으로 F 행렬 유도
+    // 3) 두 행렬 모두 (2,2) 원소로 나누어 스케일 정규화
+    // 4) 두 행렬의 차이(Frobenius norm) 반환
     // 참고: basic.cpp의 verifyEF_Relationship()
     // 기대값: 차이 < 0.1 (이상적으로 ~0)
     return -1.0;
@@ -115,7 +113,7 @@ void EpipolarGeometryBasic::visualizeEpipolarLines(const cv::Mat& img1, const cv
                                                    const cv::Mat& fundamental, cv::Mat& output)
 {
     // [Step 7] 에피폴라 선 시각화
-    // 1) cv::hconcat(img1, img2, combined) — 두 이미지 나란히
+    // 1) 두 이미지를 가로로 이어 붙여 하나의 이미지로 합치기
     // 2) 그레이스케일이면 BGR로 변환
     // 3) 각 점에 원 그리기 + computeEpipolarLine()으로 선 그리기
     // 참고: basic.cpp의 visualizeEpipolarLines()

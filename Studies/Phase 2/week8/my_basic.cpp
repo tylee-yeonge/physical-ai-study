@@ -32,12 +32,11 @@ double OpticalFlowBasic::lucasKanade(const cv::Mat& prev_img, const cv::Mat& cur
                                      std::vector<cv::Point2f>& curr_pts, std::vector<uchar>& status)
 {
     // [Step 1] Lucas-Kanade Optical Flow (Sparse)
-    // 1) cv::calcOpticalFlowPyrLK(prev_img, curr_img, prev_pts, curr_pts,
-    //                              status, err, winSize, maxLevel, criteria)
-    //    - winSize: cv::Size(21, 21)
-    //    - maxLevel: 3 (피라미드 레벨)
-    //    - criteria: TermCriteria(COUNT|EPS, 30, 0.01)
-    // 2) status에서 성공(1) 개수 세서 성공률 반환
+    // 1) calcOpticalFlowPyrLK 함수 호출
+    //    - 윈도우 크기: 21×21
+    //    - 피라미드 레벨: 3
+    //    - 종료 조건: 최대 30회 반복, 정밀도 0.01
+    // 2) status에서 성공(1) 개수를 세어 성공률 반환
     // 참고: basic.cpp의 lucasKanade()
     // 기대값: 원이 (10, 5)만큼 이동 → 성공률 > 0
     return 0.0;
@@ -46,8 +45,8 @@ double OpticalFlowBasic::lucasKanade(const cv::Mat& prev_img, const cv::Mat& cur
 void OpticalFlowBasic::farneback(const cv::Mat& prev_img, const cv::Mat& curr_img, cv::Mat& flow)
 {
     // [Step 2] Farneback Dense Optical Flow
-    // cv::calcOpticalFlowFarneback(prev_img, curr_img, flow,
-    //                               0.5, 3, 15, 3, 5, 1.2, 0)
+    // calcOpticalFlowFarneback 함수 호출
+    // (피라미드 스케일 0.5, 3레벨, 윈도우 크기 15, 반복 3회, 다항식 크기 5, 시그마 1.2)
     // 참고: basic.cpp의 farneback()
     // 기대값: flow.size() == prev_img.size(), flow.channels() == 2
 }
@@ -75,8 +74,8 @@ void OpticalFlowBasic::visualizeSparseFlow(const cv::Mat& img,
     // [Step 4] Sparse Flow 시각화
     // 1) 이미지를 BGR로 변환 (1채널이면 cvtColor, 아니면 clone)
     // 2) status[i] == 1인 점에 대해:
-    //    - cv::line(output, prev_pts[i], curr_pts[i], 녹색, 2)  // 궤적
-    //    - cv::circle(output, curr_pts[i], 5, 빨간색, -1)       // 현재 위치
+    //    - 이전 위치에서 현재 위치까지 녹색 선으로 궤적 그리기 (두께 2)
+    //    - 현재 위치에 빨간색 채움 원 그리기 (반지름 5)
     // 참고: basic.cpp의 visualizeSparseFlow()
     // 기대값: output.empty() == false
 }
@@ -86,8 +85,8 @@ void OpticalFlowBasic::visualizeFlow(const cv::Mat& flow, cv::Mat& output, int s
     // [Step 5] Dense Flow 화살표 시각화
     // 1) output = cv::Mat::zeros(flow.size(), CV_8UC3)
     // 2) step 간격으로 순회:
-    //    fxy = flow.at<cv::Point2f>(y, x)
-    //    cv::arrowedLine(output, (x,y), (x+fxy.x, y+fxy.y), 녹색, 1)
+    //    해당 위치의 flow 벡터 추출
+    //    flow 방향으로 녹색 화살표 그리기 (두께 1)
     // 참고: basic.cpp의 visualizeFlow()
     // 기대값: output.empty() == false
 }

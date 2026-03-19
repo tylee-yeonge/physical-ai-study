@@ -30,7 +30,7 @@
 void PnPBasic::rodrigues(const cv::Mat& rvec, cv::Mat& R)
 {
     // [Step 1] 회전 벡터 → 회전 행렬 (가장 먼저 구현!)
-    // cv::Rodrigues(rvec, R)
+    // Rodrigues 함수로 회전 벡터를 회전 행렬로 변환
     // 참고: basic.cpp의 rodrigues()
     // 기대값: R(3×3), det(R)≈1
 }
@@ -41,8 +41,8 @@ bool PnPBasic::solvePnP(const std::vector<cv::Point3f>& points3d,
 {
     // [Step 2] PnP로 카메라 포즈 추정
     // 1) points3d.size() < 4이면 false
-    // 2) distCoeffs = cv::Mat::zeros(4, 1, CV_64F)
-    // 3) cv::solvePnP(points3d, points2d, K, distCoeffs, rvec, tvec, false, method)
+    // 2) 왜곡 계수를 0으로 초기화 (4x1 행렬)
+    // 3) solvePnP 함수로 3D-2D 대응점에서 포즈 추정
     // 참고: basic.cpp의 solvePnP()
     // 기대값: rvec(3×1), tvec(3×1), GT와 오차 < 0.01
     return false;
@@ -54,9 +54,8 @@ int PnPBasic::solvePnPRansac(const std::vector<cv::Point3f>& points3d,
                              double reprojection_error)
 {
     // [Step 3] RANSAC PnP (outlier 제거)
-    // 1) cv::solvePnPRansac(points3d, points2d, K, distCoeffs,
-    //                        rvec, tvec, false, 100, reprojection_error, 0.99, inliers_mask)
-    // 2) inliers_mask에서 inlier 인덱스 추출
+    // 1) solvePnPRansac으로 outlier에 강건한 포즈 추정 (반복 100회, 신뢰도 0.99)
+    // 2) inlier 마스크에서 유효한 인덱스만 추출
     // 참고: basic.cpp의 solvePnPRansac()
     // 기대값: inlier 수 < 전체 수 (outlier 있을 때)
     return 0;
@@ -67,8 +66,8 @@ double PnPBasic::evaluatePose(const std::vector<cv::Point3f>& points3d,
                               const cv::Mat& rvec, const cv::Mat& tvec)
 {
     // [Step 4] 재투영 오차로 포즈 품질 평가
-    // 1) cv::projectPoints(points3d, rvec, tvec, K, distCoeffs, projected)
-    // 2) 각 점의 유클리드 거리 합 / 점 개수
+    // 1) projectPoints 함수로 3D 점을 추정 포즈로 투영
+    // 2) 각 점의 유클리드 거리를 구해 평균 반환
     // 참고: basic.cpp의 evaluatePose()
     // 기대값: 노이즈 없으면 ~0
     return -1.0;
@@ -79,8 +78,8 @@ void PnPBasic::visualizePnP(const cv::Mat& img, const std::vector<cv::Point3f>& 
                             const cv::Mat& rvec, const cv::Mat& tvec, cv::Mat& output)
 {
     // [Step 5] 관측점(녹색) + 투영점(빨강) + 연결선 시각화
-    // 1) cv::projectPoints로 투영
-    // 2) cv::circle + cv::line
+    // 1) projectPoints로 3D 점을 이미지에 투영
+    // 2) 원(관측점, 투영점)과 선(연결)으로 시각화
     // 참고: basic.cpp의 visualizePnP()
     // 기대값: output.empty() == false
 }
