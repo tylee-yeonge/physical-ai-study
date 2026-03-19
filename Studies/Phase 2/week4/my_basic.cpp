@@ -16,7 +16,6 @@
  * │  4   │ ratioTest            │ 보통   │ ./my_basic            │
  * │  5   │ visualizeMatches     │ 쉬움   │ ./my_basic            │
  * │  6   │ filterRANSAC         │ 어려움 │ ./my_basic            │
- * │  7   │ demoPipeline         │ 보통   │ ./my_basic            │
  * └──────┴──────────────────────┴────────┴───────────────────────┘
  *
  * 💡 각 Step 구현 후 ./my_basic을 실행하면 해당 단계의 ✅/❌를 확인할 수 있습니다.
@@ -98,13 +97,6 @@ double FeatureMatchingBasic::filterRANSAC(const std::vector<cv::KeyPoint>& keypo
     // 참고: basic.cpp의 filterRANSAC()
     // 기대값: inlier_ratio > 0
     return 0.0;
-}
-
-void FeatureMatchingBasic::demoPipeline(const cv::Mat& img1, const cv::Mat& img2)
-{
-    // [Step 7] 전체 파이프라인 (Step 1~6 조합)
-    // 1) ORB 검출 → 2) BF 매칭 → 3) Ratio Test → 4) RANSAC
-    // 참고: basic.cpp의 demoPipeline()
 }
 
 #ifndef MY_BASIC_LIB_ONLY
@@ -215,10 +207,6 @@ int main()
             std::cout << "   ⚠️  매칭 < 4개, Step 4 먼저 확인" << std::endl;
         }
 
-        // ── Step 7: demoPipeline ────────────────
-        std::cout << "\nStep 7: demoPipeline" << std::endl;
-        FeatureMatchingBasic::demoPipeline(img1, img2);
-        std::cout << "   (위 출력 확인)" << std::endl;
     }
 
     // ── 요약 ────────────────────────────────────
