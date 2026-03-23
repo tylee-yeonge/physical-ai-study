@@ -214,6 +214,77 @@ int main()
     std::cout << "  모든 Step ✅ 확인 후 → quiz_easy.cpp, quiz_medium.cpp" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
+    // ── 실제 이미지 테스트 ─────────────────────
+    // 합성 체커보드는 반복 패턴이라 inlier 비율이 낮음.
+    // 실제 자연 이미지(고유한 텍스처)에서 매칭 품질 차이를 비교한다.
+    // demoPipeline은 위에서 구현한 Step 1~6 함수를 순서대로 호출하는 파이프라인이다.
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+    std::cout << "  실제 이미지 테스트 (box / box_in_scene)" << std::endl;
+    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
+
+    cv::Mat real_img1 = cv::imread("../images/box.png", cv::IMREAD_GRAYSCALE);
+    cv::Mat real_img2 = cv::imread("../images/box_in_scene.png", cv::IMREAD_GRAYSCALE);
+
+    if (real_img1.empty() || real_img2.empty())
+    {
+        std::cout << "   ⚠️  이미지 로드 실패 — images/ 폴더에 box.png, box_in_scene.png 필요" << std::endl;
+        std::cout << "   build/ 폴더에서 실행했는지 확인하세요.\n" << std::endl;
+        return 0;
+    }
+
+    std::cout << "   이미지1 (box): " << real_img1.cols << "×" << real_img1.rows << std::endl;
+    std::cout << "   이미지2 (scene): " << real_img2.cols << "×" << real_img2.rows << "\n" << std::endl;
+
+    // Step 1~6에서 구현한 함수들을 순서대로 호출하는 파이프라인
+    // 1. 특징점 검출
+    cv::Ptr<cv::ORB> orb_real = cv::ORB::create(1000);
+    std::vector<cv::KeyPoint> real_kp1, real_kp2;
+    cv::Mat real_d1, real_d2;
+    orb_real->detectAndCompute(real_img1, cv::noArray(), real_kp1, real_d1);
+    orb_real->detectAndCompute(real_img2, cv::noArray(), real_kp2, real_d2);
+    std::cout << "1. 특징점 검출: " << real_kp1.size() << "개 × " << real_kp2.size() << "개" << std::endl;
+
+    // 2. BF 매칭 (Step 1 함수 사용)
+    std::vector<cv::DMatch> real_matches;
+    double real_t_bf = FeatureMatchingBasic::matchBruteForce(real_d1, real_d2, real_matches, cv::NORM_HAMMING);
+    std::cout << "2. BF 매칭: " << real_matches.size() << "개 (" << std::fixed << std::setprecision(2) << real_t_bf << " ms)" << std::endl;
+
+    // 매칭 품질 평가 (Step 2 함수 사용)
+    std::cout << "   평균 거리: " << std::setprecision(1)
+              << FeatureMatchingBasic::evaluateMatchQuality(real_matches) << std::endl;
+
+    // 3. Ratio Test (Step 4 함수 사용)
+    std::vector<cv::DMatch> real_good;
+    int real_n_good = FeatureMatchingBasic::ratioTest(real_d1, real_d2, real_good, kLoweRatioThreshold);
+    std::cout << "3. Ratio Test: " << real_matches.size() << "개 → " << real_n_good << "개" << std::endl;
+
+    // 4. RANSAC (Step 6 함수 사용)
+    if (real_good.size() >= 4)
+    {
+        std::vector<cv::DMatch> real_inliers;
+        cv::Mat real_H;
+        double real_inlier_ratio = FeatureMatchingBasic::filterRANSAC(
+            real_kp1, real_kp2, real_good, real_inliers, real_H);
+        std::cout << "4. RANSAC: " << real_good.size() << "개 → " << real_inliers.size() << "개" << std::endl;
+        std::cout << "   Inlier 비율: " << std::setprecision(1) << real_inlier_ratio * 100 << "%" << std::endl;
+
+        // 5. 시각화 (Step 5 함수 사용)
+        cv::Mat real_vis_before, real_vis_after;
+        FeatureMatchingBasic::visualizeMatches(real_img1, real_kp1, real_img2, real_kp2, real_good, real_vis_before);
+        FeatureMatchingBasic::visualizeMatches(real_img1, real_kp1, real_img2, real_kp2, real_inliers, real_vis_after);
+        cv::imwrite("real_before_ransac.png", real_vis_before);
+        cv::imwrite("real_after_ransac.png", real_vis_after);
+        std::cout << "\n   저장: real_before_ransac.png (Ratio Test 후)" << std::endl;
+        std::cout << "   저장: real_after_ransac.png (RANSAC 후)" << std::endl;
+    }
+    else
+    {
+        std::cout << "   ⚠️  매칭 < 4개, Ratio Test 결과 확인 필요" << std::endl;
+    }
+
+    std::cout << "\n   체커보드 대비 Inlier 비율이 훨씬 높은 것을 확인!" << std::endl;
+    std::cout << "   → 고유한 텍스처가 있는 실제 이미지에서 매칭이 더 잘 동작한다.\n" << std::endl;
+
     return 0;
 }
 #endif

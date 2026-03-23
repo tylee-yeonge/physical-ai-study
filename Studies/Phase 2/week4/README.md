@@ -276,7 +276,50 @@ SIFT의 경우 128개의 실수값으로 구성 (128차원 벡터).
 
 ---
 
-### 2. Brute-Force 매칭
+### 2. KNN (K-Nearest Neighbors)
+
+KNN은 "가장 가까운 k개를 찾아라"라는 **개념(질문)**이고,
+BF와 FLANN은 그 질문에 답하는 **구현 방법**이다.
+
+```
+KNN (개념)  →  "디스크립터 공간에서 가장 가까운 k개를 찾아라"
+  ├─ BF (구현 1)    →  전부 비교해서 찾기 (정확, 느림)
+  └─ FLANN (구현 2) →  자료구조로 근사 탐색 (빠름, 근사)
+```
+
+#### KNN의 동작 (k=2 기준)
+
+거창한 알고리즘이 아니다. 거리를 전부 계산해서 **가까운 순으로 k개를 뽑는 것**이 전부다.
+
+```
+이미지1 특징점 A의 디스크립터를 들고,
+이미지2의 모든 디스크립터와 거리를 계산:
+
+  특징점 1: 거리 = 82
+  특징점 2: 거리 = 15  ← 1등 (가장 가까움)
+  특징점 3: 거리 = 91
+  특징점 4: 거리 = 43  ← 2등
+
+k=1이면 → 2번만 반환
+k=2이면 → 2번(15)과 4번(43)을 반환
+```
+
+#### 왜 k=2인가?
+
+k=2로 **1등과 2등** 두 개를 받아야 뒤에 나올 **Lowe's Ratio Test**를 적용할 수 있다.
+1등만 알면 "이 매칭이 얼마나 확실한지" 판단할 기준이 없지만,
+2등과 비교하면 확신의 정도를 수치화할 수 있다.
+
+```
+확실한 매칭:  1등 거리 = 15,  2등 거리 = 82  → 1등이 압도적 → 신뢰 ✅
+애매한 매칭:  1등 거리 = 45,  2등 거리 = 48  → 1등과 2등이 비슷 → 불신 ❌
+```
+
+자세한 내용은 [5. Lowe's Ratio Test](#5-lowes-ratio-test)에서 다룬다.
+
+---
+
+### 3. Brute-Force 매칭
 
 특징점을 검출하고 디스크립터를 계산했으면, 이제 두 이미지의 **디스크립터끼리 비교**하여
 "같은 점"을 찾아야 한다. 매칭이란 결국 **디스크립터 간 거리가 가장 가까운 쌍을 연결**하는 것이다.
@@ -354,7 +397,7 @@ bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
 ---
 
-### 3. FLANN 매칭
+### 4. FLANN 매칭
 
 **Fast Library for Approximate Nearest Neighbors** (빠른 근사 최근접 이웃 탐색)
 
@@ -462,7 +505,7 @@ matches = flann.knnMatch(desc1, desc2, k=2)
 
 ---
 
-### 4. Lowe's Ratio Test
+### 5. Lowe's Ratio Test
 
 #### 문제: Outlier 매칭
 
@@ -535,7 +578,7 @@ Ratio Test와 RANSAC은 **양자택일이 아니라, 순서대로 적용하는 2
 
 ---
 
-### 5. RANSAC (Random Sample Consensus)
+### 6. RANSAC (Random Sample Consensus)
 
 #### 문제: Outlier가 여전히 존재
 
@@ -597,7 +640,7 @@ inlier_matches = [m for m, ok in zip(matches, mask.ravel()) if ok]
 
 ---
 
-### 6. 매칭 파이프라인 정리
+### 7. 매칭 파이프라인 정리
 
 ```
 이미지 1                           이미지 2
@@ -624,7 +667,7 @@ inlier_matches = [m for m, ok in zip(matches, mask.ravel()) if ok]
 
 ---
 
-### 7. SLAM에서의 활용
+### 8. SLAM에서의 활용
 
 #### ORB-SLAM3 매칭
 

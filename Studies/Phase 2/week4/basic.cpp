@@ -4,7 +4,11 @@
 #include <iomanip>
 
 
-// Brute-Force 매칭 — 모든 디스크립터 쌍을 비교하여 가장 가까운 것을 찾음
+// Brute-Force 매칭 — KNN(최근접 이웃 탐색)을 전수 비교로 구현
+//
+// KNN은 "가장 가까운 k개를 찾아라"라는 개념이고,
+// BF(Brute-Force)는 모든 쌍을 비교하여 정확하게 찾는 구현 방법이다.
+// (빠른 근사 탐색이 필요하면 FLANN을 사용)
 //
 // 동작: desc1의 각 디스크립터에 대해 desc2의 모든 디스크립터와 거리를 계산,
 //   가장 거리가 작은 것을 매칭 결과로 반환.
@@ -25,7 +29,8 @@ double FeatureMatchingBasic::matchBruteForce(const cv::Mat& descriptors1,
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    // match(): desc1의 각 디스크립터에 대해 desc2에서 최근접 1개를 찾음
+    // match(): desc1의 각 디스크립터에 대해 desc2에서 최근접 1개를 찾음 (KNN k=1)
+    // matches는 빈 벡터로 넘기면 OpenCV가 결과를 채워주는 출력 파라미터
     matcher.match(descriptors1, descriptors2, matches);
 
     auto end = std::chrono::high_resolution_clock::now();
@@ -53,12 +58,17 @@ double FeatureMatchingBasic::evaluateMatchQuality(const std::vector<cv::DMatch>&
     return total_distance / matches.size();
 }
 
-// FLANN 매칭 — 근사 최근접 이웃 탐색으로 BF보다 빠른 매칭
+// FLANN 매칭 — KNN을 근사 탐색으로 구현 (BF의 대안)
 //
 // FLANN = Fast Library for Approximate Nearest Neighbors
-//   BF가 모든 쌍을 비교하는 반면, FLANN은 KD-tree/K-means tree 등의
-//   공간 분할 자료구조를 사용하여 O(N log N) 수준으로 탐색.
-//   특징점이 수천 개 이상일 때 BF 대비 수 배~수십 배 빠름.
+//   BF와 FLANN은 둘 다 KNN(가장 가까운 k개 찾기)의 구현 방법이다.
+//   BF가 모든 쌍을 전수 비교하는 반면, FLANN은 KD-tree/LSH 등의
+//   자료구조로 비슷한 것끼리 미리 묶어두고 해당 영역만 탐색한다.
+//   결과는 동일한 형태(DMatch)로 반환되며, 내부 탐색 방식만 다르다.
+//
+// 자료구조와 디스크립터 유형은 고정 조합:
+//   이진 디스크립터 (ORB, BRIEF) → LSH (해시 기반, 비트열에 최적화)
+//   실수 디스크립터 (SIFT, SURF) → KD-Tree (공간 분할, 연속 값에 최적화)
 //
 // 주의: FLANN의 기본 인덱스는 float 타입만 지원하므로,
 //   ORB 같은 이진 디스크립터(CV_8U)는 float으로 변환 필요.
@@ -95,14 +105,22 @@ double FeatureMatchingBasic::matchFLANN(const cv::Mat& descriptors1, const cv::M
 
 // Lowe's Ratio Test — 모호한 매칭을 제거하는 핵심 필터
 //
-// 원리 (David Lowe, 2004):
-//   kNN(k=2)으로 각 특징점에 대해 가장 가까운 2개의 후보를 찾고,
-//   최근접(best) / 차근접(second-best) 거리의 비율이 작을수록 확실한 매칭.
+// 왜 KNN(k=2)이 필요한가?
+//   일반 매칭(k=1)은 가장 가까운 1개만 반환하므로
+//   "이 매칭이 진짜 좋은 건지" 판단할 기준이 없다.
+//   k=2로 1등과 2등을 함께 받으면, 1등이 얼마나 확실한지 비교할 수 있다.
 //
+// knn_matches의 자료형이 std::vector<std::vector<cv::DMatch>>인 이유:
+//   바깥 벡터: 모든 query 디스크립터 (N개)
+//   안쪽 벡터: 각 query에 대한 k개의 후보 매칭
+//   knn_matches[i][0] = i번째 특징점의 1등 매칭 (best)
+//   knn_matches[i][1] = i번째 특징점의 2등 매칭 (second-best)
+//
+// 원리 (David Lowe, 2004):
 //   best_distance / second_distance < ratio_thresh → 좋은 매칭
 //
-// 직관: 독보적으로 가까운 후보가 있으면 확실한 매칭,
-//   비슷한 거리의 후보가 여럿이면 모호한 매칭 → 제거
+//   확실한 매칭: 1등=15, 2등=82 → ratio=0.18 → 1등이 압도적 → 수락
+//   애매한 매칭: 1등=45, 2등=48 → ratio=0.94 → 구분 안됨 → 거부
 //
 // ratio_thresh 선택:
 //   0.7: Lowe의 권장값. 잘못된 매칭의 90%를 제거하면서 좋은 매칭의 95% 유지
@@ -112,18 +130,21 @@ int FeatureMatchingBasic::ratioTest(const cv::Mat& descriptors1, const cv::Mat& 
                                     std::vector<cv::DMatch>& good_matches, float ratio_thresh)
 {
     // kNN 매칭 — 각 디스크립터에 대해 가장 가까운 k=2개를 찾음
+    // BF 매처가 KNN을 전수 비교 방식으로 수행한다
     cv::BFMatcher matcher(cv::NORM_HAMMING);
     std::vector<std::vector<cv::DMatch>> knn_matches;
 
+    // knn_matches는 빈 벡터로 넘기면 OpenCV가 결과를 채워주는 출력 파라미터
     matcher.knnMatch(descriptors1, descriptors2, knn_matches, 2);
 
     good_matches.clear();
     for (const auto& match_pair : knn_matches)
     {
+        // 디스크립터가 하나뿐이면 2등이 없으므로 비교 불가 → 건너뜀
         if (match_pair.size() < 2)
             continue;
 
-        // 비율이 임계값보다 작으면 독보적인 매칭 → 유지
+        // 1등 거리가 2등 거리 대비 충분히 작으면 → 확실한 매칭 → 유지
         if (match_pair[0].distance < ratio_thresh * match_pair[1].distance)
         {
             good_matches.push_back(match_pair[0]);
@@ -152,50 +173,72 @@ void FeatureMatchingBasic::visualizeMatches(const cv::Mat& img1,
 
 // RANSAC으로 기하학적 outlier 제거 — 호모그래피 모델에 맞지 않는 매칭 제거
 //
+// Ratio Test와 RANSAC의 관계:
+//   Ratio Test → "이 매칭, 확신 있어?" (디스크립터 유사도, 개별 판단)
+//   RANSAC     → "이 매칭, 전체 그림에 맞아?" (기하학적 일관성, 전체 판단)
+//   둘은 보는 관점이 다르므로 순서대로 둘 다 적용한다.
+//
 // RANSAC (Random Sample Consensus):
-//   ① 매칭 중 4개를 랜덤 선택 → 호모그래피 H 계산 (4점 → 8 DOF 결정)
+//   Consensus(합의) = 가장 많은 매칭이 동의하는 모델을 정답으로 삼는다
+//   ① 매칭 중 4개를 랜덤 선택 → 호모그래피 H 계산 (4점 × 2방정식 = 8 DOF 결정)
 //   ② 나머지 매칭에 H 적용 → 재투영 오차 < ransac_thresh면 inlier
-//   ③ N번 반복 → inlier가 가장 많은 H를 최종 모델로 선택
+//   ③ N번 반복 → inlier가 가장 많은(합의가 가장 큰) H를 최종 모델로 선택
 //   ④ 최종 H의 inlier만 남기고 outlier 제거
 //
 // 호모그래피(H)란?
-//   같은 평면 위의 점들에 대해 두 이미지 간 변환: p2 = H · p1
-//   평면 가정이 성립하면 (벽면, 바닥 등) 효과적.
+//   이미지1의 점을 이미지2의 점으로 변환하는 3x3 행렬: p2 = H · p1
+//   이동, 회전, 크기변환, 원근변형을 하나의 행렬로 표현한다.
+//   평면 가정이 성립하면 (벽면, 바닥, 포스터 등) 효과적.
 //   비평면 장면에서는 Essential Matrix(E) 기반 RANSAC이 더 적합.
 //
 // ransac_thresh: 재투영 오차 허용치 (픽셀)
+//   이미지1 점에 H를 적용한 예측 좌표와, 실제 매칭된 이미지2 좌표의 차이.
+//   이 오차가 thresh 이내면 inlier, 초과하면 outlier.
 //   3.0: 일반적인 값. ↓ 엄격, ↑ 느슨
 //
 // 반환: inlier 비율 (0.0~1.0). 0.5 이상이면 대체로 양호한 매칭.
+// 파라미터의 const 유무로 입력/출력을 구분:
+//   const &matches       → 읽기만 하는 입력 (이미 데이터가 채워져 있음)
+//   &inlier_matches      → 함수가 채울 출력 (빈 벡터로 넘기면 됨)
+//   &homography          → 함수가 채울 출력 (추정된 호모그래피 행렬)
 double FeatureMatchingBasic::filterRANSAC(const std::vector<cv::KeyPoint>& keypoints1,
                                           const std::vector<cv::KeyPoint>& keypoints2,
                                           const std::vector<cv::DMatch>& matches,
                                           std::vector<cv::DMatch>& inlier_matches,
                                           cv::Mat& homography, double ransac_thresh)
 {
+    // 호모그래피 계산에 최소 4점이 필요 (4점 × 2방정식 = 8 DOF)
+    // 부족하면 단위 행렬(변환 없음)을 반환 — 안전한 기본값
     if (matches.size() < 4)
     {
         homography = cv::Mat::eye(3, 3, CV_64F);
         return 0.0;
     }
 
-    // DMatch에서 2D 점 좌표 추출
-    //   queryIdx: desc1의 인덱스, trainIdx: desc2의 인덱스
+    // DMatch에서 2D 점 좌표(.pt)만 추출
+    //   queryIdx: desc1(이미지1)의 인덱스 — "매칭 상대를 찾아줘"라고 질문하는 쪽
+    //   trainIdx: desc2(이미지2)의 인덱스 — 검색 대상 데이터베이스 쪽
+    //   .pt: KeyPoint에서 (x, y) 좌표만 꺼냄 (findHomography가 Point2f를 요구)
     std::vector<cv::Point2f> points1, points2;
     for (const auto& match : matches)
     {
         points1.push_back(keypoints1[match.queryIdx].pt);
         points2.push_back(keypoints2[match.trainIdx].pt);
     }
+    // points1[i]와 points2[i]는 같은 인덱스끼리 매칭 쌍을 이룸
 
     // RANSAC으로 호모그래피 추정 + inlier/outlier 분류
+    // inlier_mask: 빈 벡터로 넘기면 findHomography가 결과를 채워주는 출력 파라미터
+    //   inlier_mask[i] = 1이면 inlier(H에 부합), 0이면 outlier
     std::vector<uchar> inlier_mask;
     homography = cv::findHomography(points1, points2, cv::RANSAC, ransac_thresh, inlier_mask);
 
     // inlier만 추출
+    // inlier_mask와 matches는 같은 순서로 만들어졌으므로 인덱스가 1:1 대응
     inlier_matches.clear();
     for (size_t i = 0; i < matches.size(); i++)
     {
+        // uchar 타입에서 0이면 false(outlier), 0이 아니면 true(inlier)
         if (inlier_mask[i])
         {
             inlier_matches.push_back(matches[i]);
