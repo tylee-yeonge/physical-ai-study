@@ -217,9 +217,17 @@ void problem4_homography_dlt()
         {150, 150}, {200, 180}
     };
 
-    // H_true로 변환하여 목적 포인트 생성
+    // [OpenCV] cv::perspectiveTransform(src_pts, dst_pts, H_true);
+    // 아래는 동일한 동작의 직접 구현 — H*p 행렬 곱 + 동차좌표 정규화
     std::vector<cv::Point2d> dst_pts;
-    cv::perspectiveTransform(src_pts, dst_pts, H_true);
+    for (const auto& pt : src_pts)
+    {
+        cv::Mat p = (cv::Mat_<double>(3, 1) << pt.x, pt.y, 1.0);
+        cv::Mat p2 = H_true * p;
+        dst_pts.push_back(cv::Point2d(
+            p2.at<double>(0) / p2.at<double>(2),
+            p2.at<double>(1) / p2.at<double>(2)));
+    }
 
     std::cout << "대응점 (6쌍):" << std::endl;
     for (size_t i = 0; i < src_pts.size(); i++)
@@ -362,12 +370,20 @@ void problem5_ransac_homography()
     // 성능 평가 — True Positive(올바른 inlier 검출), False Positive(outlier 오검출)
     if (!best_H.empty())
     {
-        std::vector<cv::Point2d> projected;
-        cv::perspectiveTransform(src_pts, projected, best_H);
+        // [OpenCV] cv::perspectiveTransform(src_pts, projected, best_H);
+        // [OpenCV] double err = cv::norm(projected[i] - dst_pts[i]);
+        // 아래는 동일한 동작의 직접 구현
         int tp = 0, fp = 0;
         for (int i = 0; i < total; i++)
         {
-            double err = cv::norm(projected[i] - dst_pts[i]);
+            cv::Mat p = (cv::Mat_<double>(3, 1) << src_pts[i].x, src_pts[i].y, 1.0);
+            cv::Mat p2 = best_H * p;
+            double w = p2.at<double>(2);
+            double proj_x = p2.at<double>(0) / w;
+            double proj_y = p2.at<double>(1) / w;
+            double dx = proj_x - dst_pts[i].x;
+            double dy = proj_y - dst_pts[i].y;
+            double err = std::sqrt(dx * dx + dy * dy);
             bool is_inlier = err < threshold;
             if (is_inlier && gt_mask[i]) tp++;
             if (is_inlier && !gt_mask[i]) fp++;

@@ -294,11 +294,19 @@ void problem5_homography_understanding()
                   << dst_x << ", " << dst_y << ")" << std::endl;
     }
 
-    // OpenCV perspectiveTransform으로 검증
+    // [OpenCV] cv::perspectiveTransform(src_pts, dst_pts, H);
+    // 아래는 동일한 동작의 직접 구현 — H*p 행렬 곱 + 동차좌표 정규화
     std::vector<cv::Point2d> dst_pts;
-    cv::perspectiveTransform(src_pts, dst_pts, H);
+    for (const auto& pt : src_pts)
+    {
+        cv::Mat p = (cv::Mat_<double>(3, 1) << pt.x, pt.y, 1.0);
+        cv::Mat p2 = H * p;
+        dst_pts.push_back(cv::Point2d(
+            p2.at<double>(0) / p2.at<double>(2),
+            p2.at<double>(1) / p2.at<double>(2)));
+    }
 
-    std::cout << "\n📊 OpenCV perspectiveTransform 검증:" << std::endl;
+    std::cout << "\n📊 직접 구현 perspectiveTransform 검증:" << std::endl;
     for (size_t i = 0; i < dst_pts.size(); i++)
     {
         std::cout << "   (" << src_pts[i].x << ", " << src_pts[i].y << ") → ("

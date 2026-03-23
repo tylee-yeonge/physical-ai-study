@@ -177,16 +177,41 @@ void problem3_matching_benchmark()
 
     std::cout << "특징점 개수: " << num_features << "개\n" << std::endl;
 
-    // ✅ 정답: BF 매칭 시간 측정
+    // [OpenCV] cv::BFMatcher bf_matcher(cv::NORM_HAMMING);
+    // [OpenCV] bf_matcher.match(desc1, desc2, bf_matches);
+    // ✅ 정답: BF 매칭 직접 구현 — 모든 쌍의 해밍 거리를 비교하여 최근접 탐색
     cv::Mat desc1(num_features, 32, CV_8U);
     cv::Mat desc2(num_features, 32, CV_8U);
     cv::randu(desc1, 0, 255);
     cv::randu(desc2, 0, 255);
 
     auto start_bf = std::chrono::high_resolution_clock::now();
-    cv::BFMatcher bf_matcher(cv::NORM_HAMMING);
     std::vector<cv::DMatch> bf_matches;
-    bf_matcher.match(desc1, desc2, bf_matches);
+    for (int i = 0; i < desc1.rows; i++)
+    {
+        int best_j = 0;
+        int best_dist = INT_MAX;
+        for (int j = 0; j < desc2.rows; j++)
+        {
+            // 해밍 거리: XOR 후 1인 비트 개수
+            int dist = 0;
+            for (int k = 0; k < desc1.cols; k++)
+            {
+                uint8_t xor_val = desc1.at<uint8_t>(i, k) ^ desc2.at<uint8_t>(j, k);
+                while (xor_val)
+                {
+                    dist += xor_val & 1;
+                    xor_val >>= 1;
+                }
+            }
+            if (dist < best_dist)
+            {
+                best_dist = dist;
+                best_j = j;
+            }
+        }
+        bf_matches.push_back(cv::DMatch(i, best_j, (float)best_dist));
+    }
     auto end_bf = std::chrono::high_resolution_clock::now();
     double bf_ms = std::chrono::duration<double, std::milli>(end_bf - start_bf).count();
 
@@ -219,6 +244,42 @@ void problem3_matching_benchmark()
     std::cout << "   특징점 < 500: BF로도 충분히 빠름" << std::endl;
     std::cout << "   특징점 > 1000: FLANN이 수 배~수십 배 빠름" << std::endl;
     std::cout << "   ORB-SLAM: 이진 디스크립터 + BF (해밍 거리가 빠르므로 BF도 실용적)" << std::endl;
+}
+
+// DLT 헬퍼 함수 — 대응점으로 Homography를 직접 추정
+// 문제4에서 구현 원리를 설명하고, 문제5의 RANSAC에서도 재사용
+cv::Mat compute_homography_dlt(const std::vector<cv::Point2d>& src,
+                               const std::vector<cv::Point2d>& dst)
+{
+    int n = (int)src.size();
+    if (n < 4) return cv::Mat();
+
+    cv::Mat A = cv::Mat::zeros(2 * n, 9, CV_64F);
+    for (int i = 0; i < n; i++)
+    {
+        double x = src[i].x, y = src[i].y;
+        double u = dst[i].x, v = dst[i].y;
+        A.at<double>(2 * i, 0) = -x;
+        A.at<double>(2 * i, 1) = -y;
+        A.at<double>(2 * i, 2) = -1;
+        A.at<double>(2 * i, 6) = u * x;
+        A.at<double>(2 * i, 7) = u * y;
+        A.at<double>(2 * i, 8) = u;
+        A.at<double>(2 * i + 1, 3) = -x;
+        A.at<double>(2 * i + 1, 4) = -y;
+        A.at<double>(2 * i + 1, 5) = -1;
+        A.at<double>(2 * i + 1, 6) = v * x;
+        A.at<double>(2 * i + 1, 7) = v * y;
+        A.at<double>(2 * i + 1, 8) = v;
+    }
+
+    cv::Mat S, U_svd, Vt;
+    cv::SVD::compute(A, S, U_svd, Vt);
+    cv::Mat h = Vt.row(Vt.rows - 1);
+    cv::Mat H = h.reshape(1, 3);
+    if (std::abs(H.at<double>(2, 2)) < 1e-10) return cv::Mat();
+    H /= H.at<double>(2, 2);
+    return H.clone();
 }
 
 // 문제 4: Homography DLT 직접 구현 — A행렬 구성 + SVD 분해
@@ -270,9 +331,17 @@ void problem4_homography_dlt()
         {150, 150}, {200, 180}
     };
 
-    // H_true로 변환하여 목적 포인트 생성
+    // [OpenCV] cv::perspectiveTransform(src_pts, dst_pts, H_true);
+    // H_true로 변환하여 목적 포인트 생성 — 직접 행렬 곱으로 변환
     std::vector<cv::Point2d> dst_pts;
-    cv::perspectiveTransform(src_pts, dst_pts, H_true);
+    for (const auto& pt : src_pts)
+    {
+        cv::Mat p = (cv::Mat_<double>(3, 1) << pt.x, pt.y, 1.0);
+        cv::Mat p2 = H_true * p;
+        dst_pts.push_back(cv::Point2d(
+            p2.at<double>(0) / p2.at<double>(2),
+            p2.at<double>(1) / p2.at<double>(2)));
+    }
 
     std::cout << "대응점 (6쌍):" << std::endl;
     for (size_t i = 0; i < src_pts.size(); i++)
@@ -281,39 +350,11 @@ void problem4_homography_dlt()
                   << dst_pts[i].x << ", " << dst_pts[i].y << ")" << std::endl;
     }
 
-    // TODO: DLT 구현
-    // 1. A 행렬 구성 (2*N x 9)
-    int N = (int)src_pts.size();
-    cv::Mat A = cv::Mat::zeros(2 * N, 9, CV_64F);
-
-    // 각 대응점 (x,y)↔(u,v)에 대해 2행 추가
-    //   행 2i:   [-x, -y, -1,  0,  0,  0, u*x, u*y, u]  ← u 방정식
-    //   행 2i+1: [ 0,  0,  0, -x, -y, -1, v*x, v*y, v]  ← v 방정식
-    for (int i = 0; i < N; i++)
-    {
-        double x = src_pts[i].x, y = src_pts[i].y;
-        double u = dst_pts[i].x, v = dst_pts[i].y;
-        // ✅ 정답: A 행렬 채우기
-        A.at<double>(2 * i, 0) = -x;
-        A.at<double>(2 * i, 1) = -y;
-        A.at<double>(2 * i, 2) = -1;
-        A.at<double>(2 * i, 6) = u * x;
-        A.at<double>(2 * i, 7) = u * y;
-        A.at<double>(2 * i, 8) = u;
-        A.at<double>(2 * i + 1, 3) = -x;
-        A.at<double>(2 * i + 1, 4) = -y;
-        A.at<double>(2 * i + 1, 5) = -1;
-        A.at<double>(2 * i + 1, 6) = v * x;
-        A.at<double>(2 * i + 1, 7) = v * y;
-        A.at<double>(2 * i + 1, 8) = v;
-    }
-
-    // ✅ 정답: SVD 분해 후 H 추출
-    cv::Mat S, U_svd, Vt;
-    cv::SVD::compute(A, S, U_svd, Vt);
-    cv::Mat h = Vt.row(Vt.rows - 1);
-    cv::Mat H_dlt = h.reshape(1, 3);
-    H_dlt /= H_dlt.at<double>(2, 2);
+    // [OpenCV] cv::Mat H_dlt = cv::findHomography(src_pts, dst_pts, 0);
+    // ✅ 정답: DLT 헬퍼 함수로 H 추정
+    // A 행렬 구성 (2N×9) → SVD 분해 → Vt 마지막 행 → 3×3 reshape
+    // 상세 구현은 compute_homography_dlt() 참조
+    cv::Mat H_dlt = compute_homography_dlt(src_pts, dst_pts);
 
     // OpenCV findHomography로 비교
     cv::Mat H_cv = cv::findHomography(src_pts, dst_pts);
@@ -442,18 +483,26 @@ void problem5_ransac_homography()
             dst_4.push_back(dst_pts[indices[k]]);
         }
 
-        // Step 2: 4개 점으로 H 추정
-        cv::Mat H_est = cv::findHomography(src_4, dst_4, 0);
+        // [OpenCV] cv::Mat H_est = cv::findHomography(src_4, dst_4, 0);
+        // Step 2: 4개 점으로 DLT 직접 구현하여 H 추정
+        cv::Mat H_est = compute_homography_dlt(src_4, dst_4);
         if (H_est.empty()) continue;
 
-        // Step 3-4: 모든 점에 적용 + inlier 카운트
-        std::vector<cv::Point2d> projected;
-        cv::perspectiveTransform(src_pts, projected, H_est);
-
+        // [OpenCV] cv::perspectiveTransform(src_pts, projected, H_est);
+        // [OpenCV] if (cv::norm(projected[i] - dst_pts[i]) < threshold) inlier_count++;
+        // Step 3-4: 직접 H*p 변환 + 재투영 오차로 inlier 카운트
         int inlier_count = 0;
         for (int i = 0; i < total; i++)
         {
-            if (cv::norm(projected[i] - dst_pts[i]) < threshold)
+            cv::Mat p = (cv::Mat_<double>(3, 1) << src_pts[i].x, src_pts[i].y, 1.0);
+            cv::Mat p2 = H_est * p;
+            double w = p2.at<double>(2);
+            if (std::abs(w) < 1e-10) continue;
+            double proj_x = p2.at<double>(0) / w;
+            double proj_y = p2.at<double>(1) / w;
+            double dx = proj_x - dst_pts[i].x;
+            double dy = proj_y - dst_pts[i].y;
+            if (std::sqrt(dx * dx + dy * dy) < threshold)
                 inlier_count++;
         }
 
@@ -471,12 +520,19 @@ void problem5_ransac_homography()
     // 성능 평가 — True Positive(올바른 inlier 검출), False Positive(outlier 오검출)
     if (!best_H.empty())
     {
-        std::vector<cv::Point2d> projected;
-        cv::perspectiveTransform(src_pts, projected, best_H);
         int tp = 0, fp = 0;
         for (int i = 0; i < total; i++)
         {
-            double err = cv::norm(projected[i] - dst_pts[i]);
+            // [OpenCV] cv::perspectiveTransform + cv::norm
+            // 직접 H*p 변환 + 유클리드 거리 계산
+            cv::Mat p = (cv::Mat_<double>(3, 1) << src_pts[i].x, src_pts[i].y, 1.0);
+            cv::Mat p2 = best_H * p;
+            double w = p2.at<double>(2);
+            double proj_x = p2.at<double>(0) / w;
+            double proj_y = p2.at<double>(1) / w;
+            double dx = proj_x - dst_pts[i].x;
+            double dy = proj_y - dst_pts[i].y;
+            double err = std::sqrt(dx * dx + dy * dy);
             bool is_inlier = err < threshold;
             if (is_inlier && gt_mask[i]) tp++;
             if (is_inlier && !gt_mask[i]) fp++;
@@ -498,11 +554,11 @@ void problem5_ransac_homography()
     std::cout << "   inlier: " << cv_inliers << " / " << total << "\n" << std::endl;
 
     std::cout << "💡 정답 해설:" << std::endl;
-    std::cout << "   [코드 핵심] RANSAC 루프 5단계:" << std::endl;
+    std::cout << "   [코드 핵심] RANSAC 루프 5단계 (모두 직접 구현):" << std::endl;
     std::cout << "   1. indices를 shuffle → 앞 4개 선택 (랜덤 최소 샘플)" << std::endl;
-    std::cout << "   2. findHomography(4pts, 0) → DLT로 H 추정 (RANSAC 없이)" << std::endl;
-    std::cout << "   3. perspectiveTransform으로 전체 점 변환" << std::endl;
-    std::cout << "   4. ||변환점 - 실제점|| < threshold → inlier 카운트" << std::endl;
+    std::cout << "   2. compute_homography_dlt(4pts) → DLT로 H 직접 추정" << std::endl;
+    std::cout << "   3. H*p 행렬 곱으로 전체 점 변환" << std::endl;
+    std::cout << "   4. sqrt(dx²+dy²) < threshold → inlier 카운트" << std::endl;
     std::cout << "   5. 최다 inlier 모델을 best_H로 갱신" << std::endl;
     std::cout << std::endl;
     std::cout << "   [예상 결과]" << std::endl;

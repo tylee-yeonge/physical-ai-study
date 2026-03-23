@@ -81,20 +81,56 @@ bool TriangulationBasic::triangulatePoint(const cv::Point2f& pt1, const cv::Poin
                                           const cv::Mat& P1, const cv::Mat& P2,
                                           cv::Point3f& point3d)
 {
-    std::vector<cv::Point2f> pts1 = {pt1};
-    std::vector<cv::Point2f> pts2 = {pt2};
+    // [OpenCV] cv::Mat points4D;
+    // [OpenCV] cv::triangulatePoints(P1, P2, {pt1}, {pt2}, points4D);
+    // [OpenCV] point3d = Point3f(points4D[0]/w, points4D[1]/w, points4D[2]/w);
+    // DLT 삼각측량을 직접 구현
+    //
+    // 원리: 각 카메라에서 p = P · X (p: 2D 동차, X: 3D 동차)
+    //   외적을 이용하여 p × (P · X) = 0 으로 정리하면
+    //   각 카메라에서 2개 독립 방정식이 나옴 → 총 4×4 행렬 A 구성
+    //
+    // A 행렬 구성 (4×4):
+    //   행 0: u1 * P1[2행] - P1[0행]   ← 카메라1의 x 방정식
+    //   행 1: v1 * P1[2행] - P1[1행]   ← 카메라1의 y 방정식
+    //   행 2: u2 * P2[2행] - P2[0행]   ← 카메라2의 x 방정식
+    //   행 3: v2 * P2[2행] - P2[1행]   ← 카메라2의 y 방정식
 
-    cv::Mat points4D;
-    cv::triangulatePoints(P1, P2, pts1, pts2, points4D);
+    // P를 double로 통일 (float으로 들어올 수 있으므로)
+    cv::Mat P1_d, P2_d;
+    P1.convertTo(P1_d, CV_64F);
+    P2.convertTo(P2_d, CV_64F);
 
-    // 동차 좌표 → 유클리드 좌표: w로 나눔
-    float w = points4D.at<float>(3, 0);
+    cv::Mat A(4, 4, CV_64F);
+    double u1 = pt1.x, v1 = pt1.y;
+    double u2 = pt2.x, v2 = pt2.y;
+
+    // 행 0: u1 * P1[2] - P1[0]
+    for (int c = 0; c < 4; c++)
+        A.at<double>(0, c) = u1 * P1_d.at<double>(2, c) - P1_d.at<double>(0, c);
+    // 행 1: v1 * P1[2] - P1[1]
+    for (int c = 0; c < 4; c++)
+        A.at<double>(1, c) = v1 * P1_d.at<double>(2, c) - P1_d.at<double>(1, c);
+    // 행 2: u2 * P2[2] - P2[0]
+    for (int c = 0; c < 4; c++)
+        A.at<double>(2, c) = u2 * P2_d.at<double>(2, c) - P2_d.at<double>(0, c);
+    // 행 3: v2 * P2[2] - P2[1]
+    for (int c = 0; c < 4; c++)
+        A.at<double>(3, c) = v2 * P2_d.at<double>(2, c) - P2_d.at<double>(1, c);
+
+    // SVD 분해: A·X = 0 의 최소 노름 해 = Vt 마지막 행
+    cv::Mat S, U, Vt;
+    cv::SVD::compute(A, S, U, Vt);
+
+    // 동차 좌표 [X, Y, Z, W] → 유클리드 좌표 (X/W, Y/W, Z/W)
+    cv::Mat X = Vt.row(3);  // 가장 작은 특이값에 대응하는 행
+    double w = X.at<double>(3);
     if (std::abs(w) < 1e-6)
         return false;
 
-    point3d.x = points4D.at<float>(0, 0) / w;
-    point3d.y = points4D.at<float>(1, 0) / w;
-    point3d.z = points4D.at<float>(2, 0) / w;
+    point3d.x = (float)(X.at<double>(0) / w);
+    point3d.y = (float)(X.at<double>(1) / w);
+    point3d.z = (float)(X.at<double>(2) / w);
 
     return true;
 }
@@ -111,24 +147,18 @@ void TriangulationBasic::triangulatePoints(const std::vector<cv::Point2f>& point
                                            const cv::Mat& P1, const cv::Mat& P2,
                                            std::vector<cv::Point3f>& points3d)
 {
+    // [OpenCV] cv::Mat points4D;
+    // [OpenCV] cv::triangulatePoints(P1, P2, points1, points2, points4D);
+    // 아래는 동일한 동작의 직접 구현 — 각 점 쌍에 대해 DLT 수행
     points3d.clear();
 
-    // OpenCV triangulatePoints: DLT 기반 삼각측량
-    // 입력: P1, P2 (3×4 투영 행렬), 2D 대응점
-    // 출력: 4×N 동차 좌표 행렬
-    cv::Mat points4D;
-    cv::triangulatePoints(P1, P2, points1, points2, points4D);
-
-    // 동차 좌표 [X, Y, Z, W] → 유클리드 좌표 (X/W, Y/W, Z/W)
-    for (int i = 0; i < points4D.cols; i++)
+    // 배치 삼각측량: 각 대응점 쌍에 대해 DLT 직접 수행
+    // (triangulatePoint가 DLT를 직접 구현하고 있음)
+    for (size_t i = 0; i < points1.size(); i++)
     {
-        float w = points4D.at<float>(3, i);
-        if (std::abs(w) > 1e-6)
+        cv::Point3f pt;
+        if (triangulatePoint(points1[i], points2[i], P1, P2, pt))
         {
-            cv::Point3f pt;
-            pt.x = points4D.at<float>(0, i) / w;
-            pt.y = points4D.at<float>(1, i) / w;
-            pt.z = points4D.at<float>(2, i) / w;
             points3d.push_back(pt);
         }
     }
@@ -319,7 +349,12 @@ void TriangulationBasic::demoPipeline(const cv::Mat& K, const cv::Mat& R, const 
     // 다양한 시차 값에 대해 깊이를 계산하여 역비례 관계를 확인
     std::cout << "\n6️⃣  Stereo Depth 계산 예제..." << std::endl;
 
-    double baseline = cv::norm(t);      // 두 카메라 간 거리 (미터)
+    // [OpenCV] double baseline = cv::norm(t);
+    // 벡터 노름 직접 계산: ||t|| = sqrt(tx² + ty² + tz²)
+    double baseline = std::sqrt(
+        t.at<double>(0) * t.at<double>(0) +
+        t.at<double>(1) * t.at<double>(1) +
+        t.at<double>(2) * t.at<double>(2));  // 두 카메라 간 거리 (미터)
     double focal = K.at<double>(0, 0);  // 초점거리 (픽셀)
 
     std::cout << "   베이스라인: " << baseline << " m" << std::endl;
@@ -369,7 +404,12 @@ int main()
 
     std::cout << "카메라 설정:" << std::endl;
     std::cout << "   초점거리: " << K.at<double>(0, 0) << " 픽셀" << std::endl;
-    std::cout << "   베이스라인: " << cv::norm(t) << " m\n" << std::endl;
+    // [OpenCV] double t_norm = cv::norm(t);
+    double t_norm = std::sqrt(
+        t.at<double>(0) * t.at<double>(0) +
+        t.at<double>(1) * t.at<double>(1) +
+        t.at<double>(2) * t.at<double>(2));
+    std::cout << "   베이스라인: " << t_norm << " m\n" << std::endl;
 
     // 💡 [교육] 삼각측량이란?
     std::cout << "💡 [교육] 삼각측량이란? (quiz 문제 2에서 사용!)" << std::endl;
@@ -379,8 +419,8 @@ int main()
     // 💡 [교육] Stereo Depth: 시차 → 깊이
     std::cout << "💡 [교육] Stereo Depth (quiz 문제 1에서 사용!):" << std::endl;
     std::cout << "   depth = baseline × focal / disparity" << std::endl;
-    double demo_depth = (cv::norm(t) * K.at<double>(0, 0)) / 30.0;
-    std::cout << "   예: baseline=" << cv::norm(t) << "m, focal=" << K.at<double>(0, 0)
+    double demo_depth = (t_norm * K.at<double>(0, 0)) / 30.0;
+    std::cout << "   예: baseline=" << t_norm << "m, focal=" << K.at<double>(0, 0)
               << ", disparity=30px → depth=" << std::fixed << std::setprecision(2) << demo_depth
               << "m" << std::endl;
     std::cout << "   시차↑ → 가까움, 시차↓ → 멀리, 시차=0 → 무한대\n" << std::endl;

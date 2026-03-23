@@ -52,8 +52,18 @@ void problem1_distance_metrics()
     cv::Mat orb_desc1 = (cv::Mat_<uchar>(1, 4) << 0b10110011, 0b11001100, 0b00111100, 0b11110000);
     cv::Mat orb_desc2 = (cv::Mat_<uchar>(1, 4) << 0b10110001, 0b11001100, 0b00111000, 0b11110000);
 
-    // ✅ 정답: 해밍 거리 계산
-    int hamming_dist = static_cast<int>(cv::norm(orb_desc1, orb_desc2, cv::NORM_HAMMING));
+    // [OpenCV] int hamming_dist = static_cast<int>(cv::norm(orb_desc1, orb_desc2, cv::NORM_HAMMING));
+    // ✅ 정답: 해밍 거리 계산 — XOR 후 1인 비트 개수를 직접 센다
+    int hamming_dist = 0;
+    for (int i = 0; i < orb_desc1.cols; i++)
+    {
+        uint8_t xor_val = orb_desc1.at<uint8_t>(0, i) ^ orb_desc2.at<uint8_t>(0, i);
+        while (xor_val)
+        {
+            hamming_dist += xor_val & 1;
+            xor_val >>= 1;
+        }
+    }
 
     std::cout << "ORB 디스크립터 (이진):" << std::endl;
     std::cout << "   디스크립터1: " << orb_desc1 << std::endl;
@@ -64,8 +74,15 @@ void problem1_distance_metrics()
     cv::Mat sift_desc1 = (cv::Mat_<float>(1, 4) << 0.5, 0.8, 0.3, 0.9);
     cv::Mat sift_desc2 = (cv::Mat_<float>(1, 4) << 0.6, 0.7, 0.4, 0.8);
 
-    // ✅ 정답: 유클리드 거리 계산
-    double euclidean_dist = cv::norm(sift_desc1, sift_desc2, cv::NORM_L2);
+    // [OpenCV] double euclidean_dist = cv::norm(sift_desc1, sift_desc2, cv::NORM_L2);
+    // ✅ 정답: 유클리드 거리 계산 — sqrt(Σ(a_i - b_i)²) 직접 계산
+    double sum_sq = 0.0;
+    for (int i = 0; i < sift_desc1.cols; i++)
+    {
+        double diff = sift_desc1.at<float>(0, i) - sift_desc2.at<float>(0, i);
+        sum_sq += diff * diff;
+    }
+    double euclidean_dist = std::sqrt(sum_sq);
 
     std::cout << "SIFT 디스크립터 (실수):" << std::endl;
     std::cout << "   디스크립터1: " << sift_desc1 << std::endl;

@@ -25,13 +25,63 @@ double FeatureMatchingBasic::matchBruteForce(const cv::Mat& descriptors1,
                                              const cv::Mat& descriptors2,
                                              std::vector<cv::DMatch>& matches, int normType)
 {
-    cv::BFMatcher matcher(normType, false);
+    // [OpenCV] cv::BFMatcher matcher(normType, false);
+    // [OpenCV] matcher.match(descriptors1, descriptors2, matches);
+    // 아래는 동일한 동작의 직접 구현
+    matches.clear();
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    // match(): desc1의 각 디스크립터에 대해 desc2에서 최근접 1개를 찾음 (KNN k=1)
-    // matches는 빈 벡터로 넘기면 OpenCV가 결과를 채워주는 출력 파라미터
-    matcher.match(descriptors1, descriptors2, matches);
+    // BF 매칭을 직접 구현: desc1의 각 디스크립터에 대해 desc2 전체를 순회하며
+    // 거리가 가장 작은 것을 찾는다 (KNN k=1의 전수 비교 버전)
+    for (int i = 0; i < descriptors1.rows; i++)
+    {
+        int best_j = 0;
+        float best_dist = std::numeric_limits<float>::max();
+
+        for (int j = 0; j < descriptors2.rows; j++)
+        {
+            float dist = 0.0f;
+
+            if (normType == cv::NORM_HAMMING)
+            {
+                // 해밍 거리: 바이트별 XOR → 1인 비트 개수 합산
+                int hamming = 0;
+                for (int k = 0; k < descriptors1.cols; k++)
+                {
+                    uint8_t xor_val = descriptors1.at<uint8_t>(i, k)
+                                    ^ descriptors2.at<uint8_t>(j, k);
+                    while (xor_val)
+                    {
+                        hamming += xor_val & 1;
+                        xor_val >>= 1;
+                    }
+                }
+                dist = (float)hamming;
+            }
+            else
+            {
+                // 유클리드(L2) 거리: sqrt(Σ(a_i - b_i)²)
+                double sum_sq = 0.0;
+                for (int k = 0; k < descriptors1.cols; k++)
+                {
+                    double diff = descriptors1.at<float>(i, k)
+                                - descriptors2.at<float>(j, k);
+                    sum_sq += diff * diff;
+                }
+                dist = (float)std::sqrt(sum_sq);
+            }
+
+            if (dist < best_dist)
+            {
+                best_dist = dist;
+                best_j = j;
+            }
+        }
+
+        // DMatch(queryIdx, trainIdx, distance)
+        matches.push_back(cv::DMatch(i, best_j, best_dist));
+    }
 
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
@@ -129,13 +179,56 @@ double FeatureMatchingBasic::matchFLANN(const cv::Mat& descriptors1, const cv::M
 int FeatureMatchingBasic::ratioTest(const cv::Mat& descriptors1, const cv::Mat& descriptors2,
                                     std::vector<cv::DMatch>& good_matches, float ratio_thresh)
 {
-    // kNN 매칭 — 각 디스크립터에 대해 가장 가까운 k=2개를 찾음
-    // BF 매처가 KNN을 전수 비교 방식으로 수행한다
-    cv::BFMatcher matcher(cv::NORM_HAMMING);
+    // [OpenCV] cv::BFMatcher matcher(cv::NORM_HAMMING);
+    // [OpenCV] matcher.knnMatch(descriptors1, descriptors2, knn_matches, 2);
+    // kNN(k=2) 매칭을 직접 구현 — 각 디스크립터에 대해 가장 가까운 2개를 찾음
+    // 1등(best)과 2등(second)의 거리 비율로 매칭 품질을 판단하기 위해 k=2 필요
     std::vector<std::vector<cv::DMatch>> knn_matches;
+    for (int i = 0; i < descriptors1.rows; i++)
+    {
+        // 1등, 2등 후보를 추적
+        int best_j = -1, second_j = -1;
+        float best_dist = std::numeric_limits<float>::max();
+        float second_dist = std::numeric_limits<float>::max();
 
-    // knn_matches는 빈 벡터로 넘기면 OpenCV가 결과를 채워주는 출력 파라미터
-    matcher.knnMatch(descriptors1, descriptors2, knn_matches, 2);
+        for (int j = 0; j < descriptors2.rows; j++)
+        {
+            // 해밍 거리 계산: XOR → popcount
+            int hamming = 0;
+            for (int k = 0; k < descriptors1.cols; k++)
+            {
+                uint8_t xor_val = descriptors1.at<uint8_t>(i, k)
+                                ^ descriptors2.at<uint8_t>(j, k);
+                while (xor_val)
+                {
+                    hamming += xor_val & 1;
+                    xor_val >>= 1;
+                }
+            }
+            float dist = (float)hamming;
+
+            // 1등, 2등 갱신
+            if (dist < best_dist)
+            {
+                second_dist = best_dist;
+                second_j = best_j;
+                best_dist = dist;
+                best_j = j;
+            }
+            else if (dist < second_dist)
+            {
+                second_dist = dist;
+                second_j = j;
+            }
+        }
+
+        std::vector<cv::DMatch> pair;
+        if (best_j >= 0)
+            pair.push_back(cv::DMatch(i, best_j, best_dist));
+        if (second_j >= 0)
+            pair.push_back(cv::DMatch(i, second_j, second_dist));
+        knn_matches.push_back(pair);
+    }
 
     good_matches.clear();
     for (const auto& match_pair : knn_matches)
