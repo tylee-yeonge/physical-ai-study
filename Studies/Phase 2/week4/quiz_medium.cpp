@@ -65,12 +65,13 @@ void problem1_optimal_ratio()
     // 4. 통과한 매칭 수와 통과율(pass_rate) 출력
 
     for (float ratio : ratios)
-    {
+    {    
         // TODO: ratio test 수행
         // good_matches: match_pair[0].distance < ratio * match_pair[1].distance 인 것만 선별
-        // pass_rate = 100.0 * good_matches.size() / knn_matches.size()
 
-        std::cout << " " << ratio << "  |     ???     |    ???" << std::endl;
+        // TODO: 통과율 계산 후 결과 출력
+        // pass_rate = 통과한 매칭 수 / 전체 KNN 매칭 수 × 100
+        // 출력 형식: " {ratio}  |     {good_matches 수}     |    {pass_rate}%"
     }
 
     std::cout << "\n💡 관찰:" << std::endl;
