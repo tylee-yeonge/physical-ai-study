@@ -194,27 +194,160 @@ void problem2_essential_matrix()
     // 카메라 내부 파라미터 (가상 — 실제로는 캘리브레이션 결과 사용)
     cv::Mat K = (cv::Mat_<double>(3, 3) << 600.0, 0.0, 400.0, 0.0, 600.0, 300.0, 0.0, 0.0, 1.0);
 
-    // ✅ 정답 TODO 1: Essential Matrix 추정
-    cv::Mat E = cv::findEssentialMat(points1, points2, K, cv::RANSAC, 0.999, 1.0);
-    std::cout << "Essential Matrix E:" << std::endl;
+    // ✅ 정답 TODO 1: Essential Matrix 추정 (8-Point Algorithm 직접 구현)
+    // [OpenCV] cv::Mat E = cv::findEssentialMat(points1, points2, K, cv::RANSAC, 0.999, 1.0);
+
+    // 1-1. 픽셀 좌표 → 정규화 좌표 변환: p_norm = K^{-1} * p_pixel
+    cv::Mat K_inv = K.inv();
+    std::vector<cv::Point2d> norm_pts1, norm_pts2;
+    for (size_t i = 0; i < points1.size(); i++)
+    {
+        cv::Mat p1 = (cv::Mat_<double>(3, 1) << points1[i].x, points1[i].y, 1.0);
+        cv::Mat p2 = (cv::Mat_<double>(3, 1) << points2[i].x, points2[i].y, 1.0);
+        cv::Mat n1 = K_inv * p1;
+        cv::Mat n2 = K_inv * p2;
+        norm_pts1.push_back(cv::Point2d(n1.at<double>(0), n1.at<double>(1)));
+        norm_pts2.push_back(cv::Point2d(n2.at<double>(0), n2.at<double>(1)));
+    }
+
+    // 1-2. 8-Point Algorithm: A행렬 구성
+    //   에피폴라 제약 p2^T * E * p1 = 0을 전개하면:
+    //   [x2*x1, x2*y1, x2, y2*x1, y2*y1, y2, x1, y1, 1] · e = 0
+    //   N개 대응점 → N×9 행렬 A, Ae = 0의 비자명 해 = SVD의 V^T 마지막 행
+    int N = (int)norm_pts1.size();
+    cv::Mat A(N, 9, CV_64F);
+    for (int i = 0; i < N; i++)
+    {
+        double x1 = norm_pts1[i].x, y1 = norm_pts1[i].y;
+        double x2 = norm_pts2[i].x, y2 = norm_pts2[i].y;
+        double* row = A.ptr<double>(i);
+        row[0] = x2 * x1;  row[1] = x2 * y1;  row[2] = x2;
+        row[3] = y2 * x1;  row[4] = y2 * y1;  row[5] = y2;
+        row[6] = x1;       row[7] = y1;        row[8] = 1.0;
+    }
+
+    // 1-3. SVD로 해 구하기
+    cv::Mat w_a, u_a, vt_a;
+    cv::SVD::compute(A, w_a, u_a, vt_a);
+    cv::Mat E_raw = vt_a.row(vt_a.rows - 1).reshape(0, 3);  // 마지막 행 → 3×3
+
+    // 1-4. rank-2 제약 적용: E의 특이값을 (1, 1, 0)으로 강제
+    //   Essential Matrix는 반드시 rank 2 (두 개의 동일 특이값 + 0)
+    cv::Mat w_e, u_e, vt_e;
+    cv::SVD::compute(E_raw, w_e, u_e, vt_e);
+    w_e.at<double>(2) = 0.0;  // 가장 작은 특이값을 0으로
+    double avg_sv = (w_e.at<double>(0) + w_e.at<double>(1)) / 2.0;
+    w_e.at<double>(0) = avg_sv;
+    w_e.at<double>(1) = avg_sv;
+    cv::Mat E = u_e * cv::Mat::diag(w_e) * vt_e;
+
+    std::cout << "Essential Matrix E (8-Point):" << std::endl;
     std::cout << E << std::endl;
 
-    // ✅ 정답 TODO 2: E에서 R, t 복원
-    cv::Mat R, t;
-    int inliers = cv::recoverPose(E, points1, points2, K, R, t);
-    std::cout << "\nRotation:\n" << R << std::endl;
-    std::cout << "Translation:\n" << t << std::endl;
-    std::cout << "Cheirality 통과 inlier: " << inliers << "개\n" << std::endl;
+    // ✅ 정답 TODO 2: E에서 R, t 복원 (SVD 분해 + Cheirality 검증)
+    // [OpenCV] cv::Mat R, t;
+    // [OpenCV] int inliers = cv::recoverPose(E, points1, points2, K, R, t);
 
-    std::cout << "💡 정답 해설:" << std::endl;
-    std::cout << "   [TODO 1: findEssentialMat]" << std::endl;
-    std::cout << "   - 대응점 + K로 Essential Matrix 추정" << std::endl;
-    std::cout << "   - RANSAC으로 아웃라이어 제거" << std::endl;
+    // 2-1. E = U * diag(1,1,0) * V^T 에서 R, t 후보 생성
+    //   W = [0 -1 0; 1 0 0; 0 0 1] (90도 회전)
+    //   R1 = U * W * V^T,   R2 = U * W^T * V^T
+    //   t1 = U의 3번째 열,  t2 = -t1
+    //   → 4가지 조합: (R1,t1), (R1,t2), (R2,t1), (R2,t2)
+    cv::Mat W = (cv::Mat_<double>(3, 3) << 0, -1, 0, 1, 0, 0, 0, 0, 1);
+
+    cv::Mat R1 = u_e * W * vt_e;
+    cv::Mat R2 = u_e * W.t() * vt_e;
+    cv::Mat t1 = u_e.col(2).clone();
+    cv::Mat t2 = -t1;
+
+    // det(R) = -1이면 부호 반전 (반사 행렬 방지)
+    if (cv::determinant(R1) < 0) R1 = -R1;
+    if (cv::determinant(R2) < 0) R2 = -R2;
+
+    // 2-2. Cheirality 검증: 삼각측량한 점이 두 카메라 앞(Z>0)에 있는 해 선택
+    std::vector<std::pair<cv::Mat, cv::Mat>> candidates = {
+        {R1, t1}, {R1, t2}, {R2, t1}, {R2, t2}
+    };
+
+    cv::Mat best_R, best_t;
+    int best_count = 0;
+
+    for (const auto& [Rc, tc] : candidates)
+    {
+        int positive_depth_count = 0;
+        for (int i = 0; i < N; i++)
+        {
+            // 간단한 깊이 부호 검사:
+            // 카메라1 기준: z1 > 0
+            // 카메라2 기준: z2 = (Rc * P + tc).z > 0
+            // 여기서는 에피폴라 제약으로 근사 검사
+            cv::Mat p1 = (cv::Mat_<double>(3, 1) << norm_pts1[i].x, norm_pts1[i].y, 1.0);
+            cv::Mat p2 = (cv::Mat_<double>(3, 1) << norm_pts2[i].x, norm_pts2[i].y, 1.0);
+
+            // 삼각측량 (간단한 중점법): 두 광선의 교차점 z 부호 확인
+            // P = [I|0], P' = [R|t]
+            cv::Mat A_tri(4, 3, CV_64F);
+            cv::Mat b_tri(4, 1, CV_64F);
+            // x1 = X/Z, y1 = Y/Z → X - x1*Z = 0, Y - y1*Z = 0
+            A_tri.at<double>(0, 0) = 1;  A_tri.at<double>(0, 1) = 0;  A_tri.at<double>(0, 2) = -p1.at<double>(0);
+            A_tri.at<double>(1, 0) = 0;  A_tri.at<double>(1, 1) = 1;  A_tri.at<double>(1, 2) = -p1.at<double>(1);
+            // x2 = (r1·X + tx) / (r3·X + tz) → 전개
+            cv::Mat row2 = Rc.row(0) - p2.at<double>(0) * Rc.row(2);
+            cv::Mat row3 = Rc.row(1) - p2.at<double>(1) * Rc.row(2);
+            row2.copyTo(A_tri.row(2));
+            row3.copyTo(A_tri.row(3));
+            b_tri.at<double>(0) = 0;
+            b_tri.at<double>(1) = 0;
+            b_tri.at<double>(2) = -(tc.at<double>(0) - p2.at<double>(0) * tc.at<double>(2));
+            b_tri.at<double>(3) = -(tc.at<double>(1) - p2.at<double>(1) * tc.at<double>(2));
+
+            cv::Mat X;
+            cv::solve(A_tri, b_tri, X, cv::DECOMP_SVD);
+
+            double z1 = X.at<double>(2);
+            cv::Mat X_cam2 = Rc * X + tc;
+            double z2 = X_cam2.at<double>(2);
+
+            if (z1 > 0 && z2 > 0)
+                positive_depth_count++;
+        }
+
+        if (positive_depth_count > best_count)
+        {
+            best_count = positive_depth_count;
+            best_R = Rc.clone();
+            best_t = tc.clone();
+        }
+    }
+
+    // t를 단위 벡터로 정규화
+    best_t = best_t / cv::norm(best_t);
+
+    std::cout << "\nRotation:\n" << best_R << std::endl;
+    std::cout << "Translation:\n" << best_t << std::endl;
+    std::cout << "Cheirality 통과: " << best_count << " / " << N << "개" << std::endl;
+
+    // OpenCV 결과와 비교
+    cv::Mat E_cv = cv::findEssentialMat(points1, points2, K, cv::RANSAC, 0.999, 1.0);
+    cv::Mat R_cv, t_cv;
+    cv::recoverPose(E_cv, points1, points2, K, R_cv, t_cv);
+    std::cout << "\n📊 OpenCV 비교:" << std::endl;
+    std::cout << "E (OpenCV):\n" << E_cv << std::endl;
+    std::cout << "R (OpenCV):\n" << R_cv << std::endl;
+    std::cout << "t (OpenCV):\n" << t_cv << std::endl;
+
+    std::cout << "\n💡 정답 해설:" << std::endl;
+    std::cout << "   [TODO 1: 8-Point Algorithm]" << std::endl;
+    std::cout << "   1. 픽셀 좌표 → 정규화 좌표 (K^{-1} 적용)" << std::endl;
+    std::cout << "   2. 에피폴라 제약 p2^T E p1 = 0 → A행렬(N×9) 구성" << std::endl;
+    std::cout << "   3. SVD(A)의 마지막 V행 → 3×3 reshape" << std::endl;
+    std::cout << "   4. rank-2 제약: 특이값을 (σ, σ, 0)으로 강제" << std::endl;
     std::cout << std::endl;
-    std::cout << "   [TODO 2: recoverPose]" << std::endl;
-    std::cout << "   - E를 SVD 분해 → R, t 4가지 조합" << std::endl;
-    std::cout << "   - cheirality 조건: 3D 점이 두 카메라 앞에 있는 해만 선택" << std::endl;
-    std::cout << "   - t는 단위 벡터 (방향만, 스케일 미지)" << std::endl;
+    std::cout << "   [TODO 2: E → R, t 분해]" << std::endl;
+    std::cout << "   1. E = U diag(1,1,0) V^T 에서 W 행렬로 R 후보 2개 생성" << std::endl;
+    std::cout << "   2. t 후보 = ±U의 3번째 열 → 총 4가지 (R,t) 조합" << std::endl;
+    std::cout << "   3. 각 조합으로 삼각측량 → Z>0인 점이 가장 많은 해 선택" << std::endl;
+    std::cout << "   4. t는 단위 벡터 (스케일 미지)" << std::endl;
     std::cout << std::endl;
     std::cout << "   [SLAM에서의 역할]" << std::endl;
     std::cout << "   Visual Odometry: 매 프레임 E → R,t → 누적하여 경로 추정" << std::endl;

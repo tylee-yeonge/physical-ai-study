@@ -170,15 +170,18 @@ void problem2_essential_matrix()
     // 카메라 내부 파라미터 (가상 — 실제로는 캘리브레이션 결과 사용)
     cv::Mat K = (cv::Mat_<double>(3, 3) << 600.0, 0.0, 400.0, 0.0, 600.0, 300.0, 0.0, 0.0, 1.0);
 
-    // TODO 1: Essential Matrix 추정
-    // - 대응점(points1, points2)과 카메라 행렬(K)로 E를 추정
-    // - RANSAC으로 아웃라이어를 제거하며 추정
+    // TODO 1: Essential Matrix 추정 (8-Point Algorithm)
+    // - 픽셀 좌표를 K^{-1}로 정규화 좌표로 변환
+    // - 에피폴라 제약 p2^T E p1 = 0을 전개하여 A행렬(N×9) 구성
+    // - SVD(A)의 마지막 V행을 3×3으로 reshape
+    // - rank-2 제약: SVD로 특이값을 (σ, σ, 0)으로 강제
 
     std::cout << "Essential Matrix E:" << std::endl;
 
-    // TODO 2: E에서 R, t 복원
-    // - E를 SVD 분해하여 회전(R)과 이동(t)을 복원
-    // - 4가지 해 중 양의 깊이 조건(cheirality)을 만족하는 해를 선택
+    // TODO 2: E에서 R, t 복원 (SVD 분해 + Cheirality)
+    // - E = U diag(1,1,0) V^T 에서 W=[0 -1 0; 1 0 0; 0 0 1]로 R 후보 2개
+    // - t 후보 = ±U의 3번째 열 → 총 4가지 (R,t) 조합
+    // - 각 조합으로 삼각측량하여 Z>0인 점이 가장 많은 해를 선택
 
     std::cout << "\n💡 SLAM에서의 의미:" << std::endl;
     std::cout << "   - E를 분해 → R (회전), t (이동)" << std::endl;
