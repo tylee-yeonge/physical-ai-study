@@ -68,10 +68,10 @@ void problem1_optimal_ratio()
     }
 
     // TODO 1: ORB 특징점 검출 + 디스크립터 추출
-    // - ORB::create(500)으로 검출기 생성 (최대 500개 특징점)
-    // - detectAndCompute(img, noArray(), kp, desc)로 키포인트 + 디스크립터 한 번에 추출
+    // - ORB 검출기를 생성하고 (최대 500개 특징점)
+    // - 각 이미지에서 키포인트와 디스크립터를 한 번에 추출
     //   kp: 특징점 위치/스케일/방향 정보
-    //   desc: 32바이트(256비트) 이진 디스크립터 벡터 (CV_8U)
+    //   desc: 32바이트(256비트) 이진 디스크립터 벡터
     std::vector<cv::KeyPoint> kp1, kp2;
     cv::Mat desc1, desc2;
 
@@ -79,21 +79,21 @@ void problem1_optimal_ratio()
               << "box_in_scene.png (" << kp2.size() << " 특징점)\n" << std::endl;
 
     // TODO 2: KNN 매칭 수행 (k=2)
-    // - BFMatcher(cv::NORM_HAMMING)으로 매처 생성
-    //   NORM_HAMMING: 이진 디스크립터(ORB)의 거리 = XOR 후 1인 비트 수(popcount)
-    //   (SIFT/SURF 같은 실수 디스크립터는 NORM_L2 사용)
-    // - knnMatch(desc1, desc2, knn_matches, 2)로 각 디스크립터마다 가장 가까운 2개 후보 탐색
+    // - 해밍 거리 기반의 전수 비교 매처 생성
+    //   해밍 거리: 이진 디스크립터(ORB)의 거리 = XOR 후 1인 비트 수(popcount)
+    //   (SIFT/SURF 같은 실수 디스크립터는 L2 거리 사용)
+    // - 각 디스크립터마다 가장 가까운 2개 후보를 탐색 (k=2)
     //   왜 2개? → ratio test에서 1등(best)과 2등(second_best)의 거리를 비교하기 위해
     std::vector<std::vector<cv::DMatch>> knn_matches;
 
     for (float ratio : ratios)
     {
         // TODO 3: ratio test 수행
-        // - 각 매칭 쌍(match_pair)에서 1등과 2등의 거리를 비교:
-        //   match_pair[0].distance < ratio * match_pair[1].distance → 통과
+        // - 각 매칭 쌍에서 1등과 2등의 거리를 비교:
+        //   1등 거리 < ratio × 2등 거리 → 통과
         // - 의미: 1등이 2등보다 "충분히" 가까워야 신뢰할 수 있는 매칭
         //   (1등과 2등이 비슷하면 → 어느 쪽이 진짜인지 불확실 → 버림)
-        // - match_pair.size() < 2인 경우는 건너뛰기
+        // - 후보가 2개 미만인 경우는 건너뛰기
         std::vector<cv::DMatch> good_matches;
 
 
@@ -272,14 +272,14 @@ void problem3_matching_benchmark()
     //   이진 디스크립터의 해밍 거리: XOR 후 1인 비트 수 (popcount)
     //
     // 구현 방법:
-    //   1. 랜덤 이진 디스크립터 2세트 생성 (cv::Mat, CV_8U, 32열)
-    //   2. chrono로 시작 시간 기록
+    //   1. 랜덤 이진 디스크립터 2세트 생성 (부호 없는 8비트, 32열)
+    //   2. 시작 시간 기록
     //   3. 이중 for문: desc1의 각 행 i에 대해 desc2의 모든 행 j와 해밍 거리 비교
     //      해밍 거리 = 바이트별 XOR → 비트 카운트 합산
     //   4. 가장 거리가 작은 j를 best match로 기록
-    //   5. chrono로 종료 시간 기록 → 소요 시간(ms) 계산
+    //   5. 종료 시간 기록 → 소요 시간(ms) 계산
     //
-    // 또는 간단하게: BFMatcher(NORM_HAMMING).match(desc1, desc2, matches)로도 측정 가능
+    // 또는 간단하게: 해밍 거리 기반 전수 비교 매처로도 측정 가능
 
     // TODO: FLANN 매칭 시간 측정
     //
@@ -288,9 +288,9 @@ void problem3_matching_benchmark()
     //   정확도 ~99%이지만 속도가 수 배~수십 배 빠름
     //
     // 구현 방법:
-    //   1. FLANN은 CV_32F만 지원 → desc.convertTo(desc_f, CV_32F)로 변환 필요
-    //   2. FlannBasedMatcher로 매처 생성
-    //   3. chrono로 시간 측정하며 match() 호출
+    //   1. FLANN은 실수형(32비트 float)만 지원 → 디스크립터 타입 변환 필요
+    //   2. FLANN 기반 매처 생성
+    //   3. 시간 측정하며 매칭 수행
     //   4. BF 시간과 비교하여 속도비 계산
 
     std::cout << "매칭 알고리즘  |  시간 (ms)  |  속도비" << std::endl;
@@ -390,7 +390,7 @@ void problem4_homography_dlt()
     //   행 2i:   [-x, -y, -1,  0,  0,  0, u*x, u*y, u]  ← u 방정식
     //   행 2i+1: [ 0,  0,  0, -x, -y, -1, v*x, v*y, v]  ← v 방정식
     //
-    // A.at<double>(행, 열) = 값 형태로 채우기
+    // A 행렬의 해당 위치에 값을 채우기
     for (int i = 0; i < N; i++)
     {
         double x = src_pts[i].x, y = src_pts[i].y;
@@ -400,11 +400,11 @@ void problem4_homography_dlt()
 
     // --- Step 2: SVD 분해 후 H 추출 ---
     cv::Mat H_dlt = cv::Mat::eye(3, 3, CV_64F);
-    // cv::SVD::compute(A, S, U, Vt)로 A를 분해
+    // A를 SVD로 분해
     // Ah = 0의 비자명 해 = ||h||=1 조건에서 ||Ah||를 최소화하는 벡터
-    //   = Vt의 마지막 행 (가장 작은 특이값에 대응하는 오른쪽 특이벡터)
-    // 이 1×9 벡터를 .reshape(1, 3)으로 3×3 행렬로 변환
-    // H(2,2)로 나누어 정규화 (h33 = 1 관례)
+    //   = V^T의 마지막 행 (가장 작은 특이값에 대응하는 오른쪽 특이벡터)
+    // 이 1×9 벡터를 3×3 행렬로 재배열
+    // h33으로 나누어 정규화 (h33 = 1 관례)
 
     // OpenCV findHomography로 비교
     cv::Mat H_cv = cv::findHomography(src_pts, dst_pts);
@@ -512,13 +512,13 @@ void problem5_ransac_homography()
 
     // --- RANSAC 5단계 구현 가이드 ---
     //
-    // 준비: 0~total-1 인덱스 배열 생성 (std::iota), 셔플용
+    // 준비: 0~total-1 인덱스 배열 생성, 셔플용
     //
-    // for (iter = 0; iter < max_iters; iter++):
+    // 반복 (max_iters회):
     //
     //   Step 1: 랜덤 4개 대응점 선택
-    //     std::shuffle(indices)로 섞은 뒤 앞 4개 인덱스 사용
-    //     → src_4, dst_4에 해당 점들을 담기
+    //     인덱스 배열을 랜덤 셔플한 뒤 앞 4개 사용
+    //     → 해당 인덱스의 src, dst 점들을 담기
     //
     //   Step 2: DLT로 H 추정
     //     4개 점으로 문제4의 DLT 알고리즘 수행 (함수로 분리하면 재사용 편리)
