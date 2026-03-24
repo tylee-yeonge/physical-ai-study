@@ -69,7 +69,9 @@ void problem1_cube_projection()
     }
 
     // ✅ 정답: 이미지에 큐브 그리기
-    cv::Mat image = cv::Mat::zeros(600, 800, CV_8UC3);
+    const int kImageHeight = 600;
+    const int kImageWidth = 800;
+    cv::Mat image = cv::Mat::zeros(kImageHeight, kImageWidth, CV_8UC3);
 
     // 앞면 (초록)
     for (int i = 0; i < 4; i++)

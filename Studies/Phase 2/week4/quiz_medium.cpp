@@ -144,7 +144,8 @@ void problem2_essential_matrix()
         return;
     }
 
-    auto orb = cv::ORB::create(500);
+    const int kMaxFeatures = 500;  // ORB 최대 특징점 수
+    auto orb = cv::ORB::create(kMaxFeatures);
     std::vector<cv::KeyPoint> kp1, kp2;
     cv::Mat desc1, desc2;
     orb->detectAndCompute(img1, cv::noArray(), kp1, desc1);
@@ -184,18 +185,18 @@ void problem2_essential_matrix()
     //   K^{-1}을 곱하면 카메라 의존성이 제거된 "정규화 좌표"가 된다:
     //     x_norm = (u - cx) / fx,  y_norm = (v - cy) / fy
     //   → "카메라 앞 1m 평면"의 좌표. 에피폴라 제약 p2^T·E·p1 = 0은 여기서만 성립.
-    //
+
     // --- 단계 1-2: A행렬 구성 (N×9) ---
     //   에피폴라 제약 p2^T·E·p1 = 0을 전개하면:
     //     E를 9×1 벡터 e로 펼쳤을 때, 각 대응점마다 1개 방정식이 나온다:
     //     [x2*x1, x2*y1, x2, y2*x1, y2*y1, y2, x1, y1, 1] · e = 0
     //   N개 대응점 → N×9 행렬 A → Ae = 0 풀기
-    //
+    
     // --- 단계 1-3: SVD로 해 구하기 ---
     //   Ae = 0 → "A에 곱했을 때 가장 0에 가까운 벡터"
     //   SVD(A) = U·S·V^T 에서 V^T의 마지막 행이 해
     //   이 9×1 벡터를 3×3으로 reshape → E의 초기 추정값
-    //
+
     // --- 단계 1-4: rank-2 제약 적용 ---
     //   E = [t]×·R 이므로 수학적으로 rank 2여야 한다.
     //   노이즈 때문에 1-3의 결과는 rank 3일 수 있으므로:
@@ -206,7 +207,7 @@ void problem2_essential_matrix()
 
     // TODO 2: E에서 R, t 복원 (SVD 분해 + Cheirality 검증)
     // [OpenCV 원라이너] int inliers = cv::recoverPose(E, points1, points2, K, R, t);
-    //
+    
     // --- 단계 2-1: R, t 후보 생성 ---
     //   E의 SVD: E = U·diag(σ,σ,0)·V^T (TODO 1에서 이미 분해됨)
     //   W 행렬 (Z축 90도 회전): W = [0 -1 0; 1 0 0; 0 0 1]
@@ -214,7 +215,7 @@ void problem2_essential_matrix()
     //   t 후보 2개: t1 = +U의 3번째 열, t2 = -U의 3번째 열
     //   → 총 4가지 (R,t) 조합. 물리적으로 유효한 것은 1개뿐.
     //   주의: det(R) < 0이면 거울 반사 → R = -R로 보정
-    //
+    
     // --- 단계 2-2: Cheirality 검증 ---
     //   "삼각측량한 3D 점이 두 카메라 모두의 앞에 있는가?" (Z > 0)
     //   각 (R,t) 조합에 대해:
@@ -379,8 +380,9 @@ void problem4_homography_dlt()
     //   → H의 9개 원소를 미지수로, 대응점마다 2개 방정식을 세워서 Ah = 0 형태로 풀기
     //
     // --- Step 1: A 행렬 구성 (2N × 9) ---
-    int N = (int)src_pts.size();
-    cv::Mat A = cv::Mat::zeros(2 * N, 9, CV_64F);
+    int N = static_cast<int>(src_pts.size());
+    const int kHomographyParams = 3 * 3;  // H 행렬(3×3)의 원소 수
+    cv::Mat A = cv::Mat::zeros(2 * N, kHomographyParams, CV_64F);
 
     // 각 대응점 (x,y) ↔ (u,v)에서 투영 방정식을 전개하면 2개 행이 나온다:
     //

@@ -48,7 +48,9 @@ void problem1_fast_threshold()
     if (image.empty())
     {
         // 이미지 없으면 체커보드 생성
-        image = cv::Mat::zeros(600, 800, CV_8UC1);
+        const int kImageHeight = 600;
+        const int kImageWidth = 800;
+        image = cv::Mat::zeros(kImageHeight, kImageWidth, CV_8UC1);
         for (int i = 0; i < 12; i++)
         {
             for (int j = 0; j < 16; j++)
@@ -119,7 +121,9 @@ void problem2_orb_descriptor()
     std::cout << "문제 2: ORB 디스크립터 분석" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    cv::Mat image = cv::Mat::zeros(400, 600, CV_8UC1);
+    const int kImageHeight = 400;
+    const int kImageWidth = 600;
+    cv::Mat image = cv::Mat::zeros(kImageHeight, kImageWidth, CV_8UC1);
     cv::circle(image, cv::Point(300, 200), 100, cv::Scalar(255), -1);
 
     // ORB 검출기 생성 — nfeatures=100: 최대 100개의 특징점만 검출
@@ -130,7 +134,8 @@ void problem2_orb_descriptor()
     //   값이 클수록 매칭 정확도 ↑ but 계산량 ↑
     //   값이 작을수록 속도 ↑ but 매칭 실패 가능성 ↑
     //   create()의 디폴트는 500
-    cv::Ptr<cv::ORB> orb = cv::ORB::create(100);
+    const int kMaxFeatures = 100;  // ORB 최대 특징점 수
+    cv::Ptr<cv::ORB> orb = cv::ORB::create(kMaxFeatures);
     std::vector<cv::KeyPoint> keypoints;
     cv::Mat descriptors;
 
@@ -198,7 +203,9 @@ void problem3_nms_effect()
     std::cout << "문제 3: NMS 효과 분석" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    cv::Mat image = cv::Mat::zeros(400, 600, CV_8UC1);
+    const int kImageHeight = 400;
+    const int kImageWidth = 600;
+    cv::Mat image = cv::Mat::zeros(kImageHeight, kImageWidth, CV_8UC1);
     for (int i = 0; i < 8; i++)
     {
         for (int j = 0; j < 12; j++)
@@ -273,7 +280,9 @@ void problem4_speed_comparison()
     std::cout << "문제 4: 검출기 속도 비교" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    cv::Mat image = cv::Mat::zeros(600, 800, CV_8UC3);
+    const int kImageHeight = 600;
+    const int kImageWidth = 800;
+    cv::Mat image = cv::Mat::zeros(kImageHeight, kImageWidth, CV_8UC3);
     for (int i = 0; i < 50; i++)
     {
         cv::Point center(rand() % 800, rand() % 600);

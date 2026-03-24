@@ -252,7 +252,9 @@ void OpticalFlowBasic::demoFeatureTracking(const std::string& video_path)
 
     for (int i = 0; i < num_frames; i++)
     {
-        cv::Mat frame = cv::Mat::zeros(480, 640, CV_8UC1);
+        const int kFrameHeight = 480;
+        const int kFrameWidth = 640;
+        cv::Mat frame = cv::Mat::zeros(kFrameHeight, kFrameWidth, CV_8UC1);
 
         // 움직이는 원: 매 프레임 X+50px 이동 → LK가 추적해야 하는 대상
         cv::circle(frame, cv::Point(100 + i * 50, 240), 30, cv::Scalar(255), -1);
@@ -338,8 +340,10 @@ void OpticalFlowBasic::demoPipeline()
     // frame2: 원이 (250, 220)으로 이동 → Δx=50, Δy=20
     std::cout << "1️⃣  테스트 프레임 생성..." << std::endl;
 
-    cv::Mat frame1 = cv::Mat::zeros(400, 600, CV_8UC1);
-    cv::Mat frame2 = cv::Mat::zeros(400, 600, CV_8UC1);
+    const int kFrameHeight = 400;
+    const int kFrameWidth = 600;
+    cv::Mat frame1 = cv::Mat::zeros(kFrameHeight, kFrameWidth, CV_8UC1);
+    cv::Mat frame2 = cv::Mat::zeros(kFrameHeight, kFrameWidth, CV_8UC1);
 
     cv::circle(frame1, cv::Point(200, 200), 50, cv::Scalar(255), -1);
     cv::circle(frame2, cv::Point(250, 220), 50, cv::Scalar(255), -1);

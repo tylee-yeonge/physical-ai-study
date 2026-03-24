@@ -257,7 +257,8 @@ void EpipolarGeometryBasic::demoPipeline(const cv::Mat& img1, const cv::Mat& img
     // Step 1: ORB 특징점 검출 + BF 매칭 + Lowe's Ratio Test
     std::cout << "1️⃣  특징점 검출 및 매칭..." << std::endl;
 
-    cv::Ptr<cv::ORB> orb = cv::ORB::create(500);
+    const int kMaxFeatures = 500;  // ORB 최대 특징점 수
+    cv::Ptr<cv::ORB> orb = cv::ORB::create(kMaxFeatures);
     std::vector<cv::KeyPoint> kp1, kp2;
     cv::Mat desc1, desc2;
 
@@ -390,8 +391,10 @@ int main()
 
     // 테스트 이미지 생성: 50×50 체커보드 패턴
     // 특징점 검출에 적합한 풍부한 에지/코너 텍스처
-    cv::Mat img1 = cv::Mat::zeros(600, 800, CV_8UC1);
-    cv::Mat img2 = cv::Mat::zeros(600, 800, CV_8UC1);
+    const int kImageHeight = 600;
+    const int kImageWidth = 800;
+    cv::Mat img1 = cv::Mat::zeros(kImageHeight, kImageWidth, CV_8UC1);
+    cv::Mat img2 = cv::Mat::zeros(kImageHeight, kImageWidth, CV_8UC1);
 
     for (int i = 0; i < 12; i++)
     {

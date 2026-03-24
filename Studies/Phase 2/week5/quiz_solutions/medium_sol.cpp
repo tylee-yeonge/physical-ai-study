@@ -225,7 +225,8 @@ void problem4_eight_point_algorithm()
     hartley_normalize(pts2, pts2_n, T2);
 
     // ✅ 정답 2: A 행렬 (N×9) 구성
-    cv::Mat A(n, 9, CV_64F);
+    const int kFundamentalParams = 3 * 3;  // F 행렬(3×3)의 원소 수
+    cv::Mat A(n, kFundamentalParams, CV_64F);
     for (int i = 0; i < n; i++)
     {
         double u1 = pts1_n[i].x, v1_val = pts1_n[i].y;

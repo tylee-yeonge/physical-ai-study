@@ -145,8 +145,9 @@ void FeatureDetectionBasic::compareDetectors(const cv::Mat& image)
     std::cout << "   - 특징점 개수: " << count_fast << std::endl;
     std::cout << "   - 특징: 매우 빠름, 코너 검출, 디스크립터 없음\n" << std::endl;
 
+    const int kMaxFeatures = 500;  // ORB 최대 특징점 수
     keypoints.clear();
-    double time_orb = detectORB(image, keypoints, descriptors, 500);
+    double time_orb = detectORB(image, keypoints, descriptors, kMaxFeatures);
     int count_orb = keypoints.size();
 
     std::cout << "📍 ORB:" << std::endl;
@@ -197,7 +198,9 @@ int main()
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
     // 테스트 이미지 생성 (체커보드 패턴)
-    cv::Mat test_img = cv::Mat::zeros(600, 800, CV_8UC3);
+    const int kImageHeight = 600;
+    const int kImageWidth = 800;
+    cv::Mat test_img = cv::Mat::zeros(kImageHeight, kImageWidth, CV_8UC3);
     int sq = 50;
     for (int i = 0; i < test_img.rows; i += sq)
     {
@@ -237,7 +240,8 @@ int main()
     std::cout << "\nStep 2: detectORB" << std::endl;
     std::vector<cv::KeyPoint> kp_orb;
     cv::Mat desc;
-    double t_orb = FeatureDetectionBasic::detectORB(test_img, kp_orb, desc, 500);
+    const int kMaxFeaturesOrb = 500;  // ORB 최대 특징점 수
+    double t_orb = FeatureDetectionBasic::detectORB(test_img, kp_orb, desc, kMaxFeaturesOrb);
     std::cout << "   특징점: " << kp_orb.size() << "개, 시간: " << t_orb << " ms"
               << (kp_orb.size() > 0 ? " ✅" : " ❌ 기대: > 0개") << std::endl;
     std::cout << "   디스크립터: " << desc.size()

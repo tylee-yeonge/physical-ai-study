@@ -46,7 +46,9 @@ void problem1_uniform_distribution()
     std::cout << "문제 1: 균등한 특징점 분포 구현" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    cv::Mat image = cv::Mat::zeros(600, 800, CV_8UC1);
+    const int kImageHeight = 600;
+    const int kImageWidth = 800;
+    cv::Mat image = cv::Mat::zeros(kImageHeight, kImageWidth, CV_8UC1);
     // 테스트 패턴: 왼쪽에 많은 특징
     for (int i = 0; i < 12; i++)
     {
@@ -139,7 +141,9 @@ void problem2_adaptive_threshold()
     std::cout << "문제 2: 적응형 임계값" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    cv::Mat image = cv::Mat::zeros(600, 800, CV_8UC1);
+    const int kImageHeight = 600;
+    const int kImageWidth = 800;
+    cv::Mat image = cv::Mat::zeros(kImageHeight, kImageWidth, CV_8UC1);
     for (int i = 0; i < 50; i++)
     {
         cv::Point center(rand() % 800, rand() % 600);
@@ -217,7 +221,9 @@ void problem3_multiscale_detection()
     std::cout << "문제 3: 멀티스케일 검출" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    cv::Mat image = cv::Mat::zeros(600, 800, CV_8UC1);
+    const int kImageHeight = 600;
+    const int kImageWidth = 800;
+    cv::Mat image = cv::Mat::zeros(kImageHeight, kImageWidth, CV_8UC1);
     // 다양한 크기의 원
     cv::circle(image, cv::Point(200, 200), 80, cv::Scalar(255), -1);
     cv::circle(image, cv::Point(500, 300), 40, cv::Scalar(255), -1);
@@ -305,7 +311,8 @@ void problem4_harris_implementation()
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
     // 테스트 이미지 생성 (체커보드)
-    cv::Mat image = cv::Mat::zeros(400, 400, CV_8UC1);
+    const int kImageSize = 400;
+    cv::Mat image = cv::Mat::zeros(kImageSize, kImageSize, CV_8UC1);
     for (int i = 0; i < 8; i++)
     {
         for (int j = 0; j < 8; j++)
@@ -408,7 +415,8 @@ void problem5_nms_implementation()
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
     // 테스트 이미지 + Harris 응답 계산
-    cv::Mat image = cv::Mat::zeros(400, 400, CV_8UC1);
+    const int kImageSize = 400;
+    cv::Mat image = cv::Mat::zeros(kImageSize, kImageSize, CV_8UC1);
     for (int i = 0; i < 8; i++)
     {
         for (int j = 0; j < 8; j++)

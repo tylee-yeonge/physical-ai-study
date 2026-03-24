@@ -191,7 +191,9 @@ int main()
     std::cout << "\nStep 5: visualizePnP" << std::endl;
     if (pnp_ok)
     {
-        cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC1);
+        const int kImageHeight = 600;
+        const int kImageWidth = 800;
+        cv::Mat img = cv::Mat::zeros(kImageHeight, kImageWidth, CV_8UC1);
         cv::Mat vis;
         PnPBasic::visualizePnP(img, pts3d, pts2d, K, rvec_est, tvec_est, vis);
         std::cout << "   출력 이미지: "

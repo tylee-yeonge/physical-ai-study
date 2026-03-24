@@ -153,7 +153,9 @@ int main()
 
     // ── Step 4: undistortImage ──────────────────
     std::cout << "\nStep 4: undistortImage" << std::endl;
-    cv::Mat test_img = cv::Mat::zeros(600, 800, CV_8UC3);
+    const int kImageHeight = 600;
+    const int kImageWidth = 800;
+    cv::Mat test_img = cv::Mat::zeros(kImageHeight, kImageWidth, CV_8UC3);
     cv::Mat undist;
     cv::Mat K_test = (cv::Mat_<double>(3, 3) << 600, 0, 400, 0, 600, 300, 0, 0, 1);
     cv::Mat dist_test = (cv::Mat_<double>(1, 5) << -0.2, 0.05, 0, 0, 0);
@@ -166,7 +168,9 @@ int main()
 
     // ── Step 5: detectChessboard ────────────────
     std::cout << "\nStep 5: detectChessboard" << std::endl;
-    cv::Mat empty_img = cv::Mat::zeros(480, 640, CV_8UC1);
+    const int kEmptyHeight = 480;
+    const int kEmptyWidth = 640;
+    cv::Mat empty_img = cv::Mat::zeros(kEmptyHeight, kEmptyWidth, CV_8UC1);
     std::vector<cv::Point2f> corners;
     bool detected = calib.detectChessboard(empty_img, corners);
     std::cout << "   빈 이미지 검출: " << (detected ? "true" : "false")

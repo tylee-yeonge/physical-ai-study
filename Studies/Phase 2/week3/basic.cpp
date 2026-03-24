@@ -160,7 +160,8 @@ void FeatureDetectionBasic::compareDetectors(const cv::Mat& image)
 
     // 2. ORB
     keypoints.clear();
-    double time_orb = detectORB(image, keypoints, descriptors, 500);
+    const int kMaxFeatures = 500;  // ORB/SIFT 최대 특징점 수
+    double time_orb = detectORB(image, keypoints, descriptors, kMaxFeatures);
     int count_orb = keypoints.size();
 
     std::cout << "📍 ORB:" << std::endl;
@@ -172,7 +173,7 @@ void FeatureDetectionBasic::compareDetectors(const cv::Mat& image)
     // 3. SIFT (참고 - 특허 만료로 OpenCV 4.x에서 사용 가능)
     try
     {
-        cv::Ptr<cv::SIFT> sift = cv::SIFT::create(500);
+        cv::Ptr<cv::SIFT> sift = cv::SIFT::create(kMaxFeatures);
         keypoints.clear();
 
         auto start = std::chrono::high_resolution_clock::now();
@@ -240,7 +241,9 @@ int main()
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
     // 테스트 이미지 생성 (체커보드 패턴)
-    cv::Mat test_image = cv::Mat::zeros(600, 800, CV_8UC3);
+    const int kImageHeight = 600;
+    const int kImageWidth = 800;
+    cv::Mat test_image = cv::Mat::zeros(kImageHeight, kImageWidth, CV_8UC3);
 
     // 체커보드 패턴 그리기
     int square_size = 50;

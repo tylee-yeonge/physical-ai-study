@@ -141,7 +141,9 @@ int main()
     // ── Step 4: ratioTest ───────────────────────
     std::cout << "\nStep 4: ratioTest" << std::endl;
     // 실제 이미지로 테스트 (동일 디스크립터는 ratio test 의미 없음)
-    cv::Mat img1 = cv::Mat::zeros(400, 600, CV_8UC1);
+    const int kImageHeight = 400;
+    const int kImageWidth = 600;
+    cv::Mat img1 = cv::Mat::zeros(kImageHeight, kImageWidth, CV_8UC1);
     for (int i = 0; i < 8; i++)
     {
         for (int j = 0; j < 12; j++)
@@ -159,7 +161,8 @@ int main()
     M.at<double>(1, 2) += 20;
     cv::warpAffine(img1, img2, M, img1.size());
 
-    cv::Ptr<cv::ORB> orb = cv::ORB::create(500);
+    const int kMaxFeatures = 500;  // ORB 최대 특징점 수
+    cv::Ptr<cv::ORB> orb = cv::ORB::create(kMaxFeatures);
     std::vector<cv::KeyPoint> kp1, kp2;
     cv::Mat d1, d2;
     orb->detectAndCompute(img1, cv::noArray(), kp1, d1);
@@ -237,7 +240,8 @@ int main()
 
     // Step 1~6에서 구현한 함수들을 순서대로 호출하는 파이프라인
     // 1. 특징점 검출
-    cv::Ptr<cv::ORB> orb_real = cv::ORB::create(1000);
+    const int kMaxFeaturesReal = 1000;  // 실제 이미지용 ORB 최대 특징점 수
+    cv::Ptr<cv::ORB> orb_real = cv::ORB::create(kMaxFeaturesReal);
     std::vector<cv::KeyPoint> real_kp1, real_kp2;
     cv::Mat real_d1, real_d2;
     orb_real->detectAndCompute(real_img1, cv::noArray(), real_kp1, real_d1);

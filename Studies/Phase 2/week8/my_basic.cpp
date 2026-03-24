@@ -127,8 +127,10 @@ int main()
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
     // 테스트 이미지 생성: 원이 (10, 5) 이동
-    cv::Mat prev = cv::Mat::zeros(240, 320, CV_8UC1);
-    cv::Mat curr = cv::Mat::zeros(240, 320, CV_8UC1);
+    const int kFrameHeight = 240;
+    const int kFrameWidth = 320;
+    cv::Mat prev = cv::Mat::zeros(kFrameHeight, kFrameWidth, CV_8UC1);
+    cv::Mat curr = cv::Mat::zeros(kFrameHeight, kFrameWidth, CV_8UC1);
     cv::circle(prev, cv::Point(100, 100), 20, cv::Scalar(255), -1);
     cv::circle(curr, cv::Point(110, 105), 20, cv::Scalar(255), -1);
 

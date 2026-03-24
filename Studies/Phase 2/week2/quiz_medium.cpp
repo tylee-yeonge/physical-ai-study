@@ -205,17 +205,19 @@ void problem3_performance_optimization()
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
     // 테스트 이미지 생성
-    cv::Mat test_image = cv::Mat::zeros(600, 800, CV_8UC3);
+    const int kImageHeight = 600;
+    const int kImageWidth = 800;
+    cv::Mat test_image = cv::Mat::zeros(kImageHeight, kImageWidth, CV_8UC3);
     cv::circle(test_image, cv::Point(400, 300), 100, cv::Scalar(255, 255, 255), -1);
 
     cv::Mat K = (cv::Mat_<double>(3, 3) << 600.0, 0.0, 400.0, 0.0, 600.0, 300.0, 0.0, 0.0, 1.0);
     cv::Mat dist = (cv::Mat_<double>(1, 5) << -0.2, 0.05, 0.0, 0.0, 0.0);
 
-    int iterations = 1000;
+    const int kBenchmarkIterations = 1000;  // 벤치마크 반복 횟수
 
     // TODO: Method 1 - 매 프레임마다 왜곡 보정을 직접 수행하는 방식
     auto start1 = std::chrono::high_resolution_clock::now();
-    for (int i = 0; i < iterations; i++)
+    for (int i = 0; i < kBenchmarkIterations; i++)
     {
         cv::Mat undistorted;
         // TODO: 왜곡된 이미지를 보정하여 결과를 저장
@@ -228,7 +230,7 @@ void problem3_performance_optimization()
     // TODO: 왜곡 보정용 픽셀 매핑 테이블(map1, map2)을 미리 계산
 
     auto start2 = std::chrono::high_resolution_clock::now();
-    for (int i = 0; i < iterations; i++)
+    for (int i = 0; i < kBenchmarkIterations; i++)
     {
         cv::Mat undistorted;
         // TODO: 미리 계산한 매핑 테이블로 이미지를 보정하여 결과를 저장

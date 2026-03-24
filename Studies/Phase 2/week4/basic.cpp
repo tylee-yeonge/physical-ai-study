@@ -351,7 +351,8 @@ void FeatureMatchingBasic::demoPipeline(const cv::Mat& img1, const cv::Mat& img2
 
     // Step 1: 특징점 검출
     std::cout << "1️⃣  특징점 검출 (ORB)..." << std::endl;
-    cv::Ptr<cv::ORB> orb = cv::ORB::create(1000);
+    const int kMaxFeatures = 1000;  // ORB 최대 특징점 수
+    cv::Ptr<cv::ORB> orb = cv::ORB::create(kMaxFeatures);
 
     std::vector<cv::KeyPoint> kp1, kp2;
     cv::Mat desc1, desc2;
@@ -421,8 +422,10 @@ int main()
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
     // 테스트 이미지 생성
-    cv::Mat img1 = cv::Mat::zeros(400, 600, CV_8UC1);
-    cv::Mat img2 = cv::Mat::zeros(400, 600, CV_8UC1);
+    const int kImageHeight = 400;
+    const int kImageWidth = 600;
+    cv::Mat img1 = cv::Mat::zeros(kImageHeight, kImageWidth, CV_8UC1);
+    cv::Mat img2 = cv::Mat::zeros(kImageHeight, kImageWidth, CV_8UC1);
 
     // 이미지 1: 체커보드
     for (int i = 0; i < 8; i++)

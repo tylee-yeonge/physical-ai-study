@@ -69,7 +69,8 @@ void problem1_optimal_ratio()
     }
 
     // ✅ 정답 TODO 1: ORB 특징점 검출 + 디스크립터 추출
-    auto orb = cv::ORB::create(500);
+    const int kMaxFeatures = 500;  // ORB 최대 특징점 수
+    auto orb = cv::ORB::create(kMaxFeatures);
     std::vector<cv::KeyPoint> kp1, kp2;
     cv::Mat desc1, desc2;
     orb->detectAndCompute(img1, cv::noArray(), kp1, desc1);
@@ -163,7 +164,8 @@ void problem2_essential_matrix()
         return;
     }
 
-    auto orb = cv::ORB::create(500);
+    const int kMaxFeatures = 500;  // ORB 최대 특징점 수
+    auto orb = cv::ORB::create(kMaxFeatures);
     std::vector<cv::KeyPoint> kp1, kp2;
     cv::Mat desc1, desc2;
     orb->detectAndCompute(img1, cv::noArray(), kp1, desc1);
@@ -208,9 +210,12 @@ void problem2_essential_matrix()
     //   결과: "카메라 앞 1m 평면"에서의 좌표 (카메라 무관, 순수 기하학)
     //   Essential Matrix의 에피폴라 제약 p2^T · E · p1 = 0 은 정규화 좌표에서만 성립
     cv::Mat K_inv = K.inv();
+    // norm_pts: 픽셀 좌표를 K^{-1}로 변환한 정규화 좌표를 담는 벡터
     std::vector<cv::Point2d> norm_pts1, norm_pts2;
     for (size_t i = 0; i < points1.size(); i++)
     {
+        // 2D 픽셀 좌표 (u, v)를 3×1 동차좌표 [u, v, 1]^T로 변환
+        // → 3×3 행렬(K^{-1})과 곱하려면 벡터도 3×1이어야 하므로 1.0 추가
         cv::Mat p1 = (cv::Mat_<double>(3, 1) << points1[i].x, points1[i].y, 1.0);
         cv::Mat p2 = (cv::Mat_<double>(3, 1) << points2[i].x, points2[i].y, 1.0);
         cv::Mat n1 = K_inv * p1;
@@ -227,11 +232,27 @@ void problem2_essential_matrix()
     //       대응점 p2는 그 직선 위에만 존재할 수 있다는 기하학적 제약.
     //     → 이 제약을 수식으로 쓰면 E를 구할 수 있고, E에서 R, t를 복원한다.
     //
-    //   전개: E를 9×1 벡터 e로 펼치면 각 대응점마다 1개 방정식:
-    //     [x2*x1, x2*y1, x2, y2*x1, y2*y1, y2, x1, y1, 1] · e = 0
-    //   N개 대응점 → N×9 행렬 A → Ae = 0의 비자명 해 = SVD의 V^T 마지막 행
-    int N = (int)norm_pts1.size();
-    cv::Mat A(N, 9, CV_64F);
+    //   E를 벡터로 펼치기:
+    //     E = [e1 e2 e3]  → e = [e1, e2, e3, e4, e5, e6, e7, e8, e9]^T
+    //         [e4 e5 e6]
+    //         [e7 e8 e9]
+    //
+    //   p1 = [x1, y1, 1]^T, p2 = [x2, y2, 1]^T를 대입해서 전개하면:
+    //     x2·x1·e1 + x2·y1·e2 + x2·e3 + y2·x1·e4 + y2·y1·e5 + y2·e6 + x1·e7 + y1·e8 + e9 = 0
+    //   → 행렬 형태: [x2·x1, x2·y1, x2, y2·x1, y2·y1, y2, x1, y1, 1] · e = 0
+    //
+    //   N개 대응점을 쌓으면 N×9 행렬 A가 된다:
+    //     A = [ x2₁·x1₁  x2₁·y1₁  x2₁  y2₁·x1₁  y2₁·y1₁  y2₁  x1₁  y1₁  1 ]
+    //         [ x2₂·x1₂  x2₂·y1₂  x2₂  y2₂·x1₂  y2₂·y1₂  y2₂  x1₂  y1₂  1 ]
+    //         [  ...                                                              ]
+    //   → Ae = 0의 비자명 해 = SVD의 V^T 마지막 행
+    //
+    //   왜 "8-Point"인가?
+    //     E는 9개 미지수이지만 스케일이 자유(상수배해도 같은 E)이므로
+    //     실질 자유도는 8 → 최소 8쌍의 대응점이 필요
+    int N = static_cast<int>(norm_pts1.size());
+    const int kEssentialParams = 3 * 3;  // E 행렬(3×3)의 원소 수
+    cv::Mat A(N, kEssentialParams, CV_64F);
     for (int i = 0; i < N; i++)
     {
         double x1 = norm_pts1[i].x, y1 = norm_pts1[i].y;
@@ -239,7 +260,7 @@ void problem2_essential_matrix()
         double* row = A.ptr<double>(i);
         row[0] = x2 * x1;  row[1] = x2 * y1;  row[2] = x2;
         row[3] = y2 * x1;  row[4] = y2 * y1;  row[5] = y2;
-        row[6] = x1;       row[7] = y1;        row[8] = 1.0;
+        row[6] = x1;       row[7] = y1;       row[8] = 1.0;
     }
 
     // 1-3. SVD로 해 구하기
@@ -506,10 +527,11 @@ void problem3_matching_benchmark()
 cv::Mat compute_homography_dlt(const std::vector<cv::Point2d>& src,
                                const std::vector<cv::Point2d>& dst)
 {
-    int n = (int)src.size();
+    int n = static_cast<int>(src.size());
     if (n < 4) return cv::Mat();
 
-    cv::Mat A = cv::Mat::zeros(2 * n, 9, CV_64F);
+    const int kHomographyParams = 3 * 3;  // H 행렬(3×3)의 원소 수
+    cv::Mat A = cv::Mat::zeros(2 * n, kHomographyParams, CV_64F);
     for (int i = 0; i < n; i++)
     {
         double x = src[i].x, y = src[i].y;

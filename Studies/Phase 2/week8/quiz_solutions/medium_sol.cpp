@@ -45,8 +45,10 @@ void problem1_implement_lk()
     std::cout << "━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
     // 두 프레임 생성
-    cv::Mat frame1 = cv::Mat::zeros(300, 400, CV_8UC1);
-    cv::Mat frame2 = cv::Mat::zeros(300, 400, CV_8UC1);
+    const int kFrameHeight = 300;
+    const int kFrameWidth = 400;
+    cv::Mat frame1 = cv::Mat::zeros(kFrameHeight, kFrameWidth, CV_8UC1);
+    cv::Mat frame2 = cv::Mat::zeros(kFrameHeight, kFrameWidth, CV_8UC1);
 
     cv::circle(frame1, cv::Point(150, 150), 30, cv::Scalar(255), -1);
     cv::circle(frame2, cv::Point(180, 160), 30, cv::Scalar(255), -1);
@@ -211,8 +213,9 @@ void problem4_lk_single_point()
     std::cout << "━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
     // 두 프레임 생성: 원이 오른쪽+아래로 이동
-    cv::Mat frame1 = cv::Mat::zeros(200, 200, CV_8UC1);
-    cv::Mat frame2 = cv::Mat::zeros(200, 200, CV_8UC1);
+    const int kFrameSize = 200;
+    cv::Mat frame1 = cv::Mat::zeros(kFrameSize, kFrameSize, CV_8UC1);
+    cv::Mat frame2 = cv::Mat::zeros(kFrameSize, kFrameSize, CV_8UC1);
 
     cv::circle(frame1, cv::Point(80, 80), 20, cv::Scalar(200), -1);
     cv::circle(frame2, cv::Point(90, 85), 20, cv::Scalar(200), -1);
@@ -350,8 +353,9 @@ void problem5_window_size_analysis()
     std::cout << "━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
     // 프레임 생성
-    cv::Mat frame1 = cv::Mat::zeros(300, 300, CV_8UC1);
-    cv::Mat frame2 = cv::Mat::zeros(300, 300, CV_8UC1);
+    const int kFrameSize = 300;
+    cv::Mat frame1 = cv::Mat::zeros(kFrameSize, kFrameSize, CV_8UC1);
+    cv::Mat frame2 = cv::Mat::zeros(kFrameSize, kFrameSize, CV_8UC1);
 
     // 여러 도형 배치
     cv::rectangle(frame1, cv::Rect(50, 50, 60, 40), cv::Scalar(200), -1);

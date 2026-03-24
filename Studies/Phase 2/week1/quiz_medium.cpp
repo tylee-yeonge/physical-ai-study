@@ -58,7 +58,9 @@ void problem1_cube_projection()
     std::vector<cv::Point2d> pixels;
 
     // TODO: 이미지에 큐브 그리기
-    cv::Mat image = cv::Mat::zeros(600, 800, CV_8UC3);
+    const int kImageHeight = 600;
+    const int kImageWidth = 800;
+    cv::Mat image = cv::Mat::zeros(kImageHeight, kImageWidth, CV_8UC3);
 
     // 힌트: 큐브의 앞면·뒷면·깊이 방향 모서리를 그리세요
     //       연결 규칙은 함수 위 주석을 참고하세요

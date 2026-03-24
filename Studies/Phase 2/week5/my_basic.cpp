@@ -267,8 +267,10 @@ int main()
 
     // ── Step 7: visualizeEpipolarLines ───────────
     std::cout << "\nStep 7: visualizeEpipolarLines" << std::endl;
-    cv::Mat img1 = cv::Mat::zeros(480, 640, CV_8UC1);
-    cv::Mat img2 = cv::Mat::zeros(480, 640, CV_8UC1);
+    const int kImageHeight = 480;
+    const int kImageWidth = 640;
+    cv::Mat img1 = cv::Mat::zeros(kImageHeight, kImageWidth, CV_8UC1);
+    cv::Mat img2 = cv::Mat::zeros(kImageHeight, kImageWidth, CV_8UC1);
     // 간단한 패턴
     for (int i = 0; i < 10; i++)
     {
