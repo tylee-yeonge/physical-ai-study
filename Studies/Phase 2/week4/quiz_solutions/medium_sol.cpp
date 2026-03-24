@@ -154,40 +154,67 @@ void problem2_essential_matrix()
     std::cout << "문제 2: Essential Matrix 추정" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    // 카메라 내부 파라미터 (캘리브레이션으로 미리 구한 값)
+    // ✅ 정답: 실제 이미지에서 매칭점 추출 후 Essential Matrix 추정
+    cv::Mat img1 = cv::imread("../images/box.png", cv::IMREAD_GRAYSCALE);
+    cv::Mat img2 = cv::imread("../images/box_in_scene.png", cv::IMREAD_GRAYSCALE);
+    if (img1.empty() || img2.empty())
+    {
+        std::cerr << "이미지를 로드할 수 없습니다!" << std::endl;
+        return;
+    }
+
+    auto orb = cv::ORB::create(500);
+    std::vector<cv::KeyPoint> kp1, kp2;
+    cv::Mat desc1, desc2;
+    orb->detectAndCompute(img1, cv::noArray(), kp1, desc1);
+    orb->detectAndCompute(img2, cv::noArray(), kp2, desc2);
+
+    cv::BFMatcher matcher(cv::NORM_HAMMING);
+    std::vector<std::vector<cv::DMatch>> knn_matches;
+    matcher.knnMatch(desc1, desc2, knn_matches, 2);
+
+    // Ratio test로 좋은 매칭만 선별
+    std::vector<cv::DMatch> good_matches;
+    for (const auto& m : knn_matches)
+    {
+        if (m.size() >= 2 && m[0].distance < 0.7f * m[1].distance)
+            good_matches.push_back(m[0]);
+    }
+
+    // 매칭된 키포인트 좌표 추출
+    std::vector<cv::Point2f> points1, points2;
+    for (const auto& m : good_matches)
+    {
+        points1.push_back(kp1[m.queryIdx].pt);
+        points2.push_back(kp2[m.trainIdx].pt);
+    }
+
+    std::cout << "매칭점: " << points1.size() << "쌍\n" << std::endl;
+
+    // 카메라 내부 파라미터 (가상 — 실제로는 캘리브레이션 결과 사용)
     cv::Mat K = (cv::Mat_<double>(3, 3) << 600.0, 0.0, 400.0, 0.0, 600.0, 300.0, 0.0, 0.0, 1.0);
 
-    // ✅ 정답: 매칭된 점들 생성
-    std::vector<cv::Point2f> points1 = {cv::Point2f(100, 150), cv::Point2f(200, 250),
-                                         cv::Point2f(300, 180), cv::Point2f(450, 320)};
-    std::vector<cv::Point2f> points2 = {cv::Point2f(120, 160), cv::Point2f(210, 240),
-                                         cv::Point2f(310, 190), cv::Point2f(460, 310)};
-
-    // ✅ 정답: Essential Matrix 추정
+    // ✅ 정답 TODO 1: Essential Matrix 추정
     cv::Mat E = cv::findEssentialMat(points1, points2, K, cv::RANSAC, 0.999, 1.0);
     std::cout << "Essential Matrix E:" << std::endl;
     std::cout << E << std::endl;
 
-    // ✅ 정답: R, t 복원
+    // ✅ 정답 TODO 2: E에서 R, t 복원
     cv::Mat R, t;
-    cv::recoverPose(E, points1, points2, K, R, t);
+    int inliers = cv::recoverPose(E, points1, points2, K, R, t);
     std::cout << "\nRotation:\n" << R << std::endl;
     std::cout << "Translation:\n" << t << std::endl;
-    // R: 3x3 회전 행렬, t: 3x1 단위 이동 벡터 (스케일 미지)
+    std::cout << "Cheirality 통과 inlier: " << inliers << "개\n" << std::endl;
 
     std::cout << "💡 정답 해설:" << std::endl;
-    std::cout << "   [코드 핵심]" << std::endl;
-    std::cout << "   1. findEssentialMat(pts1, pts2, K, RANSAC) → Essential Matrix E 추정" << std::endl;
-    std::cout << "   2. recoverPose(E, pts1, pts2, K, R, t) → 상대 회전/이동 복원" << std::endl;
+    std::cout << "   [TODO 1: findEssentialMat]" << std::endl;
+    std::cout << "   - 대응점 + K로 Essential Matrix 추정" << std::endl;
+    std::cout << "   - RANSAC으로 아웃라이어 제거" << std::endl;
     std::cout << std::endl;
-    std::cout << "   [Essential vs Fundamental Matrix]" << std::endl;
-    std::cout << "   Essential: 정규화 좌표 기반, K 필요, 5 DOF → 더 안정적" << std::endl;
-    std::cout << "   Fundamental: 픽셀 좌표 기반, K 불필요, 7 DOF → 더 일반적" << std::endl;
-    std::cout << "   관계: E = K^T · F · K (캘리브레이션 있으면 E 사용)" << std::endl;
-    std::cout << std::endl;
-    std::cout << "   [중요한 제한] t는 단위 벡터 (방향만, 크기 미지)" << std::endl;
-    std::cout << "   실제 이동 거리를 알려면 별도의 스케일 정보 필요" << std::endl;
-    std::cout << "   (스테레오 카메라 기선, 알려진 물체 크기, IMU 등)" << std::endl;
+    std::cout << "   [TODO 2: recoverPose]" << std::endl;
+    std::cout << "   - E를 SVD 분해 → R, t 4가지 조합" << std::endl;
+    std::cout << "   - cheirality 조건: 3D 점이 두 카메라 앞에 있는 해만 선택" << std::endl;
+    std::cout << "   - t는 단위 벡터 (방향만, 스케일 미지)" << std::endl;
     std::cout << std::endl;
     std::cout << "   [SLAM에서의 역할]" << std::endl;
     std::cout << "   Visual Odometry: 매 프레임 E → R,t → 누적하여 경로 추정" << std::endl;

@@ -130,25 +130,60 @@ void problem2_essential_matrix()
     std::cout << "문제 2: Essential Matrix 추정" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    // 카메라 내부 파라미터 (캘리브레이션으로 미리 구한 값)
+    // 이미지 로드 + 특징점 매칭 (문제 1과 동일한 파이프라인)
+    cv::Mat img1 = cv::imread("../images/box.png", cv::IMREAD_GRAYSCALE);
+    cv::Mat img2 = cv::imread("../images/box_in_scene.png", cv::IMREAD_GRAYSCALE);
+    if (img1.empty() || img2.empty())
+    {
+        std::cerr << "이미지를 로드할 수 없습니다!" << std::endl;
+        return;
+    }
+
+    auto orb = cv::ORB::create(500);
+    std::vector<cv::KeyPoint> kp1, kp2;
+    cv::Mat desc1, desc2;
+    orb->detectAndCompute(img1, cv::noArray(), kp1, desc1);
+    orb->detectAndCompute(img2, cv::noArray(), kp2, desc2);
+
+    cv::BFMatcher matcher(cv::NORM_HAMMING);
+    std::vector<std::vector<cv::DMatch>> knn_matches;
+    matcher.knnMatch(desc1, desc2, knn_matches, 2);
+
+    // Ratio test로 좋은 매칭만 선별
+    std::vector<cv::DMatch> good_matches;
+    for (const auto& m : knn_matches)
+    {
+        if (m.size() >= 2 && m[0].distance < 0.7f * m[1].distance)
+            good_matches.push_back(m[0]);
+    }
+
+    // 매칭된 키포인트 좌표 추출
+    std::vector<cv::Point2f> points1, points2;
+    for (const auto& m : good_matches)
+    {
+        points1.push_back(kp1[m.queryIdx].pt);
+        points2.push_back(kp2[m.trainIdx].pt);
+    }
+
+    std::cout << "매칭점: " << points1.size() << "쌍\n" << std::endl;
+
+    // 카메라 내부 파라미터 (가상 — 실제로는 캘리브레이션 결과 사용)
     cv::Mat K = (cv::Mat_<double>(3, 3) << 600.0, 0.0, 400.0, 0.0, 600.0, 300.0, 0.0, 0.0, 1.0);
 
-    // TODO: 매칭된 점들 생성 (실제로는 특징점 검출+매칭 결과)
-    std::vector<cv::Point2f> points1, points2;
-    // 시뮬레이션 데이터 생성...
-
-    // TODO: Essential Matrix 추정
-    // 힌트: OpenCV에서 대응점과 K 행렬로 E를 추정하는 함수를 찾아보세요
+    // TODO 1: Essential Matrix 추정
+    // - 대응점(points1, points2)과 카메라 행렬(K)로 E를 추정
+    // - RANSAC으로 아웃라이어를 제거하며 추정
 
     std::cout << "Essential Matrix E:" << std::endl;
 
-    // TODO: E에서 R, t 복원
-    // 힌트: E를 분해하여 회전과 이동을 복원하는 함수를 찾아보세요
+    // TODO 2: E에서 R, t 복원
+    // - E를 SVD 분해하여 회전(R)과 이동(t)을 복원
+    // - 4가지 해 중 양의 깊이 조건(cheirality)을 만족하는 해를 선택
 
-    std::cout << "💡 SLAM에서의 의미:" << std::endl;
+    std::cout << "\n💡 SLAM에서의 의미:" << std::endl;
     std::cout << "   - E를 분해 → R (회전), t (이동)" << std::endl;
     std::cout << "   - 두 프레임 간 상대 포즈!" << std::endl;
-    std::cout << "   - Visual Odometry의 핵심" << std::endl;
+    std::cout << "   - t는 단위 벡터 — 스케일 정보 없음" << std::endl;
 }
 
 // 문제 3: BF vs FLANN 매칭 벤치마크 — 속도와 정확도 비교
