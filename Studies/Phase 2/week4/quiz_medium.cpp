@@ -25,6 +25,7 @@
 #include <opencv2/features2d.hpp>
 #include <opencv2/calib3d.hpp>
 #include <iostream>
+#include <iomanip>
 #include <chrono>
 #include <cmath>
 #include <random>
@@ -51,27 +52,51 @@ void problem1_optimal_ratio()
     std::cout << "문제 1: 최적의 Ratio Threshold" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    // TODO: 여러 ratio 값 테스트
+    // 여러 ratio 값 테스트
     std::vector<float> ratios = {0.5, 0.6, 0.7, 0.8, 0.9};
 
     std::cout << "Ratio  |  매칭 개수  |  Inlier 비율" << std::endl;
     std::cout << "-------+-------------+-------------" << std::endl;
 
-    // TODO: 랜덤 디스크립터로 KNN 매칭 후, ratio test 적용
-    // 1. 랜덤 디스크립터 생성 (num_features x 32, CV_8U)
-    // 2. BFMatcher(NORM_HAMMING)로 knnMatch(k=2) 수행
-    // 3. 각 ratio에 대해 ratio test 적용:
-    //    best.distance < ratio * second_best.distance 이면 통과
-    // 4. 통과한 매칭 수와 통과율(pass_rate) 출력
+    // 이미지 로드
+    cv::Mat img1 = cv::imread("../images/box.png", cv::IMREAD_GRAYSCALE);
+    cv::Mat img2 = cv::imread("../images/box_in_scene.png", cv::IMREAD_GRAYSCALE);
+    if (img1.empty() || img2.empty())
+    {
+        std::cerr << "이미지를 로드할 수 없습니다!" << std::endl;
+        return;
+    }
+
+    // TODO 1: ORB 특징점 검출 + 디스크립터 추출
+    // - ORB 검출기를 생성하고 (최대 500개 특징점)
+    // - 각 이미지에서 키포인트와 디스크립터를 한 번에 추출하기
+    // - 힌트: basic.h에서 사용한 검출+기술 함수를 참고
+    std::vector<cv::KeyPoint> kp1, kp2;
+    cv::Mat desc1, desc2;
+
+    std::cout << "이미지: box.png (" << kp1.size() << " 특징점) vs "
+              << "box_in_scene.png (" << kp2.size() << " 특징점)\n" << std::endl;
+
+    // TODO 2: KNN 매칭 수행 (k=2)
+    // - 이진 디스크립터에 적합한 거리 측정 방식으로 전수 비교 매처 생성
+    // - 각 디스크립터마다 가장 가까운 2개의 후보를 찾기
+    //   → 왜 2개? ratio test에서 1등과 2등의 거리를 비교하기 위해
+    std::vector<std::vector<cv::DMatch>> knn_matches;
 
     for (float ratio : ratios)
-    {    
-        // TODO: ratio test 수행
-        // good_matches: match_pair[0].distance < ratio * match_pair[1].distance 인 것만 선별
+    {
+        // TODO 3: ratio test 수행
+        // - 각 매칭 쌍에서 1등과 2등의 거리를 비교
+        // - 1등 거리가 2등 거리의 ratio배보다 작으면 "확실한 매칭"으로 판단
+        // - 후보가 2개 미만인 경우는 건너뛰기
+        std::vector<cv::DMatch> good_matches;
 
-        // TODO: 통과율 계산 후 결과 출력
+
         // pass_rate = 통과한 매칭 수 / 전체 KNN 매칭 수 × 100
-        // 출력 형식: " {ratio}  |     {good_matches 수}     |    {pass_rate}%"
+        double pass_rate = knn_matches.empty() ? 0.0
+            : 100.0 * good_matches.size() / knn_matches.size();
+        std::cout << " " << ratio << "  |     " << std::setw(3) << good_matches.size()
+                  << "     |    " << std::fixed << std::setprecision(1) << pass_rate << "%" << std::endl;
     }
 
     std::cout << "\n💡 관찰:" << std::endl;

@@ -25,6 +25,7 @@
 #include <opencv2/features2d.hpp>
 #include <opencv2/calib3d.hpp>
 #include <iostream>
+#include <iomanip>
 #include <chrono>
 #include <cmath>
 #include <random>
@@ -53,27 +54,41 @@ void problem1_optimal_ratio()
     std::cout << "문제 1: 최적의 Ratio Threshold" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    // TODO: 여러 ratio 값 테스트
     std::vector<float> ratios = {0.5, 0.6, 0.7, 0.8, 0.9};
 
     std::cout << "Ratio  |  매칭 개수  |  Inlier 비율" << std::endl;
     std::cout << "-------+-------------+-------------" << std::endl;
 
-    // ✅ 정답: 랜덤 디스크립터로 KNN 매칭 후, ratio test 적용
-    int num_features = 500;
-    cv::Mat desc1(num_features, 32, CV_8U);
-    cv::Mat desc2(num_features, 32, CV_8U);
-    cv::randu(desc1, 0, 255);
-    cv::randu(desc2, 0, 255);
+    // 이미지 로드
+    cv::Mat img1 = cv::imread("../images/box.png", cv::IMREAD_GRAYSCALE);
+    cv::Mat img2 = cv::imread("../images/box_in_scene.png", cv::IMREAD_GRAYSCALE);
+    if (img1.empty() || img2.empty())
+    {
+        std::cerr << "이미지를 로드할 수 없습니다!" << std::endl;
+        return;
+    }
 
-    // KNN 매칭 (k=2: best와 second_best)
+    // ✅ 정답 TODO 1: ORB 특징점 검출 + 디스크립터 추출
+    auto orb = cv::ORB::create(500);
+    std::vector<cv::KeyPoint> kp1, kp2;
+    cv::Mat desc1, desc2;
+    orb->detectAndCompute(img1, cv::noArray(), kp1, desc1);
+    orb->detectAndCompute(img2, cv::noArray(), kp2, desc2);
+
+    std::cout << "이미지: box.png (" << kp1.size() << " 특징점) vs "
+              << "box_in_scene.png (" << kp2.size() << " 특징점)\n" << std::endl;
+
+    // ✅ 정답 TODO 2: KNN 매칭 수행 (k=2)
+    // 이진 디스크립터(ORB)에는 NORM_HAMMING 사용
+    // k=2로 best와 second_best를 함께 얻어 ratio test에 활용
     cv::BFMatcher matcher(cv::NORM_HAMMING);
     std::vector<std::vector<cv::DMatch>> knn_matches;
     matcher.knnMatch(desc1, desc2, knn_matches, 2);
 
     for (float ratio : ratios)
     {
-        // ratio test: best.distance < ratio * second_best.distance 이면 통과
+        // ✅ 정답 TODO 3: ratio test 수행
+        // best.distance < ratio * second_best.distance 이면 통과
         std::vector<cv::DMatch> good_matches;
         for (const auto& match_pair : knn_matches)
         {
@@ -85,14 +100,23 @@ void problem1_optimal_ratio()
         }
 
         double pass_rate = 100.0 * good_matches.size() / knn_matches.size();
-        std::cout << " " << ratio << "  |     " << good_matches.size()
-                  << "     |    " << pass_rate << "%" << std::endl;
+        std::cout << " " << ratio << "  |     " << std::setw(3) << good_matches.size()
+                  << "     |    " << std::fixed << std::setprecision(1) << pass_rate << "%" << std::endl;
     }
 
     std::cout << "\n💡 정답 해설:" << std::endl;
-    std::cout << "   [코드 핵심]" << std::endl;
-    std::cout << "   1. knnMatch(desc1, desc2, knn_matches, 2) → best, second_best 쌍 얻기" << std::endl;
-    std::cout << "   2. best.distance < ratio * second_best.distance → 통과" << std::endl;
+    std::cout << "   [TODO 1: ORB 생성 + detectAndCompute]" << std::endl;
+    std::cout << "   - ORB::create(500): 최대 500개 특징점 검출" << std::endl;
+    std::cout << "   - detectAndCompute(img, noArray(), kp, desc)" << std::endl;
+    std::cout << "   - kp: 특징점 위치/스케일/방향, desc: 32바이트 이진 벡터" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [TODO 2: BFMatcher + knnMatch(k=2)]" << std::endl;
+    std::cout << "   - NORM_HAMMING: 이진 디스크립터(ORB)의 거리 = XOR 후 popcount" << std::endl;
+    std::cout << "   - k=2인 이유: ratio test에 best와 second_best 둘 다 필요" << std::endl;
+    std::cout << std::endl;
+    std::cout << "   [TODO 3: ratio test]" << std::endl;
+    std::cout << "   - best.distance < ratio * second_best.distance → 통과" << std::endl;
+    std::cout << "   - 의미: best가 second_best보다 '충분히' 가까워야 신뢰" << std::endl;
     std::cout << std::endl;
     std::cout << "   [Precision vs Recall 이해]" << std::endl;
     std::cout << "   Precision: 내가 '맞다'고 한 것 중 실제로 맞는 비율" << std::endl;
