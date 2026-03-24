@@ -68,9 +68,10 @@ void problem1_optimal_ratio()
     }
 
     // TODO 1: ORB 특징점 검출 + 디스크립터 추출
-    // - ORB 검출기를 생성하고 (최대 500개 특징점)
-    // - 각 이미지에서 키포인트와 디스크립터를 한 번에 추출하기
-    // - 힌트: basic.h에서 사용한 검출+기술 함수를 참고
+    // - ORB::create(500)으로 검출기 생성 (최대 500개 특징점)
+    // - detectAndCompute(img, noArray(), kp, desc)로 키포인트 + 디스크립터 한 번에 추출
+    //   kp: 특징점 위치/스케일/방향 정보
+    //   desc: 32바이트(256비트) 이진 디스크립터 벡터 (CV_8U)
     std::vector<cv::KeyPoint> kp1, kp2;
     cv::Mat desc1, desc2;
 
@@ -78,17 +79,21 @@ void problem1_optimal_ratio()
               << "box_in_scene.png (" << kp2.size() << " 특징점)\n" << std::endl;
 
     // TODO 2: KNN 매칭 수행 (k=2)
-    // - 이진 디스크립터에 적합한 거리 측정 방식으로 전수 비교 매처 생성
-    // - 각 디스크립터마다 가장 가까운 2개의 후보를 찾기
-    //   → 왜 2개? ratio test에서 1등과 2등의 거리를 비교하기 위해
+    // - BFMatcher(cv::NORM_HAMMING)으로 매처 생성
+    //   NORM_HAMMING: 이진 디스크립터(ORB)의 거리 = XOR 후 1인 비트 수(popcount)
+    //   (SIFT/SURF 같은 실수 디스크립터는 NORM_L2 사용)
+    // - knnMatch(desc1, desc2, knn_matches, 2)로 각 디스크립터마다 가장 가까운 2개 후보 탐색
+    //   왜 2개? → ratio test에서 1등(best)과 2등(second_best)의 거리를 비교하기 위해
     std::vector<std::vector<cv::DMatch>> knn_matches;
 
     for (float ratio : ratios)
     {
         // TODO 3: ratio test 수행
-        // - 각 매칭 쌍에서 1등과 2등의 거리를 비교
-        // - 1등 거리가 2등 거리의 ratio배보다 작으면 "확실한 매칭"으로 판단
-        // - 후보가 2개 미만인 경우는 건너뛰기
+        // - 각 매칭 쌍(match_pair)에서 1등과 2등의 거리를 비교:
+        //   match_pair[0].distance < ratio * match_pair[1].distance → 통과
+        // - 의미: 1등이 2등보다 "충분히" 가까워야 신뢰할 수 있는 매칭
+        //   (1등과 2등이 비슷하면 → 어느 쪽이 진짜인지 불확실 → 버림)
+        // - match_pair.size() < 2인 경우는 건너뛰기
         std::vector<cv::DMatch> good_matches;
 
 
@@ -170,18 +175,57 @@ void problem2_essential_matrix()
     // 카메라 내부 파라미터 (가상 — 실제로는 캘리브레이션 결과 사용)
     cv::Mat K = (cv::Mat_<double>(3, 3) << 600.0, 0.0, 400.0, 0.0, 600.0, 300.0, 0.0, 0.0, 1.0);
 
-    // TODO 1: Essential Matrix 추정 (8-Point Algorithm)
-    // - 픽셀 좌표를 K^{-1}로 정규화 좌표로 변환
-    // - 에피폴라 제약 p2^T E p1 = 0을 전개하여 A행렬(N×9) 구성
-    // - SVD(A)의 마지막 V행을 3×3으로 reshape
-    // - rank-2 제약: SVD로 특이값을 (σ, σ, 0)으로 강제
+    // TODO 1: Essential Matrix 추정 (8-Point Algorithm 직접 구현)
+    // [OpenCV 원라이너] cv::Mat E = cv::findEssentialMat(points1, points2, K, cv::RANSAC);
+    //
+    // --- 단계 1-1: 픽셀 좌표 → 정규화 좌표 변환 ---
+    //   p_norm = K^{-1} * p_pixel
+    //   픽셀 좌표 (u,v)는 카메라마다 해상도/렌즈가 달라서 기하학적 비교 불가.
+    //   K^{-1}을 곱하면 카메라 의존성이 제거된 "정규화 좌표"가 된다:
+    //     x_norm = (u - cx) / fx,  y_norm = (v - cy) / fy
+    //   → "카메라 앞 1m 평면"의 좌표. 에피폴라 제약 p2^T·E·p1 = 0은 여기서만 성립.
+    //
+    // --- 단계 1-2: A행렬 구성 (N×9) ---
+    //   에피폴라 제약 p2^T·E·p1 = 0을 전개하면:
+    //     E를 9×1 벡터 e로 펼쳤을 때, 각 대응점마다 1개 방정식이 나온다:
+    //     [x2*x1, x2*y1, x2, y2*x1, y2*y1, y2, x1, y1, 1] · e = 0
+    //   N개 대응점 → N×9 행렬 A → Ae = 0 풀기
+    //
+    // --- 단계 1-3: SVD로 해 구하기 ---
+    //   Ae = 0 → "A에 곱했을 때 가장 0에 가까운 벡터"
+    //   SVD(A) = U·S·V^T 에서 V^T의 마지막 행이 해
+    //   이 9×1 벡터를 3×3으로 reshape → E의 초기 추정값
+    //
+    // --- 단계 1-4: rank-2 제약 적용 ---
+    //   E = [t]×·R 이므로 수학적으로 rank 2여야 한다.
+    //   노이즈 때문에 1-3의 결과는 rank 3일 수 있으므로:
+    //   E_raw를 다시 SVD → 특이값을 (σ_avg, σ_avg, 0)으로 강제
+    //   (σ_avg = 상위 2개 특이값의 평균, 3번째를 0으로 → rank 2 보장)
 
     std::cout << "Essential Matrix E:" << std::endl;
 
-    // TODO 2: E에서 R, t 복원 (SVD 분해 + Cheirality)
-    // - E = U diag(1,1,0) V^T 에서 W=[0 -1 0; 1 0 0; 0 0 1]로 R 후보 2개
-    // - t 후보 = ±U의 3번째 열 → 총 4가지 (R,t) 조합
-    // - 각 조합으로 삼각측량하여 Z>0인 점이 가장 많은 해를 선택
+    // TODO 2: E에서 R, t 복원 (SVD 분해 + Cheirality 검증)
+    // [OpenCV 원라이너] int inliers = cv::recoverPose(E, points1, points2, K, R, t);
+    //
+    // --- 단계 2-1: R, t 후보 생성 ---
+    //   E의 SVD: E = U·diag(σ,σ,0)·V^T (TODO 1에서 이미 분해됨)
+    //   W 행렬 (Z축 90도 회전): W = [0 -1 0; 1 0 0; 0 0 1]
+    //   R 후보 2개: R1 = U·W·V^T,   R2 = U·W^T·V^T
+    //   t 후보 2개: t1 = +U의 3번째 열, t2 = -U의 3번째 열
+    //   → 총 4가지 (R,t) 조합. 물리적으로 유효한 것은 1개뿐.
+    //   주의: det(R) < 0이면 거울 반사 → R = -R로 보정
+    //
+    // --- 단계 2-2: Cheirality 검증 ---
+    //   "삼각측량한 3D 점이 두 카메라 모두의 앞에 있는가?" (Z > 0)
+    //   각 (R,t) 조합에 대해:
+    //     1) 정규화 좌표 p1, p2로부터 삼각측량 → 3D 점 X
+    //        - 카메라1: X = λ·p1 (원점에서 p1 방향 광선)
+    //        - 카메라2: X = R^T·(μ·p2 - t) (O2에서 p2 방향 광선)
+    //        - 두 광선의 교차 → 4×3 과결정 시스템 A·X = b → SVD로 최소제곱 해
+    //     2) z1 = X의 Z좌표 (카메라1 기준 깊이)
+    //        X_cam2 = R·X + t → z2 = X_cam2의 Z좌표 (카메라2 기준 깊이)
+    //     3) z1 > 0 && z2 > 0이면 유효한 점
+    //   → Z > 0인 점이 가장 많은 (R,t) 조합이 정답
 
     std::cout << "\n💡 SLAM에서의 의미:" << std::endl;
     std::cout << "   - E를 분해 → R (회전), t (이동)" << std::endl;
@@ -222,11 +266,32 @@ void problem3_matching_benchmark()
     std::cout << "특징점 개수: " << num_features << "개\n" << std::endl;
 
     // TODO: BF 매칭 시간 측정
-    // 힌트: 이진 디스크립터에 적합한 매처를 생성하고 시간을 측정하세요
+    //
+    // --- BF(Brute-Force) 매칭의 원리 ---
+    //   모든 디스크립터 쌍(N×M)의 거리를 하나씩 비교 → 최근접 보장
+    //   이진 디스크립터의 해밍 거리: XOR 후 1인 비트 수 (popcount)
+    //
+    // 구현 방법:
+    //   1. 랜덤 이진 디스크립터 2세트 생성 (cv::Mat, CV_8U, 32열)
+    //   2. chrono로 시작 시간 기록
+    //   3. 이중 for문: desc1의 각 행 i에 대해 desc2의 모든 행 j와 해밍 거리 비교
+    //      해밍 거리 = 바이트별 XOR → 비트 카운트 합산
+    //   4. 가장 거리가 작은 j를 best match로 기록
+    //   5. chrono로 종료 시간 기록 → 소요 시간(ms) 계산
+    //
+    // 또는 간단하게: BFMatcher(NORM_HAMMING).match(desc1, desc2, matches)로도 측정 가능
 
     // TODO: FLANN 매칭 시간 측정
-    // 힌트: 근사 최근접 탐색 기반 매처를 생성하고 비교하세요
-    //       FLANN은 입력 데이터 타입에 제약이 있습니다
+    //
+    // --- FLANN(Fast Library for Approximate Nearest Neighbors)의 원리 ---
+    //   KD-tree 등 공간 분할 자료구조로 근사 최근접 탐색 → O(N log N) 수준
+    //   정확도 ~99%이지만 속도가 수 배~수십 배 빠름
+    //
+    // 구현 방법:
+    //   1. FLANN은 CV_32F만 지원 → desc.convertTo(desc_f, CV_32F)로 변환 필요
+    //   2. FlannBasedMatcher로 매처 생성
+    //   3. chrono로 시간 측정하며 match() 호출
+    //   4. BF 시간과 비교하여 속도비 계산
 
     std::cout << "매칭 알고리즘  |  시간 (ms)  |  속도비" << std::endl;
     std::cout << "---------------+-------------+---------" << std::endl;
@@ -308,13 +373,24 @@ void problem4_homography_dlt()
     }
 
     // TODO: DLT 구현
-    // 1. A 행렬 구성 (2*N x 9)
+    //
+    // --- DLT(Direct Linear Transform)의 핵심 아이디어 ---
+    //   Homography: dst = H * src (동차좌표)
+    //   → H의 9개 원소를 미지수로, 대응점마다 2개 방정식을 세워서 Ah = 0 형태로 풀기
+    //
+    // --- Step 1: A 행렬 구성 (2N × 9) ---
     int N = (int)src_pts.size();
     cv::Mat A = cv::Mat::zeros(2 * N, 9, CV_64F);
 
-    // 각 대응점 (x,y)↔(u,v)에 대해 2행 추가
+    // 각 대응점 (x,y) ↔ (u,v)에서 투영 방정식을 전개하면 2개 행이 나온다:
+    //
+    //   u = (h1·x + h2·y + h3) / (h7·x + h8·y + h9)  ← 분모 제거 후 정리
+    //   v = (h4·x + h5·y + h6) / (h7·x + h8·y + h9)
+    //
     //   행 2i:   [-x, -y, -1,  0,  0,  0, u*x, u*y, u]  ← u 방정식
     //   행 2i+1: [ 0,  0,  0, -x, -y, -1, v*x, v*y, v]  ← v 방정식
+    //
+    // A.at<double>(행, 열) = 값 형태로 채우기
     for (int i = 0; i < N; i++)
     {
         double x = src_pts[i].x, y = src_pts[i].y;
@@ -322,10 +398,13 @@ void problem4_homography_dlt()
         // TODO: 각 대응점에 대해 위 행 배치 규칙으로 A 행렬 채우기
     }
 
-    // TODO: SVD 분해 후 H 추출
+    // --- Step 2: SVD 분해 후 H 추출 ---
     cv::Mat H_dlt = cv::Mat::eye(3, 3, CV_64F);
-    // 힌트: Ah=0의 비자명 해는 SVD에서 가장 작은 특이값에 대응하는 벡터입니다
-    //       이 벡터를 3x3으로 재배열하고 정규화하면 H가 됩니다
+    // cv::SVD::compute(A, S, U, Vt)로 A를 분해
+    // Ah = 0의 비자명 해 = ||h||=1 조건에서 ||Ah||를 최소화하는 벡터
+    //   = Vt의 마지막 행 (가장 작은 특이값에 대응하는 오른쪽 특이벡터)
+    // 이 1×9 벡터를 .reshape(1, 3)으로 3×3 행렬로 변환
+    // H(2,2)로 나누어 정규화 (h33 = 1 관례)
 
     // OpenCV findHomography로 비교
     cv::Mat H_cv = cv::findHomography(src_pts, dst_pts);
@@ -431,9 +510,26 @@ void problem5_ransac_homography()
     int best_inlier_count = 0;
     cv::Mat best_H;
 
-    // 힌트: 위 주석의 RANSAC 알고리즘 5단계를 구현하세요
-    //       각 반복에서 최소 점 수로 모델을 추정하고,
-    //       전체 데이터에 대한 합의(consensus)를 평가합니다
+    // --- RANSAC 5단계 구현 가이드 ---
+    //
+    // 준비: 0~total-1 인덱스 배열 생성 (std::iota), 셔플용
+    //
+    // for (iter = 0; iter < max_iters; iter++):
+    //
+    //   Step 1: 랜덤 4개 대응점 선택
+    //     std::shuffle(indices)로 섞은 뒤 앞 4개 인덱스 사용
+    //     → src_4, dst_4에 해당 점들을 담기
+    //
+    //   Step 2: DLT로 H 추정
+    //     4개 점으로 문제4의 DLT 알고리즘 수행 (함수로 분리하면 재사용 편리)
+    //     H가 유효하지 않으면 continue
+    //
+    //   Step 3-4: 모든 점에 H 적용 → inlier 카운트
+    //     각 점에 대해: p' = H * [x, y, 1]^T → 동차좌표 정규화 (w로 나누기)
+    //     재투영 오차: e = sqrt((proj_x - dst_x)² + (proj_y - dst_y)²)
+    //     e < threshold이면 inlier
+    //
+    //   Step 5: best_inlier_count보다 크면 best_H 갱신
 
     std::cout << "📊 RANSAC 결과:" << std::endl;
     std::cout << "   검출된 inlier: " << best_inlier_count << " / " << total << std::endl;
