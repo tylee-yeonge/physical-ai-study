@@ -57,11 +57,18 @@ void problem1_optimal_ratio()
     std::cout << "Ratio  |  매칭 개수  |  Inlier 비율" << std::endl;
     std::cout << "-------+-------------+-------------" << std::endl;
 
+    // TODO: 랜덤 디스크립터로 KNN 매칭 후, ratio test 적용
+    // 1. 랜덤 디스크립터 생성 (num_features x 32, CV_8U)
+    // 2. BFMatcher(NORM_HAMMING)로 knnMatch(k=2) 수행
+    // 3. 각 ratio에 대해 ratio test 적용:
+    //    best.distance < ratio * second_best.distance 이면 통과
+    // 4. 통과한 매칭 수와 통과율(pass_rate) 출력
+
     for (float ratio : ratios)
     {
         // TODO: ratio test 수행
-        // int matches_count = ...
-        // double inlier_ratio = ...
+        // good_matches: match_pair[0].distance < ratio * match_pair[1].distance 인 것만 선별
+        // pass_rate = 100.0 * good_matches.size() / knn_matches.size()
 
         std::cout << " " << ratio << "  |     ???     |    ???" << std::endl;
     }
