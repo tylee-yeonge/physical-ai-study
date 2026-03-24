@@ -59,16 +59,40 @@ void problem1_optimal_ratio()
     std::cout << "Ratio  |  매칭 개수  |  Inlier 비율" << std::endl;
     std::cout << "-------+-------------+-------------" << std::endl;
 
+    // ✅ 정답: 랜덤 디스크립터로 KNN 매칭 후, ratio test 적용
+    int num_features = 500;
+    cv::Mat desc1(num_features, 32, CV_8U);
+    cv::Mat desc2(num_features, 32, CV_8U);
+    cv::randu(desc1, 0, 255);
+    cv::randu(desc2, 0, 255);
+
+    // KNN 매칭 (k=2: best와 second_best)
+    cv::BFMatcher matcher(cv::NORM_HAMMING);
+    std::vector<std::vector<cv::DMatch>> knn_matches;
+    matcher.knnMatch(desc1, desc2, knn_matches, 2);
+
     for (float ratio : ratios)
     {
-        // ✅ 정답: ratio별 특성 출력 (실제 매칭 데이터 없이 개념 설명)
-        std::cout << " " << ratio << "  |  ratio↓=품질↑  |  ratio↑=수량↑" << std::endl;
+        // ratio test: best.distance < ratio * second_best.distance 이면 통과
+        std::vector<cv::DMatch> good_matches;
+        for (const auto& match_pair : knn_matches)
+        {
+            if (match_pair.size() >= 2 &&
+                match_pair[0].distance < ratio * match_pair[1].distance)
+            {
+                good_matches.push_back(match_pair[0]);
+            }
+        }
+
+        double pass_rate = 100.0 * good_matches.size() / knn_matches.size();
+        std::cout << " " << ratio << "  |     " << good_matches.size()
+                  << "     |    " << pass_rate << "%" << std::endl;
     }
 
     std::cout << "\n💡 정답 해설:" << std::endl;
-    std::cout << "   [코드 핵심] 여러 ratio 임계값에 따른 매칭 특성 비교" << std::endl;
-    std::cout << "   ratio ↓ → 엄격한 필터 → 소수의 고품질 매칭 (높은 precision)" << std::endl;
-    std::cout << "   ratio ↑ → 느슨한 필터 → 다수의 매칭 포함, 오매칭도 포함 (높은 recall)" << std::endl;
+    std::cout << "   [코드 핵심]" << std::endl;
+    std::cout << "   1. knnMatch(desc1, desc2, knn_matches, 2) → best, second_best 쌍 얻기" << std::endl;
+    std::cout << "   2. best.distance < ratio * second_best.distance → 통과" << std::endl;
     std::cout << std::endl;
     std::cout << "   [Precision vs Recall 이해]" << std::endl;
     std::cout << "   Precision: 내가 '맞다'고 한 것 중 실제로 맞는 비율" << std::endl;
