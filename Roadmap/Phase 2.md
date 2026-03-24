@@ -88,64 +88,64 @@
 
 ## 📋 Section 2.2: 특징점 검출과 매칭 (2주)
 
-### Week 3-4: 특징점 검출과 매칭 🔥
+### Week 3-4: 특징점 검출과 매칭 ✅
 
 > 💻 **C++ 실습**: [PRACTICE.md](../Studies/Phase%202/week3/PRACTICE.md)  
 > 🛠️ **하드웨어**: Jetson Orin Nano + ELP Stereo Camera  
 > ⏰ **실습 시간**: 12-16시간 (2주)
 
 #### Week 3: 코너 검출
-- [ ] Harris Corner Detector 원리 이해
-- [ ] 코너 응답 함수
-- [ ] Non-maximum suppression
+- [x] Harris Corner Detector 원리 이해
+- [x] 코너 응답 함수
+- [x] Non-maximum suppression
 
 #### FAST 코너
-- [ ] FAST 알고리즘 원리 (16개 픽셀 원에서 연속 밝기 비교)
-- [ ] 임계값 설정
-- [ ] 왜 "Fast"인지 — 속도 이점
+- [x] FAST 알고리즘 원리 (16개 픽셀 원에서 연속 밝기 비교)
+- [x] 임계값 설정
+- [x] 왜 "Fast"인지 — 속도 이점
 
 #### 디스크립터
-- [ ] 왜 디스크립터가 필요한지 (매칭을 위해)
-- [ ] BRIEF 개념 (이진 디스크립터)
-- [ ] ORB = oriented FAST + rotated BRIEF
-- [ ] 디스크립터 벡터 크기와 의미
+- [x] 왜 디스크립터가 필요한지 (매칭을 위해)
+- [x] BRIEF 개념 (이진 디스크립터)
+- [x] ORB = oriented FAST + rotated BRIEF
+- [x] 디스크립터 벡터 크기와 의미
 
 #### SLAM에서 어디에 쓰이나?
-- [ ] VINS `feature_tracker`는 FAST 코너 + KLT 추적 사용
-- [ ] ORB-SLAM은 ORB 디스크립터 사용
-- [ ] 검출 속도가 실시간 성능에 직접 영향
+- [x] VINS `feature_tracker`는 FAST 코너 + KLT 추적 사용
+- [x] ORB-SLAM은 ORB 디스크립터 사용
+- [x] 검출 속도가 실시간 성능에 직접 영향
 
 #### 실습
-- [ ] OpenCV로 FAST, ORB 검출 및 시각화
-- [ ] 파라미터 (임계값, 최대 개수) 변경에 따른 결과 차이 관찰
-- [ ] 검출 시간 측정
+- [x] OpenCV로 FAST, ORB 검출 및 시각화
+- [x] 파라미터 (임계값, 최대 개수) 변경에 따른 결과 차이 관찰
+- [x] 검출 시간 측정
 
 #### Week 4: 특징점 매칭
 
 #### 매칭 알고리즘
-- [ ] Brute-Force 매칭
-- [ ] FLANN 매칭 (빠른 근사)
-- [ ] 해밍 거리 (이진 디스크립터용) vs 유클리드 거리
+- [x] Brute-Force 매칭
+- [x] FLANN 매칭 (빠른 근사)
+- [x] 해밍 거리 (이진 디스크립터용) vs 유클리드 거리
 
 #### 매칭 필터링
-- [ ] Lowe's Ratio Test 원리 (best/second-best 비율)
-- [ ] Cross-check 매칭
-- [ ] 거리 임계값 설정
+- [x] Lowe's Ratio Test 원리 (best/second-best 비율)
+- [x] Cross-check 매칭
+- [x] 거리 임계값 설정
 
 #### RANSAC
-- [ ] RANSAC 알고리즘 원리 (랜덤 샘플링 + 합의)
-- [ ] Inlier vs Outlier 분류
-- [ ] 반복 횟수와 inlier 비율 관계
+- [x] RANSAC 알고리즘 원리 (랜덤 샘플링 + 합의)
+- [x] Inlier vs Outlier 분류
+- [x] 반복 횟수와 inlier 비율 관계
 
 #### SLAM에서 어디에 쓰이나?
-- [ ] Essential Matrix 추정 시 RANSAC 사용
-- [ ] Loop Closure 매칭에서 outlier 제거
-- [ ] Robust한 포즈 추정의 핵심
+- [x] Essential Matrix 추정 시 RANSAC 사용
+- [x] Loop Closure 매칭에서 outlier 제거
+- [x] Robust한 포즈 추정의 핵심
 
 #### 실습
-- [ ] 두 이미지 간 ORB 특징점 매칭
-- [ ] 매칭 결과 시각화 (`cv2.drawMatches`)
-- [ ] RANSAC으로 outlier 제거 전후 비교
+- [x] 두 이미지 간 ORB 특징점 매칭
+- [x] 매칭 결과 시각화 (`cv2.drawMatches`)
+- [x] RANSAC으로 outlier 제거 전후 비교
 
 ### 🔍 Section 2.2 자체 점검
 > 아래 질문에 답할 수 있으면 다음으로 진행
@@ -290,15 +290,15 @@
 ## ✅ Phase 2 완료 체크리스트
 
 ### 카메라 모델
-- [ ] 핀홀 모델 설명 가능
+- [x] 핀홀 모델 설명 가능
 - [ ] OpenCV로 카메라 캘리브레이션 직접 수행 가능
 - [ ] Kalibr 기본 사용법 파악
-- [ ] 왜곡 보정 적용 가능
+- [x] 왜곡 보정 적용 가능
 
 ### 특징점
-- [ ] FAST, ORB 특징점 검출 구현 가능
-- [ ] 특징점 매칭 및 시각화 가능
-- [ ] RANSAC 원리 이해
+- [x] FAST, ORB 특징점 검출 구현 가능
+- [x] 특징점 매칭 및 시각화 가능
+- [x] RANSAC 원리 이해
 
 ### 에피폴라 기하학
 - [ ] Essential Matrix와 Fundamental Matrix 차이 설명 가능
