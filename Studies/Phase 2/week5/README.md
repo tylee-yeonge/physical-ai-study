@@ -331,18 +331,10 @@ def draw_epipolar_line(img, line, color=(0, 255, 0)):
 
 ### E vs F 선택 가이드
 
-```
-캘리브레이션 됨?
-     │
-     ├── Yes ──▶ Essential Matrix (E)
-     │            - 5 DOF
-     │            - R, t 분해 가능
-     │            - SLAM 주로 사용
-     │
-     └── No ───▶ Fundamental Matrix (F)
-                  - 7 DOF
-                  - 픽셀 좌표 사용
-                  - 기하학적 검증용
+```mermaid
+flowchart TD
+    A{"캘리브레이션 됨?"} -->|Yes| B["Essential Matrix (E)<br/>- 5 DOF<br/>- R, t 분해 가능<br/>- SLAM 주로 사용"]
+    A -->|No| C["Fundamental Matrix (F)<br/>- 7 DOF<br/>- 픽셀 좌표 사용<br/>- 기하학적 검증용"]
 ```
 
 ### 공식 요약

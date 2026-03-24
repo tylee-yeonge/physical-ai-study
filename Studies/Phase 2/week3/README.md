@@ -612,20 +612,14 @@ ORB-SLAM은 **매칭 방식**을 사용한다. 매 프레임마다 디스크립�
 
 ### 알고리즘 선택 가이드
 
-```
-실시간 필요?
-    │
-    ├── Yes ──▶ 디스크립터 필요?
-    │               │
-    │               ├── Yes ──▶ ORB
-    │               │
-    │               └── No ───▶ FAST + KLT 추적
-    │
-    └── No ───▶ 정확도 우선?
-                    │
-                    ├── Yes ──▶ SIFT/SURF
-                    │
-                    └── No ───▶ ORB
+```mermaid
+flowchart TD
+    A{"실시간 필요?"} -->|Yes| B{"디스크립터 필요?"}
+    A -->|No| C{"정확도 우선?"}
+    B -->|Yes| D["ORB"]
+    B -->|No| E["FAST + KLT 추적"]
+    C -->|Yes| F["SIFT/SURF"]
+    C -->|No| G["ORB"]
 ```
 
 ### 파라미터 가이드

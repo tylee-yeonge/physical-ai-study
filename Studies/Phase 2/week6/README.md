@@ -178,23 +178,12 @@ def cheirality_check(R, t, pts1, pts2, K):
 
 ### 4. 전체 포즈 추정 파이프라인
 
-```
-대응점 (pts1, pts2)
-        │
-        ▼
-Essential Matrix 계산
-   cv2.findEssentialMat()
-        │
-        ▼
-R, t 분해 (4가지 해)
-   cv2.decomposeEssentialMat()
-        │
-        ▼
-삼각측량 + Cheirality Check
-        │
-        ▼
-올바른 (R, t) 선택
-   cv2.recoverPose()
+```mermaid
+flowchart TD
+    A["대응점 (pts1, pts2)"] --> B["Essential Matrix 계산<br/>cv2.findEssentialMat()"]
+    B --> C["R, t 분해 (4가지 해)<br/>cv2.decomposeEssentialMat()"]
+    C --> D["삼각측량 + Cheirality Check"]
+    D --> E["올바른 (R, t) 선택<br/>cv2.recoverPose()"]
 ```
 
 #### OpenCV recoverPose
@@ -304,21 +293,12 @@ sfm.cpp / initial_sfm.cpp:
 
 ### E → R, t 분해 요약
 
-```
-E = U · Σ · Vᵀ (SVD)
-        │
-        ▼
-W = [0 -1 0; 1 0 0; 0 0 1]
-        │
-        ▼
-R₁ = U·Wᵀ·Vᵀ,  R₂ = U·W·Vᵀ
-t₁ = +U₃,       t₂ = -U₃
-        │
-        ▼
-4가지 조합 중 Cheirality Check
-        │
-        ▼
-유일한 올바른 (R, t)
+```mermaid
+flowchart TD
+    A["E = U · Σ · Vᵀ (SVD)"] --> B["W = [0 -1 0; 1 0 0; 0 0 1]"]
+    B --> C["R₁ = U·Wᵀ·Vᵀ, R₂ = U·W·Vᵀ<br/>t₁ = +U₃, t₂ = -U₃"]
+    C --> D["4가지 조합 중 Cheirality Check"]
+    D --> E["유일한 올바른 (R, t)"]
 ```
 
 ### 공식 요약
