@@ -198,6 +198,15 @@ void problem2_essential_matrix()
     // [OpenCV] cv::Mat E = cv::findEssentialMat(points1, points2, K, cv::RANSAC, 0.999, 1.0);
 
     // 1-1. 픽셀 좌표 → 정규화 좌표 변환: p_norm = K^{-1} * p_pixel
+    //
+    //   픽셀 좌표 (u, v)는 카메라마다 해상도/렌즈가 달라서 기하학적 비교 불가.
+    //   K^{-1}을 곱해서 카메라 의존성을 제거한 "정규화 좌표"로 변환한다.
+    //
+    //     x_norm = (u - cx) / fx   ← 주점(cx)을 빼서 중심 이동, 초점거리(fx)로 나눠서 스케일 제거
+    //     y_norm = (v - cy) / fy
+    //
+    //   결과: "카메라 앞 1m 평면"에서의 좌표 (카메라 무관, 순수 기하학)
+    //   Essential Matrix의 에피폴라 제약 p2^T · E · p1 = 0 은 정규화 좌표에서만 성립
     cv::Mat K_inv = K.inv();
     std::vector<cv::Point2d> norm_pts1, norm_pts2;
     for (size_t i = 0; i < points1.size(); i++)
@@ -211,9 +220,16 @@ void problem2_essential_matrix()
     }
 
     // 1-2. 8-Point Algorithm: A행렬 구성
-    //   에피폴라 제약 p2^T * E * p1 = 0을 전개하면:
-    //   [x2*x1, x2*y1, x2, y2*x1, y2*y1, y2, x1, y1, 1] · e = 0
-    //   N개 대응점 → N×9 행렬 A, Ae = 0의 비자명 해 = SVD의 V^T 마지막 행
+    //
+    //   에피폴라 제약: p2^T · E · p1 = 0
+    //     "같은 3D 점의 투영 p1, p2는 반드시 에피폴라 선 위에 있다"
+    //     → 카메라1에서 본 점의 광선을 카메라2에 투영하면 직선(에피폴라 선)이 되고,
+    //       대응점 p2는 그 직선 위에만 존재할 수 있다는 기하학적 제약.
+    //     → 이 제약을 수식으로 쓰면 E를 구할 수 있고, E에서 R, t를 복원한다.
+    //
+    //   전개: E를 9×1 벡터 e로 펼치면 각 대응점마다 1개 방정식:
+    //     [x2*x1, x2*y1, x2, y2*x1, y2*y1, y2, x1, y1, 1] · e = 0
+    //   N개 대응점 → N×9 행렬 A → Ae = 0의 비자명 해 = SVD의 V^T 마지막 행
     int N = (int)norm_pts1.size();
     cv::Mat A(N, 9, CV_64F);
     for (int i = 0; i < N; i++)
@@ -227,15 +243,22 @@ void problem2_essential_matrix()
     }
 
     // 1-3. SVD로 해 구하기
+    //   Ae = 0 → "A에 곱했을 때 결과가 가장 0에 가까운 벡터"를 찾는 문제
+    //   SVD(A) = U · S · V^T 에서, 가장 작은 특이값에 대응하는 V^T의 마지막 행이 해
+    //   이 9×1 벡터를 3×3으로 reshape하면 E 행렬의 초기 추정값
     cv::Mat w_a, u_a, vt_a;
     cv::SVD::compute(A, w_a, u_a, vt_a);
-    cv::Mat E_raw = vt_a.row(vt_a.rows - 1).reshape(0, 3);  // 마지막 행 → 3×3
+    cv::Mat E_raw = vt_a.row(vt_a.rows - 1).reshape(0, 3);
 
-    // 1-4. rank-2 제약 적용: E의 특이값을 (1, 1, 0)으로 강제
-    //   Essential Matrix는 반드시 rank 2 (두 개의 동일 특이값 + 0)
+    // 1-4. rank-2 제약 적용
+    //   수학적으로 Essential Matrix는 반드시 rank 2여야 한다 (E = [t]× · R 이므로)
+    //   하지만 노이즈 때문에 SVD로 구한 E_raw는 rank 3일 수 있다.
+    //   → E_raw를 다시 SVD 분해해서 특이값을 (σ, σ, 0)으로 강제한다.
+    //     - 가장 작은 특이값을 0으로 → rank 2 보장
+    //     - 나머지 두 특이값을 평균으로 → E의 성질 (동일 특이값 2개) 만족
     cv::Mat w_e, u_e, vt_e;
     cv::SVD::compute(E_raw, w_e, u_e, vt_e);
-    w_e.at<double>(2) = 0.0;  // 가장 작은 특이값을 0으로
+    w_e.at<double>(2) = 0.0;
     double avg_sv = (w_e.at<double>(0) + w_e.at<double>(1)) / 2.0;
     w_e.at<double>(0) = avg_sv;
     w_e.at<double>(1) = avg_sv;
@@ -248,11 +271,18 @@ void problem2_essential_matrix()
     // [OpenCV] cv::Mat R, t;
     // [OpenCV] int inliers = cv::recoverPose(E, points1, points2, K, R, t);
 
-    // 2-1. E = U * diag(1,1,0) * V^T 에서 R, t 후보 생성
-    //   W = [0 -1 0; 1 0 0; 0 0 1] (90도 회전)
-    //   R1 = U * W * V^T,   R2 = U * W^T * V^T
-    //   t1 = U의 3번째 열,  t2 = -t1
-    //   → 4가지 조합: (R1,t1), (R1,t2), (R2,t1), (R2,t2)
+    // 2-1. E에서 R, t 후보 생성
+    //
+    //   E = U · diag(σ, σ, 0) · V^T 로 분해되어 있다 (1-4에서 이미 수행).
+    //   여기서 W 행렬(Z축 90도 회전)을 사용하면 R과 t 후보를 만들 수 있다:
+    //
+    //     W = [0 -1 0; 1 0 0; 0 0 1]
+    //     R 후보: R1 = U · W · V^T,  R2 = U · W^T · V^T  (2가지)
+    //     t 후보: t1 = +U의 3번째 열,  t2 = -U의 3번째 열  (2가지)
+    //     → 총 4가지 (R,t) 조합
+    //
+    //   수학적으로 E를 만족하는 (R,t) 조합은 4개이지만,
+    //   물리적으로 의미 있는 것은 1개뿐이다 (→ cheirality 검증으로 선택).
     cv::Mat W = (cv::Mat_<double>(3, 3) << 0, -1, 0, 1, 0, 0, 0, 0, 1);
 
     cv::Mat R1 = u_e * W * vt_e;
@@ -260,11 +290,18 @@ void problem2_essential_matrix()
     cv::Mat t1 = u_e.col(2).clone();
     cv::Mat t2 = -t1;
 
-    // det(R) = -1이면 부호 반전 (반사 행렬 방지)
+    // 회전 행렬은 det(R) = +1 이어야 한다 (정회전).
+    // det = -1이면 거울 반사(reflection)이므로 부호를 반전시킨다.
     if (cv::determinant(R1) < 0) R1 = -R1;
     if (cv::determinant(R2) < 0) R2 = -R2;
 
-    // 2-2. Cheirality 검증: 삼각측량한 점이 두 카메라 앞(Z>0)에 있는 해 선택
+    // 2-2. Cheirality 검증
+    //
+    //   4가지 (R,t) 조합 중 "물리적으로 맞는 해"를 고르는 과정.
+    //   기준: 삼각측량으로 복원한 3D 점이 두 카메라 모두의 앞에 있어야 한다 (Z > 0).
+    //
+    //   틀린 해의 예: t 방향이 반대이면 3D 점이 카메라 뒤에 놓임 → Z < 0
+    //   → 4개 중 Z > 0인 점이 가장 많은 조합 = 정답
     std::vector<std::pair<cv::Mat, cv::Mat>> candidates = {
         {R1, t1}, {R1, t2}, {R2, t1}, {R2, t2}
     };
@@ -277,37 +314,45 @@ void problem2_essential_matrix()
         int positive_depth_count = 0;
         for (int i = 0; i < N; i++)
         {
-            // 간단한 깊이 부호 검사:
-            // 카메라1 기준: z1 > 0
-            // 카메라2 기준: z2 = (Rc * P + tc).z > 0
-            // 여기서는 에피폴라 제약으로 근사 검사
             cv::Mat p1 = (cv::Mat_<double>(3, 1) << norm_pts1[i].x, norm_pts1[i].y, 1.0);
             cv::Mat p2 = (cv::Mat_<double>(3, 1) << norm_pts2[i].x, norm_pts2[i].y, 1.0);
 
-            // 삼각측량 (간단한 중점법): 두 광선의 교차점 z 부호 확인
-            // P = [I|0], P' = [R|t]
+            // 삼각측량: 두 카메라의 광선이 만나는 3D 점 X를 구한다.
+            //
+            //   카메라1: 원점(O1)에서 p1 방향으로 광선 → X = λ · p1
+            //   카메라2: O2에서 p2 방향으로 광선      → X = Rc^T · (μ · p2 - tc)
+            //
+            //   투영 방정식을 전개하면 선형 시스템 A·X = b 형태로 정리:
+            //     카메라1: x1 = X/Z, y1 = Y/Z  →  X - x1·Z = 0,  Y - y1·Z = 0
+            //     카메라2: x2 = (R행1·X + tx) / (R행3·X + tz)  →  전개 후 정리
             cv::Mat A_tri(4, 3, CV_64F);
             cv::Mat b_tri(4, 1, CV_64F);
-            // x1 = X/Z, y1 = Y/Z → X - x1*Z = 0, Y - y1*Z = 0
+
+            // 카메라1 방정식 (2행)
             A_tri.at<double>(0, 0) = 1;  A_tri.at<double>(0, 1) = 0;  A_tri.at<double>(0, 2) = -p1.at<double>(0);
             A_tri.at<double>(1, 0) = 0;  A_tri.at<double>(1, 1) = 1;  A_tri.at<double>(1, 2) = -p1.at<double>(1);
-            // x2 = (r1·X + tx) / (r3·X + tz) → 전개
+
+            // 카메라2 방정식 (2행): 교차곱 전개로 분모 제거
             cv::Mat row2 = Rc.row(0) - p2.at<double>(0) * Rc.row(2);
             cv::Mat row3 = Rc.row(1) - p2.at<double>(1) * Rc.row(2);
             row2.copyTo(A_tri.row(2));
             row3.copyTo(A_tri.row(3));
+
             b_tri.at<double>(0) = 0;
             b_tri.at<double>(1) = 0;
             b_tri.at<double>(2) = -(tc.at<double>(0) - p2.at<double>(0) * tc.at<double>(2));
             b_tri.at<double>(3) = -(tc.at<double>(1) - p2.at<double>(1) * tc.at<double>(2));
 
+            // 최소제곱 해 (과결정 시스템 → SVD로 풀기)
             cv::Mat X;
             cv::solve(A_tri, b_tri, X, cv::DECOMP_SVD);
 
-            double z1 = X.at<double>(2);
-            cv::Mat X_cam2 = Rc * X + tc;
-            double z2 = X_cam2.at<double>(2);
+            // 깊이 부호 확인
+            double z1 = X.at<double>(2);                     // 카메라1 기준 깊이
+            cv::Mat X_cam2 = Rc * X + tc;                    // 카메라2 좌표계로 변환
+            double z2 = X_cam2.at<double>(2);                // 카메라2 기준 깊이
 
+            // 두 카메라 모두에서 물체가 앞에 있어야 유효
             if (z1 > 0 && z2 > 0)
                 positive_depth_count++;
         }
@@ -321,6 +366,8 @@ void problem2_essential_matrix()
     }
 
     // t를 단위 벡터로 정규화
+    // Essential Matrix에서 복원한 t는 방향만 의미 있고, 절대 크기(스케일)는 알 수 없다.
+    // (단안 카메라의 근본적 한계 — 스테레오나 IMU 없이는 실제 거리를 모른다)
     best_t = best_t / cv::norm(best_t);
 
     std::cout << "\nRotation:\n" << best_R << std::endl;
