@@ -267,7 +267,9 @@ void problem2_essential_matrix()
     //   Ae = 0 → "A에 곱했을 때 결과가 가장 0에 가까운 벡터"를 찾는 문제
     //   SVD(A) = U · S · V^T 에서, 가장 작은 특이값에 대응하는 V^T의 마지막 행이 해
     //   이 9×1 벡터를 3×3으로 reshape하면 E 행렬의 초기 추정값
-    cv::Mat w_a, u_a, vt_a;
+    cv::Mat w_a;   // 특이값 벡터 (singular values)
+    cv::Mat u_a;   // 좌측 특이벡터 행렬 (U)
+    cv::Mat vt_a;  // 우측 특이벡터 행렬의 전치 (V^T)
     cv::SVD::compute(A, w_a, u_a, vt_a);
     cv::Mat E_raw = vt_a.row(vt_a.rows - 1).reshape(0, 3);
 
@@ -277,7 +279,9 @@ void problem2_essential_matrix()
     //   → E_raw를 다시 SVD 분해해서 특이값을 (σ, σ, 0)으로 강제한다.
     //     - 가장 작은 특이값을 0으로 → rank 2 보장
     //     - 나머지 두 특이값을 평균으로 → E의 성질 (동일 특이값 2개) 만족
-    cv::Mat w_e, u_e, vt_e;
+    cv::Mat w_e;   // 특이값 벡터 (σ, σ, 0) — E의 rank-2 성질을 나타냄
+    cv::Mat u_e;   // 좌측 특이벡터 (U) — 병진(translation) 방향 정보 (t = ±U의 3번째 열)
+    cv::Mat vt_e;  // 우측 특이벡터 전치 (V^T) — 회전(rotation) 복원에 사용 (R = U·W·V^T)
     cv::SVD::compute(E_raw, w_e, u_e, vt_e);
     w_e.at<double>(2) = 0.0;
     double avg_sv = (w_e.at<double>(0) + w_e.at<double>(1)) / 2.0;
