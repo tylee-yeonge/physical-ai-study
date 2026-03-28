@@ -191,6 +191,7 @@ void problem2_essential_matrix()
     //     E를 9×1 벡터 e로 펼쳤을 때, 각 대응점마다 1개 방정식이 나온다:
     //     [x2*x1, x2*y1, x2, y2*x1, y2*y1, y2, x1, y1, 1] · e = 0
     //   N개 대응점 → N×9 행렬 A → Ae = 0 풀기
+    int N = 0;
     
     // --- 단계 1-3: SVD로 해 구하기 ---
     //   Ae = 0 → "A에 곱했을 때 가장 0에 가까운 벡터"
@@ -208,6 +209,8 @@ void problem2_essential_matrix()
     // TODO 2: E에서 R, t 복원 (SVD 분해 + Cheirality 검증)
     // [OpenCV 원라이너] int inliers = cv::recoverPose(E, points1, points2, K, R, t);
     
+    cv::Mat best_R, best_t;
+    int best_count = 0;
     // --- 단계 2-1: R, t 후보 생성 ---
     //   E의 SVD: E = U·diag(σ,σ,0)·V^T (TODO 1에서 이미 분해됨)
     //   W 행렬 (Z축 90도 회전): W = [0 -1 0; 1 0 0; 0 0 1]
@@ -228,10 +231,23 @@ void problem2_essential_matrix()
     //     3) z1 > 0 && z2 > 0이면 유효한 점
     //   → Z > 0인 점이 가장 많은 (R,t) 조합이 정답
 
-    std::cout << "\n💡 SLAM에서의 의미:" << std::endl;
-    std::cout << "   - E를 분해 → R (회전), t (이동)" << std::endl;
-    std::cout << "   - 두 프레임 간 상대 포즈!" << std::endl;
-    std::cout << "   - t는 단위 벡터 — 스케일 정보 없음" << std::endl;
+    // t를 단위 벡터로 정규화
+    // Essential Matrix에서 복원한 t는 방향만 의미 있고, 절대 크기(스케일)는 알 수 없다.
+    // (단안 카메라의 근본적 한계 — 스테레오나 IMU 없이는 실제 거리를 모른다)
+    best_t = best_t / cv::norm(best_t);
+
+    std::cout << "\nRotation:\n" << best_R << std::endl;
+    std::cout << "Translation:\n" << best_t << std::endl;
+    std::cout << "Cheirality 통과: " << best_count << " / " << N << "개" << std::endl;
+
+    // OpenCV 결과와 비교
+    cv::Mat E_cv = cv::findEssentialMat(points1, points2, K, cv::RANSAC, 0.999, 1.0);
+    cv::Mat R_cv, t_cv;
+    cv::recoverPose(E_cv, points1, points2, K, R_cv, t_cv);
+    std::cout << "\n📊 OpenCV 비교:" << std::endl;
+    std::cout << "E (OpenCV):\n" << E_cv << std::endl;
+    std::cout << "R (OpenCV):\n" << R_cv << std::endl;
+    std::cout << "t (OpenCV):\n" << t_cv << std::endl;
 }
 
 // 문제 3: BF vs FLANN 매칭 벤치마크 — 속도와 정확도 비교
