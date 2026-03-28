@@ -231,14 +231,22 @@ void problem2_essential_matrix()
     //     3) z1 > 0 && z2 > 0이면 유효한 점
     //   → Z > 0인 점이 가장 많은 (R,t) 조합이 정답
 
-    // t를 단위 벡터로 정규화
-    // Essential Matrix에서 복원한 t는 방향만 의미 있고, 절대 크기(스케일)는 알 수 없다.
-    // (단안 카메라의 근본적 한계 — 스테레오나 IMU 없이는 실제 거리를 모른다)
-    best_t = best_t / cv::norm(best_t);
+    // TODO가 구현되면 아래 블록이 실행된다.
+    if (!best_t.empty())
+    {
+        // t를 단위 벡터로 정규화
+        // Essential Matrix에서 복원한 t는 방향만 의미 있고, 절대 크기(스케일)는 알 수 없다.
+        // (단안 카메라의 근본적 한계 — 스테레오나 IMU 없이는 실제 거리를 모른다)
+        best_t = best_t / cv::norm(best_t);
 
-    std::cout << "\nRotation:\n" << best_R << std::endl;
-    std::cout << "Translation:\n" << best_t << std::endl;
-    std::cout << "Cheirality 통과: " << best_count << " / " << N << "개" << std::endl;
+        std::cout << "\nRotation:\n" << best_R << std::endl;
+        std::cout << "Translation:\n" << best_t << std::endl;
+        std::cout << "Cheirality 통과: " << best_count << " / " << N << "개" << std::endl;
+    }
+    else
+    {
+        std::cout << "\n⚠️ TODO 미구현: E, R, t가 아직 계산되지 않았습니다." << std::endl;
+    }
 
     // OpenCV 결과와 비교
     cv::Mat E_cv = cv::findEssentialMat(points1, points2, K, cv::RANSAC, 0.999, 1.0);
@@ -316,23 +324,31 @@ void problem3_matching_benchmark()
     //   5. 종료 시간 기록 → 소요 시간(ms) 계산
     //
     // 또는 간단하게: 해밍 거리 기반 전수 비교 매처로도 측정 가능
-    
-    // TODO: FLANN 매칭 시간 측정
+
+    // FLANN 매칭 시간 측정
     //
-    // --- FLANN(Fast Library for Approximate Nearest Neighbors)의 원리 ---
+    // FLANN = Fast Library for Approximate Nearest Neighbors
     //   KD-tree 등 공간 분할 자료구조로 근사 최근접 탐색 → O(N log N) 수준
     //   정확도 ~99%이지만 속도가 수 배~수십 배 빠름
+    //   직접 구현하려면 KD-tree 구축 + 근사 탐색 알고리즘이 필요해 ~200줄 이상이므로
+    //   여기서는 OpenCV 함수를 사용한다.
     //
-    // 구현 방법:
-    //   1. FLANN은 실수형(32비트 float)만 지원 → 디스크립터 타입 변환 필요
-    //   2. FLANN 기반 매처 생성
-    //   3. 시간 측정하며 매칭 수행
-    //   4. BF 시간과 비교하여 속도비 계산
+    //   주의: FLANN은 실수형(CV_32F)만 지원 → 이진 디스크립터를 float로 변환 필요
+    cv::Mat desc1_f, desc2_f;
+    desc1.convertTo(desc1_f, CV_32F);
+    desc2.convertTo(desc2_f, CV_32F);
+
+    auto start_flann = std::chrono::high_resolution_clock::now();
+    cv::FlannBasedMatcher flann_matcher;
+    std::vector<cv::DMatch> flann_matches;
+    flann_matcher.match(desc1_f, desc2_f, flann_matches);
+    auto end_flann = std::chrono::high_resolution_clock::now();
+    double flann_ms = std::chrono::duration<double, std::milli>(end_flann - start_flann).count();
 
     std::cout << "매칭 알고리즘  |  시간 (ms)  |  속도비" << std::endl;
     std::cout << "---------------+-------------+---------" << std::endl;
-    std::cout << "Brute-Force    |     ???     |   1.0x" << std::endl;
-    std::cout << "FLANN          |     ???     |   ???x" << std::endl;
+    std::cout << "Brute-Force    |  " << bf_ms << "  |   1.0x" << std::endl;
+    std::cout << "FLANN          |  " << flann_ms << "  |   " << bf_ms / flann_ms << "x" << std::endl;
 
     std::cout << "\n💡 결론:" << std::endl;
     std::cout << "   - BF: 정확하지만 느림 O(N²)" << std::endl;

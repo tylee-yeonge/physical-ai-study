@@ -686,7 +686,7 @@ void problem3_matching_benchmark()
         }
         // DMatch(queryIdx, trainIdx, distance): 매칭 결과 저장
         //   i번째 desc1 디스크립터 ↔ best_j번째 desc2 디스크립터, 거리 = best_dist
-        bf_matches.push_back(cv::DMatch(i, best_j, (float)best_dist));
+        bf_matches.push_back(cv::DMatch(i, best_j, static_cast<float>(best_dist)));
     }
     auto end_bf = std::chrono::high_resolution_clock::now();
     // duration<double, std::milli>: 시간 차이를 밀리초(ms) 단위 double로 변환
