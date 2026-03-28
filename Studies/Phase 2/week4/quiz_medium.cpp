@@ -277,10 +277,29 @@ void problem3_matching_benchmark()
     std::cout << "문제 3: 매칭 성능 벤치마크" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    // 대량의 특징점으로 테스트 — 2000개에서 BF와 FLANN의 속도 차이 관찰
+    // ── 이미지에서 ORB 디스크립터 추출 ──
+    //
+    //   랜덤 데이터가 아닌 실제 이미지에서 특징점을 검출하고 디스크립터를 계산한다.
+    //   실제 디스크립터는 랜덤과 달리 구조적 패턴이 있어 매칭 결과가 더 현실적이다.
     int num_features = 2000;
 
-    std::cout << "특징점 개수: " << num_features << "개\n" << std::endl;
+    // graf1.png, graf3.png: OpenCV 공식 샘플 — 그래피티 벽을 다른 시점에서 촬영한 이미지 쌍
+    // (problem1,2의 box 이미지와 다른 장면을 사용하여 다양한 상황에서의 매칭 성능을 확인)
+    cv::Mat img1 = cv::imread("../images/graf1.png", cv::IMREAD_GRAYSCALE);
+    cv::Mat img2 = cv::imread("../images/graf3.png", cv::IMREAD_GRAYSCALE);
+    if (img1.empty() || img2.empty())
+    {
+        std::cerr << "이미지 로드 실패!" << std::endl;
+        return;
+    }
+
+    auto orb = cv::ORB::create(num_features);
+    std::vector<cv::KeyPoint> kp1, kp2;
+    cv::Mat desc1, desc2;
+    orb->detectAndCompute(img1, cv::noArray(), kp1, desc1);
+    orb->detectAndCompute(img2, cv::noArray(), kp2, desc2);
+
+    std::cout << "특징점 개수: img1=" << desc1.rows << "개, img2=" << desc2.rows << "개\n" << std::endl;
 
     // TODO: BF 매칭 시간 측정
     //
@@ -297,7 +316,7 @@ void problem3_matching_benchmark()
     //   5. 종료 시간 기록 → 소요 시간(ms) 계산
     //
     // 또는 간단하게: 해밍 거리 기반 전수 비교 매처로도 측정 가능
-
+    
     // TODO: FLANN 매칭 시간 측정
     //
     // --- FLANN(Fast Library for Approximate Nearest Neighbors)의 원리 ---

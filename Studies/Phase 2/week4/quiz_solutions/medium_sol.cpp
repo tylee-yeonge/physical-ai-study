@@ -602,36 +602,80 @@ void problem3_matching_benchmark()
     std::cout << "문제 3: 매칭 성능 벤치마크" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 
-    // 대량의 특징점으로 테스트 — 2000개에서 BF와 FLANN의 속도 차이 관찰
+    // ── 이미지에서 ORB 디스크립터 추출 ──
+    //
+    //   랜덤 데이터가 아닌 실제 이미지에서 특징점을 검출하고 디스크립터를 계산한다.
+    //   실제 디스크립터는 랜덤과 달리 구조적 패턴이 있어 매칭 결과가 더 현실적이다.
     int num_features = 2000;
 
-    std::cout << "특징점 개수: " << num_features << "개\n" << std::endl;
+    // graf1.png, graf3.png: OpenCV 공식 샘플 — 그래피티 벽을 다른 시점에서 촬영한 이미지 쌍
+    // (problem1,2의 box 이미지와 다른 장면을 사용하여 다양한 상황에서의 매칭 성능을 확인)
+    cv::Mat img1 = cv::imread("../images/graf1.png", cv::IMREAD_GRAYSCALE);
+    cv::Mat img2 = cv::imread("../images/graf3.png", cv::IMREAD_GRAYSCALE);
+    if (img1.empty() || img2.empty())
+    {
+        std::cerr << "이미지 로드 실패!" << std::endl;
+        return;
+    }
+
+    auto orb = cv::ORB::create(num_features);
+    std::vector<cv::KeyPoint> kp1, kp2;
+    cv::Mat desc1, desc2;
+    orb->detectAndCompute(img1, cv::noArray(), kp1, desc1);
+    orb->detectAndCompute(img2, cv::noArray(), kp2, desc2);
+
+    std::cout << "특징점 개수: img1=" << desc1.rows << "개, img2=" << desc2.rows << "개\n" << std::endl;
 
     // [OpenCV] cv::BFMatcher bf_matcher(cv::NORM_HAMMING);
     // [OpenCV] bf_matcher.match(desc1, desc2, bf_matches);
     // ✅ 정답: BF 매칭 직접 구현 — 모든 쌍의 해밍 거리를 비교하여 최근접 탐색
-    cv::Mat desc1(num_features, 32, CV_8U);
-    cv::Mat desc2(num_features, 32, CV_8U);
-    cv::randu(desc1, 0, 255);
-    cv::randu(desc2, 0, 255);
+    //
+    //   디스크립터(descriptor)란?
+    //     특징점 주변 영역의 "지문" 같은 것. 각 특징점마다 하나의 벡터가 할당된다.
+    //     ORB의 경우 256비트(= 32바이트) 이진 벡터로, 각 비트가 "주변 픽셀 A > B인가?"의 결과이다.
+    //
+    //   desc1, desc2: 각각 이미지1, 이미지2에서 추출한 디스크립터 행렬
+    //     행(row) = 특징점 개수
+    //     열(col) = 디스크립터 크기 (32바이트 = 256비트, ORB 기준)
+    //     CV_8U = unsigned char (0~255) → 이진 디스크립터를 바이트 단위로 저장
 
+    // ── Brute-Force(BF) 매칭 ──
+    //
+    //   원리: desc1의 모든 디스크립터를 desc2의 모든 디스크립터와 비교한다.
+    //   시간 복잡도: O(N²) — N=2000이면 2000×2000 = 400만 번 비교
+    //   장점: 정확함 (모든 쌍을 빠짐없이 비교하므로 최근접을 확실히 찾음)
+    //   단점: 특징점이 많아지면 급격히 느려짐
     auto start_bf = std::chrono::high_resolution_clock::now();
     std::vector<cv::DMatch> bf_matches;
+    // desc1의 각 디스크립터(i)에 대해, desc2에서 가장 가까운 디스크립터(j)를 찾는다
     for (int i = 0; i < desc1.rows; i++)
     {
-        int best_j = 0;
-        int best_dist = INT_MAX;
+        int best_j = 0;           // 지금까지 가장 가까운 desc2의 인덱스
+        int best_dist = INT_MAX;  // 지금까지 가장 작은 거리
         for (int j = 0; j < desc2.rows; j++)
         {
-            // 해밍 거리: XOR 후 1인 비트 개수
+            // ── 해밍 거리(Hamming Distance) 계산 ──
+            //
+            //   이진 디스크립터 간의 유사도를 측정하는 방법.
+            //   두 벡터에서 서로 다른 비트의 개수 = 해밍 거리
+            //     예) 10110 vs 10001 → 다른 비트 3개 → 해밍 거리 = 3
+            //
+            //   계산 방법:
+            //     1) XOR: 두 바이트를 XOR하면 다른 비트만 1이 된다
+            //        예) 0xB6 ^ 0x91 = 0x27 (서로 다른 비트만 1)
+            //     2) popcount: XOR 결과에서 1인 비트 개수를 센다
+            //
+            //   해밍 거리가 작을수록 두 디스크립터가 유사하다 (= 같은 물체일 가능성 높음)
             int dist = 0;
             for (int k = 0; k < desc1.cols; k++)
             {
+                // XOR: 두 바이트에서 다른 비트만 1로 만든다
                 uint8_t xor_val = desc1.at<uint8_t>(i, k) ^ desc2.at<uint8_t>(j, k);
+                // popcount: 1인 비트 개수를 하나씩 센다
                 while (xor_val)
                 {
-                    dist += xor_val & 1;
-                    xor_val >>= 1;
+                    dist += xor_val & 1;   // 최하위 비트가 1이면 +1
+                    xor_val >>= 1;         // 오른쪽으로 1비트 시프트 (다음 비트 검사)
                 }
             }
             if (dist < best_dist)
@@ -640,20 +684,32 @@ void problem3_matching_benchmark()
                 best_j = j;
             }
         }
+        // DMatch(queryIdx, trainIdx, distance): 매칭 결과 저장
+        //   i번째 desc1 디스크립터 ↔ best_j번째 desc2 디스크립터, 거리 = best_dist
         bf_matches.push_back(cv::DMatch(i, best_j, (float)best_dist));
     }
     auto end_bf = std::chrono::high_resolution_clock::now();
+    // duration<double, std::milli>: 시간 차이를 밀리초(ms) 단위 double로 변환
     double bf_ms = std::chrono::duration<double, std::milli>(end_bf - start_bf).count();
 
-    // ✅ 정답: FLANN 매칭 시간 측정
+    // ── FLANN 매칭 ──
+    //
+    //   FLANN = Fast Library for Approximate Nearest Neighbors
+    //   원리: KD-tree 등의 인덱스를 미리 구축해서 근사 최근접 이웃을 빠르게 찾는다.
+    //   BF가 모든 쌍을 비교하는 것과 달리, 트리 탐색으로 대부분의 후보를 건너뛴다.
+    //   시간 복잡도: O(N log N) — BF의 O(N²)보다 훨씬 빠름
+    //   단점: "근사(approximate)" 탐색이므로 ~99% 정확 (가끔 최근접을 놓칠 수 있음)
+    //
+    //   주의: FLANN은 실수형(CV_32F)만 지원한다.
+    //   ORB 디스크립터는 CV_8U(이진)이므로, float로 변환이 필요하다.
     cv::Mat desc1_f, desc2_f;
-    desc1.convertTo(desc1_f, CV_32F);
+    desc1.convertTo(desc1_f, CV_32F);  // uint8 → float 변환
     desc2.convertTo(desc2_f, CV_32F);
 
     auto start_flann = std::chrono::high_resolution_clock::now();
     cv::FlannBasedMatcher flann_matcher;
     std::vector<cv::DMatch> flann_matches;
-    flann_matcher.match(desc1_f, desc2_f, flann_matches);
+    flann_matcher.match(desc1_f, desc2_f, flann_matches);  // 내부적으로 KD-tree 구축 후 탐색
     auto end_flann = std::chrono::high_resolution_clock::now();
     double flann_ms = std::chrono::duration<double, std::milli>(end_flann - start_flann).count();
 
