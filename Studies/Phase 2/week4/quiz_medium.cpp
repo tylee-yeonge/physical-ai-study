@@ -356,6 +356,24 @@ void problem3_matching_benchmark()
     std::cout << "   - 실시간 SLAM: FLANN 또는 NN 기반" << std::endl;
 }
 
+// TODO: DLT 헬퍼 함수 — 대응점으로 Homography를 직접 추정
+// 문제4에서 구현 원리를 설명하고, 문제5의 RANSAC에서도 재사용
+//
+// 구현 방법:
+//   1. 대응점으로 A 행렬(2N×9) 구성 (문제4의 행 배치 규칙 참조)
+//   2. SVD 분해 후 V^T의 마지막 행 → h 벡터(9×1) → 3×3으로 reshape
+//   3. h33으로 나누어 정규화, 유효하지 않으면 빈 Mat 반환
+cv::Mat compute_homography_dlt(const std::vector<cv::Point2d>& src,
+                               const std::vector<cv::Point2d>& dst)
+{
+    int n = static_cast<int>(src.size());
+    if (n < 4) return cv::Mat();
+
+    cv::Mat H = cv::Mat::eye(3, 3, CV_64F);
+    // TODO: DLT 알고리즘 구현
+    return H;
+}
+
 // 문제 4: Homography DLT 직접 구현 — A행렬 구성 + SVD 분해
 //
 // ★ 핵심: 대응점으로 연립방정식 Ah=0을 만들고, SVD로 최소 노름 해를 구함
