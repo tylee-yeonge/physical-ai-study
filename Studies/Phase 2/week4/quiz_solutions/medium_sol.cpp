@@ -744,20 +744,28 @@ cv::Mat compute_homography_dlt(const std::vector<cv::Point2d>& src,
     cv::Mat A = cv::Mat::zeros(2 * n, kHomographyParams, CV_64F);
     for (int i = 0; i < n; i++)
     {
-        double x = src[i].x, y = src[i].y;
-        double u = dst[i].x, v = dst[i].y;
-        A.at<double>(2 * i, 0) = -x;
-        A.at<double>(2 * i, 1) = -y;
-        A.at<double>(2 * i, 2) = -1;
-        A.at<double>(2 * i, 6) = u * x;
-        A.at<double>(2 * i, 7) = u * y;
-        A.at<double>(2 * i, 8) = u;
-        A.at<double>(2 * i + 1, 3) = -x;
-        A.at<double>(2 * i + 1, 4) = -y;
-        A.at<double>(2 * i + 1, 5) = -1;
-        A.at<double>(2 * i + 1, 6) = v * x;
-        A.at<double>(2 * i + 1, 7) = v * y;
-        A.at<double>(2 * i + 1, 8) = v;
+        double x = src[i].x, y = src[i].y;  // 원본 이미지 좌표
+        double u = dst[i].x, v = dst[i].y;  // 변환된 이미지 좌표
+
+        // 행 2i: u 방정식 — u(h7x+h8y+h9) = h1x+h2y+h3 를 정리한 것
+        //   [-x, -y, -1, 0, 0, 0, ux, uy, u] · h = 0
+        A.at<double>(2 * i, 0) = -x;      // h1 계수: -x
+        A.at<double>(2 * i, 1) = -y;      // h2 계수: -y
+        A.at<double>(2 * i, 2) = -1;      // h3 계수: -1
+        // 열 3,4,5는 0 (v 방정식에서만 사용)
+        A.at<double>(2 * i, 6) = u * x;   // h7 계수: 분모에서 넘어온 u·x
+        A.at<double>(2 * i, 7) = u * y;   // h8 계수: 분모에서 넘어온 u·y
+        A.at<double>(2 * i, 8) = u;       // h9 계수: 분모에서 넘어온 u
+
+        // 행 2i+1: v 방정식 — v(h7x+h8y+h9) = h4x+h5y+h6 를 정리한 것
+        //   [0, 0, 0, -x, -y, -1, vx, vy, v] · h = 0
+        // 열 0,1,2는 0 (u 방정식에서만 사용)
+        A.at<double>(2 * i + 1, 3) = -x;  // h4 계수: -x
+        A.at<double>(2 * i + 1, 4) = -y;  // h5 계수: -y
+        A.at<double>(2 * i + 1, 5) = -1;  // h6 계수: -1
+        A.at<double>(2 * i + 1, 6) = v * x; // h7 계수: 분모에서 넘어온 v·x
+        A.at<double>(2 * i + 1, 7) = v * y; // h8 계수: 분모에서 넘어온 v·y
+        A.at<double>(2 * i + 1, 8) = v;     // h9 계수: 분모에서 넘어온 v
     }
 
     cv::Mat S, U_svd, Vt;
