@@ -309,21 +309,21 @@ void problem3_matching_benchmark()
 
     std::cout << "특징점 개수: img1=" << desc1.rows << "개, img2=" << desc2.rows << "개\n" << std::endl;
 
-    // TODO: BF 매칭 시간 측정
+    auto start_bf = std::chrono::high_resolution_clock::now();
+    // TODO: BF 매칭 구현
     //
     // --- BF(Brute-Force) 매칭의 원리 ---
     //   모든 디스크립터 쌍(N×M)의 거리를 하나씩 비교 → 최근접 보장
     //   이진 디스크립터의 해밍 거리: XOR 후 1인 비트 수 (popcount)
     //
     // 구현 방법:
-    //   1. 랜덤 이진 디스크립터 2세트 생성 (부호 없는 8비트, 32열)
-    //   2. 시작 시간 기록
-    //   3. 이중 for문: desc1의 각 행 i에 대해 desc2의 모든 행 j와 해밍 거리 비교
+    //   1. 이중 for문: desc1의 각 행 i에 대해 desc2의 모든 행 j와 해밍 거리 비교
     //      해밍 거리 = 바이트별 XOR → 비트 카운트 합산
-    //   4. 가장 거리가 작은 j를 best match로 기록
-    //   5. 종료 시간 기록 → 소요 시간(ms) 계산
+    //   2. 가장 거리가 작은 j를 best match로 기록
     //
     // 또는 간단하게: 해밍 거리 기반 전수 비교 매처로도 측정 가능
+    auto end_bf = std::chrono::high_resolution_clock::now();
+    double bf_ms = std::chrono::duration<double, std::milli>(end_bf - start_bf).count();
 
     // FLANN 매칭 시간 측정
     //
