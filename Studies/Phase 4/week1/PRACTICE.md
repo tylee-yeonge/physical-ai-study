@@ -1,314 +1,150 @@
-# Week 1 실습: IMU 센서 데이터 이해 및 시뮬레이션
+# Week 1 실습: IMU 데이터 이해 + VINS 파라미터 확인
 
-> 🎯 **목표**: IMU 측정 모델을 코드로 구현하고, 적분 드리프트를 체험
-> 💻 **언어**: C++ (Eigen)
-> ⏰ **예상 시간**: 4시간
-
----
-
-## 📋 실습 개요
-
-이번 실습에서는 IMU 센서의 측정 모델을 직접 구현하고, 가속도를 적분하여 위치를 추정해 봅니다. 적분 오차가 어떻게 누적되는지 직접 체험합니다.
+> 🎯 **목표**: IMU 측정 모델을 이해하고, VINS config에서 노이즈 파라미터 확인
+> 💻 **방식**: 개념 확인 + 코드 분석
+> ⏰ **예상 시간**: 4-5시간
 
 ---
 
-## 🔧 환경 설정
+## 실습 1: VINS IMU 파라미터 확인 (1시간)
 
-```bash
-# Eigen 설치 확인
-pkg-config --modversion eigen3
+### config 파일 확인
 
-# 빌드
-cd week1
-mkdir build && cd build
-cmake ..
-make
+```yaml
+# VINS config (예: euroc/euroc_stereo_config.yaml)
+imu_topic: "/imu0"
+
+# 노이즈 파라미터 — 이 4가지가 VIO 성능을 좌우
+acc_n: 0.1          # 가속도계 white noise (m/s^2/sqrt(Hz))
+gyr_n: 0.01         # 자이로 white noise (rad/s/sqrt(Hz))
+acc_w: 0.001        # 가속도계 bias random walk
+gyr_w: 0.0001       # 자이로 bias random walk
 ```
 
----
+### 코드에서 확인
 
-## Step 1: IMU 측정 시뮬레이터
+`parameters.cpp`에서 이 값들이 어떻게 로드되는지 찾기:
 
 ```cpp
-#include <iostream>
-#include <Eigen/Dense>
-#include <random>
-#include <vector>
-#include <cmath>
+// parameters.cpp 에서
+fsSettings["acc_n"] >> ACC_N;
+fsSettings["gyr_n"] >> GYR_N;
+fsSettings["acc_w"] >> ACC_W;
+fsSettings["gyr_w"] >> GYR_W;
+```
 
-/**
- * IMU 측정 시뮬레이터
- * 실제 운동에서 IMU가 출력할 값을 생성합니다.
- */
-class IMUSimulator {
-public:
-    // 노이즈 파라미터
-    double accel_noise_std = 0.01;   // m/s² (가속도계 노이즈)
-    double gyro_noise_std = 0.001;   // rad/s (자이로 노이즈)
-    double accel_bias = 0.02;        // m/s² (가속도계 바이어스)
-    double gyro_bias = 0.005;        // rad/s (자이로 바이어스)
+**확인할 것:**
+- [ ] 4개 노이즈 파라미터가 각각 무엇을 의미하는지
+- [ ] `ACC_N`이 이후 `integration_base.h`에서 어떻게 사용되는지 추적
+- [ ] 노이즈 값이 클수록 → 해당 센서를 덜 믿음 → 다른 센서에 더 의존
 
-    Eigen::Vector3d gravity{0.0, 0.0, -9.81};  // 중력 벡터
+### 노이즈 파라미터의 직관
 
-    IMUSimulator() : gen_(42), noise_dist_(0.0, 1.0) {}
+```
+acc_n (white noise):
+  크면 → 가속도 측정이 시끄러움 → 적분 시 위치 오차 빠르게 증가
+  작으면 → 깨끗한 가속도 → IMU 적분 신뢰 가능
 
-    /**
-     * 가속도계 측정값 생성
-     * a_meas = R^T * (a_true - gravity) + bias + noise
-     */
-    Eigen::Vector3d measureAccel(
-        const Eigen::Matrix3d& R_wb,        // World→Body 회전
-        const Eigen::Vector3d& accel_world   // 월드 프레임 가속도
-    ) {
-        // Body 프레임에서의 비중력 가속도 + 중력
-        Eigen::Vector3d a_body = R_wb.transpose() * (accel_world - gravity);
+gyr_n (white noise):
+  크면 → 각속도 측정이 시끄러움 → 회전 추정 불안정
+  작으면 → 깨끗한 각속도 → 빠른 회전도 잘 추적
 
-        // 바이어스 추가
-        Eigen::Vector3d bias(accel_bias, accel_bias * 0.5, accel_bias * 0.8);
-
-        // 노이즈 추가
-        Eigen::Vector3d noise(
-            noise_dist_(gen_) * accel_noise_std,
-            noise_dist_(gen_) * accel_noise_std,
-            noise_dist_(gen_) * accel_noise_std
-        );
-
-        return a_body + bias + noise;
-    }
-
-    /**
-     * 자이로스코프 측정값 생성
-     * ω_meas = ω_true + bias + noise
-     */
-    Eigen::Vector3d measureGyro(
-        const Eigen::Vector3d& omega_true  // 실제 각속도
-    ) {
-        Eigen::Vector3d bias(gyro_bias, gyro_bias * 0.3, gyro_bias * 0.6);
-
-        Eigen::Vector3d noise(
-            noise_dist_(gen_) * gyro_noise_std,
-            noise_dist_(gen_) * gyro_noise_std,
-            noise_dist_(gen_) * gyro_noise_std
-        );
-
-        return omega_true + bias + noise;
-    }
-
-private:
-    std::default_random_engine gen_;
-    std::normal_distribution<double> noise_dist_;
-};
+acc_w, gyr_w (bias random walk):
+  크면 → 바이어스가 빠르게 변함 → 자주 재추정 필요
+  작으면 → 바이어스가 안정적 → 한번 추정하면 오래 유지
 ```
 
 ---
 
-## Step 2: IMU 적분기
+## 실습 2: IMU 적분 드리프트 직관 (1시간)
 
-```cpp
-/**
- * 단순 IMU 적분기
- * 가속도 → 속도 → 위치 적분
- */
-class IMUIntegrator {
-public:
-    Eigen::Vector3d position = Eigen::Vector3d::Zero();
-    Eigen::Vector3d velocity = Eigen::Vector3d::Zero();
-    Eigen::Matrix3d rotation = Eigen::Matrix3d::Identity();
+### 종이 계산으로 드리프트 체감
 
-    Eigen::Vector3d gravity{0.0, 0.0, -9.81};
-
-    /**
-     * 1 스텝 적분 (Euler method)
-     * @param accel_meas 가속도계 측정값 (body frame)
-     * @param gyro_meas  자이로 측정값 (body frame)
-     * @param dt         시간 간격
-     */
-    void integrate(
-        const Eigen::Vector3d& accel_meas,
-        const Eigen::Vector3d& gyro_meas,
-        double dt
-    ) {
-        // 1. 각속도 적분 → 회전 업데이트
-        //    R_{k+1} = R_k * exp(ω × dt)
-        double angle = gyro_meas.norm() * dt;
-        if (angle > 1e-10) {
-            Eigen::Vector3d axis = gyro_meas.normalized();
-            Eigen::AngleAxisd delta_rot(angle, axis);
-            rotation = rotation * delta_rot.toRotationMatrix();
-        }
-
-        // 2. 가속도를 월드 프레임으로 변환
-        //    a_world = R * a_body + gravity
-        Eigen::Vector3d accel_world = rotation * accel_meas + gravity;
-
-        // 3. 속도 적분
-        velocity += accel_world * dt;
-
-        // 4. 위치 적분
-        position += velocity * dt;
-    }
-};
+**자이로 바이어스 = 0.01 rad/s 일 때:**
+```
+1초 후:  0.01 rad = 0.57도
+10초 후: 0.1 rad  = 5.7도
+60초 후: 0.6 rad  = 34.4도  ← 방향 완전 틀어짐
 ```
 
----
+**가속도 노이즈 sigma_a = 0.01 m/s^2 일 때:**
+```
+속도 오차: sigma_a * sqrt(t)
+위치 오차: sigma_a * t^(3/2) / 3
 
-## Step 3: 시뮬레이션 실행
-
-```cpp
-int main() {
-    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
-    std::cout << "Week 1: IMU 센서 시뮬레이션" << std::endl;
-    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
-
-    IMUSimulator imu;
-    IMUIntegrator integrator;
-
-    // 시뮬레이션 파라미터
-    double dt = 0.005;           // 200Hz
-    double total_time = 10.0;    // 10초
-    int steps = total_time / dt;
-
-    // Ground Truth: 정지 상태 (a=0, ω=0)
-    Eigen::Matrix3d R_wb = Eigen::Matrix3d::Identity();
-    Eigen::Vector3d a_true = Eigen::Vector3d::Zero();
-    Eigen::Vector3d omega_true = Eigen::Vector3d::Zero();
-
-    std::cout << "=== 실험 1: 정지 상태에서 IMU 적분 ===" << std::endl;
-    std::cout << "GT 위치: (0, 0, 0)  GT 속도: (0, 0, 0)\n" << std::endl;
-
-    for (int i = 0; i < steps; i++) {
-        // IMU 측정값 생성
-        Eigen::Vector3d a_meas = imu.measureAccel(R_wb, a_true);
-        Eigen::Vector3d w_meas = imu.measureGyro(omega_true);
-
-        // 적분
-        integrator.integrate(a_meas, w_meas, dt);
-
-        // 1초마다 출력
-        double t = (i + 1) * dt;
-        if (std::fmod(t, 1.0) < dt) {
-            std::cout << "t=" << t << "s:"
-                      << "  pos=(" << integrator.position.transpose() << ")"
-                      << "  |pos|=" << integrator.position.norm() << "m"
-                      << std::endl;
-        }
-    }
-
-    std::cout << "\n💡 관찰: 정지 상태인데도 위치가 drift 합니다!" << std::endl;
-    std::cout << "   이것이 IMU만으로 추적할 수 없는 이유입니다." << std::endl;
-
-    // 실험 2: 바이어스 영향 확인
-    std::cout << "\n=== 실험 2: 바이어스 영향 비교 ===" << std::endl;
-
-    // 바이어스 없는 경우
-    IMUSimulator imu_no_bias;
-    imu_no_bias.accel_bias = 0.0;
-    imu_no_bias.gyro_bias = 0.0;
-    IMUIntegrator integrator_no_bias;
-
-    // 바이어스 있는 경우
-    IMUSimulator imu_with_bias;
-    imu_with_bias.accel_bias = 0.05;
-    imu_with_bias.gyro_bias = 0.01;
-    IMUIntegrator integrator_with_bias;
-
-    for (int i = 0; i < steps; i++) {
-        Eigen::Vector3d a1 = imu_no_bias.measureAccel(R_wb, a_true);
-        Eigen::Vector3d w1 = imu_no_bias.measureGyro(omega_true);
-        integrator_no_bias.integrate(a1, w1, dt);
-
-        Eigen::Vector3d a2 = imu_with_bias.measureAccel(R_wb, a_true);
-        Eigen::Vector3d w2 = imu_with_bias.measureGyro(omega_true);
-        integrator_with_bias.integrate(a2, w2, dt);
-
-        double t = (i + 1) * dt;
-        if (std::fmod(t, 2.0) < dt) {
-            std::cout << "t=" << t << "s:"
-                      << "  노이즈만=" << integrator_no_bias.position.norm() << "m"
-                      << "  노이즈+바이어스=" << integrator_with_bias.position.norm() << "m"
-                      << std::endl;
-        }
-    }
-
-    std::cout << "\n💡 바이어스가 있으면 drift가 훨씬 빠릅니다!" << std::endl;
-    std::cout << "   → 바이어스 추정이 VIO 성능의 핵심입니다." << std::endl;
-
-    std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
-    std::cout << "✅ IMU 시뮬레이션 완료!" << std::endl;
-    std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
-
-    return 0;
-}
+t=1초:   위치 오차 ≈ 0.003m (3mm)
+t=10초:  위치 오차 ≈ 0.1m
+t=60초:  위치 오차 ≈ 1.5m    ← 걷기도 전에 발산
+t=300초: 위치 오차 ≈ 17m
 ```
 
----
+**결론:** IMU만으로는 수십 초 만에 발산 → Vision이 주기적으로 보정해야 함
 
-## 빌드 및 실행
+### EuRoC 데이터로 확인 (선택)
 
-```bash
-cd week1
-mkdir build && cd build
-cmake ..
-make
-./quiz_easy
-./quiz_medium
+Phase 0에서 다운로드한 EuRoC 데이터의 IMU CSV를 열어보기:
+```
+# imu0/data.csv
+# timestamp, wx, wy, wz, ax, ay, az
+1403636579763555584,-0.009975,-0.011753,0.015380,8.109810,-0.268872,-3.454120
 ```
 
+**확인할 것:**
+- [ ] 정지 상태에서 ax, ay, az 값 확인 (중력 ~9.81이 포함되어야 함)
+- [ ] wx, wy, wz 값 확인 (정지 시 0에 가깝지만 0은 아님 → 바이어스)
+
 ---
 
-## 예상 출력
+## 실습 3: Vision + IMU 상호보완 정리 (30분)
+
+아래 표를 직접 채워보세요:
+
+| 상황 | Vision만 | IMU만 | VIO (융합) |
+|------|---------|-------|-----------|
+| 어두운 환경 | | | |
+| 빠른 회전 | | | |
+| 장시간 주행 | | | |
+| 스케일 추정 | | | |
+| 텍스처 없는 벽 | | | |
+
+<details>
+<summary>클릭하여 정답 확인</summary>
+
+| 상황 | Vision만 | IMU만 | VIO (융합) |
+|------|---------|-------|-----------|
+| 어두운 환경 | 실패 (특징점 없음) | 단기 OK | IMU로 버팀 |
+| 빠른 회전 | 모션 블러 | 정확 추적 | IMU가 보완 |
+| 장시간 주행 | 드리프트 | 크게 발산 | 상호 보정 |
+| 스케일 추정 | 상대 스케일만 | 절대 스케일 | 실제 미터 단위 |
+| 텍스처 없는 벽 | 실패 (매칭 안됨) | 영향 없음 | IMU로 버팀 |
+
+</details>
+
+---
+
+## 실습 4: 센서 융합 직관 정리 (30분)
+
+### 칼만 필터를 한 줄로
 
 ```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Week 1: IMU 센서 시뮬레이션
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-=== 실험 1: 정지 상태에서 IMU 적분 ===
-GT 위치: (0, 0, 0)  GT 속도: (0, 0, 0)
-
-t=1s:  pos=(0.01 0.005 0.003)  |pos|=0.011m
-t=2s:  pos=(0.04 0.02 0.01)    |pos|=0.047m
-t=3s:  pos=(0.09 0.05 0.03)    |pos|=0.11m
-...
-t=10s: pos=(1.2 0.5 0.3)       |pos|=1.35m
-
-💡 관찰: 정지 상태인데도 위치가 drift 합니다!
-   이것이 IMU만으로 추적할 수 없는 이유입니다.
-
-=== 실험 2: 바이어스 영향 비교 ===
-t=2s:  노이즈만=0.02m  노이즈+바이어스=0.12m
-t=4s:  노이즈만=0.05m  노이즈+바이어스=0.48m
-t=6s:  노이즈만=0.08m  노이즈+바이어스=1.1m
-t=8s:  노이즈만=0.12m  노이즈+바이어스=1.9m
-t=10s: 노이즈만=0.15m  노이즈+바이어스=3.0m
-
-💡 바이어스가 있으면 drift가 훨씬 빠릅니다!
-   → 바이어스 추정이 VIO 성능의 핵심입니다.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ IMU 시뮬레이션 완료!
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+두 정보를 합칠 때, 각각의 "불확실성"에 반비례하여 가중 평균
+→ 더 확신하는 쪽을 더 믿음
 ```
 
----
+### EKF vs ESKF 비교
 
-## ✅ 체크리스트
-
-- [ ] IMU 측정 모델 코드 이해 (a_meas, ω_meas)
-- [ ] 정지 상태에서 가속도계 출력 확인 (~9.81)
-- [ ] IMU 적분 drift 관찰
-- [ ] 바이어스 유무에 따른 drift 차이 확인
-- [ ] 노이즈 파라미터 변경 실험
-
----
-
-## 💡 추가 실험 아이디어
-
-1. **노이즈 크기 변경**: `accel_noise_std`를 0.001, 0.01, 0.1으로 바꿔보기
-2. **주파수 변경**: `dt`를 0.001(1kHz), 0.01(100Hz), 0.05(20Hz)로 바꿔보기
-3. **운동 시뮬레이션**: `a_true`를 원운동이나 직선운동으로 설정해보기
-4. **중력 보정**: 측정값에서 중력을 빼고 적분하면 어떻게 되는지 확인
+| 항목 | EKF | ESKF |
+|------|-----|------|
+| 상태 표현 | Full state 직접 | Nominal + Error |
+| 회전 표현 | 쿼터니언 (4D, 제약 필요) | 오차 벡터 (3D, 제약 없음) |
+| 선형화 | Full state 주변 | Error state 주변 (더 선형) |
+| 사용 예 | 단순한 시스템 | **MSCKF, 많은 VIO** |
 
 ---
 
-**다음**: Week 2에서 IMU 노이즈 모델을 상세히 학습합니다!
+## 체크리스트
+
+- [ ] VINS config의 4가지 IMU 노이즈 파라미터 의미 이해
+- [ ] 자이로 바이어스가 1분 후 얼마나 틀어지는지 계산 가능
+- [ ] IMU만으로 적분하면 왜 발산하는지 설명 가능
+- [ ] Vision과 IMU의 상호보완 표 작성 완료

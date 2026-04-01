@@ -10,38 +10,43 @@
 
 ```mermaid
 graph LR
-    subgraph Stage1["🔷 Stage 1: 이직 전 (2026~2027)"]
-        P0[Phase 0: 환경 세팅]
-        P1[Phase 1: 수학 핵심]
-        P2[Phase 2: 컴퓨터 비전]
-        P3["Phase 3: VO & BA"]
-        P4["Phase 4: VIO 개념"]
-        P5[Phase 5: Detection+Depth]
-        P6[Phase 6: 3D Perception]
+    subgraph Stage1[Stage 1]
+        P0[Phase 0]
+        P1[Phase 1]
+        P2[Phase 2]
+        P3[Phase 3]
+        P4[Phase 4]
+        P5[Phase 5]
+        P6[Phase 6]
     end
 
-    subgraph Career["🎯 Career"]
-        Portfolio[포트폴리오]
-        Job[이직]
+    subgraph Career[Career]
+        Portfolio[Portfolio]
+        Job[Job]
     end
 
-    subgraph Stage2["🔶 Stage 2: 이직 후 (2027)"]
-        BEV[BEV/Occupancy]
-        Blender[Blender 기초]
-        Isaac[Isaac Sim 연동]
+    subgraph Stage2[Stage 2]
+        BEV[BEV]
+        Blender[Blender]
+        Isaac[Isaac Sim]
         Multi[Multi-modal]
     end
 
-    subgraph Stage2Plus["🚀 Stage 2+: 장기 (2028~)"]
-        VLA[VLA 입문]
+    subgraph VLATrack[VLA Track]
+        VLA[VLA]
+    end
+
+    subgraph Stage2Plus[Stage 2 Plus]
         Embodied[Embodied AI]
     end
 
     P0 --> P1 --> P2 --> P3 --> P4 --> P5 --> P6
     P6 --> Portfolio --> Job
+    Portfolio -.-> VLA
     Job --> BEV --> Isaac --> Multi
     Blender -.-> Isaac
-    Multi --> VLA --> Embodied
+    Multi --> Embodied
+    VLA --> Embodied
 ```
 
 ---
@@ -52,14 +57,14 @@ graph LR
 |------|-------|------|------|
 | 2026.01-02 | Stage 1 | Phase 0-1 (완료) | 환경 세팅, 수학 핵심 |
 | 2026.03-04 | Stage 1 | Phase 2: CV 기초 | 카메라 모델 이해 |
-| 2026.05-06 | Stage 1 | Phase 3: VO & BA | VO/BA 개념 이해 |
-| 2026.06 | Stage 1 | Phase 4: VIO 개념 | IMU-Vision 상호보완 이해 |
-| 2026.07-09 | Stage 1 | **Phase 5: Detection + Depth** | 2D Perception + Jetson 배포 |
-| 2026.10-11 | Stage 1 | **Phase 6: 3D Perception + BEV** | KITTI/nuScenes 3D Detection |
-| 2026.12 | Stage 1 | 포트폴리오 | GitHub + 블로그 + 데모 영상 |
-| 2027.01~ | Career | **이직 활동** | Perception Engineer |
+| 2026.05 | Stage 1 | Phase 3: VO & BA (4주) | VO/BA 개념 이해 |
+| 2026.06 전반 | Stage 1 | Phase 4: VIO 개념 (3주) | IMU-Vision 상호보완 이해 |
+| 2026.06-08 | Stage 1 | **Phase 5: Detection + Depth** | 2D Perception + Jetson 배포 |
+| 2026.09-10 | Stage 1 | **Phase 6: 3D Perception + BEV** | KITTI/nuScenes 3D Detection |
+| 2026.11 | Stage 1 | 포트폴리오 | GitHub + 블로그 + 데모 영상 |
+| 2026.12~ | Career | **이직 활동 + VLA 입문 병행** | Perception Engineer |
 | 2027 중반~ | Stage 2 | BEV, Blender, Isaac Sim | 이직 후 심화 |
-| 2028~ | Stage 2+ | **VLA, Embodied AI** | 미래 역량 |
+| 2028~ | Stage 2+ | **VLA 심화, Embodied AI** | 미래 역량 |
 
 ---
 
@@ -111,8 +116,8 @@ graph LR
 | 0 | 환경 세팅, VINS 실행 | 2주 |
 | 1 | 수학 핵심 (선형대수, 3D 기하) | 2개월 |
 | 2 | 컴퓨터 비전 기초 | 2개월 |
-| 3 | VO & BA (개념 이해 중심) | 약 3개월 |
-| 4 | VIO 개념 (직관적 이해 중심) | 약 3개월 |
+| 3 | VO & BA (개념 + 코드 분석) | 4주 |
+| 4 | VIO 개념 (직관적 이해 중심) | 3주 |
 
 ### Phase 5: Detection + Depth (3개월) ⭐
 > **핵심 Phase** - Detection + Depth 필수, Instance Seg 선택
@@ -202,9 +207,9 @@ graph LR
 
 ---
 
-## 🚀 Stage 2+: 장기 확장 (2028년~)
+## 🤖 VLA 입문 (이직 활동과 병행, 2026.12~)
 
-### VLA (Vision-Language-Action) 입문
+> 포트폴리오 완성 후, 이직 활동과 병행하며 VLA 입문
 > 로봇이 **보고 → 이해하고 → 행동**하는 End-to-End 시스템
 
 | 주제 | 내용 | 대표 모델 |
@@ -212,6 +217,12 @@ graph LR
 | VLA 기초 | Vision-Language-Action 구조 | RT-2, OpenVLA |
 | Policy Learning | 행동 정책 학습 | Diffusion Policy |
 | Simulation | 시뮬레이션 환경 | Isaac Sim, MuJoCo |
+
+> 💡 Phase 5-6의 Perception 지식 + AMR ROS 경험이 VLA 학습의 토대가 됨
+
+---
+
+## 🚀 Stage 2+: 장기 확장 (2028년~)
 
 ### Embodied AI
 | 주제 | 내용 |
@@ -240,12 +251,30 @@ graph LR
 | **Jetson Orin Nano** | 실시간 추론, 배포 |
 | **ELP 800P Stereo Monochrome** | 스테레오 비전 |
 
+### 외부 소스코드
+
+Phase 3-4에서 코드 분석 대상인 VINS-Fusion이 git submodule로 포함되어 있습니다.
+
+```bash
+# 처음 클론할 때
+git clone --recurse-submodules <repo-url>
+
+# 이미 클론한 경우
+git submodule update --init
+```
+
+| 경로 | 내용 |
+|------|------|
+| `Assets/VINS-Fusion/` | VINS-Fusion 소스코드 (submodule) |
+
 ---
 
 ## 🏆 커리어 경로
 
 ```
 현재: AMR ROS Application 개발자 (7년차)
+      ↓
+2026.12~: 이직 활동 + VLA 입문 병행
       ↓
 2027: Perception Engineer (로봇/자율주행)
       ↓
@@ -278,8 +307,12 @@ graph LR
 - [ ] Multi-modal 학습
 - [ ] 시니어 성장
 
+### VLA (이직 활동 병행)
+- [ ] VLA 논문 읽기 (RT-2, OpenVLA)
+- [ ] 간단한 VLA 실험
+
 ### Stage 2+ (2028년~)
-- [ ] VLA 입문
+- [ ] VLA 심화
 - [ ] Embodied AI 역량
 - [ ] 미래 리더십 🚀
 
@@ -335,7 +368,7 @@ graph LR
 - Phase 5까지만 해도 (Detection + Depth + Jetson 배포) 지원 가능한 포지션이 있음
 - 7년차 경력직은 신입과 다르게 평가됨. 도메인 전환이라도 엔지니어링 역량 자체는 인정받음
 
-**전략**: Phase 5 완료 시점(2026.09경)부터 **이직 시장 탐색을 병행**. Phase 6를 기다리지 말고 먼저 시장 반응을 확인
+**전략**: Phase 5 완료 시점(2026.08경)부터 **이직 시장 탐색을 병행**. Phase 6를 기다리지 말고 먼저 시장 반응을 확인
 
 ### 최악의 경우 (Worst Case)
 
