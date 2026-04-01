@@ -483,6 +483,5 @@ python tools/test.py \
 ## ❓ 다음 단계
 
 Phase 6 완료 후:
-- **이직 활동 시작** (2027.03)
-- 병행: **Blender 시뮬레이션** 학습
-- 이직 후: **Stage 2** (BEV Segmentation, Isaac Sim)
+- **이직 활동 + VLA 입문 병행** (2026.12~)
+- 이직 후: **Stage 2** (BEV Segmentation, Blender, Isaac Sim)

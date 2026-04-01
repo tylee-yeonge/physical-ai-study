@@ -101,10 +101,10 @@ graph LR
 | Phase | 가이드 위치 | 언어 |
 |-------|------------|------|
 | Phase 2 | [`Studies/Phase 2/week2/PRACTICE.md`](./Studies/Phase%202/week2/PRACTICE.md) | C++ |
-| Phase 3 | 각 week별 PRACTICE.md (예: [`week8/PRACTICE.md`](./Studies/Phase%203/week8/PRACTICE.md)) | C++ |
-| Phase 4 | [`Studies/Phase 4/PRACTICE.md`](./Studies/Phase%204/PRACTICE.md) | C++ |
-| Phase 5 | [`Studies/Phase 5/PRACTICE.md`](./Studies/Phase%205/PRACTICE.md) | Python + TensorRT |
-| Phase 6 | [`Studies/Phase 6/PRACTICE.md`](./Studies/Phase%206/PRACTICE.md) | Python |
+| Phase 3 | 각 week별 PRACTICE.md (예: [`week1/PRACTICE.md`](./Studies/Phase%203/week1/PRACTICE.md)) | C++ (코드 분석) |
+| Phase 4 | 각 week별 PRACTICE.md (예: [`week1/PRACTICE.md`](./Studies/Phase%204/week1/PRACTICE.md)) | C++ (코드 분석) |
+| Phase 5 | 각 week별 PRACTICE.md (예: [`week1/PRACTICE.md`](./Studies/Phase%205/week1/PRACTICE.md)) | Python + TensorRT |
+| Phase 6 | 각 week별 PRACTICE.md (예: [`week1/PRACTICE.md`](./Studies/Phase%206/week1/PRACTICE.md)) | Python |
 
 ---
 
@@ -125,14 +125,11 @@ graph LR
 | 주차 | 내용 | 핵심 모델 | 우선순위 |
 |------|------|----------|----------|
 | 1-2 | PyTorch 복습 | - | 필수 |
-| 3-4 | **YOLO 실습** | YOLOv8, RT-DETR | 필수 |
-| 5-6 | **Depth Estimation** | DPT, Depth Anything | 필수 |
-| 7-8 | Segmentation | SegFormer, SAM | 필수 |
-| 9-10 | **Jetson 배포** | TensorRT | 필수 |
-| 11-12 | Instance Segmentation | Mask R-CNN | ⚡선택 |
+| 3-6 | **YOLO 실습 + Jetson 배포** | YOLO11, TensorRT | 필수 |
+| 7-10 | **Depth Estimation + Jetson 배포** | Depth Anything V2, TensorRT | 필수 |
+| 11-12 | **통합 시스템** | Detection + Depth → 3D | 필수 |
 
 > ⚠️ **TensorRT 배포는 삽질 시간이 예상보다 길어질 수 있음**
-> Instance Seg은 시간 여유 있을 때 진행
 
 **산출물**: Jetson에서 실시간 Detection + Depth 데모
 

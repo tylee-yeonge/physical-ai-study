@@ -12,7 +12,7 @@
 
 **핵심 산출물**:
 - YOLO 실시간 객체 검출 (Jetson 30+ FPS)
-- Depth Estimation (Depth Anything)
+- Depth Estimation (Depth Anything V2)
 - 통합 시스템: Detection + Depth → 3D 위치 추정
 
 > ⚠️ **언어 전략**: 학습은 Python, 배포는 C++/TensorRT
@@ -80,15 +80,16 @@
 
 #### YOLO 발전사
 - [ ] YOLOv1-v3: Anchor 기반
-- [ ] YOLOv5-v7: 성능 향상
-- [ ] **YOLOv8**: Anchor-free, 최신 버전 (Ultralytics)
-- [ ] YOLO-NAS, YOLOv9 (참고)
+- [ ] YOLOv5-v8: Anchor-free로 전환, Ultralytics 생태계
+- [ ] **YOLO11** (2024): Ultralytics 최신, C3k2 블록, 경량화
+- [ ] YOLO26 (2025): 최신이지만 커뮤니티 평가 미흡 (참고)
 
-#### YOLOv8 핵심 개념
-- [ ] **Backbone**: CSPDarknet (특징 추출)
+#### YOLO11 핵심 개념
+- [ ] **Backbone**: C3k2 블록 (경량화된 CSP)
 - [ ] **Neck**: PANet (Multi-scale fusion)
 - [ ] **Head**: Decoupled head (Classification + Localization)
 - [ ] **Loss**: CIoU loss + BCE loss
+- [ ] nano(n) ~ xlarge(x) 변형, 멀티태스크 지원
 
 #### Detection 지표
 - [ ] Precision, Recall
@@ -98,7 +99,7 @@
   - mAP@0.5:0.95 (COCO metric)
 - [ ] FPS (Frames Per Second)
 
-### Week 4: YOLOv8 학습 (Python)
+### Week 4: YOLO11 학습 (Python)
 
 #### Ultralytics 사용법
 ```bash
@@ -142,7 +143,7 @@ pip install ultralytics
 - [ ] ONNX Runtime 추론
 
 #### 변환 실습
-- [ ] YOLOv8 → ONNX
+- [ ] YOLO11 → ONNX
   ```python
   model.export(format='onnx', simplify=True)
   ```
@@ -165,8 +166,8 @@ pip install ultralytics
 
 #### ONNX → TensorRT 변환
 ```bash
-trtexec --onnx=yolov8n.onnx \
-        --saveEngine=yolov8n.trt \
+trtexec --onnx=yolo11n.onnx \
+        --saveEngine=yolo11n.trt \
         --fp16 \
         --workspace=4096
 ```
@@ -178,7 +179,7 @@ trtexec --onnx=yolov8n.onnx \
 - [ ] 후처리 및 시각화
 
 #### 성능 측정
-- [ ] **목표**: 640×480 @ 30 FPS (YOLOv8n)
+- [ ] **목표**: 640×480 @ 30 FPS (YOLO11n)
 - [ ] Latency 분석 (전처리/추론/후처리)
 - [ ] Multi-threading (카메라 읽기 병렬화)
 
@@ -206,16 +207,17 @@ trtexec --onnx=yolov8n.onnx \
 #### 핵심 모델
 - [ ] MiDaS (2020): Inverse depth 예측
 - [ ] DPT (2021): Vision Transformer 기반
-- [ ] **Depth Anything** (2024): 최신, 일반화 성능 최고
+- [ ] Depth Anything (2024): 대규모 데이터 학습, 일반화 성능 우수
+- [ ] **Depth Anything V2** (2024): 합성 데이터 활용, V1 대비 정확도/속도 향상
 
-### Week 8: Depth Anything 사용
+### Week 8: Depth Anything V2 사용
 
 #### 모델 다운로드
 ```python
 from transformers import pipeline
 
 pipe = pipeline(task="depth-estimation", 
-               model="LiheYoung/depth-anything-base-hf")
+               model="depth-anything/Depth-Anything-V2-Small-hf")
 ```
 
 #### Inference
@@ -230,7 +232,7 @@ pipe = pipeline(task="depth-estimation",
 
 ### Week 9: ONNX & TensorRT 변환
 
-#### Depth Anything → ONNX
+#### Depth Anything V2 → ONNX
 - [ ] Hugging Face 모델 변환
 - [ ] Input size 고정 (384×512 권장)
 - [ ] 출력 shape 확인
@@ -248,7 +250,7 @@ pipe = pipeline(task="depth-estimation",
 #### Ground Truth 생성
 - [ ] Phase 2 스테레오 카메라 활용
 - [ ] Disparity → Depth 계산
-- [ ] Depth Anything 결과와 비교
+- [ ] Depth Anything V2 결과와 비교
 
 #### 정량 평가
 - [ ] Absolute Relative Error (AbsRel)
@@ -325,13 +327,13 @@ pipe = pipeline(task="depth-estimation",
 ## ✅ Phase 5 완료 체크리스트
 
 ### Object Detection
-- [ ] YOLOv8 커스텀 데이터 学습
+- [ ] YOLO11 커스텀 데이터 학습
 - [ ] mAP > 0.6 달성
 - [ ] ONNX 변환 및 검증
 - [ ] Jetson TensorRT 배포 (30+ FPS)
 
 ### Depth Estimation
-- [ ] Depth Anything 사용법 이해
+- [ ] Depth Anything V2 사용법 이해
 - [ ] ONNX & TensorRT 변환
 - [ ] Jetson에서 15+ FPS 달성
 - [ ] 정확도 검증
@@ -361,8 +363,8 @@ pipe = pipeline(task="depth-estimation",
 
 | 이름 | 용도 | 링크 |
 |------|------|------|
-| Ultralytics YOLOv8 | 객체 검출 | https://github.com/ultralytics/ultralytics |
-| Depth-Anything | Depth 추정 | https://github.com/LiheYoung/Depth-Anything |
+| Ultralytics YOLO11 | 객체 검출 | https://github.com/ultralytics/ultralytics |
+| Depth Anything V2 | Depth 추정 | https://github.com/DepthAnything/Depth-Anything-V2 |
 | TensorRT | Jetson 최적화 | https://developer.nvidia.com/tensorrt |
 
 ### 데이터셋
@@ -385,7 +387,7 @@ pipe = pipeline(task="depth-estimation",
 
 ## 💡 팁
 
-1. **작은 모델부터**: YOLOv8n (nano)부터 시작, 성능 필요하면 확장
+1. **작은 모델부터**: YOLO11n (nano)부터 시작, 성능 필요하면 확장
 2. **데이터가 80%**: 라벨링 품질이 성능 차이의 대부분
 3. **Jetson 메모리 주의**: Swap 설정, 모델 크기 조절
 4. **TensorRT 디버깅**: Verbose 모드로 최적화 과정 관찰
