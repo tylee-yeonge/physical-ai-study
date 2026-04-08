@@ -13,14 +13,14 @@
 **일상 비유**: 
 
 ```
-삼각측량:                    PnP:
+Triangulation:               PnP:
   두 눈으로 물체 거리 파악       지도상 랜드마크로 내 위치 파악
 
-     P ●                      🗼 🏛️ 랜드마크 (3D 알려짐)
-    ╱ ╲                         ╲ ╱
-   ╱   ╲                         ╲╱
-  👁️    👁️                       📷
- 왼쪽    오른쪽               → 카메라 위치?
+     P *                     [A] [B] Landmarks (3D known)
+    / \                         \ /
+   /   \                         \/
+ (L)   (R)                     [cam]
+ Left    Right               -> camera pose?
 ```
 
 **SLAM에서의 사용**:
@@ -68,15 +68,15 @@ cmake .. && make
 두 카메라에서 같은 3D 점을 관측하면, 광선의 교점이 그 점:
 
 ```
-        ● P (3D 점)
-       ╱│╲
-      ╱ │ ╲ 광선 2
- 광선1  │  ╲
-    ╱   │   ╲
-   ●────┼────●
-  C₁    │    C₂
-        │
-    베이스라인
+        * P (3D point)
+       /|\
+      / | \ Ray 2
+ Ray1/  |  \
+    /   |   \
+   *----+----*
+  C1    |    C2
+        |
+    Baseline
 ```
 
 **이상적**: 두 광선이 정확히 한 점에서 만남
@@ -141,15 +141,15 @@ points_3d = points_4d[:3] / points_4d[3]  # 동차 → 유클리드
 #### 기저선(Baseline) 효과
 
 ```
-좁은 기저선 (나쁨):           넓은 기저선 (좋음):
+Narrow Baseline (bad):        Wide Baseline (good):
 
-      ● P                          ● P
-     ╱╲                          ╱   ╲
-    ╱  ╲ 작은 각도              ╱     ╲ 큰 각도
-   ●────●                      ●───────●
-  C₁    C₂                    C₁       C₂
+      * P                          * P
+     /\                          /   \
+    /  \ small angle            /     \ large angle
+   *----*                      *-------*
+  C1    C2                    C1       C2
 
-→ 깊이 오차 큼               → 깊이 오차 작음
+-> depth error large          -> depth error small
 ```
 
 **경험칙**: 
@@ -184,13 +184,13 @@ points_3d = points_4d[:3] / points_4d[3]  # 동차 → 유클리드
 - 카메라 포즈 (R, t)
 
 ```
-알려진 3D 점들          현재 카메라 뷰
-   ● P₁                    ● p₁
-   ● P₂        ────▶       ● p₂
-   ● P₃       PnP로 포즈   ● p₃
-   ● P₄                    ● p₄
+Known 3D points          Current camera view
+   * P1                    * p1
+   * P2        ---->       * p2
+   * P3       PnP          * p3
+   * P4                    * p4
 
-3D-2D 대응 → 카메라 위치/방향
+3D-2D correspondence -> camera pose
 ```
 
 #### PnP 알고리즘들
