@@ -655,7 +655,7 @@ std::vector<double> params(2);
        - 재투영 오차 최소화
 ```
 
-#### VINS-Fusion에서
+#### 실전 로봇/Perception 시스템에서 (Ceres 예시)
 
 ```cpp
 // vins_estimator/src/factor/projection_factor.h
@@ -758,7 +758,7 @@ ceres::Solve(options, &problem, &summary);
 
 - Numerical Optimization (Nocedal & Wright)
 - Ceres Solver Documentation
-- VINS-Fusion optimization.cpp
+- OpenCV calib3d 모듈 (PnP, BA 실전 활용)
 
 ---
 

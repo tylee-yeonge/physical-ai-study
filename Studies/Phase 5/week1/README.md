@@ -532,6 +532,6 @@ Transform  ─┘                  │               output = model(x)
 
 ---
 
-✅ 이전: [Phase 4 - VIO](../../../Roadmap/Phase%204.md)
+✅ 이전: [Phase 2 - Perception 기하 기초](../../../Roadmap/Phase%202.md)
 
 다음: [Week 2 - CV 라이브러리](../week2/README.md)

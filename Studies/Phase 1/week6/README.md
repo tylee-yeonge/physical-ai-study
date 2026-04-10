@@ -2,7 +2,7 @@
 
 ## 📌 개요
 
-> ⚠️ **참고**: 이번 주는 가볍게 훑고, VINS-Fusion 코드 (Phase 5)에서 필요할 때 돌아와서 심화 학습
+> ⚠️ **참고**: 이번 주는 가볍게 훑고, 이후 Phase 에서 필요할 때 돌아와서 심화 학습
 
 **Lie 군/대수**는 회전과 변환을 **최적화 가능한 형태**로 표현하는 수학적 프레임워크입니다. 
 
@@ -1129,7 +1129,7 @@ def estimate_camera_motion(image1, image2):
 
 ---
 
-#### 2. IMU 사전적분 (VINS-Fusion) 사용
+#### 2. IMU 사전적분 (Visual-Inertial 시스템) 사용
 
 ```cpp
 #include <sophus/so3.hpp>
@@ -1560,7 +1560,7 @@ if __name__ == "__main__":
 
 1. **C++에서는 Sophus를 적극 활용**
    - Eigen과 완벽한 통합
-   - VINS-Fusion, ORB-SLAM 등 대부분의 SLAM 라이브러리가 사용
+   - 대부분의 로봇/Perception 라이브러리에서 사용
 
 2. **Python에서는 scipy.Rotation + 직접 구현**
    - scipy.Rotation이 SO(3) 역할
@@ -1894,10 +1894,10 @@ Week 6에서 배운 Lie 대수를 실제로 활용하는 방법을 배웁니다:
 ## ❓ FAQ
 
 **Q1: Lie 군/대수를 꼭 알아야 하나요?**  
-A: 현대 SLAM (특히 Visual-Inertial SLAM)을 이해하려면 필수입니다. VINS-Fusion, ORB-SLAM3 등 대부분의 최신 SLAM은 Lie 대수를 사용합니다.
+A: 현대 로봇 Perception / 3D 비전을 이해하려면 필수입니다. NeRF, Gaussian Splatting, PnP 최적화 등 대부분의 3D 비전 기술이 Lie 대수를 사용합니다.
 
 **Q2: 수학이 너무 어려워요**  
-A: 처음에는 "어떻게 사용하는가"에 집중하세요. 수학적 유도는 나중에 Phase 5 (VINS-Fusion 코드 분석)에서 필요할 때 다시 보면 됩니다.
+A: 처음에는 "어떻게 사용하는가"에 집중하세요. 수학적 유도는 이후 Phase 에서 필요할 때 다시 보면 됩니다.
 
 **Q3: exp/log 매핑을 외워야 하나요?**  
 A: Sophus 라이브러리가 다 해줍니다! Rodrigues 공식의 형태만 기억하고, 실제로는 라이브러리를 사용하세요.

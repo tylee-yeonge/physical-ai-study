@@ -1,5 +1,10 @@
 # Phase 0: 역순 시작 - VINS-Fusion 먼저 돌려보기 ✅ (1/2 ~ 1/3)
 
+> 📜 **회고 (2026-04-10)**: 이 Phase 는 원래 SLAM 트랙의 출발점으로, VINS-Fusion 을 먼저 돌려보며 "무엇을 모르는지" 를 파악하기 위한 단계였다.
+> 이후 이직 타겟이 Perception Engineer 로 확정되면서 SLAM 트랙(Phase 3/4) 은 [Archive/SLAM-legacy/](../Archive/SLAM-legacy/) 로 이동했고, VINS-Fusion 서브모듈도 제거되었다.
+> Phase 0 자체는 **이미 완료된 역사적 출발점** 이므로 그대로 보존한다. 본문의 VINS-Fusion 참조는 당시 시점 기준으로 읽을 것.
+> 새 로드맵의 출발점은 [Phase 1](Phase%201.md) → [Phase 2 (Perception 기하 기초)](Phase%202.md) 이다.
+
 > ⏰ **기간**: 2주 → 실제 2일
 > 🎯 **목표**: 먼저 돌려보고, 모르는 것을 파악하여 학습 동기 확보
 

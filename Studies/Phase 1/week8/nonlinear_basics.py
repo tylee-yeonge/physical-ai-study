@@ -204,8 +204,8 @@ SLAM 최적화 구조:
    - BA: JᵀJ가 sparse
    - Schur complement로 효율적 풀이
 
-4. VINS-Fusion에서
-   - Ceres Solver 사용
+4. 실전 Perception/로봇 시스템에서
+   - Ceres Solver 사용 (BA, PnP, 캘리브레이션 등)
    - Pose는 SE(3)로 표현 (Lie 대수)
 """)
 
