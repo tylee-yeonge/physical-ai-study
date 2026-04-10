@@ -14,7 +14,7 @@
 | 2 | 병목 분석 및 최적화 | 필수 | 3시간 |
 | 3 | 최종 성능 측정 | 필수 | 2시간 |
 | 4 | 포트폴리오 정리 | 필수 | 3시간 |
-| 5 | Phase 5 복습 | 필수 | 2시간 |
+| 5 | Phase 3 복습 | 필수 | 2시간 |
 
 ---
 
@@ -316,9 +316,9 @@ if __name__ == "__main__":
 import numpy as np
 
 def generate_final_report():
-    """Phase 5 최종 성능 리포트 생성"""
+    """Phase 3 최종 성능 리포트 생성"""
     print("=" * 60)
-    print("  Phase 5 최종 성능 리포트")
+    print("  Phase 3 최종 성능 리포트")
     print("=" * 60)
 
     # 성능 결과 (실제 측정값으로 교체)
@@ -364,9 +364,9 @@ def generate_final_report():
     return results
 
 def generate_phase5_summary():
-    """Phase 5 전체 학습 내용 요약"""
+    """Phase 3 전체 학습 내용 요약"""
     print("\n" + "=" * 60)
-    print("  Phase 5 학습 요약")
+    print("  Phase 3 학습 요약")
     print("=" * 60)
 
     topics = [
@@ -399,7 +399,7 @@ if __name__ == "__main__":
 ```
  최종 성능 수치 기록
  목표 대비 달성 여부 확인
- Phase 5 학습 요약 완료
+ Phase 3 학습 요약 완료
 ```
 
 ---
@@ -532,19 +532,19 @@ if __name__ == "__main__":
 
 ---
 
-## Step 5: Phase 5 복습
+## Step 5: Phase 3 복습
 
 ### 5.1 핵심 수식 복습
 
 ```python
 # review_formulas.py
-"""Phase 5 핵심 수식 복습"""
+"""Phase 3 핵심 수식 복습"""
 import numpy as np
 
 def review_all_formulas():
-    """Phase 5에서 배운 모든 핵심 수식 복습"""
+    """Phase 3에서 배운 모든 핵심 수식 복습"""
     print("=" * 55)
-    print("  Phase 5 핵심 수식 복습")
+    print("  Phase 3 핵심 수식 복습")
     print("=" * 55)
 
     # 1. 역투영
@@ -618,8 +618,8 @@ if __name__ == "__main__":
 
 ### Step 5: 복습
 - [ ] 핵심 수식 복습
-- [ ] Phase 5 전체 내용 정리
-- [ ] Phase 6 준비 사항 확인
+- [ ] Phase 3 전체 내용 정리
+- [ ] Phase 4 준비 사항 확인
 
 ---
 
@@ -657,4 +657,4 @@ if __name__ == "__main__":
 
 ---
 
-**다음**: [Phase 6 - LiDAR 3D Perception](../../../Roadmap/Phase%206.md)
+**다음**: [Phase 4 - LiDAR 3D Perception](../../../Roadmap/Phase%206.md)

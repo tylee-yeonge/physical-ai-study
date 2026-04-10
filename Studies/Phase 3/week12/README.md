@@ -1,6 +1,6 @@
 # Week 12: 최종 데모 - 최적화 & 포트폴리오 (Section 5.4)
 
-> 🎯 **이번 주 목표**: 전체 파이프라인의 성능을 최적화하고, Phase 5 학습 내용을 포트폴리오로 정리하기
+> 🎯 **이번 주 목표**: 전체 파이프라인의 성능을 최적화하고, Phase 3 학습 내용을 포트폴리오로 정리하기
 > ⏰ **예상 시간**: 12시간
 > 💡 **핵심 질문**: "실시간 2D Perception 시스템을 포트폴리오로 어떻게 보여줄 수 있는가?"
 
@@ -20,7 +20,7 @@
 
 ## 🌟 시작하기 전에
 
-### Phase 5 전체 여정 돌아보기
+### Phase 3 전체 여정 돌아보기
 
 ```
 Week 1-2:   PyTorch 기초 + CV 라이브러리
@@ -38,7 +38,7 @@ Week 12:    최종 데모 + 포트폴리오   ◄── 지금 여기!
 ❓ 전체 파이프라인이 목표 FPS를 달성하는가?
 ❓ 어디가 병목이고, 어떻게 최적화하는가?
 ❓ 성과를 포트폴리오로 어떻게 정리하는가?
-❓ Phase 6(LiDAR)으로 넘어가기 전에 뭘 준비해야 하는가?
+❓ Phase 4(LiDAR)으로 넘어가기 전에 뭘 준비해야 하는가?
 ```
 
 ---
@@ -51,7 +51,7 @@ Week 12:    최종 데모 + 포트폴리오   ◄── 지금 여기!
 
 ```
 ┌──────────────────────────────────────────────────┐
-│           Phase 5 최종 성능 목표                    │
+│           Phase 3 최종 성능 목표                    │
 ├────────────────────┬─────────────────────────────┤
 │ 항목               │ 목표                          │
 ├────────────────────┼─────────────────────────────┤
@@ -203,12 +203,12 @@ YOLO 객체 검출 + Monocular Depth 추정을 결합한
 
 ---
 
-### 4. Phase 5 전체 복습
+### 4. Phase 3 전체 복습
 
 #### 4.1 핵심 지식 맵
 
 ```
-Phase 5: 딥러닝 기반 2D Perception
+Phase 3: 딥러닝 기반 2D Perception
 ├── 기초 (Week 1-2)
 │   ├── PyTorch: Tensor, autograd, DataLoader
 │   └── CV 라이브러리: Albumentations, W&B, timm
@@ -232,7 +232,7 @@ Phase 5: 딥러닝 기반 2D Perception
     └── 최적화 & 포트폴리오
 ```
 
-#### 4.2 Phase 5에서 배운 핵심 수식
+#### 4.2 Phase 3에서 배운 핵심 수식
 
 ```
 1. 역투영 (Unprojection):
@@ -254,21 +254,21 @@ Phase 5: 딥러닝 기반 2D Perception
 
 ---
 
-### 5. Phase 6 준비 사항
+### 5. Phase 4 준비 사항
 
-#### 5.1 Phase 6 미리보기
+#### 5.1 Phase 4 미리보기
 
 ```
-Phase 6: LiDAR 3D Perception
+Phase 4: LiDAR 3D Perception
   - 3D 포인트 클라우드 처리
   - 3D 객체 검출 (PointPillars 등)
   - LiDAR-Camera 융합
   - 센서 캘리브레이션
 
 필요한 선행 지식:
-  ✅ PyTorch (Phase 5에서 완료)
-  ✅ 3D 좌표 변환 (Phase 5에서 완료)
-  ✅ TensorRT 배포 (Phase 5에서 완료)
+  ✅ PyTorch (Phase 3에서 완료)
+  ✅ 3D 좌표 변환 (Phase 3에서 완료)
+  ✅ TensorRT 배포 (Phase 3에서 완료)
   📌 PCL (Point Cloud Library) 기초
   📌 Open3D 라이브러리
 ```
@@ -369,7 +369,7 @@ Amdahl의 법칙:
 
 </details>
 
-**Q4: Phase 5에서 배운 역투영 공식을 한 줄로 쓰시오.**
+**Q4: Phase 3에서 배운 역투영 공식을 한 줄로 쓰시오.**
 
 <details>
 <summary>정답 보기</summary>
@@ -386,7 +386,7 @@ X = (u - cx) * Z / fx,  Y = (v - cy) * Z / fy,  Z = depth_map[v, u]
 
 ---
 
-## 📝 이번 주 실습 & Phase 5 마무리
+## 📝 이번 주 실습 & Phase 3 마무리
 
 ### 실습 구성
 
@@ -396,14 +396,14 @@ X = (u - cx) * Z / fx,  Y = (v - cy) * Z / fy,  Z = depth_map[v, u]
 | 2 | 병목 분석 및 최적화 적용 | 3시간 |
 | 3 | 최종 성능 측정 | 2시간 |
 | 4 | 포트폴리오 정리 | 3시간 |
-| 5 | Phase 5 복습 및 Phase 6 준비 | 2시간 |
+| 5 | Phase 3 복습 및 Phase 4 준비 | 2시간 |
 
 자세한 내용은 [PRACTICE.md](./PRACTICE.md) 참고
 
-### Phase 6 준비
+### Phase 4 준비
 
 ```
-Phase 6에서 다룰 내용:
+Phase 4에서 다룰 내용:
 - 3D 포인트 클라우드 처리 (Open3D, PCL)
 - LiDAR 데이터 전처리 (복셀화, 지면 제거)
 - 3D 객체 검출 (PointPillars, CenterPoint)
@@ -442,7 +442,7 @@ YOLO mAP@50 > 0.45
 문제 정의 → 설계 → 구현 → 결과 → 개선 방향
 ```
 
-### 4. Phase 5 핵심 수식
+### 4. Phase 3 핵심 수식
 
 ```
 역투영: X = (u-cx)*Z/fx, Y = (v-cy)*Z/fy
@@ -454,4 +454,4 @@ YOLO mAP@50 > 0.45
 
 이전: [Week 11 - Detection + Depth 융합](../week11/README.md)
 
-다음: [Phase 6 - LiDAR 3D Perception](../../../Roadmap/Phase%206.md)
+다음: [Phase 4 - LiDAR 3D Perception](../../../Roadmap/Phase%206.md)

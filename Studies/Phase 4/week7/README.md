@@ -476,7 +476,7 @@ Quaternion의 장점:
 
 - BEV(Bird's Eye View) 개념 복습
 - IPM(Inverse Perspective Mapping) 기본 원리 이해
-- Transformer Attention 메커니즘 복습 (Phase 5에서 학습)
+- Transformer Attention 메커니즘 복습 (Phase 3에서 학습)
 
 ---
 

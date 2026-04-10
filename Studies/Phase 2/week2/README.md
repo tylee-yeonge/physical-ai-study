@@ -373,7 +373,7 @@ cam0:
 ### 6. Stereo 카메라 (선택)
 
 > **⚠️ 스테레오 캘리브레이션은 지금 하지 않아도 됩니다.**
-> Jetson Orin Nano + ELP 스테레오 카메라가 필요하며, Phase 5 Stereo Depth 실습 전에 수행하면 됩니다.
+> Jetson Orin Nano + ELP 스테레오 카메라가 필요하며, Phase 3 Stereo Depth 실습 전에 수행하면 됩니다.
 
 #### Stereo의 장점
 

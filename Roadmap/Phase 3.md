@@ -1,4 +1,4 @@
-# Phase 5: Detection + Depth Estimation
+# Phase 3: Detection + Depth Estimation
 
 > ⏰ **기간**: 3개월  
 > 🎯 **목표**: 2D Perception 마스터 + Jetson 실시간 배포  
@@ -8,7 +8,7 @@
 
 ---
 
-## 👉 **실습 가이드**: [`Studies/Phase 5/PRACTICE.md`](../Studies/Phase%205/PRACTICE.md)
+## 👉 **실습 가이드**: [`Studies/Phase 3/PRACTICE.md`](../Studies/Phase%205/PRACTICE.md)
 
 **핵심 산출물**:
 - YOLO 실시간 객체 검출 (Jetson 30+ FPS)
@@ -324,7 +324,7 @@ pipe = pipeline(task="depth-estimation",
 
 ---
 
-## ✅ Phase 5 완료 체크리스트
+## ✅ Phase 3 완료 체크리스트
 
 ### Object Detection
 - [ ] YOLO11 커스텀 데이터 학습
@@ -351,7 +351,7 @@ pipe = pipeline(task="depth-estimation",
 
 ---
 
-## 🎯 Phase 5 완료 기준
+## 🎯 Phase 3 완료 기준
 
 > "Jetson Orin에서 실시간 객체 검출 + Depth 기반 3D 위치 추정 시스템을 30fps로 구동하고, 이를 데모 영상으로 증명"
 
@@ -397,7 +397,7 @@ pipe = pipeline(task="depth-estimation",
 
 ## ❓ 다음 단계
 
-Phase 5 완료 후:
-- **Phase 6** (3D Perception)로 진행
+Phase 3 완료 후:
+- **Phase 4** (3D Perception)로 진행
 - KITTI 3D Detection → nuScenes BEV
 - 이직 포트폴리오 준비

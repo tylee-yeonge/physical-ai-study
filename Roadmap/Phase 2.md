@@ -11,7 +11,7 @@
 ## 📜 재구조화 회고 (2026-04-10)
 
 이 Phase 는 원래 **컴퓨터 비전 기초 (8주)** 였고, 완료 기준이 *"VINS-Fusion 의 feature_tracker 노드가 뭘 하는지 이해"* 였다.
-이직 타겟이 **Perception Engineer** 로 확정되면서 SLAM 트랙(Phase 3 VO/BA, Phase 4 VIO)이 [Archive/SLAM-legacy/](../Archive/SLAM-legacy/) 로 이동했고, Phase 2 도 SLAM 프레이밍을 제거하고 **Perception 중심 4주 구조** 로 재작성됐다.
+이직 타겟이 **Perception Engineer** 로 확정되면서 SLAM 트랙(VO/BA, VIO)이 [Archive/SLAM-legacy/](../Archive/SLAM-legacy/) 로 이동했고, Phase 2 도 SLAM 프레이밍을 제거하고 **Perception 중심 4주 구조** 로 재작성됐다.
 
 기존 8주의 학습 결과(Week 1, 2 카메라 모델/캘리브레이션)는 보존되었고, 새 구조의 Week 1, 2 는 **README 만 Perception 맥락으로 리프레이밍** 한다. Week 3, 4 는 **새 코드** 로 작성된다.
 
@@ -50,7 +50,7 @@ graph LR
     W2[Week 2<br/>왜곡 + 캘리브레이션]
     W3[Week 3<br/>Multi-view 기하<br/>+ Rectification]
     W4[Week 4<br/>삼각측량 + PnP]
-    P5[Phase 5<br/>Detection + Depth]
+    P5[Phase 3<br/>Detection + Depth]
 
     W1 --> W2 --> W3 --> W4 --> P5
 ```
@@ -124,7 +124,7 @@ graph LR
 - **Stereo Depth Network (HITNet, CRE-Stereo, RAFT-Stereo)**: 입력은 **rectified stereo pair**. 이 전처리를 못하면 모델은 못 돌린다
 - **KITTI Stereo 벤치마크**: 직접 평가를 해보려면 rectification + disparity 파이프라인 이해 필수
 - **Multi-camera BEV (BEVFormer, BEVDet)**: 각 카메라의 intrinsic + extrinsic 정렬이 BEV 변환의 근간
-- **Visual relocalization (Phase 6 NeRF)**: 두 뷰의 상대 자세 추정은 NeRF/Gaussian Splatting 의 카메라 포즈 입력
+- **Visual relocalization (Phase 4 NeRF)**: 두 뷰의 상대 자세 추정은 NeRF/Gaussian Splatting 의 카메라 포즈 입력
 
 #### 실습 코드 (신규 작성)
 - `basic.cpp` — 데모 파이프라인: 샘플 stereo → E/F 계산 → Rectification → Disparity → Depth map → 결과 저장
@@ -151,7 +151,7 @@ graph LR
 - **Monocular 3D Detection (FCOS3D, SMOKE, MonoFlex)**: 예측한 3D 박스 8 코너를 2D 에 투영 → 재투영 오차로 검증, 학습 시 loss term 으로도 사용
 - **nuScenes Multi-view 객체 매칭**: 여러 카메라에서 보인 같은 객체 → 삼각측량으로 3D 위치 복원
 - **BEV Detection 의 역연산**: Camera → BEV 변환의 수학적 기반
-- **NeRF / Gaussian Splatting (Phase 6 preview)**: Multi-view reconstruction 의 가장 기본 연산
+- **NeRF / Gaussian Splatting (Phase 4 preview)**: Multi-view reconstruction 의 가장 기본 연산
 - **카메라 외재 캘리브레이션**: 알려진 3D 패턴(체커보드)으로 PnP 풀어 카메라 포즈 추정
 
 #### 실습 코드 (신규 작성)
@@ -176,9 +176,9 @@ graph LR
 
 ## ➡️ 다음 단계
 
-Phase 2 완료 후 → **[Phase 5: Detection + Depth](Phase%205.md)** 로 직진.
+Phase 2 완료 후 → **[Phase 3: Detection + Depth](Phase%205.md)** 로 직진.
 
-> ⚠️ 기존 Phase 3 (VO & BA) 과 Phase 4 (VIO) 는 [Archive/SLAM-legacy/](../Archive/SLAM-legacy/) 로 이동되었다. SLAM 트랙은 더 이상 메인 로드맵의 일부가 아니다.
+> ⚠️ 기존 SLAM 트랙(VO/BA, VIO)은 [Archive/SLAM-legacy/](../Archive/SLAM-legacy/) 로 이동되었다. SLAM 트랙은 더 이상 메인 로드맵의 일부가 아니다.
 
 ---
 

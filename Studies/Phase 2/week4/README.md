@@ -13,7 +13,7 @@
 - **Monocular 3D Detection (FCOS3D, SMOKE, MonoFlex)**: 예측 3D 박스 8 코너를 2D에 투영 → **재투영 오차**로 검증, 학습 시 loss term으로 사용
 - **nuScenes Multi-view**: 여러 카메라 관측 → 삼각측량으로 3D 위치 복원
 - **BEV Detection 역연산**: Camera → BEV 변환의 수학적 기반
-- **NeRF / Gaussian Splatting (Phase 6 preview)**: Multi-view 재구성의 기본 연산
+- **NeRF / Gaussian Splatting (Phase 4 preview)**: Multi-view 재구성의 기본 연산
 - **카메라 외재 캘리브레이션**: 알려진 3D 패턴(체커보드)으로 PnP 풀어 카메라 포즈 추정
 
 ---
@@ -134,7 +134,7 @@ eᵢ = ||p_obs - π(K, R, t, Xᵢ)||₂
 - Camera → BEV 변환은 본질적으로 3D→2D 투영의 역연산
 - 이번 주에 배운 삼각측량 + PnP 가 수학적 기반
 
-### NeRF / Gaussian Splatting (Phase 6 preview)
+### NeRF / Gaussian Splatting (Phase 4 preview)
 - Multi-view 이미지에서 3D 구조 복원 → 삼각측량의 확장
 - 카메라 포즈 추정 → PnP (또는 SfM pipeline)
 
@@ -179,7 +179,7 @@ flowchart TD
 
 ## 🔗 다음 단계
 
-Phase 2 완료 후 → **[Phase 5: Detection + Depth](../../Roadmap/Phase%205.md)** 로 직진.
+Phase 2 완료 후 → **[Phase 3: Detection + Depth](../../Roadmap/Phase%205.md)** 로 직진.
 
 ---
 

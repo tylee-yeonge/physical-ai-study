@@ -12,7 +12,7 @@
 
 원래 로드맵은 **SLAM 기초 + AI Perception** 하이브리드였으나, 실제 Perception Engineer 직무는 SLAM-specific 지식(VO/BA/VIO)을 일상 업무에서 쓰지 않는다. 따라서 다음 결정을 내렸다:
 
-- **Phase 3 (VO & BA, 4주)** + **Phase 4 (VIO, 3주)** = 약 7주를 절약해 **Phase 5–6 (Detection + Depth + 3D Perception)** 와 포트폴리오 Sprint 에 집중
+- **Phase 3 (VO & BA, 4주)** + **Phase 4 (VIO, 3주)** = 약 7주를 절약해 **Phase 3–4 (Detection + Depth + 3D Perception)** 와 포트폴리오 Sprint 에 집중
 - **Phase 2 (8주)** 도 SLAM 프레이밍("VINS-Fusion 의 feature_tracker 이해")이 강해 Perception 중심 4주 구조로 재작성. 기존 8주는 통째로 이 디렉토리에 보존
 - **차별화 포인트**를 "SLAM 기초 이해" → **"AMR 실무 경험 + 로봇에 Perception 배포 경험"** 으로 이동
 

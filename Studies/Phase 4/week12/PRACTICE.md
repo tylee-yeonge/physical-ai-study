@@ -486,4 +486,4 @@ prepare_interview_qa()
 
 이전: [Week 12 README](./README.md)
 
-Phase 6 완료! [Phase 6 로드맵으로 돌아가기](../../../Roadmap/Phase%206.md)
+Phase 4 완료! [Phase 4 로드맵으로 돌아가기](../../../Roadmap/Phase%206.md)

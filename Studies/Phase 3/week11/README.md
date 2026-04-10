@@ -466,7 +466,7 @@ class Detection3DPublisher(Node):
 - Week 12에서는 **최종 데모 + 최적화 + 포트폴리오 정리**를 수행합니다
 - 전체 파이프라인의 FPS 최적화
 - 성능 목표 달성 확인
-- Phase 5 전체 내용 정리
+- Phase 3 전체 내용 정리
 
 ---
 

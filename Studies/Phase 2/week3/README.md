@@ -13,7 +13,7 @@
 - **Stereo Depth Network** (HITNet, CRE-Stereo, RAFT-Stereo): 입력은 **rectified stereo pair**. 이 전처리를 못하면 모델을 돌릴 수 없음
 - **KITTI Stereo 벤치마크**: 직접 평가를 해보려면 rectification + disparity 파이프라인 이해 필수
 - **Multi-camera BEV** (BEVFormer, BEVDet): 각 카메라의 intrinsic + extrinsic 정렬이 BEV 변환의 근간
-- **Visual relocalization** (Phase 6 NeRF): 두 뷰의 상대 자세 추정은 NeRF/Gaussian Splatting 의 카메라 포즈 입력
+- **Visual relocalization** (Phase 4 NeRF): 두 뷰의 상대 자세 추정은 NeRF/Gaussian Splatting 의 카메라 포즈 입력
 
 ---
 

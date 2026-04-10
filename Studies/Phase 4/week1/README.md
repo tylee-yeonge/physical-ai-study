@@ -20,16 +20,16 @@
 
 ## 🌟 시작하기 전에
 
-### Phase 6은 커리어 준비의 핵심입니다
+### Phase 4은 커리어 준비의 핵심입니다
 
-Phase 6는 단순한 학습이 아닙니다. **자율주행, AMR, 로봇 분야 이직을 위한 포트폴리오의 핵심**이 되는 Phase입니다. 3D Perception은 면접에서 가장 자주 묻는 주제 중 하나이며, KITTI/nuScenes 데이터셋 경험은 실무 역량의 증거가 됩니다.
+Phase 4는 단순한 학습이 아닙니다. **자율주행, AMR, 로봇 분야 이직을 위한 포트폴리오의 핵심**이 되는 Phase입니다. 3D Perception은 면접에서 가장 자주 묻는 주제 중 하나이며, KITTI/nuScenes 데이터셋 경험은 실무 역량의 증거가 됩니다.
 
 ```
 💼 포트폴리오 가치:
 ┌──────────────────────────────────────────────┐
 │  Phase 2-4: SLAM 기초 (이론 역량)              │
-│  Phase 5:   2D Detection (기본기)              │
-│  Phase 6:   3D Perception (★ 핵심 어필 포인트)  │
+│  Phase 3:   2D Detection (기본기)              │
+│  Phase 4:   3D Perception (★ 핵심 어필 포인트)  │
 │              → "카메라만으로 3D 검출 가능합니다"    │
 │              → "KITTI AP3D 지표를 이해합니다"     │
 │              → "BEV 기반 접근을 설명할 수 있습니다" │
@@ -475,6 +475,6 @@ IoU 0.7은 "두 3D 박스가 70% 이상 겹쳐야 정답으로 인정"하는 것
 
 ---
 
-이전: [Phase 5 - Detection + Depth](../../../Roadmap/Phase%205.md)
+이전: [Phase 3 - Detection + Depth](../../../Roadmap/Phase%205.md)
 
 다음: [Week 2 - 좌표계 이해](../week2/README.md)

@@ -1,4 +1,4 @@
-# Phase 6: 3D Perception
+# Phase 4: 3D Perception
 
 > ⏰ **기간**: 약 3개월 (12주 분량)  
 > 🎯 **목표**: 카메라 기반 3D 객체 검출 마스터  
@@ -9,7 +9,7 @@
 
 ---
 
-## 👉 **실습 가이드**: [`Studies/Phase 6/PRACTICE.md`](../Studies/Phase%206/PRACTICE.md)
+## 👉 **실습 가이드**: [`Studies/Phase 4/PRACTICE.md`](../Studies/Phase%206/PRACTICE.md)
 
 **핵심 산출물**:
 - KITTI 3D Detection 구현
@@ -398,7 +398,7 @@ python tools/test.py \
 
 ---
 
-## ✅ Phase 6 완료 체크리스트
+## ✅ Phase 4 완료 체크리스트
 
 ### KITTI 3D Detection
 - [ ] 데이터셋 준비 및 이해
@@ -420,7 +420,7 @@ python tools/test.py \
 
 ---
 
-## 🎯 Phase 6 완료 기준
+## 🎯 Phase 4 완료 기준
 
 > "KITTI와 nuScenes에서 3D Detection을 실습하고, BEV 개념을 이해하며, 이를 증명하는 포트폴리오 (GitHub + 블로그 + 영상)를 완성"
 
@@ -466,8 +466,8 @@ python tools/test.py \
 
 ### 필수 역량 체크
 - [ ] SLAM 기초 (Phase 2-4) 이해
-- [ ] 2D Detection (Phase 5) 실무 경험
-- [ ] 3D Detection (Phase 6) 프로젝트 경험
+- [ ] 2D Detection (Phase 3) 실무 경험
+- [ ] 3D Detection (Phase 4) 프로젝트 경험
 - [ ] Jetson 배포 경험
 - [ ] 포트폴리오 3종 세트
 
@@ -482,6 +482,6 @@ python tools/test.py \
 
 ## ❓ 다음 단계
 
-Phase 6 완료 후:
+Phase 4 완료 후:
 - **이직 활동 + VLA 입문 병행** (2026.12~)
 - 이직 후: **Stage 2** (BEV Segmentation, Blender, Isaac Sim)
