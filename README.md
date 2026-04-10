@@ -1,6 +1,6 @@
-# Visual SLAM & Perception 로드맵
+# 딥러닝 Perception 로드맵
 
-> 🎯 **목표**: SLAM 기초 → **AI Perception** → **이직** (Perception Engineer)
+> 🎯 **목표**: AMR 실무 경험 + 딥러닝 Perception → **Perception Engineer**
 > ⏰ **기간**: Stage 1 (이직 전) + Stage 2 (이직 후) + Stage 2+ (장기 확장)
 > 👶 **전제**: 5개월 딸과 함께하는 직장인 아빠, AMR ROS Application 개발자
 
@@ -14,14 +14,12 @@ graph LR
         P0[Phase 0]
         P1[Phase 1]
         P2[Phase 2]
-        P3[Phase 3]
-        P4[Phase 4]
         P5[Phase 5]
         P6[Phase 6]
     end
 
     subgraph Career[Career]
-        Portfolio[Portfolio]
+        Sprint[Portfolio Sprint]
         Job[Job]
     end
 
@@ -40,9 +38,9 @@ graph LR
         Embodied[Embodied AI]
     end
 
-    P0 --> P1 --> P2 --> P3 --> P4 --> P5 --> P6
-    P6 --> Portfolio --> Job
-    Portfolio -.-> VLA
+    P0 --> P1 --> P2 --> P5 --> P6
+    P6 --> Sprint --> Job
+    Sprint -.-> VLA
     Job --> BEV --> Isaac --> Multi
     Blender -.-> Isaac
     Multi --> Embodied
@@ -56,15 +54,16 @@ graph LR
 | 시기 | Stage | 내용 | 목표 |
 |------|-------|------|------|
 | 2026.01-02 | Stage 1 | Phase 0-1 (완료) | 환경 세팅, 수학 핵심 |
-| 2026.03-04 | Stage 1 | Phase 2: CV 기초 | 카메라 모델 이해 |
-| 2026.05 | Stage 1 | Phase 3: VO & BA (4주) | VO/BA 개념 이해 |
-| 2026.06 전반 | Stage 1 | Phase 4: VIO 개념 (3주) | IMU-Vision 상호보완 이해 |
-| 2026.06-08 | Stage 1 | **Phase 5: Detection + Depth** | 2D Perception + Jetson 배포 |
-| 2026.09-10 | Stage 1 | **Phase 6: 3D Perception + BEV** | KITTI/nuScenes 3D Detection |
-| 2026.11 | Stage 1 | 포트폴리오 | GitHub + 블로그 + 데모 영상 |
+| 2026.03-04 | Stage 1 | Phase 2: Perception 기하 기초 (4주) | 카메라 모델 + Multi-view 기하 |
+| 2026.05-07 | Stage 1 | **Phase 5: Detection + Depth** | 2D Perception + Jetson 배포 |
+| 2026.08-09 | Stage 1 | **Phase 6: 3D Perception + BEV** | KITTI/nuScenes 3D Detection |
+| 2026.10-11 | Stage 1 | **Portfolio Sprint** (7주) | Jetson 데모 + 블로그 + 영상 |
 | 2026.12~ | Career | **이직 활동 + VLA 입문 병행** | Perception Engineer |
 | 2027 중반~ | Stage 2 | BEV, Blender, Isaac Sim | 이직 후 심화 |
 | 2028~ | Stage 2+ | **VLA 심화, Embodied AI** | 미래 역량 |
+
+> 📌 기존 Phase 3 (VO/BA, 4주) + Phase 4 (VIO, 3주) = **7주를 절약**하여 Portfolio Sprint 에 배정.
+> Phase 2 도 8주 → 4주로 압축. 절약된 총 11주 중 7주는 Portfolio Sprint, 나머지 4주는 학습 버퍼.
 
 ---
 
@@ -73,22 +72,17 @@ graph LR
 | Phase | 내용 | 언어 | 이유 |
 |-------|------|------|------|
 | Phase 0-1 | 환경 세팅, 수학 | Python | 빠른 프로토타이핑 |
-| **Phase 2** | **컴퓨터 비전 기초** | **C++** | Jetson 실습, OpenCV C++ |
-| **Phase 3** | **VO & BA** | **C++** | g2o, Ceres (C++ 전용) |
-| **Phase 4** | **VIO 개념** | **C++** | Sophus, 개념 이해 중심 |
+| **Phase 2** | **Perception 기하 기초** | **C++** | OpenCV C++, Jetson 실습 |
 | **Phase 5** | **Detection + Depth** | **Python** (학습) + **C++/TensorRT** (배포) | PyTorch → Jetson 최적화 |
 | **Phase 6** | **3D Perception** | **Python** | MMDetection3D, nuScenes |
 
 ### 핵심 원칙
 
-✅ **SLAM 알고리즘 (Phase 2-4)**: **C++**
-- 이유: VINS, ORB-SLAM 모두 C++, 개념 이해 수준
+✅ **기하학 기초 (Phase 2)**: **C++** (OpenCV, 카메라 모델/캘리브레이션)
 
 ✅ **딥러닝 학습 (Phase 5-6)**: **Python** (PyTorch)
-- 이유: 딥러닝 생태계 표준
 
-✅ **딥러닝 배포**: **C++ + TensorRT** (Jetson)
-- 이유: 실시간 추론 성능 (30+ FPS 목표)
+✅ **딥러닝 배포**: **C++ + TensorRT** (Jetson, 30+ FPS 목표)
 
 ---
 
@@ -100,24 +94,22 @@ graph LR
 
 | Phase | 가이드 위치 | 언어 |
 |-------|------------|------|
-| Phase 2 | [`Studies/Phase 2/week2/PRACTICE.md`](./Studies/Phase%202/week2/PRACTICE.md) | C++ |
-| Phase 3 | 각 week별 PRACTICE.md (예: [`week1/PRACTICE.md`](./Studies/Phase%203/week1/PRACTICE.md)) | C++ (코드 분석) |
-| Phase 4 | 각 week별 PRACTICE.md (예: [`week1/PRACTICE.md`](./Studies/Phase%204/week1/PRACTICE.md)) | C++ (코드 분석) |
+| Phase 2 | 각 week별 PRACTICE.md (예: [`week3/PRACTICE.md`](./Studies/Phase%202/week3/PRACTICE.md)) | C++ |
 | Phase 5 | 각 week별 PRACTICE.md (예: [`week1/PRACTICE.md`](./Studies/Phase%205/week1/PRACTICE.md)) | Python + TensorRT |
 | Phase 6 | 각 week별 PRACTICE.md (예: [`week1/PRACTICE.md`](./Studies/Phase%206/week1/PRACTICE.md)) | Python |
 
 ---
 
-### Phase 0-4: SLAM 기초
-> Phase 0-1 완료, Phase 2 진행 중, Phase 3-4 개념 이해 중심
+### Phase 0-2: 기초
+> Phase 0-1 완료, Phase 2 진행 중
 
 | Phase | 내용 | 기간 |
 |-------|------|------|
-| 0 | 환경 세팅, VINS 실행 | 2주 |
+| 0 | 환경 세팅 | 2주 |
 | 1 | 수학 핵심 (선형대수, 3D 기하) | 2개월 |
-| 2 | 컴퓨터 비전 기초 | 2개월 |
-| 3 | VO & BA (개념 + 코드 분석) | 4주 |
-| 4 | VIO 개념 (직관적 이해 중심) | 3주 |
+| 2 | Perception 기하 기초 (카메라 모델, Multi-view) | 4주 |
+
+> ⚠️ 기존 Phase 3 (VO & BA) 과 Phase 4 (VIO) 는 [Archive/SLAM-legacy/](./Archive/SLAM-legacy/) 로 이동되었습니다.
 
 ### Phase 5: Detection + Depth (3개월) ⭐
 > **핵심 Phase** - Detection + Depth 필수, Instance Seg 선택
@@ -148,12 +140,21 @@ graph LR
 
 **산출물**: 카메라 기반 3D 객체 검출 데모
 
-### 포트폴리오 (2026.12)
-| 항목 | 내용 |
-|------|------|
-| GitHub | 학습 정리 + 데모 코드 |
-| 블로그 | 학습 여정 시리즈 |
-| 데모 영상 | Jetson 실시간 Perception |
+### Portfolio Sprint (7주) 🔥
+> Phase 6 완료 직후, 이직 활동 직전
+
+**목적**: Phase 5-6에서 배운 기술을 **면접관이 보고 뽑고 싶어지는** 포트폴리오로 전환
+
+| 주 | 주제 | 핵심 |
+|----|------|------|
+| 1 | 프로젝트 설계 + 환경 고정 | 뭘 만들지 확정 |
+| 2-3 | **메인: Real-time Perception Stack** | YOLO + Depth Anything on Jetson |
+| 4 | **Mono 3D Detection 데모** | FCOS3D/SMOKE KITTI 시각화 |
+| 5 | **AMR 실무 연결** | ROS 2 노드 래퍼, 로봇 데모 영상 |
+| 6 | 블로그 + GitHub 정리 | 기술 블로그 3-5개 |
+| 7 | 데모 영상 + 이력서 | 1-3분 영상, 이력서 개편 |
+
+**차별화 메시지**: *"딥러닝 모델을 실제 로봇에 붙여본 사람"*
 
 ---
 
@@ -248,22 +249,6 @@ graph LR
 | **Jetson Orin Nano** | 실시간 추론, 배포 |
 | **ELP 800P Stereo Monochrome** | 스테레오 비전 |
 
-### 외부 소스코드
-
-Phase 3-4에서 코드 분석 대상인 VINS-Fusion이 git submodule로 포함되어 있습니다.
-
-```bash
-# 처음 클론할 때
-git clone --recurse-submodules <repo-url>
-
-# 이미 클론한 경우
-git submodule update --init
-```
-
-| 경로 | 내용 |
-|------|------|
-| `Assets/VINS-Fusion/` | VINS-Fusion 소스코드 (submodule) |
-
 ---
 
 ## 🏆 커리어 경로
@@ -279,22 +264,20 @@ git submodule update --init
 ```
 
 ### 최종 포지셔닝
-> "SLAM 기초를 이해하고, 딥러닝 Perception을 할 수 있으며,
-> 실제 로봇 제품에 배포해본 경험이 있는 **Perception Engineer**"
+> "AMR 로봇 제품에 7년간 배포해본 실무 경험 위에
+> 딥러닝 Perception을 쌓은 **Perception Engineer**"
 
 ---
 
 ## ✅ 마일스톤 체크리스트
 
 ### Stage 1 (2026~2027년)
-- [x] VINS-Fusion 실행 성공
+- [x] 환경 세팅 완료
 - [x] 수학 기초 이해
-- [ ] Phase 2 완료 (컴퓨터 비전)
-- [ ] Phase 3 완료 (VO & BA 개념)
-- [ ] Phase 4 완료 (VIO 개념)
+- [ ] Phase 2 완료 (Perception 기하 기초)
 - [ ] Phase 5 완료 (Detection + Depth, Jetson 배포)
 - [ ] Phase 6 완료 (3D Perception + BEV)
-- [ ] 포트폴리오 완성
+- [ ] Portfolio Sprint 완료
 - [ ] **이직 성공! 🎉**
 
 ### Stage 2 (2027년)
@@ -322,11 +305,11 @@ git submodule update --init
 3. **실무 연결**: 항상 "이게 로봇에 어떻게 쓰이나?" 생각
 4. **기록 습관**: 배운 것을 짧게라도 기록
 5. **가족 우선**: 학습은 마라톤, 번아웃 방지
-6. **SLAM 기초는 무기, Perception이 본체**: SLAM 이해가 차별점, Perception이 메인 스킬
+6. **AMR 실무 경험이 차별점, Perception이 본체**: 7년간의 실제 로봇 배포 경험이 최대 무기
 
 ---
 
-> 📝 **경로**: SLAM 기초 → **AI Perception** → **이직** → BEV → **VLA**
+> 📝 **경로**: 기하학 기초 → **AI Perception** → **Portfolio Sprint** → **이직** → BEV → **VLA**
 > AMR 실무 경험을 살려 **Perception Engineer**로 성장합니다.
 
 ---
@@ -346,7 +329,7 @@ git submodule update --init
 - 7년차 로봇 실무 경험은 대체 불가능한 자산. Perception을 논문으로만 아는 사람은 많지만, 실제 로봇 제품에 배포해본 사람은 드묾
 - AMR에서 ROS, 센서, 실시간 시스템을 다뤄본 경험은 면접에서 "이 사람은 현장을 안다"는 신뢰를 줌
 - Phase 5-6까지 완주하고 **Jetson 실시간 데모 영상**이 있으면 포트폴리오로 충분히 설득력 있음
-- 자율주행/로봇 업계는 "SLAM도 알고 Perception도 되는 사람"을 원하는데, 정확히 그 포지셔닝
+- 자율주행/로봇 업계는 "로봇 실무도 알고 Perception도 되는 사람"을 원하는데, 정확히 그 포지셔닝
 - C++과 Python 양쪽을 다루는 엔지니어는 수요 대비 공급이 적음
 
 **필요한 것**: Phase 5-6 완주 + Jetson 데모 1개 + 블로그/GitHub 정리
