@@ -23,3 +23,9 @@ target_link_libraries(quiz_easy PRIVATE ${OpenCV_LIBS})
 
 add_executable(quiz_medium quiz_medium.cpp)
 target_link_libraries(quiz_medium PRIVATE ${OpenCV_LIBS})
+
+add_executable(quiz_easy_answer quiz_easy_answer.cpp)
+target_link_libraries(quiz_easy_answer PRIVATE ${OpenCV_LIBS})
+
+add_executable(quiz_medium_answer quiz_medium_answer.cpp)
+target_link_libraries(quiz_medium_answer PRIVATE ${OpenCV_LIBS})
