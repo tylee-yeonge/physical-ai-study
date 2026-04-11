@@ -1,14 +1,14 @@
 # Phase 2: 컴퓨터 비전 기초
 
-> ⏰ **기간**: 2개월  
-> 🎯 **목표**: Visual SLAM의 프론트엔드 이해를 위한 비전 기초  
-> ⏱️ **주간 시간**: 약 7시간
+> [time] **기간**: 2개월  
+> [goal] **목표**: Visual SLAM의 프론트엔드 이해를 위한 비전 기초  
+> [time] **주간 시간**: 약 7시간
 
 ---
 
-## 📋 Section 2.1: 카메라 모델 (2주)
+## [list] Section 2.1: 카메라 모델 (2주)
 
-### Week 1: 핀홀 카메라 모델 ✅ (2/2 ~ 2/12)
+### Week 1: 핀홀 카메라 모델 [O] (2/2 ~ 2/12)
 
 #### 기본 개념
 - [x] 핀홀 카메라 원리 (빛이 작은 구멍 통과)
@@ -36,11 +36,11 @@
 - [x] 3D 점을 이미지에 투영할 때 K 사용
 - [x] 재투영 오차 계산의 기초
 
-### Week 2: 왜곡과 캘리브레이션 ✅ (2/12 ~ 3/2)
+### Week 2: 왜곡과 캘리브레이션 [O] (2/12 ~ 3/2)
 
-> 💻 **C++ 실습**: [PRACTICE.md](../Studies/Phase%202/week2/PRACTICE.md)  
-> 🛠️ **하드웨어**: Jetson Orin Nano + ELP Stereo Camera  
-> ⏰ **실습 시간**: 6-8시간
+> [code] **C++ 실습**: [PRACTICE.md](../Studies/Phase%202/week2/PRACTICE.md)  
+> [tool] **하드웨어**: Jetson Orin Nano + ELP Stereo Camera  
+> [time] **실습 시간**: 6-8시간
 
 #### 렌즈 왜곡 (이론)
 - [x] 방사 왜곡 (Radial Distortion) - 배럴/핀쿠션
@@ -53,7 +53,7 @@
 - [x] 캘리브레이션 과정 이해
 - [x] 재투영 오차 (Reprojection Error) 의미
 
-#### 실습: OpenCV C++ 캘리브레이션 ⭐ (→ 나중에 수행)
+#### 실습: OpenCV C++ 캘리브레이션 [*] (→ 나중에 수행)
 - [ ] **단일 카메라**: Left/Right 각각 캘리브레이션
   - [ ] `CameraCalibration` 클래스 구현
   - [ ] 체커보드 이미지 20장 캡처
@@ -70,14 +70,14 @@
 - [ ] Camera-only 캘리브레이션 실행
 - [ ] 결과 YAML 파일 분석
 
-> 💡 Kalibr는 Phase 4에서 Camera-IMU 캘리브레이션에도 사용됨. 미리 익혀두면 좋음.
+> [tip] Kalibr는 Phase 4에서 Camera-IMU 캘리브레이션에도 사용됨. 미리 익혀두면 좋음.
 
 #### Stereo 카메라 특화 (→ 나중에 수행)
-- [ ] ✅ Stereo의 장점 (스케일 복원 가능 - Monocular 대비)
+- [ ] [O] Stereo의 장점 (스케일 복원 가능 - Monocular 대비)
 - [ ] Baseline 개념 및 측정
 - [ ] VINS-Fusion Stereo 모드 config 파일 확인
 
-### 🔍 Section 2.1 자체 점검
+### [search] Section 2.1 자체 점검
 > 아래 질문에 답할 수 있으면 다음으로 진행
 
 1. 카메라 행렬 K의 각 요소 (fx, fy, cx, cy)는 무엇을 의미하는가?
@@ -86,13 +86,13 @@
 
 ---
 
-## 📋 Section 2.2: 특징점 검출과 매칭 (2주)
+## [list] Section 2.2: 특징점 검출과 매칭 (2주)
 
-### Week 3-4: 특징점 검출과 매칭 ✅
+### Week 3-4: 특징점 검출과 매칭 [O]
 
-> 💻 **C++ 실습**: [PRACTICE.md](../Studies/Phase%202/week3/PRACTICE.md)  
-> 🛠️ **하드웨어**: Jetson Orin Nano + ELP Stereo Camera  
-> ⏰ **실습 시간**: 12-16시간 (2주)
+> [code] **C++ 실습**: [PRACTICE.md](../Studies/Phase%202/week3/PRACTICE.md)  
+> [tool] **하드웨어**: Jetson Orin Nano + ELP Stereo Camera  
+> [time] **실습 시간**: 12-16시간 (2주)
 
 #### Week 3: 코너 검출
 - [x] Harris Corner Detector 원리 이해
@@ -147,7 +147,7 @@
 - [x] 매칭 결과 시각화 (`cv2.drawMatches`)
 - [x] RANSAC으로 outlier 제거 전후 비교
 
-### 🔍 Section 2.2 자체 점검
+### [search] Section 2.2 자체 점검
 > 아래 질문에 답할 수 있으면 다음으로 진행
 
 1. FAST가 Harris보다 빠른 이유는?
@@ -156,13 +156,13 @@
 
 ---
 
-## 📋 Section 2.3: 에피폴라 기하학 (3주)
+## [list] Section 2.3: 에피폴라 기하학 (3주)
 
-### Week 5-7: 에피폴라 기하학 + 스테레오 비전 🔥
+### Week 5-7: 에피폴라 기하학 + 스테레오 비전 
 
-> 💻 **C++ 실습**: [PRACTICE.md](../Studies/Phase%202/week5/PRACTICE.md)  
-> 🛠️ **하드웨어**: Jetson Orin Nano + ELP Stereo (캘리브레이션 완료 필요)  
-> ⏰ **실습 시간**: 18-24시간 (3주)
+> [code] **C++ 실습**: [PRACTICE.md](../Studies/Phase%202/week5/PRACTICE.md)  
+> [tool] **하드웨어**: Jetson Orin Nano + ELP Stereo (캘리브레이션 완료 필요)  
+> [time] **실습 시간**: 18-24시간 (3주)
 
 #### Week 5: 기본 개념 (이론)
 
@@ -189,7 +189,7 @@
 - [ ] 에피폴라 제약으로 잘못된 매칭 걸러내기
 - [ ] VINS 초기화 과정에서 사용
 
-#### Week 6: 포즈 추정 + Stereo Rectification (실습) ⭐
+#### Week 6: 포즈 추정 + Stereo Rectification (실습) [*]
 
 #### Essential Matrix에서 포즈 복원
 - [ ] E → R, t 분해 (SVD 사용)
@@ -205,7 +205,7 @@
 - [ ] 에피폴라 선 그려서 제약 확인
 - [ ] 상대 포즈 (R, t) 복원 (`cv2.recoverPose`)
 
-#### Week 7: Disparity/Depth Map 생성 (실습) ⭐
+#### Week 7: Disparity/Depth Map 생성 (실습) [*]
 
 #### 삼각측량 (Triangulation)
 - [ ] 두 카메라 뷰에서 3D 점 복원 원리
@@ -229,7 +229,7 @@
 - [ ] 복원된 점들 3D 시각화 (matplotlib 또는 Open3D)
 - [ ] PnP로 새 프레임 포즈 추정
 
-### 🔍 Section 2.3 자체 점검
+### [search] Section 2.3 자체 점검
 > 아래 질문에 답할 수 있으면 다음으로 진행
 
 1. Essential Matrix와 Fundamental Matrix의 차이는?
@@ -238,13 +238,13 @@
 
 ---
 
-## 📋 Section 2.4: 광류 (Optical Flow) (1주)
+## [list] Section 2.4: 광류 (Optical Flow) (1주)
 
-### Week 8: 광류 (Optical Flow) + KLT Tracker 🔥
+### Week 8: 광류 (Optical Flow) + KLT Tracker 
 
-> 💻 **C++ 실습**: VINS feature_tracker 구조 이해 및 구현  
-> 🛠️ **하드웨어**: Jetson Orin Nano + ELP Stereo  
-> ⏰ **실습 시간**: 6-8시간
+> [code] **C++ 실습**: VINS feature_tracker 구조 이해 및 구현  
+> [tool] **하드웨어**: Jetson Orin Nano + ELP Stereo  
+> [time] **실습 시간**: 6-8시간
 
 #### 광류 이해
 
@@ -278,7 +278,7 @@
 - [ ] `FeatureTracker` 클래스에서 KLT 사용 부분 찾기
 - [ ] 특징점 관리 방식 파악 (ID 부여, 추적 횟수)
 
-### 🔍 Section 2.4 자체 점검
+### [search] Section 2.4 자체 점검
 > 아래 질문에 답할 수 있으면 다음으로 진행
 
 1. Lucas-Kanade가 가정하는 것은?
@@ -287,7 +287,7 @@
 
 ---
 
-## ✅ Phase 2 완료 체크리스트
+## [O] Phase 2 완료 체크리스트
 
 ### 카메라 모델
 - [x] 핀홀 모델 설명 가능
@@ -311,13 +311,13 @@
 
 ---
 
-## 🎯 Phase 2 완료 기준
+## [goal] Phase 2 완료 기준
 
 > "VINS-Fusion의 `feature_tracker` 노드가 뭘 하는지 이해하고, 각 단계가 왜 필요한지 설명 가능"
 
 ---
 
-## 📚 참고 자료
+## [ref] 참고 자료
 
 ### 책 (사전처럼 사용)
 
@@ -343,7 +343,7 @@
 
 ---
 
-## 💡 팁
+## [tip] 팁
 
 1. **실습 우선**: 이론 30%, 실습 70%
 2. **OpenCV 문서 활용**: 함수 파라미터와 반환값 정확히 확인
@@ -353,7 +353,7 @@
 
 ---
 
-## ❓ 다음 단계
+## [?] 다음 단계
 
 Phase 2 완료 후:
 - Phase 3 (Visual Odometry & Bundle Adjustment)로 진행

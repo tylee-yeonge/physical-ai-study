@@ -1,11 +1,11 @@
 # Week 3 실습: YOLO 이론 검증
 
-> 🎯 **실습 목표**: YOLO의 핵심 개념을 코드로 직접 구현하여 이해를 깊게 한다.
-> ⏰ **예상 시간**: 6~8시간
+> [goal] **실습 목표**: YOLO의 핵심 개념을 코드로 직접 구현하여 이해를 깊게 한다.
+> [time] **예상 시간**: 6~8시간
 
 ---
 
-## 🔧 환경 설정
+## [tool] 환경 설정
 
 ```bash
 cd Studies/Phase\ 5/week3
@@ -16,7 +16,7 @@ python quiz_medium.py    # 코드 퀴즈
 
 ---
 
-## 📝 실습 1: IoU 계열 Loss 직접 구현
+## [note] 실습 1: IoU 계열 Loss 직접 구현
 
 **파일명**: `practice_iou.py`
 
@@ -113,7 +113,7 @@ def compute_ciou(box1, box2):
     return ciou
 
 
-# ── 시나리오 비교 ──
+# -- 시나리오 비교 --
 print("\n[시나리오 1] BBox가 겹치는 경우")
 gt = torch.tensor([100., 100., 200., 200.])
 pred1 = torch.tensor([120., 110., 220., 210.])
@@ -139,7 +139,7 @@ print(f"  IoU:  {compute_iou(pred3, gt):.4f}")
 print(f"  GIoU: {compute_giou(pred3, gt):.4f}")
 print(f"  CIoU: {compute_ciou(pred3, gt):.4f}")
 
-# ── 시각화 ──
+# -- 시각화 --
 fig, axes = plt.subplots(1, 3, figsize=(15, 5))
 scenarios = [
     ("겹치는 경우", pred1),
@@ -176,7 +176,7 @@ for ax, (title, pred) in zip(axes, scenarios):
 plt.tight_layout()
 plt.savefig('iou_comparison.png', dpi=100)
 print("\n시각화 저장: iou_comparison.png")
-print("\n✅ 실습 1 완료!")
+print("\n[O] 실습 1 완료!")
 ```
 
 **실행**:
@@ -186,7 +186,7 @@ python practice_iou.py
 
 ---
 
-## 📝 실습 2: Detection 지표 계산
+## [note] 실습 2: Detection 지표 계산
 
 **파일명**: `practice_metrics.py`
 
@@ -219,7 +219,7 @@ def compute_iou_np(box1, box2):
     return inter / (area1 + area2 - inter + 1e-7)
 
 
-# ── 가상 검출 결과 ──
+# -- 가상 검출 결과 --
 # 10개의 GT box가 있는 이미지
 gt_boxes = [
     [50, 50, 150, 150],     # 객체 0
@@ -243,7 +243,7 @@ predictions = [
 print(f"\nGT 객체 수: {len(gt_boxes)}")
 print(f"예측 수: {len(predictions)}")
 
-# ── Precision-Recall 계산 ──
+# -- Precision-Recall 계산 --
 iou_threshold = 0.5
 matched_gt = set()
 precisions = []
@@ -283,7 +283,7 @@ for i, pred in enumerate(predictions):
     print(f"  예측 {i}: conf={pred['conf']:.2f}, IoU={best_iou:.3f}, "
           f"{status}, Precision={precision:.3f}, Recall={recall:.3f}")
 
-# ── AP 계산 (11-point interpolation) ──
+# -- AP 계산 (11-point interpolation) --
 recall_levels = np.linspace(0, 1, 11)
 ap = 0
 for r_level in recall_levels:
@@ -295,7 +295,7 @@ for r_level in recall_levels:
 ap /= 11
 print(f"\n  AP@0.5 (11-point): {ap:.4f}")
 
-# ── PR Curve 시각화 ──
+# -- PR Curve 시각화 --
 fig, ax = plt.subplots(1, 1, figsize=(8, 6))
 ax.plot(recalls, precisions, 'b-o', linewidth=2, markersize=8)
 ax.set_xlabel('Recall', fontsize=12)
@@ -309,7 +309,7 @@ ax.fill_between(recalls, precisions, alpha=0.2)
 plt.tight_layout()
 plt.savefig('pr_curve.png', dpi=100)
 print("PR Curve 저장: pr_curve.png")
-print("\n✅ 실습 2 완료!")
+print("\n[O] 실습 2 완료!")
 ```
 
 **실행**:
@@ -319,7 +319,7 @@ python practice_metrics.py
 
 ---
 
-## 📝 실습 3: NMS (Non-Maximum Suppression) 구현
+## [note] 실습 3: NMS (Non-Maximum Suppression) 구현
 
 **파일명**: `practice_nms.py`
 
@@ -384,7 +384,7 @@ def nms(boxes, scores, iou_threshold=0.5):
     return keep
 
 
-# ── 테스트 데이터 ──
+# -- 테스트 데이터 --
 # 같은 객체를 여러 번 검출한 상황
 boxes = np.array([
     [100, 100, 210, 210],   # BBox 0: conf=0.9
@@ -407,7 +407,7 @@ print(f"\nNMS 후: {len(keep)}개 BBox (유지: {keep})")
 for i in keep:
     print(f"  BBox {i}: {boxes[i].tolist()}, conf={scores[i]:.2f}")
 
-# ── 시각화 ──
+# -- 시각화 --
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
 colors = ['red', 'blue', 'green', 'orange', 'purple', 'cyan']
 
@@ -441,7 +441,7 @@ for i in keep:
 plt.tight_layout()
 plt.savefig('nms_result.png', dpi=100)
 print("\n시각화 저장: nms_result.png")
-print("\n✅ 실습 3 완료!")
+print("\n[O] 실습 3 완료!")
 ```
 
 **실행**:
@@ -451,7 +451,7 @@ python practice_nms.py
 
 ---
 
-## 📝 실습 4: YOLOv8 구조 살펴보기
+## [note] 실습 4: YOLOv8 구조 살펴보기
 
 **파일명**: `practice_yolov8_structure.py`
 
@@ -466,22 +466,22 @@ print("=" * 50)
 print("실습 4: YOLOv8 구조 분석")
 print("=" * 50)
 
-# ── 모델 로드 ──
+# -- 모델 로드 --
 model = YOLO('yolov8n.pt')  # nano 모델 (가장 작음)
 
-# ── 모델 정보 출력 ──
+# -- 모델 정보 출력 --
 print("\n[1] 모델 기본 정보")
 print(f"  모델명: {model.model.yaml.get('yaml_file', 'yolov8n')}")
 print(f"  총 파라미터: {sum(p.numel() for p in model.model.parameters()):,}")
 print(f"  학습 가능 파라미터: {sum(p.numel() for p in model.model.parameters() if p.requires_grad):,}")
 
-# ── 레이어별 구조 ──
+# -- 레이어별 구조 --
 print("\n[2] 모델 레이어 구조")
 for i, layer in enumerate(model.model.model):
     params = sum(p.numel() for p in layer.parameters())
     print(f"  Layer {i:2d}: {layer.__class__.__name__:20s} → 파라미터: {params:>8,}")
 
-# ── 모델 크기 비교 ──
+# -- 모델 크기 비교 --
 print("\n[3] YOLOv8 모델 크기 비교")
 model_sizes = {
     'yolov8n': '3.2M params, 8.7 GFLOPs',
@@ -493,7 +493,7 @@ model_sizes = {
 for name, info in model_sizes.items():
     print(f"  {name}: {info}")
 
-print("\n✅ 실습 4 완료!")
+print("\n[O] 실습 4 완료!")
 ```
 
 **실행**:
@@ -504,7 +504,7 @@ python practice_yolov8_structure.py
 
 ---
 
-## ✅ 실습 체크리스트
+## [O] 실습 체크리스트
 
 - [ ] IoU, GIoU, CIoU 직접 구현 및 결과 비교
 - [ ] Precision, Recall, AP 수동 계산
@@ -514,7 +514,7 @@ python practice_yolov8_structure.py
 
 ---
 
-## 🔗 참고 자료
+## [link] 참고 자료
 
 - [YOLO 원본 논문 (Redmon et al., 2015)](https://arxiv.org/abs/1506.02640)
 - [YOLOv3 논문](https://arxiv.org/abs/1804.02767)

@@ -1,12 +1,12 @@
 # Week 6: Jetson 배포 - TensorRT (C++)
 
-> 🎯 **이번 주 목표**: ONNX 모델을 TensorRT로 변환하고 C++로 실시간 추론 구현하기
-> ⏰ **예상 시간**: 12시간
-> 💡 **핵심 질문**: "왜 ONNX Runtime이 아니라 TensorRT를 사용할까?"
+> [goal] **이번 주 목표**: ONNX 모델을 TensorRT로 변환하고 C++로 실시간 추론 구현하기
+> [time] **예상 시간**: 12시간
+> [tip] **핵심 질문**: "왜 ONNX Runtime이 아니라 TensorRT를 사용할까?"
 
 ---
 
-## 📋 학습 순서
+## [list] 학습 순서
 
 | 순서 | 단계 | 파일 | 설명 |
 |:----:|------|------|------|
@@ -17,7 +17,7 @@
 
 ---
 
-## 🌟 시작하기 전에
+## [*] 시작하기 전에
 
 ### Week 5 복습
 
@@ -26,16 +26,16 @@
 Week 1-4: YOLOv8 학습 → .pt 모델 (PyTorch)
 Week 5:   .pt → .onnx 변환 (ONNX Runtime 추론)
 
-💥 문제: Jetson에서 ONNX Runtime만으로는 30 FPS 달성 어려움!
+[!] 문제: Jetson에서 ONNX Runtime만으로는 30 FPS 달성 어려움!
 ```
 
 **TensorRT가 필요한 이유:**
 ```
 ONNX Runtime (GPU):    ~12 ms / 83 FPS (데스크톱 GPU)
-ONNX Runtime (Jetson): ~40 ms / 25 FPS (Jetson Orin Nano)  ❌
+ONNX Runtime (Jetson): ~40 ms / 25 FPS (Jetson Orin Nano)  [X]
 
-TensorRT (Jetson):     ~15 ms / 66 FPS (Jetson Orin Nano)  ✅
-TensorRT FP16:         ~8 ms  / 125 FPS (Jetson Orin Nano) ✅✅
+TensorRT (Jetson):     ~15 ms / 66 FPS (Jetson Orin Nano)  [O]
+TensorRT FP16:         ~8 ms  / 125 FPS (Jetson Orin Nano) [O][O]
 
 → TensorRT는 NVIDIA GPU에 특화된 최적화 엔진!
 ```
@@ -54,7 +54,7 @@ TensorRT = NVIDIA 전문 통역사
 
 ---
 
-## 📚 핵심 개념 자세히 알아보기
+## [ref] 핵심 개념 자세히 알아보기
 
 ### 1. TensorRT란?
 
@@ -62,29 +62,29 @@ TensorRT = NVIDIA 전문 통역사
 
 ```
 핵심 최적화 기법:
-┌─────────────────────────────────────────┐
-│           TensorRT 최적화                 │
-│                                          │
-│  🔗 Layer Fusion (레이어 합치기)          │
-│     Conv + BN + ReLU → FusedCBR         │
-│     → 메모리 접근 감소, 커널 호출 감소     │
-│                                          │
-│  ⚙️ Kernel Auto-Tuning                  │
-│     수백 개 커널 중 최적 선택              │
-│     → GPU 아키텍처별 최적 커널 자동 탐색   │
-│                                          │
-│  📐 Precision Calibration                │
-│     FP32 → FP16 → INT8                  │
-│     → 정확도 유지하며 속도 극대화          │
-│                                          │
-│  🧠 Dynamic Tensor Memory               │
-│     메모리 재사용 최적화                   │
-│     → Jetson 8GB 메모리 효율적 사용       │
-│                                          │
-│  📊 Multi-Stream Execution               │
-│     여러 추론을 병렬 실행                  │
-│     → GPU 활용률 극대화                   │
-└─────────────────────────────────────────┘
++-----------------------------------------+
+|           TensorRT 최적화                 |
+|                                          |
+|  [link] Layer Fusion (레이어 합치기)          |
+|     Conv + BN + ReLU → FusedCBR         |
+|     → 메모리 접근 감소, 커널 호출 감소     |
+|                                          |
+|   Kernel Auto-Tuning                  |
+|     수백 개 커널 중 최적 선택              |
+|     → GPU 아키텍처별 최적 커널 자동 탐색   |
+|                                          |
+|   Precision Calibration                |
+|     FP32 → FP16 → INT8                  |
+|     → 정확도 유지하며 속도 극대화          |
+|                                          |
+|   Dynamic Tensor Memory               |
+|     메모리 재사용 최적화                   |
+|     → Jetson 8GB 메모리 효율적 사용       |
+|                                          |
+|  [chart] Multi-Stream Execution               |
+|     여러 추론을 병렬 실행                  |
+|     → GPU 활용률 극대화                   |
++-----------------------------------------+
 ```
 
 ### 2. Layer Fusion 상세
@@ -110,16 +110,16 @@ FusedConvBNReLU → 메모리 쓰기
 **YOLO에서의 Fusion 예시:**
 ```
 YOLO 원본:          TensorRT 최적화 후:
-Conv 3x3            ┐
-BatchNorm           ├→ FusedConvBNSiLU
-SiLU                ┘
-Conv 1x1            ┐
-BatchNorm           ├→ FusedConvBN
-                    ┘
+Conv 3x3            +
+BatchNorm           +→ FusedConvBNSiLU
+SiLU                +
+Conv 1x1            +
+BatchNorm           +→ FusedConvBN
+                    +
 Concat              → 유지
-Conv 3x3            ┐
-BatchNorm           ├→ FusedConvBNSiLU
-SiLU                ┘
+Conv 3x3            +
+BatchNorm           +→ FusedConvBNSiLU
+SiLU                +
 
 레이어 수: 180 → 80 (55% 감소!)
 ```
@@ -133,10 +133,10 @@ SiLU                ┘
 ONNX 모델 입력
     ↓
 각 레이어에 대해:
-    ├── 커널 후보 A: im2col + GEMM
-    ├── 커널 후보 B: Winograd
-    ├── 커널 후보 C: FFT
-    └── 커널 후보 D: Direct convolution
+    +-- 커널 후보 A: im2col + GEMM
+    +-- 커널 후보 B: Winograd
+    +-- 커널 후보 C: FFT
+    +-- 커널 후보 D: Direct convolution
     ↓
 각 후보를 실제 GPU에서 실행하여 시간 측정
     ↓
@@ -144,8 +144,8 @@ ONNX 모델 입력
     ↓
 TensorRT Engine (.trt) 저장
 
-⚠️ 빌드 시간: 5-30분 (한 번만 하면 됨!)
-⚠️ GPU마다 다른 엔진 생성 (이식 불가)
+[!] 빌드 시간: 5-30분 (한 번만 하면 됨!)
+[!] GPU마다 다른 엔진 생성 (이식 불가)
 ```
 
 **왜 GPU마다 다를까?**
@@ -203,15 +203,15 @@ trtexec --loadEngine=yolov8n_fp16.trt \
 
 **전체 파이프라인:**
 ```
-┌─────────────┐     ┌──────────────┐     ┌──────────────┐
-│ 카메라 입력   │ ──→ │  전처리       │ ──→ │  TensorRT    │
-│ (OpenCV)     │     │  (GPU에서)   │     │  추론        │
-└─────────────┘     └──────────────┘     └──────────────┘
-                                              │
-┌─────────────┐     ┌──────────────┐          │
-│ 시각화/출력   │ ←── │  NMS         │ ←────────┘
-│ (OpenCV)     │     │  후처리       │
-└─────────────┘     └──────────────┘
++-------------+     +--------------+     +--------------+
+| 카메라 입력   | --→ |  전처리       | --→ |  TensorRT    |
+| (OpenCV)     |     |  (GPU에서)   |     |  추론        |
++-------------+     +--------------+     +--------------+
+                                              |
++-------------+     +--------------+          |
+| 시각화/출력   | ←-- |  NMS         | ←--------+
+| (OpenCV)     |     |  후처리       |
++-------------+     +--------------+
 ```
 
 **핵심 클래스:**
@@ -223,7 +223,7 @@ nvinfer1::IExecutionContext // 실행 컨텍스트
 
 // CUDA 메모리 관리
 cudaMalloc()              // GPU 메모리 할당
-cudaMemcpy()              // CPU ↔ GPU 복사
+cudaMemcpy()              // CPU <-> GPU 복사
 cudaFree()                // GPU 메모리 해제
 
 // OpenCV (입출력)
@@ -241,13 +241,13 @@ cv::rectangle()           // 바운딩 박스 그리기
 YOLO 출력: 8400개 후보 박스!
 
 같은 객체에 여러 박스가 겹침:
-┌─────────────┐
-│ ┌──────────┐│  box1: conf=0.9
-│ │┌────────┐││  box2: conf=0.85
-│ ││ 사람   │││  box3: conf=0.7
-│ │└────────┘││
-│ └──────────┘│
-└─────────────┘
++-------------+
+| +----------+|  box1: conf=0.9
+| |+--------+||  box2: conf=0.85
+| || 사람   |||  box3: conf=0.7
+| |+--------+||
+| +----------+|
++-------------+
 
 NMS 후: box1만 남김 (가장 높은 confidence)
 ```
@@ -263,11 +263,11 @@ NMS 후: box1만 남김 (가장 높은 confidence)
 
 **IoU (Intersection over Union):**
 ```
-         ┌──────┐
-    ┌────┤      │
-    │    │ 교집합 │
-    │    ├──────┘
-    └────┘
+         +------+
+    +----+      |
+    |    | 교집합 |
+    |    +------+
+    +----+
 
 IoU = 교집합 면적 / 합집합 면적
 
@@ -287,8 +287,8 @@ IoU > 0.45 → 같은 객체로 간주 → 하나만 유지
 TensorRT 추론:   ~8ms (FP16)
 NMS 후처리:      ~1ms
 시각화:          ~3ms
-─────────────────────
-총:              ~19ms → OK! ✅
+---------------------
+총:              ~19ms → OK! [O]
 
 여유: 33.3 - 19 = 14.3ms
 ```
@@ -314,39 +314,39 @@ Thread 2: 추론 + 후처리
 ### 8. FP16 vs INT8 성능 (Jetson Orin Nano)
 
 ```
-┌──────────┬──────────┬──────────┬──────────┬──────────┐
-│  정밀도   │  빌드 시간 │ 엔진 크기  │ 추론 시간  │  mAP     │
-├──────────┼──────────┼──────────┼──────────┼──────────┤
-│  FP32    │  5분     │  25 MB   │  30 ms   │  0.45    │
-│  FP16    │  8분     │  13 MB   │   8 ms   │  0.44    │
-│  INT8    │  15분    │   7 MB   │   5 ms   │  0.42    │
-└──────────┴──────────┴──────────┴──────────┴──────────┘
++----------+----------+----------+----------+----------+
+|  정밀도   |  빌드 시간 | 엔진 크기  | 추론 시간  |  mAP     |
++----------+----------+----------+----------+----------+
+|  FP32    |  5분     |  25 MB   |  30 ms   |  0.45    |
+|  FP16    |  8분     |  13 MB   |   8 ms   |  0.44    |
+|  INT8    |  15분    |   7 MB   |   5 ms   |  0.42    |
++----------+----------+----------+----------+----------+
 
-💡 결론: FP16이 최적!
+[tip] 결론: FP16이 최적!
    → INT8 대비 약간 느리지만 캘리브레이션 불필요
    → 정확도 손실 거의 없음 (0.01 mAP)
 ```
 
 ---
 
-## 💡 꼭 이해해야 할 핵심 개념
+## [tip] 꼭 이해해야 할 핵심 개념
 
 ### TensorRT 엔진 빌드 주의사항
 
 ```
-⚠️ 1. GPU별 엔진 호환 불가
+[!] 1. GPU별 엔진 호환 불가
    Jetson에서 빌드 → Jetson에서만 실행
    RTX에서 빌드 → RTX에서만 실행
 
-⚠️ 2. TensorRT 버전 호환
+[!] 2. TensorRT 버전 호환
    TRT 8.x로 빌드한 엔진은 TRT 9.x에서 실행 불가
    → JetPack 버전에 맞는 TRT 사용!
 
-⚠️ 3. 빌드 시간이 오래 걸림
+[!] 3. 빌드 시간이 오래 걸림
    → 엔진을 파일로 저장하고 재사용!
    → 매번 빌드하면 안 됨
 
-⚠️ 4. 메모리 관리
+[!] 4. 메모리 관리
    → Jetson 8GB 제한 → workspace 크기 조절
    → GPU 메모리 누수 주의 (cudaFree)
 ```
@@ -386,7 +386,7 @@ runtime->destroy();
 
 ---
 
-## 🔍 자체 점검 - 이해했는지 확인!
+## [search] 자체 점검 - 이해했는지 확인!
 
 ### Q1: Layer Fusion
 **Q:** TensorRT의 Layer Fusion이 속도를 높이는 원리는?
@@ -406,7 +406,7 @@ runtime->destroy();
 
 **A:**
 ```
-❌ 불가능!
+[X] 불가능!
 
 TensorRT 엔진은 빌드 시 다음이 고정됨:
 1. GPU 아키텍처 (Ampere vs Ada Lovelace)
@@ -456,7 +456,7 @@ TensorRT 추론은 GPU 바운드
 
 ---
 
-## 📝 이번 주 실습 & 다음 주 준비
+## [note] 이번 주 실습 & 다음 주 준비
 
 ### 실습 항목
 
@@ -485,14 +485,14 @@ TensorRT 추론은 GPU 바운드
 Week 7에서는 Monocular Depth Estimation을 학습합니다!
 
 준비:
-✅ TensorRT 추론 파이프라인 완성
-✅ Python 환경 준비 (transformers, timm)
-✅ MiDaS, Depth Anything 논문 훑어보기
+[O] TensorRT 추론 파이프라인 완성
+[O] Python 환경 준비 (transformers, timm)
+[O] MiDaS, Depth Anything 논문 훑어보기
 ```
 
 ---
 
-## 🎯 이번 주 핵심 요약
+## [goal] 이번 주 핵심 요약
 
 1. **TensorRT = NVIDIA GPU 전용 최적화 엔진**
    - Layer Fusion으로 레이어 합치기

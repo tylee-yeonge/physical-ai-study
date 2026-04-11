@@ -1,20 +1,20 @@
 # Week 4: 특징점 매칭 실습 (C++)
 
-> 🎯 **목표**: 스테레오 매칭 및 RANSAC Outlier 제거 구현
-> 💻 **언어**: C++ (OpenCV 4.x)
-> 🛠️ **하드웨어**: Jetson Orin Nano + ELP Stereo Camera
-> ⏰ **예상 시간**: 6-8시간
+> [goal] **목표**: 스테레오 매칭 및 RANSAC Outlier 제거 구현
+> [code] **언어**: C++ (OpenCV 4.x)
+> [tool] **하드웨어**: Jetson Orin Nano + ELP Stereo Camera
+> [time] **예상 시간**: 6-8시간
 
 ---
 
-## 📋 전제 조건
+## [list] 전제 조건
 
 - [ ] Week 3 특징점 검출 실습 완료
 - [ ] ORB 디스크립터 개념 이해
 
 ---
 
-## 🔧 실습 1: 스테레오 매칭 (Brute-Force)
+## [tool] 실습 1: 스테레오 매칭 (Brute-Force)
 
 ### StereoFeatureMatcher 클래스 구현
 
@@ -125,7 +125,7 @@ void StereoFeatureMatcher::visualizeMatches(
 
 ---
 
-## 🔧 실습 2: RANSAC Outlier 제거
+## [tool] 실습 2: RANSAC Outlier 제거
 
 **src/ransac_demo.cpp**:
 ```cpp
@@ -201,7 +201,7 @@ int main() {
 
 ---
 
-## ✅ 체크리스트
+## [O] 체크리스트
 
 - [ ] 스테레오 매칭 구현
 - [ ] Lowe's Ratio Test 적용
@@ -211,7 +211,7 @@ int main() {
 
 ---
 
-## 🏗️ mini_vo 구현 (이번 주 핵심)
+##  mini_vo 구현 (이번 주 핵심)
 
 **구현 파일**: `Studies/Phase 2/mini_vo/src/feature_matcher.cpp`
 

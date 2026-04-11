@@ -1,12 +1,12 @@
 # Week 3: YOLO 이론 (Section 5.2)
 
-> 🎯 **이번 주 목표**: YOLO의 발전사를 이해하고, YOLOv8의 구조(Backbone-Neck-Head)와 Loss 함수, Detection 평가 지표를 학습한다.
-> ⏰ **예상 시간**: 12시간
-> 💡 **핵심 질문**: "YOLOv8이 어떤 원리로 하나의 이미지에서 여러 객체를 한 번에 검출하는가?"
+> [goal] **이번 주 목표**: YOLO의 발전사를 이해하고, YOLOv8의 구조(Backbone-Neck-Head)와 Loss 함수, Detection 평가 지표를 학습한다.
+> [time] **예상 시간**: 12시간
+> [tip] **핵심 질문**: "YOLOv8이 어떤 원리로 하나의 이미지에서 여러 객체를 한 번에 검출하는가?"
 
 ---
 
-## 📋 학습 순서
+## [list] 학습 순서
 
 | 순서 | 단계 | 파일 | 설명 |
 |:----:|------|------|------|
@@ -18,7 +18,7 @@
 
 ---
 
-## 🌟 시작하기 전에
+## [*] 시작하기 전에
 
 ### Week 2와의 연결
 
@@ -41,7 +41,7 @@ YOLO(You Only Look Once)는 **실시간 객체 검출(Real-time Object Detection
 
 ---
 
-## 📚 핵심 개념 자세히 알아보기
+## [ref] 핵심 개념 자세히 알아보기
 
 ### 1. YOLO 발전사 개요
 
@@ -51,21 +51,21 @@ YOLO는 2015년 YOLOv1 이후 꾸준히 발전해왔습니다. 크게 **Anchor �
 YOLO 발전 타임라인
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-2015  YOLOv1 ─── 최초의 One-Stage Detector
-        │
-2016  YOLOv2 ─── Anchor Box 도입, Batch Normalization
-        │
-2018  YOLOv3 ─── Multi-Scale Detection (FPN)
-        │         ──── Anchor 기반 시대 ────
-        │
-2020  YOLOv5 ─── PyTorch 구현, 실용성 극대화
-        │
-2022  YOLOv7 ─── E-ELAN, Auxiliary Head
-        │
-2023  YOLOv8 ─── Anchor-Free, Decoupled Head
-        │         ──── Anchor-Free 시대 ────
-        │
-2024  YOLOv11── 최신 경량화 + 성능 향상
+2015  YOLOv1 --- 최초의 One-Stage Detector
+        |
+2016  YOLOv2 --- Anchor Box 도입, Batch Normalization
+        |
+2018  YOLOv3 --- Multi-Scale Detection (FPN)
+        |         ---- Anchor 기반 시대 ----
+        |
+2020  YOLOv5 --- PyTorch 구현, 실용성 극대화
+        |
+2022  YOLOv7 --- E-ELAN, Auxiliary Head
+        |
+2023  YOLOv8 --- Anchor-Free, Decoupled Head
+        |         ---- Anchor-Free 시대 ----
+        |
+2024  YOLOv11-- 최신 경량화 + 성능 향상
 ```
 
 ---
@@ -78,19 +78,19 @@ YOLO 발전 타임라인
 
 ```
 Anchor 기반 방식:
-┌─────────────────────────┐
-│  미리 정의된 Anchor Box  │
-│  ┌──┐  ┌────┐  ┌─┐     │
-│  │  │  │    │  │ │     │
-│  └──┘  └────┘  └─┘     │
-│  작은   중간    큰      │
-│                         │
-│  모델 예측:             │
-│    Δx, Δy (위치 보정)   │
-│    Δw, Δh (크기 보정)   │
-│    confidence           │
-│    class probabilities  │
-└─────────────────────────┘
++-------------------------+
+|  미리 정의된 Anchor Box  |
+|  +--+  +----+  +-+     |
+|  |  |  |    |  | |     |
+|  +--+  +----+  +-+     |
+|  작은   중간    큰      |
+|                         |
+|  모델 예측:             |
+|    Δx, Δy (위치 보정)   |
+|    Δw, Δh (크기 보정)   |
+|    confidence           |
+|    class probabilities  |
++-------------------------+
 ```
 
 **문제점**:
@@ -104,21 +104,21 @@ Anchor 기반 방식:
 
 ```
 Anchor-Free 방식:
-┌─────────────────────────┐
-│  각 그리드 셀이 직접     │
-│  BBox 좌표를 예측        │
-│                         │
-│    ┌──────────┐         │
-│    │  ●       │  ● = 셀 중심  │
-│    │  ↕ top   │         │
-│    │←left  right→│      │
-│    │  ↕ bottom│         │
-│    └──────────┘         │
-│                         │
-│  예측값:                │
-│    left, top, right, bottom │
-│    (셀 중심으로부터 거리) │
-└─────────────────────────┘
++-------------------------+
+|  각 그리드 셀이 직접     |
+|  BBox 좌표를 예측        |
+|                         |
+|    +----------+         |
+|    |  *       |  * = 셀 중심  |
+|    |  <-> top   |         |
+|    |←left  right→|      |
+|    |  <-> bottom|         |
+|    +----------+         |
+|                         |
+|  예측값:                |
+|    left, top, right, bottom |
+|    (셀 중심으로부터 거리) |
++-------------------------+
 ```
 
 **장점**:
@@ -134,39 +134,39 @@ YOLOv8은 **Backbone → Neck → Head** 세 부분으로 구성됩니다.
 
 ```
 입력 이미지 [B, 3, 640, 640]
-        │
-        ▼
-┌──────────────────────────┐
-│     Backbone (CSPDarknet) │  ← 특징 추출
-│                          │
-│  Conv ──→ C2f ──→ Conv   │
-│    ↓         ↓       ↓   │
-│   P3       P4      P5   │  ← Multi-Scale Feature Maps
-│  [80x80]  [40x40] [20x20]│
-└──────┬───────┬───────┬───┘
-       │       │       │
-       ▼       ▼       ▼
-┌──────────────────────────┐
-│      Neck (PANet/FPN)     │  ← 특징 융합
-│                          │
-│  P5 ──→ Upsample ──→ P4 │  Top-Down (FPN)
-│  P4 ──→ Upsample ──→ P3 │
-│  P3 ──→ Downsample → P4 │  Bottom-Up (PAN)
-│  P4 ──→ Downsample → P5 │
-│                          │
-│  출력: N3, N4, N5        │
-└──────┬───────┬───────┬───┘
-       │       │       │
-       ▼       ▼       ▼
-┌──────────────────────────┐
-│   Head (Decoupled Head)   │  ← 예측
-│                          │
-│  각 스케일별 독립 예측:   │
-│    ├─ BBox Branch (reg)  │  → [B, 64, H, W]
-│    └─ Cls Branch (cls)   │  → [B, nc, H, W]
-│                          │
-│  ※ Objectness 제거 (v8)  │
-└──────────────────────────┘
+        |
+        v
++--------------------------+
+|     Backbone (CSPDarknet) |  ← 특징 추출
+|                          |
+|  Conv --→ C2f --→ Conv   |
+|    ↓         ↓       ↓   |
+|   P3       P4      P5   |  ← Multi-Scale Feature Maps
+|  [80x80]  [40x40] [20x20]|
++------+-------+-------+---+
+       |       |       |
+       v       v       v
++--------------------------+
+|      Neck (PANet/FPN)     |  ← 특징 융합
+|                          |
+|  P5 --→ Upsample --→ P4 |  Top-Down (FPN)
+|  P4 --→ Upsample --→ P3 |
+|  P3 --→ Downsample → P4 |  Bottom-Up (PAN)
+|  P4 --→ Downsample → P5 |
+|                          |
+|  출력: N3, N4, N5        |
++------+-------+-------+---+
+       |       |       |
+       v       v       v
++--------------------------+
+|   Head (Decoupled Head)   |  ← 예측
+|                          |
+|  각 스케일별 독립 예측:   |
+|    +- BBox Branch (reg)  |  → [B, 64, H, W]
+|    +- Cls Branch (cls)   |  → [B, nc, H, W]
+|                          |
+|  ※ Objectness 제거 (v8)  |
++--------------------------+
 ```
 
 ---
@@ -180,10 +180,10 @@ CSPDarknet은 **CSP(Cross Stage Partial)** 구조를 활용한 특징 추출기�
 ```
 C2f (Cross Stage Partial + 2 Convolutions + split/concat)
 
-입력 ─→ Conv1x1 ─→ Split ─→ Branch1 (direct)
-                      │                    │
-                      └→ Bottleneck ─┬─→ Concat ─→ Conv1x1 ─→ 출력
-                         Bottleneck ─┘
+입력 -→ Conv1x1 -→ Split -→ Branch1 (direct)
+                      |                    |
+                      +→ Bottleneck -+-→ Concat -→ Conv1x1 -→ 출력
+                         Bottleneck -+
                          ...
 
 장점:
@@ -237,12 +237,12 @@ Neck은 Backbone에서 추출한 Multi-Scale Feature를 **융합(fusion)**합니
 FPN (Top-Down) + PAN (Bottom-Up) 결합:
 
 Top-Down (FPN):                Bottom-Up (PAN):
-P5 ─────→ Upsample + P4        N3 ────→ Downsample + N4
-              │                              │
-              ▼                              ▼
-P4' ────→ Upsample + P3        N4' ───→ Downsample + N5
-              │                              │
-              ▼                              ▼
+P5 -----→ Upsample + P4        N3 ----→ Downsample + N4
+              |                              |
+              v                              v
+P4' ----→ Upsample + P3        N4' ---→ Downsample + N5
+              |                              |
+              v                              v
             P3'                            N5'
 
 효과:
@@ -280,10 +280,10 @@ YOLOv8의 Head는 **Detection(BBox)과 Classification을 분리(Decoupled)**합�
   Feature → 하나의 Conv → [BBox, Objectness, Class]
 
 YOLOv8 (Decoupled Head):
-  Feature ─┬─→ BBox Branch ──→ BBox 예측 [B, 64, H, W]
-           │    (Conv → Conv)
-           │
-           └─→ Cls Branch ───→ Class 예측 [B, nc, H, W]
+  Feature -+-→ BBox Branch --→ BBox 예측 [B, 64, H, W]
+           |    (Conv → Conv)
+           |
+           +-→ Cls Branch ---→ Class 예측 [B, nc, H, W]
                 (Conv → Conv)
 
 변경점 (v5 → v8):
@@ -317,11 +317,11 @@ YOLOv8의 Loss는 세 가지 요소로 구성됩니다.
 ```
 Total Loss = λ_box * L_box + λ_cls * L_cls + λ_dfl * L_dfl
 
-┌─────────────────────────────────────────────────┐
-│  L_box: CIoU Loss (BBox 위치 정확도)             │
-│  L_cls: BCE Loss (클래스 분류 정확도)             │
-│  L_dfl: Distribution Focal Loss (BBox 분포)      │
-└─────────────────────────────────────────────────┘
++-------------------------------------------------+
+|  L_box: CIoU Loss (BBox 위치 정확도)             |
+|  L_cls: BCE Loss (클래스 분류 정확도)             |
+|  L_dfl: Distribution Focal Loss (BBox 분포)      |
++-------------------------------------------------+
 ```
 
 #### IoU 계열 비교
@@ -425,11 +425,11 @@ loss_cls = bce_loss(pred_cls, target_cls)
 
 ```
                     실제 양성 (GT)    실제 음성
-                ┌────────────────┬────────────────┐
-예측 양성       │  TP (True Pos)  │  FP (False Pos) │
-                ├────────────────┼────────────────┤
-예측 음성       │  FN (False Neg) │  TN (True Neg)  │
-                └────────────────┴────────────────┘
+                +----------------+----------------+
+예측 양성       |  TP (True Pos)  |  FP (False Pos) |
+                +----------------+----------------+
+예측 음성       |  FN (False Neg) |  TN (True Neg)  |
+                +----------------+----------------+
 
 Precision = TP / (TP + FP)
   "모델이 검출한 것 중 실제 맞는 비율"
@@ -492,7 +492,7 @@ FPS = 1초에 처리할 수 있는 이미지 수
 
 ---
 
-## 💡 꼭 이해해야 할 핵심 개념
+## [tip] 꼭 이해해야 할 핵심 개념
 
 ### 1. One-Stage vs Two-Stage Detector
 
@@ -537,7 +537,7 @@ NMS: 중복 검출 제거
 
 ---
 
-## 🔍 자체 점검 - 이해했는지 확인!
+## [search] 자체 점검 - 이해했는지 확인!
 
 **Q1. Anchor 기반과 Anchor-Free의 핵심 차이는?**
 > Anchor 기반은 미리 정의한 BBox 템플릿(Anchor)의 오프셋을 예측하고, Anchor-Free는 각 그리드 셀에서 직접 BBox 좌표를 예측합니다. YOLOv8은 Anchor-Free 방식을 사용하여 Anchor 설계 부담을 없앴습니다.
@@ -553,7 +553,7 @@ NMS: 중복 검출 제거
 
 ---
 
-## ✅ 이번 주 체크리스트
+## [O] 이번 주 체크리스트
 
 - [ ] YOLO 발전사 (v1~v8) 흐름 이해
 - [ ] Anchor 기반 vs Anchor-Free 차이 설명 가능
@@ -567,19 +567,19 @@ NMS: 중복 검출 제거
 
 ---
 
-## 📝 핵심 요약
+## [note] 핵심 요약
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│  YOLOv8 핵심 정리                                       │
-│                                                         │
-│  1. Anchor-Free: Anchor 없이 직접 BBox 예측             │
-│  2. 구조: CSPDarknet(Backbone) → PANet(Neck)            │
-│           → Decoupled Head(Head)                        │
-│  3. Loss: CIoU(위치) + BCE(분류) + DFL(분포)            │
-│  4. 평가: mAP@0.5:0.95 (COCO 공식 지표)                │
-│  5. NMS로 중복 검출 제거                                 │
-└─────────────────────────────────────────────────────────┘
++---------------------------------------------------------+
+|  YOLOv8 핵심 정리                                       |
+|                                                         |
+|  1. Anchor-Free: Anchor 없이 직접 BBox 예측             |
+|  2. 구조: CSPDarknet(Backbone) → PANet(Neck)            |
+|           → Decoupled Head(Head)                        |
+|  3. Loss: CIoU(위치) + BCE(분류) + DFL(분포)            |
+|  4. 평가: mAP@0.5:0.95 (COCO 공식 지표)                |
+|  5. NMS로 중복 검출 제거                                 |
++---------------------------------------------------------+
 ```
 
 ---

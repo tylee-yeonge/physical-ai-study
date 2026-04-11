@@ -1,14 +1,14 @@
 # Week 7: 삼각측량과 PnP (Triangulation & PnP)
 
-## 📌 개요
+## [pin] 개요
 
-> 🎯 **목표**: 2D 대응점에서 3D 점 복원, 3D-2D 대응에서 카메라 포즈 추정
-> ⏱️ **예상 시간**: 이론 3시간 + 실습 2시간
+> [goal] **목표**: 2D 대응점에서 3D 점 복원, 3D-2D 대응에서 카메라 포즈 추정
+> [time] **예상 시간**: 이론 3시간 + 실습 2시간
 
 **삼각측량(Triangulation)**은 두 카메라에서 같은 점을 보고 그 점의 3D 위치를 복원하는 기술입니다.
 **PnP(Perspective-n-Point)**는 알려진 3D 점과 그 2D 투영에서 카메라 포즈를 추정합니다.
 
-### 🤔 왜 이걸 배워야 할까요?
+### [?] 왜 이걸 배워야 할까요?
 
 **일상 비유**: 
 
@@ -30,7 +30,7 @@ Triangulation:               PnP:
 
 ---
 
-## 📋 학습 순서
+## [list] 학습 순서
 
 | 순서 | 활동 | 연결 퀴즈 |
 |:----:|------|:--------:|
@@ -45,7 +45,7 @@ Triangulation:               PnP:
 
 ---
 
-## 🚀 Step 1: 먼저 돌려보기
+##  Step 1: 먼저 돌려보기
 
 > **이론을 읽기 전에 먼저 코드를 돌려보세요!**
 
@@ -59,7 +59,7 @@ cmake .. && make
 
 ---
 
-## 📖 핵심 개념
+## [ref] 핵심 개념
 
 ### 1. 삼각측량 (Triangulation)
 
@@ -108,10 +108,10 @@ v(P₃ᵀX) - (P₂ᵀX) = 0
 ```
 A · X = 0
 
-    ⎡ u₁P₁³ᵀ - P₁¹ᵀ ⎤
-A = ⎢ v₁P₁³ᵀ - P₁²ᵀ ⎥  (4×4 행렬)
-    ⎢ u₂P₂³ᵀ - P₂¹ᵀ ⎥
-    ⎣ v₂P₂³ᵀ - P₂²ᵀ ⎦
+    [ u₁P₁³ᵀ - P₁¹ᵀ ]
+A = [ v₁P₁³ᵀ - P₁²ᵀ ]  (4×4 행렬)
+    [ u₂P₂³ᵀ - P₂¹ᵀ ]
+    [ v₂P₂³ᵀ - P₂²ᵀ ]
 
 SVD로 해: A의 null space (가장 작은 특이값)
 ```
@@ -297,16 +297,16 @@ bool GlobalSFM::solveFrameByPnP(...)
 
 ---
 
-## 💻 실습 파일
+## [code] 실습 파일
 
 | 파일 | 내용 | 난이도 |
 |------|------|--------|
-| `quiz_easy.cpp` | DLT 삼각측량 개념, PnP 기초 | ⭐⭐ |
-| `quiz_medium.cpp` | DLT 삼각측량/PnP 구현, RANSAC | ⭐⭐⭐ |
+| `quiz_easy.cpp` | DLT 삼각측량 개념, PnP 기초 | [*][*] |
+| `quiz_medium.cpp` | DLT 삼각측량/PnP 구현, RANSAC | [*][*][*] |
 
 ---
 
-## 📊 핵심 정리
+## [chart] 핵심 정리
 
 ### 삼각측량 vs PnP
 
@@ -334,7 +334,7 @@ cv2.solvePnPRansac(
 
 ---
 
-## ✅ 학습 완료 체크리스트
+## [O] 학습 완료 체크리스트
 
 ### 기초 이해 (필수)
 - [ ] 삼각측량 원리 설명 가능
@@ -353,7 +353,7 @@ cv2.solvePnPRansac(
 
 ---
 
-## 🔗 다음 단계
+## [link] 다음 단계
 
 ### Week 8: 광류 (Optical Flow)
 
@@ -364,7 +364,7 @@ cv2.solvePnPRansac(
 
 ---
 
-## 📚 참고 자료
+## [ref] 참고 자료
 
 - Multiple View Geometry - Chapter 12 (Triangulation)
 - OpenCV solvePnP documentation
@@ -372,7 +372,7 @@ cv2.solvePnPRansac(
 
 ---
 
-## ❓ FAQ
+## [?] FAQ
 
 **Q1: 삼각측량된 점 품질을 어떻게 판단하나요?**
 A: 재투영 오차로. 3D → 2D 재투영 후 원래 2D점과 비교.
@@ -388,7 +388,7 @@ A: 깊이 불확실도 증가. 5° 이상 권장.
 
 ---
 
-**🎯 Week 7 핵심 메시지:**
+**[goal] Week 7 핵심 메시지:**
 
 > **삼각측량** = 2D → 3D (맵 구축)
 > **PnP** = 3D-2D → 포즈 (추적)

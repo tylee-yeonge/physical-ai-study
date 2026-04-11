@@ -1,12 +1,12 @@
 # Week 2: 컴퓨터 비전용 라이브러리 (Section 5.1)
 
-> 🎯 **이번 주 목표**: Albumentations, W&B, torchvision/timm 라이브러리를 활용한 CV 파이프라인 구축
-> ⏰ **예상 시간**: 12시간
-> 💡 **핵심 질문**: "효율적인 CV 실험을 위한 도구 세트는 무엇인가?"
+> [goal] **이번 주 목표**: Albumentations, W&B, torchvision/timm 라이브러리를 활용한 CV 파이프라인 구축
+> [time] **예상 시간**: 12시간
+> [tip] **핵심 질문**: "효율적인 CV 실험을 위한 도구 세트는 무엇인가?"
 
 ---
 
-## 📋 학습 순서
+## [list] 학습 순서
 
 | 순서 | 단계 | 파일 | 설명 |
 |:----:|------|------|------|
@@ -18,7 +18,7 @@
 
 ---
 
-## 🌟 시작하기 전에
+## [*] 시작하기 전에
 
 ### Week 1과의 연결
 
@@ -30,7 +30,7 @@
 
 ---
 
-## 📚 핵심 개념
+## [ref] 핵심 개념
 
 ### 1. Albumentations (Data Augmentation)
 
@@ -114,7 +114,7 @@ model = timm.create_model(
 
 ---
 
-## 🤔 자체 점검 퀴즈
+## [?] 자체 점검 퀴즈
 
 1. **Albumentations의 bbox_params 역할은?**
    - Augmentation 시 BBox도 동일하게 변환
@@ -130,7 +130,7 @@ model = timm.create_model(
 
 ---
 
-## ✅ 이번 주 체크리스트
+## [O] 이번 주 체크리스트
 
 - [ ] Albumentations 설치 및 기본 변환 테스트
 - [ ] Detection용 BBox 변환 파이프라인 구축
@@ -140,17 +140,17 @@ model = timm.create_model(
 
 ---
 
-## 📝 핵심 요약
+## [note] 핵심 요약
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│  CV 라이브러리 도구 세트                                  │
-│                                                         │
-│  Albumentations: 빠른 Augmentation + BBox 지원           │
-│  W&B: 실험 로깅, 시각화, 하이퍼파라미터 탐색              │
-│  timm: 최신 Pretrained 모델 700+ (backbone)              │
-│  torchvision: 공식 Detection/Segmentation API            │
-└─────────────────────────────────────────────────────────┘
++---------------------------------------------------------+
+|  CV 라이브러리 도구 세트                                  |
+|                                                         |
+|  Albumentations: 빠른 Augmentation + BBox 지원           |
+|  W&B: 실험 로깅, 시각화, 하이퍼파라미터 탐색              |
+|  timm: 최신 Pretrained 모델 700+ (backbone)              |
+|  torchvision: 공식 Detection/Segmentation API            |
++---------------------------------------------------------+
 ```
 
 ---

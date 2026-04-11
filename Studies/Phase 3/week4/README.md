@@ -1,12 +1,12 @@
 # Week 4: YOLOv8 학습 (Section 5.2)
 
-> 🎯 **이번 주 목표**: Ultralytics를 사용하여 YOLOv8을 직접 학습시키고, 커스텀 데이터셋 준비부터 모델 평가까지 전체 파이프라인을 구축한다.
-> ⏰ **예상 시간**: 12시간
-> 💡 **핵심 질문**: "커스텀 데이터셋으로 YOLOv8을 학습하고, mAP를 기반으로 모델을 평가할 수 있는가?"
+> [goal] **이번 주 목표**: Ultralytics를 사용하여 YOLOv8을 직접 학습시키고, 커스텀 데이터셋 준비부터 모델 평가까지 전체 파이프라인을 구축한다.
+> [time] **예상 시간**: 12시간
+> [tip] **핵심 질문**: "커스텀 데이터셋으로 YOLOv8을 학습하고, mAP를 기반으로 모델을 평가할 수 있는가?"
 
 ---
 
-## 📋 학습 순서
+## [list] 학습 순서
 
 | 순서 | 단계 | 파일 | 설명 |
 |:----:|------|------|------|
@@ -18,7 +18,7 @@
 
 ---
 
-## 🌟 시작하기 전에
+## [*] 시작하기 전에
 
 ### Week 3과의 연결
 
@@ -43,7 +43,7 @@
 
 ---
 
-## 📚 핵심 개념 자세히 알아보기
+## [ref] 핵심 개념 자세히 알아보기
 
 ### 1. Ultralytics 사용법
 
@@ -63,17 +63,17 @@ yolo detect train data=coco128.yaml model=yolov8n.pt epochs=100 imgsz=640
 ```python
 from ultralytics import YOLO
 
-# ── 모델 로드 ──
+# -- 모델 로드 --
 model = YOLO('yolov8n.pt')         # Pretrained 모델
 model = YOLO('yolov8n.yaml')       # 새 모델 (from scratch)
 model = YOLO('best.pt')            # 학습된 모델
 
-# ── 추론 ──
+# -- 추론 --
 results = model('image.jpg')
 results = model('video.mp4')
 results = model('path/to/images/')  # 디렉토리
 
-# ── 학습 ──
+# -- 학습 --
 results = model.train(
     data='coco128.yaml',
     epochs=100,
@@ -81,10 +81,10 @@ results = model.train(
     batch=16,
 )
 
-# ── 평가 ──
+# -- 평가 --
 metrics = model.val()
 
-# ── 내보내기 ──
+# -- 내보내기 --
 model.export(format='onnx')        # ONNX
 model.export(format='engine')      # TensorRT
 ```
@@ -123,23 +123,23 @@ YOLO는 특정한 디렉토리 구조와 라벨 포맷을 요구합니다.
 
 ```
 dataset/
-├── images/
-│   ├── train/
-│   │   ├── img001.jpg
-│   │   ├── img002.jpg
-│   │   └── ...
-│   └── val/
-│       ├── img101.jpg
-│       └── ...
-├── labels/
-│   ├── train/
-│   │   ├── img001.txt    ← 이미지와 동일한 이름
-│   │   ├── img002.txt
-│   │   └── ...
-│   └── val/
-│       ├── img101.txt
-│       └── ...
-└── data.yaml              ← 데이터셋 설정 파일
++-- images/
+|   +-- train/
+|   |   +-- img001.jpg
+|   |   +-- img002.jpg
+|   |   +-- ...
+|   +-- val/
+|       +-- img101.jpg
+|       +-- ...
++-- labels/
+|   +-- train/
+|   |   +-- img001.txt    ← 이미지와 동일한 이름
+|   |   +-- img002.txt
+|   |   +-- ...
+|   +-- val/
+|       +-- img101.txt
+|       +-- ...
++-- data.yaml              ← 데이터셋 설정 파일
 ```
 
 #### 라벨 포맷 (YOLO format)
@@ -234,7 +234,7 @@ COCO128은 COCO 데이터셋에서 128장을 추출한 미니 데이터셋으로
 ```python
 from ultralytics import YOLO
 
-# ── 기본 학습 ──
+# -- 기본 학습 --
 model = YOLO('yolov8n.pt')  # Pretrained nano 모델
 
 results = model.train(
@@ -252,7 +252,7 @@ results = model.train(
 
 ```python
 model.train(
-    # ── 기본 설정 ──
+    # -- 기본 설정 --
     data='data.yaml',        # 데이터셋 설정 파일
     epochs=100,              # 에폭 수 (기본 100)
     patience=50,             # Early stopping (50 에폭 동안 개선 없으면 중단)
@@ -260,14 +260,14 @@ model.train(
     imgsz=640,               # 입력 이미지 크기
     device=0,                # GPU 번호
 
-    # ── 최적화 ──
+    # -- 최적화 --
     optimizer='auto',        # 옵티마이저 (SGD, Adam, AdamW, auto)
     lr0=0.01,                # 초기 학습률
     lrf=0.01,                # 최종 학습률 비율 (lr0 * lrf)
     momentum=0.937,          # SGD momentum
     weight_decay=0.0005,     # 가중치 감쇠
 
-    # ── Augmentation ──
+    # -- Augmentation --
     hsv_h=0.015,             # HSV-Hue 변형
     hsv_s=0.7,               # HSV-Saturation 변형
     hsv_v=0.4,               # HSV-Value 변형
@@ -278,7 +278,7 @@ model.train(
     mosaic=1.0,              # Mosaic augmentation
     mixup=0.0,               # MixUp augmentation
 
-    # ── 기타 ──
+    # -- 기타 --
     pretrained=True,         # Pretrained 가중치 사용
     resume=False,            # 이전 학습 이어서 진행
     val=True,                # 에폭마다 검증
@@ -291,13 +291,13 @@ model.train(
 
 ```
 Mosaic: 4장의 이미지를 하나로 합쳐 학습
-┌──────────┬──────────┐
-│  이미지1  │  이미지2  │
-│          │          │
-├──────────┼──────────┤
-│  이미지3  │  이미지4  │
-│          │          │
-└──────────┴──────────┘
++----------+----------+
+|  이미지1  |  이미지2  |
+|          |          |
++----------+----------+
+|  이미지3  |  이미지4  |
+|          |          |
++----------+----------+
 
 효과:
   - 작은 객체를 더 많이 포함
@@ -313,27 +313,27 @@ Mosaic: 4장의 이미지를 하나로 합쳐 학습
 #### 핵심 Hyperparameter
 
 ```
-┌─────────────────────────────────────────────────┐
-│  성능에 큰 영향을 미치는 Hyperparameter          │
-│                                                 │
-│  1. 학습률 (lr0):                               │
-│     0.01 (SGD), 0.001 (Adam) 기본값             │
-│     너무 크면 발산, 너무 작으면 수렴 느림         │
-│                                                 │
-│  2. 배치 크기 (batch):                           │
-│     GPU 메모리에 맞게 설정                       │
-│     클수록 안정적, 작으면 정규화 효과             │
-│                                                 │
-│  3. 이미지 크기 (imgsz):                         │
-│     클수록 정확, 작으면 빠름                     │
-│     320, 640, 1280 등 (32의 배수)               │
-│                                                 │
-│  4. Augmentation 강도:                           │
-│     데이터 적으면 강하게, 많으면 약하게           │
-│                                                 │
-│  5. 모델 크기 (n/s/m/l/x):                      │
-│     데이터/GPU에 맞게 선택                       │
-└─────────────────────────────────────────────────┘
++-------------------------------------------------+
+|  성능에 큰 영향을 미치는 Hyperparameter          |
+|                                                 |
+|  1. 학습률 (lr0):                               |
+|     0.01 (SGD), 0.001 (Adam) 기본값             |
+|     너무 크면 발산, 너무 작으면 수렴 느림         |
+|                                                 |
+|  2. 배치 크기 (batch):                           |
+|     GPU 메모리에 맞게 설정                       |
+|     클수록 안정적, 작으면 정규화 효과             |
+|                                                 |
+|  3. 이미지 크기 (imgsz):                         |
+|     클수록 정확, 작으면 빠름                     |
+|     320, 640, 1280 등 (32의 배수)               |
+|                                                 |
+|  4. Augmentation 강도:                           |
+|     데이터 적으면 강하게, 많으면 약하게           |
+|                                                 |
+|  5. 모델 크기 (n/s/m/l/x):                      |
+|     데이터/GPU에 맞게 선택                       |
++-------------------------------------------------+
 ```
 
 #### 튜닝 전략
@@ -381,18 +381,18 @@ print(f"Recall:       {metrics.box.mr:.4f}")
 
 ```
 runs/detect/coco128_exp/
-├── weights/
-│   ├── best.pt             ← 최고 mAP 모델
-│   └── last.pt             ← 마지막 에폭 모델
-├── results.csv             ← 에폭별 메트릭
-├── results.png             ← 학습 커브 그래프
-├── confusion_matrix.png    ← 혼동 행렬
-├── P_curve.png             ← Precision 커브
-├── R_curve.png             ← Recall 커브
-├── PR_curve.png            ← PR 커브
-├── F1_curve.png            ← F1 커브
-├── val_batch0_pred.jpg     ← 검증 예측 시각화
-└── val_batch0_labels.jpg   ← 검증 GT 시각화
++-- weights/
+|   +-- best.pt             ← 최고 mAP 모델
+|   +-- last.pt             ← 마지막 에폭 모델
++-- results.csv             ← 에폭별 메트릭
++-- results.png             ← 학습 커브 그래프
++-- confusion_matrix.png    ← 혼동 행렬
++-- P_curve.png             ← Precision 커브
++-- R_curve.png             ← Recall 커브
++-- PR_curve.png            ← PR 커브
++-- F1_curve.png            ← F1 커브
++-- val_batch0_pred.jpg     ← 검증 예측 시각화
++-- val_batch0_labels.jpg   ← 검증 GT 시각화
 ```
 
 #### Confusion Matrix 분석
@@ -401,10 +401,10 @@ runs/detect/coco128_exp/
 Confusion Matrix (혼동 행렬):
 
               예측: person  car  bicycle  background
-실제: person  │  85    2     1      12   │
-      car     │   3   78     0      19   │
-      bicycle │   1    0    65      34   │
-      background│ 5    3     2       -   │
+실제: person  |  85    2     1      12   |
+      car     |   3   78     0      19   |
+      bicycle |   1    0    65      34   |
+      background| 5    3     2       -   |
 
 대각선: 올바른 분류 (높을수록 좋음)
 비대각선: 오분류 (낮을수록 좋음)
@@ -463,29 +463,29 @@ for result in results:
 
 ---
 
-## 💡 꼭 이해해야 할 핵심 개념
+## [tip] 꼭 이해해야 할 핵심 개념
 
 ### 1. 학습 전체 파이프라인
 
 ```
 데이터 수집        라벨링           학습 설정
-──────────      ──────────      ──────────
+----------      ----------      ----------
 이미지 촬영/수집   LabelImg/        data.yaml 작성
                  Roboflow로       모델 크기 선택
                  BBox 라벨링      Hyperparameter 설정
-     │              │               │
-     ▼              ▼               ▼
-┌───────────────────────────────────────┐
-│          model.train(...)             │
-│                                       │
-│  Epoch 1: mAP=0.10 ────→ 개선 중     │
-│  Epoch 50: mAP=0.45 ────→ 수렴 중    │
-│  Epoch 100: mAP=0.52 ───→ 최종       │
-└───────────────────────────────────────┘
-     │
-     ▼
+     |              |               |
+     v              v               v
++---------------------------------------+
+|          model.train(...)             |
+|                                       |
+|  Epoch 1: mAP=0.10 ----→ 개선 중     |
+|  Epoch 50: mAP=0.45 ----→ 수렴 중    |
+|  Epoch 100: mAP=0.52 ---→ 최종       |
++---------------------------------------+
+     |
+     v
   평가 & 분석
-  ──────────
+  ----------
   mAP 확인
   Confusion Matrix
   FP 분석
@@ -519,7 +519,7 @@ for result in results:
 
 ---
 
-## 🔍 자체 점검 - 이해했는지 확인!
+## [search] 자체 점검 - 이해했는지 확인!
 
 **Q1. YOLO 라벨 포맷에서 좌표가 0~1로 정규화된 이유는?**
 > 이미지 크기에 상관없이 동일한 라벨을 사용하기 위해서입니다. 640x480 이미지와 1920x1080 이미지에서 같은 라벨 파일을 사용할 수 있습니다. 학습 시 이미지 크기를 변경해도 라벨 수정이 필요 없습니다.
@@ -535,7 +535,7 @@ for result in results:
 
 ---
 
-## ✅ 이번 주 체크리스트
+## [O] 이번 주 체크리스트
 
 - [ ] Ultralytics 설치 및 기본 추론 성공
 - [ ] YOLO 데이터셋 포맷 (디렉토리 구조, 라벨 형식) 이해
@@ -548,18 +548,18 @@ for result in results:
 
 ---
 
-## 📝 핵심 요약
+## [note] 핵심 요약
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│  YOLOv8 학습 핵심 정리                                   │
-│                                                         │
-│  1. Ultralytics: pip install ultralytics (간편한 API)    │
-│  2. 데이터셋: YOLO format (class x_c y_c w h, 정규화)   │
-│  3. 학습: model.train(data, epochs, imgsz, batch)       │
-│  4. 평가: mAP@0.5:0.95 + Confusion Matrix              │
-│  5. 분석: FP 유형별 원인 파악 → 데이터/설정 개선        │
-└─────────────────────────────────────────────────────────┘
++---------------------------------------------------------+
+|  YOLOv8 학습 핵심 정리                                   |
+|                                                         |
+|  1. Ultralytics: pip install ultralytics (간편한 API)    |
+|  2. 데이터셋: YOLO format (class x_c y_c w h, 정규화)   |
+|  3. 학습: model.train(data, epochs, imgsz, batch)       |
+|  4. 평가: mAP@0.5:0.95 + Confusion Matrix              |
+|  5. 분석: FP 유형별 원인 파악 → 데이터/설정 개선        |
++---------------------------------------------------------+
 ```
 
 ---

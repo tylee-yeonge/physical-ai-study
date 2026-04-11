@@ -1,18 +1,18 @@
 # Week 1 실습: 3D Detection 개념 탐구 및 3D BBox 시각화
 
-> 🎯 **목표**: 3D BBox의 파라미터를 이해하고, 기본적인 3D 시각화를 Python으로 구현
-> 💻 **언어**: Python (NumPy, Matplotlib)
-> ⏰ **예상 시간**: 4시간
+> [goal] **목표**: 3D BBox의 파라미터를 이해하고, 기본적인 3D 시각화를 Python으로 구현
+> [code] **언어**: Python (NumPy, Matplotlib)
+> [time] **예상 시간**: 4시간
 
 ---
 
-## 📋 실습 개요
+## [list] 실습 개요
 
 이번 실습에서는 3D Bounding Box의 7개 파라미터를 코드로 다루고, matplotlib을 이용해 3D 공간에서 시각화합니다. 이후 2D 이미지에 투영하는 기초도 실습합니다.
 
 ---
 
-## 🔧 환경 설정
+## [tool] 환경 설정
 
 ```bash
 pip install numpy matplotlib opencv-python
@@ -155,7 +155,7 @@ def visualize_scene_3d():
     plt.tight_layout()
     plt.savefig('scene_3d.png', dpi=150)
     plt.show()
-    print("✅ 3D 장면 시각화 완료! → scene_3d.png 저장됨")
+    print("[O] 3D 장면 시각화 완료! → scene_3d.png 저장됨")
 
 
 visualize_scene_3d()
@@ -221,7 +221,7 @@ def visualize_bev():
     plt.tight_layout()
     plt.savefig('bev_view.png', dpi=150)
     plt.show()
-    print("✅ BEV 시각화 완료! → bev_view.png 저장됨")
+    print("[O] BEV 시각화 완료! → bev_view.png 저장됨")
 
 
 visualize_bev()
@@ -257,7 +257,7 @@ def compare_2d_3d():
         ax1.add_patch(rect)
         ax1.text(x, y - 5, label, fontsize=9, color=color, fontweight='bold')
 
-    ax1.text(320, 460, '❌ 거리 정보 없음', fontsize=12, ha='center', color='red')
+    ax1.text(320, 460, '[X] 거리 정보 없음', fontsize=12, ha='center', color='red')
     ax1.set_xlabel('u (pixels)')
     ax1.set_ylabel('v (pixels)')
 
@@ -286,12 +286,12 @@ def compare_2d_3d():
     ax2.set_ylim(-2, 35)
     ax2.set_aspect('equal')
     ax2.grid(True, alpha=0.3)
-    ax2.text(0, -1, '✅ 정확한 3D 위치 & 크기', fontsize=12, ha='center', color='green')
+    ax2.text(0, -1, '[O] 정확한 3D 위치 & 크기', fontsize=12, ha='center', color='green')
 
     plt.tight_layout()
     plt.savefig('2d_vs_3d.png', dpi=150)
     plt.show()
-    print("✅ 2D vs 3D 비교 시각화 완료! → 2d_vs_3d.png 저장됨")
+    print("[O] 2D vs 3D 비교 시각화 완료! → 2d_vs_3d.png 저장됨")
 
 
 compare_2d_3d()
@@ -353,14 +353,14 @@ iou_bad = compute_3d_iou_simple(gt_box, pred_box_bad)
 print("=== 3D IoU 계산 결과 ===")
 print(f"GT Box:          center={gt_box['center']}, size={gt_box['size']}")
 print(f"Good Prediction: center={pred_box_good['center']}, size={pred_box_good['size']}")
-print(f"  → 3D IoU = {iou_good:.4f} {'✅ TP (≥0.7)' if iou_good >= 0.7 else '❌ FP (<0.7)'}")
+print(f"  → 3D IoU = {iou_good:.4f} {'[O] TP (≥0.7)' if iou_good >= 0.7 else '[X] FP (<0.7)'}")
 print(f"Bad Prediction:  center={pred_box_bad['center']}, size={pred_box_bad['size']}")
-print(f"  → 3D IoU = {iou_bad:.4f} {'✅ TP (≥0.7)' if iou_bad >= 0.7 else '❌ FP (<0.7)'}")
+print(f"  → 3D IoU = {iou_bad:.4f} {'[O] TP (≥0.7)' if iou_bad >= 0.7 else '[X] FP (<0.7)'}")
 ```
 
 ---
 
-## ✅ 체크리스트
+## [O] 체크리스트
 
 - [ ] 3D BBox corners 계산 함수 이해 및 실행
 - [ ] 3D 장면 시각화 (matplotlib 3D) 확인
@@ -371,7 +371,7 @@ print(f"  → 3D IoU = {iou_bad:.4f} {'✅ TP (≥0.7)' if iou_bad >= 0.7 else '
 
 ---
 
-## 💡 추가 실험 아이디어
+## [tip] 추가 실험 아이디어
 
 1. **다양한 yaw 각도**: theta를 0, pi/4, pi/2, pi로 바꿔서 회전 확인
 2. **크기 변경**: 트럭 (l=12, w=2.5, h=3.5) vs 자전거 (l=1.8, w=0.6, h=1.5)

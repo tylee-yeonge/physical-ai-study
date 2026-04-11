@@ -1,15 +1,15 @@
 # Phase 4: 3D Perception
 
-> ⏰ **기간**: 약 3개월 (12주 분량)  
-> 🎯 **목표**: 카메라 기반 3D 객체 검출 마스터  
-> 💻 **언어**: **Python** (PyTorch, MMDetection3D)  
-> 🛠️ **환경**: PC (GPU 필수), Jetson (선택)  
-> 💼 **이직 준비 핵심 Phase**  
-> ⏱️ **주간 시간**: 약 12-15시간
+> [time] **기간**: 약 3개월 (12주 분량)  
+> [goal] **목표**: 카메라 기반 3D 객체 검출 마스터  
+> [code] **언어**: **Python** (PyTorch, MMDetection3D)  
+> [tool] **환경**: PC (GPU 필수), Jetson (선택)  
+>  **이직 준비 핵심 Phase**  
+> [time] **주간 시간**: 약 12-15시간
 
 ---
 
-## 👉 **실습 가이드**: [`Studies/Phase 4/PRACTICE.md`](../Studies/Phase%206/PRACTICE.md)
+## -> **실습 가이드**: [`Studies/Phase 4/PRACTICE.md`](../Studies/Phase%206/PRACTICE.md)
 
 **핵심 산출물**:
 - KITTI 3D Detection 구현
@@ -17,11 +17,11 @@
 - BEV (Bird's Eye View) 개념 이해
 - **포트폴리오 완성** (이직 준비)
 
-> ⚠️ **목표**: 자율주행/로봇 면접에서 3D Perception 경험 어필
+> [!] **목표**: 자율주행/로봇 면접에서 3D Perception 경험 어필
 
 ---
 
-## 📋 Section 6.1: 3D Detection 기초 (2주)
+## [list] Section 6.1: 3D Detection 기초 (2주)
 
 ### Week 1: 3D Detection 개념
 
@@ -40,7 +40,7 @@
 ```
 2D bbox: [x, y, w, h]
 3D bbox: [x, y, z, l, w, h, θ]
-         └─ 중심 ─┘ └ 크기 ┘ └회전┘
+         +- 중심 -+ + 크기 + +회전+
 ```
 - [ ] 중심 좌표 (x, y, z): 월드 또는 카메라 좌표계
 - [ ] 크기 (length, width, height)
@@ -81,14 +81,14 @@
 - [ ] 3D bbox corners 계산
 - [ ] 2D 이미지에 3D bbox 투영
 
-### 🔍 Section 6.1 자체 점검
+### [search] Section 6.1 자체 점검
 1. 2D Detection과 3D Detection의 가장 큰 차이는?
 2. KITTI에서 ry (yaw)는 어느 축 회전인가?
 3. BEV 표현의 장점은?
 
 ---
 
-## 📋 Section 6.2: KITTI 3D Detection (4주)
+## [list] Section 6.2: KITTI 3D Detection (4주)
 
 ### Week 3: KITTI 데이터셋
 
@@ -101,18 +101,18 @@
 #### 데이터 구조 이해
 ```
 KITTI/
-├── training/
-│   ├── image_2/      # 왼쪽 카메라
-│   ├── calib/        # 내부/외부 파라미터
-│   └── label_2/      # 3D annotations
-└── testing/
++-- training/
+|   +-- image_2/      # 왼쪽 카메라
+|   +-- calib/        # 내부/외부 파라미터
+|   +-- label_2/      # 3D annotations
++-- testing/
 ```
 
 #### 레이블 파싱
 ```python
 # label_2/000000.txt
 Car 0.0 0 1.85 387 173 614 200 1.48 1.65 3.69 1.84 1.47 8.41 0.01
-└┬┘                   └─ 2D bbox ─┘ └─ 3D info ─┘
++++                   +- 2D bbox -+ +- 3D info -+
  class                               (h,w,l,x,y,z,ry)
 ```
 
@@ -188,14 +188,14 @@ python tools/train.py \
 - [ ] Car (Moderate): **AP3D > 15%** (Monocular는 어려움)
 - [ ] 참고: SOTA는 ~25% (Monocular)
 
-### 🔍 Section 6.2 자체 점검
+### [search] Section 6.2 자체 점검
 1. KITTI에서 "Moderate" 난이도의 기준은?
 2. Monocular 3D Detection의 가장 큰 어려움은?
 3. AP3D와 AP2D의 차이는?
 
 ---
 
-## 📋 Section 6.3: nuScenes & BEV (4주)
+## [list] Section 6.3: nuScenes & BEV (4주)
 
 ### Week 7: nuScenes 데이터셋
 
@@ -206,20 +206,20 @@ python tools/train.py \
 - [ ] 23개 클래스 (KITTI의 3개 vs)
 
 #### 데이터셋 다운로드 (~400GB)
-⚠️ **주의**: 다운로드/압축 해제에 며칠 소요
+[!] **주의**: 다운로드/압축 해제에 며칠 소요
 - [ ] Full dataset (v1.0-trainval)
 - [ ] Mini dataset (v1.0-mini, 10GB) 먼저 실험 권장
 
 #### 데이터 구조
 ```
 nuScenes/
-├── maps/             # HD 맵
-├── samples/          # 키프레임 (2Hz)
-│   ├── CAM_FRONT/
-│   ├── CAM_FRONT_LEFT/
-│   ├── CAM_BACK/
-│   └── LIDAR_TOP/
-└── v1.0-trainval/    # Annotations
++-- maps/             # HD 맵
++-- samples/          # 키프레임 (2Hz)
+|   +-- CAM_FRONT/
+|   +-- CAM_FRONT_LEFT/
+|   +-- CAM_BACK/
+|   +-- LIDAR_TOP/
++-- v1.0-trainval/    # Annotations
 ```
 
 #### nuScenes Devkit
@@ -240,11 +240,11 @@ nusc.render_sample(sample['token'])
 #### Bird's Eye View란?
 ```
 Side View (Camera):       BEV (Top-down):
-    │  🚗 │                  ┌─────────┐
-    │     │                  │    ▲    │
-    ├─────┤   ⇒              │    │    │
-  Road                       │  🚗    │
-                             └─────────┘
+    |  [car] |                  +---------+
+    |     |                  |    ^    |
+    +-----+   ⇒              |    |    |
+  Road                       |  [car]    |
+                             +---------+
 ```
 - [ ] 위에서 본 시점
 - [ ] X-Y 평면 (높이 정보 압축)
@@ -291,7 +291,7 @@ Detection Head (3D bbox + Velocity)
 
 ### Week 10: BEVFormer 실습 (선택)
 
-⚠️ **주의**: BEVFormer 학습은 GPU 메모리 많이 필요 (A100 권장)
+[!] **주의**: BEVFormer 학습은 GPU 메모리 많이 필요 (A100 권장)
 
 #### 추론만 실습
 ```bash
@@ -315,33 +315,33 @@ python tools/test.py \
 - [ ] **mAP**: mean Average Precision
 - [ ] Pretrained model: NDS ~0.52 (SOTA: ~0.56)
 
-### 🔍 Section 6.3 자체 점검
+### [search] Section 6.3 자체 점검
 1. BEV 표현이 Camera view보다 나은 점은?
 2. BEVFormer의 Spatial Cross-Attention 역할은?
 3. Temporal Attention이 왜 중요한가?
 
 ---
 
-## 📋 Section 6.4: 포트폴리오 마무리 (2주)
+## [list] Section 6.4: 포트폴리오 마무리 (2주)
 
 ### Week 11: 코드 및 문서 정리
 
 #### GitHub Repository 구성
 ```
 3d-perception-portfolio/
-├── README.md                  # 전체 개요
-├── kitti_3d/
-│   ├── train.py
-│   ├── inference.py
-│   ├── configs/
-│   └── README.md              # KITTI 결과
-├── nuscenes_bev/
-│   ├── visualize_bev.py
-│   ├── results/
-│   └── README.md              # nuScenes 결과
-└── docs/
-    ├── setup.md               # 환경 세팅
-    └── evaluation.md          # 평가 지표
++-- README.md                  # 전체 개요
++-- kitti_3d/
+|   +-- train.py
+|   +-- inference.py
+|   +-- configs/
+|   +-- README.md              # KITTI 결과
++-- nuscenes_bev/
+|   +-- visualize_bev.py
+|   +-- results/
+|   +-- README.md              # nuScenes 결과
++-- docs/
+    +-- setup.md               # 환경 세팅
+    +-- evaluation.md          # 평가 지표
 ```
 
 #### README.md 작성 요소
@@ -391,14 +391,14 @@ python tools/test.py \
 - [ ] Demo 영상 링크
 - [ ] 해시태그: #3DDetection #AutonomousDriving #ComputerVision
 
-### 🔍 Section 6.4 자체 점검
+### [search] Section 6.4 자체 점검
 1. 포트폴리오에서 가장 어필할 점은?
 2. 면접관이 물어볼 만한 질문 5개는?
 3. 다음 단계로 배우고 싶은 것은?
 
 ---
 
-## ✅ Phase 4 완료 체크리스트
+## [O] Phase 4 완료 체크리스트
 
 ### KITTI 3D Detection
 - [ ] 데이터셋 준비 및 이해
@@ -420,13 +420,13 @@ python tools/test.py \
 
 ---
 
-## 🎯 Phase 4 완료 기준
+## [goal] Phase 4 완료 기준
 
 > "KITTI와 nuScenes에서 3D Detection을 실습하고, BEV 개념을 이해하며, 이를 증명하는 포트폴리오 (GitHub + 블로그 + 영상)를 완성"
 
 ---
 
-## 📚 참고 자료
+## [ref] 참고 자료
 
 ### 논문
 
@@ -452,7 +452,7 @@ python tools/test.py \
 
 ---
 
-## 💡 팁
+## [tip] 팁
 
 1. **KITTI 먼저**: nuScenes는 크고 복잡함, KITTI로 개념 잡기
 2. **Mini dataset 활용**: nuScenes mini로 빠르게 실험
@@ -462,7 +462,7 @@ python tools/test.py \
 
 ---
 
-## 💼 이직 준비 최종 점검
+##  이직 준비 최종 점검
 
 ### 필수 역량 체크
 - [ ] SLAM 기초 (Phase 2-4) 이해
@@ -480,7 +480,7 @@ python tools/test.py \
 
 ---
 
-## ❓ 다음 단계
+## [?] 다음 단계
 
 Phase 4 완료 후:
 - **이직 활동 + VLA 입문 병행** (2026.12~)

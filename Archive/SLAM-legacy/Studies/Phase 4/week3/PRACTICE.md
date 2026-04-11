@@ -1,8 +1,8 @@
 # Week 3 실습: VIO 초기화 코드 읽기 + Phase 4 마무리
 
-> 🎯 **목표**: VINS 초기화 코드 구조 파악, Phase 4 전체 복습
-> 💻 **방식**: 코드 분석 중심
-> ⏰ **예상 시간**: 3-4시간
+> [goal] **목표**: VINS 초기화 코드 구조 파악, Phase 4 전체 복습
+> [code] **방식**: 코드 분석 중심
+> [time] **예상 시간**: 3-4시간
 
 ---
 
@@ -12,11 +12,11 @@
 
 ```
 vins_estimator/src/initial/
-├── initial_sfm.cpp          # Vision-only SfM
-├── initial_sfm.h
-├── initial_alignment.cpp    # Visual-Inertial Alignment
-├── initial_alignment.h
-└── initial_ex_rotation.cpp  # Extrinsic 초기 추정
++-- initial_sfm.cpp          # Vision-only SfM
++-- initial_sfm.h
++-- initial_alignment.cpp    # Visual-Inertial Alignment
++-- initial_alignment.h
++-- initial_ex_rotation.cpp  # Extrinsic 초기 추정
 ```
 
 ### initial_sfm.cpp 분석 포인트

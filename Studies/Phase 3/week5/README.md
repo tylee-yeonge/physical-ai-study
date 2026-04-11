@@ -1,12 +1,12 @@
 # Week 5: ONNX 변환 - 프레임워크 독립적 모델 배포
 
-> 🎯 **이번 주 목표**: PyTorch 모델을 ONNX로 변환하고 Runtime 추론 및 양자화 적용하기
-> ⏰ **예상 시간**: 12시간
-> 💡 **핵심 질문**: "왜 PyTorch 모델을 그대로 배포하지 않고 ONNX로 변환할까?"
+> [goal] **이번 주 목표**: PyTorch 모델을 ONNX로 변환하고 Runtime 추론 및 양자화 적용하기
+> [time] **예상 시간**: 12시간
+> [tip] **핵심 질문**: "왜 PyTorch 모델을 그대로 배포하지 않고 ONNX로 변환할까?"
 
 ---
 
-## 📋 학습 순서
+## [list] 학습 순서
 
 | 순서 | 단계 | 파일 | 설명 |
 |:----:|------|------|------|
@@ -18,7 +18,7 @@
 
 ---
 
-## 🌟 시작하기 전에
+## [*] 시작하기 전에
 
 ### Week 1-4 복습
 
@@ -27,7 +27,7 @@
 Week 1-2: YOLOv8 학습 (PyTorch) → .pt 모델 생성
 Week 3-4: 커스텀 데이터셋 학습 + 평가
 
-💥 문제: .pt 파일은 PyTorch에서만 사용 가능!
+[!] 문제: .pt 파일은 PyTorch에서만 사용 가능!
 ```
 
 **현실 세계의 배포 문제:**
@@ -37,8 +37,8 @@ Week 3-4: 커스텀 데이터셋 학습 + 평가
 팀 C: Jetson에서 TensorRT로 추론하고 싶음
 팀 D: 모바일에서 CoreML로 실행하고 싶음
 
-→ 각 프레임워크에 맞게 다시 구현해야 할까? ❌
-→ 중간 포맷이 필요하다! → ONNX ✅
+→ 각 프레임워크에 맞게 다시 구현해야 할까? [X]
+→ 중간 포맷이 필요하다! → ONNX [O]
 ```
 
 **비유:**
@@ -48,14 +48,14 @@ ONNX = 모델의 "PDF"
 .docx → Word에서만 편집 가능 (= .pt → PyTorch에서만 실행)
 .pdf  → 어디서든 볼 수 있음   (= .onnx → 어디서든 추론)
 
-PyTorch (.pt) ──→ ONNX (.onnx) ──→ TensorRT (.trt)
-TensorFlow (.pb) ──↗              ──→ CoreML (.mlmodel)
-                                   ──→ ONNX Runtime
+PyTorch (.pt) --→ ONNX (.onnx) --→ TensorRT (.trt)
+TensorFlow (.pb) --->              --→ CoreML (.mlmodel)
+                                   --→ ONNX Runtime
 ```
 
 ---
 
-## 📚 핵심 개념 자세히 알아보기
+## [ref] 핵심 개념 자세히 알아보기
 
 ### 1. ONNX란 무엇인가?
 
@@ -63,27 +63,27 @@ TensorFlow (.pb) ──↗              ──→ CoreML (.mlmodel)
 
 ```
 핵심 구성요소:
-┌─────────────────────────────────────────┐
-│              ONNX 모델                    │
-│                                          │
-│  📐 Graph (계산 그래프)                   │
-│  ├── Node: Conv, ReLU, BatchNorm, ...   │
-│  ├── Input: 입력 텐서 형상               │
-│  ├── Output: 출력 텐서 형상              │
-│  └── Initializer: 학습된 가중치           │
-│                                          │
-│  📋 Opset Version (연산자 버전)           │
-│  📦 Metadata (모델 정보)                  │
-└─────────────────────────────────────────┘
++-----------------------------------------+
+|              ONNX 모델                    |
+|                                          |
+|   Graph (계산 그래프)                   |
+|  +-- Node: Conv, ReLU, BatchNorm, ...   |
+|  +-- Input: 입력 텐서 형상               |
+|  +-- Output: 출력 텐서 형상              |
+|  +-- Initializer: 학습된 가중치           |
+|                                          |
+|  [list] Opset Version (연산자 버전)           |
+|  [pkg] Metadata (모델 정보)                  |
++-----------------------------------------+
 ```
 
 **지원하는 프레임워크:**
 ```
-PyTorch    ──→ ONNX ──→ TensorRT (Jetson)
-TensorFlow ──→ ONNX ──→ ONNX Runtime (서버)
-PaddlePaddle→ ONNX ──→ CoreML (iOS)
-JAX        ──→ ONNX ──→ OpenVINO (Intel)
-                    ──→ DirectML (Windows)
+PyTorch    --→ ONNX --→ TensorRT (Jetson)
+TensorFlow --→ ONNX --→ ONNX Runtime (서버)
+PaddlePaddle→ ONNX --→ CoreML (iOS)
+JAX        --→ ONNX --→ OpenVINO (Intel)
+                    --→ DirectML (Windows)
 ```
 
 ### 2. PyTorch → ONNX 변환 과정
@@ -133,7 +133,7 @@ Opset 12: Einsum, Dropout 업데이트
 Opset 13: Squeeze/Unsqueeze 변경
 Opset 17: LayerNorm, GroupNorm 추가
 
-💡 권장: opset_version=12 (안정적, 호환성 좋음)
+[tip] 권장: opset_version=12 (안정적, 호환성 좋음)
 
 주의: 높은 Opset ≠ 더 좋음
   → TensorRT가 지원하지 않는 연산이 포함될 수 있음!
@@ -158,13 +158,13 @@ CoreML: Opset 9-15 지원
 입력: [1, 3, 640, 640]  → 항상 동일한 크기
 
 장점:
-✅ 추론 속도 빠름 (메모리 사전 할당)
-✅ TensorRT 최적화 극대화
-✅ 디버깅 쉬움
+[O] 추론 속도 빠름 (메모리 사전 할당)
+[O] TensorRT 최적화 극대화
+[O] 디버깅 쉬움
 
 단점:
-❌ 다른 크기 입력 불가
-❌ 배치 크기 변경 불가
+[X] 다른 크기 입력 불가
+[X] 배치 크기 변경 불가
 ```
 
 **Dynamic Shape (가변 크기):**
@@ -172,17 +172,17 @@ CoreML: Opset 9-15 지원
 입력: [batch, 3, height, width]  → 실행 시 결정
 
 장점:
-✅ 유연한 입력 크기
-✅ 배치 크기 가변
+[O] 유연한 입력 크기
+[O] 배치 크기 가변
 
 단점:
-❌ 약간 느린 추론 (동적 할당)
-❌ TensorRT 최적화 제한적
+[X] 약간 느린 추론 (동적 할당)
+[X] TensorRT 최적화 제한적
 ```
 
 **SLAM/로봇 환경에서의 선택:**
 ```
-✅ Static Shape 권장!
+[O] Static Shape 권장!
 
 이유:
 1. 카메라 해상도 고정 (640x480)
@@ -202,11 +202,11 @@ CoreML: Opset 9-15 지원
 Microsoft가 개발한 고성능 추론 엔진
 
 특징:
-├── 크로스 플랫폼 (Windows, Linux, macOS)
-├── GPU 가속 (CUDA, TensorRT, DirectML)
-├── CPU 최적화 (AVX, VNNI)
-├── 그래프 최적화 (연산 융합, 상수 폴딩)
-└── Python, C++, C#, Java API
++-- 크로스 플랫폼 (Windows, Linux, macOS)
++-- GPU 가속 (CUDA, TensorRT, DirectML)
++-- CPU 최적화 (AVX, VNNI)
++-- 그래프 최적화 (연산 융합, 상수 폴딩)
++-- Python, C++, C#, Java API
 ```
 
 **추론 파이프라인:**
@@ -216,10 +216,10 @@ Microsoft가 개발한 고성능 추론 엔진
 전처리 (resize, normalize, transpose)
     ↓
 ONNX Runtime Session
-    ├── ExecutionProvider 선택
-    │   ├── CUDAExecutionProvider (GPU)
-    │   ├── TensorrtExecutionProvider (TensorRT)
-    │   └── CPUExecutionProvider (CPU)
+    +-- ExecutionProvider 선택
+    |   +-- CUDAExecutionProvider (GPU)
+    |   +-- TensorrtExecutionProvider (TensorRT)
+    |   +-- CPUExecutionProvider (CPU)
     ↓
 후처리 (NMS, bbox decode)
     ↓
@@ -233,25 +233,25 @@ ONNX Runtime Session
 **정밀도 비교:**
 ```
 FP32 (32-bit 부동소수점):
-  ┌──────┬──────────────┬──────────────────┐
-  │ 부호 │   지수 (8b)   │    가수 (23b)     │
-  └──────┴──────────────┴──────────────────┘
+  +------+--------------+------------------+
+  | 부호 |   지수 (8b)   |    가수 (23b)     |
+  +------+--------------+------------------+
   → 메모리: 4 바이트
   → 범위: ±3.4 × 10³⁸
   → 정확도: 높음
 
 FP16 (16-bit 부동소수점):
-  ┌──────┬──────────┬───────────┐
-  │ 부호 │ 지수 (5b) │ 가수 (10b) │
-  └──────┴──────────┴───────────┘
+  +------+----------+-----------+
+  | 부호 | 지수 (5b) | 가수 (10b) |
+  +------+----------+-----------+
   → 메모리: 2 바이트 (50% 절약!)
   → 범위: ±65504
   → 정확도: 약간 감소
 
 INT8 (8-bit 정수):
-  ┌─────────────────────┐
-  │    정수 (8 bits)     │
-  └─────────────────────┘
+  +---------------------+
+  |    정수 (8 bits)     |
+  +---------------------+
   → 메모리: 1 바이트 (75% 절약!)
   → 범위: -128 ~ 127
   → 정확도: 감소 (캘리브레이션 필요)
@@ -259,15 +259,15 @@ INT8 (8-bit 정수):
 
 **성능 비교 (Jetson Orin Nano 기준):**
 ```
-┌──────────┬──────────┬──────────┬──────────┐
-│  정밀도   │  모델 크기 │ 추론 속도  │  mAP     │
-├──────────┼──────────┼──────────┼──────────┤
-│  FP32    │  25 MB   │  15 FPS  │  0.45    │
-│  FP16    │  12 MB   │  30 FPS  │  0.44    │
-│  INT8    │   6 MB   │  55 FPS  │  0.42    │
-└──────────┴──────────┴──────────┴──────────┘
++----------+----------+----------+----------+
+|  정밀도   |  모델 크기 | 추론 속도  |  mAP     |
++----------+----------+----------+----------+
+|  FP32    |  25 MB   |  15 FPS  |  0.45    |
+|  FP16    |  12 MB   |  30 FPS  |  0.44    |
+|  INT8    |   6 MB   |  55 FPS  |  0.42    |
++----------+----------+----------+----------+
 
-💡 FP16이 가성비 최고!
+[tip] FP16이 가성비 최고!
    → 정확도 손실 거의 없이 2배 빨라짐
 ```
 
@@ -298,16 +298,16 @@ quantize_dynamic(model, "model_int8.onnx")
 - 반복: 100회 평균
 
 결과:
-┌────────────────┬──────────┬──────────┐
-│    방법         │ 추론 시간  │  비율     │
-├────────────────┼──────────┼──────────┤
-│ PyTorch (GPU)  │  18 ms   │  1.0x    │
-│ ONNX RT (CPU)  │  45 ms   │  0.4x    │
-│ ONNX RT (GPU)  │  12 ms   │  1.5x    │
-│ ONNX RT (TRT)  │   6 ms   │  3.0x    │
-└────────────────┴──────────┴──────────┘
++----------------+----------+----------+
+|    방법         | 추론 시간  |  비율     |
++----------------+----------+----------+
+| PyTorch (GPU)  |  18 ms   |  1.0x    |
+| ONNX RT (CPU)  |  45 ms   |  0.4x    |
+| ONNX RT (GPU)  |  12 ms   |  1.5x    |
+| ONNX RT (TRT)  |   6 ms   |  3.0x    |
++----------------+----------+----------+
 
-💡 ONNX Runtime + TensorRT EP가 가장 빠름!
+[tip] ONNX Runtime + TensorRT EP가 가장 빠름!
 ```
 
 **왜 ONNX Runtime이 더 빠를까?**
@@ -327,21 +327,21 @@ quantize_dynamic(model, "model_int8.onnx")
 
 ---
 
-## 💡 꼭 이해해야 할 핵심 개념
+## [tip] 꼭 이해해야 할 핵심 개념
 
 ### ONNX 변환 시 자주 발생하는 문제
 
 ```
-❌ 문제 1: 지원되지 않는 연산자
+[X] 문제 1: 지원되지 않는 연산자
    → 해결: opset 버전 올리거나, 커스텀 연산 등록
 
-❌ 문제 2: Dynamic control flow (if/for)
+[X] 문제 2: Dynamic control flow (if/for)
    → 해결: torch.jit.trace 대신 torch.jit.script
 
-❌ 문제 3: 출력 shape 불일치
+[X] 문제 3: 출력 shape 불일치
    → 해결: onnx.checker.check_model()로 검증
 
-❌ 문제 4: 성능이 오히려 느려짐
+[X] 문제 4: 성능이 오히려 느려짐
    → 해결: 그래프 최적화 옵션 확인
    → ort.SessionOptions().graph_optimization_level
 ```
@@ -349,23 +349,23 @@ quantize_dynamic(model, "model_int8.onnx")
 ### 변환 후 검증 체크리스트
 
 ```
-✅ 1. 모델 구조 검증
+[O] 1. 모델 구조 검증
    onnx.checker.check_model(model)
 
-✅ 2. 출력값 비교
+[O] 2. 출력값 비교
    PyTorch 출력 vs ONNX 출력
    → np.allclose(pt_out, onnx_out, atol=1e-5)
 
-✅ 3. 성능 벤치마크
+[O] 3. 성능 벤치마크
    추론 시간 측정 (warm-up 포함)
 
-✅ 4. 시각화
+[O] 4. 시각화
    netron.app 에서 그래프 확인
 ```
 
 ---
 
-## 🔍 자체 점검 - 이해했는지 확인!
+## [search] 자체 점검 - 이해했는지 확인!
 
 ### Q1: ONNX의 핵심 장점
 **Q:** ONNX를 사용하는 가장 큰 이유는 무엇인가요?
@@ -431,7 +431,7 @@ INT8: 스케일 + 제로포인트 계산 필요
 
 ---
 
-## 📝 이번 주 실습 & 다음 주 준비
+## [note] 이번 주 실습 & 다음 주 준비
 
 ### 실습 항목
 
@@ -462,15 +462,15 @@ Week 6에서는 ONNX를 TensorRT로 변환하여
 Jetson에서 C++로 실시간 추론합니다!
 
 준비:
-✅ ONNX 파일 생성 완료
-✅ Jetson 보드 준비 (Orin Nano)
-✅ JetPack SDK 설치 확인
-✅ C++ 기본 문법 복습
+[O] ONNX 파일 생성 완료
+[O] Jetson 보드 준비 (Orin Nano)
+[O] JetPack SDK 설치 확인
+[O] C++ 기본 문법 복습
 ```
 
 ---
 
-## 🎯 이번 주 핵심 요약
+## [goal] 이번 주 핵심 요약
 
 1. **ONNX = 모델의 PDF**
    - 프레임워크 독립적 포맷

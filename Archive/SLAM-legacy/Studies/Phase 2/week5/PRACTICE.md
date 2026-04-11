@@ -1,20 +1,20 @@
 # Week 5: Stereo Rectification 실습 (C++)
 
-> 🎯 **목표**: 스테레오 이미지 정류(Rectification) 구현
-> 💻 **언어**: C++ (OpenCV 4.x, Eigen3)
-> 🛠️ **하드웨어**: Jetson Orin Nano + ELP Stereo (캘리브레이션 완료)
-> ⏰ **예상 시간**: 6-8시간
+> [goal] **목표**: 스테레오 이미지 정류(Rectification) 구현
+> [code] **언어**: C++ (OpenCV 4.x, Eigen3)
+> [tool] **하드웨어**: Jetson Orin Nano + ELP Stereo (캘리브레이션 완료)
+> [time] **예상 시간**: 6-8시간
 
 ---
 
-## 📋 전제 조건
+## [list] 전제 조건
 
 - [ ] Week 2 캘리브레이션 완료 (`stereo_calib.yaml` 필요)
 - [ ] Week 3-4 특징점 검출/매칭 이해
 
 ---
 
-## 🔧 실습: StereoRectifier 클래스 구현
+## [tool] 실습: StereoRectifier 클래스 구현
 
 ### 헤더 파일
 
@@ -75,7 +75,7 @@ StereoRectifier::StereoRectifier(const std::string& calib_file) {
 
     fs.release();
 
-    std::cout << "✅ Loaded calibration parameters" << std::endl;
+    std::cout << "[O] Loaded calibration parameters" << std::endl;
 }
 
 void StereoRectifier::computeRectification(cv::Size image_size) {
@@ -99,7 +99,7 @@ void StereoRectifier::computeRectification(cv::Size image_size) {
         K_right_, dist_right_, R2_, P2_, image_size,
         CV_32FC1, map1_right_, map2_right_);
 
-    std::cout << "✅ Computed rectification maps" << std::endl;
+    std::cout << "[O] Computed rectification maps" << std::endl;
     std::cout << "Q Matrix:\n" << Q_ << std::endl;
 }
 
@@ -114,7 +114,7 @@ void StereoRectifier::rectify(
 
 ---
 
-## ✅ 체크리스트
+## [O] 체크리스트
 
 - [ ] `StereoRectifier` 클래스 구현
 - [ ] 캘리브레이션 파일 로드 확인
@@ -123,7 +123,7 @@ void StereoRectifier::rectify(
 
 ---
 
-## 🏗️ mini_vo 구현 (이번 주 핵심)
+##  mini_vo 구현 (이번 주 핵심)
 
 **구현 파일**: `Studies/Phase 2/mini_vo/src/epipolar.cpp`
 

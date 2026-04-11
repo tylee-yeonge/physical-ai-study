@@ -1,23 +1,23 @@
 # Week 8: 비선형 최적화 (Nonlinear Optimization)
 
-## 📌 개요
+## [pin] 개요
 
-> 🎯 **목표**: 반복적 최적화로 비선형 문제 풀기
-> ⏱️ **예상 시간**: 이론 3시간 + 실습 2시간
+> [goal] **목표**: 반복적 최적화로 비선형 문제 풀기
+> [time] **예상 시간**: 이론 3시간 + 실습 2시간
 
 실제 SLAM 문제는 대부분 **비선형**입니다. 카메라 투영, 회전 연산, 지수 함수 등이 모두 비선형이기 때문입니다. 이번 주에는 **Gauss-Newton**, **Levenberg-Marquardt** 알고리즘을 배우고, SLAM 실전 라이브러리인 **Ceres Solver**를 소개합니다.
 
-### 🤔 왜 이걸 배워야 할까요?
+### [?] 왜 이걸 배워야 할까요?
 
 **일상 비유**: 산에서 가장 낮은 골짜기 찾기
 
 ```
 선형 문제:                비선형 문제:
-   ╲       ╱                    ╱╲   ╱╲
-    ╲     ╱                    ╱  ╲ ╱  ╲
-     ╲   ╱                    ╱    ●    ╲
-      ╲ ╱                    ╱   최소점   ╲
-       ●                    ●              ●
+   \       /                    /\   /\
+    \     /                    /  \ /  \
+     \   /                    /    *    \
+      \ /                    /   최소점   \
+       *                    *              *
     한 번에 찾음           여러 번 탐색 필요!
 ```
 
@@ -28,7 +28,7 @@
 
 ---
 
-## 📋 학습 순서
+## [list] 학습 순서
 
 | 순서 | 단계 | 파일 | 설명 |
 |:----:|------|------|------|
@@ -38,7 +38,7 @@
 
 ---
 
-## 📖 핵심 개념
+## [ref] 핵심 개념
 
 ### 1. 비선형 vs 선형
 
@@ -84,11 +84,11 @@ f(x + Δx) ≈ f(x) + J·Δx
 
 ```
 실제 곡선:          선형 근사:
-    ╭─╮                ╱
-   ╱   ╲           접선╱
-  ╱     ╲            ╱←── 현재 위치
-                    ╱
-                   ╱
+    +-+                /
+   /   \           접선/
+  /     \            /←-- 현재 위치
+                    /
+                   /
 → 작은 범위에서는 근사가 잘 맞음!
 ```
 
@@ -97,9 +97,9 @@ f(x + Δx) ≈ f(x) + J·Δx
 ```
 J = ∂f/∂x
 
-    ⎡ ∂f₁/∂x₁  ∂f₁/∂x₂  ...  ∂f₁/∂xₙ ⎤
-J = ⎢ ∂f₂/∂x₁  ∂f₂/∂x₂  ...  ∂f₂/∂xₙ ⎥
-    ⎣   ...       ...    ...    ...   ⎦
+    [ ∂f₁/∂x₁  ∂f₁/∂x₂  ...  ∂f₁/∂xₙ ]
+J = [ ∂f₂/∂x₁  ∂f₂/∂x₂  ...  ∂f₂/∂xₙ ]
+    [   ...       ...    ...    ...   ]
 
 크기: m×n (m개 함수, n개 변수)
 ```
@@ -124,17 +124,17 @@ J = [e^(bx),  a·x·e^(bx)]
 **비선형 문제를 반복적으로 선형화하여 풀기**
 
 ```
-┌─────────────────────────────────────────┐
-│        Gauss-Newton 한 단계             │
-│                                         │
-│  1. 현재 x에서 Jacobian J 계산          │
-│  2. 잔차 r = z - f(x) 계산              │
-│  3. 선형화된 정규방정식:                 │
-│     (JᵀJ)·Δx = Jᵀr                      │
-│  4. 업데이트: x ← x + Δx                │
-│  5. 수렴할 때까지 반복                   │
-│                                         │
-└─────────────────────────────────────────┘
++-----------------------------------------+
+|        Gauss-Newton 한 단계             |
+|                                         |
+|  1. 현재 x에서 Jacobian J 계산          |
+|  2. 잔차 r = z - f(x) 계산              |
+|  3. 선형화된 정규방정식:                 |
+|     (JᵀJ)·Δx = Jᵀr                      |
+|  4. 업데이트: x ← x + Δx                |
+|  5. 수렴할 때까지 반복                   |
+|                                         |
++-----------------------------------------+
 ```
 
 #### 왜 JᵀJ인가?
@@ -154,9 +154,9 @@ Week 7에서는 AᵀA였는데:
 
 ```
 반복 1:        반복 2:        반복 3:
-    ╲              ╲              ╲
-     ╲              ●              ●
-      ●                            │
+    \              \              \
+     \              *              *
+      *                            |
     시작           근접          수렴!
 ```
 
@@ -190,10 +190,10 @@ def gauss_newton(f, jacobian, x0, z, max_iter=10):
 ```
 초기값이 멀면 발산!
 
-        최소점 ●
-                ╲
-                 ╲
-          시작점 ●──────▶ 멀리 떠남 💥
+        최소점 *
+                \
+                 \
+          시작점 *------> 멀리 떠남 [!]
 ```
 
 #### LM의 해결책
@@ -224,23 +224,23 @@ def gauss_newton(f, jacobian, x0, z, max_iter=10):
 ```
 
 ```
-┌────────────────────────────────────────┐
-│            LM 알고리즘                  │
-├────────────────────────────────────────┤
-│                                        │
-│    ┌─▶ Δx 계산 (JᵀJ + λI)             │
-│    │                                   │
-│    │   비용 감소?                       │
-│    │      │                            │
-│    │   Yes ↓     No                    │
-│    │   x 업데이트  └──▶ λ *= 2        │
-│    │   λ /= 2          └──┐            │
-│    │      │                │           │
-│    └──────┴────────────────┘           │
-│                                        │
-│   수렴할 때까지 반복                    │
-│                                        │
-└────────────────────────────────────────┘
++----------------------------------------+
+|            LM 알고리즘                  |
++----------------------------------------+
+|                                        |
+|    +-> Δx 계산 (JᵀJ + λI)             |
+|    |                                   |
+|    |   비용 감소?                       |
+|    |      |                            |
+|    |   Yes ↓     No                    |
+|    |   x 업데이트  +--> λ *= 2        |
+|    |   λ /= 2          +--+            |
+|    |      |                |           |
+|    +------+----------------+           |
+|                                        |
+|   수렴할 때까지 반복                    |
+|                                        |
++----------------------------------------+
 ```
 
 ---
@@ -373,23 +373,23 @@ vcpkg install ceres
 ##### 단계별 설명
 
 ```
-┌─────────────────────────────────────────┐
-│      Ceres Solver 사용 흐름             │
-├─────────────────────────────────────────┤
-│                                         │
-│  1. 비용 함수 정의 (CostFunction)        │
-│     ↓                                   │
-│  2. Problem 객체 생성                   │
-│     ↓                                   │
-│  3. ResidualBlock 추가                  │
-│     ↓                                   │
-│  4. Solver Options 설정                 │
-│     ↓                                   │
-│  5. Solve() 실행                        │
-│     ↓                                   │
-│  6. Summary 확인                        │
-│                                         │
-└─────────────────────────────────────────┘
++-----------------------------------------+
+|      Ceres Solver 사용 흐름             |
++-----------------------------------------+
+|                                         |
+|  1. 비용 함수 정의 (CostFunction)        |
+|     ↓                                   |
+|  2. Problem 객체 생성                   |
+|     ↓                                   |
+|  3. ResidualBlock 추가                  |
+|     ↓                                   |
+|  4. Solver Options 설정                 |
+|     ↓                                   |
+|  5. Solve() 실행                        |
+|     ↓                                   |
+|  6. Summary 확인                        |
+|                                         |
++-----------------------------------------+
 ```
 
 ##### 완전한 곡선 피팅 예제
@@ -405,7 +405,7 @@ vcpkg install ceres
 #include <cmath>
 #include <random>
 
-// 1️⃣ 비용 함수 정의
+// 1⃣ 비용 함수 정의
 struct ExponentialResidual {
     ExponentialResidual(double x, double y)
         : x_(x), y_(y) {}
@@ -431,7 +431,7 @@ private:
 };
 
 int main() {
-    // 🎲 데이터 생성 (실제 값: a=2.5, b=0.3)
+    //  데이터 생성 (실제 값: a=2.5, b=0.3)
     std::vector<double> x_data, y_data;
     std::default_random_engine generator;
     std::normal_distribution<double> noise(0.0, 0.1);
@@ -446,16 +446,16 @@ int main() {
         y_data.push_back(y);
     }
     
-    // 2️⃣ 초기 추정값 (일부러 틀리게)
+    // 2⃣ 초기 추정값 (일부러 틀리게)
     double params[2] = {1.0, 0.1};
     
     std::cout << "초기값: a = " << params[0] 
               << ", b = " << params[1] << std::endl;
     
-    // 3️⃣ Problem 생성
+    // 3⃣ Problem 생성
     ceres::Problem problem;
     
-    // 4️⃣ 각 데이터 포인트에 대해 ResidualBlock 추가
+    // 4⃣ 각 데이터 포인트에 대해 ResidualBlock 추가
     for (size_t i = 0; i < x_data.size(); ++i) {
         ceres::CostFunction* cost_function = 
             ExponentialResidual::Create(x_data[i], y_data[i]);
@@ -466,17 +466,17 @@ int main() {
             params);            // 최적화할 변수
     }
     
-    // 5️⃣ Solver 옵션 설정
+    // 5⃣ Solver 옵션 설정
     ceres::Solver::Options options;
     options.linear_solver_type = ceres::DENSE_QR;
     options.minimizer_progress_to_stdout = true;
     options.max_num_iterations = 100;
     
-    // 6️⃣ 최적화 실행
+    // 6⃣ 최적화 실행
     ceres::Solver::Summary summary;
     ceres::Solve(options, &problem, &summary);
     
-    // 7️⃣ 결과 출력
+    // 7⃣ 결과 출력
     std::cout << "\n" << summary.BriefReport() << "\n\n";
     std::cout << "최적화 결과:\n";
     std::cout << "  a = " << params[0] << " (실제: " << true_a << ")\n";
@@ -538,8 +538,8 @@ Ceres Solver Report: Iterations: 11, Initial cost: 9.842e+02, Final cost: 1.235e
 // template <비용함수타입, 잔차차원, 파라미터1차원, 파라미터2차원, ...>
 ceres::AutoDiffCostFunction<ExponentialResidual, 1, 2>
                                                   ↑  ↑
-                                                  │  └─ 2개 파라미터 (a, b)
-                                                  └─── 1차원 잔차 (scalar)
+                                                  |  +- 2개 파라미터 (a, b)
+                                                  +--- 1차원 잔차 (scalar)
 ```
 
 **자동 미분의 장점**:
@@ -593,12 +593,12 @@ options.minimizer_progress_to_stdout = true;
 
 #### 7.4 실전 팁
 
-##### ✅ Best Practices
+##### [O] Best Practices
 
 ```cpp
 // 1. 좋은 초기값 제공
-double params[2] = {1.0, 0.1};  // ❌ 너무 멀 수 있음
-double params[2] = {2.0, 0.2};  // ✅ 대략적 사전 지식 활용
+double params[2] = {1.0, 0.1};  // [X] 너무 멀 수 있음
+double params[2] = {2.0, 0.2};  // [O] 대략적 사전 지식 활용
 
 // 2. 파라미터 범위 제한
 problem.SetParameterLowerBound(params, 0, 0.0);   // a > 0
@@ -610,27 +610,27 @@ problem.SetParameterBlockConstant(params);
 // 4. Loss function 사용 (outlier 대응)
 problem.AddResidualBlock(
     cost_function,
-    new ceres::HuberLoss(1.0),  // ✅
+    new ceres::HuberLoss(1.0),  // [O]
     params);
 ```
 
-##### ⚠️ 주의사항
+##### [!] 주의사항
 
 ```cpp
-// ❌ 잘못된 예: 메모리 관리
+// [X] 잘못된 예: 메모리 관리
 ceres::CostFunction* cost = ExponentialResidual::Create(x, y);
-delete cost;  // ❌ Ceres가 자동으로 관리함!
+delete cost;  // [X] Ceres가 자동으로 관리함!
 
-// ✅ 올바른 예
+// [O] 올바른 예
 problem.AddResidualBlock(cost, nullptr, params);
 // Ceres가 소멸자에서 자동 해제
 
-// ❌ 잘못된 예: 파라미터 범위
+// [X] 잘못된 예: 파라미터 범위
 double params[2];
 // ... solve ...
 // params가 스택 변수라면 함수 끝나면 소멸! 
 
-// ✅ 올바른 예: 충분한 생명주기 보장
+// [O] 올바른 예: 충분한 생명주기 보장
 std::vector<double> params(2);
 // 또는 heap 할당
 ```
@@ -643,11 +643,11 @@ std::vector<double> params(2);
 
 ```
            카메라 1        카메라 2        카메라 3
-              ●──────────────●──────────────●
-             ╱│╲            ╱│╲            ╱│╲
-            ╱ │ ╲          ╱ │ ╲          ╱ │ ╲
-           ╱  │  ╲        ╱  │  ╲        ╱  │  ╲
-          ★   ★  ★     ★   ★   ★     ★   ★  ★
+              *--------------*--------------*
+             /|\            /|\            /|\
+            / | \          / | \          / | \
+           /  |  \        /  |  \        /  |  \
+          *   *  *     *   *   *     *   *  *
           
        동시에 최적화:
        - 모든 카메라 포즈 (R, t)
@@ -687,16 +687,16 @@ ceres::Solve(options, &problem, &summary);
 
 ---
 
-## 💻 실습 파일
+## [code] 실습 파일
 
 | 파일 | 내용 | 난이도 |
 |------|------|--------|
-| `nonlinear_basics.py` | Gauss-Newton, 곡선 피팅 | ⭐⭐⭐ |
-| `nonlinear_quiz.py` | LM, scipy 활용 | ⭐⭐⭐ |
+| `nonlinear_basics.py` | Gauss-Newton, 곡선 피팅 | [*][*][*] |
+| `nonlinear_quiz.py` | LM, scipy 활용 | [*][*][*] |
 
 ---
 
-## 📊 핵심 정리
+## [chart] 핵심 정리
 
 ### 알고리즘 요약
 
@@ -718,7 +718,7 @@ ceres::Solve(options, &problem, &summary);
 
 ---
 
-## ✅ 학습 완료 체크리스트
+## [O] 학습 완료 체크리스트
 
 ### 기초 이해 (필수)
 - [ ] 선형화와 Jacobian 관계 설명 가능
@@ -737,7 +737,7 @@ ceres::Solve(options, &problem, &summary);
 
 ---
 
-## 🔗 Phase 1 완료! 🎉
+## [link] Phase 1 완료! 
 
 8주간의 수학 핵심 학습을 완료했습니다:
 
@@ -750,11 +750,11 @@ ceres::Solve(options, &problem, &summary);
 | 7 | 최소자승 | AᵀAx = Aᵀb |
 | **8** | **비선형 최적화** | **GN, LM, Ceres 설치/실습** |
 
-**다음: Phase 2 - 컴퓨터 비전 기초! 🚀**
+**다음: Phase 2 - 컴퓨터 비전 기초! **
 
 ---
 
-## 📚 참고 자료
+## [ref] 참고 자료
 
 - Numerical Optimization (Nocedal & Wright)
 - Ceres Solver Documentation
@@ -762,7 +762,7 @@ ceres::Solve(options, &problem, &summary);
 
 ---
 
-## ❓ FAQ
+## [?] FAQ
 
 **Q1: Jacobian은 어떻게 구하나요?**
 A: 분석적 미분(손계산) 또는 자동 미분(Ceres AutoDiff).
@@ -778,7 +778,7 @@ A: 대부분 LM. 하지만 BA에서는 GN + trust region 조합도 많이 사용
 
 ---
 
-**🎯 Week 8 핵심 메시지:**
+**[goal] Week 8 핵심 메시지:**
 
 > 비선형 문제 = 반복적 선형화
 >

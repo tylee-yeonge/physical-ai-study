@@ -1,12 +1,12 @@
 # Week 1: PyTorch 기초 재정비
 
-> 🎯 **이번 주 목표**: CUDA 환경을 세팅하고, PyTorch의 핵심 개념(Tensor, autograd, DataLoader)을 복습한 뒤, CNN으로 이미지 분류를 직접 학습시킨다.
-> ⏰ **예상 시간**: 12시간
-> 💡 **핵심 질문**: "PyTorch에서 모델 학습의 전체 파이프라인(데이터 → 모델 → 학습 → 평가 → 저장)을 혼자서 구성할 수 있는가?"
+> [goal] **이번 주 목표**: CUDA 환경을 세팅하고, PyTorch의 핵심 개념(Tensor, autograd, DataLoader)을 복습한 뒤, CNN으로 이미지 분류를 직접 학습시킨다.
+> [time] **예상 시간**: 12시간
+> [tip] **핵심 질문**: "PyTorch에서 모델 학습의 전체 파이프라인(데이터 → 모델 → 학습 → 평가 → 저장)을 혼자서 구성할 수 있는가?"
 
 ---
 
-## 📋 학습 순서
+## [list] 학습 순서
 
 | 순서 | 단계 | 파일 | 설명 |
 |:----:|------|------|------|
@@ -18,7 +18,7 @@
 
 ---
 
-## 🌟 시작하기 전에
+## [*] 시작하기 전에
 
 Phase 3는 **딥러닝 기반 2D Perception**을 다루는 단계입니다. YOLO 객체 검출과 Depth Estimation을 배우기 전에, 그 기반이 되는 **PyTorch**를 확실히 잡아야 합니다.
 
@@ -43,7 +43,7 @@ PyTorch를 **레고 블록**에 비유할 수 있습니다.
 
 ---
 
-## 📚 핵심 개념 자세히 알아보기
+## [ref] 핵심 개념 자세히 알아보기
 
 ### 1. CUDA 환경 세팅
 
@@ -112,19 +112,19 @@ Tensor는 PyTorch의 **기본 데이터 구조**입니다. NumPy의 ndarray와 �
 ```python
 import torch
 
-# ── 텐서 생성 ──
+# -- 텐서 생성 --
 x = torch.zeros(3, 4)           # 0으로 채운 3x4 텐서
 x = torch.ones(3, 4)            # 1로 채운 3x4 텐서
 x = torch.randn(3, 4)           # 표준 정규분포 랜덤
 x = torch.tensor([1, 2, 3])     # 직접 값 지정
 x = torch.arange(0, 10, 2)      # [0, 2, 4, 6, 8]
 
-# ── 텐서 속성 ──
+# -- 텐서 속성 --
 print(x.shape)     # 크기
 print(x.dtype)     # 데이터 타입 (float32, int64 등)
 print(x.device)    # cpu 또는 cuda:0
 
-# ── GPU로 이동 ──
+# -- GPU로 이동 --
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 x = x.to(device)
 # 또는
@@ -134,7 +134,7 @@ x = x.cuda()
 #### 주요 연산
 
 ```python
-# ── 기본 연산 ──
+# -- 기본 연산 --
 a = torch.randn(3, 4)
 b = torch.randn(3, 4)
 
@@ -143,7 +143,7 @@ c = a * b               # 요소별 곱셈 (Hadamard product)
 c = a @ b.T             # 행렬 곱 (matmul)
 c = torch.matmul(a, b.T)  # 동일
 
-# ── Shape 변환 ──
+# -- Shape 변환 --
 x = torch.randn(2, 3, 4)
 x = x.view(2, 12)       # reshape (메모리 연속 필요)
 x = x.reshape(2, 12)    # reshape (메모리 복사 가능)
@@ -151,7 +151,7 @@ x = x.permute(2, 0, 1)  # 차원 순서 변경 (HWC → CHW 등)
 x = x.unsqueeze(0)      # 차원 추가: [3,4] → [1,3,4]
 x = x.squeeze(0)        # 차원 제거: [1,3,4] → [3,4]
 
-# ── 이미지에서 자주 쓰는 변환 ──
+# -- 이미지에서 자주 쓰는 변환 --
 # OpenCV (HWC, BGR) → PyTorch (CHW, RGB)
 import numpy as np
 img_np = np.random.randint(0, 255, (480, 640, 3), dtype=np.uint8)
@@ -167,13 +167,13 @@ autograd는 PyTorch의 **자동 미분 엔진**입니다. 순전파(forward)에�
 
 ```
 순전파 (Forward)          역전파 (Backward)
-─────────────────       ─────────────────
-x ──┐                   dx ◄──┐
-    ├─── z = x*w + b         │
-w ──┘       │           dw ◄──┤
-            │                 │
-            ▼           dL/dz │
-          loss ─────────────► ◄── backward()
+-----------------       -----------------
+x --+                   dx ◄--+
+    +--- z = x*w + b         |
+w --+       |           dw ◄--+
+            |                 |
+            v           dL/dz |
+          loss -------------> ◄-- backward()
 ```
 
 ```python
@@ -280,7 +280,7 @@ import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
 
-# ── 1. 데이터 준비 ──
+# -- 1. 데이터 준비 --
 transform = transforms.Compose([
     transforms.RandomHorizontalFlip(),
     transforms.RandomCrop(32, padding=4),
@@ -297,7 +297,7 @@ testset = torchvision.datasets.CIFAR10(
     root='./data', train=False, download=True, transform=transform)
 testloader = DataLoader(testset, batch_size=128, shuffle=False, num_workers=2)
 
-# ── 2. 간단한 CNN 모델 ──
+# -- 2. 간단한 CNN 모델 --
 class SimpleCNN(nn.Module):
     def __init__(self):
         super().__init__()
@@ -325,14 +325,14 @@ class SimpleCNN(nn.Module):
         x = self.classifier(x)
         return x
 
-# ── 3. 학습 설정 ──
+# -- 3. 학습 설정 --
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = SimpleCNN().to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
 
-# ── 4. 학습 루프 ──
+# -- 4. 학습 루프 --
 num_epochs = 50
 for epoch in range(num_epochs):
     model.train()
@@ -369,9 +369,9 @@ for epoch in range(num_epochs):
 
 ```
 일반 블록:           ResNet 블록:
-x ──→ F(x)          x ──→ F(x) ──→ F(x) + x
-                     │                ↑
-                     └────────────────┘
+x --→ F(x)          x --→ F(x) --→ F(x) + x
+                     |                ↑
+                     +----------------+
                         (skip connection)
 ```
 
@@ -417,7 +417,7 @@ tensorboard --logdir=runs
 ### 8. Checkpoint 저장/로드
 
 ```python
-# ── 저장 ──
+# -- 저장 --
 torch.save({
     'epoch': epoch,
     'model_state_dict': model.state_dict(),
@@ -426,7 +426,7 @@ torch.save({
     'best_acc': best_acc,
 }, 'checkpoint.pth')
 
-# ── 로드 ──
+# -- 로드 --
 checkpoint = torch.load('checkpoint.pth')
 model.load_state_dict(checkpoint['model_state_dict'])
 optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
@@ -451,20 +451,20 @@ for epoch in range(num_epochs):
 
 ---
 
-## 💡 꼭 이해해야 할 핵심 개념
+## [tip] 꼭 이해해야 할 핵심 개념
 
 ### 1. 학습 파이프라인의 흐름
 
 ```
 데이터 준비                모델 정의              학습 루프
-─────────               ──────────           ──────────
-Dataset    ─┐           nn.Module            for epoch:
-             ├→ DataLoader ──→ model(x)        optimizer.zero_grad()
-Transform  ─┘                  │               output = model(x)
-                               ▼               loss = criterion(output, y)
+---------               ----------           ----------
+Dataset    -+           nn.Module            for epoch:
+             +→ DataLoader --→ model(x)        optimizer.zero_grad()
+Transform  -+                  |               output = model(x)
+                               v               loss = criterion(output, y)
                            predictions         loss.backward()
-                               │               optimizer.step()
-                               ▼
+                               |               optimizer.step()
+                               v
                            loss 계산
 ```
 
@@ -487,7 +487,7 @@ Transform  ─┘                  │               output = model(x)
 
 ---
 
-## 🔍 자체 점검 - 이해했는지 확인!
+## [search] 자체 점검 - 이해했는지 확인!
 
 **Q1. `requires_grad=True`의 역할은 무엇인가?**
 > autograd가 해당 텐서에 대한 연산을 추적하여, `backward()` 호출 시 자동으로 gradient를 계산할 수 있게 합니다. 모델의 학습 가능한 파라미터(weight, bias)는 기본적으로 이 속성이 True입니다.
@@ -503,7 +503,7 @@ Transform  ─┘                  │               output = model(x)
 
 ---
 
-## 📝 이번 주 실습 & 다음 주 준비
+## [note] 이번 주 실습 & 다음 주 준비
 
 ### 이번 주 실습 과제
 
@@ -522,7 +522,7 @@ Transform  ─┘                  │               output = model(x)
 
 ---
 
-## 🎯 이번 주 핵심 요약
+## [goal] 이번 주 핵심 요약
 
 1. **CUDA 환경 세팅**이 딥러닝의 첫 걸음이다. `torch.cuda.is_available()`이 True여야 한다.
 2. **Tensor**는 PyTorch의 기본 단위이며, GPU에서 동작하고 자동 미분을 지원한다.
@@ -532,6 +532,6 @@ Transform  ─┘                  │               output = model(x)
 
 ---
 
-✅ 이전: [Phase 2 - Perception 기하 기초](../../../Roadmap/Phase%202.md)
+[O] 이전: [Phase 2 - Perception 기하 기초](../../../Roadmap/Phase%202.md)
 
 다음: [Week 2 - CV 라이브러리](../week2/README.md)

@@ -1,12 +1,12 @@
 # Week 11 실습: Detection + Depth 융합 (Python)
 
-> 🎯 **목표**: YOLO 검출 + Depth 맵으로 3D 위치 추정 파이프라인을 구축하고 ROS2와 통합
-> 💻 **언어**: Python (PyTorch, OpenCV, ultralytics, rclpy)
-> ⏰ **예상 시간**: 12시간
+> [goal] **목표**: YOLO 검출 + Depth 맵으로 3D 위치 추정 파이프라인을 구축하고 ROS2와 통합
+> [code] **언어**: Python (PyTorch, OpenCV, ultralytics, rclpy)
+> [time] **예상 시간**: 12시간
 
 ---
 
-## 📋 실습 개요
+## [list] 실습 개요
 
 | Step | 내용 | 난이도 | 시간 |
 |------|------|--------|------|
@@ -18,7 +18,7 @@
 
 ---
 
-## 🔧 환경 설정
+## [tool] 환경 설정
 
 ```bash
 # 가상환경 활성화
@@ -537,13 +537,13 @@ def run_full_pipeline_demo():
 
     # 결과 출력
     print(f"\n  {num_frames}프레임 벤치마크 결과:")
-    print(f"  ─────────────────────────────────")
+    print(f"  ---------------------------------")
     for key, vals in times.items():
         avg_ms = np.mean(vals) * 1000
         print(f"  {key:>8}: {avg_ms:>7.1f} ms")
 
     total_fps = 1000.0 / (np.mean(times['total']) * 1000)
-    print(f"  ─────────────────────────────────")
+    print(f"  ---------------------------------")
     print(f"  {'FPS':>8}: {total_fps:>7.1f}")
 
     if total_fps >= 10:
@@ -557,7 +557,7 @@ if __name__ == "__main__":
 
 ---
 
-## ✅ 실습 체크리스트
+## [O] 실습 체크리스트
 
 ### Step 1: 개별 추론
 - [ ] YOLO 검출 동작 확인
@@ -584,7 +584,7 @@ if __name__ == "__main__":
 
 ---
 
-## 💡 트러블슈팅
+## [tip] 트러블슈팅
 
 ### YOLO 검출이 안 될 때
 
@@ -605,7 +605,7 @@ if __name__ == "__main__":
 
 ---
 
-## 🔗 참고 자료
+## [link] 참고 자료
 
 - [Ultralytics YOLOv8 문서](https://docs.ultralytics.com/)
 - [Depth Anything HuggingFace](https://huggingface.co/LiheYoung/depth-anything-small-hf)

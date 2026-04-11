@@ -1,12 +1,12 @@
 # Week 9 실습: ONNX & TensorRT 변환 - Depth 모델 (C++)
 
-> 🎯 **목표**: Depth Anything 모델을 TensorRT로 변환하고 Jetson에서 실시간 추론 달성
-> 💻 **언어**: C++ (TensorRT) + Python (변환용)
-> ⏰ **예상 시간**: 12시간
+> [goal] **목표**: Depth Anything 모델을 TensorRT로 변환하고 Jetson에서 실시간 추론 달성
+> [code] **언어**: C++ (TensorRT) + Python (변환용)
+> [time] **예상 시간**: 12시간
 
 ---
 
-## 📋 실습 개요
+## [list] 실습 개요
 
 | Step | 내용 | 난이도 | 시간 |
 |------|------|--------|------|
@@ -17,7 +17,7 @@
 
 ---
 
-## 🔧 환경 설정
+## [tool] 환경 설정
 
 ### PC (ONNX 변환용)
 
@@ -139,10 +139,10 @@ print(f"  출력 범위: [{outputs[0].min():.3f}, {outputs[0].max():.3f}]")
 ### 1.4 체크포인트
 
 ```
-✅ ONNX 파일 생성 확인
-✅ ONNX 검증 통과
-✅ ONNX Runtime 추론 성공
-✅ 출력 shape 확인 (1, 384, 512) 또는 (1, 1, 384, 512)
+[O] ONNX 파일 생성 확인
+[O] ONNX 검증 통과
+[O] ONNX Runtime 추론 성공
+[O] 출력 shape 확인 (1, 384, 512) 또는 (1, 1, 384, 512)
 ```
 
 ---
@@ -197,9 +197,9 @@ ls -lh /home/jetson/models/depth_anything_small_*.trt
 ### 2.4 체크포인트
 
 ```
-✅ TRT FP16 엔진 파일 생성
-✅ trtexec 벤치마크에서 15+ FPS 확인
-✅ FP32 vs FP16 속도 비교 완료
+[O] TRT FP16 엔진 파일 생성
+[O] trtexec 벤치마크에서 15+ FPS 확인
+[O] FP32 vs FP16 속도 비교 완료
 ```
 
 ---
@@ -210,14 +210,14 @@ ls -lh /home/jetson/models/depth_anything_small_*.trt
 
 ```
 depth_trt_inference/
-├── CMakeLists.txt
-├── include/
-│   └── depth_trt_engine.h
-├── src/
-│   ├── depth_trt_engine.cpp
-│   └── main.cpp
-└── models/
-    └── depth_anything_small_fp16.trt
++-- CMakeLists.txt
++-- include/
+|   +-- depth_trt_engine.h
++-- src/
+|   +-- depth_trt_engine.cpp
+|   +-- main.cpp
++-- models/
+    +-- depth_anything_small_fp16.trt
 ```
 
 ### 3.2 헤더 파일: depth_trt_engine.h
@@ -461,9 +461,9 @@ void runBenchmark(DepthTRTEngine& engine, int num_frames = 100) {
 
     // 목표 달성 여부
     if (fps >= 15.0f) {
-        printf("✅ 목표 달성! (15 FPS 이상)\n");
+        printf("[O] 목표 달성! (15 FPS 이상)\n");
     } else {
-        printf("❌ 목표 미달. 최적화 필요.\n");
+        printf("[X] 목표 미달. 최적화 필요.\n");
     }
 
     engine.printMemoryUsage();
@@ -600,24 +600,24 @@ jtop
 ### 4.3 결과 기록 템플릿
 
 ```
-┌─────────────────────────────────────────┐
-│         Depth TRT 성능 측정 결과         │
-├──────────────────┬──────────────────────┤
-│ FP32 추론 시간   │         ms           │
-│ FP16 추론 시간   │         ms           │
-│ FP32 FPS         │         fps          │
-│ FP16 FPS         │         fps          │
-│ FP16 속도 향상   │         x            │
-│ GPU 메모리 사용   │         MB           │
-│ GPU 사용률       │         %            │
-│ 전력 소비        │         W            │
-│ 온도             │         °C           │
-└──────────────────┴──────────────────────┘
++-----------------------------------------+
+|         Depth TRT 성능 측정 결과         |
++------------------+----------------------+
+| FP32 추론 시간   |         ms           |
+| FP16 추론 시간   |         ms           |
+| FP32 FPS         |         fps          |
+| FP16 FPS         |         fps          |
+| FP16 속도 향상   |         x            |
+| GPU 메모리 사용   |         MB           |
+| GPU 사용률       |         %            |
+| 전력 소비        |         W            |
+| 온도             |         °C           |
++------------------+----------------------+
 ```
 
 ---
 
-## ✅ 체크리스트
+## [O] 체크리스트
 
 ### Step 1: ONNX 변환
 - [ ] Depth Anything Small 모델 로드
@@ -645,7 +645,7 @@ jtop
 
 ---
 
-## 💡 트러블슈팅
+## [tip] 트러블슈팅
 
 ### ONNX 변환 실패 시
 

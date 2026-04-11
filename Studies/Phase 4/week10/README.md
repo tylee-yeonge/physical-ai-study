@@ -1,12 +1,12 @@
 # Week 10: BEVFormer 실습 - Pretrained 모델로 추론 및 시각화
 
-> 🎯 **이번 주 목표**: BEVFormer pretrained 모델로 추론을 실행하고, BEV Feature를 시각화하며, NDS/mAP 성능 지표를 이해한다.
-> ⏰ **예상 시간**: 12-15시간
-> 💡 **핵심 질문**: "BEVFormer의 추론 결과를 어떻게 해석하고, 성능을 어떤 지표로 평가하는가?"
+> [goal] **이번 주 목표**: BEVFormer pretrained 모델로 추론을 실행하고, BEV Feature를 시각화하며, NDS/mAP 성능 지표를 이해한다.
+> [time] **예상 시간**: 12-15시간
+> [tip] **핵심 질문**: "BEVFormer의 추론 결과를 어떻게 해석하고, 성능을 어떤 지표로 평가하는가?"
 
 ---
 
-## 📋 학습 순서
+## [list] 학습 순서
 
 | 순서 | 단계 | 파일 | 설명 |
 |:----:|------|------|------|
@@ -18,7 +18,7 @@
 
 ---
 
-## 🌟 시작하기 전에
+## [*] 시작하기 전에
 
 ### Week 9에서 배운 것
 
@@ -51,7 +51,7 @@ Detection Head → [x, y, z, l, w, h, theta, vx, vy]
 
 ---
 
-## 📚 핵심 개념 자세히 알아보기
+## [ref] 핵심 개념 자세히 알아보기
 
 ### 1. BEVFormer 코드 구조
 
@@ -59,27 +59,27 @@ Detection Head → [x, y, z, l, w, h, theta, vx, vy]
 
 ```
 BEVFormer/
-├── projects/
-│   └── mmdet3d_plugin/
-│       └── bevformer/
-│           ├── detectors/        # BEVFormer 모델 정의
-│           │   └── bevformer.py
-│           ├── modules/          # 핵심 모듈
-│           │   ├── encoder.py            # BEV Encoder
-│           │   ├── spatial_cross_attention.py
-│           │   ├── temporal_self_attention.py
-│           │   └── decoder.py            # Detection Decoder
-│           └── dense_heads/      # Detection Head
-├── tools/
-│   ├── train.py
-│   ├── test.py
-│   └── visualize.py
-├── configs/
-│   └── bevformer/
-│       ├── bevformer_base.py      # Base 모델 config
-│       ├── bevformer_small.py     # Small 모델 config
-│       └── bevformer_tiny.py      # Tiny 모델 (테스트용)
-└── ckpts/                         # Pretrained weights
++-- projects/
+|   +-- mmdet3d_plugin/
+|       +-- bevformer/
+|           +-- detectors/        # BEVFormer 모델 정의
+|           |   +-- bevformer.py
+|           +-- modules/          # 핵심 모듈
+|           |   +-- encoder.py            # BEV Encoder
+|           |   +-- spatial_cross_attention.py
+|           |   +-- temporal_self_attention.py
+|           |   +-- decoder.py            # Detection Decoder
+|           +-- dense_heads/      # Detection Head
++-- tools/
+|   +-- train.py
+|   +-- test.py
+|   +-- visualize.py
++-- configs/
+|   +-- bevformer/
+|       +-- bevformer_base.py      # Base 모델 config
+|       +-- bevformer_small.py     # Small 모델 config
+|       +-- bevformer_tiny.py      # Tiny 모델 (테스트용)
++-- ckpts/                         # Pretrained weights
 ```
 
 #### 1.2 핵심 파일 분석
@@ -167,20 +167,20 @@ mkdir -p ckpts
 
 # 데이터 구조
 data/nuscenes/
-├── maps/
-├── samples/          # 센서 데이터
-│   ├── CAM_FRONT/
-│   ├── CAM_FRONT_LEFT/
-│   ├── CAM_FRONT_RIGHT/
-│   ├── CAM_BACK/
-│   ├── CAM_BACK_LEFT/
-│   └── CAM_BACK_RIGHT/
-├── sweeps/           # 중간 프레임
-├── v1.0-mini/        # 메타데이터
-│   ├── sample.json
-│   ├── sample_data.json
-│   └── ...
-└── nuscenes_infos_*.pkl  # 전처리된 정보
++-- maps/
++-- samples/          # 센서 데이터
+|   +-- CAM_FRONT/
+|   +-- CAM_FRONT_LEFT/
+|   +-- CAM_FRONT_RIGHT/
+|   +-- CAM_BACK/
+|   +-- CAM_BACK_LEFT/
+|   +-- CAM_BACK_RIGHT/
++-- sweeps/           # 중간 프레임
++-- v1.0-mini/        # 메타데이터
+|   +-- sample.json
+|   +-- sample_data.json
+|   +-- ...
++-- nuscenes_infos_*.pkl  # 전처리된 정보
 ```
 
 ---
@@ -235,21 +235,21 @@ def run_bevformer_inference():
 
 ```
 BEVFormer 출력 형식 (nuScenes):
-┌──────────────────────────────────────────┐
-│  각 검출 객체:                            │
-│    - center: [cx, cy, cz]    # 3D 중심   │
-│    - size:   [w, l, h]       # 크기      │
-│    - rotation: quaternion     # 회전      │
-│    - velocity: [vx, vy]      # 속도      │
-│    - score: float            # 신뢰도    │
-│    - class: int              # 클래스     │
-│                                          │
-│  nuScenes 10 클래스:                      │
-│    car, truck, bus, trailer,             │
-│    construction_vehicle, pedestrian,      │
-│    motorcycle, bicycle,                   │
-│    barrier, traffic_cone                  │
-└──────────────────────────────────────────┘
++------------------------------------------+
+|  각 검출 객체:                            |
+|    - center: [cx, cy, cz]    # 3D 중심   |
+|    - size:   [w, l, h]       # 크기      |
+|    - rotation: quaternion     # 회전      |
+|    - velocity: [vx, vy]      # 속도      |
+|    - score: float            # 신뢰도    |
+|    - class: int              # 클래스     |
+|                                          |
+|  nuScenes 10 클래스:                      |
+|    car, truck, bus, trailer,             |
+|    construction_vehicle, pedestrian,      |
+|    motorcycle, bicycle,                   |
+|    barrier, traffic_cone                  |
++------------------------------------------+
 ```
 
 ---
@@ -365,16 +365,16 @@ mAP: mean Average Precision
 mTP_i: 5가지 True Positive 메트릭
 
 NDS 구성 요소:
-┌───────────────────────────────────────────┐
-│  메트릭      │ 무엇을 평가하는가?          │
-├───────────────────────────────────────────┤
-│  mAP        │ 검출 정확도 (위치 + 클래스)  │
-│  mATE       │ Translation Error (위치 오차) │
-│  mASE       │ Scale Error (크기 오차)      │
-│  mAOE       │ Orientation Error (방향 오차) │
-│  mAVE       │ Velocity Error (속도 오차)    │
-│  mAAE       │ Attribute Error (속성 오차)   │
-└───────────────────────────────────────────┘
++-------------------------------------------+
+|  메트릭      | 무엇을 평가하는가?          |
++-------------------------------------------+
+|  mAP        | 검출 정확도 (위치 + 클래스)  |
+|  mATE       | Translation Error (위치 오차) |
+|  mASE       | Scale Error (크기 오차)      |
+|  mAOE       | Orientation Error (방향 오차) |
+|  mAVE       | Velocity Error (속도 오차)    |
+|  mAAE       | Attribute Error (속성 오차)   |
++-------------------------------------------+
 
 NDS = 1/10 * (5*mAP + (1-mATE) + (1-mASE) + (1-mAOE)
               + (1-mAVE) + (1-mAAE))
@@ -398,14 +398,14 @@ nuScenes mAP 계산:
    mAP = mean(AP_car, AP_truck, ..., AP_traffic_cone)
 
 KITTI와의 차이:
-┌──────────────────────────────────────────┐
-│           │ KITTI        │ nuScenes      │
-├──────────────────────────────────────────┤
-│ 매칭 기준 │ 3D IoU       │ BEV 중심 거리  │
-│ 클래스    │ 3개          │ 10개           │
-│ 카메라    │ 1대 (전방)   │ 6대 (360도)    │
-│ 종합 지표 │ AP3D         │ NDS            │
-└──────────────────────────────────────────┘
++------------------------------------------+
+|           | KITTI        | nuScenes      |
++------------------------------------------+
+| 매칭 기준 | 3D IoU       | BEV 중심 거리  |
+| 클래스    | 3개          | 10개           |
+| 카메라    | 1대 (전방)   | 6대 (360도)    |
+| 종합 지표 | AP3D         | NDS            |
++------------------------------------------+
 ```
 
 #### 5.3 BEVFormer 성능 분석
@@ -413,27 +413,27 @@ KITTI와의 차이:
 ```
 BEVFormer 성능 (nuScenes val set):
 
-┌────────────────────────────────────────────┐
-│  모델              │ NDS   │ mAP   │ FPS  │
-├────────────────────────────────────────────┤
-│  BEVFormer-Tiny    │ 0.354 │ 0.252 │ 4.3  │
-│  BEVFormer-Small   │ 0.478 │ 0.370 │ 2.3  │
-│  BEVFormer-Base    │ 0.517 │ 0.416 │ 1.7  │
-└────────────────────────────────────────────┘
++--------------------------------------------+
+|  모델              | NDS   | mAP   | FPS  |
++--------------------------------------------+
+|  BEVFormer-Tiny    | 0.354 | 0.252 | 4.3  |
+|  BEVFormer-Small   | 0.478 | 0.370 | 2.3  |
+|  BEVFormer-Base    | 0.517 | 0.416 | 1.7  |
++--------------------------------------------+
 
 클래스별 AP (BEVFormer-Base):
-┌────────────────────────────────────────┐
-│  클래스              │ AP              │
-├────────────────────────────────────────┤
-│  Car                │ 0.636           │
-│  Truck              │ 0.401           │
-│  Bus                │ 0.457           │
-│  Pedestrian         │ 0.420           │
-│  Motorcycle         │ 0.393           │
-│  Bicycle            │ 0.226           │
-│  Traffic Cone       │ 0.505           │
-│  Barrier            │ 0.530           │
-└────────────────────────────────────────┘
++----------------------------------------+
+|  클래스              | AP              |
++----------------------------------------+
+|  Car                | 0.636           |
+|  Truck              | 0.401           |
+|  Bus                | 0.457           |
+|  Pedestrian         | 0.420           |
+|  Motorcycle         | 0.393           |
+|  Bicycle            | 0.226           |
+|  Traffic Cone       | 0.505           |
+|  Barrier            | 0.530           |
++----------------------------------------+
 
 관찰:
 - Car가 가장 높은 AP (크기가 크고 데이터 많음)
@@ -578,15 +578,15 @@ def visualize_detection_bev(detections, bev_range=50):
 
 ```
 거리별 AP (BEVFormer-Base, Car):
-┌──────────────────────────────────────┐
-│  거리 범위    │ AP     │ 비고        │
-├──────────────────────────────────────┤
-│  0-10m       │ 0.78   │ 매우 좋음   │
-│  10-20m      │ 0.72   │ 좋음        │
-│  20-30m      │ 0.55   │ 보통        │
-│  30-40m      │ 0.35   │ 낮음        │
-│  40-50m      │ 0.18   │ 매우 낮음   │
-└──────────────────────────────────────┘
++--------------------------------------+
+|  거리 범위    | AP     | 비고        |
++--------------------------------------+
+|  0-10m       | 0.78   | 매우 좋음   |
+|  10-20m      | 0.72   | 좋음        |
+|  20-30m      | 0.55   | 보통        |
+|  30-40m      | 0.35   | 낮음        |
+|  40-50m      | 0.18   | 매우 낮음   |
++--------------------------------------+
 
 → 거리가 멀어질수록 성능 급감
 → 이미지에서 작아지므로 Feature 추출이 어려움
@@ -595,7 +595,7 @@ def visualize_detection_bev(detections, bev_range=50):
 
 ---
 
-## 💡 꼭 이해해야 할 핵심 개념
+## [tip] 꼭 이해해야 할 핵심 개념
 
 ### 1. NDS가 mAP보다 중요한 이유
 
@@ -649,7 +649,7 @@ BEVFormer 추론 속도:
 
 ---
 
-## 🔍 자체 점검 - 이해했는지 확인!
+## [search] 자체 점검 - 이해했는지 확인!
 
 **Q1. NDS에서 mAP의 가중치가 5배인 이유는?**
 
@@ -669,7 +669,7 @@ BEVFormer 추론 속도:
 
 ---
 
-## 📝 이번 주 실습 & 다음 주 준비
+## [note] 이번 주 실습 & 다음 주 준비
 
 ### 이번 주 실습 과제
 
@@ -690,7 +690,7 @@ BEVFormer 추론 속도:
 
 ---
 
-## 🎯 이번 주 핵심 요약
+## [goal] 이번 주 핵심 요약
 
 1. **BEVFormer 추론**은 6대 카메라 이미지를 입력으로 받아, BEV Feature Map을 생성하고, 3D Bounding Box + 속도를 출력한다.
 2. **NDS(nuScenes Detection Score)**는 mAP와 5가지 TP 메트릭을 종합한 점수로, mAP만으로는 부족한 3D 속성 정확도를 평가한다.

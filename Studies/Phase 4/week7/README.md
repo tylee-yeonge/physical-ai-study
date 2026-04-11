@@ -6,7 +6,7 @@
 
 ---
 
-## 📋 학습 순서
+## [list] 학습 순서
 
 | 순서 | 단계 | 파일 | 설명 |
 |:----:|------|------|------|
@@ -58,35 +58,35 @@ nuScenes는 Motional(구 nuTonomy)에서 공개한 **대규모 자율주행 데�
 
 ```
 nuScenes 핵심 특징:
-┌─────────────────────────────────────────────────┐
-│  360도 커버리지: 6대 카메라로 전 방향 촬영       │
-│  1000개 장면:   각 20초, 총 5.5시간 주행 데이터  │
-│  23개 클래스:   차량, 보행자, 장벽 등 다양한 객체  │
-│  센서 융합:     카메라 6 + LiDAR 1 + RADAR 5     │
-│  3D 어노테이션: 140만 개 3D bounding box          │
-│  Key Frame:     2Hz (초당 2프레임) 어노테이션      │
-│  위치:          보스턴 + 싱가포르 도심 주행         │
-└─────────────────────────────────────────────────┘
++-------------------------------------------------+
+|  360도 커버리지: 6대 카메라로 전 방향 촬영       |
+|  1000개 장면:   각 20초, 총 5.5시간 주행 데이터  |
+|  23개 클래스:   차량, 보행자, 장벽 등 다양한 객체  |
+|  센서 융합:     카메라 6 + LiDAR 1 + RADAR 5     |
+|  3D 어노테이션: 140만 개 3D bounding box          |
+|  Key Frame:     2Hz (초당 2프레임) 어노테이션      |
+|  위치:          보스턴 + 싱가포르 도심 주행         |
++-------------------------------------------------+
 ```
 
 #### 1.2 KITTI vs nuScenes 비교
 
 ```
-┌──────────────────┬───────────────┬──────────────────┐
-│ 항목              │ KITTI         │ nuScenes          │
-├──────────────────┼───────────────┼──────────────────┤
-│ 카메라 수        │ 1대 (전방)    │ 6대 (360도)       │
-│ 시야각           │ ~90도         │ 360도             │
-│ 장면 수          │ ~7K 이미지    │ 1000 scene (28K) │
-│ 클래스 수        │ 3개           │ 23개              │
-│ LiDAR           │ 1대 (64채널)  │ 1대 (32채널)      │
-│ RADAR           │ 없음          │ 5대               │
-│ 어노테이션       │ 2D + 3D      │ 3D + 속도         │
-│ 도심 환경        │ 교외 도로     │ 복잡한 도심       │
-│ 날씨 다양성      │ 맑은 날       │ 비, 야간 포함     │
-│ 평가 지표        │ AP3D          │ mAP + NDS        │
-│ 벤치마크 활용    │ 전통적 표준    │ 현재 표준         │
-└──────────────────┴───────────────┴──────────────────┘
++------------------+---------------+------------------+
+| 항목              | KITTI         | nuScenes          |
++------------------+---------------+------------------+
+| 카메라 수        | 1대 (전방)    | 6대 (360도)       |
+| 시야각           | ~90도         | 360도             |
+| 장면 수          | ~7K 이미지    | 1000 scene (28K) |
+| 클래스 수        | 3개           | 23개              |
+| LiDAR           | 1대 (64채널)  | 1대 (32채널)      |
+| RADAR           | 없음          | 5대               |
+| 어노테이션       | 2D + 3D      | 3D + 속도         |
+| 도심 환경        | 교외 도로     | 복잡한 도심       |
+| 날씨 다양성      | 맑은 날       | 비, 야간 포함     |
+| 평가 지표        | AP3D          | mAP + NDS        |
+| 벤치마크 활용    | 전통적 표준    | 현재 표준         |
++------------------+---------------+------------------+
 ```
 
 #### 1.3 6대 카메라 배치
@@ -95,16 +95,16 @@ nuScenes 핵심 특징:
 nuScenes 카메라 배치 (위에서 본 시점):
 
              FRONT_LEFT    FRONT    FRONT_RIGHT
-                  ╲         │         ╱
-                   ╲        │        ╱
-                    ╲       │       ╱
-              ───────┌─────────────┐───────
-                     │             │
-     BACK_LEFT ──────│   자동차    │────── BACK_RIGHT (없음)
-                     │    (Ego)    │
-              ───────└─────────────┘───────
-                           │
-                           │
+                  \         |         /
+                   \        |        /
+                    \       |       /
+              -------+-------------+-------
+                     |             |
+     BACK_LEFT ------|   자동차    |------ BACK_RIGHT (없음)
+                     |    (Ego)    |
+              -------+-------------+-------
+                           |
+                           |
                          BACK
 
 카메라별 FOV:
@@ -126,25 +126,25 @@ nuScenes 카메라 배치 (위에서 본 시점):
 ```
 nuScenes Detection 클래스 (23개 중 주요 10개):
 
-┌──────────────────────────────────────────────────┐
-│  차량 관련:                                       │
-│    car            - 승용차                        │
-│    truck          - 트럭                          │
-│    bus            - 버스                          │
-│    trailer        - 트레일러                       │
-│    construction   - 공사 차량                      │
-│                                                   │
-│  사람 관련:                                       │
-│    pedestrian     - 보행자                        │
-│    motorcycle     - 오토바이                       │
-│    bicycle        - 자전거                        │
-│                                                   │
-│  장애물:                                          │
-│    barrier        - 장벽, 가드레일                  │
-│    traffic_cone   - 교통 원뿔                      │
-│                                                   │
-│  (전체 23개 중 벤치마크는 10개 클래스로 평가)       │
-└──────────────────────────────────────────────────┘
++--------------------------------------------------+
+|  차량 관련:                                       |
+|    car            - 승용차                        |
+|    truck          - 트럭                          |
+|    bus            - 버스                          |
+|    trailer        - 트레일러                       |
+|    construction   - 공사 차량                      |
+|                                                   |
+|  사람 관련:                                       |
+|    pedestrian     - 보행자                        |
+|    motorcycle     - 오토바이                       |
+|    bicycle        - 자전거                        |
+|                                                   |
+|  장애물:                                          |
+|    barrier        - 장벽, 가드레일                  |
+|    traffic_cone   - 교통 원뿔                      |
+|                                                   |
+|  (전체 23개 중 벤치마크는 10개 클래스로 평가)       |
++--------------------------------------------------+
 ```
 
 ---
@@ -163,52 +163,52 @@ nuScenes Detection 클래스 (23개 중 주요 10개):
 
 # 압축 해제 후 구조:
 # v1.0-mini/
-# ├── maps/
-# ├── samples/         ← Key Frame 이미지/LiDAR
-# ├── sweeps/          ← Key Frame 사이의 추가 데이터
-# └── v1.0-mini/       ← 메타데이터 JSON 파일들
+# +-- maps/
+# +-- samples/         ← Key Frame 이미지/LiDAR
+# +-- sweeps/          ← Key Frame 사이의 추가 데이터
+# +-- v1.0-mini/       ← 메타데이터 JSON 파일들
 ```
 
 #### 3.2 디렉토리 구조
 
 ```
 v1.0-mini/
-├── maps/                          # 지도 데이터
-│   ├── basemap/
-│   └── expansion/
-│
-├── samples/                       # Key Frame 데이터 (2Hz)
-│   ├── CAM_FRONT/                # 전방 카메라 이미지
-│   ├── CAM_FRONT_LEFT/           # 전방 좌측 카메라
-│   ├── CAM_FRONT_RIGHT/          # 전방 우측 카메라
-│   ├── CAM_BACK/                 # 후방 카메라
-│   ├── CAM_BACK_LEFT/            # 후방 좌측 카메라
-│   ├── CAM_BACK_RIGHT/           # 후방 우측 카메라
-│   ├── LIDAR_TOP/                # LiDAR 포인트 클라우드
-│   ├── RADAR_FRONT/              # 전방 RADAR
-│   ├── RADAR_FRONT_LEFT/
-│   ├── RADAR_FRONT_RIGHT/
-│   ├── RADAR_BACK_LEFT/
-│   └── RADAR_BACK_RIGHT/
-│
-├── sweeps/                        # 중간 프레임 (비어노테이션)
-│   ├── CAM_FRONT/
-│   └── ...
-│
-└── v1.0-mini/                     # 메타데이터 (JSON)
-    ├── scene.json                 # 장면 정보
-    ├── sample.json               # Key Frame 정보
-    ├── sample_data.json          # 센서 데이터 참조
-    ├── sample_annotation.json    # 3D 어노테이션
-    ├── ego_pose.json             # 차량 위치/자세
-    ├── calibrated_sensor.json    # 센서 캘리브레이션
-    ├── sensor.json               # 센서 정보
-    ├── instance.json             # 객체 인스턴스 (추적용)
-    ├── category.json             # 객체 카테고리
-    ├── attribute.json            # 객체 속성 (움직임/정지)
-    ├── visibility.json           # 가시성 수준
-    ├── log.json                  # 주행 로그
-    └── map.json                  # 지도 정보
++-- maps/                          # 지도 데이터
+|   +-- basemap/
+|   +-- expansion/
+|
++-- samples/                       # Key Frame 데이터 (2Hz)
+|   +-- CAM_FRONT/                # 전방 카메라 이미지
+|   +-- CAM_FRONT_LEFT/           # 전방 좌측 카메라
+|   +-- CAM_FRONT_RIGHT/          # 전방 우측 카메라
+|   +-- CAM_BACK/                 # 후방 카메라
+|   +-- CAM_BACK_LEFT/            # 후방 좌측 카메라
+|   +-- CAM_BACK_RIGHT/           # 후방 우측 카메라
+|   +-- LIDAR_TOP/                # LiDAR 포인트 클라우드
+|   +-- RADAR_FRONT/              # 전방 RADAR
+|   +-- RADAR_FRONT_LEFT/
+|   +-- RADAR_FRONT_RIGHT/
+|   +-- RADAR_BACK_LEFT/
+|   +-- RADAR_BACK_RIGHT/
+|
++-- sweeps/                        # 중간 프레임 (비어노테이션)
+|   +-- CAM_FRONT/
+|   +-- ...
+|
++-- v1.0-mini/                     # 메타데이터 (JSON)
+    +-- scene.json                 # 장면 정보
+    +-- sample.json               # Key Frame 정보
+    +-- sample_data.json          # 센서 데이터 참조
+    +-- sample_annotation.json    # 3D 어노테이션
+    +-- ego_pose.json             # 차량 위치/자세
+    +-- calibrated_sensor.json    # 센서 캘리브레이션
+    +-- sensor.json               # 센서 정보
+    +-- instance.json             # 객체 인스턴스 (추적용)
+    +-- category.json             # 객체 카테고리
+    +-- attribute.json            # 객체 속성 (움직임/정지)
+    +-- visibility.json           # 가시성 수준
+    +-- log.json                  # 주행 로그
+    +-- map.json                  # 지도 정보
 ```
 
 #### 3.3 관계형 데이터 구조
@@ -223,22 +223,22 @@ scene → sample → sample_data → 파일 경로
 
 관계도:
   scene (장면)
-    ├── first_sample_token (첫 Key Frame)
-    └── last_sample_token
-          │
+    +-- first_sample_token (첫 Key Frame)
+    +-- last_sample_token
+          |
   sample (Key Frame)
-    ├── data → sample_data (센서별 데이터)
-    ├── anns → sample_annotation (3D bbox 목록)
-    ├── prev → 이전 sample
-    └── next → 다음 sample
-          │
+    +-- data → sample_data (센서별 데이터)
+    +-- anns → sample_annotation (3D bbox 목록)
+    +-- prev → 이전 sample
+    +-- next → 다음 sample
+          |
   sample_annotation (3D bbox)
-    ├── translation [x, y, z]
-    ├── size [w, l, h]
-    ├── rotation [quaternion]
-    ├── category_name
-    ├── visibility_token
-    └── instance_token → 같은 객체 추적용
+    +-- translation [x, y, z]
+    +-- size [w, l, h]
+    +-- rotation [quaternion]
+    +-- category_name
+    +-- visibility_token
+    +-- instance_token → 같은 객체 추적용
 ```
 
 ---
@@ -308,9 +308,9 @@ for ann_token in sample['anns']:
 nuScenes 좌표계 (Global, 즉 World 좌표계):
 
   ↑ Y (북쪽)
-  │
-  │
-  └──────→ X (동쪽)
+  |
+  |
+  +------→ X (동쪽)
   Z: 위쪽 (+)
 
 카메라 좌표계:
@@ -377,16 +377,16 @@ NDS = (1/10) * [5*mAP + (1-mATE) + (1-mASE) + (1-mAOE)
 #### 6.3 KITTI AP3D vs nuScenes NDS 비교
 
 ```
-┌─────────────────────────────────────────────┐
-│           │ KITTI AP3D     │ nuScenes NDS   │
-├─────────────────────────────────────────────┤
-│ 매칭 기준 │ 3D IoU         │ 중심 거리      │
-│ 난이도    │ Easy/Mod/Hard  │ 없음 (통합)    │
-│ 속도 평가 │ 없음           │ AVE 포함       │
-│ 속성 평가 │ 없음           │ AAE 포함       │
-│ 360도    │ 전방만         │ 360도 전체     │
-│ 종합성   │ 검출만 평가    │ 검출+품질 평가  │
-└─────────────────────────────────────────────┘
++---------------------------------------------+
+|           | KITTI AP3D     | nuScenes NDS   |
++---------------------------------------------+
+| 매칭 기준 | 3D IoU         | 중심 거리      |
+| 난이도    | Easy/Mod/Hard  | 없음 (통합)    |
+| 속도 평가 | 없음           | AVE 포함       |
+| 속성 평가 | 없음           | AAE 포함       |
+| 360도    | 전방만         | 360도 전체     |
+| 종합성   | 검출만 평가    | 검출+품질 평가  |
++---------------------------------------------+
 ```
 
 ---

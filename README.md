@@ -1,12 +1,12 @@
 # 딥러닝 Perception 로드맵
 
-> 🎯 **목표**: AMR 실무 경험 + 딥러닝 Perception → **Perception Engineer**
-> ⏰ **기간**: Stage 1 (이직 전) + Stage 2 (이직 후) + Stage 2+ (장기 확장)
-> 👶 **전제**: 5개월 딸과 함께하는 직장인 아빠, AMR ROS Application 개발자
+> [goal] **목표**: AMR 실무 경험 + 딥러닝 Perception → **Perception Engineer**
+> [time] **기간**: Stage 1 (이직 전) + Stage 2 (이직 후) + Stage 2+ (장기 확장)
+>  **전vscode-remote://tunnel%2Bmac-mini/workspace/study/visual-slam-and-perception-learning/Studies/Phase%202/week3/quiz_medium.cpp?vscode-lang%3Dko-kr제**: 5개월 딸과 함께하는 직장인 아빠, AMR ROS Application 개발자
 
 ---
 
-## 📊 전체 로드맵
+## [chart] 전체 로드맵
 
 ```mermaid
 graph LR
@@ -49,7 +49,7 @@ graph LR
 
 ---
 
-## 🗓️ 타임라인 요약
+##  타임라인 요약
 
 | 시기 | Stage | 내용 | 목표 |
 |------|-------|------|------|
@@ -62,12 +62,12 @@ graph LR
 | 이직 후~ | Stage 2 | BEV, Blender, Isaac Sim | 심화 학습 |
 | Stage 2 이후~ | Stage 2+ | **VLA 심화, Embodied AI** | 미래 역량 |
 
-> 📌 기존 SLAM 트랙 (VO/BA 4주 + VIO 3주) = **7주를 절약**하여 Portfolio Sprint 에 배정.
+> [pin] 기존 SLAM 트랙 (VO/BA 4주 + VIO 3주) = **7주를 절약**하여 Portfolio Sprint 에 배정.
 > Phase 2 도 8주 → 4주로 압축. 절약된 총 11주 중 7주는 Portfolio Sprint, 나머지 4주는 학습 버퍼.
 
 ---
 
-## 💻 언어 사용 전략
+## [code] 언어 사용 전략
 
 | Phase | 내용 | 언어 | 이유 |
 |-------|------|------|------|
@@ -78,15 +78,15 @@ graph LR
 
 ### 핵심 원칙
 
-✅ **기하학 기초 (Phase 2)**: **C++** (OpenCV, 카메라 모델/캘리브레이션)
+[O] **기하학 기초 (Phase 2)**: **C++** (OpenCV, 카메라 모델/캘리브레이션)
 
-✅ **딥러닝 학습 (Phase 3-6)**: **Python** (PyTorch)
+[O] **딥러닝 학습 (Phase 3-6)**: **Python** (PyTorch)
 
-✅ **딥러닝 배포**: **C++ + TensorRT** (Jetson, 30+ FPS 목표)
+[O] **딥러닝 배포**: **C++ + TensorRT** (Jetson, 30+ FPS 목표)
 
 ---
 
-## 🔷 Stage 1: 이직 전 (2026년)
+##  Stage 1: 이직 전 (2026년)
 
 ### 실습 가이드 위치
 
@@ -109,9 +109,9 @@ graph LR
 | 1 | 수학 핵심 (선형대수, 3D 기하) | 2개월 |
 | 2 | Perception 기하 기초 (카메라 모델, Multi-view) | 4주 |
 
-> ⚠️ 기존 SLAM 트랙 (VO/BA, VIO) 은 [Archive/SLAM-legacy/](./Archive/SLAM-legacy/) 로 이동되었습니다.
+> [!] 기존 SLAM 트랙 (VO/BA, VIO) 은 [Archive/SLAM-legacy/](./Archive/SLAM-legacy/) 로 이동되었습니다.
 
-### Phase 3: Detection + Depth (3개월) ⭐
+### Phase 3: Detection + Depth (3개월) [*]
 > **핵심 Phase** - Detection + Depth 필수, Instance Seg 선택
 
 | 주차 | 내용 | 핵심 모델 | 우선순위 |
@@ -121,11 +121,11 @@ graph LR
 | 7-10 | **Depth Estimation + Jetson 배포** | Depth Anything V2, TensorRT | 필수 |
 | 11-12 | **통합 시스템** | Detection + Depth → 3D | 필수 |
 
-> ⚠️ **TensorRT 배포는 삽질 시간이 예상보다 길어질 수 있음**
+> [!] **TensorRT 배포는 삽질 시간이 예상보다 길어질 수 있음**
 
 **산출물**: Jetson에서 실시간 Detection + Depth 데모
 
-### Phase 4: 3D Perception (약 3개월) ⭐
+### Phase 4: 3D Perception (약 3개월) [*]
 > **이직 준비 핵심** - KITTI 3D → nuScenes 순서로 진행
 
 | 주차 | 내용 | 핵심 |
@@ -135,12 +135,12 @@ graph LR
 | 5-6 | Monocular 3D Detection | FCOS3D |
 | 7-8 | **nuScenes + BEV 입문** | BEVFormer 개념 |
 
-> 💡 **nuScenes (~400GB)는 셋업에만 며칠 걸릴 수 있음**
+> [tip] **nuScenes (~400GB)는 셋업에만 며칠 걸릴 수 있음**
 > KITTI 3D로 먼저 연습 후 nuScenes 진입 권장
 
 **산출물**: 카메라 기반 3D 객체 검출 데모
 
-### Portfolio Sprint (7주) 🔥
+### Portfolio Sprint (7주) 
 > Phase 4 완료 직후, 이직 활동 직전
 
 **목적**: Phase 3-6에서 배운 기술을 **면접관이 보고 뽑고 싶어지는** 포트폴리오로 전환
@@ -158,10 +158,10 @@ graph LR
 
 ---
 
-## 🔶 Stage 2: 이직 후
+##  Stage 2: 이직 후
 
 > 새 회사 적응 기간 (3-6개월) 후 심화 학습 시작
-> ⚠️ 이직 직후 바로 시작하지 말고 적응 기간 버퍼 확보
+> [!] 이직 직후 바로 시작하지 말고 적응 기간 버퍼 확보
 
 ### BEV & Occupancy (3개월)
 | 주제 | 내용 |
@@ -170,7 +170,7 @@ graph LR
 | Occupancy Network | 3D 공간 점유 예측 |
 | nuScenes 벤치마크 | 성능 평가 |
 
-### 🎨 Blender for Simulation
+###  Blender for Simulation
 > **목적**: Isaac Sim/Gazebo용 시뮬레이션 에셋 제작
 
 | 단계 | 내용 | 기간 | 산출물 |
@@ -180,11 +180,11 @@ graph LR
 | 3 | **Isaac Sim/Gazebo Export** | 2주 | USD/URDF 변환 |
 | 4 | Procedural Generation | 2주 (선택) | 다양한 에셋 자동 생성 |
 
-> 💡 **3D 좌표계/투영 개념이 Blender 모델링에 바로 적용됨**
+> [tip] **3D 좌표계/투영 개념이 Blender 모델링에 바로 적용됨**
 
 **산출물**: Isaac Sim에서 사용 가능한 커스텀 로봇 환경 에셋
 
-### 🎮 Isaac Sim 연동 (2개월)
+###  Isaac Sim 연동 (2개월)
 > Blender 에셋을 활용한 시뮬레이션 환경 구축
 
 | 주제 | 내용 |
@@ -194,7 +194,7 @@ graph LR
 | **Synthetic Data 생성** | Domain Randomization |
 | Perception 파이프라인 | 시뮬레이션 → 실제 전이 |
 
-> 💡 **Synthetic Data로 학습 데이터 무한 생성 가능!**
+> [tip] **Synthetic Data로 학습 데이터 무한 생성 가능!**
 
 ### Multi-modal Perception (3개월)
 | 주제 | 내용 |
@@ -205,7 +205,7 @@ graph LR
 
 ---
 
-## 🤖 VLA 입문 (이직 활동과 병행)
+##  VLA 입문 (이직 활동과 병행)
 
 > 포트폴리오 완성 후, 이직 활동과 병행하며 VLA 입문
 > 로봇이 **보고 → 이해하고 → 행동**하는 End-to-End 시스템
@@ -216,11 +216,11 @@ graph LR
 | Policy Learning | 행동 정책 학습 | Diffusion Policy |
 | Simulation | 시뮬레이션 환경 | Isaac Sim, MuJoCo |
 
-> 💡 Phase 3-6의 Perception 지식 + AMR ROS 경험이 VLA 학습의 토대가 됨
+> [tip] Phase 3-6의 Perception 지식 + AMR ROS 경험이 VLA 학습의 토대가 됨
 
 ---
 
-## 🚀 Stage 2+: 장기 확장
+##  Stage 2+: 장기 확장
 
 ### Embodied AI
 | 주제 | 내용 |
@@ -237,12 +237,12 @@ graph LR
 | 하드웨어 이해 | 펌웨어 2년 |
 | 로봇 도메인 | AMR 도메인 지식 |
 
-> 💡 **VLA는 "Vision+Language 연구자" + "로봇 실무자"가 만나야 가능한 영역**
+> [tip] **VLA는 "Vision+Language 연구자" + "로봇 실무자"가 만나야 가능한 영역**
 > 당신은 후자를 이미 갖추고 있음!
 
 ---
 
-## 🔧 실습 환경
+## [tool] 실습 환경
 
 | 장비 | 용도 |
 |------|------|
@@ -251,7 +251,7 @@ graph LR
 
 ---
 
-## 🏆 커리어 경로
+## [goal] 커리어 경로
 
 ```
 현재: AMR ROS Application 개발자 (7년차)
@@ -269,7 +269,7 @@ Portfolio Sprint 이후~: 이직 활동 시작 (계속 트라이)
 
 ---
 
-## ✅ 마일스톤 체크리스트
+## [O] 마일스톤 체크리스트
 
 ### Stage 1 (학습 + Portfolio)
 - [x] 환경 세팅 완료
@@ -282,8 +282,8 @@ Portfolio Sprint 이후~: 이직 활동 시작 (계속 트라이)
 
 ### Stage 2 (이직 후)
 - [ ] BEV Perception 심화
-- [ ] 🎨 Blender 기초 완료
-- [ ] 🎮 Isaac Sim 연동
+- [ ]  Blender 기초 완료
+- [ ]  Isaac Sim 연동
 - [ ] Multi-modal 학습
 - [ ] 시니어 성장
 
@@ -294,11 +294,11 @@ Portfolio Sprint 이후~: 이직 활동 시작 (계속 트라이)
 ### Stage 2+ (장기)
 - [ ] VLA 심화
 - [ ] Embodied AI 역량
-- [ ] 미래 리더십 🚀
+- [ ] 미래 리더십 
 
 ---
 
-## 💡 핵심 원칙
+## [tip] 핵심 원칙
 
 1. **역순 학습**: 먼저 돌려보고, 모르는 것을 채운다
 2. **개념은 설명할 수 있게, 구현은 찾을 수 있게**: "이게 뭐고 왜 쓰나요?" → 답할 수 있어야 함 (면접 대비). "코드로 어떻게 짜나요?" → 뭘 찾아봐야 하는지 알면 OK (실무 대비). 수학적 유도는 스킵. 막힌 부분은 표시해두고 다음으로.
@@ -309,12 +309,12 @@ Portfolio Sprint 이후~: 이직 활동 시작 (계속 트라이)
 
 ---
 
-> 📝 **경로**: 기하학 기초 → **AI Perception** → **Portfolio Sprint** → **이직** → BEV → **VLA**
+> [note] **경로**: 기하학 기초 → **AI Perception** → **Portfolio Sprint** → **이직** → BEV → **VLA**
 > AMR 실무 경험을 살려 **Perception Engineer**로 성장합니다.
 
 ---
 
-## 🔥 이직 시나리오 분석 — 흔들릴 때 다시 읽기
+##  이직 시나리오 분석 — 흔들릴 때 다시 읽기
 
 > 아이도 생겼고, 가족도 있고, 책임질 게 많아졌다.
 > 그래도 지금 하고 있는 도메인을 벗어나고 싶다.

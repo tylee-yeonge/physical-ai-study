@@ -1,8 +1,8 @@
 # Week 2 실습: BA 개념 확인 + VINS 최적화 코드 읽기
 
-> 🎯 **목표**: BA 비용 함수와 VINS의 최적화 구조를 코드에서 확인
-> 💻 **방식**: 코드 분석 중심
-> ⏰ **예상 시간**: 3-4시간
+> [goal] **목표**: BA 비용 함수와 VINS의 최적화 구조를 코드에서 확인
+> [code] **방식**: 코드 분석 중심
+> [time] **예상 시간**: 3-4시간
 
 ---
 
@@ -12,10 +12,10 @@
 
 ```
 vins_estimator/src/
-├── estimator.cpp          # optimization() 호출부
-├── factor/
-│   ├── projection_factor.cpp  # Visual factor (재투영 오차)
-│   └── imu_factor.cpp         # IMU factor (Phase 4)
++-- estimator.cpp          # optimization() 호출부
++-- factor/
+|   +-- projection_factor.cpp  # Visual factor (재투영 오차)
+|   +-- imu_factor.cpp         # IMU factor (Phase 4)
 ```
 
 ### 확인 포인트

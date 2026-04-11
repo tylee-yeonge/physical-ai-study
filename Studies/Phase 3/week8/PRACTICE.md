@@ -1,18 +1,18 @@
 # Week 8 실습: Depth Anything 모델 사용 및 시각화
 
-> 🎯 **목표**: Depth Anything으로 실제 이미지 깊이 추론, 시각화, Metric 변환 실험하기
-> 💻 **언어**: Python (PyTorch, transformers, OpenCV)
-> ⏰ **예상 시간**: 12시간
+> [goal] **목표**: Depth Anything으로 실제 이미지 깊이 추론, 시각화, Metric 변환 실험하기
+> [code] **언어**: Python (PyTorch, transformers, OpenCV)
+> [time] **예상 시간**: 12시간
 
 ---
 
-## 📋 실습 개요
+## [list] 실습 개요
 
 Week 8은 Depth Anything 모델을 실제로 사용합니다. HuggingFace에서 모델을 불러오고, 단일 이미지/비디오에서 깊이맵을 추론한 후 다양한 방법으로 시각화합니다. Metric Depth 변환과 YOLO+Depth 결합까지 실습합니다.
 
 ---
 
-## 🔧 환경 설정
+## [tool] 환경 설정
 
 ```bash
 # 가상환경 활성화
@@ -39,15 +39,15 @@ print('Depth Anything 로드 성공!')
 
 ```
 week8_depth_anything/
-├── infer_pipeline.py         # Pipeline API 추론
-├── infer_manual.py           # 직접 모델 로드 추론
-├── visualize_depth.py        # 깊이맵 시각화
-├── metric_depth.py           # Metric Depth 변환
-├── realtime_depth.py         # 실시간 카메라 깊이
-├── yolo_depth_combine.py     # YOLO + Depth 결합 (미리보기)
-└── data/
-    ├── indoor.jpg            # 실내 테스트 이미지
-    └── outdoor.jpg           # 야외 테스트 이미지
++-- infer_pipeline.py         # Pipeline API 추론
++-- infer_manual.py           # 직접 모델 로드 추론
++-- visualize_depth.py        # 깊이맵 시각화
++-- metric_depth.py           # Metric Depth 변환
++-- realtime_depth.py         # 실시간 카메라 깊이
++-- yolo_depth_combine.py     # YOLO + Depth 결합 (미리보기)
++-- data/
+    +-- indoor.jpg            # 실내 테스트 이미지
+    +-- outdoor.jpg           # 야외 테스트 이미지
 ```
 
 ---
@@ -718,7 +718,7 @@ Pipeline API 깊이 추론
 
 ---
 
-## ✅ 체크리스트
+## [O] 체크리스트
 
 - [ ] HuggingFace Pipeline으로 깊이 추론 성공
 - [ ] 직접 모델 로드 및 추론 성공
@@ -733,7 +733,7 @@ Pipeline API 깊이 추론
 
 ---
 
-## 💡 트러블슈팅
+## [tip] 트러블슈팅
 
 ### 모델 다운로드 느림
 ```

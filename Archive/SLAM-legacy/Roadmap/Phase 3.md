@@ -1,17 +1,17 @@
 # Phase 3: Visual Odometry & Bundle Adjustment
 
-> ⏰ **기간**: 4주
-> 🎯 **목표**: VO 파이프라인 개념 이해, BA 원리 파악 (코드 분석 중심)
-> ⏱️ **주간 시간**: 약 7-10시간
-> 💻 **언어**: **C++** (g2o, Ceres 코드 읽기)
+> [time] **기간**: 4주
+> [goal] **목표**: VO 파이프라인 개념 이해, BA 원리 파악 (코드 분석 중심)
+> [time] **주간 시간**: 약 7-10시간
+> [code] **언어**: **C++** (g2o, Ceres 코드 읽기)
 
 ---
 
-## 👉 **실습 가이드**: 각 week별 PRACTICE.md (예: [`week8/PRACTICE.md`](../Studies/Phase%203/week8/PRACTICE.md))
+## -> **실습 가이드**: 각 week별 PRACTICE.md (예: [`week8/PRACTICE.md`](../Studies/Phase%203/week8/PRACTICE.md))
 
 ---
 
-## 📋 Week 1: VO 파이프라인 + 모션 추정 방법
+## [list] Week 1: VO 파이프라인 + 모션 추정 방법
 
 ### VO 개요
 - [ ] Visual Odometry 정의 (연속 이미지로 카메라 움직임 추정)
@@ -39,14 +39,14 @@
 - [ ] VINS에서 Visual factor = PnP 기반 재투영 오차
 - [ ] AMR 휠 오도메트리와 유사한 역할
 
-### 🔍 자체 점검
+### [search] 자체 점검
 1. VO와 SLAM의 가장 큰 차이는?
 2. 2D-2D와 3D-2D 방법은 각각 언제 사용하는가?
 3. Monocular VO의 근본적인 한계는?
 
 ---
 
-## 📋 Week 2: 키프레임 + Bundle Adjustment 개념
+## [list] Week 2: 키프레임 + Bundle Adjustment 개념
 
 ### 키프레임 관리
 - [ ] 왜 키프레임이 필요한가 (메모리, 중복 정보, 계산량)
@@ -70,14 +70,14 @@
 - [ ] Local BA (실시간) vs Global BA (Loop closure 후)
 - [ ] VINS는 sliding window 내 Local BA
 
-### 🔍 자체 점검
+### [search] 자체 점검
 1. BA에서 최소화하는 것은 정확히 무엇인가?
 2. Schur complement가 BA를 빠르게 만드는 원리는?
 3. VINS의 sliding window 크기는 어떤 trade-off가 있는가?
 
 ---
 
-## 📋 Week 3: g2o / Ceres 코드 분석
+## [list] Week 3: g2o / Ceres 코드 분석
 
 > 기존 코드를 **읽고 이해**하는 데 집중
 
@@ -98,14 +98,14 @@
 - [ ] Ceres: 범용적, 자동 미분 편리
 - [ ] **VINS는 Ceres 사용**
 
-### 🔍 자체 점검
+### [search] 자체 점검
 1. g2o에서 Vertex와 Edge는 각각 무엇을 의미하는가?
 2. Ceres의 automatic differentiation 장점은?
 3. VINS `optimization.cpp`에서 Ceres가 어떻게 사용되는가?
 
 ---
 
-## 📋 Week 4: 스케일 문제 + Phase 3 마무리
+## [list] Week 4: 스케일 문제 + Phase 3 마무리
 
 ### Monocular 스케일 모호성
 - [ ] 핀홀 모델: 3D 점 X와 lambdaX가 같은 2D 점에 투영
@@ -122,14 +122,14 @@
 - [ ] `optimization.cpp`: Ceres 기반 최적화 구조
 - [ ] Visual factor가 BA의 재투영 오차임을 확인
 
-### 🔍 자체 점검
+### [search] 자체 점검
 1. Monocular VO에서 스케일이 틀어지는 근본 원인은?
 2. IMU가 스케일 복구에 도움이 되는 원리는?
 3. VINS의 최적화 구조를 개략적으로 설명할 수 있는가?
 
 ---
 
-## ✅ Phase 3 완료 체크리스트
+## [O] Phase 3 완료 체크리스트
 
 ### Visual Odometry
 - [ ] VO 파이프라인 전체 흐름 설명 가능
@@ -148,13 +148,13 @@
 
 ---
 
-## 🎯 Phase 3 완료 기준
+## [goal] Phase 3 완료 기준
 
 > "VO 파이프라인 흐름을 설명하고, BA가 무엇을 최적화하는지 설명 가능. VINS 코드에서 해당 부분을 찾을 수 있음."
 
 ---
 
-## 📚 참고 자료
+## [ref] 참고 자료
 
 ### 강의
 
@@ -172,7 +172,7 @@
 
 ---
 
-## 💡 팁
+## [tip] 팁
 
 1. **구현보다 이해**: 이 Phase는 코드를 **읽는** 것이 목표
 2. **VINS 코드와 연결**: 개념마다 VINS 어디에 해당하는지 확인
@@ -181,7 +181,7 @@
 
 ---
 
-## ❓ 다음 단계
+## [?] 다음 단계
 
 Phase 3 완료 후:
 - Phase 4 (VIO 개념)로 진행

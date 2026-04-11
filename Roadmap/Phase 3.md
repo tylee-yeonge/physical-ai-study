@@ -1,25 +1,25 @@
 # Phase 3: Detection + Depth Estimation
 
-> ⏰ **기간**: 3개월  
-> 🎯 **목표**: 2D Perception 마스터 + Jetson 실시간 배포  
-> 💻 **언어**: **Python** (학습) + **C++/TensorRT** (배포)  
-> 🛠️ **하드웨어**: Jetson Orin Nano 필수  
-> ⏱️ **주간 시간**: 약 12시간
+> [time] **기간**: 3개월  
+> [goal] **목표**: 2D Perception 마스터 + Jetson 실시간 배포  
+> [code] **언어**: **Python** (학습) + **C++/TensorRT** (배포)  
+> [tool] **하드웨어**: Jetson Orin Nano 필수  
+> [time] **주간 시간**: 약 12시간
 
 ---
 
-## 👉 **실습 가이드**: [`Studies/Phase 3/PRACTICE.md`](../Studies/Phase%205/PRACTICE.md)
+## -> **실습 가이드**: [`Studies/Phase 3/PRACTICE.md`](../Studies/Phase%205/PRACTICE.md)
 
 **핵심 산출물**:
 - YOLO 실시간 객체 검출 (Jetson 30+ FPS)
 - Depth Estimation (Depth Anything V2)
 - 통합 시스템: Detection + Depth → 3D 위치 추정
 
-> ⚠️ **언어 전략**: 학습은 Python, 배포는 C++/TensorRT
+> [!] **언어 전략**: 학습은 Python, 배포는 C++/TensorRT
 
 ---
 
-## 📋 Section 5.1: PyTorch 복습 (2주)
+## [list] Section 5.1: PyTorch 복습 (2주)
 
 ### Week 1: PyTorch 기초 재정비
 
@@ -67,14 +67,14 @@
 - [ ] timm: 최신 모델 (EfficientNet, ViT 등)
 - [ ] Pretrained weights 사용법
 
-### 🔍 Section 5.1 자체 점검
+### [search] Section 5.1 자체 점검
 1. PyTorch Dataset과 DataLoader의 역할 차이는?
 2. GPU 메모리 부족 시 해결 방법 3가지는?
 3. Albumentations의 장점은?
 
 ---
 
-## 📋 Section 5.2: Object Detection (4주)
+## [list] Section 5.2: Object Detection (4주)
 
 ### Week 3: YOLO 이론
 
@@ -116,12 +116,12 @@ pip install ultralytics
 - [ ] 데이터셋 구조:
   ```
   dataset/
-  ├── images/
-  │   ├── train/
-  │   └── val/
-  └── labels/
-      ├── train/
-      └── val/
+  +-- images/
+  |   +-- train/
+  |   +-- val/
+  +-- labels/
+      +-- train/
+      +-- val/
   ```
 
 #### 학습 실습
@@ -183,14 +183,14 @@ trtexec --onnx=yolo11n.onnx \
 - [ ] Latency 분석 (전처리/추론/후처리)
 - [ ] Multi-threading (카메라 읽기 병렬화)
 
-### 🔍 Section 5.2 자체 점검
+### [search] Section 5.2 자체 점검
 1. mAP@0.5와 mAP@0.5:0.95의 차이는?
 2. TensorRT가 빠른 이유 3가지는?
 3. Jetson에서 FP16을 쓰는 이유는?
 
 ---
 
-## 📋 Section 5.3: Depth Estimation (4주)
+## [list] Section 5.3: Depth Estimation (4주)
 
 ### Week 7: Monocular Depth 이론
 
@@ -261,14 +261,14 @@ pipe = pipeline(task="depth-estimation",
 - [ ] 실제 환경에서 Depth map 시각화
 - [ ] 경계선, 먼 물체, 반사 표면 등 취약점 파악
 
-### 🔍 Section 5.3 자체 점검
+### [search] Section 5.3 자체 점검
 1. Monocular Depth가 Stereo보다 부정확한 이유는?
 2. Relative depth와 Metric depth의 차이는?
 3. Depth Anything의 장점은?
 
 ---
 
-## 📋 Section 5.4: 통합 시스템 (2주)
+## [list] Section 5.4: 통합 시스템 (2주)
 
 ### Week 11: Detection + Depth 융합
 
@@ -317,14 +317,14 @@ pipe = pipeline(task="depth-estimation",
 - [ ] 블로그: YOLO/Depth 학습 과정 정리
 - [ ] Demo 영상 YouTube
 
-### 🔍 Section 5.4 자체 점검
+### [search] Section 5.4 자체 점검
 1. Depth map과 Detection bbox를 어떻게 융합하는가?
 2. 실시간성을 위한 최적화 기법 3가지는?
 3. AMR에서 이 시스템을 어떻게 활용할 수 있는가?
 
 ---
 
-## ✅ Phase 3 완료 체크리스트
+## [O] Phase 3 완료 체크리스트
 
 ### Object Detection
 - [ ] YOLO11 커스텀 데이터 학습
@@ -351,13 +351,13 @@ pipe = pipeline(task="depth-estimation",
 
 ---
 
-## 🎯 Phase 3 완료 기준
+## [goal] Phase 3 완료 기준
 
 > "Jetson Orin에서 실시간 객체 검출 + Depth 기반 3D 위치 추정 시스템을 30fps로 구동하고, 이를 데모 영상으로 증명"
 
 ---
 
-## 📚 참고 자료
+## [ref] 참고 자료
 
 ### 모델 & 라이브러리
 
@@ -385,7 +385,7 @@ pipe = pipeline(task="depth-estimation",
 
 ---
 
-## 💡 팁
+## [tip] 팁
 
 1. **작은 모델부터**: YOLO11n (nano)부터 시작, 성능 필요하면 확장
 2. **데이터가 80%**: 라벨링 품질이 성능 차이의 대부분
@@ -395,7 +395,7 @@ pipe = pipeline(task="depth-estimation",
 
 ---
 
-## ❓ 다음 단계
+## [?] 다음 단계
 
 Phase 3 완료 후:
 - **Phase 4** (3D Perception)로 진행

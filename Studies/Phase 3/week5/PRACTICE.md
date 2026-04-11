@@ -1,18 +1,18 @@
 # Week 5 실습: ONNX 변환 및 Runtime 추론
 
-> 🎯 **목표**: PyTorch 모델을 ONNX로 변환하고 Runtime으로 추론하기
-> 💻 **언어**: Python (PyTorch, ONNX, ONNX Runtime)
-> ⏰ **예상 시간**: 12시간
+> [goal] **목표**: PyTorch 모델을 ONNX로 변환하고 Runtime으로 추론하기
+> [code] **언어**: Python (PyTorch, ONNX, ONNX Runtime)
+> [time] **예상 시간**: 12시간
 
 ---
 
-## 📋 실습 개요
+## [list] 실습 개요
 
 Week 5는 학습된 PyTorch 모델을 **ONNX 포맷으로 변환**하고, **ONNX Runtime으로 추론**한 후 속도를 비교합니다. 양자화(FP16/INT8)까지 실험합니다.
 
 ---
 
-## 🔧 환경 설정
+## [tool] 환경 설정
 
 ```bash
 # 가상환경 활성화
@@ -36,12 +36,12 @@ python -c "import torch; print(f'PyTorch: {torch.__version__}')"
 
 ```
 week5_onnx/
-├── export_onnx.py          # ONNX 변환
-├── validate_onnx.py        # ONNX 검증
-├── infer_onnx.py           # ONNX Runtime 추론
-├── benchmark.py            # 속도 비교
-├── quantize_model.py       # 양자화
-└── utils.py                # 전처리/후처리 유틸리티
++-- export_onnx.py          # ONNX 변환
++-- validate_onnx.py        # ONNX 검증
++-- infer_onnx.py           # ONNX Runtime 추론
++-- benchmark.py            # 속도 비교
++-- quantize_model.py       # 양자화
++-- utils.py                # 전처리/후처리 유틸리티
 ```
 
 ---
@@ -69,7 +69,7 @@ def export_static():
         simplify=True,
         half=False,  # FP32
     )
-    print("✅ Static ONNX 변환 완료: yolov8n.onnx")
+    print("[O] Static ONNX 변환 완료: yolov8n.onnx")
 
 def export_dynamic():
     """Dynamic shape 변환 (서버 배포용)"""
@@ -82,7 +82,7 @@ def export_dynamic():
         simplify=True,
         dynamic=True,  # 동적 배치
     )
-    print("✅ Dynamic ONNX 변환 완료")
+    print("[O] Dynamic ONNX 변환 완료")
 
 def export_manual():
     """수동 ONNX 변환 (커스텀 모델용)"""
@@ -108,7 +108,7 @@ def export_manual():
             'output': {0: 'batch_size'}
         }
     )
-    print("✅ ResNet18 ONNX 변환 완료: resnet18.onnx")
+    print("[O] ResNet18 ONNX 변환 완료: resnet18.onnx")
 
 if __name__ == "__main__":
     export_static()
@@ -137,28 +137,28 @@ def check_model(onnx_path):
 
     # 기본 검증
     onnx.checker.check_model(model)
-    print(f"✅ 모델 검증 통과: {onnx_path}")
+    print(f"[O] 모델 검증 통과: {onnx_path}")
 
     # 모델 정보 출력
-    print(f"\n📋 모델 정보:")
+    print(f"\n[list] 모델 정보:")
     print(f"  Opset version: {model.opset_import[0].version}")
     print(f"  IR version: {model.ir_version}")
     print(f"  Producer: {model.producer_name}")
 
     # 입력 정보
-    print(f"\n📥 입력:")
+    print(f"\n[in] 입력:")
     for inp in model.graph.input:
         shape = [d.dim_value for d in inp.type.tensor_type.shape.dim]
         print(f"  {inp.name}: {shape}")
 
     # 출력 정보
-    print(f"\n📤 출력:")
+    print(f"\n[out] 출력:")
     for out in model.graph.output:
         shape = [d.dim_value for d in out.type.tensor_type.shape.dim]
         print(f"  {out.name}: {shape}")
 
     # 노드 수
-    print(f"\n🔢 노드 수: {len(model.graph.node)}")
+    print(f"\n 노드 수: {len(model.graph.node)}")
 
 def compare_outputs(pt_path, onnx_path):
     """PyTorch vs ONNX 출력 비교"""
@@ -172,8 +172,8 @@ def compare_outputs(pt_path, onnx_path):
     input_name = session.get_inputs()[0].name
     onnx_out = session.run(None, {input_name: dummy})
 
-    print(f"✅ ONNX 출력 shape: {onnx_out[0].shape}")
-    print(f"📊 출력 범위: [{onnx_out[0].min():.4f}, {onnx_out[0].max():.4f}]")
+    print(f"[O] ONNX 출력 shape: {onnx_out[0].shape}")
+    print(f"[chart] 출력 범위: [{onnx_out[0].min():.4f}, {onnx_out[0].max():.4f}]")
 
 if __name__ == "__main__":
     check_model("yolov8n.onnx")
@@ -207,8 +207,8 @@ class ONNXDetector:
         self.iou_thresh = iou_thresh
 
         # 사용 중인 Provider 확인
-        print(f"✅ Provider: {self.session.get_providers()}")
-        print(f"📐 입력 shape: {self.input_shape}")
+        print(f"[O] Provider: {self.session.get_providers()}")
+        print(f" 입력 shape: {self.input_shape}")
 
     def preprocess(self, image):
         """이미지 전처리"""
@@ -321,7 +321,7 @@ if __name__ == "__main__":
     image = cv2.imread("test.jpg")
     boxes, scores, class_ids = detector.detect(image)
 
-    print(f"\n🔍 검출 결과: {len(boxes)}개 객체")
+    print(f"\n[search] 검출 결과: {len(boxes)}개 객체")
     for box, score, cls_id in zip(boxes, scores, class_ids):
         print(f"  클래스 {cls_id}: score={score:.3f}, "
               f"bbox=({box[0]:.0f},{box[1]:.0f},{box[2]:.0f},{box[3]:.0f})")
@@ -329,7 +329,7 @@ if __name__ == "__main__":
     # 시각화
     result = draw_detections(image.copy(), boxes, scores, class_ids)
     cv2.imwrite("result_onnx.jpg", result)
-    print("✅ 결과 저장: result_onnx.jpg")
+    print("[O] 결과 저장: result_onnx.jpg")
 ```
 
 ---
@@ -395,14 +395,14 @@ def benchmark_onnx(model_path, provider='CUDAExecutionProvider', num_runs=100):
 
 if __name__ == "__main__":
     print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    print("🏎️  속도 벤치마크: PyTorch vs ONNX")
+    print("  속도 벤치마크: PyTorch vs ONNX")
     print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
 
     pt_time = benchmark_pytorch("yolov8n.pt")
     onnx_cpu = benchmark_onnx("yolov8n.onnx", "CPUExecutionProvider")
     onnx_gpu = benchmark_onnx("yolov8n.onnx", "CUDAExecutionProvider")
 
-    print(f"\n📊 결과 요약:")
+    print(f"\n[chart] 결과 요약:")
     print(f"  ONNX GPU vs PyTorch: {pt_time/onnx_gpu:.1f}x 빠름")
     print(f"  ONNX CPU vs PyTorch: {pt_time/onnx_cpu:.1f}x")
 ```
@@ -433,7 +433,7 @@ def convert_fp16(input_path, output_path):
     import os
     size_fp32 = os.path.getsize(input_path) / 1024 / 1024
     size_fp16 = os.path.getsize(output_path) / 1024 / 1024
-    print(f"✅ FP16 변환 완료")
+    print(f"[O] FP16 변환 완료")
     print(f"  FP32: {size_fp32:.1f} MB")
     print(f"  FP16: {size_fp16:.1f} MB ({size_fp16/size_fp32*100:.0f}%)")
 
@@ -448,13 +448,13 @@ def quantize_int8_dynamic(input_path, output_path):
     import os
     size_orig = os.path.getsize(input_path) / 1024 / 1024
     size_int8 = os.path.getsize(output_path) / 1024 / 1024
-    print(f"✅ INT8 Dynamic 양자화 완료")
+    print(f"[O] INT8 Dynamic 양자화 완료")
     print(f"  원본:  {size_orig:.1f} MB")
     print(f"  INT8: {size_int8:.1f} MB ({size_int8/size_orig*100:.0f}%)")
 
 if __name__ == "__main__":
     print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    print("🔧 ONNX 양자화")
+    print("[tool] ONNX 양자화")
     print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
 
     # FP16
@@ -491,33 +491,33 @@ python quantize_model.py
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🏎️  속도 벤치마크: PyTorch vs ONNX
+  속도 벤치마크: PyTorch vs ONNX
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   PyTorch:     18.2 ms / 54.9 FPS
   ONNX (CPU):  45.1 ms / 22.2 FPS
   ONNX (CUDA): 11.8 ms / 84.7 FPS
 
-📊 결과 요약:
+[chart] 결과 요약:
   ONNX GPU vs PyTorch: 1.5x 빠름
   ONNX CPU vs PyTorch: 0.4x
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🔧 ONNX 양자화
+[tool] ONNX 양자화
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-✅ FP16 변환 완료
+[O] FP16 변환 완료
   FP32: 12.2 MB
   FP16:  6.1 MB (50%)
 
-✅ INT8 Dynamic 양자화 완료
+[O] INT8 Dynamic 양자화 완료
   원본:  12.2 MB
   INT8:  3.2 MB (26%)
 ```
 
 ---
 
-## ✅ 체크리스트
+## [O] 체크리스트
 
 - [ ] PyTorch → ONNX 변환 성공
 - [ ] onnx.checker 검증 통과
@@ -530,7 +530,7 @@ python quantize_model.py
 
 ---
 
-## 💡 트러블슈팅
+## [tip] 트러블슈팅
 
 ### CUDA Provider 오류
 ```

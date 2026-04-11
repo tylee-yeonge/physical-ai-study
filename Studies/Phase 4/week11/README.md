@@ -1,12 +1,12 @@
 # Week 11: 코드 및 문서 정리 - GitHub 포트폴리오 완성
 
-> 🎯 **이번 주 목표**: 지금까지의 3D Perception 프로젝트 코드를 GitHub에 체계적으로 정리하고, 면접관이 읽기 좋은 README와 문서를 작성한다.
-> ⏰ **예상 시간**: 12-15시간
-> 💡 **핵심 질문**: "내 GitHub 저장소를 처음 본 면접관이 5분 안에 내 역량을 파악할 수 있는가?"
+> [goal] **이번 주 목표**: 지금까지의 3D Perception 프로젝트 코드를 GitHub에 체계적으로 정리하고, 면접관이 읽기 좋은 README와 문서를 작성한다.
+> [time] **예상 시간**: 12-15시간
+> [tip] **핵심 질문**: "내 GitHub 저장소를 처음 본 면접관이 5분 안에 내 역량을 파악할 수 있는가?"
 
 ---
 
-## 📋 학습 순서
+## [list] 학습 순서
 
 | 순서 | 단계 | 파일 | 설명 |
 |:----:|------|------|------|
@@ -18,7 +18,7 @@
 
 ---
 
-## 🌟 시작하기 전에
+## [*] 시작하기 전에
 
 ### 왜 코드 정리가 중요한가?
 
@@ -36,29 +36,29 @@
 **좋은 프로젝트 vs 나쁜 프로젝트:**
 ```
 나쁜 예:
-├── test.py
-├── test2.py
-├── final_final.py
-├── untitled.ipynb
-└── (README 없음)
++-- test.py
++-- test2.py
++-- final_final.py
++-- untitled.ipynb
++-- (README 없음)
 
 좋은 예:
-├── README.md                  ← 프로젝트 설명
-├── requirements.txt           ← 의존성
-├── configs/                   ← 설정 파일
-├── src/
-│   ├── models/               ← 모델 정의
-│   ├── datasets/             ← 데이터 처리
-│   ├── evaluation/           ← 평가 코드
-│   └── visualization/        ← 시각화
-├── scripts/                   ← 실행 스크립트
-├── results/                   ← 결과 이미지
-└── docs/                      ← 추가 문서
++-- README.md                  ← 프로젝트 설명
++-- requirements.txt           ← 의존성
++-- configs/                   ← 설정 파일
++-- src/
+|   +-- models/               ← 모델 정의
+|   +-- datasets/             ← 데이터 처리
+|   +-- evaluation/           ← 평가 코드
+|   +-- visualization/        ← 시각화
++-- scripts/                   ← 실행 스크립트
++-- results/                   ← 결과 이미지
++-- docs/                      ← 추가 문서
 ```
 
 ---
 
-## 📚 핵심 개념 자세히 알아보기
+## [ref] 핵심 개념 자세히 알아보기
 
 ### 1. GitHub Repository 구조 설계
 
@@ -66,55 +66,55 @@
 
 ```
 camera-3d-perception/
-├── README.md                          # 프로젝트 메인 설명
-├── LICENSE                            # 라이선스
-├── requirements.txt                   # Python 의존성
-├── setup.py                           # 패키지 설치 (선택)
-├── .gitignore                         # Git 무시 파일
-│
-├── configs/                           # 설정 파일
-│   ├── fcos3d_kitti.py
-│   └── bevformer_nuscenes.py
-│
-├── src/                               # 소스 코드
-│   ├── __init__.py
-│   ├── models/                        # 모델 관련
-│   │   ├── __init__.py
-│   │   ├── fcos3d_wrapper.py
-│   │   └── bevformer_wrapper.py
-│   ├── datasets/                      # 데이터 처리
-│   │   ├── __init__.py
-│   │   ├── kitti_dataset.py
-│   │   └── nuscenes_dataset.py
-│   ├── evaluation/                    # 평가
-│   │   ├── __init__.py
-│   │   ├── metrics.py               # AP3D, NDS 계산
-│   │   └── analysis.py              # 오류 분석
-│   └── visualization/                # 시각화
-│       ├── __init__.py
-│       ├── draw_3d_bbox.py
-│       ├── bev_visualization.py
-│       └── bev_feature_viz.py
-│
-├── scripts/                          # 실행 스크립트
-│   ├── train.sh
-│   ├── test.sh
-│   └── visualize.sh
-│
-├── notebooks/                        # Jupyter 노트북
-│   ├── 01_kitti_exploration.ipynb
-│   ├── 02_3d_bbox_visualization.ipynb
-│   └── 03_bevformer_analysis.ipynb
-│
-├── results/                          # 결과물
-│   ├── images/                       # 시각화 결과
-│   ├── tables/                       # 성능 표
-│   └── logs/                         # 학습 로그
-│
-└── docs/                             # 추가 문서
-    ├── installation.md
-    ├── dataset_preparation.md
-    └── model_comparison.md
++-- README.md                          # 프로젝트 메인 설명
++-- LICENSE                            # 라이선스
++-- requirements.txt                   # Python 의존성
++-- setup.py                           # 패키지 설치 (선택)
++-- .gitignore                         # Git 무시 파일
+|
++-- configs/                           # 설정 파일
+|   +-- fcos3d_kitti.py
+|   +-- bevformer_nuscenes.py
+|
++-- src/                               # 소스 코드
+|   +-- __init__.py
+|   +-- models/                        # 모델 관련
+|   |   +-- __init__.py
+|   |   +-- fcos3d_wrapper.py
+|   |   +-- bevformer_wrapper.py
+|   +-- datasets/                      # 데이터 처리
+|   |   +-- __init__.py
+|   |   +-- kitti_dataset.py
+|   |   +-- nuscenes_dataset.py
+|   +-- evaluation/                    # 평가
+|   |   +-- __init__.py
+|   |   +-- metrics.py               # AP3D, NDS 계산
+|   |   +-- analysis.py              # 오류 분석
+|   +-- visualization/                # 시각화
+|       +-- __init__.py
+|       +-- draw_3d_bbox.py
+|       +-- bev_visualization.py
+|       +-- bev_feature_viz.py
+|
++-- scripts/                          # 실행 스크립트
+|   +-- train.sh
+|   +-- test.sh
+|   +-- visualize.sh
+|
++-- notebooks/                        # Jupyter 노트북
+|   +-- 01_kitti_exploration.ipynb
+|   +-- 02_3d_bbox_visualization.ipynb
+|   +-- 03_bevformer_analysis.ipynb
+|
++-- results/                          # 결과물
+|   +-- images/                       # 시각화 결과
+|   +-- tables/                       # 성능 표
+|   +-- logs/                         # 학습 로그
+|
++-- docs/                             # 추가 문서
+    +-- installation.md
+    +-- dataset_preparation.md
+    +-- model_comparison.md
 ```
 
 #### 1.2 .gitignore 설정
@@ -243,11 +243,11 @@ python src/evaluation/metrics.py --result_path results/predictions.json
 
 ```
 camera-3d-perception/
-├── src/           # 소스 코드
-├── configs/       # 설정 파일
-├── scripts/       # 실행 스크립트
-├── notebooks/     # 분석 노트북
-└── results/       # 결과물
++-- src/           # 소스 코드
++-- configs/       # 설정 파일
++-- scripts/       # 실행 스크립트
++-- notebooks/     # 분석 노트북
++-- results/       # 결과물
 ```
 
 ## 참고 자료
@@ -417,16 +417,16 @@ feature/xxx:
 ```
 코드 품질 체크리스트:
 
-□ 모든 함수에 docstring이 있는가?
-□ 주요 변수에 type hint가 있는가?
-□ 매직 넘버가 상수로 정의되어 있는가?
-□ 에러 처리(try-except)가 적절한가?
-□ 불필요한 주석이나 print문이 제거되었는가?
-□ import가 정리되어 있는가? (표준→서드파티→로컬 순)
-□ 파일/함수 이름이 직관적인가?
-□ 중복 코드가 없는가?
-□ README에 실행 방법이 명확한가?
-□ requirements.txt가 최신인가?
+[ ] 모든 함수에 docstring이 있는가?
+[ ] 주요 변수에 type hint가 있는가?
+[ ] 매직 넘버가 상수로 정의되어 있는가?
+[ ] 에러 처리(try-except)가 적절한가?
+[ ] 불필요한 주석이나 print문이 제거되었는가?
+[ ] import가 정리되어 있는가? (표준→서드파티→로컬 순)
+[ ] 파일/함수 이름이 직관적인가?
+[ ] 중복 코드가 없는가?
+[ ] README에 실행 방법이 명확한가?
+[ ] requirements.txt가 최신인가?
 ```
 
 #### 5.2 면접관 관점 체크
@@ -435,24 +435,24 @@ feature/xxx:
 면접관이 보는 것:
 
 1. README 품질:
-   □ 프로젝트 목적이 한 줄로 설명되는가?
-   □ 결과 이미지/GIF가 있는가?
-   □ 설치/실행이 즉시 가능한가?
+   [ ] 프로젝트 목적이 한 줄로 설명되는가?
+   [ ] 결과 이미지/GIF가 있는가?
+   [ ] 설치/실행이 즉시 가능한가?
 
 2. 코드 구조:
-   □ 폴더 구조가 체계적인가?
-   □ 모듈 분리가 적절한가?
-   □ 네이밍이 일관적인가?
+   [ ] 폴더 구조가 체계적인가?
+   [ ] 모듈 분리가 적절한가?
+   [ ] 네이밍이 일관적인가?
 
 3. 기술적 깊이:
-   □ 핵심 알고리즘을 이해하고 구현했는가?
-   □ 단순 복붙이 아닌 자체 구현이 있는가?
-   □ 오류 분석/개선 시도가 있는가?
+   [ ] 핵심 알고리즘을 이해하고 구현했는가?
+   [ ] 단순 복붙이 아닌 자체 구현이 있는가?
+   [ ] 오류 분석/개선 시도가 있는가?
 
 4. 실행 가능성:
-   □ 실제로 동작하는 코드인가?
-   □ 결과가 재현 가능한가?
-   □ 의존성이 명확한가?
+   [ ] 실제로 동작하는 코드인가?
+   [ ] 결과가 재현 가능한가?
+   [ ] 의존성이 명확한가?
 ```
 
 ---
@@ -499,7 +499,7 @@ feature/xxx:
 
 ---
 
-## 💡 꼭 이해해야 할 핵심 개념
+## [tip] 꼭 이해해야 할 핵심 개념
 
 ### 1. README가 면접의 첫인상
 
@@ -542,7 +542,7 @@ README = 프로젝트의 첫인상
 
 ---
 
-## 🔍 자체 점검 - 이해했는지 확인!
+## [search] 자체 점검 - 이해했는지 확인!
 
 **Q1. README에 결과 이미지가 중요한 이유는?**
 
@@ -562,7 +562,7 @@ README = 프로젝트의 첫인상
 
 ---
 
-## 📝 이번 주 실습 & 다음 주 준비
+## [note] 이번 주 실습 & 다음 주 준비
 
 ### 이번 주 실습 과제
 
@@ -583,7 +583,7 @@ README = 프로젝트의 첫인상
 
 ---
 
-## 🎯 이번 주 핵심 요약
+## [goal] 이번 주 핵심 요약
 
 1. **GitHub 저장소 구조**는 체계적인 폴더 구조, .gitignore, requirements.txt가 기본이다. 면접관은 구조만 봐도 코드 품질을 가늠한다.
 2. **README**는 프로젝트의 첫인상으로, 한 줄 설명 + 결과 이미지 + 설치/실행 방법이 필수이다. 30초 안에 핵심을 전달해야 한다.

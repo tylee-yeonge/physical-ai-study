@@ -1,12 +1,12 @@
 # Week 9: BEVFormer 이해 - 카메라로 Bird's Eye View 만들기
 
-> 🎯 **이번 주 목표**: BEVFormer의 전체 구조를 이해하고, Spatial Cross-Attention과 Temporal Self-Attention의 원리를 파악한다.
-> ⏰ **예상 시간**: 12-15시간
-> 💡 **핵심 질문**: "Multi-view 카메라 이미지로부터 어떻게 Bird's Eye View 표현을 생성하고, 시간 정보를 활용하는가?"
+> [goal] **이번 주 목표**: BEVFormer의 전체 구조를 이해하고, Spatial Cross-Attention과 Temporal Self-Attention의 원리를 파악한다.
+> [time] **예상 시간**: 12-15시간
+> [tip] **핵심 질문**: "Multi-view 카메라 이미지로부터 어떻게 Bird's Eye View 표현을 생성하고, 시간 정보를 활용하는가?"
 
 ---
 
-## 📋 학습 순서
+## [list] 학습 순서
 
 | 순서 | 단계 | 파일 | 설명 |
 |:----:|------|------|------|
@@ -18,18 +18,18 @@
 
 ---
 
-## 🌟 시작하기 전에
+## [*] 시작하기 전에
 
 ### Week 8에서 배운 것
 
 **BEV 개념 복습:**
 ```
 Side View (Camera):       BEV (Top-down):
-    │  🚗 │                  ┌─────────┐
-    │     │                  │    ▲    │
-    ├─────┤   ⇒              │    │    │
-  Road                       │  🚗    │
-                             └─────────┘
+    |  [car] |                  +---------+
+    |     |                  |    ^    |
+    +-----+   ⇒              |    |    |
+  Road                       |  [car]    |
+                             +---------+
 ```
 
 **BEV 생성 방법 분류:**
@@ -58,43 +58,43 @@ Multi-view 카메라 이미지에서 BEV 표현을 생성하는 모델이다.
 
 ---
 
-## 📚 핵심 개념 자세히 알아보기
+## [ref] 핵심 개념 자세히 알아보기
 
 ### 1. BEVFormer 전체 구조
 
 #### 파이프라인 개요
 
 ```
-┌───────────────────────────────────────────────────────────┐
-│                    BEVFormer Pipeline                      │
-│                                                           │
-│  Multi-view Images (6대 카메라)                            │
-│       ↓                                                   │
-│  Backbone (ResNet-101 / VoVNet)                           │
-│       ↓                                                   │
-│  FPN (Feature Pyramid Network)                            │
-│       ↓                                                   │
-│  Multi-scale Image Features                               │
-│       ↓                                                   │
-│  ┌─────────────────────────────────────────────────┐      │
-│  │          BEV Encoder (6 layers)                 │      │
-│  │                                                 │      │
-│  │  BEV Queries (200×200)                         │      │
-│  │       ↓                                         │      │
-│  │  Temporal Self-Attention ← 이전 프레임 BEV      │      │
-│  │       ↓                                         │      │
-│  │  Spatial Cross-Attention ← Image Features       │      │
-│  │       ↓                                         │      │
-│  │  Feed Forward Network                           │      │
-│  │                                                 │      │
-│  └─────────────────────────────────────────────────┘      │
-│       ↓                                                   │
-│  BEV Feature Map (200×200×256)                            │
-│       ↓                                                   │
-│  Detection Head (3D bbox + Velocity)                      │
-│       ↓                                                   │
-│  Output: [x, y, z, l, w, h, θ, vx, vy]                  │
-└───────────────────────────────────────────────────────────┘
++-----------------------------------------------------------+
+|                    BEVFormer Pipeline                      |
+|                                                           |
+|  Multi-view Images (6대 카메라)                            |
+|       ↓                                                   |
+|  Backbone (ResNet-101 / VoVNet)                           |
+|       ↓                                                   |
+|  FPN (Feature Pyramid Network)                            |
+|       ↓                                                   |
+|  Multi-scale Image Features                               |
+|       ↓                                                   |
+|  +-------------------------------------------------+      |
+|  |          BEV Encoder (6 layers)                 |      |
+|  |                                                 |      |
+|  |  BEV Queries (200×200)                         |      |
+|  |       ↓                                         |      |
+|  |  Temporal Self-Attention ← 이전 프레임 BEV      |      |
+|  |       ↓                                         |      |
+|  |  Spatial Cross-Attention ← Image Features       |      |
+|  |       ↓                                         |      |
+|  |  Feed Forward Network                           |      |
+|  |                                                 |      |
+|  +-------------------------------------------------+      |
+|       ↓                                                   |
+|  BEV Feature Map (200×200×256)                            |
+|       ↓                                                   |
+|  Detection Head (3D bbox + Velocity)                      |
+|       ↓                                                   |
+|  Output: [x, y, z, l, w, h, θ, vx, vy]                  |
++-----------------------------------------------------------+
 ```
 
 #### 논문 정보
@@ -125,23 +125,23 @@ BEV Queries:
   - 커버 범위: 100m × 100m (200 × 0.5m)
   - 종류: Learnable Embedding (학습으로 최적화)
 
-┌─────────────────────────────────────────┐
-│  BEV Query Grid (200 × 200)             │
-│                                         │
-│  ┌───┬───┬───┬───┬─ ─ ─┬───┐           │
-│  │q₀₀│q₀₁│q₀₂│q₀₃│     │q₀,₁₉₉│      │
-│  ├───┼───┼───┼───┤     ├───┤           │
-│  │q₁₀│q₁₁│   │   │     │   │           │
-│  ├───┼───┤   │   │     │   │           │
-│  │   │   │   │   │     │   │           │
-│  │   │   │   │   │     │   │           │
-│  ├───┼───┼───┼───┤     ├───┤           │
-│  │q₁₉₉,₀│  │   │     │q₁₉₉,₁₉₉│     │
-│  └───┴───┴───┴───┴─ ─ ─┴───┘           │
-│                                         │
-│  각 qᵢⱼ ∈ ℝ²⁵⁶ (256차원 벡터)          │
-│  각 셀 = 0.5m × 0.5m 물리 공간          │
-└─────────────────────────────────────────┘
++-----------------------------------------+
+|  BEV Query Grid (200 × 200)             |
+|                                         |
+|  +---+---+---+---+- - -+---+           |
+|  |q₀₀|q₀₁|q₀₂|q₀₃|     |q₀,₁₉₉|      |
+|  +---+---+---+---+     +---+           |
+|  |q₁₀|q₁₁|   |   |     |   |           |
+|  +---+---+   |   |     |   |           |
+|  |   |   |   |   |     |   |           |
+|  |   |   |   |   |     |   |           |
+|  +---+---+---+---+     +---+           |
+|  |q₁₉₉,₀|  |   |     |q₁₉₉,₁₉₉|     |
+|  +---+---+---+---+- - -+---+           |
+|                                         |
+|  각 qᵢⱼ ∈ ℝ²⁵⁶ (256차원 벡터)          |
+|  각 셀 = 0.5m × 0.5m 물리 공간          |
++-----------------------------------------+
 ```
 
 #### BEV Query의 직관적 이해
@@ -226,17 +226,17 @@ Deformable Attention:
   Reference Point 주변 K개 점에 대해서만 attention
   → 효율적! (O(K), K ≈ 4~8)
 
-┌────────────────────────────────┐
-│  Image Feature Map             │
-│                                │
-│           ○  ○                 │
-│         ○  ●  ○               │
-│           ○  ○                 │
-│                                │
-│  ● = Reference Point           │
-│  ○ = Learnable Offset Points  │
-│  (학습으로 최적 위치 결정)      │
-└────────────────────────────────┘
++--------------------------------+
+|  Image Feature Map             |
+|                                |
+|           o  o                 |
+|         o  *  o               |
+|           o  o                 |
+|                                |
+|  * = Reference Point           |
+|  o = Learnable Offset Points  |
+|  (학습으로 최적 위치 결정)      |
++--------------------------------+
 ```
 
 #### 수식
@@ -271,11 +271,11 @@ SpatialCrossAttention(Q_p, F_cam):
 문제 상황:
 
 Frame t:                      Frame t-1:
-┌──────────────┐              ┌──────────────┐
-│    🚗        │              │  🚗          │
-│  (가려짐!)   │              │ (잘 보임!)   │
-│    🚛       │              │   🚛         │
-└──────────────┘              └──────────────┘
++--------------+              +--------------+
+|    [car]        |              |  [car]          |
+|  (가려짐!)   |              | (잘 보임!)   |
+|    [truck]       |              |   [truck]         |
++--------------+              +--------------+
 
 → 현재 프레임에서 가려진 차량도
   이전 프레임 정보로 검출 가능!
@@ -298,19 +298,19 @@ Step 2: Ego-motion으로 좌표 정렬
 Step 3: 현재 BEV Query와 정렬된 이전 BEV를 합침
         output = SelfAttention(Q_t, concat(Q_t, B_{t-1}'))
 
-┌─────────────────────────────────────────────┐
-│                                             │
-│  Q_t (현재 BEV Query)                       │
-│       ↓                                     │
-│  Self-Attention                             │
-│       ↑                                     │
-│  [Q_t, warp(B_{t-1})] (concat)             │
-│                                             │
-│  warp: ego-motion으로 좌표 정렬              │
-│    - 차량이 앞으로 1m 이동했으면              │
-│    - 이전 BEV를 1m 만큼 shift               │
-│                                             │
-└─────────────────────────────────────────────┘
++---------------------------------------------+
+|                                             |
+|  Q_t (현재 BEV Query)                       |
+|       ↓                                     |
+|  Self-Attention                             |
+|       ↑                                     |
+|  [Q_t, warp(B_{t-1})] (concat)             |
+|                                             |
+|  warp: ego-motion으로 좌표 정렬              |
+|    - 차량이 앞으로 1m 이동했으면              |
+|    - 이전 BEV를 1m 만큼 shift               |
+|                                             |
++---------------------------------------------+
 ```
 
 #### Ego-motion 보상
@@ -319,12 +319,12 @@ Step 3: 현재 BEV Query와 정렬된 이전 BEV를 합침
 왜 필요한가?
 
 t-1 시점:                 t 시점:
-  ┌─────────┐              ┌─────────┐
-  │  A       │              │         │
-  │    ego→  │              │    ego  │
-  │  B       │     →        │  A      │
-  └─────────┘              │  B      │
-                           └─────────┘
+  +---------+              +---------+
+  |  A       |              |         |
+  |    ego→  |              |    ego  |
+  |  B       |     →        |  A      |
+  +---------+              |  B      |
+                           +---------+
 
 ego-motion 없이 합치면 → A, B 위치가 어긋남!
 ego-motion으로 보정 후 합치면 → 정확한 정렬!
@@ -358,22 +358,22 @@ nuScenes 기준 출력:
 #### Detection Head 구조
 
 ```
-┌───────────────────────────────────────┐
-│  Detection Head (DETR style)          │
-│                                       │
-│  Object Queries (900개)               │
-│       ↓                               │
-│  Decoder (6 layers)                   │
-│       ↓                               │
-│  ├── Classification Head → 클래스     │
-│  ├── Regression Head → 3D bbox       │
-│  └── Velocity Head → vx, vy         │
-│                                       │
-│  Loss:                                │
-│  - Classification: Focal Loss        │
-│  - Regression: L1 Loss               │
-│  - Hungarian Matching (GT 매칭)      │
-└───────────────────────────────────────┘
++---------------------------------------+
+|  Detection Head (DETR style)          |
+|                                       |
+|  Object Queries (900개)               |
+|       ↓                               |
+|  Decoder (6 layers)                   |
+|       ↓                               |
+|  +-- Classification Head → 클래스     |
+|  +-- Regression Head → 3D bbox       |
+|  +-- Velocity Head → vx, vy         |
+|                                       |
+|  Loss:                                |
+|  - Classification: Focal Loss        |
+|  - Regression: L1 Loss               |
+|  - Hungarian Matching (GT 매칭)      |
++---------------------------------------+
 ```
 
 ---
@@ -463,15 +463,15 @@ nuScenes 기준 출력:
 ### 8. BEVFormer vs 다른 BEV 방법론 비교
 
 ```
-┌──────────────┬────────────┬──────────────┬────────────┐
-│ 방법          │ BEV 생성    │ Temporal     │ NDS        │
-├──────────────┼────────────┼──────────────┼────────────┤
-│ DETR3D       │ Query→3D   │ ✗           │ 0.412      │
-│ PETR         │ 3D PE      │ ✗           │ 0.455      │
-│ BEVDet       │ Lift-Splat │ ✗           │ 0.392      │
-│ BEVFormer    │ Query+Attn │ ✓           │ 0.517      │
-│ BEVFormer v2 │ 개선 버전   │ ✓           │ 0.556      │
-└──────────────┴────────────┴──────────────┴────────────┘
++--------------+------------+--------------+------------+
+| 방법          | BEV 생성    | Temporal     | NDS        |
++--------------+------------+--------------+------------+
+| DETR3D       | Query→3D   | [x]           | 0.412      |
+| PETR         | 3D PE      | [x]           | 0.455      |
+| BEVDet       | Lift-Splat | [x]           | 0.392      |
+| BEVFormer    | Query+Attn | [v]           | 0.517      |
+| BEVFormer v2 | 개선 버전   | [v]           | 0.556      |
++--------------+------------+--------------+------------+
 
 BEVFormer의 핵심 차별점:
   1. Explicit Depth 예측 불필요 (vs BEVDet)
@@ -481,7 +481,7 @@ BEVFormer의 핵심 차별점:
 
 ---
 
-## 💡 꼭 이해해야 할 핵심 개념
+## [tip] 꼭 이해해야 할 핵심 개념
 
 ### 1. BEV Query의 역할
 
@@ -539,7 +539,7 @@ K = 4~8: Reference Point 주변에서 가장 유용한 점을 학습
 
 ---
 
-## 🔍 자체 점검 - 이해했는지 확인!
+## [search] 자체 점검 - 이해했는지 확인!
 
 **Q1. BEV Queries의 크기가 200x200이고 셀 크기가 0.5m일 때, 커버하는 실제 범위는?**
 
@@ -559,7 +559,7 @@ K = 4~8: Reference Point 주변에서 가장 유용한 점을 학습
 
 ---
 
-## 📝 이번 주 실습 & 다음 주 준비
+## [note] 이번 주 실습 & 다음 주 준비
 
 ### 이번 주 실습 과제
 
@@ -579,7 +579,7 @@ K = 4~8: Reference Point 주변에서 가장 유용한 점을 학습
 
 ---
 
-## 🎯 이번 주 핵심 요약
+## [goal] 이번 주 핵심 요약
 
 1. **BEVFormer**는 Transformer 기반으로 Multi-view 이미지에서 BEV 표현을 생성하는 모델이며, ECCV 2022에서 발표되었다.
 2. **BEV Queries**는 200x200 그리드의 learnable embedding으로, BEV 공간의 각 셀을 대표하며 0.5m 해상도로 100m x 100m 영역을 커버한다.
@@ -589,6 +589,6 @@ K = 4~8: Reference Point 주변에서 가장 유용한 점을 학습
 
 ---
 
-✅ 이전: [Week 8 - BEV 개념 이해](../week8/README.md)
+[O] 이전: [Week 8 - BEV 개념 이해](../week8/README.md)
 
 다음: [Week 10 - BEVFormer 실습](../week10/README.md)

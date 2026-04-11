@@ -1,12 +1,12 @@
 # Week 5: MMDetection3D 실습 - KITTI 3D Detection 프레임워크
 
-> 🎯 **이번 주 목표**: MMDetection3D 환경을 세팅하고, KITTI 데이터셋에서 FCOS3D 모델을 학습시켜 3D 객체 검출 결과를 시각화하고 평가한다.
-> ⏰ **예상 시간**: 12-15시간
-> 💡 **핵심 질문**: "카메라 한 장으로 3D 바운딩 박스를 예측하는 모델을 직접 학습시키고 평가할 수 있는가?"
+> [goal] **이번 주 목표**: MMDetection3D 환경을 세팅하고, KITTI 데이터셋에서 FCOS3D 모델을 학습시켜 3D 객체 검출 결과를 시각화하고 평가한다.
+> [time] **예상 시간**: 12-15시간
+> [tip] **핵심 질문**: "카메라 한 장으로 3D 바운딩 박스를 예측하는 모델을 직접 학습시키고 평가할 수 있는가?"
 
 ---
 
-## 📋 학습 순서
+## [list] 학습 순서
 
 | 순서 | 단계 | 파일 | 설명 |
 |:----:|------|------|------|
@@ -18,18 +18,18 @@
 
 ---
 
-## 🌟 시작하기 전에
+## [*] 시작하기 전에
 
 ### Week 3-4에서 배운 것
 
 **KITTI 데이터셋 구조:**
 ```
 KITTI/
-├── training/
-│   ├── image_2/      # 왼쪽 카메라 이미지
-│   ├── calib/        # 캘리브레이션 파라미터
-│   └── label_2/      # 3D bbox 레이블 [h,w,l,x,y,z,ry]
-└── testing/
++-- training/
+|   +-- image_2/      # 왼쪽 카메라 이미지
+|   +-- calib/        # 캘리브레이션 파라미터
+|   +-- label_2/      # 3D bbox 레이블 [h,w,l,x,y,z,ry]
++-- testing/
 ```
 
 **Monocular 3D Detection의 핵심:**
@@ -40,18 +40,18 @@ KITTI/
 
 **하지만 궁금하지 않았나요?**
 ```
-❓ 실제로 모델을 학습시키려면 어떤 프레임워크를 써야 하지?
-❓ MMDetection3D의 Config 시스템은 어떻게 동작하지?
-❓ 학습 결과를 어떻게 평가하고 시각화하지?
+[?] 실제로 모델을 학습시키려면 어떤 프레임워크를 써야 하지?
+[?] MMDetection3D의 Config 시스템은 어떻게 동작하지?
+[?] 학습 결과를 어떻게 평가하고 시각화하지?
 ```
 
 **이번 주에 직접 해봅니다!**
 
-> 💼 **포트폴리오 관점**: MMDetection3D는 자율주행/로봇 분야에서 표준 프레임워크입니다. 이 프레임워크 사용 경험은 면접에서 큰 강점이 됩니다.
+>  **포트폴리오 관점**: MMDetection3D는 자율주행/로봇 분야에서 표준 프레임워크입니다. 이 프레임워크 사용 경험은 면접에서 큰 강점이 됩니다.
 
 ---
 
-## 📚 핵심 개념 자세히 알아보기
+## [ref] 핵심 개념 자세히 알아보기
 
 ### 1. MMDetection3D 프레임워크 소개
 
@@ -71,29 +71,29 @@ MMDetection3D는 OpenMMLab에서 개발한 **3D 객체 검출 오픈소스 프�
 
 ```
 MMDetection3D 구조:
-┌─────────────────────────────────────────┐
-│                Config (.py)              │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐ │
-│  │ Backbone │→│   Neck   │→│   Head   │ │
-│  │ (ResNet) │ │  (FPN)   │ │(FCOS3D)  │ │
-│  └──────────┘ └──────────┘ └──────────┘ │
-│       ↑                          ↓       │
-│  ┌──────────┐            ┌──────────┐   │
-│  │ Dataset  │            │  Loss    │   │
-│  │ (KITTI)  │            │(Focal+L1)│   │
-│  └──────────┘            └──────────┘   │
-└─────────────────────────────────────────┘
++-----------------------------------------+
+|                Config (.py)              |
+|  +----------+ +----------+ +----------+ |
+|  | Backbone |→|   Neck   |→|   Head   | |
+|  | (ResNet) | |  (FPN)   | |(FCOS3D)  | |
+|  +----------+ +----------+ +----------+ |
+|       ↑                          ↓       |
+|  +----------+            +----------+   |
+|  | Dataset  |            |  Loss    |   |
+|  | (KITTI)  |            |(Focal+L1)|   |
+|  +----------+            +----------+   |
++-----------------------------------------+
 ```
 
 #### 1.3 OpenMMLab 생태계
 
 ```
 OpenMMLab 생태계:
-├── mmcv          # 기본 유틸리티 (Config, Registry, Runner)
-├── mmdet         # 2D Detection (YOLO, Faster R-CNN 등)
-├── mmdet3d       # 3D Detection (FCOS3D, BEVFormer 등)
-├── mmseg         # Segmentation
-└── mmengine      # 학습 엔진 (v2.0+)
++-- mmcv          # 기본 유틸리티 (Config, Registry, Runner)
++-- mmdet         # 2D Detection (YOLO, Faster R-CNN 등)
++-- mmdet3d       # 3D Detection (FCOS3D, BEVFormer 등)
++-- mmseg         # Segmentation
++-- mmengine      # 학습 엔진 (v2.0+)
 ```
 
 ---
@@ -129,7 +129,7 @@ python -c "import mmdet3d; print(mmdet3d.__version__)"
 #### 2.2 버전 호환성 (중요!)
 
 ```
-⚠️ 버전 매칭이 매우 중요합니다!
+[!] 버전 매칭이 매우 중요합니다!
 
 Python:    3.8
 PyTorch:   1.13.1
@@ -170,7 +170,7 @@ FCOS3D는 **Fully Convolutional One-Stage 3D Detection** 모델입니다.
 
 ```
 FCOS (2D)                    FCOS3D (3D)
-──────                       ─────────
+------                       ---------
 이미지 → 2D bbox             이미지 → 3D bbox
 [x, y, w, h, cls]           [x, y, z, l, w, h, θ, cls]
                               ↑ Depth 추정 추가!
@@ -185,16 +185,16 @@ ResNet-101 (Backbone)
     ↓
 FPN (Feature Pyramid Network)
     ↓ Multi-scale features
-┌──────────────────────────────┐
-│         FCOS3D Head          │
-├──────────┬───────────────────┤
-│ 분류 분기 │    회귀 분기      │
-│  (cls)   │ offset(2D)       │
-│          │ depth(z)          │
-│          │ size(l,w,h)       │
-│          │ rotation(sin,cos) │
-│          │ velocity(vx,vy)   │
-└──────────┴───────────────────┘
++------------------------------+
+|         FCOS3D Head          |
++----------+-------------------+
+| 분류 분기 |    회귀 분기      |
+|  (cls)   | offset(2D)       |
+|          | depth(z)          |
+|          | size(l,w,h)       |
+|          | rotation(sin,cos) |
+|          | velocity(vx,vy)   |
++----------+-------------------+
 ```
 
 #### 3.3 핵심: Depth 예측
@@ -233,15 +233,15 @@ python tools/create_data.py kitti \
 
 ```
 data/kitti/
-├── training/
-│   ├── image_2/
-│   ├── calib/
-│   └── label_2/
-├── testing/
-├── kitti_infos_train.pkl      # ← 생성됨
-├── kitti_infos_val.pkl        # ← 생성됨
-├── kitti_infos_trainval.pkl   # ← 생성됨
-└── kitti_infos_test.pkl       # ← 생성됨
++-- training/
+|   +-- image_2/
+|   +-- calib/
+|   +-- label_2/
++-- testing/
++-- kitti_infos_train.pkl      # ← 생성됨
++-- kitti_infos_val.pkl        # ← 생성됨
++-- kitti_infos_trainval.pkl   # ← 생성됨
++-- kitti_infos_test.pkl       # ← 생성됨
 ```
 
 #### 4.3 데이터 포맷 확인
@@ -301,14 +301,14 @@ data = dict(
 
 ```
 Config 구조:
-├── model          # 모델 아키텍처 (backbone, neck, head)
-├── dataset_type   # 데이터셋 종류 (KittiMonoDataset)
-├── data_root      # 데이터 경로
-├── data           # train/val/test 데이터 설정
-├── optimizer      # 옵티마이저 (SGD, AdamW)
-├── lr_config      # 학습률 스케줄러
-├── runner         # 학습 반복 설정 (epoch, max_epochs)
-└── evaluation     # 평가 주기 및 메트릭
++-- model          # 모델 아키텍처 (backbone, neck, head)
++-- dataset_type   # 데이터셋 종류 (KittiMonoDataset)
++-- data_root      # 데이터 경로
++-- data           # train/val/test 데이터 설정
++-- optimizer      # 옵티마이저 (SGD, AdamW)
++-- lr_config      # 학습률 스케줄러
++-- runner         # 학습 반복 설정 (epoch, max_epochs)
++-- evaluation     # 평가 주기 및 메트릭
 ```
 
 ---
@@ -352,7 +352,7 @@ GPU: RTX 4090 (24GB)
 배치: 4/GPU
 학습 시간: ~8시간
 
-⚠️ Pretrained weights 사용 시 훨씬 빠름!
+[!] Pretrained weights 사용 시 훨씬 빠름!
 ```
 
 ---
@@ -412,13 +412,13 @@ def draw_3d_bbox(img, corners_2d, color=(0, 255, 0)):
 AP3D = 3D 공간에서의 정밀도-재현율 곡선 아래 면적
 
 평가 기준:
-┌──────────────────────────────────────────┐
-│  난이도     │ 기준                        │
-├──────────────────────────────────────────┤
-│  Easy      │ 크고, 안 가려진 객체         │
-│  Moderate  │ 중간 크기, 부분 가려짐       │
-│  Hard      │ 작고, 많이 가려진 객체        │
-└──────────────────────────────────────────┘
++------------------------------------------+
+|  난이도     | 기준                        |
++------------------------------------------+
+|  Easy      | 크고, 안 가려진 객체         |
+|  Moderate  | 중간 크기, 부분 가려짐       |
+|  Hard      | 작고, 많이 가려진 객체        |
++------------------------------------------+
 
 IoU Threshold:
 - Car: 0.7 (매우 엄격)
@@ -447,15 +447,15 @@ AP3D: 3D bbox IoU로 평가
 
 ```
 KITTI Car Moderate AP3D (2024 기준):
-┌────────────────────────────────────┐
-│ 방법            │ AP3D (Moderate) │
-├────────────────────────────────────┤
-│ FCOS3D          │ ~12%            │
-│ MonoDLE         │ ~17%            │
-│ MonoFlex        │ ~19%            │
-│ GUPNet          │ ~22%            │
-│ MonoDETR (SOTA) │ ~25%            │
-└────────────────────────────────────┘
++------------------------------------+
+| 방법            | AP3D (Moderate) |
++------------------------------------+
+| FCOS3D          | ~12%            |
+| MonoDLE         | ~17%            |
+| MonoFlex        | ~19%            |
+| GUPNet          | ~22%            |
+| MonoDETR (SOTA) | ~25%            |
++------------------------------------+
 
 → Monocular 특성상 AP3D 15% 이상이면 성공적!
 → LiDAR 기반은 80%+ (센서 차이)
@@ -463,7 +463,7 @@ KITTI Car Moderate AP3D (2024 기준):
 
 ---
 
-## 💡 꼭 이해해야 할 핵심 개념
+## [tip] 꼭 이해해야 할 핵심 개념
 
 ### 1. MMDetection3D Config 시스템
 
@@ -480,15 +480,15 @@ _base_: 기본 설정 상속
 
 ```
 FCOS3D는 하나의 네트워크에서 동시에 예측:
-┌─────────────────────────────┐
-│ Task          │ Output      │
-├─────────────────────────────┤
-│ Classification│ cls score   │
-│ 2D offset     │ (dx, dy)    │
-│ Depth         │ z           │
-│ Size          │ (l, w, h)   │
-│ Rotation      │ (sin θ, cos θ) │
-└─────────────────────────────┘
++-----------------------------+
+| Task          | Output      |
++-----------------------------+
+| Classification| cls score   |
+| 2D offset     | (dx, dy)    |
+| Depth         | z           |
+| Size          | (l, w, h)   |
+| Rotation      | (sin θ, cos θ) |
++-----------------------------+
 
 → 각 Task의 Loss를 합산하여 학습
 → Loss 가중치 조절이 성능에 큰 영향
@@ -508,7 +508,7 @@ KITTI 평가:
 
 ---
 
-## 🔍 자체 점검 - 이해했는지 확인!
+## [search] 자체 점검 - 이해했는지 확인!
 
 **Q1. MMDetection3D에서 openmim의 역할은 무엇인가?**
 > openmim은 OpenMMLab 패키지 간의 버전 호환성을 자동으로 관리해주는 패키지 매니저입니다. `mim install mmcv-full`처럼 사용하면 현재 설치된 PyTorch와 호환되는 mmcv 버전을 자동으로 찾아 설치합니다.
@@ -524,7 +524,7 @@ KITTI 평가:
 
 ---
 
-## 📝 이번 주 실습 & 다음 주 준비
+## [note] 이번 주 실습 & 다음 주 준비
 
 ### 이번 주 실습 과제
 
@@ -545,7 +545,7 @@ KITTI 평가:
 
 ---
 
-## 🎯 이번 주 핵심 요약
+## [goal] 이번 주 핵심 요약
 
 1. **MMDetection3D**는 OpenMMLab의 3D 검출 프레임워크로, Config 기반의 모듈화된 구조를 제공한다.
 2. **openmim**으로 설치하면 버전 호환성 문제를 줄일 수 있다. 버전 매칭은 매우 중요하다.
@@ -555,6 +555,6 @@ KITTI 평가:
 
 ---
 
-✅ 이전: [Week 4 - Monocular 3D Detection 모델](../week4/README.md)
+[O] 이전: [Week 4 - Monocular 3D Detection 모델](../week4/README.md)
 
 다음: [Week 6 - 성능 분석 및 개선](../week6/README.md)

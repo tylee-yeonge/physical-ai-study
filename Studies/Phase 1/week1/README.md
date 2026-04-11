@@ -1,6 +1,6 @@
 # 선형대수의 본질 (Essence of Linear Algebra) - 3Blue1Brown
 
-## 📌 개요
+## [pin] 개요
 
 이 섹션은 3Blue1Brown의 **"Essence of Linear Algebra"** 시리즈를 통해 선형대수학의 핵심 개념을 **시각적이고 직관적으로** 이해하는 것을 목표로 합니다. 전통적인 수식 중심 접근과 달리, 기하학적 관점에서 선형대수를 이해함으로써 Visual SLAM의 수학적 기초를 탄탄히 다질 수 있습니다.
 
@@ -8,7 +8,7 @@
 
 ---
 
-## 📋 학습 순서
+## [list] 학습 순서
 
 | 순서 | 단계 | 파일 | 설명 |
 |:----:|------|------|------|
@@ -17,7 +17,7 @@
 
 ---
 
-## 🎯 학습 목표
+## [goal] 학습 목표
 
 Visual SLAM에 필수적인 다음 개념들을 **기하학적 직관**을 중심으로 이해합니다:
 
@@ -26,7 +26,7 @@ Visual SLAM에 필수적인 다음 개념들을 **기하학적 직관**을 중�
 - 고유값/고유벡터 직관 얻기
 - 내적과 외적의 의미 파악하기
 
-## 📚 사전 지식
+## [ref] 사전 지식
 
 ### 필수 사항
 - **기초 수학**: 고등학교 수준의 대수학 (방정식, 함수 개념)
@@ -40,19 +40,19 @@ Visual SLAM에 필수적인 다음 개념들을 **기하학적 직관**을 중�
 > [!NOTE]
 > 이 시리즈는 수학적 엄밀함보다는 **직관적 이해**에 중점을 두므로, 고급 수학 지식이 없어도 학습 가능합니다.
 
-## ⏱️ 예상 학습 시간
+## [time] 예상 학습 시간
 
 - **전체 동영상 시청**: 약 3-4시간
 - **개념 정리 및 실습**: 약 4-6시간
 - **총 소요 시간**: **1-2주** (하루 1-2시간 학습 기준)
 
-## 🎬 공식 자료
+## [video] 공식 자료
 
 - **YouTube 재생목록**: [Essence of Linear Algebra](https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab)
 - **공식 웹사이트**: [3Blue1Brown](https://www.3blue1brown.com/)
 - **한글 자막**: YouTube에서 한글 자막(CC) 제공
 
-## 📖 주요 학습 내용
+## [ref] 주요 학습 내용
 
 ### 1. 벡터와 선형 결합
 - 벡터의 기하학적 의미 (위치 vs 방향)
@@ -107,7 +107,7 @@ Visual SLAM에 필수적인 다음 개념들을 **기하학적 직관**을 중�
 > [!TIP]
 > 각 챕터를 완료한 후에는 해당 개념을 자신만의 언어로 설명해보거나, Python/MATLAB으로 직접 구현해보는 것을 추천합니다.
 
-## �💡 학습 팁
+## �[tip] 학습 팁
 
 1. **각 영상을 2번 이상 시청하세요**
    - 1회: 전체 흐름 파악
@@ -138,13 +138,13 @@ Visual SLAM에 필수적인 다음 개념들을 **기하학적 직관**을 중�
    - 각 개념이 Visual SLAM의 어떤 부분에 사용되는지 생각해보세요
    - 예: 고유값 분해 → 공분산 행렬 분석 → 불확실성 표현
 
-## 🔗 관련 자료
+## [link] 관련 자료
 
 - **연습 문제**: [3Blue1Brown 공식 연습 문제](https://www.3blue1brown.com/lessons/eola-preview)
 - **보충 자료**: Khan Academy - [Linear Algebra](https://www.khanacademy.org/math/linear-algebra)
 - **추천 교재**: "Linear Algebra and Its Applications" by Gilbert Strang
 
-## ✅ 학습 완료 체크리스트
+## [O] 학습 완료 체크리스트
 
 다음 질문에 답할 수 있다면 이 섹션을 완료한 것입니다:
 

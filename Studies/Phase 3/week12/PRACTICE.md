@@ -1,12 +1,12 @@
 # Week 12 실습: 최종 데모 - 최적화 & 포트폴리오 (Python)
 
-> 🎯 **목표**: 전체 파이프라인 최적화, 성능 목표 달성, 포트폴리오 정리
-> 💻 **언어**: Python (PyTorch, OpenCV, NumPy)
-> ⏰ **예상 시간**: 12시간
+> [goal] **목표**: 전체 파이프라인 최적화, 성능 목표 달성, 포트폴리오 정리
+> [code] **언어**: Python (PyTorch, OpenCV, NumPy)
+> [time] **예상 시간**: 12시간
 
 ---
 
-## 📋 실습 개요
+## [list] 실습 개요
 
 | Step | 내용 | 난이도 | 시간 |
 |------|------|--------|------|
@@ -18,7 +18,7 @@
 
 ---
 
-## 🔧 환경 설정
+## [tool] 환경 설정
 
 ```bash
 # 가상환경 활성화
@@ -74,7 +74,7 @@ class PipelineBenchmark:
             print(f"  {stage:>20}: {avg:7.2f} ms (±{std:.2f}) {bar}")
 
         fps = 1000.0 / total_avg if total_avg > 0 else 0
-        print(f"  {'─' * 55}")
+        print(f"  {'-' * 55}")
         print(f"  {'합계':>20}: {total_avg:7.2f} ms")
         print(f"  {'FPS':>20}: {fps:7.1f}")
         print()
@@ -103,7 +103,7 @@ def simulate_pipeline_benchmark(num_frames=50):
     benchmark = PipelineBenchmark()
 
     print(f"벤치마크 시작: {num_frames}프레임")
-    print(f"{'─' * 40}")
+    print(f"{'-' * 40}")
 
     for i in range(num_frames):
         # 이미지 캡처 시뮬레이션
@@ -277,7 +277,7 @@ def analyze_resolution_tradeoff():
     ]
 
     print(f"\n  {'해상도':>10} | {'추론시간':>8} | {'FPS':>5} | {'AbsRel':>8} | 적합성")
-    print(f"  {'─' * 55}")
+    print(f"  {'-' * 55}")
 
     for name, h, w, ms, absrel in configs:
         fps = 1000.0 / ms
@@ -333,7 +333,7 @@ def generate_final_report():
     }
 
     print(f"\n  {'항목':>15} | {'결과':>8} | {'목표':>8} | 달성")
-    print(f"  {'─' * 50}")
+    print(f"  {'-' * 50}")
 
     all_passed = True
     for name, data in results.items():
@@ -353,7 +353,7 @@ def generate_final_report():
 
         print(f"  {name:>15} | {val:>6.2f}{unit:>2} | {target:>6.2f}{unit:>2} | {status}")
 
-    print(f"  {'─' * 50}")
+    print(f"  {'-' * 50}")
     if all_passed:
         print(f"  전체 결과: 모든 목표 달성!")
     else:
@@ -594,7 +594,7 @@ if __name__ == "__main__":
 
 ---
 
-## ✅ 실습 체크리스트
+## [O] 실습 체크리스트
 
 ### Step 1: 벤치마크
 - [ ] 전체 파이프라인 시간 측정 완료
@@ -623,7 +623,7 @@ if __name__ == "__main__":
 
 ---
 
-## 💡 트러블슈팅
+## [tip] 트러블슈팅
 
 ### 병렬 실행이 빨라지지 않을 때
 
@@ -649,7 +649,7 @@ if __name__ == "__main__":
 
 ---
 
-## 🔗 참고 자료
+## [link] 참고 자료
 
 - [TensorRT 최적화 가이드](https://developer.nvidia.com/tensorrt)
 - [Jetson 성능 튜닝](https://developer.nvidia.com/embedded/jetson-orin-nano)

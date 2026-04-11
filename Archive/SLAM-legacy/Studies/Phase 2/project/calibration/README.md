@@ -1,33 +1,33 @@
 # Camera Calibration (카메라 캘리브레이션)
 
-## 📌 개요
+## [pin] 개요
 
-> 🎯 **목표**: 체스보드 패턴으로 카메라 내부 파라미터(K)와 왜곡 계수 추정
-> 💻 **언어**: C++ (OpenCV 4.x)
-> 🛠️ **하드웨어**: MacBook 내장 카메라 또는 Jetson + ELP Stereo
+> [goal] **목표**: 체스보드 패턴으로 카메라 내부 파라미터(K)와 왜곡 계수 추정
+> [code] **언어**: C++ (OpenCV 4.x)
+> [tool] **하드웨어**: MacBook 내장 카메라 또는 Jetson + ELP Stereo
 
 카메라 캘리브레이션은 Visual SLAM의 첫 단계입니다. 카메라가 세상을 어떻게 투영하는지(초점 거리, 주점, 왜곡)를 알아야 정확한 3D 복원이 가능합니다.
 
 ---
 
-## 🔧 프로젝트 구조
+## [tool] 프로젝트 구조
 
 ```
 calibration/
-├── CMakeLists.txt
-├── include/
-│   └── camera_calibration.hpp   # CameraCalibration 클래스
-├── src/
-│   ├── camera_calibration.cpp   # 체스보드 검출, 캘리브레이션, 저장
-│   ├── mono_calib.cpp           # 단일 카메라 캘리브레이션 (main)
-│   └── stereo_calib.cpp         # 스테레오 캘리브레이션 (TODO)
-└── data/
-    └── macbook_calib.yaml       # 캘리브레이션 결과 예시
++-- CMakeLists.txt
++-- include/
+|   +-- camera_calibration.hpp   # CameraCalibration 클래스
++-- src/
+|   +-- camera_calibration.cpp   # 체스보드 검출, 캘리브레이션, 저장
+|   +-- mono_calib.cpp           # 단일 카메라 캘리브레이션 (main)
+|   +-- stereo_calib.cpp         # 스테레오 캘리브레이션 (TODO)
++-- data/
+    +-- macbook_calib.yaml       # 캘리브레이션 결과 예시
 ```
 
 ---
 
-## 📋 관련 주차
+## [list] 관련 주차
 
 | 주차 | 주제 | 연결 |
 |:----:|------|------|
@@ -36,7 +36,7 @@ calibration/
 
 ---
 
-## 🚀 빌드 및 실행
+##  빌드 및 실행
 
 ```bash
 cd calibration
@@ -63,7 +63,7 @@ cmake .. && make
 
 ---
 
-## 🏗️ 아키텍처
+##  아키텍처
 
 ```mermaid
 flowchart LR
@@ -85,7 +85,7 @@ flowchart LR
 
 ---
 
-## 📊 캘리브레이션 결과 예시
+## [chart] 캘리브레이션 결과 예시
 
 MacBook 내장 카메라 (1920x1080):
 
@@ -97,7 +97,7 @@ k1 = 0.018,   k2 = -0.151,  p1 = -0.003,  p2 = -0.002,  k3 = 0.246
 
 ---
 
-## 📚 핵심 개념
+## [ref] 핵심 개념
 
 - **내부 파라미터 K**: 초점 거리(fx, fy) + 주점(cx, cy) — 3D→2D 투영에 필수
 - **왜곡 계수**: 방사 왜곡(k1, k2, k3) + 접선 왜곡(p1, p2) — 렌즈 특성 보정

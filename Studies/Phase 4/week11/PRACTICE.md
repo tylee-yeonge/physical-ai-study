@@ -1,12 +1,12 @@
 # Week 11 실습: GitHub 저장소 정리 및 코드 품질 개선
 
-> 🎯 **목표**: 프로젝트 코드를 체계적으로 구조화하고, docstring/type hint를 추가하며, 포트폴리오 수준의 README를 작성한다
-> 💻 **언어**: Python
-> ⏰ **예상 시간**: 8시간
+> [goal] **목표**: 프로젝트 코드를 체계적으로 구조화하고, docstring/type hint를 추가하며, 포트폴리오 수준의 README를 작성한다
+> [code] **언어**: Python
+> [time] **예상 시간**: 8시간
 
 ---
 
-## 📋 실습 개요
+## [list] 실습 개요
 
 | Step | 내용 | 난이도 | 시간 |
 |------|------|--------|------|
@@ -17,7 +17,7 @@
 
 ---
 
-## 🔧 환경 설정
+## [tool] 환경 설정
 
 ```bash
 pip install -r requirements.txt
@@ -431,15 +431,15 @@ python src/evaluation/metrics.py --result_path results/
 
 ```
 {project_name}/
-├── src/               # 소스 코드
-│   ├── models/        # 모델 래퍼
-│   ├── datasets/      # 데이터 처리
-│   ├── evaluation/    # 평가 메트릭
-│   └── visualization/ # 시각화
-├── configs/           # 설정 파일
-├── scripts/           # 실행 스크립트
-├── notebooks/         # 분석 노트북
-└── results/           # 결과물
++-- src/               # 소스 코드
+|   +-- models/        # 모델 래퍼
+|   +-- datasets/      # 데이터 처리
+|   +-- evaluation/    # 평가 메트릭
+|   +-- visualization/ # 시각화
++-- configs/           # 설정 파일
++-- scripts/           # 실행 스크립트
++-- notebooks/         # 분석 노트북
++-- results/           # 결과물
 ```
 
 ## 참고 자료
@@ -662,7 +662,7 @@ if __name__ == '__main__':
 
 ---
 
-## ✅ 체크리스트
+## [O] 체크리스트
 
 ### 프로젝트 구조
 - [ ] 폴더 구조가 체계적으로 생성되었는가
@@ -689,7 +689,7 @@ if __name__ == '__main__':
 
 ---
 
-## 💡 추가 실험 아이디어
+## [tip] 추가 실험 아이디어
 
 1. **코드 포매터 적용**: `black` 또는 `autopep8`으로 코드 스타일 통일
 2. **정적 분석**: `mypy`로 type hint 검증, `flake8`으로 코드 스타일 검사

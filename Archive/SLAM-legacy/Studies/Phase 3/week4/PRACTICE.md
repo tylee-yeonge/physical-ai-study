@@ -1,8 +1,8 @@
 # Week 4 실습: 스케일 문제 확인 + VINS 전체 구조 읽기
 
-> 🎯 **목표**: 스케일 드리프트를 코드로 확인하고, VINS 전체 구조를 파악
-> 💻 **방식**: 코드 분석 중심
-> ⏰ **예상 시간**: 3-4시간
+> [goal] **목표**: 스케일 드리프트를 코드로 확인하고, VINS 전체 구조를 파악
+> [code] **방식**: 코드 분석 중심
+> [time] **예상 시간**: 3-4시간
 
 ---
 
@@ -12,18 +12,18 @@
 
 ```
 vins_estimator/src/
-├── estimator.cpp/.h          # 핵심: 상태 추정 메인 클래스
-├── estimator_node.cpp        # ROS 노드 진입점
-├── parameters.cpp/.h         # config 파라미터 로드
-├── feature_manager.cpp/.h    # 특징점 생명주기 관리
-├── factor/
-│   ├── imu_factor.h          # IMU factor (Phase 4)
-│   ├── projection_factor.cpp # Visual factor (재투영 오차)
-│   └── marginalization_factor.cpp
-├── initial/
-│   ├── initial_sfm.cpp       # Vision-only 초기화
-│   └── initial_alignment.cpp # Visual-Inertial 정렬
-└── utility/
++-- estimator.cpp/.h          # 핵심: 상태 추정 메인 클래스
++-- estimator_node.cpp        # ROS 노드 진입점
++-- parameters.cpp/.h         # config 파라미터 로드
++-- feature_manager.cpp/.h    # 특징점 생명주기 관리
++-- factor/
+|   +-- imu_factor.h          # IMU factor (Phase 4)
+|   +-- projection_factor.cpp # Visual factor (재투영 오차)
+|   +-- marginalization_factor.cpp
++-- initial/
+|   +-- initial_sfm.cpp       # Vision-only 초기화
+|   +-- initial_alignment.cpp # Visual-Inertial 정렬
++-- utility/
 ```
 
 ### 분석 포인트
@@ -60,14 +60,14 @@ vins_estimator/src/
 
 ```
 processImage() 호출
-├── addFeatureCheckParallax()  # 키프레임 여부 판단
-├── if (!INIT_DONE)
-│   └── initialStructure()     # SfM + VI 정렬 (초기화)
-└── else
-    └── optimization()         # Ceres BA (추적 모드)
-        ├── IMU factor
-        ├── Visual factor
-        └── Marginalization factor
++-- addFeatureCheckParallax()  # 키프레임 여부 판단
++-- if (!INIT_DONE)
+|   +-- initialStructure()     # SfM + VI 정렬 (초기화)
++-- else
+    +-- optimization()         # Ceres BA (추적 모드)
+        +-- IMU factor
+        +-- Visual factor
+        +-- Marginalization factor
 ```
 
 **확인할 것:**

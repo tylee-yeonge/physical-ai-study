@@ -1,12 +1,12 @@
 # Week 2: Pre-integration + Factor Graph
 
-> 🎯 **목표**: Pre-integration의 필요성과 직관, Factor Graph에서의 역할 이해
-> ⏰ **예상 시간**: 7-10시간
-> 💡 **핵심 질문**: "왜 IMU를 단순 적분하지 않고 Pre-integration을 쓰는가?"
+> [goal] **목표**: Pre-integration의 필요성과 직관, Factor Graph에서의 역할 이해
+> [time] **예상 시간**: 7-10시간
+> [tip] **핵심 질문**: "왜 IMU를 단순 적분하지 않고 Pre-integration을 쓰는가?"
 
 ---
 
-## 📚 핵심 개념
+## [ref] 핵심 개념
 
 ### 1. Pre-integration 필요성
 
@@ -14,7 +14,7 @@
 
 ```
 IMU: ████████████████████████████ (200Hz)
-Vision:     ■         ■         ■ (20Hz)
+Vision:     #         #         # (20Hz)
            KF_i      KF_j      KF_k
 ```
 
@@ -103,7 +103,7 @@ Delta_q_corrected ≈ Delta_q * Exp(J_q * delta_bg)
 
 ---
 
-## 🔍 자체 점검
+## [search] 자체 점검
 
 1. Pre-integration이 없으면 왜 비효율적인가?
 2. Delta_p, Delta_v, Delta_q가 "포즈 독립적"이라는 게 무슨 의미인가?

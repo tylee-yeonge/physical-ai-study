@@ -1,18 +1,18 @@
 # Week 6 실습: TensorRT C++ 추론 파이프라인
 
-> 🎯 **목표**: ONNX 모델을 TensorRT로 변환하고 C++로 실시간 추론 구현하기
-> 💻 **언어**: C++ (TensorRT, CUDA, OpenCV)
-> ⏰ **예상 시간**: 12시간
+> [goal] **목표**: ONNX 모델을 TensorRT로 변환하고 C++로 실시간 추론 구현하기
+> [code] **언어**: C++ (TensorRT, CUDA, OpenCV)
+> [time] **예상 시간**: 12시간
 
 ---
 
-## 📋 실습 개요
+## [list] 실습 개요
 
 Week 6은 Week 5에서 생성한 ONNX 모델을 **TensorRT 엔진으로 변환**하고, **C++로 추론 파이프라인**을 구현합니다. NMS 후처리까지 포함하여 640x480 @ 30 FPS를 목표로 합니다.
 
 ---
 
-## 🔧 환경 설정
+## [tool] 환경 설정
 
 ### Jetson 환경 (권장)
 
@@ -50,20 +50,20 @@ sudo apt install libopencv-dev
 
 ```
 week6_tensorrt/
-├── CMakeLists.txt
-├── include/
-│   ├── trt_engine.h          # TensorRT 엔진 클래스
-│   ├── yolo_detector.h       # YOLO 검출기
-│   └── nms.h                 # NMS 함수
-├── src/
-│   ├── trt_engine.cpp        # 엔진 로드/추론
-│   ├── yolo_detector.cpp     # 전처리/후처리
-│   ├── nms.cpp               # NMS 구현
-│   └── main.cpp              # 메인 실행
-├── models/
-│   └── yolov8n.onnx          # Week 5에서 변환한 모델
-└── data/
-    └── test.jpg              # 테스트 이미지
++-- CMakeLists.txt
++-- include/
+|   +-- trt_engine.h          # TensorRT 엔진 클래스
+|   +-- yolo_detector.h       # YOLO 검출기
+|   +-- nms.h                 # NMS 함수
++-- src/
+|   +-- trt_engine.cpp        # 엔진 로드/추론
+|   +-- yolo_detector.cpp     # 전처리/후처리
+|   +-- nms.cpp               # NMS 구현
+|   +-- main.cpp              # 메인 실행
++-- models/
+|   +-- yolov8n.onnx          # Week 5에서 변환한 모델
++-- data/
+    +-- test.jpg              # 테스트 이미지
 ```
 
 ---
@@ -546,7 +546,7 @@ make -j$(nproc)
 
 ---
 
-## ✅ 체크리스트
+## [O] 체크리스트
 
 - [ ] trtexec로 FP32 엔진 빌드 성공
 - [ ] trtexec로 FP16 엔진 빌드 성공
@@ -561,7 +561,7 @@ make -j$(nproc)
 
 ---
 
-## 💡 트러블슈팅
+## [tip] 트러블슈팅
 
 ### trtexec가 없을 때
 ```

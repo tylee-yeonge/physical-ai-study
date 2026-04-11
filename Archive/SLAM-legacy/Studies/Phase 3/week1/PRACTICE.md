@@ -1,8 +1,8 @@
 # Week 1 실습: VINS 코드에서 VO 프론트엔드 분석
 
-> 🎯 **목표**: VO 파이프라인의 각 단계를 VINS 코드에서 찾고 이해
-> 💻 **방식**: 코드 분석 (구현 없음)
-> ⏰ **예상 시간**: 4-5시간
+> [goal] **목표**: VO 파이프라인의 각 단계를 VINS 코드에서 찾고 이해
+> [code] **방식**: 코드 분석 (구현 없음)
+> [time] **예상 시간**: 4-5시간
 
 ---
 
@@ -21,9 +21,9 @@ git clone https://github.com/HKUST-Aerial-Robotics/VINS-Fusion.git
 
 ```
 VINS-Fusion/
-└── vins_estimator/src/featureTracker/
-    ├── feature_tracker.h
-    └── feature_tracker.cpp
++-- vins_estimator/src/featureTracker/
+    +-- feature_tracker.h
+    +-- feature_tracker.cpp
 ```
 
 ### Step 1: 특징점 검출 찾기
@@ -85,7 +85,7 @@ if (n_pts.size() > 0) {
 
 ```
 vins_estimator/src/
-└── feature_manager.cpp/.h
++-- feature_manager.cpp/.h
 ```
 
 ### 확인 포인트
@@ -170,4 +170,4 @@ VO 파이프라인 6단계를 VINS 코드에 매핑해보세요:
 - [ ] feature_tracker에서 검출-추적-관리 흐름 파악
 - [ ] feature_manager의 FeaturePerId 구조 이해
 - [ ] 모션 추정 3가지 방법 비교표 작성
-- [ ] VO 파이프라인 ↔ VINS 코드 매핑 완료
+- [ ] VO 파이프라인 <-> VINS 코드 매핑 완료

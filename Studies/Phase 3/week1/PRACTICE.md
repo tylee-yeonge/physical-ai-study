@@ -1,11 +1,11 @@
 # Week 1 실습: PyTorch 기초 재정비
 
-> 🎯 **실습 목표**: CUDA 환경 세팅 → Tensor 연산 → CNN 학습 → ResNet Fine-tuning → TensorBoard → Checkpoint
-> ⏰ **예상 시간**: 6~8시간
+> [goal] **실습 목표**: CUDA 환경 세팅 → Tensor 연산 → CNN 학습 → ResNet Fine-tuning → TensorBoard → Checkpoint
+> [time] **예상 시간**: 6~8시간
 
 ---
 
-## 🔧 환경 설정
+## [tool] 환경 설정
 
 ```bash
 # 가상환경 생성 및 활성화
@@ -21,7 +21,7 @@ python -c "import torch; print(f'CUDA: {torch.cuda.is_available()}, Device: {tor
 
 ---
 
-## 📝 실습 1: Tensor 기초 연산
+## [note] 실습 1: Tensor 기초 연산
 
 **파일명**: `practice_tensor.py`
 
@@ -37,7 +37,7 @@ print("=" * 50)
 print("실습 1: Tensor 기초 연산")
 print("=" * 50)
 
-# ── 1-1. 텐서 생성 ──
+# -- 1-1. 텐서 생성 --
 print("\n[1-1] 텐서 생성")
 zeros = torch.zeros(3, 4)
 ones = torch.ones(2, 3)
@@ -50,7 +50,7 @@ print(f"  randn:\n{rand}")
 print(f"  arange: {arange}")
 print(f"  linspace: {linspace}")
 
-# ── 1-2. NumPy 변환 ──
+# -- 1-2. NumPy 변환 --
 print("\n[1-2] NumPy 변환")
 np_array = np.array([[1, 2], [3, 4]], dtype=np.float32)
 tensor_from_np = torch.from_numpy(np_array)
@@ -58,7 +58,7 @@ np_from_tensor = tensor_from_np.numpy()
 print(f"  NumPy → Tensor: {tensor_from_np}")
 print(f"  Tensor → NumPy: {np_from_tensor}")
 
-# ── 1-3. 연산 ──
+# -- 1-3. 연산 --
 print("\n[1-3] 연산")
 a = torch.tensor([[1.0, 2.0], [3.0, 4.0]])
 b = torch.tensor([[5.0, 6.0], [7.0, 8.0]])
@@ -70,7 +70,7 @@ print(f"  a.sum() = {a.sum()}")
 print(f"  a.mean() = {a.mean()}")
 print(f"  a.max() = {a.max()}")
 
-# ── 1-4. Shape 변환 ──
+# -- 1-4. Shape 변환 --
 print("\n[1-4] Shape 변환")
 x = torch.randn(2, 3, 4)
 print(f"  원래 shape: {x.shape}")
@@ -80,14 +80,14 @@ print(f"  permute(2,0,1): {x.permute(2, 0, 1).shape}")
 print(f"  unsqueeze(0): {x.unsqueeze(0).shape}")
 print(f"  squeeze 후: {x.unsqueeze(0).squeeze(0).shape}")
 
-# ── 1-5. GPU 이동 ──
+# -- 1-5. GPU 이동 --
 print("\n[1-5] GPU 이동")
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"  사용 디바이스: {device}")
 x_gpu = x.to(device)
 print(f"  텐서 디바이스: {x_gpu.device}")
 
-# ── 1-6. 이미지 텐서 변환 연습 ──
+# -- 1-6. 이미지 텐서 변환 연습 --
 print("\n[1-6] 이미지 텐서 변환")
 # OpenCV 형식: (H, W, C), uint8, BGR
 fake_img = np.random.randint(0, 255, (480, 640, 3), dtype=np.uint8)
@@ -96,7 +96,7 @@ img_tensor = torch.from_numpy(fake_img).permute(2, 0, 1).float() / 255.0
 print(f"  OpenCV shape: {fake_img.shape} → PyTorch shape: {img_tensor.shape}")
 print(f"  dtype: {img_tensor.dtype}, range: [{img_tensor.min():.2f}, {img_tensor.max():.2f}]")
 
-print("\n✅ 실습 1 완료!")
+print("\n[O] 실습 1 완료!")
 ```
 
 **실행**:
@@ -117,12 +117,12 @@ python practice_tensor.py
   사용 디바이스: cuda
   텐서 디바이스: cuda:0
 
-✅ 실습 1 완료!
+[O] 실습 1 완료!
 ```
 
 ---
 
-## 📝 실습 2: autograd 자동 미분
+## [note] 실습 2: autograd 자동 미분
 
 **파일명**: `practice_autograd.py`
 
@@ -137,7 +137,7 @@ print("=" * 50)
 print("실습 2: autograd 자동 미분")
 print("=" * 50)
 
-# ── 2-1. 기본 자동 미분 ──
+# -- 2-1. 기본 자동 미분 --
 print("\n[2-1] 기본 자동 미분")
 x = torch.tensor(3.0, requires_grad=True)
 y = x ** 2 + 2 * x + 1  # y = x^2 + 2x + 1
@@ -146,7 +146,7 @@ print(f"  x = {x.item()}")
 print(f"  y = x^2 + 2x + 1 = {y.item()}")
 print(f"  dy/dx = 2x + 2 = {x.grad.item()}")  # 2*3 + 2 = 8
 
-# ── 2-2. 벡터 입력 ──
+# -- 2-2. 벡터 입력 --
 print("\n[2-2] 벡터 입력")
 x = torch.tensor([1.0, 2.0, 3.0], requires_grad=True)
 y = (x ** 2).sum()  # y = x1^2 + x2^2 + x3^2
@@ -155,7 +155,7 @@ print(f"  x = {x.data}")
 print(f"  y = sum(x^2) = {y.item()}")
 print(f"  dy/dx = 2x = {x.grad}")  # [2, 4, 6]
 
-# ── 2-3. 간단한 선형 회귀 ──
+# -- 2-3. 간단한 선형 회귀 --
 print("\n[2-3] 수동 선형 회귀 (y = 2x + 1)")
 torch.manual_seed(42)
 
@@ -190,7 +190,7 @@ for epoch in range(100):
 
 print(f"\n  최종: w={w.item():.4f} (정답: 2.0), b={b.item():.4f} (정답: 1.0)")
 
-# ── 2-4. no_grad 블록 ──
+# -- 2-4. no_grad 블록 --
 print("\n[2-4] torch.no_grad() 사용")
 x = torch.randn(3, requires_grad=True)
 print(f"  requires_grad 상태: {x.requires_grad}")
@@ -199,7 +199,7 @@ with torch.no_grad():
     y = x * 2
     print(f"  no_grad 블록 내 y.requires_grad: {y.requires_grad}")
 
-print("\n✅ 실습 2 완료!")
+print("\n[O] 실습 2 완료!")
 ```
 
 **실행**:
@@ -209,7 +209,7 @@ python practice_autograd.py
 
 ---
 
-## 📝 실습 3: CIFAR-10 CNN 학습
+## [note] 실습 3: CIFAR-10 CNN 학습
 
 **파일명**: `practice_cifar10.py`
 
@@ -231,11 +231,11 @@ print("=" * 50)
 print("실습 3: CIFAR-10 CNN 학습")
 print("=" * 50)
 
-# ── 설정 ──
+# -- 설정 --
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"디바이스: {device}")
 
-# ── 데이터 준비 ──
+# -- 데이터 준비 --
 transform_train = transforms.Compose([
     transforms.RandomHorizontalFlip(),
     transforms.RandomCrop(32, padding=4),
@@ -263,7 +263,7 @@ classes = ('airplane', 'automobile', 'bird', 'cat', 'deer',
 
 print(f"학습 데이터: {len(trainset)}장, 테스트 데이터: {len(testset)}장")
 
-# ── CNN 모델 ──
+# -- CNN 모델 --
 class SimpleCNN(nn.Module):
     def __init__(self):
         super().__init__()
@@ -296,10 +296,10 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=15, gamma=0.5)
 
-# ── TensorBoard ──
+# -- TensorBoard --
 writer = SummaryWriter('runs/cifar10_simple_cnn')
 
-# ── 학습 함수 ──
+# -- 학습 함수 --
 def train_one_epoch(model, loader, criterion, optimizer, device):
     model.train()
     running_loss = 0.0
@@ -322,7 +322,7 @@ def train_one_epoch(model, loader, criterion, optimizer, device):
 
     return running_loss / len(loader), 100. * correct / total
 
-# ── 평가 함수 ──
+# -- 평가 함수 --
 @torch.no_grad()
 def evaluate(model, loader, criterion, device):
     model.eval()
@@ -342,7 +342,7 @@ def evaluate(model, loader, criterion, device):
 
     return running_loss / len(loader), 100. * correct / total
 
-# ── 학습 루프 ──
+# -- 학습 루프 --
 num_epochs = 30
 best_acc = 0.0
 
@@ -386,7 +386,7 @@ for epoch in range(num_epochs):
 writer.close()
 print(f"\n최고 검증 정확도: {best_acc:.2f}%")
 print("TensorBoard 확인: tensorboard --logdir=runs")
-print("\n✅ 실습 3 완료!")
+print("\n[O] 실습 3 완료!")
 ```
 
 **실행**:
@@ -402,7 +402,7 @@ tensorboard --logdir=runs
 
 ---
 
-## 📝 실습 4: ResNet-18 Fine-tuning
+## [note] 실습 4: ResNet-18 Fine-tuning
 
 **파일명**: `practice_resnet18.py`
 
@@ -427,7 +427,7 @@ print("=" * 50)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-# ── 데이터 (ResNet용 224x224) ──
+# -- 데이터 (ResNet용 224x224) --
 transform_train = transforms.Compose([
     transforms.Resize(224),
     transforms.RandomHorizontalFlip(),
@@ -451,7 +451,7 @@ testset = torchvision.datasets.CIFAR10(
 trainloader = DataLoader(trainset, batch_size=64, shuffle=True, num_workers=2)
 testloader = DataLoader(testset, batch_size=64, shuffle=False, num_workers=2)
 
-# ── ResNet-18 모델 (Pretrained) ──
+# -- ResNet-18 모델 (Pretrained) --
 model = models.resnet18(weights='IMAGENET1K_V1')
 
 # 마지막 FC 레이어를 CIFAR-10용으로 교체
@@ -460,7 +460,7 @@ model.fc = nn.Linear(num_features, 10)
 
 model = model.to(device)
 
-# ── Backbone freeze (선택사항) ──
+# -- Backbone freeze (선택사항) --
 # 처음 몇 에폭은 FC만 학습 → 이후 전체 학습
 for param in model.parameters():
     param.requires_grad = False
@@ -472,8 +472,8 @@ optimizer = optim.Adam(model.fc.parameters(), lr=0.001)
 
 writer = SummaryWriter('runs/cifar10_resnet18')
 
-# ── Phase 1: FC만 학습 (5 epochs) ──
-print("\n── Phase 1: FC 레이어만 학습 (Backbone Frozen) ──")
+# -- Phase 1: FC만 학습 (5 epochs) --
+print("\n-- Phase 1: FC 레이어만 학습 (Backbone Frozen) --")
 for epoch in range(5):
     model.train()
     running_loss = 0.0
@@ -496,8 +496,8 @@ for epoch in range(5):
     acc = 100. * correct / total
     print(f"  Epoch {epoch+1}: Loss={running_loss/len(trainloader):.4f}, Acc={acc:.2f}%")
 
-# ── Phase 2: 전체 모델 학습 (Unfreeze) ──
-print("\n── Phase 2: 전체 모델 학습 (Backbone Unfrozen) ──")
+# -- Phase 2: 전체 모델 학습 (Unfreeze) --
+print("\n-- Phase 2: 전체 모델 학습 (Backbone Unfrozen) --")
 for param in model.parameters():
     param.requires_grad = True
 
@@ -554,7 +554,7 @@ for epoch in range(15):
 
 writer.close()
 print(f"\n최고 검증 정확도: {best_acc:.2f}%")
-print("\n✅ 실습 4 완료!")
+print("\n[O] 실습 4 완료!")
 ```
 
 **실행**:
@@ -567,7 +567,7 @@ python practice_resnet18.py
 
 ---
 
-## 📝 실습 5: Checkpoint 로드 및 추론
+## [note] 실습 5: Checkpoint 로드 및 추론
 
 **파일명**: `practice_inference.py`
 
@@ -593,7 +593,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 classes = ('airplane', 'automobile', 'bird', 'cat', 'deer',
            'dog', 'frog', 'horse', 'ship', 'truck')
 
-# ── 모델 로드 ──
+# -- 모델 로드 --
 model = models.resnet18()
 model.fc = nn.Linear(model.fc.in_features, 10)
 model.load_state_dict(torch.load('best_resnet18_cifar10.pth', map_location=device))
@@ -601,7 +601,7 @@ model = model.to(device)
 model.eval()
 print("모델 로드 완료!")
 
-# ── 테스트 데이터 ──
+# -- 테스트 데이터 --
 transform = transforms.Compose([
     transforms.Resize(224),
     transforms.ToTensor(),
@@ -612,7 +612,7 @@ transform = transforms.Compose([
 testset = torchvision.datasets.CIFAR10(
     root='./data', train=False, download=True, transform=transform)
 
-# ── 랜덤 샘플 추론 ──
+# -- 랜덤 샘플 추론 --
 fig, axes = plt.subplots(2, 5, figsize=(15, 6))
 indices = torch.randint(0, len(testset), (10,))
 
@@ -642,7 +642,7 @@ for i, idx in enumerate(indices):
 plt.tight_layout()
 plt.savefig('inference_results.png', dpi=100)
 print("추론 결과 저장: inference_results.png")
-print("\n✅ 실습 5 완료!")
+print("\n[O] 실습 5 완료!")
 ```
 
 **실행**:
@@ -652,7 +652,7 @@ python practice_inference.py
 
 ---
 
-## ✅ 실습 체크리스트
+## [O] 실습 체크리스트
 
 - [ ] CUDA 환경 세팅 완료 (`torch.cuda.is_available()` = True)
 - [ ] Tensor 연산 및 shape 변환 숙지
@@ -665,7 +665,7 @@ python practice_inference.py
 
 ---
 
-## 🔗 참고 자료
+## [link] 참고 자료
 
 - [PyTorch Tutorials](https://pytorch.org/tutorials/)
 - [PyTorch 공식 문서](https://pytorch.org/docs/stable/index.html)

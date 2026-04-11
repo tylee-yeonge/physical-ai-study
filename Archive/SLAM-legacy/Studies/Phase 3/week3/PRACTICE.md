@@ -1,8 +1,8 @@
 # Week 3 실습: g2o / Ceres 예제 코드 읽기
 
-> 🎯 **목표**: g2o와 Ceres의 BA 예제를 읽고 구조를 파악
-> 💻 **방식**: 코드 분석 중심 (빌드/실행은 선택)
-> ⏰ **예상 시간**: 3-4시간
+> [goal] **목표**: g2o와 Ceres의 BA 예제를 읽고 구조를 파악
+> [code] **방식**: 코드 분석 중심 (빌드/실행은 선택)
+> [time] **예상 시간**: 3-4시간
 
 ---
 
@@ -51,9 +51,9 @@ ceres-solver/examples/bundle_adjuster.cc
 ```
 vins_estimator/src/estimator.cpp     # optimization() 함수
 vins_estimator/src/factor/
-├── projection_factor.h/.cpp          # Visual factor
-├── projection_td_factor.h/.cpp       # Time delay 포함 버전
-└── marginalization_factor.h/.cpp     # Marginalization
++-- projection_factor.h/.cpp          # Visual factor
++-- projection_td_factor.h/.cpp       # Time delay 포함 버전
++-- marginalization_factor.h/.cpp     # Marginalization
 ```
 
 ### 분석 포인트
@@ -77,7 +77,7 @@ void Estimator::optimization() {
     // 3. IMU factor 추가 (연속 키프레임 연결)
     //    problem.AddResidualBlock(imu_factor, NULL, ...)
     
-    // 4. Visual factor 추가 (3D점 ↔ 카메라 연결)
+    // 4. Visual factor 추가 (3D점 <-> 카메라 연결)
     //    problem.AddResidualBlock(projection_factor, loss_function, ...)
     
     // 5. Marginalization factor 추가 (이전 정보 보존)

@@ -1,12 +1,12 @@
 # Week 10 실습: Depth 정확도 검증 (Python)
 
-> 🎯 **목표**: Depth Anything 모델의 출력을 GT와 비교하여 정량/정성 평가 수행
-> 💻 **언어**: Python (PyTorch, OpenCV, NumPy)
-> ⏰ **예상 시간**: 12시간
+> [goal] **목표**: Depth Anything 모델의 출력을 GT와 비교하여 정량/정성 평가 수행
+> [code] **언어**: Python (PyTorch, OpenCV, NumPy)
+> [time] **예상 시간**: 12시간
 
 ---
 
-## 📋 실습 개요
+## [list] 실습 개요
 
 | Step | 내용 | 난이도 | 시간 |
 |------|------|--------|------|
@@ -18,7 +18,7 @@
 
 ---
 
-## 🔧 환경 설정
+## [tool] 환경 설정
 
 ```bash
 # 가상환경 활성화
@@ -332,12 +332,12 @@ def print_metrics(metrics):
         return
 
     print(f"  유효 픽셀 수:  {metrics['num_valid']:,}")
-    print(f"  ─────────────────────────────")
+    print(f"  -----------------------------")
     print(f"  AbsRel:        {metrics['AbsRel']:.4f}  {'(양호)' if metrics['AbsRel'] < 0.1 else '(개선필요)'}")
     print(f"  SqRel:         {metrics['SqRel']:.4f}")
     print(f"  RMSE:          {metrics['RMSE']:.4f} m")
     print(f"  RMSE_log:      {metrics['RMSE_log']:.4f}")
-    print(f"  ─────────────────────────────")
+    print(f"  -----------------------------")
     print(f"  delta < 1.25:  {metrics['delta_1']:.4f}  {'(양호)' if metrics['delta_1'] > 0.95 else '(개선필요)'}")
     print(f"  delta < 1.25^2:{metrics['delta_2']:.4f}")
     print(f"  delta < 1.25^3:{metrics['delta_3']:.4f}")
@@ -549,7 +549,7 @@ if __name__ == "__main__":
 
 ---
 
-## ✅ 실습 체크리스트
+## [O] 실습 체크리스트
 
 ### Step 1: GT 생성
 - [ ] 스테레오 매칭 (SGBM) 구현
@@ -580,7 +580,7 @@ if __name__ == "__main__":
 
 ---
 
-## 💡 트러블슈팅
+## [tip] 트러블슈팅
 
 ### 스테레오 매칭이 잘 안 될 때
 
@@ -602,7 +602,7 @@ if __name__ == "__main__":
 
 ---
 
-## 🔗 참고 자료
+## [link] 참고 자료
 
 - [Depth Anything 논문](https://arxiv.org/abs/2401.10891)
 - [KITTI Depth Benchmark](https://www.cvlibs.net/datasets/kitti/eval_depth.php)

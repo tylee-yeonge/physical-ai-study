@@ -1,8 +1,8 @@
 # Week 2 실습: Pre-integration 개념 확인 + VINS 코드 읽기
 
-> 🎯 **목표**: VINS의 Pre-integration 코드 구조를 파악
-> 💻 **방식**: 코드 분석 중심
-> ⏰ **예상 시간**: 4-5시간
+> [goal] **목표**: VINS의 Pre-integration 코드 구조를 파악
+> [code] **방식**: 코드 분석 중심
+> [time] **예상 시간**: 4-5시간
 
 ---
 
@@ -12,8 +12,8 @@
 
 ```
 vins_estimator/src/
-├── factor/imu_factor.h           # IMU Factor 정의
-└── utility/integration_base.h    # Pre-integration 클래스
++-- factor/imu_factor.h           # IMU Factor 정의
++-- utility/integration_base.h    # Pre-integration 클래스
 ```
 
 ### integration_base.h 분석 포인트

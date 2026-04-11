@@ -1,13 +1,13 @@
 # Week 8: 광류 (Optical Flow) 실습 (C++)
 
-> 🎯 **목표**: Lucas-Kanade Optical Flow 실시간 구현 및 Dense Flow 시각화
-> 💻 **언어**: C++ (OpenCV 4.x)
-> 🛠️ **하드웨어**: Jetson Orin Nano + ELP Stereo Camera 또는 MacBook (내장 카메라)
-> ⏰ **예상 시간**: 6-8시간
+> [goal] **목표**: Lucas-Kanade Optical Flow 실시간 구현 및 Dense Flow 시각화
+> [code] **언어**: C++ (OpenCV 4.x)
+> [tool] **하드웨어**: Jetson Orin Nano + ELP Stereo Camera 또는 MacBook (내장 카메라)
+> [time] **예상 시간**: 6-8시간
 
 ---
 
-## 📋 준비사항
+## [list] 준비사항
 
 **Jetson (Linux):**
 ```bash
@@ -24,14 +24,14 @@ brew install opencv
 
 ---
 
-## 📋 전제 조건
+## [list] 전제 조건
 
 - [ ] Week 3-4 특징점 검출/매칭 이해
 - [ ] Lucas-Kanade 원리 이해 (README.md 참조)
 
 ---
 
-## 🔧 실습 1: KLT Feature Tracker
+## [tool] 실습 1: KLT Feature Tracker
 
 ### KLTTracker 클래스
 
@@ -202,7 +202,7 @@ void KLTTracker::drawTracks(cv::Mat& display, int trail_length) {
 
 ---
 
-## 🔧 실습 2: 실시간 KLT 추적 데모
+## [tool] 실습 2: 실시간 KLT 추적 데모
 
 **src/optical_flow_demo.cpp**:
 ```cpp
@@ -221,7 +221,7 @@ int main() {
     cv::Mat frame, gray, prev_gray;
     bool initialized = false;
 
-    std::cout << "\n🎥 KLT Optical Flow 추적 시작" << std::endl;
+    std::cout << "\n[video] KLT Optical Flow 추적 시작" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "R: 특징점 재검출" << std::endl;
     std::cout << "ESC: 종료\n" << std::endl;
@@ -271,7 +271,7 @@ int main() {
 
 ---
 
-## 🔧 실습 3: Dense Optical Flow 시각화
+## [tool] 실습 3: Dense Optical Flow 시각화
 
 **src/dense_flow_demo.cpp**:
 ```cpp
@@ -321,7 +321,7 @@ int main() {
     cap >> frame;
     cv::cvtColor(frame, prev_gray, cv::COLOR_BGR2GRAY);
 
-    std::cout << "\n🎥 Dense Optical Flow 시작" << std::endl;
+    std::cout << "\n[video] Dense Optical Flow 시작" << std::endl;
     std::cout << "1: Arrow 시각화 / 2: HSV 시각화" << std::endl;
     std::cout << "ESC: 종료\n" << std::endl;
 
@@ -373,7 +373,7 @@ int main() {
 
 ---
 
-## ✅ 체크리스트
+## [O] 체크리스트
 
 ### Sparse Flow (KLT)
 - [ ] `KLTTracker` 클래스 구현
@@ -394,7 +394,7 @@ int main() {
 
 ---
 
-## 💡 VINS-Fusion feature_tracker 비교
+## [tip] VINS-Fusion feature_tracker 비교
 
 ```cpp
 // VINS-Fusion 패턴 (참고)
@@ -418,7 +418,7 @@ void FeatureTracker::trackImage(...) {
 
 ---
 
-## 🏗️ mini_vo 구현 (이번 주 핵심 + Phase 2 완성)
+##  mini_vo 구현 (이번 주 핵심 + Phase 2 완성)
 
 **구현 파일**: `Studies/Phase 2/mini_vo/src/tracker.cpp`
 

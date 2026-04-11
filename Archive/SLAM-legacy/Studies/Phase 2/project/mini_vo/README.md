@@ -1,44 +1,44 @@
 # mini_vo (Visual Odometry 파이프라인)
 
-## 📌 개요
+## [pin] 개요
 
-> 🎯 **목표**: Phase 2에서 배운 모듈들을 조합하여 Visual Odometry 파이프라인 구축
-> 💻 **언어**: C++ 17 (OpenCV 4.x)
-> 📦 **구조**: 주차별로 하나의 모듈을 직접 구현하여 점진적으로 완성
+> [goal] **목표**: Phase 2에서 배운 모듈들을 조합하여 Visual Odometry 파이프라인 구축
+> [code] **언어**: C++ 17 (OpenCV 4.x)
+> [pkg] **구조**: 주차별로 하나의 모듈을 직접 구현하여 점진적으로 완성
 
 mini_vo는 Phase 2의 **통합 프로젝트**입니다. 각 주차에서 학습한 개념을 하나의 모듈로 구현하고, 최종적으로 이미지 시퀀스에서 카메라 궤적을 추정하는 VO 시스템을 만듭니다.
 
 ---
 
-## 🔧 프로젝트 구조
+## [tool] 프로젝트 구조
 
 ```
 mini_vo/
-├── CMakeLists.txt
-├── main.cpp                     # 데모 실행 (주차별 모듈 테스트)
-├── include/
-│   ├── camera.h                 # W1-W2: 핀홀 카메라 모델
-│   ├── feature_detector.h       # W3: FAST 직접 구현
-│   ├── descriptor.h             # W3: BRIEF 직접 구현
-│   ├── feature_matcher.h        # W4: BF 매칭 + Ratio Test
-│   ├── epipolar.h               # W5: 8-Point Algorithm
-│   ├── pose_recovery.h          # W6: E → R, t 분해
-│   ├── triangulator.h           # W7: DLT 삼각측량
-│   └── tracker.h                # W8: LK 광류 추적
-└── src/
-    ├── camera.cpp
-    ├── feature_detector.cpp
-    ├── descriptor.cpp
-    ├── feature_matcher.cpp
-    ├── epipolar.cpp
-    ├── pose_recovery.cpp
-    ├── triangulator.cpp
-    └── tracker.cpp
++-- CMakeLists.txt
++-- main.cpp                     # 데모 실행 (주차별 모듈 테스트)
++-- include/
+|   +-- camera.h                 # W1-W2: 핀홀 카메라 모델
+|   +-- feature_detector.h       # W3: FAST 직접 구현
+|   +-- descriptor.h             # W3: BRIEF 직접 구현
+|   +-- feature_matcher.h        # W4: BF 매칭 + Ratio Test
+|   +-- epipolar.h               # W5: 8-Point Algorithm
+|   +-- pose_recovery.h          # W6: E → R, t 분해
+|   +-- triangulator.h           # W7: DLT 삼각측량
+|   +-- tracker.h                # W8: LK 광류 추적
++-- src/
+    +-- camera.cpp
+    +-- feature_detector.cpp
+    +-- descriptor.cpp
+    +-- feature_matcher.cpp
+    +-- epipolar.cpp
+    +-- pose_recovery.cpp
+    +-- triangulator.cpp
+    +-- tracker.cpp
 ```
 
 ---
 
-## 📋 주차별 모듈 매핑
+## [list] 주차별 모듈 매핑
 
 | 주차 | 모듈 | 핵심 구현 |
 |:----:|------|----------|
@@ -53,7 +53,7 @@ mini_vo/
 
 ---
 
-## 🚀 빌드 및 실행
+##  빌드 및 실행
 
 ```bash
 cd mini_vo
@@ -65,7 +65,7 @@ cmake .. && make
 
 ---
 
-## 🏗️ 파이프라인 아키텍처
+##  파이프라인 아키텍처
 
 ```mermaid
 flowchart TD
@@ -89,7 +89,7 @@ flowchart TD
 
 ---
 
-## 📚 Phase 3과의 연결
+## [ref] Phase 3과의 연결
 
 mini_vo의 모든 모듈은 Phase 3의 `mini_slam`에서 재사용됩니다:
 

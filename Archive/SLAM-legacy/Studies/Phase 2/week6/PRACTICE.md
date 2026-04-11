@@ -1,20 +1,20 @@
 # Week 6: Disparity Map 생성 실습 (C++)
 
-> 🎯 **목표**: SGBM으로 Disparity Map 생성 및 시각화
-> 💻 **언어**: C++ (OpenCV 4.x)
-> 🛠️ **하드웨어**: Jetson Orin Nano + ELP Stereo (캘리브레이션 완료)
-> ⏰ **예상 시간**: 6-8시간
+> [goal] **목표**: SGBM으로 Disparity Map 생성 및 시각화
+> [code] **언어**: C++ (OpenCV 4.x)
+> [tool] **하드웨어**: Jetson Orin Nano + ELP Stereo (캘리브레이션 완료)
+> [time] **예상 시간**: 6-8시간
 
 ---
 
-## 📋 전제 조건
+## [list] 전제 조건
 
 - [ ] Week 5 Stereo Rectification 완료
 - [ ] Rectified 이미지 생성 가능
 
 ---
 
-## 🔧 실습: StereoMatcher 클래스 구현
+## [tool] 실습: StereoMatcher 클래스 구현
 
 ### 헤더 파일
 
@@ -114,7 +114,7 @@ void StereoMatcher::visualizeDisparity(const cv::Mat& disparity, cv::Mat& vis) {
 
 ---
 
-## ✅ 체크리스트
+## [O] 체크리스트
 
 - [ ] `StereoMatcher` SGBM 구현
 - [ ] Disparity 시각화 (Colormap)
@@ -123,7 +123,7 @@ void StereoMatcher::visualizeDisparity(const cv::Mat& disparity, cv::Mat& vis) {
 
 ---
 
-## 🏗️ mini_vo 구현 (이번 주 핵심)
+##  mini_vo 구현 (이번 주 핵심)
 
 **구현 파일**: `Studies/Phase 2/mini_vo/src/pose_recovery.cpp`
 

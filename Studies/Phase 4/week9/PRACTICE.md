@@ -1,12 +1,12 @@
 # Week 9 실습: BEVFormer 핵심 구조 구현 및 시각화
 
-> 🎯 **목표**: BEVFormer의 핵심 구성 요소(BEV Query, Spatial Cross-Attention, Temporal Self-Attention)를 Python으로 구현하고 시각화한다
-> 💻 **언어**: Python (PyTorch, NumPy, Matplotlib)
-> ⏰ **예상 시간**: 6시간
+> [goal] **목표**: BEVFormer의 핵심 구성 요소(BEV Query, Spatial Cross-Attention, Temporal Self-Attention)를 Python으로 구현하고 시각화한다
+> [code] **언어**: Python (PyTorch, NumPy, Matplotlib)
+> [time] **예상 시간**: 6시간
 
 ---
 
-## 📋 실습 개요
+## [list] 실습 개요
 
 | Step | 내용 | 난이도 | 시간 |
 |------|------|--------|------|
@@ -17,7 +17,7 @@
 
 ---
 
-## 🔧 환경 설정
+## [tool] 환경 설정
 
 ```bash
 pip install -r requirements.txt
@@ -527,7 +527,7 @@ visualize_temporal_attention()
 
 ---
 
-## ✅ 체크리스트
+## [O] 체크리스트
 
 ### BEV Query Grid
 - [ ] BEV Query Grid 생성 코드 실행
@@ -551,7 +551,7 @@ visualize_temporal_attention()
 
 ---
 
-## 💡 추가 실험 아이디어
+## [tip] 추가 실험 아이디어
 
 1. **BEV 해상도 변경**: 50x50, 100x100, 200x200에서 커버 범위와 해상도 비교
 2. **높이 개수 변경**: Reference Point의 높이를 2개, 4개, 8개로 바꿔서 투영 패턴 비교

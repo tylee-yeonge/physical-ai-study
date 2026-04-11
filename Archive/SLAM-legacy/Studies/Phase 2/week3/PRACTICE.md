@@ -1,13 +1,13 @@
 # Week 3: 특징점 검출 실습 (C++)
 
-> 🎯 **목표**: FAST, ORB 특징점 검출 실시간 구현
-> 💻 **언어**: C++ (OpenCV 4.x)
-> 🛠️ **하드웨어**: Jetson Orin Nano + ELP Stereo Camera 또는 MacBook (내장 카메라)
-> ⏰ **예상 시간**: 6-8시간
+> [goal] **목표**: FAST, ORB 특징점 검출 실시간 구현
+> [code] **언어**: C++ (OpenCV 4.x)
+> [tool] **하드웨어**: Jetson Orin Nano + ELP Stereo Camera 또는 MacBook (내장 카메라)
+> [time] **예상 시간**: 6-8시간
 
 ---
 
-## 📋 준비사항
+## [list] 준비사항
 
 **Jetson (Linux):**
 ```bash
@@ -24,11 +24,11 @@ brew install opencv
 
 ---
 
-## 📋 실습 0: FAST 코너 검출 직접 구현
+## [list] 실습 0: FAST 코너 검출 직접 구현
 
-> 🎯 **목표**: OpenCV의 `cv::FAST`를 사용하지 않고, 알고리즘을 직접 C++로 구현한다.
-> ⏰ **예상 시간**: 2-3시간
-> 📁 **파일**: `src/my_fast_detector.cpp`
+> [goal] **목표**: OpenCV의 `cv::FAST`를 사용하지 않고, 알고리즘을 직접 C++로 구현한다.
+> [time] **예상 시간**: 2-3시간
+> [dir] **파일**: `src/my_fast_detector.cpp`
 
 ### 왜 직접 구현하는가?
 
@@ -43,7 +43,7 @@ brew install opencv
 ```
         1  2  3
      16         4
-    15    ●     5
+    15    *     5
     14          6
     13  12 11 10 9
          8  7
@@ -131,7 +131,7 @@ score = Σ |I(주변 픽셀 i) - Ip|    (i = 1~16)
 
 ---
 
-## 📋 실습 1: FAST 코너 검출
+## [list] 실습 1: FAST 코너 검출
 
 **src/fast_detector.cpp**:
 ```cpp
@@ -213,7 +213,7 @@ int main(int argc, char** argv) {
 
 ---
 
-## 📋 실습 2: ORB 특징점 + 디스크립터
+## [list] 실습 2: ORB 특징점 + 디스크립터
 
 **src/orb_detector.cpp**:
 ```cpp
@@ -271,7 +271,7 @@ int main() {
 
 ---
 
-## ✅ 체크리스트
+## [O] 체크리스트
 
 - [ ] FAST 직접 구현: Bresenham 원 16개 오프셋 정의
 - [ ] FAST 직접 구현: 연속 9개 판별 + 고속 사전 검사
@@ -283,7 +283,7 @@ int main() {
 
 ---
 
-## 💡 성능 최적화 팁 (Jetson 전용)
+## [tip] 성능 최적화 팁 (Jetson 전용)
 
 ```cpp
 // 1. OpenCV CUDA 가속 (Jetson에서 매우 효과적)
@@ -304,7 +304,7 @@ cv::resize(img, img_small, cv::Size(), 0.5, 0.5);
 
 ---
 
-## 🏗️ mini_vo 구현 (이번 주 핵심)
+##  mini_vo 구현 (이번 주 핵심)
 
 > 이 실습의 최종 목적은 `mini_vo` 프로젝트에 FAST 검출기를 완성하는 것이다.
 > 위의 실습을 통해 FAST 알고리즘을 이해했다면, 아래 파일에 직접 구현하라.

@@ -1,8 +1,8 @@
 # SLAM-legacy Archive
 
-> 📦 **아카이브 디렉토리** — 과거 SLAM 트랙(Phase 2/3/4) 학습 내용을 보존하는 공간
-> 📅 **아카이브 시점**: 2026-04-10
-> 🔗 **상위 plan**: [`../../plan.md`](../../plan.md)
+> [pkg] **아카이브 디렉토리** — 과거 SLAM 트랙(Phase 2/3/4) 학습 내용을 보존하는 공간
+>  **아카이브 시점**: 2026-04-10
+> [link] **상위 plan**: [`../../plan.md`](../../plan.md)
 
 ---
 
@@ -29,7 +29,7 @@
 | `Roadmap/Phase 3.md` | [`Roadmap/Phase 3.md`](Roadmap/Phase%203.md) |
 | `Roadmap/Phase 4.md` | [`Roadmap/Phase 4.md`](Roadmap/Phase%204.md) |
 
-> 📌 모든 이동은 `git mv` 로 수행되어 git 히스토리(blame, log)가 보존된다.
+> [pin] 모든 이동은 `git mv` 로 수행되어 git 히스토리(blame, log)가 보존된다.
 
 ---
 
@@ -73,7 +73,7 @@
 
 ---
 
-## 5. ⚠️ 주의
+## 5. [!] 주의
 
 - 이 디렉토리의 **코드/문서를 새 `Studies/Phase 2/` 에서 직접 import 하거나 인용하지 말 것** — SLAM 맥락 잔재가 새 Perception 트랙으로 누수되는 것을 막기 위함
 - 새 Phase 2 의 week3, week4 는 일부 주제가 겹치지만(에피폴라, 삼각측량, PnP) **새로 작성된 Perception 맥락 코드** 를 사용한다

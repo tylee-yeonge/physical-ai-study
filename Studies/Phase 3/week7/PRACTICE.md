@@ -1,18 +1,18 @@
 # Week 7 실습: Monocular Depth Estimation 이론 및 모델 탐구
 
-> 🎯 **목표**: 깊이 추정의 원리를 이해하고, 주요 모델의 구조와 성능을 비교 분석하기
-> 💻 **언어**: Python (PyTorch, transformers)
-> ⏰ **예상 시간**: 12시간
+> [goal] **목표**: 깊이 추정의 원리를 이해하고, 주요 모델의 구조와 성능을 비교 분석하기
+> [code] **언어**: Python (PyTorch, transformers)
+> [time] **예상 시간**: 12시간
 
 ---
 
-## 📋 실습 개요
+## [list] 실습 개요
 
 Week 7은 이론 중심의 주차입니다. Monocular Depth Estimation의 핵심 개념을 학습하고, MiDaS/DPT/Depth Anything 모델을 Python으로 간단히 불러보며 구조를 파악합니다.
 
 ---
 
-## 🔧 환경 설정
+## [tool] 환경 설정
 
 ```bash
 # 가상환경 활성화
@@ -37,11 +37,11 @@ python -c "import torch; print(f'PyTorch: {torch.__version__}')"
 
 ```
 week7_depth_theory/
-├── explore_midas.py          # MiDaS 모델 탐구
-├── explore_dpt.py            # DPT 모델 탐구
-├── explore_depth_anything.py # Depth Anything 모델 탐구
-├── compare_models.py         # 모델 비교 분석
-└── depth_basics.py           # 깊이 추정 기초 개념
++-- explore_midas.py          # MiDaS 모델 탐구
++-- explore_dpt.py            # DPT 모델 탐구
++-- explore_depth_anything.py # Depth Anything 모델 탐구
++-- compare_models.py         # 모델 비교 분석
++-- depth_basics.py           # 깊이 추정 기초 개념
 ```
 
 ---
@@ -312,31 +312,31 @@ def compare_models():
     print("=" * 60)
 
     print("""
-    ┌──────────────┬──────────────┬──────────────┬──────────────┐
-    │  항목         │  MiDaS v3.1  │  DPT-Large   │ Depth Any-S  │
-    ├──────────────┼──────────────┼──────────────┼──────────────┤
-    │ 연도         │  2022        │  2021        │  2024        │
-    │ Backbone     │  BEiT/Swin   │  ViT-Large   │  ViT-Small   │
-    │ 파라미터     │  ~345M       │  ~343M       │  ~24.8M      │
-    │ 학습 데이터  │  라벨 12종   │  라벨 1.2M   │  라벨+비라벨  │
-    │              │              │              │  63.5M       │
-    │ Zero-shot    │  좋음        │  좋음        │  매우 우수    │
-    │ 속도 (A100)  │  ~40ms       │  ~45ms       │  ~12ms       │
-    │ Jetson 추론  │  ~200ms      │  ~350ms      │  ~50ms       │
-    │ 출력 타입    │  Relative    │  Relative    │  Relative    │
-    │ 실시간 가능  │  어려움      │  불가능      │  가능 (FP16) │
-    └──────────────┴──────────────┴──────────────┴──────────────┘
+    +--------------+--------------+--------------+--------------+
+    |  항목         |  MiDaS v3.1  |  DPT-Large   | Depth Any-S  |
+    +--------------+--------------+--------------+--------------+
+    | 연도         |  2022        |  2021        |  2024        |
+    | Backbone     |  BEiT/Swin   |  ViT-Large   |  ViT-Small   |
+    | 파라미터     |  ~345M       |  ~343M       |  ~24.8M      |
+    | 학습 데이터  |  라벨 12종   |  라벨 1.2M   |  라벨+비라벨  |
+    |              |              |              |  63.5M       |
+    | Zero-shot    |  좋음        |  좋음        |  매우 우수    |
+    | 속도 (A100)  |  ~40ms       |  ~45ms       |  ~12ms       |
+    | Jetson 추론  |  ~200ms      |  ~350ms      |  ~50ms       |
+    | 출력 타입    |  Relative    |  Relative    |  Relative    |
+    | 실시간 가능  |  어려움      |  불가능      |  가능 (FP16) |
+    +--------------+--------------+--------------+--------------+
     """)
 
     print("\n  용도별 추천:")
-    print("  ┌──────────────────────┬──────────────────┐")
-    print("  │ 용도                  │ 추천 모델         │")
-    print("  ├──────────────────────┼──────────────────┤")
-    print("  │ Jetson 실시간 추론   │ Depth Anything-S │")
-    print("  │ 서버 고정밀 추론     │ Depth Anything-L │")
-    print("  │ 연구/실험용         │ DPT-Large        │")
-    print("  │ 레거시 호환         │ MiDaS v3.1       │")
-    print("  └──────────────────────┴──────────────────┘")
+    print("  +----------------------+------------------+")
+    print("  | 용도                  | 추천 모델         |")
+    print("  +----------------------+------------------+")
+    print("  | Jetson 실시간 추론   | Depth Anything-S |")
+    print("  | 서버 고정밀 추론     | Depth Anything-L |")
+    print("  | 연구/실험용         | DPT-Large        |")
+    print("  | 레거시 호환         | MiDaS v3.1       |")
+    print("  +----------------------+------------------+")
 
 def compare_learning_methods():
     """학습 방법론 비교"""
@@ -345,17 +345,17 @@ def compare_learning_methods():
     print("=" * 60)
 
     print("""
-    ┌──────────────────┬──────────────┬──────────────┬──────────────┐
-    │  항목             │ Supervised   │Self-supervised│  Zero-shot   │
-    ├──────────────────┼──────────────┼──────────────┼──────────────┤
-    │ GT 깊이 필요     │  필요        │  불필요       │  혼합        │
-    │ 학습 데이터      │  적음 (~1M)  │  중간         │  대규모      │
-    │                  │              │  (동영상)     │  (60M+)      │
-    │ 일반화 능력      │  약함        │  보통         │  매우 강함   │
-    │ 정확도           │  높음        │  보통         │  높음        │
-    │ 대표 모델        │  AdaBins     │  Monodepth2  │ Depth Any.   │
-    │ 특징             │ 환경 특화    │ 비디오 활용   │ 범용적       │
-    └──────────────────┴──────────────┴──────────────┴──────────────┘
+    +------------------+--------------+--------------+--------------+
+    |  항목             | Supervised   |Self-supervised|  Zero-shot   |
+    +------------------+--------------+--------------+--------------+
+    | GT 깊이 필요     |  필요        |  불필요       |  혼합        |
+    | 학습 데이터      |  적음 (~1M)  |  중간         |  대규모      |
+    |                  |              |  (동영상)     |  (60M+)      |
+    | 일반화 능력      |  약함        |  보통         |  매우 강함   |
+    | 정확도           |  높음        |  보통         |  높음        |
+    | 대표 모델        |  AdaBins     |  Monodepth2  | Depth Any.   |
+    | 특징             | 환경 특화    | 비디오 활용   | 범용적       |
+    +------------------+--------------+--------------+--------------+
     """)
 
 if __name__ == "__main__":
@@ -403,7 +403,7 @@ Depth Anything 모델 탐구
 
 ---
 
-## ✅ 체크리스트
+## [O] 체크리스트
 
 - [ ] 깊이맵의 기본 개념 이해 (Relative vs Metric)
 - [ ] Supervised/Self-supervised/Zero-shot 학습 방법 이해
@@ -417,7 +417,7 @@ Depth Anything 모델 탐구
 
 ---
 
-## 💡 트러블슈팅
+## [tip] 트러블슈팅
 
 ### HuggingFace 모델 다운로드 실패
 ```

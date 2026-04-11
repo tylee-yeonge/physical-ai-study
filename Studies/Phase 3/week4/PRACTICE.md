@@ -1,11 +1,11 @@
 # Week 4 실습: YOLOv8 학습 파이프라인
 
-> 🎯 **실습 목표**: YOLOv8을 COCO128으로 학습하고, 커스텀 데이터셋을 준비하며, 평가 결과를 분석한다.
-> ⏰ **예상 시간**: 6~8시간
+> [goal] **실습 목표**: YOLOv8을 COCO128으로 학습하고, 커스텀 데이터셋을 준비하며, 평가 결과를 분석한다.
+> [time] **예상 시간**: 6~8시간
 
 ---
 
-## 🔧 환경 설정
+## [tool] 환경 설정
 
 ```bash
 cd Studies/Phase\ 5/week4
@@ -21,7 +21,7 @@ python quiz_medium.py
 
 ---
 
-## 📝 실습 1: YOLOv8 기본 추론
+## [note] 실습 1: YOLOv8 기본 추론
 
 **파일명**: `practice_inference.py`
 
@@ -41,16 +41,16 @@ print("=" * 50)
 print("실습 1: YOLOv8 기본 추론")
 print("=" * 50)
 
-# ── 모델 로드 ──
+# -- 모델 로드 --
 model = YOLO('yolov8n.pt')  # 자동 다운로드
 print(f"\n모델 로드 완료: yolov8n.pt")
 
-# ── 테스트 이미지 생성 (실제로는 이미지 경로 사용) ──
+# -- 테스트 이미지 생성 (실제로는 이미지 경로 사용) --
 # 실제 이미지가 있으면: results = model('image.jpg')
 # 여기서는 Ultralytics 내장 이미지 사용
 results = model('https://ultralytics.com/images/bus.jpg')
 
-# ── 결과 분석 ──
+# -- 결과 분석 --
 print("\n[1] 검출 결과 분석")
 for result in results:
     boxes = result.boxes
@@ -71,7 +71,7 @@ for result in results:
     cv2.imwrite('inference_result.jpg', annotated)
     print("\n결과 저장: inference_result.jpg")
 
-# ── Confidence 임계값 변경 ──
+# -- Confidence 임계값 변경 --
 print("\n[2] Confidence 임계값 비교")
 for conf_thresh in [0.25, 0.50, 0.75]:
     results = model('https://ultralytics.com/images/bus.jpg',
@@ -79,7 +79,7 @@ for conf_thresh in [0.25, 0.50, 0.75]:
     n_detections = len(results[0].boxes)
     print(f"  conf={conf_thresh:.2f}: {n_detections}개 검출")
 
-print("\n✅ 실습 1 완료!")
+print("\n[O] 실습 1 완료!")
 ```
 
 **실행**:
@@ -89,7 +89,7 @@ python practice_inference.py
 
 ---
 
-## 📝 실습 2: COCO128 학습
+## [note] 실습 2: COCO128 학습
 
 **파일명**: `practice_train_coco128.py`
 
@@ -105,10 +105,10 @@ print("=" * 50)
 print("실습 2: COCO128 학습")
 print("=" * 50)
 
-# ── 모델 로드 ──
+# -- 모델 로드 --
 model = YOLO('yolov8n.pt')
 
-# ── 학습 ──
+# -- 학습 --
 print("\n학습 시작...")
 results = model.train(
     data='coco128.yaml',        # 내장 데이터셋 (자동 다운로드)
@@ -124,7 +124,7 @@ results = model.train(
     verbose=True,
 )
 
-# ── 결과 확인 ──
+# -- 결과 확인 --
 print("\n[학습 결과]")
 result_dir = 'runs/detect/coco128_baseline'
 
@@ -134,7 +134,7 @@ if os.path.exists(result_dir):
     print(f"  결과 디렉토리: {result_dir}")
     print(f"  생성된 파일: {files}")
 
-# ── 평가 ──
+# -- 평가 --
 print("\n[모델 평가]")
 best_model = YOLO(f'{result_dir}/weights/best.pt')
 metrics = best_model.val()
@@ -149,7 +149,7 @@ print(f"  - {result_dir}/results.png (학습 커브)")
 print(f"  - {result_dir}/confusion_matrix.png (혼동 행렬)")
 print(f"  - {result_dir}/PR_curve.png (PR 커브)")
 
-print("\n✅ 실습 2 완료!")
+print("\n[O] 실습 2 완료!")
 ```
 
 **실행**:
@@ -162,7 +162,7 @@ python practice_train_coco128.py
 
 ---
 
-## 📝 실습 3: Hyperparameter 비교 실험
+## [note] 실습 3: Hyperparameter 비교 실험
 
 **파일명**: `practice_hyperparameter.py`
 
@@ -179,7 +179,7 @@ print("=" * 50)
 print("실습 3: Hyperparameter 비교 실험")
 print("=" * 50)
 
-# ── 실험 설정 ──
+# -- 실험 설정 --
 experiments = [
     {
         "name": "exp_lr_low",
@@ -250,22 +250,22 @@ for exp in experiments:
             "precision": 0, "recall": 0,
         })
 
-# ── 결과 비교 ──
+# -- 결과 비교 --
 print("\n" + "=" * 70)
 print("실험 결과 비교")
 print("=" * 70)
-print(f"{'실험':20s} │ {'mAP@0.5':>8s} │ {'mAP@0.5:0.95':>12s} │ {'Precision':>9s} │ {'Recall':>6s}")
-print("─" * 70)
+print(f"{'실험':20s} | {'mAP@0.5':>8s} | {'mAP@0.5:0.95':>12s} | {'Precision':>9s} | {'Recall':>6s}")
+print("-" * 70)
 for r in results_summary:
-    print(f"{r['desc']:20s} │ {r['map50']:>8.4f} │ {r['map50_95']:>12.4f} │ "
-          f"{r['precision']:>9.4f} │ {r['recall']:>6.4f}")
+    print(f"{r['desc']:20s} | {r['map50']:>8.4f} | {r['map50_95']:>12.4f} | "
+          f"{r['precision']:>9.4f} | {r['recall']:>6.4f}")
 
 # 결과 저장
 with open('experiment_results.json', 'w') as f:
     json.dump(results_summary, f, indent=2, ensure_ascii=False)
 print("\n결과 저장: experiment_results.json")
 
-print("\n✅ 실습 3 완료!")
+print("\n[O] 실습 3 완료!")
 ```
 
 **실행**:
@@ -275,7 +275,7 @@ python practice_hyperparameter.py
 
 ---
 
-## 📝 실습 4: 커스텀 데이터셋 준비
+## [note] 실습 4: 커스텀 데이터셋 준비
 
 **파일명**: `practice_custom_dataset.py`
 
@@ -298,7 +298,7 @@ print("실습 4: 커스텀 데이터셋 준비")
 print("=" * 50)
 
 
-# ── 1. 디렉토리 구조 생성 ──
+# -- 1. 디렉토리 구조 생성 --
 print("\n[1] 디렉토리 구조 생성")
 base_dir = 'custom_dataset'
 for split in ['train', 'val']:
@@ -307,7 +307,7 @@ for split in ['train', 'val']:
 print(f"  {base_dir}/ 구조 생성 완료")
 
 
-# ── 2. 가상 이미지와 라벨 생성 ──
+# -- 2. 가상 이미지와 라벨 생성 --
 print("\n[2] 가상 데이터 생성")
 class_names = ['person', 'car', 'bicycle']
 np.random.seed(42)
@@ -359,7 +359,7 @@ create_dummy_data('train', 20)
 create_dummy_data('val', 5)
 
 
-# ── 3. data.yaml 생성 ──
+# -- 3. data.yaml 생성 --
 print("\n[3] data.yaml 생성")
 data_yaml = {
     'path': os.path.abspath(base_dir),
@@ -379,7 +379,7 @@ for key, value in data_yaml.items():
     print(f"    {key}: {value}")
 
 
-# ── 4. 라벨 검증 ──
+# -- 4. 라벨 검증 --
 print("\n[4] 라벨 검증")
 label_file = f'{base_dir}/labels/train/img_0000.txt'
 print(f"  라벨 파일: {label_file}")
@@ -402,7 +402,7 @@ with open(label_file, 'r') as f:
 print("  모든 좌표가 0~1 범위 내 (검증 통과)")
 
 
-# ── 5. 시각화 ──
+# -- 5. 시각화 --
 print("\n[5] 라벨 시각화")
 img = cv2.imread(f'{base_dir}/images/train/img_0000.jpg')
 img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -437,7 +437,7 @@ plt.tight_layout()
 plt.savefig('label_visualization.png', dpi=100)
 print("  저장: label_visualization.png")
 
-print("\n✅ 실습 4 완료!")
+print("\n[O] 실습 4 완료!")
 ```
 
 **실행**:
@@ -447,7 +447,7 @@ python practice_custom_dataset.py
 
 ---
 
-## 📝 실습 5: 학습 결과 분석
+## [note] 실습 5: 학습 결과 분석
 
 **파일명**: `practice_analysis.py`
 
@@ -467,7 +467,7 @@ print("=" * 50)
 print("실습 5: 학습 결과 분석")
 print("=" * 50)
 
-# ── 1. 학습 커브 직접 그리기 ──
+# -- 1. 학습 커브 직접 그리기 --
 print("\n[1] results.csv 분석")
 
 result_dir = 'runs/detect/coco128_baseline'
@@ -534,10 +534,10 @@ else:
     print(f"  결과 파일 없음: {csv_path}")
     print("  실습 2를 먼저 실행하세요.")
 
-# ── 2. 모델별 성능 비교 ──
+# -- 2. 모델별 성능 비교 --
 print("\n[2] 모델 크기별 성능 (참고)")
-print(f"  {'모델':10s} │ {'파라미터':>10s} │ {'mAP@0.5:0.95':>12s} │ {'용도':12s}")
-print("  " + "─" * 55)
+print(f"  {'모델':10s} | {'파라미터':>10s} | {'mAP@0.5:0.95':>12s} | {'용도':12s}")
+print("  " + "-" * 55)
 model_info = [
     ('YOLOv8n', '3.2M', '37.3', 'Edge/실시간'),
     ('YOLOv8s', '11.2M', '44.9', '경량 서버'),
@@ -546,18 +546,18 @@ model_info = [
     ('YOLOv8x', '68.2M', '53.9', '최고 성능'),
 ]
 for name, params, mAP, usage in model_info:
-    print(f"  {name:10s} │ {params:>10s} │ {mAP:>12s} │ {usage:12s}")
+    print(f"  {name:10s} | {params:>10s} | {mAP:>12s} | {usage:12s}")
 
-# ── 3. 개선 제안 ──
+# -- 3. 개선 제안 --
 print("\n[3] 성능 개선 체크리스트")
-print("  □ 더 큰 모델 시도 (n → s → m)")
-print("  □ 이미지 크기 증가 (640 → 960)")
-print("  □ 학습 에폭 증가 (30 → 100)")
-print("  □ Augmentation 강화 (mosaic, mixup)")
-print("  □ 학습률 조절 (lr0)")
-print("  □ 데이터 추가/정제")
+print("  [ ] 더 큰 모델 시도 (n → s → m)")
+print("  [ ] 이미지 크기 증가 (640 → 960)")
+print("  [ ] 학습 에폭 증가 (30 → 100)")
+print("  [ ] Augmentation 강화 (mosaic, mixup)")
+print("  [ ] 학습률 조절 (lr0)")
+print("  [ ] 데이터 추가/정제")
 
-print("\n✅ 실습 5 완료!")
+print("\n[O] 실습 5 완료!")
 ```
 
 **실행**:
@@ -567,7 +567,7 @@ python practice_analysis.py
 
 ---
 
-## ✅ 실습 체크리스트
+## [O] 실습 체크리스트
 
 - [ ] YOLOv8 Pretrained 모델로 추론 성공
 - [ ] COCO128 학습 완료 (30+ 에폭)
@@ -579,7 +579,7 @@ python practice_analysis.py
 
 ---
 
-## 🔗 참고 자료
+## [link] 참고 자료
 
 - [Ultralytics YOLOv8 공식 문서](https://docs.ultralytics.com/)
 - [COCO Dataset](https://cocodataset.org/)

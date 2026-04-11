@@ -1,13 +1,13 @@
 # Week 3: Multi-view 기하 + Stereo Rectification
 
-## 📌 개요
+## [pin] 개요
 
-> 🎯 **목표**: 에피폴라 제약을 이해하고 Stereo Rectification까지 한 흐름으로 연결
-> ⏱️ **예상 시간**: 이론 2시간 + 실습 4시간
+> [goal] **목표**: 에피폴라 제약을 이해하고 Stereo Rectification까지 한 흐름으로 연결
+> [time] **예상 시간**: 이론 2시간 + 실습 4시간
 
 **Multi-view 기하**는 두 개 이상의 카메라로 같은 장면을 볼 때 성립하는 기하학적 관계입니다. 이 관계를 이용하면 2D 이미지에서 3D 깊이 정보를 복원할 수 있습니다.
 
-### 🤔 왜 이걸 배워야 할까요?
+### [?] 왜 이걸 배워야 할까요?
 
 **Perception에서의 활용**:
 - **Stereo Depth Network** (HITNet, CRE-Stereo, RAFT-Stereo): 입력은 **rectified stereo pair**. 이 전처리를 못하면 모델을 돌릴 수 없음
@@ -17,7 +17,7 @@
 
 ---
 
-## 📋 학습 순서
+## [list] 학습 순서
 
 | 순서 | 활동 | 파일 | 마치면 풀 퀴즈 |
 |:----:|------|------|:-------------:|
@@ -30,7 +30,7 @@
 
 ---
 
-## 🚀 Step 1: 먼저 돌려보기
+##  Step 1: 먼저 돌려보기
 
 ```bash
 cd week3 && mkdir build && cd build
@@ -44,7 +44,7 @@ cmake .. && make
 
 ---
 
-## 📖 핵심 개념
+## [ref] 핵심 개념
 
 ### 1. 에피폴라 제약 (Epipolar Constraint)
 
@@ -62,10 +62,10 @@ p₂ᵀ · F · p₁ = 0
 
 ```
 왼쪽 이미지:          오른쪽 이미지:
-┌──────────┐         ┌──────────┐
-│    ●p₁   │         │  ──────── │  ← 에피폴라 선 (p₂는 이 선 위)
-│          │         │     ●p₂  │
-└──────────┘         └──────────┘
++----------+         +----------+
+|    *p₁   |         | -------- |  ← 에피폴라 선 (p₂는 이 선 위)
+|          |         |     *p₂  |
++----------+         +----------+
 ```
 
 → 2D 전체 탐색이 **1D 선 탐색**으로 줄어듦
@@ -85,11 +85,11 @@ p₂ᵀ · F · p₁ = 0
 
 ```
 Rectification 전:                   Rectification 후:
-┌──────────┐ ┌──────────┐          ┌──────────┐ ┌──────────┐
-│  ╲       │ │       ╲  │          │ ────────  │ │ ────────  │  ← 수평!
-│   ╲      │ │      ╲   │   ──▶   │  ●        │ │  ●        │
-│    ╲     │ │     ╲    │          │ ────────  │ │ ────────  │
-└──────────┘ └──────────┘          └──────────┘ └──────────┘
++----------+ +----------+          +----------+ +----------+
+|  \       | |       /  |          |          | |          |
+|   *      | |      *   |   -->    | --*----- | | -----*-- |  ← 수평!
+|    \     | |     /    |          |          | |          |
++----------+ +----------+          +----------+ +----------+
   에피폴라 선이 기울어짐               수평으로 정렬됨
 ```
 
@@ -100,7 +100,7 @@ OpenCV 파이프라인:
 2. `cv::initUndistortRectifyMap` → 각 카메라의 remap 테이블
 3. `cv::remap` → rectified 이미지 생성
 
-### 4. Disparity ↔ Depth
+### 4. Disparity <-> Depth
 
 ```
 Z = fB / d
@@ -130,7 +130,7 @@ d: disparity (픽셀) = u_left - u_right
 
 ---
 
-## 🔗 Perception에서 어디에 쓰이나
+## [link] Perception에서 어디에 쓰이나
 
 ### Stereo Depth Network (HITNet, CRE-Stereo)
 - **입력**: rectified stereo pair
@@ -149,7 +149,7 @@ d: disparity (픽셀) = u_left - u_right
 
 ---
 
-## 📊 핵심 정리
+## [chart] 핵심 정리
 
 ### 파이프라인
 
@@ -173,7 +173,7 @@ flowchart TD
 
 ---
 
-## ✅ 학습 완료 체크리스트
+## [O] 학습 완료 체크리스트
 
 ### 기초 이해 (필수)
 - [ ] 에피폴라 제약의 기하학적 의미 설명 가능
@@ -192,7 +192,7 @@ flowchart TD
 
 ---
 
-## 🔗 다음 단계
+## [link] 다음 단계
 
 ### Week 4: 삼각측량 + PnP (Perception 3D 맥락)
 
@@ -203,7 +203,7 @@ Stereo에서 한 걸음 더:
 
 ---
 
-## 📚 참고 자료
+## [ref] 참고 자료
 
 - *Multiple View Geometry* (Hartley & Zisserman) — Chapter 9, 11
 - OpenCV: [Stereo Calibration and Rectification](https://docs.opencv.org/4.x/dd/d53/tutorial_py_depthmap.html)

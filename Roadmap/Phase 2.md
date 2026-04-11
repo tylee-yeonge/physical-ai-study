@@ -1,14 +1,14 @@
 # Phase 2: Perception을 위한 기하학 기초
 
-> ⏰ **기간**: 4주 (기존 8주 → 4주 압축, Optical Flow 제거)
-> 🎯 **목표**: 카메라 행렬·왜곡·Multi-view 기하를 사용해 **2D 관측과 3D 세계를 연결**한다. 3D Object Detection / Depth Estimation / BEV의 기하학적 기초.
-> ⏱️ **주간 시간**: 약 7시간
-> 💻 **언어**: C++ (OpenCV)
-> 🛠️ **하드웨어**: Jetson Orin Nano + ELP 800P Stereo Camera
+> [time] **기간**: 4주 (기존 8주 → 4주 압축, Optical Flow 제거)
+> [goal] **목표**: 카메라 행렬·왜곡·Multi-view 기하를 사용해 **2D 관측과 3D 세계를 연결**한다. 3D Object Detection / Depth Estimation / BEV의 기하학적 기초.
+> [time] **주간 시간**: 약 7시간
+> [code] **언어**: C++ (OpenCV)
+> [tool] **하드웨어**: Jetson Orin Nano + ELP 800P Stereo Camera
 
 ---
 
-## 📜 재구조화 회고 (2026-04-10)
+##  재구조화 회고 (2026-04-10)
 
 이 Phase 는 원래 **컴퓨터 비전 기초 (8주)** 였고, 완료 기준이 *"VINS-Fusion 의 feature_tracker 노드가 뭘 하는지 이해"* 였다.
 이직 타겟이 **Perception Engineer** 로 확정되면서 SLAM 트랙(VO/BA, VIO)이 [Archive/SLAM-legacy/](../Archive/SLAM-legacy/) 로 이동했고, Phase 2 도 SLAM 프레이밍을 제거하고 **Perception 중심 4주 구조** 로 재작성됐다.
@@ -19,7 +19,7 @@
 
 ---
 
-## 🎯 완료 기준
+## [goal] 완료 기준
 
 다음 한 문장에 자신 있게 답할 수 있으면 Phase 2 완료:
 
@@ -33,16 +33,16 @@
 
 ---
 
-## 🗺️ 4주 구조 한눈에
+##  4주 구조 한눈에
 
 | Week | 주제 | 학습 상태 | 코드 상태 |
 |------|------|----------|----------|
-| **1** | 카메라 모델 (핀홀, K, 내부/외부 파라미터) | ✅ 학습 완료 | 기존 유지, README 리프레이밍 |
-| **2** | 렌즈 왜곡 + 캘리브레이션 | ✅ 학습 완료 | 기존 유지, README 리프레이밍 |
-| **3** | Multi-view 기하 + Stereo Rectification | 🟡 재정리 | **신규 작성** (OpenCV C++) |
-| **4** | 삼각측량 + PnP (Perception 3D 맥락) | ⏳ 대기 | **신규 작성** (OpenCV C++) |
+| **1** | 카메라 모델 (핀홀, K, 내부/외부 파라미터) | [O] 학습 완료 | 기존 유지, README 리프레이밍 |
+| **2** | 렌즈 왜곡 + 캘리브레이션 | [O] 학습 완료 | 기존 유지, README 리프레이밍 |
+| **3** | Multi-view 기하 + Stereo Rectification |  재정리 | **신규 작성** (OpenCV C++) |
+| **4** | 삼각측량 + PnP (Perception 3D 맥락) | [time] 대기 | **신규 작성** (OpenCV C++) |
 
-> 📌 학습 상태는 "학습자(나)의 진행도" 이고, 코드 상태는 "이 디렉토리의 실습 코드 상태"이다.
+> [pin] 학습 상태는 "학습자(나)의 진행도" 이고, 코드 상태는 "이 디렉토리의 실습 코드 상태"이다.
 
 ```mermaid
 graph LR
@@ -57,12 +57,12 @@ graph LR
 
 ---
 
-## 📋 Section 2.1: 카메라 모델 (Week 1, 2)
+## [list] Section 2.1: 카메라 모델 (Week 1, 2)
 
-### Week 1: 핀홀 카메라 모델 ✅ (학습 완료)
+### Week 1: 핀홀 카메라 모델 [O] (학습 완료)
 
-> 💻 **C++ 실습**: [Studies/Phase 2/week1/](../Studies/Phase%202/week1/)
-> 📝 **README 변경**: SLAM 프레이밍 제거 → Perception 맥락으로 리프레이밍
+> [code] **C++ 실습**: [Studies/Phase 2/week1/](../Studies/Phase%202/week1/)
+> [note] **README 변경**: SLAM 프레이밍 제거 → Perception 맥락으로 리프레이밍
 
 #### 기본 개념 (학습 완료)
 - [x] 핀홀 카메라 원리
@@ -80,9 +80,9 @@ graph LR
 - **3D → 2D Back-projection**: 3D 박스 코너를 2D 이미지에 그려 시각적 검증할 때 핵심 연산
 - **데이터셋 호환**: KITTI/nuScenes calibration 파일이 정확히 이 형식
 
-### Week 2: 렌즈 왜곡 + 캘리브레이션 ✅ (학습 완료)
+### Week 2: 렌즈 왜곡 + 캘리브레이션 [O] (학습 완료)
 
-> 💻 **C++ 실습**: [Studies/Phase 2/week2/](../Studies/Phase%202/week2/)
+> [code] **C++ 실습**: [Studies/Phase 2/week2/](../Studies/Phase%202/week2/)
 
 #### 렌즈 왜곡 / 캘리브레이션 (학습 완료)
 - [x] 방사 왜곡 (배럴/핀쿠션) + 접선 왜곡
@@ -101,12 +101,12 @@ graph LR
 
 ---
 
-## 📋 Section 2.2: Multi-view 기하 (Week 3, 4) — Perception 맥락 신규
+## [list] Section 2.2: Multi-view 기하 (Week 3, 4) — Perception 맥락 신규
 
-### Week 3: Multi-view 기하 + Stereo Rectification 🟡
+### Week 3: Multi-view 기하 + Stereo Rectification 
 
-> 💻 **C++ 실습 (신규)**: [Studies/Phase 2/week3/](../Studies/Phase%202/week3/)
-> ⏰ **실습 시간**: 6-8시간
+> [code] **C++ 실습 (신규)**: [Studies/Phase 2/week3/](../Studies/Phase%202/week3/)
+> [time] **실습 시간**: 6-8시간
 
 #### 학습 목표
 - 에피폴라 제약을 이해하고 Stereo Rectification 까지 한 흐름으로 연결
@@ -117,7 +117,7 @@ graph LR
 - [ ] 에피폴라 제약 (Epipolar Constraint) — 두 뷰 사이 점이 만족해야 하는 선형 관계
 - [ ] Essential Matrix `E` / Fundamental Matrix `F` — 두 카메라의 상대 자세
 - [ ] Stereo Rectification — 두 이미지를 같은 평면에 정렬, epipolar line 이 수평이 되도록
-- [ ] 디스패리티 ↔ 깊이 관계 `Z = fB/d`
+- [ ] 디스패리티 <-> 깊이 관계 `Z = fB/d`
 - [ ] (보조) RANSAC — outlier 가 많은 매칭에서 robust 하게 모델 추정
 
 #### Perception에서 어디에 쓰이나
@@ -131,14 +131,14 @@ graph LR
 - `my_basic.cpp` — 사용자 구현 뼈대 (Step 1~6)
 - `quiz_easy.cpp` / `quiz_medium.cpp` — 개념 + 구현 퀴즈
 
-### Week 4: 삼각측량 + PnP (Perception 3D 맥락) ⏳
+### Week 4: 삼각측량 + PnP (Perception 3D 맥락) [time]
 
-> 💻 **C++ 실습 (신규)**: [Studies/Phase 2/week4/](../Studies/Phase%202/week4/)
-> ⏰ **실습 시간**: 6-8시간
+> [code] **C++ 실습 (신규)**: [Studies/Phase 2/week4/](../Studies/Phase%202/week4/)
+> [time] **실습 시간**: 6-8시간
 
 #### 학습 목표
 - 삼각측량 = Multi-view Depth / Multi-view 3D Detection 의 기초 연산
-- PnP = 3D 박스 ↔ 2D 이미지 관계 검증의 도구
+- PnP = 3D 박스 <-> 2D 이미지 관계 검증의 도구
 - 재투영 오차 (Reprojection Error) = 3D Detection 평가 지표의 기초
 
 #### 핵심 개념
@@ -161,7 +161,7 @@ graph LR
 
 ---
 
-## 🔍 Phase 2 최종 자체 점검
+## [search] Phase 2 최종 자체 점검
 
 다음 질문에 짧게라도 설명할 수 있으면 Phase 2 완료:
 
@@ -174,15 +174,15 @@ graph LR
 
 ---
 
-## ➡️ 다음 단계
+## -> 다음 단계
 
 Phase 2 완료 후 → **[Phase 3: Detection + Depth](Phase%205.md)** 로 직진.
 
-> ⚠️ 기존 SLAM 트랙(VO/BA, VIO)은 [Archive/SLAM-legacy/](../Archive/SLAM-legacy/) 로 이동되었다. SLAM 트랙은 더 이상 메인 로드맵의 일부가 아니다.
+> [!] 기존 SLAM 트랙(VO/BA, VIO)은 [Archive/SLAM-legacy/](../Archive/SLAM-legacy/) 로 이동되었다. SLAM 트랙은 더 이상 메인 로드맵의 일부가 아니다.
 
 ---
 
-## 📚 참고 자료
+## [ref] 참고 자료
 
 ### Multi-view Geometry
 - *Multiple View Geometry in Computer Vision* (Hartley & Zisserman) — 1, 6, 9, 10, 11장

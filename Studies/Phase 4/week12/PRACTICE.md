@@ -1,12 +1,12 @@
 # Week 12 실습: 블로그 포스팅 & Demo 영상 제작
 
-> 🎯 **목표**: KITTI 3D Detection 블로그 포스팅을 작성하고, Demo 영상 스크립트를 준비하며, LinkedIn 포스팅 초안을 작성한다
-> 💻 **언어**: Python (Markdown 생성, 시각화)
-> ⏰ **예상 시간**: 8시간
+> [goal] **목표**: KITTI 3D Detection 블로그 포스팅을 작성하고, Demo 영상 스크립트를 준비하며, LinkedIn 포스팅 초안을 작성한다
+> [code] **언어**: Python (Markdown 생성, 시각화)
+> [time] **예상 시간**: 8시간
 
 ---
 
-## 📋 실습 개요
+## [list] 실습 개요
 
 | Step | 내용 | 난이도 | 시간 |
 |------|------|--------|------|
@@ -17,7 +17,7 @@
 
 ---
 
-## 🔧 환경 설정
+## [tool] 환경 설정
 
 ```bash
 pip install -r requirements.txt
@@ -91,11 +91,11 @@ KITTI는 자율주행 3D Detection의 대표적인 벤치마크입니다.
 
 ```
 KITTI/
-├── training/
-│   ├── image_2/      # 왼쪽 카메라 이미지 (7,481장)
-│   ├── calib/        # 카메라 캘리브레이션
-│   └── label_2/      # 3D 어노테이션
-└── testing/          # 테스트 세트
++-- training/
+|   +-- image_2/      # 왼쪽 카메라 이미지 (7,481장)
+|   +-- calib/        # 카메라 캘리브레이션
+|   +-- label_2/      # 3D 어노테이션
++-- testing/          # 테스트 세트
 ```
 
 ### 레이블 형식
@@ -432,9 +432,9 @@ def prepare_interview_qa():
     print("━" * 50)
 
     for i, qa in enumerate(qa_list, 1):
-        print(f"\n{'─' * 50}")
+        print(f"\n{'-' * 50}")
         print(f"  Q{i}. {qa['question']}")
-        print(f"{'─' * 50}")
+        print(f"{'-' * 50}")
         print(qa['answer'])
 
     print(f"\n{'━' * 50}")
@@ -449,7 +449,7 @@ prepare_interview_qa()
 
 ---
 
-## ✅ 체크리스트
+## [O] 체크리스트
 
 ### 블로그
 - [ ] 블로그 플랫폼 선택 (Velog, Tistory 등)
@@ -475,7 +475,7 @@ prepare_interview_qa()
 
 ---
 
-## 💡 추가 실험 아이디어
+## [tip] 추가 실험 아이디어
 
 1. **블로그 시리즈**: 2편(nuScenes & BEV), 3편(면접 대비) 추가 작성
 2. **영상 시리즈**: KITTI 편, nuScenes 편 별도 제작

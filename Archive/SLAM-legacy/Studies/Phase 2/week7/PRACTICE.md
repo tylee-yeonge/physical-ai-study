@@ -1,20 +1,20 @@
 # Week 7: Depth Map 계산 및 실시간 데모 (C++)
 
-> 🎯 **목표**: Disparity → Depth 변환 및 실시간 깊이 추정 시스템 구현
-> 💻 **언어**: C++ (OpenCV 4.x)
-> 🛠️ **하드웨어**: Jetson Orin Nano + ELP Stereo (캘리브레이션 완료)
-> ⏰ **예상 시간**: 6-8시간
+> [goal] **목표**: Disparity → Depth 변환 및 실시간 깊이 추정 시스템 구현
+> [code] **언어**: C++ (OpenCV 4.x)
+> [tool] **하드웨어**: Jetson Orin Nano + ELP Stereo (캘리브레이션 완료)
+> [time] **예상 시간**: 6-8시간
 
 ---
 
-## 📋 전제 조건
+## [list] 전제 조건
 
 - [ ] Week 5 Stereo Rectification 완료
 - [ ] Week 6 Disparity Map 생성 완료
 
 ---
 
-## 🔧 실습 1: DepthEstimator 클래스 구현
+## [tool] 실습 1: DepthEstimator 클래스 구현
 
 ### 헤더 파일
 
@@ -89,7 +89,7 @@ float DepthEstimator::getDepthAt(const cv::Mat& depth, int x, int y) {
 
 ---
 
-## 🔧 실습 2: 실시간 Depth Map 데모
+## [tool] 실습 2: 실시간 Depth Map 데모
 
 **src/realtime_depth.cpp**:
 ```cpp
@@ -139,7 +139,7 @@ int main() {
     cv::namedWindow("Depth Map");
     cv::setMouseCallback("Depth Map", mouse_callback, &mouse_pt);
 
-    std::cout << "\n🎥 실시간 Depth 추정 시작" << std::endl;
+    std::cout << "\n[video] 실시간 Depth 추정 시작" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "마우스를 Depth Map 위로 이동하면 거리 표시" << std::endl;
     std::cout << "Q/W: NumDisparities 조정" << std::endl;
@@ -236,7 +236,7 @@ int main() {
 
 ---
 
-## ✅ 체크리스트
+## [O] 체크리스트
 
 ### Depth Map
 - [ ] `DepthEstimator` 클래스 구현
@@ -255,7 +255,7 @@ int main() {
 
 ---
 
-## 🏗️ mini_vo 구현 (이번 주 핵심)
+##  mini_vo 구현 (이번 주 핵심)
 
 **구현 파일**: `Studies/Phase 2/mini_vo/src/triangulator.cpp`
 

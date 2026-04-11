@@ -1,13 +1,13 @@
 # Week 2: 카메라 캘리브레이션 실습 (C++)
 
-> 🎯 **목표**: 카메라의 내부 파라미터를 C++로 측정
-> 💻 **언어**: C++ (OpenCV 4.x)
-> 🛠️ **하드웨어**: Jetson Orin Nano + ELP 800P Stereo 또는 MacBook (내장 카메라)
-> ⏰ **예상 시간**: 6-8시간
+> [goal] **목표**: 카메라의 내부 파라미터를 C++로 측정
+> [code] **언어**: C++ (OpenCV 4.x)
+> [tool] **하드웨어**: Jetson Orin Nano + ELP 800P Stereo 또는 MacBook (내장 카메라)
+> [time] **예상 시간**: 6-8시간
 
 ---
 
-## 📋 준비사항
+## [list] 준비사항
 
 ### 하드웨어
 
@@ -85,7 +85,7 @@ pkg-config --modversion opencv4
 
 ---
 
-## 📂 프로젝트 구조
+## [dir] 프로젝트 구조
 
 ```bash
 cd ~/workspace
@@ -95,22 +95,22 @@ cd stereo_calib_practice
 
 ```
 stereo_calib_practice/
-├── CMakeLists.txt
-├── include/
-│   └── camera_calibration.hpp
-├── src/
-│   ├── camera_calibration.cpp
-│   ├── mono_calib.cpp
-│   └── stereo_calib.cpp
-└── data/
-    ├── left/
-    ├── right/
-    └── calib_results/
++-- CMakeLists.txt
++-- include/
+|   +-- camera_calibration.hpp
++-- src/
+|   +-- camera_calibration.cpp
+|   +-- mono_calib.cpp
+|   +-- stereo_calib.cpp
++-- data/
+    +-- left/
+    +-- right/
+    +-- calib_results/
 ```
 
 ---
 
-## 🔧 실습 1: 단일 카메라 캘리브레이션
+## [tool] 실습 1: 단일 카메라 캘리브레이션
 
 ### Step 1: 헤더 파일 작성
 
@@ -219,7 +219,7 @@ double CameraCalibration::calibrate(
         allObjectPoints, imagePoints, imageSize,
         cameraMatrix, distCoeffs, rvecs, tvecs);
     
-    std::cout << "✅ RMS re-projection error: " << rms << " pixels" << std::endl;
+    std::cout << "[O] RMS re-projection error: " << rms << " pixels" << std::endl;
     
     return rms;
 }
@@ -237,7 +237,7 @@ void CameraCalibration::saveCalibration(
     fs << "image_height" << imageSize.height;
     fs.release();
 
-    std::cout << "💾 Saved calibration to " << filename << std::endl;
+    std::cout << "[save] Saved calibration to " << filename << std::endl;
 }
 ```
 
@@ -263,7 +263,7 @@ int main(int argc, char** argv) {
     
     cv::VideoCapture cap(camera_id);
     if (!cap.isOpened()) {
-        std::cerr << "❌ Cannot open camera " << camera_id << std::endl;
+        std::cerr << "[X] Cannot open camera " << camera_id << std::endl;
         return -1;
     }
     
@@ -275,7 +275,7 @@ int main(int argc, char** argv) {
     int capturedFrames = 0;
     const int targetFrames = 20;
     
-    std::cout << "\n📸 카메라 캘리브레이션 시작" << std::endl;
+    std::cout << "\n[img] 카메라 캘리브레이션 시작" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "SPACE: 캡처 (" << targetFrames << "장 필요)" << std::endl;
     std::cout << "ESC: 캡처 종료" << std::endl;
@@ -314,18 +314,18 @@ int main(int argc, char** argv) {
         if (key == 32 && found) {  // SPACE
             imagePoints.push_back(corners);
             capturedFrames++;
-            std::cout << "📷 Frame " << capturedFrames << " captured" << std::endl;
+            std::cout << "[img] Frame " << capturedFrames << " captured" << std::endl;
         }
     }
     
     cv::destroyAllWindows();
     
     if (capturedFrames < 10) {
-        std::cerr << "❌ Not enough frames! (minimum 10)" << std::endl;
+        std::cerr << "[X] Not enough frames! (minimum 10)" << std::endl;
         return -1;
     }
     
-    std::cout << "\n⚙️  캘리브레이션 수행 중..." << std::endl;
+    std::cout << "\n  캘리브레이션 수행 중..." << std::endl;
 
     // 실제 카메라 해상도 사용 (cap.set()이 요청대로 되지 않을 수 있음)
     cv::Size imageSize(frame.cols, frame.rows);
@@ -333,7 +333,7 @@ int main(int argc, char** argv) {
     cv::Mat K, dist;
     double rms = calib.calibrate(imagePoints, imageSize, K, dist);
 
-    std::cout << "\n📊 결과:" << std::endl;
+    std::cout << "\n[chart] 결과:" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "Camera Matrix K:\n" << K << std::endl;
     std::cout << "\nDistortion Coefficients:\n" << dist << std::endl;
@@ -344,11 +344,11 @@ int main(int argc, char** argv) {
     calib.saveCalibration(filename, K, dist, imageSize);
     
     if (rms < 0.5) {
-        std::cout << "✅ 우수한 캘리브레이션! (RMS < 0.5)" << std::endl;
+        std::cout << "[O] 우수한 캘리브레이션! (RMS < 0.5)" << std::endl;
     } else if (rms < 1.0) {
-        std::cout << "⚠️  양호한 캘리브레이션 (RMS < 1.0)" << std::endl;
+        std::cout << "[!]  양호한 캘리브레이션 (RMS < 1.0)" << std::endl;
     } else {
-        std::cout << "❌ 재캘리브레이션 권장 (RMS >= 1.0)" << std::endl;
+        std::cout << "[X] 재캘리브레이션 권장 (RMS >= 1.0)" << std::endl;
     }
     
     return 0;
@@ -403,7 +403,7 @@ make -j4
 
 ---
 
-## 🔧 실습 2: 스테레오 캘리브레이션
+## [tool] 실습 2: 스테레오 캘리브레이션
 
 > **MacBook 사용자**: 내장 카메라는 단일 카메라이므로 스테레오 캘리브레이션은 Jetson + ELP에서 수행합니다. 실습 1의 단일 카메라 캘리브레이션 결과를 분석하세요.
 
@@ -430,7 +430,7 @@ distortion_coefficients: !!opencv-matrix
 
 ---
 
-## ✅ 체크리스트
+## [O] 체크리스트
 
 ### 환경 세팅
 - [ ] OpenCV 4.x 설치 확인
@@ -453,7 +453,7 @@ distortion_coefficients: !!opencv-matrix
 
 ---
 
-## 💡 팁
+## [tip] 팁
 
 ### 좋은 캘리브레이션을 위한 팁
 1. **다양한 각도**: 체커보드를 여러 각도에서 촬영
@@ -468,7 +468,7 @@ distortion_coefficients: !!opencv-matrix
 
 ---
 
-## 📚 참고 자료
+## [ref] 참고 자료
 
 - [OpenCV Camera Calibration Tutorial](https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html)
 - [Pinhole Camera Model (README.md)](../week1/README.md)

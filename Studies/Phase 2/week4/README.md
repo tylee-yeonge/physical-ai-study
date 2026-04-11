@@ -1,13 +1,13 @@
 # Week 4: 삼각측량 + PnP (Perception 3D 맥락)
 
-## 📌 개요
+## [pin] 개요
 
-> 🎯 **목표**: 삼각측량과 PnP를 이해하고 Perception 3D Detection 평가의 기초 확보
-> ⏱️ **예상 시간**: 이론 2시간 + 실습 4시간
+> [goal] **목표**: 삼각측량과 PnP를 이해하고 Perception 3D Detection 평가의 기초 확보
+> [time] **예상 시간**: 이론 2시간 + 실습 4시간
 
 **삼각측량**은 두 시점에서 관측한 점의 3D 위치를 복원하는 연산이고, **PnP**는 알려진 3D-2D 대응에서 카메라 포즈를 추정하는 연산입니다. 이 두 연산은 Monocular 3D Detection, Multi-view Depth, 카메라 외재 캘리브레이션의 핵심 빌딩 블록입니다.
 
-### 🤔 왜 이걸 배워야 할까요?
+### [?] 왜 이걸 배워야 할까요?
 
 **Perception에서의 활용**:
 - **Monocular 3D Detection (FCOS3D, SMOKE, MonoFlex)**: 예측 3D 박스 8 코너를 2D에 투영 → **재투영 오차**로 검증, 학습 시 loss term으로 사용
@@ -18,7 +18,7 @@
 
 ---
 
-## 📋 학습 순서
+## [list] 학습 순서
 
 | 순서 | 활동 | 파일 | 마치면 풀 퀴즈 |
 |:----:|------|------|:-------------:|
@@ -31,7 +31,7 @@
 
 ---
 
-## 🚀 Step 1: 먼저 돌려보기
+##  Step 1: 먼저 돌려보기
 
 ```bash
 cd week4 && mkdir build && cd build
@@ -45,7 +45,7 @@ cmake .. && make
 
 ---
 
-## 📖 핵심 개념
+## [ref] 핵심 개념
 
 ### 1. DLT 삼각측량
 
@@ -119,7 +119,7 @@ eᵢ = ||p_obs - π(K, R, t, Xᵢ)||₂
 
 ---
 
-## 🔗 Perception에서 어디에 쓰이나
+## [link] Perception에서 어디에 쓰이나
 
 ### Monocular 3D Detection (FCOS3D, SMOKE, MonoFlex)
 - 모델이 예측한 3D 박스의 8 코너를 2D 이미지에 **재투영**
@@ -140,7 +140,7 @@ eᵢ = ||p_obs - π(K, R, t, Xᵢ)||₂
 
 ---
 
-## 📊 핵심 정리
+## [chart] 핵심 정리
 
 ### 파이프라인
 
@@ -158,7 +158,7 @@ flowchart TD
 
 ---
 
-## ✅ 학습 완료 체크리스트
+## [O] 학습 완료 체크리스트
 
 ### 기초 이해 (필수)
 - [ ] 삼각측량의 기하학적 원리 설명 가능
@@ -177,13 +177,13 @@ flowchart TD
 
 ---
 
-## 🔗 다음 단계
+## [link] 다음 단계
 
 Phase 2 완료 후 → **[Phase 3: Detection + Depth](../../Roadmap/Phase%205.md)** 로 직진.
 
 ---
 
-## 📚 참고 자료
+## [ref] 참고 자료
 
 - *Multiple View Geometry* (Hartley & Zisserman) — Chapter 12 (Triangulation), 7 (PnP)
 - OpenCV: [solvePnP](https://docs.opencv.org/4.x/d5/d1f/calib3d_solvePnP.html)

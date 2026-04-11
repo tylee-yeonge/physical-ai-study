@@ -1,17 +1,17 @@
 # Phase 4: VIO 핵심 (Visual-Inertial Odometry)
 
-> ⏰ **기간**: 3주
-> 🎯 **목표**: IMU와 Vision 융합의 핵심 직관적 이해
-> ⏱️ **주간 시간**: 약 7-10시간
-> 💻 **언어**: **C++** (VINS 코드 읽기 중심)
+> [time] **기간**: 3주
+> [goal] **목표**: IMU와 Vision 융합의 핵심 직관적 이해
+> [time] **주간 시간**: 약 7-10시간
+> [code] **언어**: **C++** (VINS 코드 읽기 중심)
 
 ---
 
-## 👉 **실습 가이드**: [`Studies/Phase 4/PRACTICE.md`](../Studies/Phase%204/PRACTICE.md)
+## -> **실습 가이드**: [`Studies/Phase 4/PRACTICE.md`](../Studies/Phase%204/PRACTICE.md)
 
 ---
 
-## 📋 Week 1: IMU 기초 + 센서 융합 개념
+## [list] Week 1: IMU 기초 + 센서 융합 개념
 
 ### IMU 센서 이해
 
@@ -42,14 +42,14 @@
 - [ ] EKF: 비선형 시스템을 현재 추정값 주변에서 선형화
 - [ ] ESKF: 작은 오차는 더 선형적 → 회전 문제 해결
 
-### 🔍 자체 점검
+### [search] 자체 점검
 1. 가속도계가 정지 상태에서도 값을 출력하는 이유는?
 2. IMU 데이터 주파수가 Vision보다 높은 이유는?
 3. 칼만 필터에서 공분산이 의미하는 것은?
 
 ---
 
-## 📋 Week 2: Pre-integration + Factor Graph
+## [list] Week 2: Pre-integration + Factor Graph
 
 > VIO의 핵심 개념. 직관적 이해에 집중.
 
@@ -58,7 +58,7 @@
 #### 문제 상황
 ```
 IMU: ████████████████████████████ (200Hz)
-Vision:     ■         ■         ■ (20Hz)
+Vision:     #         #         # (20Hz)
            KF_i      KF_j      KF_k
 ```
 - [ ] 키프레임 i→j 사이에 IMU 데이터 수십 개
@@ -102,14 +102,14 @@ Pre-integration: "출발점 기준 최종 변위: (150m, 30도 회전)"
 - [ ] `imu_factor.h`: IMU Factor 정의
 - [ ] `Evaluate()`: Factor 오차 계산
 
-### 🔍 자체 점검
+### [search] 자체 점검
 1. Pre-integration이 없으면 왜 비효율적인가?
 2. Delta_p, Delta_v, Delta_q가 "포즈 독립적"이라는 게 무슨 의미인가?
 3. 바이어스가 변할 때 왜 재적분 없이 보정 가능한가?
 
 ---
 
-## 📋 Week 3: VIO 초기화 + Camera-IMU 캘리브레이션
+## [list] Week 3: VIO 초기화 + Camera-IMU 캘리브레이션
 
 ### VIO 초기화
 
@@ -144,14 +144,14 @@ Camera Frame ←[R, t]→ IMU Frame
 - [ ] AprilGrid 타겟, 다양한 축 회전 필요
 - [ ] 결과를 VINS config에 반영
 
-### 🔍 자체 점검
+### [search] 자체 점검
 1. VIO 초기화에서 스케일을 어떻게 알아내는가?
 2. 중력 방향을 왜 추정해야 하는가?
 3. Camera-IMU extrinsic이 틀리면 어떤 현상이 나타나는가?
 
 ---
 
-## ✅ Phase 4 완료 체크리스트
+## [O] Phase 4 완료 체크리스트
 
 ### IMU 기초
 - [ ] IMU 센서 동작 원리 이해
@@ -168,20 +168,20 @@ Camera Frame ←[R, t]→ IMU Frame
 
 ---
 
-## 🎯 Phase 4 완료 기준
+## [goal] Phase 4 완료 기준
 
 > "IMU와 Vision이 왜 상호보완적인지, Pre-integration 개념을 직관적으로 설명 가능"
 
 ---
 
-## 📚 참고 자료
+## [ref] 참고 자료
 
 ### 논문 (필독)
 
 | 논문 | 용도 | 우선순위 |
 |------|------|---------|
-| VINS-Mono (Qin et al., 2018) | VIO 전체 | ⭐⭐⭐ |
-| On-Manifold Preintegration (Forster et al., 2017) | Pre-integration 상세 | ⭐⭐ |
+| VINS-Mono (Qin et al., 2018) | VIO 전체 | [*][*][*] |
+| On-Manifold Preintegration (Forster et al., 2017) | Pre-integration 상세 | [*][*] |
 
 ### 책
 
@@ -199,7 +199,7 @@ Camera Frame ←[R, t]→ IMU Frame
 
 ---
 
-## 💡 팁
+## [tip] 팁
 
 1. **수식에 겁먹지 말기**: 직관적 이해가 먼저, 수식은 나중에
 2. **논문 반복 읽기**: VINS 논문을 3번 이상 읽기
@@ -208,7 +208,7 @@ Camera Frame ←[R, t]→ IMU Frame
 
 ---
 
-## ❓ 다음 단계
+## [?] 다음 단계
 
 Phase 4 완료 후:
 - Phase 5 (Detection + Depth Estimation)로 진행

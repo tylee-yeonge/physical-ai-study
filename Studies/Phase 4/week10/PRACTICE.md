@@ -1,12 +1,12 @@
 # Week 10 실습: BEVFormer 추론 및 BEV Feature 시각화
 
-> 🎯 **목표**: BEVFormer pretrained 모델로 추론하고, BEV Feature를 시각화하며, NDS/mAP 지표를 직접 계산해본다
-> 💻 **언어**: Python (PyTorch, NumPy, Matplotlib)
-> ⏰ **예상 시간**: 8시간
+> [goal] **목표**: BEVFormer pretrained 모델로 추론하고, BEV Feature를 시각화하며, NDS/mAP 지표를 직접 계산해본다
+> [code] **언어**: Python (PyTorch, NumPy, Matplotlib)
+> [time] **예상 시간**: 8시간
 
 ---
 
-## 📋 실습 개요
+## [list] 실습 개요
 
 | Step | 내용 | 난이도 | 시간 |
 |------|------|--------|------|
@@ -17,7 +17,7 @@
 
 ---
 
-## 🔧 환경 설정
+## [tool] 환경 설정
 
 ```bash
 pip install -r requirements.txt
@@ -452,7 +452,7 @@ analyze_distance_performance()
 
 ---
 
-## ✅ 체크리스트
+## [O] 체크리스트
 
 ### 환경 세팅
 - [ ] BEVFormer 코드 클론 완료
@@ -476,7 +476,7 @@ analyze_distance_performance()
 
 ---
 
-## 💡 추가 실험 아이디어
+## [tip] 추가 실험 아이디어
 
 1. **Temporal 효과 분석**: Temporal Attention 유무에 따른 NDS 차이 비교
 2. **해상도 영향**: BEV 해상도(50x50, 100x100, 200x200)에 따른 성능/속도 트레이드오프

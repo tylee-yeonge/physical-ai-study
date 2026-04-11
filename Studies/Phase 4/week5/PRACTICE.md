@@ -1,12 +1,12 @@
 # Week 5 실습: MMDetection3D로 KITTI 3D Detection
 
-> 🎯 **목표**: MMDetection3D 환경을 세팅하고, FCOS3D 모델로 KITTI 3D Detection을 실습한다
-> 💻 **언어**: Python (PyTorch, MMDetection3D)
-> ⏰ **예상 시간**: 10시간
+> [goal] **목표**: MMDetection3D 환경을 세팅하고, FCOS3D 모델로 KITTI 3D Detection을 실습한다
+> [code] **언어**: Python (PyTorch, MMDetection3D)
+> [time] **예상 시간**: 10시간
 
 ---
 
-## 📋 실습 개요
+## [list] 실습 개요
 
 | Step | 내용 | 난이도 | 시간 |
 |------|------|--------|------|
@@ -17,7 +17,7 @@
 
 ---
 
-## 🔧 환경 설정
+## [tool] 환경 설정
 
 ```bash
 # Conda 환경 생성
@@ -64,10 +64,10 @@ def check_package(name, import_name=None):
     try:
         mod = __import__(import_name)
         version = getattr(mod, '__version__', 'unknown')
-        print(f"  ✅ {name}: {version}")
+        print(f"  [O] {name}: {version}")
         return True
     except ImportError:
-        print(f"  ❌ {name}: 설치되지 않음")
+        print(f"  [X] {name}: 설치되지 않음")
         return False
 
 print("=" * 50)
@@ -76,7 +76,7 @@ print("=" * 50)
 
 all_ok = True
 all_ok &= check_package("Python", "sys")
-print(f"  ✅ Python: {sys.version.split()[0]}")
+print(f"  [O] Python: {sys.version.split()[0]}")
 
 all_ok &= check_package("PyTorch", "torch")
 all_ok &= check_package("torchvision")
@@ -96,9 +96,9 @@ if torch.cuda.is_available():
 
 print("\n" + "=" * 50)
 if all_ok:
-    print("✅ 모든 패키지가 올바르게 설치되었습니다!")
+    print("[O] 모든 패키지가 올바르게 설치되었습니다!")
 else:
-    print("❌ 일부 패키지 설치가 필요합니다.")
+    print("[X] 일부 패키지 설치가 필요합니다.")
 print("=" * 50)
 ```
 
@@ -160,7 +160,7 @@ def check_kitti_structure():
         full_path = os.path.join(KITTI_ROOT, path)
         exists = os.path.exists(full_path)
         count = len(os.listdir(full_path)) if exists else 0
-        status = "✅" if exists else "❌"
+        status = "[O]" if exists else "[X]"
         print(f"  {status} {path}: {count} 파일")
 
 def parse_kitti_label(label_file):
@@ -592,7 +592,7 @@ python tools/test.py \
 
 ---
 
-## 🔧 트러블슈팅
+## [tool] 트러블슈팅
 
 ### 자주 발생하는 문제
 
@@ -605,7 +605,7 @@ python tools/test.py \
 
 ---
 
-## ✅ 체크리스트
+## [O] 체크리스트
 
 ### 환경 세팅
 - [ ] conda 환경 생성 및 활성화

@@ -1,13 +1,13 @@
 # Week 8: 광류 (Optical Flow)
 
-## 📌 개요
+## [pin] 개요
 
-> 🎯 **목표**: 픽셀 단위 움직임 추정, 특징점 추적 이해하기
-> ⏱️ **예상 시간**: 이론 2시간 + 실습 3시간
+> [goal] **목표**: 픽셀 단위 움직임 추정, 특징점 추적 이해하기
+> [time] **예상 시간**: 이론 2시간 + 실습 3시간
 
 **광류(Optical Flow)**는 연속된 프레임 사이에서 **픽셀의 움직임**을 추정하는 기술입니다. 특징점 매칭 없이 **추적**을 가능하게 하여 실시간 SLAM에 핵심적입니다.
 
-### 🤔 왜 이걸 배워야 할까요?
+### [?] 왜 이걸 배워야 할까요?
 
 **일상 비유**: 달리는 차에서 창밖 풍경
 
@@ -30,7 +30,7 @@ Stationary                  While driving
 
 ---
 
-## 📋 학습 순서
+## [list] 학습 순서
 
 | 순서 | 활동 | 연결 퀴즈 |
 |:----:|------|:--------:|
@@ -45,7 +45,7 @@ Stationary                  While driving
 
 ---
 
-## 🚀 Step 1: 먼저 돌려보기
+##  Step 1: 먼저 돌려보기
 
 > **이론을 읽기 전에 먼저 코드를 돌려보세요!**
 
@@ -59,7 +59,7 @@ cmake .. && make
 
 ---
 
-## 📖 핵심 개념
+## [ref] 핵심 개념
 
 ### 1. 광류란?
 
@@ -171,9 +171,9 @@ IₓN·u + IᵧN·v = -IₜN
 ```
 A · [u, v]ᵀ = b
 
-    ⎡ Iₓ₁  Iᵧ₁ ⎤       ⎡ -Iₜ₁ ⎤
-A = ⎢ Iₓ₂  Iᵧ₂ ⎥,  b = ⎢ -Iₜ₂ ⎥
-    ⎣ ...  ... ⎦       ⎣ ...  ⎦
+    [ Iₓ₁  Iᵧ₁ ]       [ -Iₜ₁ ]
+A = [ Iₓ₂  Iᵧ₂ ],  b = [ -Iₜ₂ ]
+    [ ...  ... ]       [ ...  ]
 ```
 
 **최소제곱 해**:
@@ -184,9 +184,9 @@ A = ⎢ Iₓ₂  Iᵧ₂ ⎥,  b = ⎢ -Iₜ₂ ⎥
 #### AᵀA 행렬
 
 ```
-        ⎡ ΣIₓ²    ΣIₓIᵧ ⎤
-AᵀA =   ⎢               ⎥  = Structure Tensor!
-        ⎣ ΣIₓIᵧ  ΣIᵧ²  ⎦
+        [ ΣIₓ²    ΣIₓIᵧ ]
+AᵀA =   [               ]  = Structure Tensor!
+        [ ΣIₓIᵧ  ΣIᵧ²  ]
 ```
 
 **Harris 코너와 같은 행렬!**
@@ -323,16 +323,16 @@ F_threshold: 1.0      # Fundamental matrix 임계값
 
 ---
 
-## 💻 실습 파일
+## [code] 실습 파일
 
 | 파일 | 내용 | 난이도 |
 |------|------|--------|
-| `quiz_easy.cpp` | 그래디언트, LK 방정식, 추적 가능성 | ⭐⭐ |
-| `quiz_medium.cpp` | LK 구현, 윈도우 크기 분석 | ⭐⭐⭐ |
+| `quiz_easy.cpp` | 그래디언트, LK 방정식, 추적 가능성 | [*][*] |
+| `quiz_medium.cpp` | LK 구현, 윈도우 크기 분석 | [*][*][*] |
 
 ---
 
-## 📊 핵심 정리
+## [chart] 핵심 정리
 
 ### 광류 방법 비교
 
@@ -353,7 +353,7 @@ F_threshold: 1.0      # Fundamental matrix 임계값
 
 ---
 
-## ✅ 학습 완료 체크리스트
+## [O] 학습 완료 체크리스트
 
 ### 기초 이해 (필수)
 - [ ] 밝기 항상성 가정 설명 가능
@@ -372,9 +372,9 @@ F_threshold: 1.0      # Fundamental matrix 임계값
 
 ---
 
-## 🔗 다음 단계
+## [link] 다음 단계
 
-### Phase 2 완료! 🎉
+### Phase 2 완료! 
 
 다음은 **Phase 3: Visual Odometry & Bundle Adjustment**:
 - VO 파이프라인 이해
@@ -383,7 +383,7 @@ F_threshold: 1.0      # Fundamental matrix 임계값
 
 ---
 
-## 📚 참고 자료
+## [ref] 참고 자료
 
 - Computer Vision: Algorithms and Applications (Szeliski) - Chapter 8
 - OpenCV Optical Flow Tutorial
@@ -391,7 +391,7 @@ F_threshold: 1.0      # Fundamental matrix 임계값
 
 ---
 
-## ❓ FAQ
+## [?] FAQ
 
 **Q1: 추적 실패는 왜 발생하나요?**
 A: 폐색, 빠른 움직임, 조명 변화, 플랫 영역.
@@ -407,7 +407,7 @@ A: 직접은 불가. 추적된 점들로 E 분해 또는 PnP 필요.
 
 ---
 
-**🎯 Week 8 핵심 메시지:**
+**[goal] Week 8 핵심 메시지:**
 
 > 광류 = 픽셀 단위 움직임 추정
 > 
@@ -416,7 +416,7 @@ A: 직접은 불가. 추적된 점들로 E 분해 또는 PnP 필요.
 
 ---
 
-# 🎉 Phase 2 완료!
+#  Phase 2 완료!
 
 8주간의 컴퓨터 비전 기초를 완료했습니다:
 
@@ -428,7 +428,7 @@ A: 직접은 불가. 추적된 점들로 E 분해 또는 PnP 필요.
 | 4 | 특징점 매칭 | Ratio Test, RANSAC |
 | 5 | 에피폴라 기하학 | E, F Matrix |
 | 6 | 포즈 추정 | E → R, t |
-| 7 | 삼각측량/PnP | 2D↔3D |
+| 7 | 삼각측량/PnP | 2D<->3D |
 | 8 | 광류 | Lucas-Kanade |
 
-**다음: Phase 3 - VO & BA! 🚀**
+**다음: Phase 3 - VO & BA! **
