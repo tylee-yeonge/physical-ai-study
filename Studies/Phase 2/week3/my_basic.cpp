@@ -7,8 +7,22 @@
  */
 
 #include <opencv2/opencv.hpp>
+#include <filesystem>
 #include <iostream>
 #include <vector>
+
+/**
+ * @brief 이미지를 output/ 디렉토리에 PNG 파일로 저장
+ * @param name 저장할 파일 이름 (확장자 제외)
+ * @param image 저장할 이미지
+ */
+void save_output(const std::string& name, const cv::Mat& image)
+{
+    std::filesystem::create_directories("output");
+    std::string path = "output/" + name + ".png";
+    cv::imwrite(path, image);
+    std::cout << "   저장: " << path << std::endl;
+}
 
 int main()
 {
