@@ -33,10 +33,13 @@ int main()
 
     // ── Step 2: 합성 스테레오 이미지 생성 ──
     // TODO: 3D 점 50개를 랜덤 생성 (x: -3~3, y: -2~2, z: 3~10)
-    //       K, [R|t] 로 왼쪽/오른쪽 이미지에 각각 투영하여 원 그리기
     cv::Mat left = cv::Mat::zeros(image_size, CV_8UC1);
     cv::Mat right = cv::Mat::zeros(image_size, CV_8UC1);
-    // TODO: 점 투영 + cv::circle 로 그리기
+    // TODO: 위에서 만든 3D 점들을 2D 이미지 평면에 투영한 뒤, cv::circle 로 그린다.
+    //       1) 투영 행렬 만들기: P1 = K * [I|0] (왼쪽), P2 = K * [R|t] (오른쪽)
+    //       2) 각 3D 점을 동차좌표 (x, y, z, 1)로 만들어 P * Pw 계산
+    //       3) 원근 나누기: u = result(0)/w, v = result(1)/w (w는 result(2))
+    //       4) w > 0 이고 이미지 범위 안이면 cv::circle 로 원 그리기
 
     std::cout << "[Step 2] 스테레오 쌍 생성 완료" << std::endl;
 
