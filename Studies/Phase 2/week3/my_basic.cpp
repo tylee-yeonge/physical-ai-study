@@ -33,9 +33,10 @@ int main()
     cv::Size image_size(640, 480);
 
     // ── Step 1: 카메라 파라미터 설정 ──
-    // TODO: fx=500, fy=500, cx=320, cy=240 으로 K 행렬 생성
-    //       baseline=0.12m 로 T 벡터 생성
-    //       R = 단위 행렬, dist = 영벡터
+    // TODO: fx=500, fy=500, cx=320, cy=240 으로 K 행렬(카메라 내부 파라미터) 생성
+    //       baseline=0.12m 로 T 벡터(왼쪽 카메라 기준 오른쪽 카메라의 위치) 생성
+    //       R(왼쪽 카메라 기준 오른쪽 카메라의 회전) = 단위 행렬 (두 카메라가 평행)
+    //       dist1, dist2(왼쪽/오른쪽 카메라의 왜곡 계수 [k1,k2,p1,p2,k3]) = 영벡터 (왜곡 없음)
     cv::Mat K1;  // TODO
     cv::Mat K2;  // TODO
     cv::Mat dist1;  // TODO
@@ -45,8 +46,7 @@ int main()
 
     std::cout << "[Step 1] 카메라 파라미터 설정 완료" << std::endl;
 
-    // ── Step 2: 합성 스테레오 이미지 생성 ──
-    // TODO: 3D 점 50개를 랜덤 생성 (x: -3~3, y: -2~2, z: 3~10)
+    // ── Step 2: 합성 스테레오 이미지 생성 ──     // TODO: 3D 점 50개를 랜덤 생성 (x: -3~3, y: -2~2, z: 3~10)
     cv::Mat left = cv::Mat::zeros(image_size, CV_8UC1);
     cv::Mat right = cv::Mat::zeros(image_size, CV_8UC1);
     // TODO: 위에서 만든 3D 점들을 2D 이미지 평면에 투영한 뒤, cv::circle 로 그린다.
