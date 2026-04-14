@@ -37,6 +37,9 @@ int main()
     //       baseline=0.12m 로 T 벡터(왼쪽 카메라 기준 오른쪽 카메라의 위치) 생성
     //       R(왼쪽 카메라 기준 오른쪽 카메라의 회전) = 단위 행렬 (두 카메라가 평행)
     //       dist1, dist2(왼쪽/오른쪽 카메라의 왜곡 계수 [k1,k2,p1,p2,k3]) = 영벡터 (왜곡 없음)
+    // 주의: 투영 시 [R|T] * Pw = R*Pw + T 이므로, 오른쪽 카메라가 +X 방향으로 떨어져 있을 때
+    //       오른쪽 카메라 좌표의 x = p.x - baseline 이 되게 하려면 T 의 X 성분은 -baseline.
+    //       (+baseline 이면 거울상 stereo 가 되어 ORB 매칭이 틀어져 F 계산이 엉망이 됨)
     cv::Mat K1;  // TODO
     cv::Mat K2;  // TODO
     cv::Mat dist1;  // TODO

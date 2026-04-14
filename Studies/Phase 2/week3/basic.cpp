@@ -123,6 +123,10 @@ cv::Mat draw_epipolar_lines(
         cv::Scalar color(rng.uniform(0, 256), rng.uniform(0, 256), rng.uniform(0, 256));
 
         // 왼쪽 이미지에 에피폴라 선 + 점
+        // 주의: 아래 -c/b 계산은 b가 0에 가까우면 (수직에 가까운 에피폴라 선)
+        //       0 나눗셈 또는 큰 오차가 발생할 수 있다. 일반적인 stereo 세팅에서는
+        //       에피폴라 선이 거의 수평이라 문제되지 않지만, 엄밀하게 하려면
+        //       |a| > |b|일 때 x에 대해 푸는 분기가 필요하다.
         double a = lines1[i][0], b = lines1[i][1], c = lines1[i][2];
         cv::Point pt1(0, static_cast<int>(-c / b));
         cv::Point pt2(vis_left.cols, static_cast<int>(-(c + a * vis_left.cols) / b));
