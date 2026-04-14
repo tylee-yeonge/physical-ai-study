@@ -46,7 +46,8 @@ int main()
 
     std::cout << "[Step 1] 카메라 파라미터 설정 완료" << std::endl;
 
-    // ── Step 2: 합성 스테레오 이미지 생성 ──     // TODO: 3D 점 50개를 랜덤 생성 (x: -3~3, y: -2~2, z: 3~10)
+    // ── Step 2: 합성 스테레오 이미지 생성 ──
+    // TODO: 3D 점 200개를 랜덤 생성 (x: -3~3, y: -2~2, z: 3~10)
     cv::Mat left = cv::Mat::zeros(image_size, CV_8UC1);
     cv::Mat right = cv::Mat::zeros(image_size, CV_8UC1);
     // TODO: 위에서 만든 3D 점들을 2D 이미지 평면에 투영한 뒤, cv::circle 로 그린다.
