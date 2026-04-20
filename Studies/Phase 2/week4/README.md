@@ -20,14 +20,33 @@
 
 ## [list] 학습 순서
 
-| 순서 | 활동 | 파일 | 마치면 풀 퀴즈 |
-|:----:|------|------|:-------------:|
-| 1 | 데모 실행 — `./basic` 출력 + output/ 이미지 확인 | `basic.cpp` | - |
-| 2 | 삼각측량 이론 학습 | `README.md` | **easy 문제 1**: 삼각측량 원리 |
-| 3 | PnP 이론 학습 | `README.md` | **easy 문제 2**: PnP 최소 점 수 |
-| 4 | 재투영 오차 이해 | `README.md` | **easy 문제 3**: 재투영 오차 계산 |
-| 5 | `my_basic.cpp` Step 1~5 구현 | `my_basic.cpp` | - |
-| 6 | 중급 퀴즈 풀기 | `quiz_medium.cpp` | **medium 문제 1~2** |
+| 순서 | 활동 | 파일 | 비고 |
+|:----:|------|------|------|
+| 1 | 데모 실행 (basic.cpp 결과 확인) | `basic.cpp` | - |
+| 2 | 삼각측량 이론 학습 | `README.md` | - |
+| 3 | PnP 이론 학습 | `README.md` | - |
+| 4 | 재투영 오차 이해 | `README.md` | - |
+| 5 | OpenCV API 실습 (my_basic.cpp 에서 API 호출 부분 채움) | `my_basic.cpp` | API 조립 중심 |
+| 6 | KITTI 3D Object Detection 의 3D 박스 2D 재투영 | `PRACTICE.md` 4단계 | 원격 PC |
+| 7 | nuScenes 샘플로 solvePnP 외재 추정 | `PRACTICE.md` 5단계 | 원격 PC |
+| 8 | 중급 퀴즈 (개념 중심) | `quiz_medium.cpp` | 문제 1 scratch 는 풀이 선택 |
+
+---
+
+## 왜 scratch 구현을 생략하는가
+
+- **수학 핵심은 Week 3 에서 경험 완료**: rectify scratch 로 행렬/좌표 변환을 직접 다뤘다
+- **PnP/삼각측량 본질은 SVD + 수치 안정화**: 교육용 scratch 는 이해 비용만 크고 실무 가치 낮음
+- **Perception 실무 무게중심**: API 호출 + 데이터셋 처리 — Phase 3, 4 와 직접 연결
+- **재미와 지속성**: 즉시적 시각 피드백이 있는 데이터셋 실습이 동기부여 유지에 유리
+
+## 코드 TODO 처리 지침
+
+- `my_basic.cpp`: TODO 가 이미 OpenCV API 조립 중심으로 작성되어 있음. 순서대로 채우면 됨 (scratch 유도 블록 없음)
+- `quiz_medium.cpp`:
+  - **문제 1 (DLT 삼각측량 SVD scratch)**: 개념 이해만 하고 풀이는 선택
+  - **문제 2 (RANSAC 반복 수 공식 계산)**: 권장 — 공식 적용 수준
+- 학습 목표는 **"API 를 올바르게 조립하고 결과를 해석할 수 있다"** 이며, scratch 는 Week 3 에서 경험 완료로 간주
 
 ---
 
@@ -170,6 +189,9 @@ flowchart TD
 - [ ] `cv::triangulatePoints` 사용 가능
 - [ ] `cv::solvePnP` / `cv::solvePnPRansac` 사용 가능
 - [ ] `cv::projectPoints` 로 재투영 오차 계산 가능
+- [ ] KITTI 3D Object Detection 의 3D 박스를 올바르게 2D 에 재투영 가능
+- [ ] nuScenes 6-cam 샘플에서 solvePnP 로 외재 추정 가능
+- [ ] Rerun.io 로 3D 점 / 박스 시각화 가능
 
 ### 심화 (선택)
 - [ ] DLT 삼각측량을 SVD 로 직접 구현 가능
@@ -179,7 +201,9 @@ flowchart TD
 
 ## [link] 다음 단계
 
-Phase 2 완료 후 → **[Phase 3: Detection + Depth](../../Roadmap/Phase%205.md)** 로 직진.
+Phase 2 완료 후 → **[Phase 3: Detection + Depth](../../Roadmap/Phase%203.md)** 로 직진.
+
+Phase 3 는 PyTorch + 데이터셋 기반 딥러닝 흐름입니다. 이번 주의 KITTI/nuScenes 실습으로 **데이터셋 감각을 이미 선제 확보**했으므로 자연스럽게 이어집니다.
 
 ---
 
@@ -189,3 +213,4 @@ Phase 2 완료 후 → **[Phase 3: Detection + Depth](../../Roadmap/Phase%205.md
 - OpenCV: [solvePnP](https://docs.opencv.org/4.x/d5/d1f/calib3d_solvePnP.html)
 - FCOS3D 논문 — Monocular 3D detection 의 기하학적 후처리
 - SMOKE 논문 — 재투영 기반 3D box 학습
+- 학습 환경 / 원격 작업 가이드: [ENVIRONMENT.md](../../../ENVIRONMENT.md)
