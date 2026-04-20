@@ -27,6 +27,8 @@
 | 4 | Disparity-Depth 공식 이해 | `README.md` | **easy 문제 3**: Z = fB/d 계산 |
 | 5 | `my_basic.cpp` Step 1~6 구현 | `my_basic.cpp` | - |
 | 6 | 중급 퀴즈 풀기 | `quiz_medium.cpp` | **medium 문제 1~2** |
+| 7 | **KITTI 검증 실습** (출장지 원격 PC) | [PRACTICE.md](./PRACTICE.md) 5단계 | - |
+| 8 | (선택) **ELP 실카메라 캘리브 실습** | [PRACTICE.md](./PRACTICE.md) 6단계 | - |
 
 ---
 
@@ -185,6 +187,9 @@ flowchart TD
 - [ ] OpenCV `stereoRectify` + `remap` 파이프라인 구현 가능
 - [ ] `StereoBM` 으로 disparity map 생성 가능
 - [ ] Rectification 품질을 y-disparity 오차로 검증 가능
+- [ ] KITTI 공식 rectified 이미지와 본인 구현 결과의 픽셀 diff 측정 가능
+- [ ] Rerun.io 로 disparity / depth map 시각화 가능
+- [ ] (선택) ELP 실카메라로 mono/stereo 캘리브 → rectify y-disparity < 1 px 확인
 
 ### 심화 (선택)
 - [ ] KITTI stereo 벤치마크의 입력/출력 형식 이해
@@ -194,9 +199,12 @@ flowchart TD
 
 ## [link] 다음 단계
 
-### Week 4: 삼각측량 + PnP (Perception 3D 맥락)
+### Week 4: 삼각측량 + PnP (하이브리드 방식)
 
-Stereo에서 한 걸음 더:
+scratch 구현은 **생략**하고 이론 정독 + OpenCV API + KITTI/nuScenes 실습으로 진행합니다.
+Week 3 에서 rectify scratch 로 수학을 한 번 체화했으니, Week 4 는 **데이터셋 감각** 쌓기에 집중 (Phase 3 워크플로우의 전초).
+
+핵심 주제:
 - **삼각측량**: 두 뷰에서 관측한 점의 3D 위치 복원
 - **PnP**: 3D-2D 대응에서 카메라 포즈 추정
 - **재투영 오차**: Monocular 3D Detection 의 평가 지표
@@ -209,3 +217,4 @@ Stereo에서 한 걸음 더:
 - OpenCV: [Stereo Calibration and Rectification](https://docs.opencv.org/4.x/dd/d53/tutorial_py_depthmap.html)
 - HITNet 논문 — Stereo network 입력 조건
 - KITTI 데이터셋 README — calibration 형식 설명
+- 학습 환경 / 원격 작업 가이드: [ENVIRONMENT.md](../../../ENVIRONMENT.md)

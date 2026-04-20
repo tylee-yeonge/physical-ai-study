@@ -47,6 +47,39 @@ cmake .. && make
 - 문제 1: 수동 Disparity → Depth + 3D 점 복원
 - 문제 2: Rectification 품질 검증 (y-disparity 오차)
 
+### 5단계: KITTI 검증 실습 (출장지 원격 PC 가능) [1-2시간]
+
+**선행조건**: 3단계(직접 구현) Step 3~6 완료.
+
+**목적**: scratch 구현한 rectify 를 KITTI 실데이터에 적용해 공식 결과와 diff.
+
+1. KITTI raw 샘플 다운로드 (Ubuntu PC)
+   - `2011_09_26_drive_0001_sync` 중 image_02, image_03 각 1-2장
+   - 캘리브 파일: `calib_cam_to_cam.txt`
+2. `P_rect_02`, `P_rect_03`, `R_rect_02`, `K_02`, `K_03`, baseline T 추출
+3. 본인의 `buildRectifyMap` 에 파라미터 주입 → `cv::remap` 수행
+4. OpenCV `cv::initUndistortRectifyMap` 결과와 픽셀 단위 diff
+5. 매칭된 특징점의 y-disparity 측정
+6. Rerun.io 로 좌/우 이미지 + 수평 에피폴라선 시각화
+
+**검증 기준**: y-disparity < 1.0 px, OpenCV 결과와 diff 는 sub-pixel 수준.
+
+### 6단계 (선택): ELP 실카메라 캘리브 실습 [2-3시간]
+
+**목적**: 이론/데이터셋 너머 실제 하드웨어에서 rectify 품질을 확인.
+
+**환경**: Ubuntu PC + ELP Stereo Camera (USB 연결). 원격 접속 시 PC 가 ELP 와 항시 연결되어 있으면 출장지에서도 가능.
+
+1. ELP 좌/우 스트림 동시 캡처 (OpenCV `cv::VideoCapture` 로 두 채널)
+2. ChArUco 또는 체커보드로 stereo calibrate (`cv::stereoCalibrate`)
+3. 본인의 `buildRectifyMap` 에 결과 주입 → remap
+4. 특징점 매칭으로 y-disparity 측정 (실데이터 기준 < 1-2 px 목표)
+5. Rerun.io 로 실시간 / 스냅샷 시각화
+
+**검증 기준**: reprojection error < 0.5 px (캘리브 품질), y-disparity < 2 px (rectify 품질).
+
+**참고**: 필수 아님. 시간 여유 있을 때 수행. 상세 하드웨어 팁은 [ENVIRONMENT.md](../../../ENVIRONMENT.md) 참조.
+
 ## 핵심 API 정리
 
 | 함수 | 입력 | 출력 | 용도 |
@@ -62,3 +95,10 @@ cmake .. && make
 - 이 파이프라인의 **Step 4 결과 (rectified pair)** 가 HITNet / CRE-Stereo 같은 Stereo Depth 모델의 입력
 - KITTI Stereo 벤치마크는 rectified 이미지를 기본 제공 — 이 전처리가 이미 적용된 상태
 - `Z = fB/d` 공식은 모든 Stereo Depth 파이프라인의 최종 변환 단계
+
+## 원격 실행 팁 (출장지 환경)
+
+- VS Code Tunnel: `code tunnel` → vscode.dev 로 접속
+- Docker 컨테이너: CUDA + OpenCV + PyTorch 이미지 권장
+- Rerun 서버: `rr.serve()` 포트(9090) Tailscale 메시로 브라우저 접속
+- 상세: [ENVIRONMENT.md](../../../ENVIRONMENT.md)
