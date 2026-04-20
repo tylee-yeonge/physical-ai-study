@@ -152,6 +152,102 @@ cv::Mat draw_epipolar_lines(
     return F;
 }
 
+// initUndistortRectifyMap 을 직접 구현한 헬퍼.
+//
+// Rectified 이미지의 각 (u_dst, v_dst) 픽셀이 원본 이미지의 어느
+// (u_src, v_src) 에서 와야 하는지를 미리 계산해서 테이블(map_x, map_y)
+// 에 저장한다. (Backward mapping)
+//
+// 왜 backward 인가?
+//   Forward (원본 -> rectified) 로 쏘면 dst 에 정수 픽셀이 고르게
+//   안 맞아 구멍이 생긴다. Backward 는 dst 픽셀마다 src 에서 하나씩
+//   꺼내오므로 빈 곳이 없다.
+//
+// 계산 순서 (각 dst 픽셀마다):
+//   [1] P_rect 역투영 : (u_dst, v_dst) -> rectified normalized (x_r, y_r)
+//   [2] R_rect^T 회전 : rectified 방향벡터 -> 원본 카메라 좌표계
+//   [3] 렌즈 왜곡 적용 : 이상적 normalized -> 왜곡된 normalized
+//   [4] K 적용        : 왜곡된 normalized -> 원본 픽셀 (u_src, v_src)
+static void build_rectify_map(
+    const cv::Mat& K,       // 원본 카메라 내부 행렬 (3x3)
+    const cv::Mat& dist,    // 왜곡 계수 [k1, k2, p1, p2, k3]
+    const cv::Mat& R_rect,  // 원본 -> rectified 좌표계 회전 (3x3)
+    const cv::Mat& P_rect,  // rectified 투영 행렬 (3x4)
+    const cv::Size& size,
+    cv::Mat& map_x,
+    cv::Mat& map_y)
+{
+    map_x.create(size, CV_32FC1);
+    map_y.create(size, CV_32FC1);
+
+    // rectified 쪽 내부 파라미터 (P_rect 안에 박혀 있음)
+    const double fx_r = P_rect.at<double>(0, 0);
+    const double fy_r = P_rect.at<double>(1, 1);
+    const double cx_r = P_rect.at<double>(0, 2);
+    const double cy_r = P_rect.at<double>(1, 2);
+
+    // 원본 카메라 내부 파라미터
+    const double fx = K.at<double>(0, 0);
+    const double fy = K.at<double>(1, 1);
+    const double cx = K.at<double>(0, 2);
+    const double cy = K.at<double>(1, 2);
+
+    // 왜곡 계수 (Brown-Conrady: radial k1,k2,k3 + tangential p1,p2)
+    const double k1 = dist.at<double>(0);
+    const double k2 = dist.at<double>(1);
+    const double p1 = dist.at<double>(2);
+    const double p2 = dist.at<double>(3);
+    const double k3 = dist.rows >= 5 ? dist.at<double>(4) : 0.0;
+
+    // R_rect 는 원본 -> rectified. 우리는 그 반대가 필요하므로 전치(=역)
+    const cv::Mat R_inv = R_rect.t();
+
+    for (int v_dst = 0; v_dst < size.height; v_dst++)
+    {
+        for (int u_dst = 0; u_dst < size.width; u_dst++)
+        {
+            // [1] rectified 픽셀 -> rectified normalized 좌표
+            //     P_rect 의 역투영 : 픽셀에서 중심(cx',cy') 빼고 초점거리로 나눔
+            const double x_r = (u_dst - cx_r) / fx_r;
+            const double y_r = (v_dst - cy_r) / fy_r;
+
+            // [2] rectified 방향벡터 (x_r, y_r, 1) 을 원본 카메라 좌표계로 되돌림
+            //     = R_rect^T 곱하기
+            const double Xc = R_inv.at<double>(0, 0) * x_r
+                            + R_inv.at<double>(0, 1) * y_r
+                            + R_inv.at<double>(0, 2);
+            const double Yc = R_inv.at<double>(1, 0) * x_r
+                            + R_inv.at<double>(1, 1) * y_r
+                            + R_inv.at<double>(1, 2);
+            const double Zc = R_inv.at<double>(2, 0) * x_r
+                            + R_inv.at<double>(2, 1) * y_r
+                            + R_inv.at<double>(2, 2);
+
+            // 원본 카메라의 normalized 평면 좌표 (Z 로 나눔)
+            const double x = Xc / Zc;
+            const double y = Yc / Zc;
+
+            // [3] 렌즈 왜곡 적용 (Brown-Conrady)
+            //     원본 이미지는 왜곡된 상태로 찍혔으므로, "이상적" normalized
+            //     좌표를 왜곡된 좌표로 되돌려야 원본 픽셀 위치를 찾을 수 있다.
+            //     x_d = x*(1 + k1*r^2 + k2*r^4 + k3*r^6) + 2*p1*x*y + p2*(r^2 + 2*x^2)
+            //     y_d = y*(1 + k1*r^2 + k2*r^4 + k3*r^6) + p1*(r^2 + 2*y^2) + 2*p2*x*y
+            const double r2 = x * x + y * y;
+            const double radial = 1.0 + k1 * r2 + k2 * r2 * r2 + k3 * r2 * r2 * r2;
+            const double x_d = x * radial + 2.0 * p1 * x * y + p2 * (r2 + 2.0 * x * x);
+            const double y_d = y * radial + p1 * (r2 + 2.0 * y * y) + 2.0 * p2 * x * y;
+
+            // [4] 왜곡된 normalized -> 원본 픽셀 좌표 (K 적용)
+            const double u_src = fx * x_d + cx;
+            const double v_src = fy * y_d + cy;
+
+            // 테이블에 저장. remap 이 이 float 좌표로 쌍선형 보간.
+            map_x.at<float>(v_dst, u_dst) = static_cast<float>(u_src);
+            map_y.at<float>(v_dst, u_dst) = static_cast<float>(v_src);
+        }
+    }
+}
+
 void stereo_rectify(
     const cv::Mat& left, const cv::Mat& right,
     const cv::Mat& K1, const cv::Mat& K2,
@@ -161,18 +257,47 @@ void stereo_rectify(
     cv::Mat& rect_left, cv::Mat& rect_right,
     cv::Mat& Q)
 {
-    // Rectification 변환 행렬 계산
+    // [1] Rectification 변환 규칙 계산 (cv 에 맡김)
+    //
+    // 내부적으로 Bouguet 알고리즘으로 두 카메라 사이 회전 R 을
+    // "반씩" 분배해 양쪽 이미지의 왜곡을 최소화한다. 이 수학은
+    // 복잡하므로 cv 에 맡긴다.
+    //
+    // 출력의 의미:
+    //   R1, R2 : 각 카메라 좌표계 -> rectified 좌표계로 보내는 3x3 회전
+    //   P1, P2 : rectified 상태에서의 3x4 투영 행렬
+    //     P1 = [ fx'  0   cx'   0      ]
+    //          [  0  fy'  cy'   0      ]
+    //          [  0   0    1    0      ]
+    //     P2 = [ fx'  0   cx'  -fx'*B  ]   <- (0,3) 에 baseline 인코딩됨
+    //          [  0  fy'  cy'   0      ]
+    //          [  0   0    1    0      ]
+    //   Q      : disparity -> 3D 복원 4x4 행렬
+    //            [X Y Z W]^T = Q * [u v disp 1]^T, (X/W, Y/W, Z/W) 가 3D 점
+    //            cv::reprojectImageTo3D(disparity, Q) 로 한 번에 쓸 수도 있다.
     cv::Mat R1, R2, P1, P2;
     cv::stereoRectify(K1, dist1, K2, dist2, image_size, R, T,
                       R1, R2, P1, P2, Q,
                       cv::CALIB_ZERO_DISPARITY, 0, image_size);
 
-    // Undistort + Rectify 맵 생성
+    // [2] 픽셀 매핑 테이블 생성 (직접 구현)
+    //
+    // 원래 cv 버전:
+    //   cv::initUndistortRectifyMap(K1, dist1, R1, P1, image_size, CV_32FC1, map1x, map1y);
+    //   cv::initUndistortRectifyMap(K2, dist2, R2, P2, image_size, CV_32FC1, map2x, map2y);
+    //
+    // 학습을 위해 build_rectify_map 으로 풀어서 구현한다.
+    // 각 rectified 픽셀이 원본 이미지의 어느 위치에서 왔는지를 테이블에
+    // 저장. 자세한 4단계는 build_rectify_map 내부 주석 참고.
     cv::Mat map1x, map1y, map2x, map2y;
-    cv::initUndistortRectifyMap(K1, dist1, R1, P1, image_size, CV_32FC1, map1x, map1y);
-    cv::initUndistortRectifyMap(K2, dist2, R2, P2, image_size, CV_32FC1, map2x, map2y);
+    build_rectify_map(K1, dist1, R1, P1, image_size, map1x, map1y);
+    build_rectify_map(K2, dist2, R2, P2, image_size, map2x, map2y);
 
-    // Remap 적용
+    // [3] Remap 적용 (cv 에 맡김)
+    //
+    // 테이블(map*x, map*y) 을 따라 원본 이미지에서 픽셀을 꺼내
+    // 쌍선형 보간으로 rectified 이미지를 생성. 보간 자체는 SIMD 최적화가
+    // 되어 있으므로 cv 에 맡긴다.
     cv::remap(left, rect_left, map1x, map1y, cv::INTER_LINEAR);
     cv::remap(right, rect_right, map2x, map2y, cv::INTER_LINEAR);
 }
