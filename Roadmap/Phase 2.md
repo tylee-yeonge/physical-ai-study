@@ -2,9 +2,9 @@
 
 > [time] **기간**: 4주 (기존 8주 → 4주 압축, Optical Flow 제거)
 > [goal] **목표**: 카메라 행렬·왜곡·Multi-view 기하를 사용해 **2D 관측과 3D 세계를 연결**한다. 3D Object Detection / Depth Estimation / BEV의 기하학적 기초.
-> [time] **주간 시간**: 약 7시간
+> [time] **주간 시간**: Week 3 6-9시간, Week 4 5-7시간 (하이브리드 적용)
 > [code] **언어**: C++ (OpenCV)
-> [tool] **하드웨어**: Jetson Orin Nano + ELP 800P Stereo Camera
+> [tool] **하드웨어**: Ubuntu PC (RTX 4070) + ELP Stereo Camera
 
 ---
 
@@ -16,6 +16,21 @@
 기존 8주의 학습 결과(Week 1, 2 카메라 모델/캘리브레이션)는 보존되었고, 새 구조의 Week 1, 2 는 **README 만 Perception 맥락으로 리프레이밍** 한다. Week 3, 4 는 **새 코드** 로 작성된다.
 
 기존 원본은 [Archive/SLAM-legacy/Roadmap/Phase 2.md](../Archive/SLAM-legacy/Roadmap/Phase%202.md) 에서 확인할 수 있다.
+
+### 2026-04-20: 하이브리드 전환 회고
+
+Phase 2 Week 3 진행 중 아래를 재점검했다:
+- scratch C++ 구현이 Week 3 후반부터 학습 효용 대비 시간 소모가 크게 느껴짐
+- 출장지에서 원격 작업이 잦아 실제 학습 환경이 "Ubuntu PC 원격 + 데이터셋" 중심으로 자연스럽게 재편됨
+- Jetson Orin Nano 실습은 당장 시간 확보가 어려워 **보류**
+
+결정:
+- Week 3: scratch 구현은 마무리 짓되, **KITTI 데이터 검증**을 추가해 실데이터 감각을 선제 확보
+- Week 4: **scratch 구현 생략**, OpenCV API 호출 + KITTI/nuScenes 데이터셋 실습으로 전환
+- Phase 3 이후도 **Ubuntu PC 중심 + 원격 접속**을 전제로 재프레이밍
+- 장비 표기를 **ELP Stereo Camera** 로 통일
+
+기존 Jetson 관련 가정은 하드웨어 실습 시간 확보 시점까지 "보류" 주석으로 남긴다.
 
 ---
 
@@ -39,8 +54,8 @@
 |------|------|----------|----------|
 | **1** | 카메라 모델 (핀홀, K, 내부/외부 파라미터) | [O] 학습 완료 | 기존 유지, README 리프레이밍 |
 | **2** | 렌즈 왜곡 + 캘리브레이션 | [O] 학습 완료 | 기존 유지, README 리프레이밍 |
-| **3** | Multi-view 기하 + Stereo Rectification |  재정리 | **신규 작성** (OpenCV C++) |
-| **4** | 삼각측량 + PnP (Perception 3D 맥락) | [time] 대기 | **신규 작성** (OpenCV C++) |
+| **3** | Multi-view 기하 + Stereo Rectification |  재정리 | 신규 작성 + KITTI 검증 + (선택) ELP |
+| **4** | 삼각측량 + PnP (Perception 3D 맥락) | [time] 대기 → 하이브리드 | 이론 + OpenCV API + KITTI/nuScenes |
 
 > [pin] 학습 상태는 "학습자(나)의 진행도" 이고, 코드 상태는 "이 디렉토리의 실습 코드 상태"이다.
 
@@ -131,6 +146,19 @@ graph LR
 - `my_basic.cpp` — 사용자 구현 뼈대 (Step 1~6)
 - `quiz_easy.cpp` / `quiz_medium.cpp` — 개념 + 구현 퀴즈
 
+#### KITTI 데이터 검증 (출장지 원격 PC 가능)
+- scratch 구현한 rectify 결과를 **KITTI 공식 rectified 이미지와 픽셀 단위 diff**
+- 매칭 특징점의 **y-disparity 측정** → 학습한 품질 지표를 실데이터에 적용
+- 실행: Ubuntu PC (원격), 시각화: Rerun.io
+- 이 단계가 Phase 3 (데이터셋 기반) 로의 자연스러운 전환점
+- 상세: [Studies/Phase 2/week3/PRACTICE.md](../Studies/Phase%202/week3/PRACTICE.md) 5단계
+
+#### ELP 실카메라 캘리브 실습 (선택)
+- 이론으로 배운 캘리브/rectify 를 실제 하드웨어로 확인
+- 체커보드 또는 ChArUco 보드로 stereo 캘리브 → 본인 구현으로 rectify → y-disparity 측정
+- 필수 아님 — 시간 여유 있을 때 수행
+- 상세: [Studies/Phase 2/week3/PRACTICE.md](../Studies/Phase%202/week3/PRACTICE.md) 6단계
+
 ### Week 4: 삼각측량 + PnP (Perception 3D 맥락) [time]
 
 > [code] **C++ 실습 (신규)**: [Studies/Phase 2/week4/](../Studies/Phase%202/week4/)
@@ -154,10 +182,36 @@ graph LR
 - **NeRF / Gaussian Splatting (Phase 4 preview)**: Multi-view reconstruction 의 가장 기본 연산
 - **카메라 외재 캘리브레이션**: 알려진 3D 패턴(체커보드)으로 PnP 풀어 카메라 포즈 추정
 
-#### 실습 코드 (신규 작성)
-- `basic.cpp` — 합성 3D 박스 → 두 뷰 투영 → 삼각측량 복원 → PnP 로 포즈 역추정 → 재투영 오차 시각화
-- `my_basic.cpp` — `cv::triangulatePoints`, `cv::solvePnPRansac`, `cv::projectPoints` 를 사용한 사용자 구현
-- `quiz_easy.cpp` / `quiz_medium.cpp`
+#### 실습 방식 (하이브리드)
+
+scratch 구현은 **생략**한다. 이유:
+- Week 3 에서 rectify scratch 로 행렬/좌표 변환을 한 번 직접 다뤘다 → "내부 수학 한 번 경험" 충족
+- PnP / 삼각측량의 본질은 SVD + 수치 안정화 — 교육용 scratch 는 이해 비용만 높고 실무 가치 낮음
+- Perception 실무 감각은 **API 활용 + 데이터셋 처리**가 핵심
+
+실습 흐름:
+1. README 이론 정독 (DLT, PnP, 재투영 오차)
+2. OpenCV API 조립 (`cv::triangulatePoints`, `cv::solvePnP`, `cv::projectPoints`) — my_basic.cpp 의 TODO 를 순서대로 채움 (이미 API 조립 중심으로 작성되어 있음)
+3. KITTI Object Detection calib + label 로 3D 박스 2D 재투영
+4. nuScenes mini-split 6-cam 샘플로 `cv::solvePnP` 외재 추정
+5. Rerun.io 시각화
+
+> [note] `quiz_medium.cpp` 의 **문제 1 (DLT 삼각측량 SVD scratch 구현)** 은 개념 이해만 하고 풀이는 선택. **문제 2 (RANSAC 반복 수 공식 계산)** 은 권장.
+
+상세: [Studies/Phase 2/week4/PRACTICE.md](../Studies/Phase%202/week4/PRACTICE.md)
+
+---
+
+## [tool] 학습 환경 (Phase 2)
+
+| Week | 주 장비 | 출장지 가능 여부 |
+|---|---|---|
+| 1, 2 (완료) | 보존 | - |
+| 3 | Ubuntu PC (원격) | O (KITTI 검증) / 선택: ELP 실카메라 (PC 로컬 또는 원격) |
+| 4 | Ubuntu PC (원격) | O |
+
+- 시각화 기본: Rerun.io
+- 상세: [ENVIRONMENT.md](../ENVIRONMENT.md)
 
 ---
 
@@ -171,12 +225,14 @@ graph LR
 4. Monocular 3D Detection 모델이 출력한 3D 박스가 정확한지 어떻게 시각적으로 검증하는가?
 5. PnP 알고리즘이 최소 몇 개의 3D-2D 대응을 필요로 하는가? P3P 와 EPnP 의 차이는?
 6. RANSAC 의 반복 횟수를 결정하는 공식과 그 의미는?
+7. KITTI 의 P0/P1/P_rect_02 와 본인이 구현한 rectify 결과가 어느 수준까지 일치하는가? (픽셀 diff, y-disparity 수치)
+8. nuScenes 의 calibrated_sensor + ego_pose 체인을 통해 월드 좌표계에서의 카메라 위치를 구할 수 있는가?
 
 ---
 
 ## -> 다음 단계
 
-Phase 2 완료 후 → **[Phase 3: Detection + Depth](Phase%205.md)** 로 직진.
+Phase 2 완료 후 → **[Phase 3: Detection + Depth](Phase%203.md)** 로 직진.
 
 > [!] 기존 SLAM 트랙(VO/BA, VIO)은 [Archive/SLAM-legacy/](../Archive/SLAM-legacy/) 로 이동되었다. SLAM 트랙은 더 이상 메인 로드맵의 일부가 아니다.
 
