@@ -3,13 +3,13 @@
 > [time] **기간**: 약 3개월 (12주 분량)  
 > [goal] **목표**: 카메라 기반 3D 객체 검출 마스터  
 > [code] **언어**: **Python** (PyTorch, MMDetection3D)  
-> [tool] **환경**: PC (GPU 필수), Jetson (선택)  
+> [tool] **환경**: Ubuntu PC (RTX 4070) — 주 학습/실험 장비 / Jetson (하드웨어 확보 시 선택)  
 >  **이직 준비 핵심 Phase**  
 > [time] **주간 시간**: 약 12-15시간
 
 ---
 
-## -> **실습 가이드**: [`Studies/Phase 4/PRACTICE.md`](../Studies/Phase%206/PRACTICE.md)
+## -> **실습 가이드**: [`Studies/Phase 4/PRACTICE.md`](../Studies/Phase%204/PRACTICE.md)
 
 **핵심 산출물**:
 - KITTI 3D Detection 구현
@@ -18,6 +18,19 @@
 - **포트폴리오 완성** (이직 준비)
 
 > [!] **목표**: 자율주행/로봇 면접에서 3D Perception 경험 어필
+
+---
+
+## [tool] 학습 환경
+
+- 주 장비: Ubuntu PC (RTX 4070, 원격)
+- 데이터셋:
+  - KITTI 3D Object Detection (~12GB)
+  - nuScenes mini-split (~3GB, 입문용)
+  - nuScenes full (~400GB) — 디스크 확보 후 선택 진입
+- 시각화: Rerun.io (3D 박스, point cloud 표준)
+- 출장지 가능 여부: O (전 주차)
+- 상세: [ENVIRONMENT.md](../ENVIRONMENT.md)
 
 ---
 
