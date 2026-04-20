@@ -2,7 +2,7 @@
 
 > [goal] **목표**: AMR 실무 경험 + 딥러닝 Perception → **Perception Engineer**
 > [time] **기간**: Stage 1 (이직 전) + Stage 2 (이직 후) + Stage 2+ (장기 확장)
->  **전vscode-remote://tunnel%2Bmac-mini/workspace/study/visual-slam-and-perception-learning/Studies/Phase%202/week3/quiz_medium.cpp?vscode-lang%3Dko-kr제**: 5개월 딸과 함께하는 직장인 아빠, AMR ROS Application 개발자
+>  **전제**: 5개월 딸과 함께하는 직장인 아빠, AMR ROS Application 개발자
 
 ---
 
@@ -72,7 +72,7 @@ graph LR
 | Phase | 내용 | 언어 | 이유 |
 |-------|------|------|------|
 | Phase 0-1 | 환경 세팅, 수학 | Python | 빠른 프로토타이핑 |
-| **Phase 2** | **Perception 기하 기초** | **C++** | OpenCV C++, Jetson 실습 |
+| **Phase 2** | **Perception 기하 기초** | **C++** | OpenCV C++ (Ubuntu PC) |
 | **Phase 3** | **Detection + Depth** | **Python** (학습) + **C++/TensorRT** (배포) | PyTorch → Jetson 최적화 |
 | **Phase 4** | **3D Perception** | **Python** | MMDetection3D, nuScenes |
 
@@ -95,8 +95,8 @@ graph LR
 | Phase | 가이드 위치 | 언어 |
 |-------|------------|------|
 | Phase 2 | 각 week별 PRACTICE.md (예: [`week3/PRACTICE.md`](./Studies/Phase%202/week3/PRACTICE.md)) | C++ |
-| Phase 3 | 각 week별 PRACTICE.md (예: [`week1/PRACTICE.md`](./Studies/Phase%205/week1/PRACTICE.md)) | Python + TensorRT |
-| Phase 4 | 각 week별 PRACTICE.md (예: [`week1/PRACTICE.md`](./Studies/Phase%206/week1/PRACTICE.md)) | Python |
+| Phase 3 | 각 week별 PRACTICE.md (예: [`week1/PRACTICE.md`](./Studies/Phase%203/week1/PRACTICE.md)) | Python + TensorRT |
+| Phase 4 | 각 week별 PRACTICE.md (예: [`week1/PRACTICE.md`](./Studies/Phase%204/week1/PRACTICE.md)) | Python |
 
 ---
 
@@ -244,10 +244,18 @@ graph LR
 
 ## [tool] 실습 환경
 
-| 장비 | 용도 |
-|------|------|
-| **Jetson Orin Nano** | 실시간 추론, 배포 |
-| **ELP 800P Stereo Monochrome** | 스테레오 비전 |
+| 장비 | 주 용도 | 사용 조건 |
+|------|---------|----------|
+| Ubuntu PC (RTX 4070, 12GB VRAM) | 데이터셋 실험, 딥러닝 학습/추론, 원격 접속 메인 | 출장지 포함 상시 |
+| ELP Stereo Camera | 실카메라 캘리브/rectification 실습 (USB 주변기기) | Ubuntu PC 연결 |
+
+### 원격 작업 워크플로우
+- 출장지: VS Code Tunnel 또는 vscode.dev → Ubuntu PC (Docker 컨테이너)
+- 네트워크: Tailscale 메시 (포트 포워딩 불필요)
+- 시각화: Rerun.io (perception 주력), Jupyter inline (이미지), Foxglove (ROS 2 쓰는 경우)
+- 상세 가이드: [ENVIRONMENT.md](./ENVIRONMENT.md)
+
+> [note] Jetson Orin Nano 는 **하드웨어 실습 시간 확보 시점**에 재도입 검토. 현 로드맵에서는 Ubuntu PC 중심으로 진행.
 
 ---
 
