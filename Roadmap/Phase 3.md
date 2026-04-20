@@ -3,12 +3,12 @@
 > [time] **기간**: 3개월  
 > [goal] **목표**: 2D Perception 마스터 + Jetson 실시간 배포  
 > [code] **언어**: **Python** (학습) + **C++/TensorRT** (배포)  
-> [tool] **하드웨어**: Jetson Orin Nano 필수  
+> [tool] **하드웨어**: Ubuntu PC (RTX 4070) — 주 학습/실험 장비 / Jetson Orin Nano — 하드웨어 실습 시간 확보 시 재도입 (TensorRT 배포 파트)  
 > [time] **주간 시간**: 약 12시간
 
 ---
 
-## -> **실습 가이드**: [`Studies/Phase 3/PRACTICE.md`](../Studies/Phase%205/PRACTICE.md)
+## -> **실습 가이드**: [`Studies/Phase 3/PRACTICE.md`](../Studies/Phase%203/PRACTICE.md)
 
 **핵심 산출물**:
 - YOLO 실시간 객체 검출 (Jetson 30+ FPS)
@@ -16,6 +16,23 @@
 - 통합 시스템: Detection + Depth → 3D 위치 추정
 
 > [!] **언어 전략**: 학습은 Python, 배포는 C++/TensorRT
+
+---
+
+## [tool] 학습 환경
+
+| 단계 | 주 장비 | 출장지 가능 여부 |
+|---|---|---|
+| PyTorch 복습 / YOLO 학습 | Ubuntu PC (원격) | O |
+| TensorRT 변환 (PC 환경) | Ubuntu PC (원격) | O |
+| Jetson 실기 배포 / 실측 FPS | Jetson (하드웨어 확보 시) | 보류 |
+| Depth Anything V2 실습 | Ubuntu PC (원격) | O |
+| 통합 시스템 (Detection + Depth) | Ubuntu PC (원격) | O (Jetson 배포는 보류) |
+
+- 데이터셋 (COCO, KITTI, Middlebury): Ubuntu PC 디스크 상시 보관
+- 상세: [ENVIRONMENT.md](../ENVIRONMENT.md)
+
+> [note] **Jetson 배포 파트**는 하드웨어 실습 시간 확보 시점까지 "개념 이해 + PC 에서의 TensorRT 변환 실습" 수준으로 진행. 실기 배포는 보류.
 
 ---
 
