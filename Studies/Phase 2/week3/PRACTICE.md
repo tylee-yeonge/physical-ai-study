@@ -80,6 +80,65 @@ cmake .. && make
 
 **참고**: 필수 아님. 시간 여유 있을 때 수행. 상세 하드웨어 팁은 [ENVIRONMENT.md](../../../ENVIRONMENT.md) 참조.
 
+### 7단계 (선택): Classical vs Learning-based Depth 비교 [1-2시간]
+
+**목적**: 기하학 stereo 가 실패하는 영역(textureless / repetitive / occlusion)을 딥러닝 monocular depth 가 어떻게 메우는지 직접 시각화.
+
+**전제**: 3단계 또는 5단계에서 얻은 rectified stereo pair 가 있을 것.
+
+#### 7-1. Python 환경 준비 (venv)
+
+```bash
+# week3 디렉토리에서 실행
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install torch transformers opencv-python matplotlib pillow numpy
+```
+
+GPU 가 있으면 CUDA 지원 torch 를 설치하면 빠름. CPU 만으로도 Small 모델은 수 초 내 추론 가능.
+
+#### 7-2. 스크립트 실행
+
+```bash
+python practice_dl_compare.py \
+    --left build/output/01_left.png \
+    --right build/output/01_right.png \
+    --output-dir build/output/dl_compare
+```
+
+기본 모델은 `depth-anything/Depth-Anything-V2-Small-hf`. 처음 실행 시 HuggingFace 에서 자동 다운로드.
+
+#### 7-3. 결과 관찰
+
+`build/output/dl_compare/` 에 생성되는 파일:
+- `01_sgbm_disparity.png` — SGBM dense disparity (invalid 는 검정)
+- `02_sgbm_invalid_mask.png` — 기하가 포기한 영역 (흰색)
+- `03_da_depth.png` — Depth Anything relative depth
+- `04_comparison.png` — 4-패널 비교 (좌측원본 / SGBM / DA / Overlay)
+
+**관찰 포인트**:
+- Textureless 영역(벽, 하늘): SGBM 구멍 vs DA 의 smooth gradient
+- Repetitive pattern: SGBM 의 잘못된 mode 선택 vs DA 의 일관된 표면
+- Occlusion 경계: SGBM 의 무효 띠 vs DA 의 dense 출력
+- 물체 경계 sharpness: 누가 더 선명한가
+
+#### 7-4. (선택) Scale Alignment
+
+Depth Anything 은 relative depth 만 출력. SGBM 의 유효 픽셀을 ground truth 로 써서 least-squares 로 scale/shift 를 맞추면 metric 스케일에 가깝게 변환 가능.
+
+```bash
+python practice_dl_compare.py \
+    --left build/output/01_left.png \
+    --right build/output/01_right.png \
+    --output-dir build/output/dl_compare \
+    --align-scale
+```
+
+이 단계까지 하면 "학습 기반 prior + 기하학 scale anchor" 라는 현대 perception 의 **hybrid 구조**를 직접 구현한 셈이 됩니다.
+
+**검증 기준**: SGBM invalid 영역에서 DA 출력이 주변과 이질적이지 않은 gradient 를 만드는지 정성 평가.
+
 ## 핵심 API 정리
 
 | 함수 | 입력 | 출력 | 용도 |
@@ -92,9 +151,11 @@ cmake .. && make
 
 ## Perception 맥락 정리
 
-- 이 파이프라인의 **Step 4 결과 (rectified pair)** 가 HITNet / CRE-Stereo 같은 Stereo Depth 모델의 입력
+- 이 파이프라인의 **Step 4 결과 (rectified pair)** 가 HITNet / CRE-Stereo / RAFT-Stereo 같은 학습 기반 Stereo Depth 모델의 입력
 - KITTI Stereo 벤치마크는 rectified 이미지를 기본 제공 — 이 전처리가 이미 적용된 상태
 - `Z = fB/d` 공식은 모든 Stereo Depth 파이프라인의 최종 변환 단계
+- **Monocular depth** (Depth Anything v2, MiDaS, ZoeDepth) 는 rectify/baseline 불필요하지만 metric scale 부재 → stereo/LiDAR 의 sparse metric 과 **fusion** 하는 것이 현대 perception 의 표준
+- Classical stereo 의 textureless / repetitive / occlusion 실패 영역을 학습 기반 방법이 dense 하게 메우는 것이 핵심 장점 — 7단계에서 직접 체감
 
 ## 원격 실행 팁 (출장지 환경)
 
