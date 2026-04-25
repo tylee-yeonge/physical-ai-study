@@ -119,7 +119,7 @@ std::vector<double> compute_reprojection_errors(
     const cv::Mat& rvec,
     const cv::Mat& tvec)
 {
-    std::vector<cv::Point2f> projected;
+    std::vector<cv::Point2d> projected;
     cv::projectPoints(points_3d, rvec, tvec, K, cv::noArray(), projected);
 
     std::vector<double> errors;
