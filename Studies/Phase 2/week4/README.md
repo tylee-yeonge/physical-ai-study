@@ -27,8 +27,8 @@
 | 3 | PnP 이론 학습 | `README.md` | - |
 | 4 | 재투영 오차 이해 | `README.md` | - |
 | 5 | OpenCV API 실습 (my_basic.cpp 에서 API 호출 부분 채움) | `my_basic.cpp` | API 조립 중심 |
-| 6 | KITTI 3D Object Detection 의 3D 박스 2D 재투영 | `PRACTICE.md` 4단계 | 원격 PC |
-| 7 | nuScenes 샘플로 solvePnP 외재 추정 | `PRACTICE.md` 5단계 | 원격 PC |
+| 6 | KITTI 3D Object Detection 의 3D 박스 2D 재투영 | `PRACTICE.md` 4단계 | 데이터셋 다운로드 필요 |
+| 7 | nuScenes 샘플로 solvePnP 외재 추정 | `PRACTICE.md` 5단계 | 데이터셋 다운로드 필요 |
 | 8 | 중급 퀴즈 (개념 중심) | `quiz_medium.cpp` | 문제 1 scratch 는 풀이 선택 |
 
 ---

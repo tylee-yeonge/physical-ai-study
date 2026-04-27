@@ -38,7 +38,7 @@ cmake .. && make
 
 합성 데이터로 파이프라인 동작 확인.
 
-### 4단계: KITTI 3D Object Detection 실습 (2시간) [원격 PC]
+### 4단계: KITTI 3D Object Detection 실습 (2시간)
 
 1. KITTI Object Detection (image_2, calib, label_2 각 ~1GB) 다운로드 (선행 작업)
 2. `label_2/000000.txt` 에서 3D 박스 (h, w, l, x, y, z, ry) 파싱
@@ -48,7 +48,7 @@ cmake .. && make
 
 **검증 기준**: 2D 박스 어노테이션과 재투영 8 코너 2D 바운딩이 대체로 일치.
 
-### 5단계: nuScenes 샘플 실습 (1-2시간) [원격 PC]
+### 5단계: nuScenes 샘플 실습 (1-2시간)
 
 1. nuScenes mini-split (~3GB) 다운로드 (선행 작업), devkit 설치
 2. 한 sample 에서 6 카메라 `calibrated_sensor` 파라미터 추출
@@ -88,8 +88,11 @@ cmake .. && make
 - **PnP**: 3D Detection 결과의 재투영 검증, 카메라 외재 캘리브레이션
 - **재투영 오차**: Monocular 3D Detection (FCOS3D) 의 평가/학습 지표
 
-## 원격 실행 팁
+## 실행 환경 안내
 
+Week 4 는 GPU 가 필요 없고 (딥러닝 없이 OpenCV/Python 기하 연산만), 데이터셋도 합쳐서 ~6GB 로 가벼움. **현재 작업 PC 어디서나 실행 가능** — Ubuntu PC 가 아니어도 됨.
+
+원격 작업이 필요한 경우 (출장지 등):
 - VS Code Tunnel / vscode.dev → Ubuntu PC 접속
 - Docker + Tailscale 메시 권장
 - Rerun 서버 포트(9090) 브라우저 접속
