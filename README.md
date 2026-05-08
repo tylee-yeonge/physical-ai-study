@@ -58,12 +58,9 @@ graph LR
 | 2026.05-07 | Stage 1 | **Phase 3: Detection + Depth + GitHub 산출물 #1 공개** | 면접 가능한 산출물 1개 |
 | 2026.08-09 | Stage 1 | **Phase 4: 3D Perception + 첫 지원 1~2건 (캘리브레이션)** | 시장 시그널 측정 |
 | 2026.10-11 | Stage 1 | **Portfolio Sprint: 산출물 통합 + 이력서 + 데모 영상** | 30초 패키징 |
-| 2026.12~ | Career | **본격 이직 활동 (계속 트라이) + VLA 입문은 보류/병행** | 분기당 면접 2~3건 |
-| 이직 후~ | Stage 2 | BEV, Blender, Isaac Sim | 심화 학습 |
+| 2026.12~ | Career | **본격 이직 활동 + 1차 트라이 실패 시 Stage 2 BEV/Multi-modal 병행** | 분기당 면접 2~3건 |
+| 이직 후~ | Stage 2 | Blender, Isaac Sim, BEV/Multi-modal 심화 | 회사 환경 활용 |
 | Stage 2 이후~ | Stage 2+ | **VLA 심화, Embodied AI** | 미래 역량 |
-
-> [pin] 기존 SLAM 트랙 (VO/BA 4주 + VIO 3주) = **7주를 절약**하여 Portfolio Sprint 에 배정.
-> Phase 2 도 8주 → 4주로 압축. 절약된 총 11주 중 7주는 Portfolio Sprint, 나머지 4주는 학습 버퍼.
 
 ---
 
@@ -329,6 +326,7 @@ Portfolio Sprint (2026.10~11): 패키징
 #### 12월~ (본격 이직 활동)
 - [ ] 본격 지원 시작 (분기당 면접 2~3건 목표)
 - [ ] 면접 결과를 트래커에 누적 → 포트폴리오/이력서 보완
+- [ ] 1차 트라이 1~2분기 동안 합격 시그널 약하면 → **Stage 2 (BEV / Multi-modal) 1개 트랙 병행 시작** (포트폴리오 #3 작성). Blender / Isaac Sim 은 이직 후로 보류 (회사 환경에서 효율적)
 
 #### 서브 트랙 — 내부 옵션 유지
 - [ ] Phase 3 산출물 #1 사내 데모 발표 1회 검토
