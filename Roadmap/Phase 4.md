@@ -36,6 +36,8 @@
 
 ## [list] Section 6.1: 3D Detection 기초 (2주)
 
+> [!] **이력서 1차 작성 병행**: Week 1-2 동안 Phase 3 산출물 #1 을 반영한 **이력서 국문 1차** 를 작성. 늦어도 2026.09 까지.
+
 ### Week 1: 3D Detection 개념
 
 #### 왜 3D Detection인가?
@@ -102,6 +104,8 @@
 ---
 
 ## [list] Section 6.2: KITTI 3D Detection (4주)
+
+> [!] **시장 탐색 병행**: Week 3-4 KITTI 실습 중 **첫 지원 1~2건 (캘리브레이션 목적)** 을 1순위 풀(베어로보틱스 / 우아한형제들 / 로보티즈)에 넣는다. 합격이 목표가 아니라 **면접관 반응으로 포트폴리오 보완 방향 잡기**가 목적.
 
 ### Week 3: KITTI 데이터셋
 
@@ -218,10 +222,12 @@ python tools/train.py \
 - [ ] 1000 scene, 40,000 keyframe
 - [ ] 23개 클래스 (KITTI의 3개 vs)
 
-#### 데이터셋 다운로드 (~400GB)
-[!] **주의**: 다운로드/압축 해제에 며칠 소요
-- [ ] Full dataset (v1.0-trainval)
-- [ ] Mini dataset (v1.0-mini, 10GB) 먼저 실험 권장
+#### 데이터셋 다운로드
+
+[!] **현 시점 권장**: **Mini dataset (v1.0-mini, 10GB) 만 사용**. Full dataset (~400GB) 은 **Stage 2 (이직 후) 로 보류 가능** — KITTI 3D 데모만으로도 채용 라인 충분.
+
+- [ ] **Mini dataset (v1.0-mini, 10GB)** — 입문/실험용 (필수)
+- [ ] Full dataset (v1.0-trainval, ~400GB) — Stage 2 보류 옵션, 다운로드/압축 해제만 며칠 소요
 
 #### 데이터 구조
 ```
@@ -335,7 +341,9 @@ python tools/test.py \
 
 ---
 
-## [list] Section 6.4: 포트폴리오 마무리 (2주)
+## [list] Section 6.4: 산출물 #2 공개 (2주)
+
+> [!] **역할 재정의**: Phase 4 = **산출물 #2 (3D Detection) 작성·공개까지**. 면접용 통합 패키징·이력서 다듬기·AMR 연결 영상은 별도 **Portfolio Sprint (2026.10-11)** 에서 처리.
 
 ### Week 11: 코드 및 문서 정리
 
@@ -478,11 +486,11 @@ python tools/test.py \
 ##  이직 준비 최종 점검
 
 ### 필수 역량 체크
-- [ ] SLAM 기초 (Phase 2-4) 이해
-- [ ] 2D Detection (Phase 3) 실무 경험
+- [ ] 기하학 기초 (Phase 2) — 카메라 모델 / 캘리브레이션 / Multi-view / PnP / 재투영
+- [ ] 2D Detection + Depth (Phase 3) 실무 경험
 - [ ] 3D Detection (Phase 4) 프로젝트 경험
 - [ ] Jetson 배포 경험
-- [ ] 포트폴리오 3종 세트
+- [ ] 포트폴리오 (별도 Public Repo `robotics-perception-portfolio`, 산출물 2개)
 
 ### 면접 대비 질문 (예상)
 1. "3D Detection 프로젝트 설명해주세요"
@@ -496,5 +504,7 @@ python tools/test.py \
 ## [?] 다음 단계
 
 Phase 4 완료 후:
-- **이직 활동 + VLA 입문 병행** (2026.12~)
+- **Portfolio Sprint** (2026.10-11) — 산출물 통합 패키징
+- **본격 이직 활동** (2026.12~) — 분기당 면접 2~3건 목표
+- **VLA 입문은 Stage 2 초기 또는 회사 적응 후** (이직 직후 바로 시작 X — Robotics Perception 채용은 VLA 미요구)
 - 이직 후: **Stage 2** (BEV Segmentation, Blender, Isaac Sim)

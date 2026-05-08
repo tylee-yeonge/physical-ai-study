@@ -200,6 +200,8 @@ scratch 구현은 **생략**한다. 이유:
 
 상세: [Studies/Phase 2/week4/PRACTICE.md](../Studies/Phase%202/week4/PRACTICE.md)
 
+**완료 기준**: `my_basic.cpp` 실행 시 Step 5 재투영 오차의 **평균 / 최대 / RMS** 픽셀값 콘솔 출력. 합성 데이터 평균 < 0.01 px.
+
 ---
 
 ## [tool] 학습 환경 (Phase 2)

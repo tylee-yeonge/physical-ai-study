@@ -4,7 +4,7 @@
 > [goal] **목표**: 2D Perception 마스터 + Jetson 실시간 배포  
 > [code] **언어**: **Python** (학습) + **C++/TensorRT** (배포)  
 > [tool] **하드웨어**: Ubuntu PC (RTX 4070) — 주 학습/실험 장비 / Jetson Orin Nano — 하드웨어 실습 시간 확보 시 재도입 (TensorRT 배포 파트)  
-> [time] **주간 시간**: 약 12시간
+> [time] **주간 시간**: 약 8~12시간 (출장 주 50% 보정)
 
 ---
 
@@ -15,7 +15,15 @@
 - Depth Estimation (Depth Anything V2)
 - 통합 시스템: Detection + Depth → 3D 위치 추정
 
+**산출물 #1 모델 예시**: YOLO11 + Depth Anything V2 → Jetson Orin Nano TensorRT, KITTI raw 또는 자체 stereo 데이터 → **30+ FPS, 1분 데모 영상** (2026.07까지 별도 Public Repo 공개)
+
 > [!] **언어 전략**: 학습은 Python, 배포는 C++/TensorRT
+
+> [!] **학습 노트 vs 포트폴리오 분리 원칙**:
+> - **학습 노트 (private)**: `Studies/Phase 3/` — 자기 이해용, 빠르고 거친 형태 OK
+> - **포트폴리오 (public)**: 별도 GitHub Repo `robotics-perception-portfolio` — 채용 담당자 진입점, README + 영상 + 수치
+>
+> 두 가지를 절대 섞지 않는다. Studies/ 노트는 면접관이 보지 않는다.
 
 ---
 
@@ -36,7 +44,20 @@
 
 ---
 
-## [list] Section 5.1: PyTorch 복습 (2주)
+## [list] Section 5.0: 시작 전 (0주, 이번 달 안)
+
+> Phase 3 진입 전에 반드시 완료. 학습이 채용 라인에서 이탈하지 않게 하는 출발점.
+
+- [ ] 타깃 회사 JD 3개 정독 — 베어로보틱스 / 우아한형제들 / 로보티즈 + 카카오모빌리티 자율주행팀 로보틱스 엔지니어 JD
+- [ ] 공통 요구 스택 추출 → 학습 우선순위 매핑 표 작성
+- [ ] **Phase 3 산출물 #1 스펙 1페이지 확정** (타깃 모델 / 데이터 / 수치 목표 / 데모 형태)
+- [ ] 별도 포트폴리오 Public GitHub Repo 생성 (`robotics-perception-portfolio`) — Studies/와 분리
+
+---
+
+## [list] Section 5.1: PyTorch 복습 (1~2주, 압축 옵션)
+
+> 이미 PyTorch에 익숙하면 Week 1+2를 1주로 압축. 절약된 1주를 Week 12 GitHub 공개·블로그 정리에 투입.
 
 ### Week 1: PyTorch 기초 재정비
 
@@ -328,11 +349,12 @@ pipe = pipeline(task="depth-estimation",
 - [ ] 3D 좌표 표시
 - [ ] 다양한 실내/실외 환경
 
-#### 포트폴리오 정리
-- [ ] GitHub 코드 업로드
-- [ ] README: 환경 세팅, 실행 방법
-- [ ] 블로그: YOLO/Depth 학습 과정 정리
-- [ ] Demo 영상 YouTube
+#### 포트폴리오 정리 (산출물 #1 공개)
+- [ ] **별도 Public Repo `robotics-perception-portfolio`** 에 산출물 #1 디렉토리 추가 (Studies/와 분리)
+- [ ] **README**: 환경 세팅 + 실행 방법 + **수치 성능 표** (mAP, FPS, AbsRel)
+- [ ] **1분 데모 영상** (Detection + Depth + 3D 위치 시각화)
+- [ ] **기술 블로그 1개** (YOLO/Depth 학습 + Jetson 배포 정리)
+- [ ] **공개 시점**: 2026.07까지 (Phase 3 완료 시점)
 
 ### [search] Section 5.4 자체 점검
 1. Depth map과 Detection bbox를 어떻게 융합하는가?

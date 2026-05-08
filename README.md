@@ -55,10 +55,10 @@ graph LR
 |------|-------|------|------|
 | 2026.01-02 | Stage 1 | Phase 0-1 (완료) | 환경 세팅, 수학 핵심 |
 | 2026.03-04 | Stage 1 | Phase 2: Perception 기하 기초 (4주) | 카메라 모델 + Multi-view 기하 |
-| 2026.05-07 | Stage 1 | **Phase 3: Detection + Depth** | 2D Perception + Jetson 배포 |
-| 2026.08-09 | Stage 1 | **Phase 4: 3D Perception + BEV** | KITTI/nuScenes 3D Detection |
-| 2026.10-11 | Stage 1 | **Portfolio Sprint** (7주) | Jetson 데모 + 블로그 + 영상 |
-| Portfolio Sprint 이후~ | Career | **이직 활동 시작 + VLA 입문 병행** | Perception Engineer |
+| 2026.05-07 | Stage 1 | **Phase 3: Detection + Depth + GitHub 산출물 #1 공개** | 면접 가능한 산출물 1개 |
+| 2026.08-09 | Stage 1 | **Phase 4: 3D Perception + 첫 지원 1~2건 (캘리브레이션)** | 시장 시그널 측정 |
+| 2026.10-11 | Stage 1 | **Portfolio Sprint: 산출물 통합 + 이력서 + 데모 영상** | 30초 패키징 |
+| 2026.12~ | Career | **본격 이직 활동 (계속 트라이) + VLA 입문은 보류/병행** | 분기당 면접 2~3건 |
 | 이직 후~ | Stage 2 | BEV, Blender, Isaac Sim | 심화 학습 |
 | Stage 2 이후~ | Stage 2+ | **VLA 심화, Embodied AI** | 미래 역량 |
 
@@ -113,6 +113,7 @@ graph LR
 
 ### Phase 3: Detection + Depth (3개월) [*]
 > **핵심 Phase** - Detection + Depth 필수, Instance Seg 선택
+> **시작 전 액션**: 타깃 회사 JD 3개 정독 (베어로보틱스 / 우아한형제들 / 로보티즈) → 산출물 #1 스펙 1페이지 확정
 
 | 주차 | 내용 | 핵심 모델 | 우선순위 |
 |------|------|----------|----------|
@@ -123,36 +124,39 @@ graph LR
 
 > [!] **TensorRT 배포는 삽질 시간이 예상보다 길어질 수 있음**
 
-**산출물**: Jetson에서 실시간 Detection + Depth 데모
+**산출물**: Jetson 실시간 Detection + Depth 데모 + **별도 Public Repo `robotics-perception-portfolio`** + README + 수치 성능 표 + 1분 영상 (2026.07까지 공개)
 
 ### Phase 4: 3D Perception (약 3개월) [*]
-> **이직 준비 핵심** - KITTI 3D → nuScenes 순서로 진행
+> **이직 준비 핵심** - KITTI 3D → nuScenes 입문 순서로 진행
+> **시장 탐색 병행**: Phase 4 중 1~2건 지원 (캘리브레이션 목적, 합격 X). 면접관 반응으로 포트폴리오 보완
 
 | 주차 | 내용 | 핵심 |
 |------|------|------|
-| 1-2 | 3D Object Detection 개념 | 카메라 → 3D |
-| 3-4 | **KITTI 3D 실습** | 가벼운 데이터셋으로 먼저 |
-| 5-6 | Monocular 3D Detection | FCOS3D |
-| 7-8 | **nuScenes + BEV 입문** | BEVFormer 개념 |
+| 1-2 | 3D Object Detection 개념 + 이력서 1차 작성 | 카메라 → 3D |
+| 3-4 | **KITTI 3D 실습** + 첫 지원 1~2건 | 가벼운 데이터셋으로 먼저 |
+| 5-6 | Monocular 3D Detection | FCOS3D / SMOKE |
+| 7-8 | **nuScenes + BEV 입문** (mini만, 가볍게) | BEVFormer 개념 |
 
-> [tip] **nuScenes (~400GB)는 셋업에만 며칠 걸릴 수 있음**
-> KITTI 3D로 먼저 연습 후 nuScenes 진입 권장
+> [tip] **nuScenes Full (~400GB) 학습은 Stage 2로 보류 가능**
+> KITTI 3D 데모만으로도 채용 라인 충분. Mini (10GB) 만 사용 권장
 
-**산출물**: 카메라 기반 3D 객체 검출 데모
+**산출물**: GitHub 산출물 #2 (3D Detection) — 별도 Public Repo 에 KITTI 3D bbox 시각화 + AP3D 표 + 1분 영상 (2026.09까지 공개)
 
-### Portfolio Sprint (7주) 
+### Portfolio Sprint (7주)
 > Phase 4 완료 직후, 이직 활동 직전
 
-**목적**: Phase 3-6에서 배운 기술을 **면접관이 보고 뽑고 싶어지는** 포트폴리오로 전환
+**목적**: 이미 공개한 산출물 #1, #2를 **면접용으로 패키징**. **새 산출물 제작 X, 통합/포장에 집중**.
+
+(Phase 3·4에서 매주 산출물을 누적했으므로 Sprint는 만드는 단계가 아니라 다듬는 단계)
 
 | 주 | 주제 | 핵심 |
 |----|------|------|
-| 1 | 프로젝트 설계 + 환경 고정 | 뭘 만들지 확정 |
-| 2-3 | **메인: Real-time Perception Stack** | YOLO + Depth Anything on Jetson |
-| 4 | **Mono 3D Detection 데모** | FCOS3D/SMOKE KITTI 시각화 |
-| 5 | **AMR 실무 연결** | ROS 2 노드 래퍼, 로봇 데모 영상 |
-| 6 | 블로그 + GitHub 정리 | 기술 블로그 3-5개 |
-| 7 | 데모 영상 + 이력서 | 1-3분 영상, 이력서 개편 |
+| 1 | 패키징 설계 | 산출물 2개를 면접관 진입점으로 재구성 |
+| 2-3 | **포트폴리오 Repo 정비** | 메인 README + 산출물별 디렉토리 정리 |
+| 4 | **AMR 실무 연결 영상** | ROS 2 노드 래퍼 시연, 1분 |
+| 5 | 블로그 정리 | Phase 3·4에서 작성한 글 + 추가 1~2개 |
+| 6 | 데모 영상 + 이력서 개편 | 1~3분 통합 영상, 이력서 국문/영문 |
+| 7 | LinkedIn / 지원 트래커 정비 | 본격 지원 시작 준비 |
 
 **차별화 메시지**: *"딥러닝 모델을 실제 로봇에 붙여본 사람"*
 
@@ -205,9 +209,10 @@ graph LR
 
 ---
 
-##  VLA 입문 (이직 활동과 병행)
+##  VLA 입문 (Stage 2 초기로 이동)
 
-> 포트폴리오 완성 후, 이직 활동과 병행하며 VLA 입문
+> Stage 1 동안은 이직 가능 상태 만들기가 최우선. VLA는 가산점이지 차별화 요소가 아님 (현재 시장에서 Robotics Perception 채용은 VLA 미요구).
+> **Stage 2 초기 또는 회사 적응 후 시작 권장**.
 > 로봇이 **보고 → 이해하고 → 행동**하는 End-to-End 시스템
 
 | 주제 | 내용 | 대표 모델 |
@@ -264,7 +269,13 @@ graph LR
 ```
 현재: AMR ROS Application 개발자 (7년차)
       ↓
-Portfolio Sprint 이후~: 이직 활동 시작 (계속 트라이)
+Phase 3 끝 (2026.07): GitHub 산출물 #1 공개
+      ↓
+Phase 4 중 (2026.08~09): 첫 지원 1~2건 (캘리브레이션)
+      ↓
+Portfolio Sprint (2026.10~11): 패키징
+      ↓
+2026.12~: 본격 이직 활동 (계속 트라이)
       ↓
 이직 성공: Perception Engineer (로봇/자율주행)
       ↓
@@ -280,13 +291,53 @@ Portfolio Sprint 이후~: 이직 활동 시작 (계속 트라이)
 ## [O] 마일스톤 체크리스트
 
 ### Stage 1 (학습 + Portfolio)
+
+#### 환경 / 기초
 - [x] 환경 세팅 완료
 - [x] 수학 기초 이해
 - [ ] Phase 2 완료 (Perception 기하 기초)
-- [ ] Phase 3 완료 (Detection + Depth, Jetson 배포)
-- [ ] Phase 4 완료 (3D Perception + BEV)
-- [ ] Portfolio Sprint 완료
-- [ ] **이직 활동 시작 → 될 때까지 계속 트라이**
+
+#### 5월 안 (Phase 3 진입 전)
+- [ ] 타깃 회사 3개 확정 — 베어로보틱스 + 우아한형제들 + 로보티즈
+- [ ] 1순위 풀 6개사 JD 정독 + 카카오모빌리티 자율주행팀 로보틱스 엔지니어 JD
+- [ ] 학습 우선순위 매핑 표 작성
+- [ ] Phase 3 산출물 #1 스펙 1페이지 확정
+
+#### 5월 말~6월 초
+- [ ] 포트폴리오 Public GitHub Repo 신규 생성 (`robotics-perception-portfolio`)
+- [ ] LinkedIn 프로필 정비 (헤드라인·키워드)
+
+#### 6~7월 (Phase 3)
+- [ ] Phase 3 완료 (PyTorch → YOLO + Jetson 배포 → Depth → 통합)
+- [ ] 매주 공개 가능한 형태로 산출물 누적
+- [ ] 이력서 국문 1차 작성 (2026.07까지)
+- [ ] **GitHub 산출물 #1 공개** (Phase 3 끝, 2026.07)
+
+#### 8~9월 (Phase 4 + 첫 지원)
+- [ ] Phase 4 완료 (3D 개념 → KITTI → Mono 3D → BEV 입문)
+- [ ] 이력서 영문 작성 (2026.09까지)
+- [ ] 지원 트래커 스프레드시트 생성
+- [ ] **첫 지원 1~2건 (캘리브레이션 목적, 합격 X)**
+- [ ] **GitHub 산출물 #2 공개** (Phase 4 끝, 2026.09)
+
+#### 10~11월 (Portfolio Sprint — 패키징)
+- [ ] 산출물 2개 면접용 패키징 (새 산출물 제작 X)
+- [ ] AMR ROS 연결 영상 1분
+- [ ] 이력서 개편 (국문/영문)
+- [ ] 기술 블로그 3~5개
+
+#### 12월~ (본격 이직 활동)
+- [ ] 본격 지원 시작 (분기당 면접 2~3건 목표)
+- [ ] 면접 결과를 트래커에 누적 → 포트폴리오/이력서 보완
+
+#### 서브 트랙 — 내부 옵션 유지
+- [ ] Phase 3 산출물 #1 사내 데모 발표 1회 검토
+- [ ] 사내 AMR 제품에 Detection/Depth 모듈 PoC 1건 모니터링
+- [ ] 회사가 Vision/AI 라인 재편할 가능성 대비 사내 노출 유지
+
+#### 측정 지표 (지속)
+- [ ] 매월: 포트폴리오 Public Repo 커밋 그래프 변화 확인
+- [ ] 매분기: 시장 시그널 1개 (지원 / 면접 / 네트워킹)
 
 ### Stage 2 (이직 후)
 - [ ] BEV Perception 심화
