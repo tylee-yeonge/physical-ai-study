@@ -299,6 +299,7 @@ Portfolio Sprint (2026.10~11): 패키징
 - [ ] 1순위 풀 6개사 JD 정독 + 카카오모빌리티 자율주행팀 로보틱스 엔지니어 JD
 - [ ] 학습 우선순위 매핑 표 작성
 - [ ] Phase 3 산출물 #1 스펙 1페이지 확정
+- [ ] TensorRT C++ Quick Start 1회 따라하기 (Phase 3 배포 사전 워밍업) — [공식 가이드](https://docs.nvidia.com/deeplearning/tensorrt/latest/getting-started/quick-start-guide.html), [샘플 코드](https://github.com/NVIDIA/TensorRT/tree/main/quickstart/SemanticSegmentation)
 
 #### 5월 말~6월 초
 - [ ] 포트폴리오 Public GitHub Repo 신규 생성 (`robotics-perception-portfolio`)

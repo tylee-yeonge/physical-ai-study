@@ -52,6 +52,12 @@
 - [ ] 공통 요구 스택 추출 → 학습 우선순위 매핑 표 작성
 - [ ] **Phase 3 산출물 #1 스펙 1페이지 확정** (타깃 모델 / 데이터 / 수치 목표 / 데모 형태)
 - [ ] 별도 포트폴리오 Public GitHub Repo 생성 (`robotics-perception-portfolio`) — Studies/와 분리
+- [ ] **TensorRT C++ Quick Start 1회 따라하기** — Section 5.2 Week 6 (Jetson 배포) 학습 곡선 단축용 사전 워밍업
+  - 공식 가이드: https://docs.nvidia.com/deeplearning/tensorrt/latest/getting-started/quick-start-guide.html
+  - 샘플 코드 (Semantic Segmentation, C++): https://github.com/NVIDIA/TensorRT/tree/main/quickstart/SemanticSegmentation
+  - 사전 환경: CUDA + TensorRT (Ubuntu PC 에서 진행 — Jetson 불필요)
+  - 예상 시간: 2-3 시간 (빌드/실행 + 코드 1회 정독)
+  - 완료 기준: `trtexec` 로 ONNX → engine 변환 1회 + C++ 샘플로 추론 1회 성공
 
 ---
 
