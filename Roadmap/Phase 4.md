@@ -1,11 +1,11 @@
 # Phase 4: VLA 논문 reading + OpenVLA → ROS2 minimal demo
 
 
-> **기간**: 약 4개월 (2026.09~12, F안)
+> **기간**: 약 4개월 (2026.09-12, F안)
 > **목표**: VLA 의 아키텍처 다이어그램을 막힘없이 읽을 수 있는 수준 + OpenVLA inference 를 ROS2 토픽으로 받는 minimal demo
 > **언어**: **Python** + **ROS2 (rclpy)**
 > **하드웨어**: Ubuntu PC (RTX 4070) — HuggingFace inference / ROS2 노드 / 시각화
-> **주간 시간**: 약 8~12시간 (출장 주 50% 보정)
+> **주간 시간**: 약 8-12시간 (출장 주 50% 보정)
 
 
 ---
@@ -57,7 +57,7 @@
 - [ ] OpenVLA HuggingFace 모델 카드 + 라이선스 확인
 - [ ] PC VRAM 점검 (7B 모델 inference 가능성, 4-bit quantization 옵션 확인)
 - [ ] 블로그 플랫폼 선정 (Velog / Medium / 본 레포의 `Studies/Phase 4/blog/`)
-- [x] **Studies/Phase 4/ week 1~16 자료** 미리 작성됨. 진입 시 (2026.09) 본문 다시 체크.
+- [x] **Studies/Phase 4/ week 1-16 자료** 미리 작성됨. 진입 시 (2026.09) 본문 다시 체크.
 
 
 ---
@@ -194,7 +194,7 @@ Output : /vla/action (geometry_msgs/Twist 또는 custom msg)
 
 
 Phase 4 완료 후 (2026.12):
-- **Phase 5: Foundation Model 기초** (ViT / CLIP / DINOv2 / SigLIP, 동작 원리 수준, 2026.12~2027.02)
+- **Phase 5: Foundation Model 기초** (ViT / CLIP / DINOv2 / SigLIP, 동작 원리 수준, 2026.12-2027.02)
 - 동시기 진행: **Hardware-Arm Stage 1 마무리** (산출물 #2.5)
-- 동시기 진행: **정찰 지원 2~3건** (2026.11~12)
+- 동시기 진행: **정찰 지원 2-3건** (2026.11-12)
 - **6개월 분기 재평가 #1 (2026.11)** — Phase 4 진행률 / VLA 모델 갱신 검토 / 정찰 지원 반응

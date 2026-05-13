@@ -1,7 +1,7 @@
 # Week 2 실습: ViT inference + Benchmark
 
 
-> **예상 시간**: 5~7시간
+> **예상 시간**: 5-7시간
 
 
 ---

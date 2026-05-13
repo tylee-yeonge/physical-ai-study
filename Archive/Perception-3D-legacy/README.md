@@ -6,7 +6,7 @@
 
 ## 이동된 자료
 - `Roadmap/Phase 4.md` — 기존 3D Perception 마스터 한 페이지 (KITTI 3D Detection, Monocular 3D, BEV 입문, nuScenes mini)
-- `Studies/Phase 4/` — 12주치 학습 가이드 자료 (week1~12, 추후 이동 예정)
+- `Studies/Phase 4/` — 12주치 학습 가이드 자료 (week1-12, 추후 이동 예정)
 
 
 ## Archive 사유

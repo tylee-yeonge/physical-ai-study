@@ -2,7 +2,7 @@
 
 
 > **이번 주 목표**: OpenVLA 의 HuggingFace 모델 카드를 정독하고, RTX 4070 12GB 환경에서 4-bit quantization 으로 inference 실행까지 가져간다. (week 7 블로그 + week 8~ ROS2 demo 의 사전 준비)
-> **예상 시간**: 8~10시간
+> **예상 시간**: 8-10시간
 > **핵심 질문**: "OpenVLA inference 가 내 환경에서 동작하는가? 한 frame 의 latency 는 몇 ms 인가?"
 
 
@@ -212,7 +212,7 @@ action = vla.predict_action(**inputs, unnormalize_key="bridge_orig", do_sample=F
 ```
 
 
-### 8. 본 로드맵의 다음 5주 흐름 (week 8~12)
+### 8. 본 로드맵의 다음 5주 흐름 (week 8-12)
 
 
 이번 주의 inference 셋업이 끝나면:
@@ -241,11 +241,11 @@ action = vla.predict_action(**inputs, unnormalize_key="bridge_orig", do_sample=F
 
 
 **Q3. inference 의 가장 큰 latency component 는?**
-> LM decoder generate (~60~120ms). 다음이 vision encoder (~20~40ms). preprocess / de-tokenize 는 미미.
+> LM decoder generate (~60-120ms). 다음이 vision encoder (~20-40ms). preprocess / de-tokenize 는 미미.
 
 
 **Q4. 첫 inference 가 두번째 inference 보다 느린 이유는?**
-> Warm-up. CUDA kernel JIT, KV cache 초기화, model weights GPU 로드 등. 첫 1~2번 inference 는 측정에서 제외하고 평균.
+> Warm-up. CUDA kernel JIT, KV cache 초기화, model weights GPU 로드 등. 첫 1-2번 inference 는 측정에서 제외하고 평균.
 
 
 **Q5. OpenVLA inference 시 do_sample=False 의 의미?**
@@ -279,7 +279,7 @@ action = vla.predict_action(**inputs, unnormalize_key="bridge_orig", do_sample=F
 
 1. **4-bit quantization (bitsandbytes nf4) 필수** RTX 4070 12GB 환경.
 2. **`predict_action()` + `unnormalize_key`**: OpenVLA 의 custom inference API.
-3. **Latency ~ 100~200ms**: LM decoder 가 대부분.
+3. **Latency ~ 100-200ms**: LM decoder 가 대부분.
 4. **첫 데이터 확보**: 산출물 #4 의 latency 측정의 baseline.
 5. **다음 주부터 블로그 + ROS2 demo**: 본격적 통합 시작.
 

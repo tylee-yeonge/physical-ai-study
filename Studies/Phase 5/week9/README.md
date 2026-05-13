@@ -155,7 +155,7 @@ OpenVLA 기본 224. 384 도 옵션.
 ### 8. Phase 5 학습의 총 정리
 
 
-본 주가 Phase 5 의 사실상 종합. week 10~12 는 SigLIP + Phase 4 demo 보강.
+본 주가 Phase 5 의 사실상 종합. week 10-12 는 SigLIP + Phase 4 demo 보강.
 
 
 이번 주의 결과물:

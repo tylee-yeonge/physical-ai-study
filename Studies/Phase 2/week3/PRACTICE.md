@@ -42,7 +42,7 @@ cmake .. && make
 ### 3단계: 직접 구현 (2-3시간)
 
 
-`my_basic.cpp` 의 Step 1~6 을 순서대로 구현:
+`my_basic.cpp` 의 Step 1-6 을 순서대로 구현:
 1. 카메라 파라미터 설정
 2. 합성 스테레오 쌍 생성
 3. 특징점 매칭 + Fundamental Matrix
@@ -62,7 +62,7 @@ cmake .. && make
 ### 5단계: KITTI 검증 실습 (출장지 원격 PC 가능) [1-2시간]
 
 
-**선행조건**: 3단계(직접 구현) Step 3~6 완료.
+**선행조건**: 3단계(직접 구현) Step 3-6 완료.
 
 
 **목적**: scratch 구현한 rectify 를 KITTI 실데이터에 적용해 공식 결과와 diff.

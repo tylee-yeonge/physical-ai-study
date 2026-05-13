@@ -535,7 +535,7 @@ occluded (가려짐):
 1. **KITTI 데이터셋**: 3D Detection 표준 벤치마크. 7,481장 학습 + 7,518장 테스트. 센서: 스테레오 카메라 + LiDAR + GPS/IMU
 
 
-2. **디렉토리 구조**: image_2(이미지), calib(캘리브레이션), label_2(레이블). 모두 6자리 숫자(000000~007480)로 정렬
+2. **디렉토리 구조**: image_2(이미지), calib(캘리브레이션), label_2(레이블). 모두 6자리 숫자(000000-007480)로 정렬
 
 
 3. **레이블 15개 필드**: class, truncated, occluded, alpha, bbox_2d(4), h, w, l, x, y, z, ry. [h,w,l] 순서에 주의

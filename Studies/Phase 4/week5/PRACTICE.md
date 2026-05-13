@@ -2,7 +2,7 @@
 
 
 > **실습 목표**: OpenX-Embodiment 의 한 dataset 을 직접 로드해 RLDS schema 를 손에 익히고, LoRA config 를 작성해 학습 가능 파라미터를 확인한다.
-> **예상 시간**: 6~8시간
+> **예상 시간**: 6-8시간
 
 
 ---

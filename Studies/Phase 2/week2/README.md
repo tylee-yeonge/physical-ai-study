@@ -40,11 +40,11 @@
 | 1 | 데모 실행 — `./basic` 출력 전체 읽기 | `basic.cpp` | - |
 | 2 | 왜곡 이론 학습 (방사/접선) | `README.md` | **easy 문제 2**: 왜곡 유형 판별 |
 | 3 | 캘리브레이션 과정 이해 | `README.md` | **easy 문제 4**: 3D-2D 대응점 생성 |
-| 4 | my_basic Step 1~3 (생성자, 품질평가, 객체점) | `my_basic.cpp` | **easy 문제 1**: K 행렬 분석, **문제 3**: RMS 평가 |
-| 5 | my_basic Step 4~5 (왜곡보정, 체커보드) | `my_basic.cpp` | **easy 문제 5**: 왜곡 크기 분포 분석 |
-| 6 | my_basic Step 6~7 (저장, 캘리브레이션) | `my_basic.cpp` | - |
-| 7 | 초급 퀴즈 풀기 | `quiz_easy.cpp` | **easy 문제 1~5** |
-| 8 | 중급 퀴즈 풀기 | `quiz_medium.cpp` | **medium 문제 1~5** |
+| 4 | my_basic Step 1-3 (생성자, 품질평가, 객체점) | `my_basic.cpp` | **easy 문제 1**: K 행렬 분석, **문제 3**: RMS 평가 |
+| 5 | my_basic Step 4-5 (왜곡보정, 체커보드) | `my_basic.cpp` | **easy 문제 5**: 왜곡 크기 분포 분석 |
+| 6 | my_basic Step 6-7 (저장, 캘리브레이션) | `my_basic.cpp` | - |
+| 7 | 초급 퀴즈 풀기 | `quiz_easy.cpp` | **easy 문제 1-5** |
+| 8 | 중급 퀴즈 풀기 | `quiz_medium.cpp` | **medium 문제 1-5** |
 | 9 | Fisheye / Kalibr 이론 읽기 | `README.md` | - |
 | 10 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 실제 카메라 캘리브레이션 |
 

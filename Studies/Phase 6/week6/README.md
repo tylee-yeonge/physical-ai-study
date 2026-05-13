@@ -102,7 +102,7 @@ end-effector 위치 비교:
 - Sensor noise (Real 만) -> Sim 의 결과는 cleaner
 
 
-이 한계가 Phase 6 week 9~10 의 측정 인프라의 토대.
+이 한계가 Phase 6 week 9-10 의 측정 인프라의 토대.
 
 
 ---
@@ -138,7 +138,7 @@ end-effector 위치 비교:
 2. **ROS2 /joint_states subscribe** + set_joint_position_targets
 3. **Latency < 100 ms, joint < 0.5 deg, ee < 5 mm**
 4. **매핑 표** 필수 (week 5 의 결과)
-5. **Dynamic mismatch** 한계 + week 9~10 의 측정
+5. **Dynamic mismatch** 한계 + week 9-10 의 측정
 
 
 - [Week 5](../week5/README.md) | [Week 7](../week7/README.md)

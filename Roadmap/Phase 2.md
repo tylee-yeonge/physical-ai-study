@@ -183,7 +183,7 @@ graph LR
 
 #### 실습 코드 (신규 작성)
 - `basic.cpp` — 데모 파이프라인: 샘플 stereo → E/F 계산 → Rectification → Disparity → Depth map → 결과 저장
-- `my_basic.cpp` — 사용자 구현 뼈대 (Step 1~6)
+- `my_basic.cpp` — 사용자 구현 뼈대 (Step 1-6)
 - `quiz_easy.cpp` / `quiz_medium.cpp` — 개념 + 구현 퀴즈
 
 
@@ -296,7 +296,7 @@ scratch 구현은 **생략**한다. 이유:
 ## -> 다음 단계
 
 
-Phase 2 완료 후 → **[Phase 3 (축소): Detection + Depth → PC TensorRT + ROS2 노드](Phase%203.md)** (약 2개월, 2026.06~08) 로 직진.
+Phase 2 완료 후 → **[Phase 3 (축소): Detection + Depth → PC TensorRT + ROS2 노드](Phase%203.md)** (약 2개월, 2026.06-08) 로 직진.
 
 
 > 기존 SLAM 트랙(VO/BA, VIO)은 [Archive/SLAM-legacy/](../Archive/SLAM-legacy/) 로 이동되었다. SLAM 트랙은 더 이상 메인 로드맵의 일부가 아니다.

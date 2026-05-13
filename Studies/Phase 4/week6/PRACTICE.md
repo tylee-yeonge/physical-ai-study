@@ -2,7 +2,7 @@
 
 
 > **실습 목표**: RTX 4070 12GB 에서 OpenVLA 4-bit inference 가 동작하고, 첫 latency 데이터를 확보한다.
-> **예상 시간**: 6~8시간
+> **예상 시간**: 6-8시간
 
 
 ---
@@ -119,10 +119,10 @@ python practice_first_inference.py
 **기대 출력**:
 - Action shape: (7,)
 - Action: 7-DoF action vector
-- GPU memory: ~ 5~7 GB
+- GPU memory: ~ 5-7 GB
 
 
-> 첫 실행 시 모델 다운로드에 ~ 15GB 디스크 사용 + ~ 5~10분 시간.
+> 첫 실행 시 모델 다운로드에 ~ 15GB 디스크 사용 + ~ 5-10분 시간.
 
 
 ---
@@ -239,9 +239,9 @@ python practice_latency_measure.py
 
 
 **기대 통계** (RTX 4070, 4-bit nf4):
-- mean: 120~180 ms
-- p95: 200~250 ms
-- Throughput: 5~7 Hz
+- mean: 120-180 ms
+- p95: 200-250 ms
+- Throughput: 5-7 Hz
 
 
 > 이 latency 데이터를 Phase 7 의 산출물 #4 영상에서 직접 인용. "RTX 4070 + 4-bit OpenVLA = 6Hz, 5Hz robot control 가능".

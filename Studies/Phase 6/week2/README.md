@@ -110,7 +110,7 @@ cube.apply_visual_material(mat)
 **Q1. prim_path 형식?** > `/World/<name>` linux 비슷.
 **Q2. Camera 인자?** > position, orientation (quat), resolution, focal_length.
 **Q3. Material 의 의의?** > Sim 의 시각 realism. Sim/Real gap 의 핵심.
-**Q4. Light intensity 단위?** > Lumens. indoor 1000~5000.
+**Q4. Light intensity 단위?** > Lumens. indoor 1000-5000.
 **Q5. Sim/Real 시각 gap 원인?** > Light / Material / Camera distortion 차이.
 
 

@@ -2,7 +2,7 @@
 
 
 > **이번 주 목표**: OpenVLA 논문을 1회독하고, Llama 7B + DINOv2 + SigLIP 라는 hybrid vision encoder 구조를 한 페이지로 설명할 수 있는 수준에 도달한다.
-> **예상 시간**: 10~12시간
+> **예상 시간**: 10-12시간
 > **핵심 질문**: "OpenVLA 가 RT-2 의 open-source 재현이라면, 그저 작은 모델을 쓴 것 외에 어떤 본질적 개선이 있는가?"
 
 
@@ -16,9 +16,9 @@
 |:----:|------|----------|------|
 | 1 | 환경 (week2 그대로) | `requirements.txt` | 추가 의존성 없음 |
 | 2 | 사전 지식 점검 | `README.md` 2장 | DINOv2 / SigLIP / Llama 의 큰 그림 |
-| 3 | 논문 1회독 (Sec 1~3) | OpenVLA PDF | Introduction + Background + Approach |
-| 4 | 논문 1회독 (Sec 4~6) | OpenVLA PDF | Experiments + Open-source release + Discussion |
-| 5 | Architecture 분해 | `PRACTICE.md` 1~2 | hybrid vision encoder 의 의도 분석 |
+| 3 | 논문 1회독 (Sec 1-3) | OpenVLA PDF | Introduction + Background + Approach |
+| 4 | 논문 1회독 (Sec 4-6) | OpenVLA PDF | Experiments + Open-source release + Discussion |
+| 5 | Architecture 분해 | `PRACTICE.md` 1-2 | hybrid vision encoder 의 의도 분석 |
 | 6 | 퀴즈 | quiz_easy / quiz_medium | OpenVLA 의 핵심 결정 / 수치 |
 | 7 | 노트 정리 | `PRACTICE.md` 3 | "한 페이지 OpenVLA" 노트 |
 
@@ -34,11 +34,11 @@ OpenVLA 는 본 로드맵 **산출물 #2 (2026.12), #4 결정타 (2027.07) 모�
 
 | 산출물 | OpenVLA 의 역할 |
 |---|---|
-| #2 (2026.12) | OpenVLA HuggingFace inference → ROS2 토픽 minimal demo (week 8~12) |
+| #2 (2026.12) | OpenVLA HuggingFace inference → ROS2 토픽 minimal demo (week 8-12) |
 | #4 (2027.07) | OpenVLA fork + ROS2 노드 + 자작 6DOF 팔 통합 (Real-to-Sim-to-Real) |
 
 
-즉 이번 주의 정독 깊이 = 산출물 #4 의 깊이. RT-2 (week 1~3) 보다 더 정밀하게 읽어야 한다.
+즉 이번 주의 정독 깊이 = 산출물 #4 의 깊이. RT-2 (week 1-3) 보다 더 정밀하게 읽어야 한다.
 
 
 > 2026.11 분기 재평가에서 OpenVLA 가 한 세대 뒤 (π0 / Helix / GR00T 등 등장) 라면 모델 갱신 가능. 단, 본 마스터는 OpenVLA 표준 가정.
@@ -214,7 +214,7 @@ OpenX-Embodiment 는 Google + DeepMind + 21 개 institution 협력의 **로봇 t
 | Weight 공개 | X | O (HuggingFace) |
 | Training code | X | O (GitHub) |
 | VRAM (4-bit) | ~ 14 GB+ (55B) | ~ 8 GB (7B) |
-| Inference latency | ~ 200ms | ~ 100~150ms |
+| Inference latency | ~ 200ms | ~ 100-150ms |
 
 
 ### 8. OpenVLA 의 핵심 contribution 4 가지
@@ -240,7 +240,7 @@ LoRA fine-tuning 은 본 로드맵 Phase 7 의 산출물 #4 에서 자작 6DOF �
 
 1. **데이터 분포 의존**: OpenX-Embodiment 에 없는 robot / 환경 / 작업은 zero-shot 실패율 큼
 2. **VRAM**: 7B fp16 = ~14GB. RTX 4070 12GB 에서는 4-bit quantization 필수
-3. **Latency**: ~100~150ms (5~7Hz). 여전히 실시간 30Hz 불가
+3. **Latency**: ~100-150ms (5-7Hz). 여전히 실시간 30Hz 불가
 4. **Single-arm**: bimanual / mobile manipulation 약함
 5. **No teleoperation policy**: behavioral cloning only, RL 또는 teleop 보강 따로 필요
 
@@ -301,7 +301,7 @@ LoRA fine-tuning 은 본 로드맵 Phase 7 의 산출물 #4 에서 자작 6DOF �
 
 
 **Q5. RTX 4070 12GB 에서 OpenVLA 를 inference 하려면?**
-> 7B model fp16 은 ~ 14GB → 12GB 메모리 부족. 4-bit quantization (bitsandbytes / GPTQ) 필요. 4-bit 시 약 4~5GB 로 inference 가능. 단 정확도 약간 떨어질 수 있음.
+> 7B model fp16 은 ~ 14GB → 12GB 메모리 부족. 4-bit quantization (bitsandbytes / GPTQ) 필요. 4-bit 시 약 4-5GB 로 inference 가능. 단 정확도 약간 떨어질 수 있음.
 
 
 ---

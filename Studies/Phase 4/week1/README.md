@@ -2,7 +2,7 @@
 
 
 > **이번 주 목표**: RT-2 논문을 처음부터 끝까지 1회독하고, Architecture Diagram을 분해해서 "Vision-Language Model이 어떻게 로봇 행동을 생성하는가" 를 한 페이지로 설명할 수 있는 수준에 도달한다.
-> **예상 시간**: 10~12시간 (논문 정독 6h + 다이어그램 분해 2h + 노트 정리 2~4h)
+> **예상 시간**: 10-12시간 (논문 정독 6h + 다이어그램 분해 2h + 노트 정리 2-4h)
 > **핵심 질문**: "VLM은 text token을 출력한다. Robot은 7-DoF continuous action을 받는다. 둘은 어떻게 연결되는가?"
 
 
@@ -16,9 +16,9 @@
 |:----:|------|----------|------|
 | 1 | 환경 준비 | `requirements.txt` | `pip install -r requirements.txt` (논문 reading note 도구만) |
 | 2 | 사전 지식 점검 | `README.md` 2장 | Transformer / VLM / RT-1 의 큰 그림 |
-| 3 | 논문 1회독 (Sec 1~3) | RT-2 PDF | Introduction + Related Work + Approach |
-| 4 | 논문 1회독 (Sec 4~6) | RT-2 PDF | Experiments + Emergent Capability + Conclusion |
-| 5 | Architecture Diagram 분해 | `PRACTICE.md` 1~3 | 그림 1, 2, 3 을 손으로 다시 그려서 설명 |
+| 3 | 논문 1회독 (Sec 1-3) | RT-2 PDF | Introduction + Related Work + Approach |
+| 4 | 논문 1회독 (Sec 4-6) | RT-2 PDF | Experiments + Emergent Capability + Conclusion |
+| 5 | Architecture Diagram 분해 | `PRACTICE.md` 1-3 | 그림 1, 2, 3 을 손으로 다시 그려서 설명 |
 | 6 | 퀴즈 (개념) | `quiz_easy.py` | RT-2 핵심 용어 / 다이어그램 이해 |
 | 7 | 퀴즈 (코드/계산) | `quiz_medium.py` | Action tokenization 계산 / VLM 토큰 분포 추정 |
 | 8 | 1주 reading note 정리 | `PRACTICE.md` 4 | "한 페이지 RT-2 다이어그램" 노트 산출 |
@@ -33,10 +33,10 @@
 Phase 4는 **VLA (Vision-Language-Action) 의 논문 이해 + ROS2 통합 첫 사이클** 이다. 4개월 (16주) 동안:
 
 
-- **week 1~3**: RT-2 정독 + 블로그 1편 (이번 주는 1주)
-- **week 4~7**: OpenVLA 정독 + 블로그 1편
-- **week 8~12**: OpenVLA HuggingFace inference → ROS2 토픽 minimal demo (산출물 #2)
-- **week 13~16**: 블로그 2편 마무리 + 산출물 #2 패키징
+- **week 1-3**: RT-2 정독 + 블로그 1편 (이번 주는 1주)
+- **week 4-7**: OpenVLA 정독 + 블로그 1편
+- **week 8-12**: OpenVLA HuggingFace inference → ROS2 토픽 minimal demo (산출물 #2)
+- **week 13-16**: 블로그 2편 마무리 + 산출물 #2 패키징
 
 
 본 phase의 최종 산출물 #2 (2026.12 공개):
@@ -50,7 +50,7 @@ Phase 4는 **VLA (Vision-Language-Action) 의 논문 이해 + ROS2 통합 첫 �
 ### 왜 RT-2 부터 시작하는가
 
 
-RT-2 는 "VLM (Vision-Language Model) 에 web-scale 데이터로 학습된 지식이 로봇 제어 능력으로 transfer 된다" 는 것을 처음으로 대규모로 보여준 논문이다. 이 한 줄이 VLA 라는 분야의 시작점이다. OpenVLA (week 4~7) 는 이 아이디어의 open-source 버전이며, RT-2 를 이해하지 않고 OpenVLA 만 보면 "왜 이런 구조인가" 가 흐릿하다.
+RT-2 는 "VLM (Vision-Language Model) 에 web-scale 데이터로 학습된 지식이 로봇 제어 능력으로 transfer 된다" 는 것을 처음으로 대규모로 보여준 논문이다. 이 한 줄이 VLA 라는 분야의 시작점이다. OpenVLA (week 4-7) 는 이 아이디어의 open-source 버전이며, RT-2 를 이해하지 않고 OpenVLA 만 보면 "왜 이런 구조인가" 가 흐릿하다.
 
 
 | Phase 4 학습 순서 | 이유 |
@@ -209,7 +209,7 @@ VLM vocabulary 의 마지막 256 개 token ID:
 이번 주 핵심 정리 포인트:
 - Vision Encoder 와 Text Tokenizer 가 **독립적으로** token 을 만든다
 - 두 종류 token 이 **concat** 되어 한 sequence 로 Decoder 에 들어간다
-- 출력 token sequence 의 **앞부분 7~11 개** 가 action 으로 해석된다
+- 출력 token sequence 의 **앞부분 7-11 개** 가 action 으로 해석된다
 - 출력 token sequence 의 **그 뒤** 가 일반적인 text (예: "<terminate>") 이면 episode 종료
 
 

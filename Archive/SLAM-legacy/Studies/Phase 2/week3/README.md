@@ -43,11 +43,11 @@
 | 1 | 데모 실행 — `./basic` 출력 전체 읽기 | `basic.cpp` | - |
 | 2 | 특징점 이론 (Harris, FAST 원리) | `README.md` | **easy 문제 1**: FAST 파라미터, **문제 5**: Harris 응답 |
 | 3 | 디스크립터 이론 (BRIEF, ORB) | `README.md` | **easy 문제 2**: ORB 디스크립터 분석 |
-| 4 | my_basic Step 1~2 (FAST, ORB 검출) | `my_basic.cpp` | **easy 문제 4**: 검출기 속도 비교 |
-| 5 | my_basic Step 3~4 (시각화, 분포 분석) | `my_basic.cpp` | **easy 문제 3**: NMS 효과 분석 |
-| 6 | my_basic Step 5~6 (비교, NMS 데모) | `my_basic.cpp` | - |
-| 7 | 초급 퀴즈 풀기 | `quiz_easy.cpp` | **easy 문제 1~5** |
-| 8 | 중급 퀴즈 풀기 | `quiz_medium.cpp` | **medium 문제 1~5** |
+| 4 | my_basic Step 1-2 (FAST, ORB 검출) | `my_basic.cpp` | **easy 문제 4**: 검출기 속도 비교 |
+| 5 | my_basic Step 3-4 (시각화, 분포 분석) | `my_basic.cpp` | **easy 문제 3**: NMS 효과 분석 |
+| 6 | my_basic Step 5-6 (비교, NMS 데모) | `my_basic.cpp` | - |
+| 7 | 초급 퀴즈 풀기 | `quiz_easy.cpp` | **easy 문제 1-5** |
+| 8 | 중급 퀴즈 풀기 | `quiz_medium.cpp` | **medium 문제 1-5** |
 | 9 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | 실시간 특징점 검출 |
 
 
@@ -169,7 +169,7 @@ row3 [ 50 | 50 |200 |200 ]
 ```
 
 
-**평탄한 영역 (row0~1, col0~1)에서 밀기:**
+**평탄한 영역 (row0-1, col0-1)에서 밀기:**
 
 
 ```
@@ -181,7 +181,7 @@ row3 [ 50 | 50 |200 |200 ]
 ```
 
 
-**코너 근처 (row1~2, col1~2)에서 밀기:**
+**코너 근처 (row1-2, col1-2)에서 밀기:**
 
 
 ```
@@ -405,7 +405,7 @@ FAST는 **픽셀 밝기 비교만**으로 코너를 판별하므로 훨씬 빠�
 ```
 
 
-**코너 판별**: 16개 중 **연속 N개**(보통 9~12개)가 중심보다 **모두 밝거나** 또는 **모두 어두우면** 코너로 판정한다.
+**코너 판별**: 16개 중 **연속 N개**(보통 9-12개)가 중심보다 **모두 밝거나** 또는 **모두 어두우면** 코너로 판정한다.
 
 
 구체적으로, threshold `t`를 정해놓고:

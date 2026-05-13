@@ -662,7 +662,7 @@ One-Stage (YOLO):
 | BBox 예측 | offset | DFL | **DFL** |
 | Backbone 블록 | C3 | C2f | **C3k2** |
 | Neck Attention | 없음 | 없음 | **C2PSA (PSA)** |
-| 같은 크기 mAP | 기준 | +2~3% | **+3~5%** |
+| 같은 크기 mAP | 기준 | +2-3% | **+3-5%** |
 | 같은 mAP 파라미터 | 기준 | 기준 | **약 22% 감소** |
 
 

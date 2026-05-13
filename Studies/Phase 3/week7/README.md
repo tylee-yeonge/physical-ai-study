@@ -236,7 +236,7 @@ AMR에서의 현실적 고려사항:
 ---
 
 
-### 3. 핵심 모델 1: MiDaS (2019~2022)
+### 3. 핵심 모델 1: MiDaS (2019-2022)
 
 
 **MiDaS = Monocular Depth in the wild using Mixing Datasets**

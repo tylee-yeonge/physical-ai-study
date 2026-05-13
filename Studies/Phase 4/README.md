@@ -1,7 +1,7 @@
 # Studies/Phase 4 — VLA 논문 reading + OpenVLA → ROS2 minimal demo
 
 
-> **학습 기간**: 2026.09~12 (4개월, 16주)
+> **학습 기간**: 2026.09-12 (4개월, 16주)
 > **마스터 가이드**: [`Roadmap/Phase 4.md`](../../Roadmap/Phase%204.md)
 > **자료 미리 작성됨** — 진입 시 (2026.09) 다시 체크 후 학습 시작
 

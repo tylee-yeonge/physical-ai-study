@@ -26,7 +26,7 @@
 ## Phase 6 마지막 주
 
 
-Phase 7 (2027.05~07, Real-to-Sim-to-Real) 의 진입.
+Phase 7 (2027.05-07, Real-to-Sim-to-Real) 의 진입.
 
 
 ```
@@ -140,7 +140,7 @@ ee position trace
 
 
 ### 이번 주: 종합 보고서 + Rerun + retro + quiz
-### Phase 7 (2027.05~07): 산출물 #4 결정타
+### Phase 7 (2027.05-07): 산출물 #4 결정타
 
 
 ---

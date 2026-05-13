@@ -17,7 +17,7 @@
 | 1 | 환경 | `requirements.txt` | datasets, h5py 추가 |
 | 2 | OpenX 페이지 정독 | https://robotics-transformer-x.github.io/ | dataset list / format |
 | 3 | OpenVLA 논문 Sec 4 재정독 | OpenVLA PDF | fine-tuning details |
-| 4 | datasets 라이브러리 실습 | `PRACTICE.md` 1~2 | HuggingFace로 OpenX 일부 로드 |
+| 4 | datasets 라이브러리 실습 | `PRACTICE.md` 1-2 | HuggingFace로 OpenX 일부 로드 |
 | 5 | LoRA 코드 흐름 분석 | `PRACTICE.md` 3 | OpenVLA repo 의 LoRA config |
 | 6 | 퀴즈 | quiz_easy / quiz_medium | 데이터 구조 / LoRA 설정 |
 | 7 | 노트 정리 | `PRACTICE.md` 4 | "자작 팔 데이터 호환성 분석" 노트 |
@@ -41,7 +41,7 @@ Phase 7 산출물 #4 의 fine-tuning 단계 (2027.06):
 ```
 
 
-이번 주에 1~3 의 *방법* 을 미리 익혀둔다. 자작 팔의 데이터 format 까지 미리 결정하면 Phase 7 진입 시 1~2주 절약 가능.
+이번 주에 1-3 의 *방법* 을 미리 익혀둔다. 자작 팔의 데이터 format 까지 미리 결정하면 Phase 7 진입 시 1-2주 절약 가능.
 
 
 ---
@@ -183,7 +183,7 @@ config = LoraConfig(
 
 
 설정 별 영향:
-- **rank (r)**: 클수록 표현력 강함, 작을수록 메모리 절약. 16~32 권장.
+- **rank (r)**: 클수록 표현력 강함, 작을수록 메모리 절약. 16-32 권장.
 - **alpha**: scaling factor. 일반적으로 alpha = 2 * rank.
 - **target_modules**: 어디에 LoRA 적용. attention 만 vs FFN 까지 vs all linear.
 - **dropout**: regularization. 보통 0 ~ 0.1.
@@ -254,7 +254,7 @@ OpenVLA 의 평가 지표 (논문 Table):
 
 
 **Q3. OpenVLA + LoRA 학습 시 학습 가능 파라미터는 전체 모델의 몇 %인가?**
-> rank 16~32 기준 약 1% 미만 (~50~100M out of 7B). 이게 빠른 fine-tuning 의 핵심.
+> rank 16-32 기준 약 1% 미만 (~50-100M out of 7B). 이게 빠른 fine-tuning 의 핵심.
 
 
 **Q4. RTX 4070 12GB 에서 OpenVLA + LoRA 학습 가능한가?**
@@ -262,7 +262,7 @@ OpenVLA 의 평가 지표 (논문 Table):
 
 
 **Q5. 자작 팔 데이터 수집 시 episode 당 평균 step 수는?**
-> 보통 30~100 step (5~15초). 1 task 당 50~100 episode 면 ~ 5000~10000 step. LoRA 학습에 충분.
+> 보통 30-100 step (5-15초). 1 task 당 50-100 episode 면 ~ 5000-10000 step. LoRA 학습에 충분.
 
 
 ---
@@ -294,7 +294,7 @@ OpenVLA 의 평가 지표 (논문 Table):
 2. **자작 6DOF 팔 = WidowX 250 유사** → Bridge dataset 의 trajectory 가 prior 로 유용.
 3. **LoRA + 4-bit base** 가 RTX 4070 12GB 환경의 표준 fine-tune 구성.
 4. **학습 파라미터 ~ 1% 미만** → 새 robot 빠른 적응.
-5. **자작 팔 데이터 수집**: 50~100 demonstrations × 30~100 step = ~5K~10K step.
+5. **자작 팔 데이터 수집**: 50-100 demonstrations × 30-100 step = ~5K~10K step.
 
 
 ---

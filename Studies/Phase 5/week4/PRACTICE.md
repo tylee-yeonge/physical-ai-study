@@ -1,7 +1,7 @@
 # Week 4 실습: CLIP Architecture + image-text similarity
 
 
-> **예상 시간**: 4~6시간
+> **예상 시간**: 4-6시간
 
 
 ---

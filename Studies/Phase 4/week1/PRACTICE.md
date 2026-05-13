@@ -2,7 +2,7 @@
 
 
 > **실습 목표**: 논문을 닫고도 RT-2 의 입출력 / Architecture / 학습 흐름 / Emergent capability 를 한 페이지로 그릴 수 있게 한다.
-> **예상 시간**: 6~8시간
+> **예상 시간**: 6-8시간
 
 
 ---
@@ -436,6 +436,6 @@ python practice_action_tokenization.py
 | 증상 | 원인 | 해결 |
 |---|---|---|
 | 논문이 너무 길어 막힘 | 한 번에 다 보려 함 | Sec 1+3+5 만 우선, Sec 2 (Related Work) 는 마지막에 |
-| Architecture 가 이해 안 됨 | VLM 사전 지식 부족 | Phase 5 의 ViT/CLIP 자료 미리 훑기 (1~2시간) |
+| Architecture 가 이해 안 됨 | VLM 사전 지식 부족 | Phase 5 의 ViT/CLIP 자료 미리 훑기 (1-2시간) |
 | Action tokenization 이 이해 안 됨 | tokenizer 의 개념 자체가 모호 | Karpathy 강의 30분만 보기 |
 | 시간 부족 | Sec 1+3+5+reading_note 만 끝내도 OK | Sec 2/4 는 week 2 에 흡수 |

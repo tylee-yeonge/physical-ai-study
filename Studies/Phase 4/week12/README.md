@@ -16,7 +16,7 @@
 |:----:|------|----------|------|
 | 1 | Rerun 설치 + 기본 사용 | `PRACTICE.md` 1 | rerun-sdk |
 | 2 | rerun_logger 노드 | `PRACTICE.md` 2 | ROS topic 들 -> Rerun |
-| 3 | 영상 시나리오 작성 | `PRACTICE.md` 3 | 1분 절차 1~3 단계 |
+| 3 | 영상 시나리오 작성 | `PRACTICE.md` 3 | 1분 절차 1-3 단계 |
 | 4 | 녹화 + 편집 | `PRACTICE.md` 4 | OBS / Kazam |
 | 5 | 자막 + 패키징 | `PRACTICE.md` 5 | 한글 자막 |
 | 6 | 퀴즈 | quiz_easy / quiz_medium | 시각화 / 영상 |
@@ -30,7 +30,7 @@
 
 이번 주가 끝나면 **산출물 #2 완성**:
 - 블로그 2 편 (RT-2 + OpenVLA, week 3 + week 7)
-- OpenVLA -> ROS2 토픽 minimal demo (week 8~11)
+- OpenVLA -> ROS2 토픽 minimal demo (week 8-11)
 - **1분 데모 영상** (이번 주)
 - 발행: `physical-ai-study` 레포의 `Portfolio/02_VLA_demo/`
 

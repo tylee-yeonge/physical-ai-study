@@ -2,7 +2,7 @@
 
 
 > **실습 목표**: VLM 의 토크나이저를 직접 다루고, action token 의 추출/복원 사이클을 코드로 검증한다.
-> **예상 시간**: 6~8시간
+> **예상 시간**: 6-8시간
 
 
 ---
@@ -96,7 +96,7 @@ python practice_sentencepiece.py
 
 
 **확인 포인트**:
-- "pick up the can" 이 4~6 개 토큰으로 분해됨
+- "pick up the can" 이 4-6 개 토큰으로 분해됨
 - 흔하지 않은 단어는 더 많은 sub-word 로 분해
 - vocab 의 마지막 token 들은 의미 없는 부분 문자열
 

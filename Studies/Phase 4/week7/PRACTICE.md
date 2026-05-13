@@ -1,8 +1,8 @@
 # Week 7 실습: OpenVLA 블로그 1편 작성 + 발행
 
 
-> **실습 목표**: week 6 의 latency 데이터 + week 4~5 의 reading note 를 통합해 OpenVLA 블로그 1편 마감.
-> **예상 시간**: 8~10시간
+> **실습 목표**: week 6 의 latency 데이터 + week 4-5 의 reading note 를 통합해 OpenVLA 블로그 1편 마감.
+> **예상 시간**: 8-10시간
 
 
 ---
@@ -228,8 +228,8 @@ xychart-beta
 
 
 - [ ] outline 작성
-- [ ] Mermaid 다이어그램 2~3 개
-- [ ] 본문 작성 (3500~4500 자)
+- [ ] Mermaid 다이어그램 2-3 개
+- [ ] 본문 작성 (3500-4500 자)
 - [ ] week 6 의 latency 데이터 인용
 - [ ] self-review 통과
 - [ ] Velog 발행
@@ -244,6 +244,6 @@ xychart-beta
 
 
 - week 3 (RT-2 블로그) 의 작성 가이드
-- week 4~6 의 reading note + latency 데이터
+- week 4-6 의 reading note + latency 데이터
 - [OpenVLA HuggingFace](https://huggingface.co/openvla/openvla-7b)
 - [Velog](https://velog.io)

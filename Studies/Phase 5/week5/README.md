@@ -65,10 +65,10 @@ probs = logits.softmax(dim=-1)
 
 | 분야 | 정확도 |
 |---|---|
-| ImageNet | 70~80% |
+| ImageNet | 70-80% |
 | Fashion | 80%+ |
-| 추상 / 그래픽 | 50~60% |
-| Fine-grained | 40~50% |
+| 추상 / 그래픽 | 50-60% |
+| Fine-grained | 40-50% |
 | OCR | 매우 약함 |
 
 
@@ -105,7 +105,7 @@ OpenVLA 의 "pick up the red can" 명령에서 'red can' 인식이 비슷한 원
 
 
 **Q2. Zero-shot 정확도 일반 객체?**
-> 70~80%.
+> 70-80%.
 
 
 **Q3. Detection 가능?**
@@ -144,7 +144,7 @@ OpenVLA 의 "pick up the red can" 명령에서 'red can' 인식이 비슷한 원
 
 1. **HuggingFace CLIPProcessor + CLIPModel**
 2. **"a photo of a X"** 표준 prompt
-3. **Zero-shot 70~80%** 일반 객체
+3. **Zero-shot 70-80%** 일반 객체
 4. **Detection 별도 모델** (CLIP feature 활용)
 5. **SigLIP 가 CLIP 의 후속**, OpenVLA backbone
 

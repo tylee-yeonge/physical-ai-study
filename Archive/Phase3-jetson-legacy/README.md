@@ -1,7 +1,7 @@
 # Phase 3 Jetson Legacy
 
 
-기존 Phase 3 (Detection + Depth + Jetson 실기 배포) 12주 학습 자료 중 **week 9~12 (Jetson 실기 배포 관련)** 가 F안 (revision_plan.md v3, 2026-05) 의 축소판 결정에 따라 본 디렉토리로 이동됨.
+기존 Phase 3 (Detection + Depth + Jetson 실기 배포) 12주 학습 자료 중 **week 9-12 (Jetson 실기 배포 관련)** 가 F안 (revision_plan.md v3, 2026-05) 의 축소판 결정에 따라 본 디렉토리로 이동됨.
 
 
 ## 이동된 자료
@@ -13,7 +13,7 @@
 
 ## Archive 사유
 - F안 결정 (revision_plan.md): Jetson 실기 배포는 **Phase 7 이후 옵션 #5** 로 분리
-- Phase 3 (축소판) 은 *PC TensorRT + ROS2 노드 까지만* (week 1~8, 약 2개월)
+- Phase 3 (축소판) 은 *PC TensorRT + ROS2 노드 까지만* (week 1-8, 약 2개월)
 - 본 자료는 Phase 7 이후 *Jetson 실기 배포 시점* 에 재활용 — 본 디렉토리는 *대기 상태* 의 자산
 
 
@@ -22,5 +22,5 @@
 
 
 ## 참고
-- 새 Phase 3 (축소판) 본 디렉토리: [`Studies/Phase 3/`](../../Studies/Phase%203/) (week 1~8 만 유지)
+- 새 Phase 3 (축소판) 본 디렉토리: [`Studies/Phase 3/`](../../Studies/Phase%203/) (week 1-8 만 유지)
 - Phase 7 이후 Jetson 옵션 섹션: [README 부록 C](../../README.md)

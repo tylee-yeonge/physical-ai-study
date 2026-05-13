@@ -1,7 +1,7 @@
 # Week 7: OpenVLA 블로그 1편 작성
 
 
-> **이번 주 목표**: week 4~6 의 reading note + 한 페이지 요약 + 실측 latency 데이터를 합쳐서 OpenVLA 블로그 1편 (산출물 #2 의 2/3) 마감.
+> **이번 주 목표**: week 4-6 의 reading note + 한 페이지 요약 + 실측 latency 데이터를 합쳐서 OpenVLA 블로그 1편 (산출물 #2 의 2/3) 마감.
 > **예상 시간**: 10시간 (outline 1h + 본문 6h + 다이어그램 1h + 퇴고 2h)
 > **핵심 질문**: "OpenVLA 블로그가 RT-2 블로그 (week 3) 와 어떻게 차별화되는가? '내가 직접 돌려본 OpenVLA' 만의 가치가 있는가?"
 
@@ -18,7 +18,7 @@
 | 2 | OpenVLA outline 작성 | `PRACTICE.md` 1 | RT-2 와의 차별점 강조 |
 | 3 | 다이어그램 작성 | `PRACTICE.md` 2 | hybrid vision encoder 다이어그램 |
 | 4 | latency 데이터 인용 | week 6 의 `.npy` | "내가 직접 측정" 의 증거 |
-| 5 | 본문 작성 | 블로그 플랫폼 | 약 3500~4500 자 한국어 |
+| 5 | 본문 작성 | 블로그 플랫폼 | 약 3500-4500 자 한국어 |
 | 6 | 퀴즈 | quiz_easy / quiz_medium | OpenVLA 블로그의 차별점 |
 | 7 | 퇴고 + 발행 | Velog + 본 레포 사본 | 산출물 #2 의 2/3 완성 |
 
@@ -65,12 +65,12 @@ OpenVLA 블로그는 week 3 의 RT-2 블로그와 동일한 8-section 구조지�
 - "내가 RTX 4070 4-bit 에서 inference 했다" 의 증명 (latency 통계 표)
 
 
-### Section 4: 자세한 동작 (1000~1500 자)
+### Section 4: 자세한 동작 (1000-1500 자)
 - 4-1. Hybrid vision encoder 의 의도
 - 4-2. Llama 2 7B 의 의의
 - 4-3. OpenX-Embodiment 의 22 embodiments
 - 4-4. LoRA fine-tuning 흐름
-- 4-5. 4-bit quantization 의 trade-off (~ 1~2%p 정확도 손실, 메모리 1/8)
+- 4-5. 4-bit quantization 의 trade-off (~ 1-2%p 정확도 손실, 메모리 1/8)
 
 
 ### Section 5: 결과 + 실측 데이터
@@ -107,8 +107,8 @@ OpenVLA 블로그는 week 3 의 RT-2 블로그와 동일한 8-section 구조지�
 
 
 ### Section 8: 다음
-- Phase 4 의 다음 단계 (week 8~12 의 ROS2 demo)
-- Phase 6~7 의 자작 팔 통합
+- Phase 4 의 다음 단계 (week 8-12 의 ROS2 demo)
+- Phase 6-7 의 자작 팔 통합
 - π0 / Helix 등 후속 모델
 
 
@@ -147,7 +147,7 @@ OpenVLA 블로그는 week 3 의 RT-2 블로그와 동일한 8-section 구조지�
 
 
 **Q4. 4-bit quantization 의 trade-off 를 블로그에서 어떻게 다루는가?**
-> "정확도 1~2%p 손실 vs 메모리 1/8 / 속도 1.5~2x" 같은 정량 trade-off. 양산 시점에는 어느 쪽이 우선인지 본인 의견.
+> "정확도 1-2%p 손실 vs 메모리 1/8 / 속도 1.5-2x" 같은 정량 trade-off. 양산 시점에는 어느 쪽이 우선인지 본인 의견.
 
 
 **Q5. 양산 SW 엔지니어의 차별화 메시지는 Section 7 에 어떻게 적나?**
@@ -161,10 +161,10 @@ OpenVLA 블로그는 week 3 의 RT-2 블로그와 동일한 8-section 구조지�
 
 
 ### 이번 주 실습 과제
-1. week 4~6 의 reading note + 한 페이지 노트 + latency 데이터 통합
+1. week 4-6 의 reading note + 한 페이지 노트 + latency 데이터 통합
 2. OpenVLA 블로그 outline (8-section)
 3. 다이어그램 2 개 작성 (Mermaid)
-4. 본문 작성 (3500~4500 자 한국어)
+4. 본문 작성 (3500-4500 자 한국어)
 5. self-review + 퇴고
 6. Velog 발행 + 본 레포 사본
 7. quiz_easy / quiz_medium 풀기
@@ -184,7 +184,7 @@ OpenVLA 블로그는 week 3 의 RT-2 블로그와 동일한 8-section 구조지�
 
 1. **RT-2 블로그와 차별화**: 직접 측정한 latency 데이터.
 2. **8-section 구조 동일**: week 3 의 패턴 그대로.
-3. **분량 3500~4500 자**: RT-2 블로그보다 약간 더 (실측 데이터 표 추가).
+3. **분량 3500-4500 자**: RT-2 블로그보다 약간 더 (실측 데이터 표 추가).
 4. **양산 SW 엔지니어 메시지**: 5Hz 의 양산 의미.
 5. **산출물 #2 의 2/3 완료**: RT-2 블로그 (1/3) + OpenVLA 블로그 (2/3) + ROS2 demo (3/3).
 

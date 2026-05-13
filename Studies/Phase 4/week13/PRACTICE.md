@@ -2,7 +2,7 @@
 
 
 > **실습 목표**: week 3 + week 7 의 두 블로그를 면접관 진입점 수준으로 다듬는다.
-> **예상 시간**: 5~7시간
+> **예상 시간**: 5-7시간
 
 
 ---
@@ -30,7 +30,7 @@ flowchart LR
 - theme: default (또는 forest)
 - direction: LR (좌→우)
 - 노드 모양: rectangle 기본 + ellipse 는 입출력만
-- 강조: stroke 또는 fill 1~2개
+- 강조: stroke 또는 fill 1-2개
 
 
 ### 1-2. 일관된 약어

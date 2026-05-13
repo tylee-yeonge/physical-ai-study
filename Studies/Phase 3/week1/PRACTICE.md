@@ -2,7 +2,7 @@
 
 
 > **실습 목표**: CUDA 환경 세팅 → Tensor 연산 → CNN 학습 → ResNet Fine-tuning → TensorBoard → Checkpoint
-> **예상 시간**: 6~8시간
+> **예상 시간**: 6-8시간
 
 
 ---
@@ -481,7 +481,7 @@ tensorboard --logdir=runs
 
 
 **예상 결과**:
-- SimpleCNN: 약 75~80% 정확도
+- SimpleCNN: 약 75-80% 정확도
 
 
 ---
@@ -680,7 +680,7 @@ python practice_resnet18.py
 
 
 **예상 결과**:
-- ResNet-18 Fine-tuning: 약 88~92% 정확도
+- ResNet-18 Fine-tuning: 약 88-92% 정확도
 
 
 ---

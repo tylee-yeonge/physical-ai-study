@@ -2,7 +2,7 @@
 
 
 > **이번 주 목표**: "Action 도 token 이다" 의 의미를 손으로 계산할 수 있는 수준까지 내려간다. Co-fine-tuning 의 데이터 비율 / loss / 학습 step 을 한 페이지에 정리.
-> **예상 시간**: 10~12시간 (Sec 3.2~3.3 재정독 4h + 토크나이저 실습 3h + 노트 정리 3h)
+> **예상 시간**: 10-12시간 (Sec 3.2-3.3 재정독 4h + 토크나이저 실습 3h + 노트 정리 3h)
 > **핵심 질문**: "VLM 의 vocab 의 마지막 256 개를 action 으로 쓰는 게 정말로 가능한가? 학습 시 web data 의 마지막 token 들과 충돌하지 않는가?"
 
 
@@ -17,7 +17,7 @@
 | 1 | 환경 (week1 그대로) | `requirements.txt` | numpy / sentencepiece 추가 |
 | 2 | RT-2 Sec 3.2 재정독 | RT-2 PDF | Action Tokenization |
 | 3 | RT-2 Sec 3.3 재정독 | RT-2 PDF | Co-fine-tuning |
-| 4 | 토크나이저 실습 | `PRACTICE.md` 1~3 | SentencePiece + action token 시뮬레이션 |
+| 4 | 토크나이저 실습 | `PRACTICE.md` 1-3 | SentencePiece + action token 시뮬레이션 |
 | 5 | 퀴즈 (개념) | `quiz_easy.py` | tokenization / data mixture 개념 |
 | 6 | 퀴즈 (코드/수학) | `quiz_medium.py` | loss 비율 계산 / vocab overlap 분석 |
 | 7 | 노트 정리 | `PRACTICE.md` 4 | "한 페이지 Action Tokenization" 노트 |
@@ -291,7 +291,7 @@ Robot sample 에서 output text 의 처음 7~11 token 이 action 으로 해석�
 
 
 **Q1. "Action 도 token 이다" 의 정확한 의미는?**
-> VLM 의 vocabulary (예: 256000 개) 중 마지막 256 개 token 을 action discrete bin (0~255) 으로 재해석. 즉 별도의 action head 없이 VLM 의 표준 next-token-prediction 으로 action 도 생성 가능. 학습 시에도 표준 cross-entropy loss 그대로 사용.
+> VLM 의 vocabulary (예: 256000 개) 중 마지막 256 개 token 을 action discrete bin (0-255) 으로 재해석. 즉 별도의 action head 없이 VLM 의 표준 next-token-prediction 으로 action 도 생성 가능. 학습 시에도 표준 cross-entropy loss 그대로 사용.
 
 
 **Q2. 왜 vocab 의 마지막 256 개를 선택하는가?**

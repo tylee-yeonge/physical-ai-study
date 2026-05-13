@@ -1,9 +1,9 @@
 # Hardware-Arm Stage 1 - 가이드
 
 
-> **기간**: 2026.10~12 (3개월)
-> **목표**: Dynamixel 2~3DOF + URDF + ROS2 + Isaac Sim 임포트
-> **30~50만원**
+> **기간**: 2026.10-12 (3개월)
+> **목표**: Dynamixel 2-3DOF + URDF + ROS2 + Isaac Sim 임포트
+> **30-50만원**
 
 
 ---
@@ -41,7 +41,7 @@
 
 
 ### 2026.10: 부품 + 조립
-- XL330 2~3 + U2D2 구매
+- XL330 2-3 + U2D2 구매
 - 3D 프린트 부품 (open-source fork)
 - Dynamixel Wizard 동작 확인
 
@@ -74,7 +74,7 @@ Stage 2 에서 자동화 (C++ 노드).
 
 
 ## 완료 체크리스트
-- [ ] 2~3DOF 동작
+- [ ] 2-3DOF 동작
 - [ ] URDF + RViz
 - [ ] ROS2 드라이버
 - [ ] pick-and-place

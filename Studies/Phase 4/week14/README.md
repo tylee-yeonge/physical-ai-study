@@ -14,7 +14,7 @@
 
 | 순서 | 단계 | 파일/자료 | 설명 |
 |:----:|------|----------|------|
-| 1 | README 구조 잡기 | `PRACTICE.md` 1 | section 6~8 개 |
+| 1 | README 구조 잡기 | `PRACTICE.md` 1 | section 6-8 개 |
 | 2 | 환경 세팅 가이드 | `PRACTICE.md` 2 | conda + apt + pip 모두 |
 | 3 | 실행 방법 | `PRACTICE.md` 3 | step-by-step |
 | 4 | 트러블슈팅 | `PRACTICE.md` 4 | 자주 발생 + 해결 |
@@ -195,7 +195,7 @@ Llama 2 License (OpenVLA weights - commercial use 시 확인)
 
 ### 이번 주 실습 과제
 1. README 구조 잡기 + 작성
-2. 트러블슈팅 표 (5~10개)
+2. 트러블슈팅 표 (5-10개)
 3. Clean 환경 검증 (선택, Docker 또는 새 conda)
 4. quiz_easy / quiz_medium
 

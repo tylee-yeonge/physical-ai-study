@@ -70,7 +70,7 @@ sim_step_ms = (time.time() - t0) * 1000
 ```
 
 
-기대: 33~50 ms (Sim 의 render 부담).
+기대: 33-50 ms (Sim 의 render 부담).
 
 
 ### 4. Real latency 측정
@@ -87,7 +87,7 @@ real_lat = (t_response - t_cmd).nanoseconds / 1e6
 ```
 
 
-기대: Dynamixel XM430 ~ 5~10 ms.
+기대: Dynamixel XM430 ~ 5-10 ms.
 
 
 ### 5. Gap 계산
@@ -137,8 +137,8 @@ plt.savefig("latency_hist.png")
 
 
 **Q1. 4 latency measurement?** > Inference / Sim step / Real actuator / Closed loop.
-**Q2. Sim step latency?** > ~ 33~50 ms.
-**Q3. Real Dynamixel?** > ~ 5~10 ms.
+**Q2. Sim step latency?** > ~ 33-50 ms.
+**Q3. Real Dynamixel?** > ~ 5-10 ms.
 **Q4. Gap 의 양산 의미?** > 위치 오차 (속도 * gap).
 **Q5. Phase 7 핵심 측정?** > Closed loop latency = inference + Sim/Real + actuator.
 

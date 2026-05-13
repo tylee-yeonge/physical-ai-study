@@ -48,9 +48,9 @@ Stationary While driving
 | 1 | `./basic` 실행, 광류 시각화 출력 전체 읽기 | - |
 | 2 | 밝기 항상성/Aperture Problem 이해 | **easy 1**: OF 가정, **easy 2**: Aperture Problem |
 | 3 | 피라미드 LK 이해 | **easy 3**: Pyramidal OF |
-| 4 | `my_basic.cpp` Step 1~3 (LK, Farneback, evaluate) | **easy 4**: SLAM 활용 |
+| 4 | `my_basic.cpp` Step 1-3 (LK, Farneback, evaluate) | **easy 4**: SLAM 활용 |
 | 5 | LK 수학 이해 (A^T A, Structure Tensor) | **easy 5**: LK 방정식, **easy 6**: 추적 가능성 |
-| 6 | `my_basic.cpp` Step 4~8 (시각화, 비교, tracking, pipeline) | - |
+| 6 | `my_basic.cpp` Step 4-8 (시각화, 비교, tracking, pipeline) | - |
 | 7 | 중급 퀴즈 | **medium 1**: LK 구현, **medium 2**: 추적 품질, **medium 3**: Flow vs Matching, **medium 4**: LK 단일점, **medium 5**: 윈도우 크기 |
 | 8 | 실시간 추적 실습 | [PRACTICE.md](./PRACTICE.md) |
 
@@ -505,7 +505,7 @@ A: 폐색, 빠른 움직임, 조명 변화, 플랫 영역.
 
 
 **Q2: winSize 선택 기준?**
-A: 작으면 정밀하나 민감, 크면 안정적이나 뭉뚱그려짐. 보통 15~31.
+A: 작으면 정밀하나 민감, 크면 안정적이나 뭉뚱그려짐. 보통 15-31.
 
 
 **Q3: 매칭 대신 추적의 장점?**

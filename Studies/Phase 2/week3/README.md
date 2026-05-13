@@ -33,8 +33,8 @@
 | 2 | 에피폴라 제약 이론 학습 | `README.md` | **easy 문제 1**: 에피폴라 선 계산 |
 | 3 | Rectification 이론 학습 | `README.md` | **easy 문제 2**: Rectification 목적 |
 | 4 | Disparity-Depth 공식 이해 | `README.md` | **easy 문제 3**: Z = fB/d 계산 |
-| 5 | `my_basic.cpp` Step 1~6 구현 | `my_basic.cpp` | - |
-| 6 | 중급 퀴즈 풀기 | `quiz_medium.cpp` | **medium 문제 1~2** |
+| 5 | `my_basic.cpp` Step 1-6 구현 | `my_basic.cpp` | - |
+| 6 | 중급 퀴즈 풀기 | `quiz_medium.cpp` | **medium 문제 1-2** |
 | 7 | **KITTI 검증 실습** (출장지 원격 PC) | [PRACTICE.md](./PRACTICE.md) 5단계 | - |
 | 8 | (선택) **ELP 실카메라 캘리브 실습** | [PRACTICE.md](./PRACTICE.md) 6단계 | - |
 | 9 | (선택) **Classical vs Learning-based Depth 비교** | [PRACTICE.md](./PRACTICE.md) 7단계 | - |
@@ -137,7 +137,7 @@ p₂ᵀ · F · p₁ = 0
 | 행렬 | 장면 조건 | K 필요? | 최소 점수 | DoF |
 |------|-----------|---------|-----------|-----|
 | H | **평면 장면** 또는 **순수 회전** | 불필요 | 4쌍 | 8 |
-| F | 일반 3D + baseline 있음 | 불필요 | 7~8쌍 | 7 |
+| F | 일반 3D + baseline 있음 | 불필요 | 7-8쌍 | 7 |
 | E | 일반 3D + baseline + K 있음 | **필요** | 5쌍 | 5 |
 
 

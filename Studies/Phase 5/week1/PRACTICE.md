@@ -2,7 +2,7 @@
 
 
 > **실습 목표**: ViT 의 patch embedding 을 직접 구현하고, HuggingFace ViT 로 inference + attention map 을 시각화한다.
-> **예상 시간**: 5~7시간
+> **예상 시간**: 5-7시간
 
 
 ---

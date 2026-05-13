@@ -54,14 +54,14 @@ gantt
 | 2026.03-05 | Stage 1 | Phase 2: Perception 기하 기초 (마무리 중) | 카메라 모델 + Multi-view |
 | 2026.06-08 | Stage 1 | **Phase 3 (축소): Detection + Depth → PC TensorRT + ROS2 노드** | **산출물 #1 (2026.08)** |
 | 2026.09-12 | Stage 1 | **Phase 4: RT-2 + OpenVLA 블로그 2편 + ROS2 minimal demo** | **산출물 #2 (2026.12)** |
-| 2026.10-12 | Stage 1 | **Hardware-Arm Stage 1**: Dynamixel 2~3DOF + URDF + Sim 디지털 트윈 | **산출물 #2.5 (2026.12)** |
-| 2026.11-12 | Stage 1 | **정찰 지원 2~3건** (합격 기대 X, 면접관 반응 측정) | 시장 시그널 |
+| 2026.10-12 | Stage 1 | **Hardware-Arm Stage 1**: Dynamixel 2-3DOF + URDF + Sim 디지털 트윈 | **산출물 #2.5 (2026.12)** |
+| 2026.11-12 | Stage 1 | **정찰 지원 2-3건** (합격 기대 X, 면접관 반응 측정) | 시장 시그널 |
 | 2026.12-2027.02 | Stage 1 | Phase 5: Foundation Model (ViT/CLIP/DINOv2/SigLIP, 동작 원리 수준) | 사전 지식 |
 | 2027.02-04 | Stage 1 | **Hardware-Arm Stage 2**: 6DOF + teleop + 안전 인터록 | #4 하드웨어 기반 |
 | 2027.02-05 | Stage 1 | Phase 6: Isaac Sim + 디지털 트윈 (Sim/Real gap 측정) | #4 Sim 기반 |
 | 2027.05-07 | Stage 1 | **Phase 7: Real-to-Sim-to-Real (OpenVLA + ROS2 + 자작 팔 통합)** | **산출물 #4 결정타 (2027.07)** |
 | 2027.07 | Stage 1 | **Portfolio Sprint** (1개월, 패키징) | 이직 준비 |
-| **2027.08~** | **Career** | **본격 이직 활동 (분기당 면접 2~3건)** | 합격 |
+| **2027.08~** | **Career** | **본격 이직 활동 (분기당 면접 2-3건)** | 합격 |
 | 이직 후~ | Stage 2 | 회사 환경 활용 (BEV / Foundation Model 심화 / 그 외) | 시니어 성장 |
 
 
@@ -87,7 +87,7 @@ gantt
 
 
 - **기하학 기초 (Phase 2)**: **C++** (OpenCV, 카메라 모델/캘리브레이션)
-- **딥러닝 학습 (Phase 3~5)**: **Python** (PyTorch, HuggingFace)
+- **딥러닝 학습 (Phase 3-5)**: **Python** (PyTorch, HuggingFace)
 - **딥러닝 배포 (Phase 3, 7)**: **PC TensorRT + ROS2 노드** (Jetson 30+ FPS 는 Phase 7 이후 옵션)
 - **로봇 통합 (Phase 6, 7, Hardware-Arm)**: **ROS2 + URDF + Isaac Sim**
 
@@ -95,7 +95,7 @@ gantt
 ---
 
 
-## Stage 1: 학습 + 자작 팔 + 본격 지원 (2026.05~2027.08)
+## Stage 1: 학습 + 자작 팔 + 본격 지원 (2026.05-2027.08)
 
 
 ### 실습 가이드 위치
@@ -134,7 +134,7 @@ gantt
 > 기존 SLAM 트랙 (VO/BA, VIO) 은 [Archive/SLAM-legacy/](./Archive/SLAM-legacy/) 로 이동되었습니다.
 
 
-### Phase 3 (축소): Detection + Depth → PC TensorRT + ROS2 노드 (약 2개월, 2026.06~08)
+### Phase 3 (축소): Detection + Depth → PC TensorRT + ROS2 노드 (약 2개월, 2026.06-08)
 > **메시지**: Detection + Depth 의 핵심 + Foundation Model latency 사전 학습용 PC TensorRT 경험
 > **시작 전 액션**: 1순위 3개사 JD 정독 (VLA 모델 직접 개발 코스닥 상장사 / 대기업 SW 자회사 VLA / 신생 휴머노이드 스타트업) → 산출물 #1 스펙 1페이지 확정
 
@@ -147,13 +147,13 @@ gantt
 | 8 | **통합 시스템 + ROS2 노드 래퍼** | Detection + Depth + ROS2 | 필수 |
 
 
-> **Jetson 실기 배포는 Phase 7 이후 옵션** — 전체 학습 (Phase 2~7) 완료 후 시간 여유 보고 결정
+> **Jetson 실기 배포는 Phase 7 이후 옵션** — 전체 학습 (Phase 2-7) 완료 후 시간 여유 보고 결정
 
 
 **산출물 #1**: YOLO11 + Depth Anything V2 → **PC TensorRT 추론 + ROS2 노드 래퍼 + 1분 영상** (2026.08까지 `physical-ai-study` 레포에 공개)
 
 
-### Phase 4: VLA 논문 reading + OpenVLA ROS2 minimal demo (4개월, 2026.09~12)
+### Phase 4: VLA 논문 reading + OpenVLA ROS2 minimal demo (4개월, 2026.09-12)
 > **목표**: VLA 의 아키텍처 다이어그램을 막힘없이 읽을 수 있는 수준 + OpenVLA inference 를 ROS2 토픽으로 받는 minimal demo
 > **선정 논문 (2편)**: RT-2, OpenVLA — 필요 시 분기 재평가에서 π0 / Helix 로 갱신
 
@@ -169,7 +169,7 @@ gantt
 **산출물 #2**: RT-2 + OpenVLA 블로그 2편 + **OpenVLA inference → ROS2 토픽 minimal demo + 1분 영상** (2026.12까지)
 
 
-### Phase 5: Foundation Model 기초 (3개월, 2026.12~2027.02)
+### Phase 5: Foundation Model 기초 (3개월, 2026.12-2027.02)
 > **목표**: ViT / CLIP / DINOv2 / SigLIP 의 *동작 원리 수준* — 아키텍처 다이어그램 + 학습 방식 + 입출력 인터페이스 설명 가능 수준. **직접 학습 / fine-tune 은 하지 않음**.
 
 
@@ -184,9 +184,9 @@ gantt
 > 결과물 없는 학습 금지. 각 주제별 짧은 노트 또는 mini-demo 1개.
 
 
-### Phase 6: Isaac Sim + 디지털 트윈 (3개월, 2027.02~05)
+### Phase 6: Isaac Sim + 디지털 트윈 (3개월, 2027.02-05)
 > **목표**: 자작 팔 (Hardware-Arm Stage 2) 의 URDF 를 Isaac Sim 에 임포트 → 디지털 트윈 + Sim/Real gap 측정 인프라 구축
-> **자작 팔 Stage 2 (2027.02~04) 와 병행**
+> **자작 팔 Stage 2 (2027.02-04) 와 병행**
 
 
 | 주차 | 내용 | 핵심 |
@@ -196,7 +196,7 @@ gantt
 | 8-12 | Sim/Real gap 측정 인프라 | latency / 반복성 / force / 시각 |
 
 
-### Phase 7: Real-to-Sim-to-Real (3개월, 2027.05~07) — 결정타
+### Phase 7: Real-to-Sim-to-Real (3개월, 2027.05-07) — 결정타
 > **목표**: OpenVLA fork + ROS2 노드 래핑 + 자작 6DOF 팔 + 디지털 트윈 (Isaac Sim) + 안전 인터록 + latency 측정 → **산출물 #4**
 
 
@@ -217,7 +217,7 @@ gantt
 ---
 
 
-### Hardware-Arm: 자작 팔 트랙 (2단계, 2026.10~2027.04)
+### Hardware-Arm: 자작 팔 트랙 (2단계, 2026.10-2027.04)
 > **왜 자작 팔인가**: *"Brain ↔ Body 통합 SW 엔지니어"* 의 가장 완전한 증거. 본인 약점 (VLA 신입급) 을 본인 강점 (펌웨어 2년 + 자동차 R&D 보조 2년 + AMR ROS 5년) 으로 직접 깨는 카드.
 >
 > 박사·연구생이 못 만드는 결과물 3가지:
@@ -226,14 +226,14 @@ gantt
 > - **양산 비용 이해**: DIY 팔 BOM 표 — "이 가격대에 이 성능까지"
 
 
-#### Stage 1 (2026.10~12, 3개월, 약 30~50만원)
-- **하드웨어**: Dynamixel XL330 2~3DOF + U2D2 + 그리퍼 (3D 프린트)
+#### Stage 1 (2026.10-12, 3개월, 약 30-50만원)
+- **하드웨어**: Dynamixel XL330 2-3DOF + U2D2 + 그리퍼 (3D 프린트)
 - **목표**: pick-and-place 단순 동작 + URDF + ROS2 드라이버 (`dynamixel_hardware`) + Isaac Sim 디지털 트윈 첫 사이클
 - **산출물 #2.5**: 동작 영상 + URDF + Sim 임포트 영상 (1분)
 - **이유**: 첫 사이클을 작게 돌려 시행착오 비용 분산. 두 번째 사이클 (Stage 2) 압축에 결정적.
 
 
-#### Stage 2 (2027.02~04, 3개월, 약 100~150만원 추가)
+#### Stage 2 (2027.02-04, 3개월, 약 100-150만원 추가)
 - **하드웨어**: 6DOF 확장 (Dynamixel XM430 추가) + teleop 입력 장치
 - **목표**: teleop 데이터 수집 + 카메라 ↔ 팔 base 캘리브 + 안전 인터록 + Sim 물리 파라미터 매칭
 - **출력**: Phase 6 (Isaac Sim) 의 자연스러운 토대. Phase 7 산출물 #4 의 하드웨어 기반.
@@ -242,19 +242,19 @@ gantt
 #### BOM 합계 (Dynamixel 풀세트, 보유 3D 프린터 활용)
 | 항목 | 권장 | 비용 |
 |---|---|---|
-| 모터 6 DOF | XL330 + XM430 | 100~200만 |
+| 모터 6 DOF | XL330 + XM430 | 100-200만 |
 | 컨트롤러 | U2D2 + 전원 | ~10만 |
-| 그리퍼 | 단순 2-finger 또는 3D 프린트 | 0~15만 |
+| 그리퍼 | 단순 2-finger 또는 3D 프린트 | 0-15만 |
 | 카메라 | 보유 ELP Stereo 활용 | 0 |
 | 3D 프린터 | 보유 시 그대로 | 0 |
-| **합계** | | **약 150~225만** |
+| **합계** | | **약 150-225만** |
 
 
 > **보너스**: Dynamixel 채택 = **Dynamixel 제조사이자 휴머노이드 양산 상장사 (2순위 C)** 지원 시 직접 매칭 (모터 제조사 = 회사 자체).
-> **대안 (AR4 저예산, ~50~100만)**: 스테퍼 기반이라 토크 피드백 없음 → "안전 메커니즘" 증거 약화 → 추천 안 함.
+> **대안 (AR4 저예산, ~50-100만)**: 스테퍼 기반이라 토크 피드백 없음 → "안전 메커니즘" 증거 약화 → 추천 안 함.
 
 
-### 정찰 지원 (2026.11~12, 2~3건)
+### 정찰 지원 (2026.11-12, 2-3건)
 > **목적**: 시장 시그널을 *추측이 아닌 실측* 으로. 합격 기대 X, 면접관 반응 측정.
 >
 > **시점 정합**: 2026.12 시점에 가진 패 = 산출물 #1 (Detection+Depth+TRT+ROS2 노드) + #2 (RT-2 + OpenVLA 블로그 2편 + ROS2 minimal demo) + #2.5 (자작 팔 Stage 1 영상).
@@ -266,7 +266,7 @@ gantt
 - 시리즈 B 이상 AMR Perception SW 포지션 중 1
 
 
-**활용**: 면접관 질문 패턴 → Phase 4~7 학습 우선순위 보정. 2027.05 분기 재평가 입력.
+**활용**: 면접관 질문 패턴 → Phase 4-7 학습 우선순위 보정. 2027.05 분기 재평가 입력.
 
 
 ### Portfolio Sprint (1개월, 2027.07)
@@ -276,14 +276,14 @@ gantt
 **목적**: 산출물 #1, #2, #2.5, #4 를 **면접용으로 패키징**. **새 산출물 제작 X, 통합/포장**.
 
 
-(Phase 3~7 에서 누적했으므로 Sprint 는 만드는 단계가 아니라 다듬는 단계)
+(Phase 3-7 에서 누적했으므로 Sprint 는 만드는 단계가 아니라 다듬는 단계)
 
 
 | 주 | 주제 | 핵심 |
 |----|------|------|
 | 1 | 패키징 설계 | 산출물 4개를 면접관 진입점으로 재구성 |
 | 2 | **포트폴리오 Repo 정비** | `physical-ai-study` README + 산출물별 디렉토리 정리 |
-| 3 | **결정타 #4 영상 통합** | Real-to-Sim-to-Real 1~3분 영상 마감 |
+| 3 | **결정타 #4 영상 통합** | Real-to-Sim-to-Real 1-3분 영상 마감 |
 | 4 | 이력서 개편 + LinkedIn / 지원 트래커 정비 | 국문/영문, 본격 지원 시작 준비 |
 
 
@@ -296,7 +296,7 @@ gantt
 ## Stage 2: 이직 후 (회사 환경 활용)
 
 
-> 새 회사 적응 기간 (3~6개월) 후 심화 학습 시작. 적응 기간 버퍼 확보 우선.
+> 새 회사 적응 기간 (3-6개월) 후 심화 학습 시작. 적응 기간 버퍼 확보 우선.
 
 
 Stage 1 에서 학습 제외로 분류한 영역 중 회사 환경에서 자연스럽게 익혀야 할 것:
@@ -414,7 +414,7 @@ Portfolio Sprint (2027.07): 패키징
 ## 마일스톤 체크리스트
 
 
-### Stage 1 (학습 + 자작 팔 + Portfolio + 본격 지원, 2026.05~2027.08)
+### Stage 1 (학습 + 자작 팔 + Portfolio + 본격 지원, 2026.05-2027.08)
 
 
 #### 환경 / 기초
@@ -433,35 +433,35 @@ Portfolio Sprint (2027.07): 패키징
 - [ ] LinkedIn 프로필 헤드라인 변경 ("AMR ROS Engineer" → "AMR ROS Production SW + Physical AI Integration")
 
 
-#### 6~8월 (Phase 3 축소판)
+#### 6-8월 (Phase 3 축소판)
 - [ ] Phase 3 완료 (PyTorch → YOLO11 + PC TensorRT → Depth Anything V2 + PC TensorRT → 통합 + ROS2 노드 래퍼)
 - [ ] 매주 공개 가능한 형태로 산출물 누적
 - [ ] 이력서 국문 1차 작성 (2026.08 까지)
 - [ ] **GitHub 산출물 #1 공개** (Phase 3 끝, 2026.08)
 
 
-#### 9~12월 (Phase 4 VLA + Hardware-Arm Stage 1 + 정찰 지원)
+#### 9-12월 (Phase 4 VLA + Hardware-Arm Stage 1 + 정찰 지원)
 - [ ] Phase 4 완료 (RT-2 + OpenVLA 블로그 2편 + OpenVLA inference → ROS2 minimal demo)
 - [ ] **GitHub 산출물 #2 공개** (2026.12)
-- [ ] Hardware-Arm Stage 1 완성 (Dynamixel 2~3DOF + URDF + ROS2 드라이버 + Isaac Sim 디지털 트윈 첫 사이클)
+- [ ] Hardware-Arm Stage 1 완성 (Dynamixel 2-3DOF + URDF + ROS2 드라이버 + Isaac Sim 디지털 트윈 첫 사이클)
 - [ ] **GitHub 산출물 #2.5 공개** (자작 팔 Stage 1 영상, 2026.12)
 - [ ] 이력서 영문 작성 (2026.12 까지)
 - [ ] 지원 트래커 스프레드시트 생성
-- [ ] **정찰 지원 2~3건** (2026.11~12, 합격 기대 X, 면접관 반응 측정)
+- [ ] **정찰 지원 2-3건** (2026.11-12, 합격 기대 X, 면접관 반응 측정)
 - [ ] **6개월 분기 재평가 #1 (2026.11)** — 정찰 지원 반응 / Phase 4 진행률 / 시장 시그널 (1순위 회사 채용 활성도, OpenVLA 후속 모델 등장 여부)
 
 
-#### 2027.01~04 (Phase 5 + Hardware-Arm Stage 2)
+#### 2027.01-04 (Phase 5 + Hardware-Arm Stage 2)
 - [ ] Phase 5 완료 (Foundation Model: ViT / CLIP / DINOv2 / SigLIP, 동작 원리 수준)
 - [ ] Hardware-Arm Stage 2 진행 (6DOF + teleop + 안전 인터록 + Sim 물리 파라미터 매칭)
 
 
-#### 2027.02~05 (Phase 6)
+#### 2027.02-05 (Phase 6)
 - [ ] Phase 6 완료 (Isaac Sim 환경 + URDF 임포트 + 디지털 트윈 + Sim/Real gap 측정 인프라)
 - [ ] **6개월 분기 재평가 #2 (2027.05)** — Phase 5 결과 / Hardware-Arm Stage 2 완성도 / VLA 모델 갱신 검토 (OpenVLA 유지 or π0/Helix 등)
 
 
-#### 2027.05~07 (Phase 7 결정타)
+#### 2027.05-07 (Phase 7 결정타)
 - [ ] Phase 7 완료 (OpenVLA fork + ROS2 노드 래핑 + 자작 팔 + 안전 인터록 + latency 측정 + Sim/Real gap 영상)
 - [ ] **GitHub 산출물 #4 결정타 공개** (Real-to-Sim-to-Real, 2027.07)
 - [ ] Portfolio Sprint 완료 (1개월, 패키징)
@@ -469,7 +469,7 @@ Portfolio Sprint (2027.07): 패키징
 
 #### 2027.08~ (본격 이직 활동)
 - [ ] 본격 지원 시작 (1순위 3개사 우선 + 2순위 보완)
-- [ ] 분기당 면접 2~3건 목표
+- [ ] 분기당 면접 2-3건 목표
 - [ ] **6개월 분기 재평가 #3 (2027.11)** — 면접 결과 누적 / 시장 매칭 / 2028.03 fallback 진입 여부 / Jetson 옵션 (#5) 진입 여부
 
 
@@ -479,7 +479,7 @@ Portfolio Sprint (2027.07): 패키징
 
 
 ### Stage 2 (이직 후, 회사 환경 활용)
-- [ ] 회사 직무 따라 BEV / Foundation Model 응용 / Synthetic Data / Multi-modal 중 1~2개 선택 심화
+- [ ] 회사 직무 따라 BEV / Foundation Model 응용 / Synthetic Data / Multi-modal 중 1-2개 선택 심화
 - [ ] 시니어 성장
 
 
@@ -521,14 +521,14 @@ Portfolio Sprint (2027.07): 패키징
 
 | Stage/Phase | 주제 | 기간 | 대응 디렉토리 |
 |---|---|---|---|
-| Stage 1 Phase 0~1 | 학습 사전 (환경 + 수학) | 완료 | `Studies/Phase 0`, `Studies/Phase 1` |
+| Stage 1 Phase 0-1 | 학습 사전 (환경 + 수학) | 완료 | `Studies/Phase 0`, `Studies/Phase 1` |
 | Stage 1 Phase 2 | 기하 기초 | ~2026.05 | `Studies/Phase 2/` |
-| Stage 1 Phase 3 | Detection+Depth (축소) | 2026.06~08 | `Studies/Phase 3/` |
-| Stage 1 Phase 4 | VLA 논문 2편 + ROS2 demo | 2026.09~12 | `Studies/Phase 4/` |
-| Stage 1 Phase 5 | Foundation Model 기초 | 2026.12~2027.02 | `Studies/Phase 5/` |
-| Stage 1 Phase 6 | Isaac Sim + 디지털 트윈 (Sim-to-Real) | 2027.02~05 | `Studies/Phase 6/` |
-| Stage 1 Phase 7 | Real-to-Sim-to-Real (OpenVLA + ROS2 통합) | 2027.05~07 | `Studies/Phase 7/` |
-| Hardware-Arm | 자작 팔 트랙 (Stage 1 + Stage 2) | 2026.10~2027.04 | `Studies/Hardware-Arm/` |
+| Stage 1 Phase 3 | Detection+Depth (축소) | 2026.06-08 | `Studies/Phase 3/` |
+| Stage 1 Phase 4 | VLA 논문 2편 + ROS2 demo | 2026.09-12 | `Studies/Phase 4/` |
+| Stage 1 Phase 5 | Foundation Model 기초 | 2026.12-2027.02 | `Studies/Phase 5/` |
+| Stage 1 Phase 6 | Isaac Sim + 디지털 트윈 (Sim-to-Real) | 2027.02-05 | `Studies/Phase 6/` |
+| Stage 1 Phase 7 | Real-to-Sim-to-Real (OpenVLA + ROS2 통합) | 2027.05-07 | `Studies/Phase 7/` |
+| Hardware-Arm | 자작 팔 트랙 (Stage 1 + Stage 2) | 2026.10-2027.04 | `Studies/Hardware-Arm/` |
 
 
 ---
@@ -541,7 +541,7 @@ Portfolio Sprint (2027.07): 패키징
 |---|---|---|---|
 | #1 | 2026.08 | YOLO11 + Depth Anything V2 → PC TensorRT + ROS2 노드 + 1분 영상 (Jetson 제외) | 3 (진입 신호) |
 | #2 | 2026.12 | RT-2 + OpenVLA 블로그 2편 + OpenVLA HuggingFace → ROS2 토픽 minimal demo | 2 (VLA 이해 증거) |
-| #2.5 | 2026.12 | 자작 팔 Stage 1 첫 사이클 영상 (2~3DOF pick-and-place + URDF + Sim 디지털 트윈) | (마이너) |
+| #2.5 | 2026.12 | 자작 팔 Stage 1 첫 사이클 영상 (2-3DOF pick-and-place + URDF + Sim 디지털 트윈) | (마이너) |
 | **#4 결정타** | **2027.07** | **Real-to-Sim-to-Real**: 자작 6DOF 팔 + Isaac Sim 디지털 트윈 + OpenVLA fork + ROS2 노드 래핑 + 안전 인터록 + latency 측정 + Sim/Real gap 영상 | **1 (본인만 만들 수 있는 결정타)** |
 | #5 (옵션) | Phase 7 이후 | Jetson 실기 배포 — #1 또는 #4 의 Jetson 포팅판 | (옵션) |
 
@@ -558,7 +558,7 @@ Portfolio Sprint (2027.07): 패키징
 ## 부록 C: Phase 7 이후 옵션 — Jetson 실기 배포
 
 
-전체 학습 (Phase 2~7) 완료 후, 시간 여유가 있으면 Jetson Orin Nano 에 포팅:
+전체 학습 (Phase 2-7) 완료 후, 시간 여유가 있으면 Jetson Orin Nano 에 포팅:
 
 
 - 산출물 #1 (Detection + Depth) 의 Jetson TensorRT 실기 배포 — 30+ FPS 목표
@@ -582,7 +582,7 @@ Portfolio Sprint (2027.07): 패키징
 
 | 시점 | 재평가 항목 |
 |---|---|
-| **2026.11** | 정찰 지원 2~3건 결과 / Phase 4 (VLA 논문) 진행률 / 자작 팔 Stage 1 첫 사이클 완성 여부 / 시장 시그널 (1순위 회사 채용 활성도, OpenVLA 후속 모델 등장 여부) |
+| **2026.11** | 정찰 지원 2-3건 결과 / Phase 4 (VLA 논문) 진행률 / 자작 팔 Stage 1 첫 사이클 완성 여부 / 시장 시그널 (1순위 회사 채용 활성도, OpenVLA 후속 모델 등장 여부) |
 | **2027.05** | Phase 5 (Foundation Model) 종료 시점 / 자작 팔 Stage 2 완성도 / VLA 모델 선정 재검토 (OpenVLA 유지 or π0/Helix 등으로 갱신) / Phase 6 (Isaac Sim) 진입 준비도 |
 | **2027.11** | 2027.08 본격 지원 후 3개월 — 면접 결과 누적 / 시장 매칭 시그널 / **2028.03 fallback 진입 여부 판단** / Jetson 옵션 (#5) 진입 여부 |
 

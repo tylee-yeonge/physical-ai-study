@@ -17,7 +17,7 @@
 | 1 | 환경 | `requirements.txt` | torch, transformers |
 | 2 | 사전 지식 점검 | `README.md` 2장 | Transformer / CNN 의 차이 |
 | 3 | ViT 논문 1회독 | https://arxiv.org/abs/2010.11929 | 13 페이지 |
-| 4 | Patch embedding 실습 | `PRACTICE.md` 1~2 | 직접 patch -> token |
+| 4 | Patch embedding 실습 | `PRACTICE.md` 1-2 | 직접 patch -> token |
 | 5 | Self-attention 시각화 | `PRACTICE.md` 3 | attention map |
 | 6 | 퀴즈 | quiz_easy / quiz_medium | 구조 / 수치 |
 | 7 | 한 페이지 노트 | `PRACTICE.md` 4 | "ViT one-pager" |
@@ -230,7 +230,7 @@ OpenVLA 의 vision encoder:
 - SigLIP (ViT-L, image-text contrastive, 300M)
 
 
-둘 다 ViT-L 기반. 본 phase 의 week 7~12 에서 자세히. 본 주는 **ViT 자체** 만.
+둘 다 ViT-L 기반. 본 phase 의 week 7-12 에서 자세히. 본 주는 **ViT 자체** 만.
 
 
 ---

@@ -1,11 +1,11 @@
 # Phase 3 (축소): Detection + Depth → PC TensorRT + ROS2 노드
 
 
-> **기간**: 약 2개월 (2026.06~08, F안)
+> **기간**: 약 2개월 (2026.06-08, F안)
 > **목표**: Detection + Depth 의 핵심 + Foundation Model latency 사전 학습용 PC TensorRT 경험
 > **언어**: **Python** (학습) + **C++/TensorRT** (PC 배포) + **ROS2** (노드 래퍼)
 > **하드웨어**: Ubuntu PC (RTX 4070) — 주 학습/실험/배포 장비 / Jetson Orin Nano — **Phase 7 이후 옵션 #5**
-> **주간 시간**: 약 8~12시간 (출장 주 50% 보정)
+> **주간 시간**: 약 8-12시간 (출장 주 50% 보정)
 
 
 ---
@@ -48,7 +48,7 @@
 - 상세: [ENVIRONMENT.md](../ENVIRONMENT.md)
 
 
-> Phase 3 (축소판) 에서는 **PC TensorRT + ROS2 노드까지만**. Jetson 실기 배포는 전체 학습 (Phase 2~7) 완료 후 옵션 (#5).
+> Phase 3 (축소판) 에서는 **PC TensorRT + ROS2 노드까지만**. Jetson 실기 배포는 전체 학습 (Phase 2-7) 완료 후 옵션 (#5).
 
 
 ---
@@ -76,7 +76,7 @@
 ---
 
 
-## Section 5.1: PyTorch 복습 (1~2주, 압축 옵션)
+## Section 5.1: PyTorch 복습 (1-2주, 압축 옵션)
 
 
 > 이미 PyTorch에 익숙하면 Week 1+2를 1주로 압축. 절약된 1주를 Week 12 GitHub 공개·블로그 정리에 투입.
@@ -469,7 +469,7 @@ pipe = pipeline(task="depth-estimation",
 
 ### 산출물 #1 공개
 - [ ] `physical-ai-study` 레포 산출물 #1 디렉토리 정리 (README, 코드)
-- [ ] 블로그 포스팅 1~2개
+- [ ] 블로그 포스팅 1-2개
 - [ ] Demo 영상 1분
 
 
@@ -538,10 +538,10 @@ pipe = pipeline(task="depth-estimation",
 
 
 Phase 3 완료 후 (2026.08):
-- **Phase 4: VLA 논문 reading + OpenVLA → ROS2 minimal demo** (2026.09~12)
+- **Phase 4: VLA 논문 reading + OpenVLA → ROS2 minimal demo** (2026.09-12)
 - 산출물 #2 목표: RT-2 + OpenVLA 블로그 2편 + ROS2 토픽 demo (2026.12)
-- 동시기 진행: **Hardware-Arm Stage 1** (2026.10~12)
-- 동시기 진행: **정찰 지원 2~3건** (2026.11~12, 합격 기대 X, 면접관 반응 측정)
+- 동시기 진행: **Hardware-Arm Stage 1** (2026.10-12)
+- 동시기 진행: **정찰 지원 2-3건** (2026.11-12, 합격 기대 X, 면접관 반응 측정)
 - 2026.11 **6개월 분기 재평가 #1**
 
 

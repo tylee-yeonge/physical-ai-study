@@ -166,7 +166,7 @@ urdf_to_graphviz my_arm.urdf
 ## 체크리스트
 
 
-- [ ] base_link + 2~3 link 정의
+- [ ] base_link + 2-3 link 정의
 - [ ] joint 의 axis / origin / limit 정확
 - [ ] mesh 파일 로딩
 - [ ] inertial 추가

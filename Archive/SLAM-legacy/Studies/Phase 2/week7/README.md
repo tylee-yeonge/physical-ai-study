@@ -48,9 +48,9 @@ Triangulation: PnP:
 | 1 | `./basic` 실행, PnP/VO 파이프라인 출력 전체 읽기 | - |
 | 2 | PnP 정의 이해 (3D-2D → 포즈) | **easy 1**: PnP란?, **easy 2**: PnP vs Essential |
 | 3 | RANSAC 필요성 이해 | **easy 3**: 왜 RANSAC? |
-| 4 | `my_basic.cpp` Step 1~4 (rodrigues, PnP, RANSAC, eval) | **easy 4**: VO 흐름 |
+| 4 | `my_basic.cpp` Step 1-4 (rodrigues, PnP, RANSAC, eval) | **easy 4**: VO 흐름 |
 | 5 | DLT/삼각측량 개념 복습 | **easy 5**: DLT 삼각측량 |
-| 6 | `my_basic.cpp` Step 5~8 (vis, compare, VO, pipeline) | - |
+| 6 | `my_basic.cpp` Step 5-8 (vis, compare, VO, pipeline) | - |
 | 7 | 중급 퀴즈 | **medium 1**: PnP 구현, **medium 2**: RANSAC 횟수, **medium 3**: 포즈 최적화, **medium 4**: DLT 삼각측량 구현, **medium 5**: PnP DLT 구현 |
 | 8 | PnP/삼각측량 실습 | [PRACTICE.md](./PRACTICE.md) |
 

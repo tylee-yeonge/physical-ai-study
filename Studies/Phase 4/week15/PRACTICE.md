@@ -2,7 +2,7 @@
 
 
 > **실습 목표**: Portfolio/02_VLA_demo/ 의 모든 영상 파일 완성.
-> **예상 시간**: 4~6시간
+> **예상 시간**: 4-6시간
 
 
 ---
@@ -77,7 +77,7 @@ Shotcut 의 Filters > Text: Simple 또는 Filters > Subtitles:
 
 각 자막:
 - 폰트: Pretendard / Apple SD Gothic (한국어 가독성)
-- 크기: 24~32 pt
+- 크기: 24-32 pt
 - 색: 흰색 + 검은 outline
 - 위치: 화면 하단 중앙
 
@@ -88,7 +88,7 @@ Shotcut 의 Filters > Text: Simple 또는 Filters > Subtitles:
 ## 실습 3: 인트로 / 아웃트로 카드
 
 
-### 인트로 카드 (3~5초)
+### 인트로 카드 (3-5초)
 
 
 ```
@@ -110,7 +110,7 @@ Shotcut 의 Filters > Text: Simple 또는 Filters > Subtitles:
 ```
 
 
-### 아웃트로 카드 (3~5초)
+### 아웃트로 카드 (3-5초)
 
 
 ```

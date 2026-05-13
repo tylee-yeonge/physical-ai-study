@@ -122,7 +122,7 @@ RTX 4070: 5-10 hr
 
 
 **Q1. Fork 의 이유?** > Custom adapter + LoRA script.
-**Q2. Demos 권장?** > 300~600 episodes.
+**Q2. Demos 권장?** > 300-600 episodes.
 **Q3. Data format?** > OpenX RLDS.
 **Q4. LoRA rank?** > 32.
 **Q5. 학습 시간?** > 5-10 hr (RTX 4070).

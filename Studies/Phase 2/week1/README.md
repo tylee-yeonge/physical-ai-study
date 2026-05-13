@@ -40,10 +40,10 @@
 | 1 | 데모 실행 — `./basic` 출력 전체 읽기 | `basic.cpp` | - |
 | 2 | K 행렬 이해 — README 핵심 개념 + basic 출력 대조 | `README.md` | **easy 문제 1**: K 행렬 분석 |
 | 3 | 투영 과정 이해 — basic 출력의 "투영 수학" 블록 확인 | `README.md` | **easy 문제 2**: 투영 단계별 계산 |
-| 4 | `my_basic.cpp` Step 1~2 구현 (isInImage, FOV) | `my_basic.cpp` | **easy 문제 3**: FOV 계산 |
-| 5 | `my_basic.cpp` Step 3~4 구현 (project, backProject) | `my_basic.cpp` | **easy 문제 4**: 역투영, **문제 5**: 가시성 |
-| 6 | `my_basic.cpp` Step 5~6 구현 (projectMultiple, reprojectionError) | `my_basic.cpp` | - |
-| 7 | 중급 퀴즈 풀기 | `quiz_medium.cpp` | **medium 문제 1~5** |
+| 4 | `my_basic.cpp` Step 1-2 구현 (isInImage, FOV) | `my_basic.cpp` | **easy 문제 3**: FOV 계산 |
+| 5 | `my_basic.cpp` Step 3-4 구현 (project, backProject) | `my_basic.cpp` | **easy 문제 4**: 역투영, **문제 5**: 가시성 |
+| 6 | `my_basic.cpp` Step 5-6 구현 (projectMultiple, reprojectionError) | `my_basic.cpp` | - |
+| 7 | 중급 퀴즈 풀기 | `quiz_medium.cpp` | **medium 문제 1-5** |
 | 8 | 카메라 실습 | [PRACTICE.md](./PRACTICE.md) | - |
 
 
@@ -404,8 +404,8 @@ v = fy · y' + cy
 
 | 파라미터 | 의미 | 단위 | 전형적인 값 |
 |---------|------|------|------------|
-| fx | X축 초점 거리 | 픽셀 | 500~1500 |
-| fy | Y축 초점 거리 | 픽셀 | 500~1500 |
+| fx | X축 초점 거리 | 픽셀 | 500-1500 |
+| fy | Y축 초점 거리 | 픽셀 | 500-1500 |
 | cx | 주점 X 좌표 | 픽셀 | 이미지 너비/2 근처 |
 | cy | 주점 Y 좌표 | 픽셀 | 이미지 높이/2 근처 |
 
@@ -505,7 +505,7 @@ cy_actual = 244.357 # 이론값과 4.357 픽셀 차이
 | RealSense | 640×480 | 320.0 | 320.885 | 240.0 | 244.357 | 4.4px |
 
 
-→ 고급 카메라도 1~5픽셀 정도 차이 발생!
+→ 고급 카메라도 1-5픽셀 정도 차이 발생!
 
 
 **오차의 영향**:
@@ -533,7 +533,7 @@ x'_correct = (320 - 320) / fx = 0 # 정면
 **캘리브레이션의 중요성**:
 
 
-- [X] 이론값 사용: 재투영 오차 2~5 픽셀 (나쁨)
+- [X] 이론값 사용: 재투영 오차 2-5 픽셀 (나쁨)
 - 캘리브레이션: 재투영 오차 < 0.5 픽셀 (좋음)
 - Week 2에서 체커보드 패턴을 이용한 정확한 측정 방법 학습
 
@@ -777,7 +777,7 @@ cy_calibrated = 244.357 # 240.0이 아님!
 **캘리브레이션 과정** (Week 2에서 자세히):
 
 
-1. **체커보드 패턴 촬영** (10~20장, 다양한 각도)
+1. **체커보드 패턴 촬영** (10-20장, 다양한 각도)
    ```
    +-----------+
    | # [ ] # [ ] # | ← 알려진 크기

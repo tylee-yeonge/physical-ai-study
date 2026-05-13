@@ -16,7 +16,7 @@
 |:----:|------|----------|------|
 | 1 | week 12 영상 재검토 | `PRACTICE.md` 1 | 부족한 부분 list |
 | 2 | 자막 보강 | `PRACTICE.md` 2 | 한국어 / 영어 (선택) |
-| 3 | 인트로 / 아웃트로 | `PRACTICE.md` 3 | 3~5초 title 카드 |
+| 3 | 인트로 / 아웃트로 | `PRACTICE.md` 3 | 3-5초 title 카드 |
 | 4 | thumbnail | `PRACTICE.md` 4 | YouTube / LinkedIn 용 |
 | 5 | 최종 export | `PRACTICE.md` 5 | mp4 + gif |
 | 6 | 퀴즈 | quiz_easy / quiz_medium | 영상 패키징 |
@@ -88,7 +88,7 @@ YouTube / LinkedIn 미리보기에 노출되는 이미지:
 ### 4. 인트로 / 아웃트로 패턴
 
 
-**인트로 (3~5초)**:
+**인트로 (3-5초)**:
 ```
 [Title 카드]
 큰 글씨: "OpenVLA -> ROS2 Minimal Demo"
@@ -97,7 +97,7 @@ YouTube / LinkedIn 미리보기에 노출되는 이미지:
 ```
 
 
-**아웃트로 (3~5초)**:
+**아웃트로 (3-5초)**:
 ```
 [End 카드]
 "다음 산출물: Real-to-Sim-to-Real (2027.07)"
@@ -149,7 +149,7 @@ ffmpeg -i vla_demo.mp4 -ss 00:00:25 -t 8 \
 ```
 
 
-- 길이: 5~10초
+- 길이: 5-10초
 - 크기: < 5 MB
 - README 의 [![demo](demo.gif)](vla_demo.mp4) 식으로 embed
 
@@ -178,7 +178,7 @@ Portfolio/02_VLA_demo/
 
 
 **Q1. 영상의 인트로 / 아웃트로 길이 권장?**
-> 각 3~5초. 너무 길면 면접관이 본문 도달 전 떠남.
+> 각 3-5초. 너무 길면 면접관이 본문 도달 전 떠남.
 
 
 **Q2. 자막의 한 줄 글자 수 권장?**
@@ -190,11 +190,11 @@ Portfolio/02_VLA_demo/
 
 
 **Q4. README 의 demo GIF 의 권장 크기?**
-> < 5 MB, 5~10초 길이.
+> < 5 MB, 5-10초 길이.
 
 
 **Q5. 최종 영상 형식의 권장?**
-> 1920x1080, 30fps, H.264, 2~3 Mbps bitrate, < 30MB.
+> 1920x1080, 30fps, H.264, 2-3 Mbps bitrate, < 30MB.
 
 
 ---
@@ -223,10 +223,10 @@ Portfolio/02_VLA_demo/
 ## 이번 주 핵심 요약
 
 
-1. **인트로 / 아웃트로** 각 3~5초.
+1. **인트로 / 아웃트로** 각 3-5초.
 2. **자막** 한국어, 한 줄 15자, 2초+ 유지.
 3. **Thumbnail** 1280x720, 핵심 단어 큰 폰트.
-4. **GIF preview** 5~10초, < 5MB.
+4. **GIF preview** 5-10초, < 5MB.
 5. **최종 export** 1920x1080, < 30MB.
 
 

@@ -47,8 +47,8 @@ E를 알면 -> R, t를 추정할 수 있다!
 | 1 | `./basic` 실행, 삼각측량 파이프라인 출력 전체 읽기 | - |
 | 2 | Stereo Depth / 삼각측량 이해 (README §1-2 + basic 출력 대조) | **easy 1**: Stereo Depth, **easy 2**: 삼각측량 기하학 |
 | 3 | 재투영 오차 / Baseline 이해 | **easy 3**: 재투영 오차, **easy 4**: Baseline 정확도 |
-| 4 | `my_basic.cpp` Step 1~4 (depth, cheirality, reproj, triangulate) | **easy 5**: 회전 행렬 검증, **easy 6**: 스케일 모호성 |
-| 5 | `my_basic.cpp` Step 5~9 (multi, avg, eval, vis, pipeline) | - |
+| 4 | `my_basic.cpp` Step 1-4 (depth, cheirality, reproj, triangulate) | **easy 5**: 회전 행렬 검증, **easy 6**: 스케일 모호성 |
+| 5 | `my_basic.cpp` Step 5-9 (multi, avg, eval, vis, pipeline) | - |
 | 6 | 중급 퀴즈 | **medium 1**: 삼각측량 구현, **medium 2**: Bundle Adjustment, **medium 3**: Stereo Matching, **medium 4**: E 분해 + Cheirality, **medium 5**: 실패 사례 |
 | 7 | 삼각측량 실습 | [PRACTICE.md](./PRACTICE.md) |
 

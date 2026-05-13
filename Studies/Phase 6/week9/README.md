@@ -113,7 +113,7 @@ Real 의 std 가 크면:
 **Q2. Real 의 variability 원인?** > Mechanical play / sensor noise / temperature / vibration.
 **Q3. 측정 표준?** > 100회 반복, std / box plot.
 **Q4. Sim std 기대?** > < 0.1 mm.
-**Q5. Real std 기대?** > 1~5 mm (자작 팔).
+**Q5. Real std 기대?** > 1-5 mm (자작 팔).
 
 
 ---
@@ -133,7 +133,7 @@ Real 의 std 가 크면:
 
 
 1. **Sim deterministic** std ~ 0
-2. **Real variability** 1~5 mm std
+2. **Real variability** 1-5 mm std
 3. **100회 반복** 측정
 4. **box plot** 시각화
 5. **Phase 7 의 baseline**
