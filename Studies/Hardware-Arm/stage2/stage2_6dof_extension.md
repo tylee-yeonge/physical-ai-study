@@ -1,10 +1,14 @@
 # Hardware-Arm Stage 2 - 6DOF 확장
 
-> [time] 2027.02
+
+> 2027.02
+
 
 ---
 
+
 ## 추가 BOM
+
 
 | 항목 | 수량 | 비용 |
 |---|---|---|
@@ -12,32 +16,41 @@
 | 추가 케이블 + 부품 | - | ~5만 |
 | 3D 프린트 새 부품 | - | ~5만 |
 
+
 Total Stage 2 추가: ~ 100만.
+
 
 XM430 vs XL330:
 - XM430: 4.1 Nm stall torque (XL330 의 25배)
 - 출력 모터로 적합
 - 가격 ~ 30만/개
 
+
 ---
+
 
 ## 6DOF 구성
 
+
 ```
-Joint 1 (base rotation)     : XM430 (큰 부하)
-Joint 2 (shoulder pitch)    : XM430
-Joint 3 (elbow pitch)        : XM430
-Joint 4 (wrist roll)         : XL330 (소형)
-Joint 5 (wrist pitch)        : XL330
-Joint 6 (wrist yaw)          : XL330
-Gripper                      : XL330 or 단순
+Joint 1 (base rotation) : XM430 (큰 부하)
+Joint 2 (shoulder pitch) : XM430
+Joint 3 (elbow pitch) : XM430
+Joint 4 (wrist roll) : XL330 (소형)
+Joint 5 (wrist pitch) : XL330
+Joint 6 (wrist yaw) : XL330
+Gripper : XL330 or 단순
 ```
+
 
 ---
 
+
 ## URDF 갱신
 
+
 기존 Stage 1 URDF 에 추가:
+
 
 ```xml
 <!-- New joints 4, 5, 6 -->
@@ -49,7 +62,9 @@ Gripper                      : XL330 or 단순
   <limit lower="-3.14" upper="3.14" effort="0.16" velocity="3.14"/>
 </joint>
 
+
 <!-- ... joint_5, joint_6 ... -->
+
 
 <!-- Gripper -->
 <joint name="gripper_joint" type="revolute">
@@ -57,9 +72,12 @@ Gripper                      : XL330 or 단순
 </joint>
 ```
 
+
 ---
 
+
 ## ros2_control 인터페이스 확장
+
 
 ```xml
 <joint name="joint_4">
@@ -76,13 +94,17 @@ Gripper                      : XL330 or 단순
 </joint>
 ```
 
+
 ---
 
+
 ## 검증
+
 
 ```bash
 # 6DOF 모두 detection
 ros2 launch my_arm_description bringup.launch.py
+
 
 # 각 joint 단독 동작 (Phase 6 week 5 의 패턴)
 for joint_idx in 1 2 3 4 5 6; do
@@ -90,7 +112,9 @@ for joint_idx in 1 2 3 4 5 6; do
 done
 ```
 
+
 ---
+
 
 ## 체크리스트
 - [ ] XM430 x 3 + XL330 x 3 조립

@@ -1,17 +1,22 @@
 # Phase 7: Real-to-Sim-to-Real (결정타 산출물 #4)
 
-> [time] **기간**: 약 3개월 (2027.05~07, F안)
-> [goal] **목표**: OpenVLA fork + ROS2 노드 래핑 + 자작 6DOF 팔 + 디지털 트윈 (Isaac Sim) + 안전 인터록 + latency 측정 → **산출물 #4 결정타**
-> [code] **언어**: **Python** + **C++** (안전 인터록) + **ROS2**
-> [tool] **하드웨어**: Ubuntu PC (RTX 4070) + 자작 팔 (Hardware-Arm Stage 2, 6DOF) + Isaac Sim 디지털 트윈 (Phase 6 산출)
-> [time] **주간 시간**: 약 8~12시간 (출장 주 50% 보정)
+
+> **기간**: 약 3개월 (2027.05~07, F안)
+> **목표**: OpenVLA fork + ROS2 노드 래핑 + 자작 6DOF 팔 + 디지털 트윈 (Isaac Sim) + 안전 인터록 + latency 측정 → **산출물 #4 결정타**
+> **언어**: **Python** + **C++** (안전 인터록) + **ROS2**
+> **하드웨어**: Ubuntu PC (RTX 4070) + 자작 팔 (Hardware-Arm Stage 2, 6DOF) + Isaac Sim 디지털 트윈 (Phase 6 산출)
+> **주간 시간**: 약 8~12시간 (출장 주 50% 보정)
+
 
 ---
 
+
 ## -> **실습 가이드**: `Studies/Phase 7/weekN/` (각 week 별 README + PRACTICE + quiz 미리 작성됨. **진입 시 (2027.05) 다시 체크**)
+
 
 **핵심 산출물 (#4, 결정타)**:
 > *Real-to-Sim-to-Real*: 자작 6DOF 팔 + Isaac Sim 디지털 트윈 + OpenVLA fork + ROS2 노드 래핑 + 안전 인터록 + latency 측정 + Sim/Real gap 영상
+
 
 **산출물 #4** (2027.07까지 `physical-ai-study` 레포 공개):
 - 통합 데모 영상 1~3분
@@ -19,13 +24,17 @@
 - latency 측정 보고서 (Sim, Real, 안전 인터록 오버헤드)
 - Sim/Real gap 비교 영상
 
-> [*] **"Sim only 산출물은 박사도 만든다. Sim + 자작 실 팔이면 본인만 만든다."**
+
+> **"Sim only 산출물은 박사도 만든다. Sim + 자작 실 팔이면 본인만 만든다."**
 >
 > 본 Phase 가 *"VLA latency 200ms / 안전 메커니즘 / 양산 비용"* 의 직접 증거. 본인 9년 경력 (자동차 R&D 보조 + 펌웨어 + AMR ROS) 이 한 점에 수렴.
 
+
 ---
 
-## [tool] 학습 환경
+
+## 학습 환경
+
 
 | 단계 | 주 장비 | 출장지 가능 여부 |
 |---|---|---|
@@ -35,20 +44,27 @@
 | 안전 인터록 (C++) | Ubuntu PC + 자작 팔 | △ |
 | 통합 영상 제작 | Ubuntu PC + 자작 팔 + Sim | △ |
 
+
 - 사전 자산: Phase 4 의 OpenVLA → ROS2 minimal demo, Phase 6 의 Isaac Sim 디지털 트윈, Hardware-Arm Stage 2 의 6DOF 팔 + 안전 인터록 기초
 - 상세: [ENVIRONMENT.md](../ENVIRONMENT.md)
 
+
 ---
 
-## [list] Section 9.0: 시작 전 (Phase 6 종료 후)
+
+## Section 9.0: 시작 전 (Phase 6 종료 후)
+
 
 - [ ] **6개월 분기 재평가 #2 결과 반영** (2027.05) — VLA 모델 결정 (OpenVLA 유지 or π0/Helix 등으로 갱신)
 - [ ] 자작 팔 안전성 점검 (Hardware-Arm Stage 2 의 안전 인터록 동작 확인)
 - [x] **Studies/Phase 7/ week 1~12 자료** 미리 작성됨. 진입 시 (2027.05) 본문 다시 체크.
 
+
 ---
 
-## [list] Section 9.1: OpenVLA fork + ROS2 통합 (3주)
+
+## Section 9.1: OpenVLA fork + ROS2 통합 (3주)
+
 
 | 주차 | 내용 | 핵심 |
 |------|------|------|
@@ -56,11 +72,15 @@
 | 2 | inference 노드 통합 (Phase 4 demo 확장) | image + instruction → joint action |
 | 3 | Sim 환경 (Isaac Sim) 에서 dry-run | 디지털 트윈 활용 |
 
+
 ---
 
-## [list] Section 9.2: 안전 인터록 통합 (3주)
+
+## Section 9.2: 안전 인터록 통합 (3주)
+
 
 > "안전 메커니즘" (e-stop, 토크 한계, 충돌 감지) 의 직접 증거. C++ 기반 노드.
+
 
 | 주차 | 내용 | 핵심 |
 |------|------|------|
@@ -68,11 +88,15 @@
 | 5 | e-stop + 충돌 감지 | 토크 급증 감지 |
 | 6 | inference 출력 → 안전 노드 → 모터 명령 | 인터록 오버헤드 측정 |
 
+
 ---
 
-## [list] Section 9.3: latency 측정 + Sim/Real gap 영상 (3주)
+
+## Section 9.3: latency 측정 + Sim/Real gap 영상 (3주)
+
 
 > "VLA latency 200ms" (양산 시점의 차별화 메시지) 의 직접 증거.
+
 
 | 주차 | 내용 | 핵심 |
 |------|------|------|
@@ -80,9 +104,12 @@
 | 8 | Sim 과 Real 의 동일 명령 비교 영상 | 디지털 트윈 활용 |
 | 9 | 4가지 gap 정량 (Phase 6 인프라 활용) | latency / 반복성 / force / 시각 |
 
+
 ---
 
-## [list] Section 9.4: 통합 영상 + 패키징 (3주)
+
+## Section 9.4: 통합 영상 + 패키징 (3주)
+
 
 | 주차 | 내용 | 핵심 |
 |------|------|------|
@@ -90,47 +117,62 @@
 | 11 | ROS2 패키지 정리 + README | 재현성 |
 | 12 | 산출물 #4 공개 + Portfolio Sprint 진입 | 2027.07 |
 
+
 ---
 
-## [O] Phase 7 완료 체크리스트
+
+## Phase 7 완료 체크리스트
+
 
 ### OpenVLA 통합
 - [ ] OpenVLA fork + 자작 팔용 인터페이스 정리
 - [ ] ROS2 inference 노드 (Phase 4 demo 확장)
 - [ ] Sim 환경 dry-run 동작
 
+
 ### 안전 인터록 (C++)
 - [ ] 위치 / 속도 / 토크 한계 검증
 - [ ] e-stop + 충돌 감지 동작
 - [ ] 인터록 오버헤드 측정
+
 
 ### latency / Sim-Real gap
 - [ ] 전체 파이프라인 latency 측정 (ms 단위)
 - [ ] Sim/Real 동일 명령 비교 영상
 - [ ] 4가지 gap 정량 보고서
 
+
 ### 산출물 #4 공개
 - [ ] 통합 영상 1~3분
 - [ ] ROS2 패키지 + README
 - [ ] `physical-ai-study/Portfolio/04_R2S2R/` 정리
 
+
 ---
 
-## [goal] Phase 7 완료 기준
+
+## Phase 7 완료 기준
+
 
 > "자작 6DOF 팔에 OpenVLA fork 를 ROS2 노드로 래핑해 배포하고, 안전 인터록 통과 + Sim/Real gap 측정 + latency 측정 까지 완료한 *Real-to-Sim-to-Real* 통합 영상을 공개한다."
 
+
 ---
 
-## [ref] 참고 자료
+
+## 참고 자료
+
 
 - OpenVLA: https://openvla.github.io/
 - Dynamixel SDK / `dynamixel_hardware`: 자작 팔 트랙 ([Hardware-Arm.md](Hardware-Arm.md)) 참고
 - Isaac Sim ROS2 Bridge ([Phase 6.md](Phase%206.md))
 
+
 ---
 
+
 ## [?] 다음 단계
+
 
 Phase 7 완료 후 (2027.07):
 - **Portfolio Sprint (2027.07, 1개월)** — 산출물 #1, #2, #2.5, #4 패키징

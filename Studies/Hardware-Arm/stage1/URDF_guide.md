@@ -1,10 +1,14 @@
 # Hardware-Arm Stage 1 - URDF 작성 가이드
 
-> [time] 2026.11
+
+> 2026.11
+
 
 ---
 
+
 ## URDF 의 기본 구조
+
 
 ```xml
 <robot name="my_arm">
@@ -23,6 +27,7 @@
     </inertial>
   </link>
 
+
   <!-- Joint 1 -->
   <joint name="joint_1" type="revolute">
     <parent link="base_link"/>
@@ -33,24 +38,31 @@
            effort="0.16" velocity="3.14"/>
   </joint>
 
+
   <!-- Link 1 -->
   <link name="link_1">
     ...
   </link>
 
+
   <!-- Joint 2, Link 2, ... -->
 </robot>
 ```
 
+
 ---
 
+
 ## XACRO 사용 권장
+
 
 ```xml
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="my_arm">
 
+
 <xacro:property name="link_length" value="0.1"/>
+
 
 <xacro:macro name="dxl_joint" params="name parent child *origin">
   <joint name="${name}" type="revolute">
@@ -62,17 +74,22 @@
   </joint>
 </xacro:macro>
 
+
 </robot>
 ```
+
 
 `xacro` 명령으로 build:
 ```bash
 xacro my_arm.urdf.xacro > my_arm.urdf
 ```
 
+
 ---
 
+
 ## 3D 프린트 부품 -> mesh 파일
+
 
 ```
 1. Fusion 360 또는 OpenSCAD 로 디자인
@@ -81,9 +98,12 @@ xacro my_arm.urdf.xacro > my_arm.urdf
 4. URDF 에서 mesh filename="package://...
 ```
 
+
 ---
 
+
 ## ros2_control 인터페이스 추가
+
 
 ```xml
 <ros2_control name="MyArmHardware" type="system">
@@ -103,25 +123,33 @@ xacro my_arm.urdf.xacro > my_arm.urdf
 </ros2_control>
 ```
 
+
 ---
 
+
 ## 검증 단계
+
 
 ```bash
 # 1. URDF 파싱 검증
 check_urdf my_arm.urdf
 
+
 # 2. RViz 시각화
 ros2 launch urdf_tutorial display.launch.py model:=my_arm.urdf
+
 
 # 3. Tree 확인
 urdf_to_graphviz my_arm.urdf
 # 결과 PDF 확인
 ```
 
+
 ---
 
+
 ## 일반 문제
+
 
 | 증상 | 해결 |
 |---|---|
@@ -131,9 +159,12 @@ urdf_to_graphviz my_arm.urdf
 | Inertia 0 | mass + ixx/iyy/izz 추가 |
 | 충돌 무시 | `<collision>` block 추가 |
 
+
 ---
 
+
 ## 체크리스트
+
 
 - [ ] base_link + 2~3 link 정의
 - [ ] joint 의 axis / origin / limit 정확

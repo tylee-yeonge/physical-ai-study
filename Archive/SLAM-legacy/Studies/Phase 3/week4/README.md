@@ -1,29 +1,39 @@
 # Week 4: 스케일 문제 + VINS 코드 마무리
 
-> [goal] **목표**: Monocular 스케일 모호성 이해, IMU 필요성 체감, VINS 코드 전체 구조 파악
-> [time] **예상 시간**: 7-10시간
-> [tip] **핵심 질문**: "왜 카메라만으로는 실제 거리를 모르고, IMU가 그걸 해결하는가?"
+
+> **목표**: Monocular 스케일 모호성 이해, IMU 필요성 체감, VINS 코드 전체 구조 파악
+> **예상 시간**: 7-10시간
+> **핵심 질문**: "왜 카메라만으로는 실제 거리를 모르고, IMU가 그걸 해결하는가?"
+
 
 ---
 
-## [ref] 핵심 개념
+
+## 핵심 개념
+
 
 ### 1. Monocular 스케일 모호성
 
+
 #### 왜 스케일을 모르는가?
 
+
 핀홀 카메라는 3D 점 X와 lambdaX(스케일된 점)가 **같은 2D 점에 투영**됩니다.
+
 
 ```
 실제 세계:
   1m 앞 작은 물체 --→ 이미지에서 같은 크기!
-  10m 앞 큰 물체  --→ 
+  10m 앞 큰 물체 --→
+
 
 Essential Matrix에서 t는 방향만 알려줌:
   ||t|| = 1로 정규화 → 실제 이동 거리 모름
 ```
 
+
 #### 스케일 드리프트
+
 
 ```
 프레임 1→2: 추정 이동 1.0m (실제 1.1m) → 10% 오차
@@ -32,66 +42,83 @@ Essential Matrix에서 t는 방향만 알려줌:
 100 프레임 후: 100m vs 110m → 오차 누적!
 ```
 
+
 ---
+
 
 ### 2. 스케일 복구 방법
 
+
 #### Stereo 카메라
+
 
 ```
 depth = f * b / disparity
 ```
 
+
 - 두 카메라 간격(baseline b)을 알면 절대 깊이 계산 가능
 - 스케일 문제 없음
 
+
 #### IMU 융합 (VIO의 핵심)
+
 
 ```
 가속도 적분 → 속도 → 위치 (절대 스케일, 미터 단위)
 
-Vision: 방향 정확, 스케일 모호   ←---- 상호 보완 ----→
-IMU:    스케일 제공, 장기 drift  ←---- 상호 보완 ----→
+
+Vision: 방향 정확, 스케일 모호 ←---- 상호 보완 ----→
+IMU: 스케일 제공, 장기 drift ←---- 상호 보완 ----→
 ```
+
 
 - AMR에는 이미 IMU가 있음 → 추가 센서 없이 스케일 복구 가능
 - 빠른 움직임에서 Vision 보완
 - **Phase 4에서 자세히 학습**
 
+
 ---
+
 
 ### 3. VINS 전체 구조 요약
 
+
 ```
 +-----------------------------------------+
-|               VINS-Fusion               |
+| VINS-Fusion |
 +-----------------------------------------+
-|  프론트엔드                                |
-|  +-- feature_tracker: FAST + KLT        |
-|  +-- feature_manager: 특징점 생명주기      |
+| 프론트엔드 |
+| +-- feature_tracker: FAST + KLT |
+| +-- feature_manager: 특징점 생명주기 |
 +-----------------------------------------+
-|  백엔드                                   |
-|  +-- optimization(): Ceres BA           |
-|  |   +-- Visual factor (재투영 오차)      |
-|  |   +-- IMU factor (Pre-integration)   |
-|  |   +-- Marginalization factor         |
-|  +-- loop_closure: 4-DOF 포즈 그래프      |
+| 백엔드 |
+| +-- optimization(): Ceres BA |
+| | +-- Visual factor (재투영 오차) |
+| | +-- IMU factor (Pre-integration) |
+| | +-- Marginalization factor |
+| +-- loop_closure: 4-DOF 포즈 그래프 |
 +-----------------------------------------+
-|  초기화                                   |
-|  +-- initial_sfm: Vision-only SfM       |
-|  +-- initial_alignment: VI 정렬          |
+| 초기화 |
+| +-- initial_sfm: Vision-only SfM |
+| +-- initial_alignment: VI 정렬 |
 +-----------------------------------------+
 ```
+
 
 ---
 
-## [search] 자체 점검
+
+## 자체 점검
+
 
 1. Monocular VO에서 스케일이 틀어지는 근본 원인은?
 2. IMU가 스케일 복구에 도움이 되는 원리는?
 3. VINS의 프론트엔드/백엔드를 각각 한 문장으로 설명할 수 있는가?
 4. Phase 3에서 배운 VO → BA → 스케일 흐름을 전체적으로 설명할 수 있는가?
 
+
 ---
+
 
 Phase 3 완료! 다음: [Phase 4 Week 1 - IMU 기초 + 센서 융합](../../Phase%204/week1/README.md)

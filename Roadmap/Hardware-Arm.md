@@ -1,34 +1,45 @@
 # Hardware-Arm: 자작 팔 트랙 (2단계)
 
-> [time] **기간**: 2026.10~2027.04 (Stage 1: 3개월, Stage 2: 3개월)
-> [goal] **목표**: VLA 통합 엔지니어로서 *Brain ↔ Body 통합* 의 가장 완전한 증거 — 자작 6DOF 팔 + URDF + ROS2 드라이버 + 안전 인터록
-> [code] **언어**: **ROS2 (Python/C++)** + **URDF/XACRO**
-> [tool] **하드웨어**: Dynamixel 6DOF + U2D2 + 3D 프린트 부품 + 카메라 (보유 ELP Stereo 활용)
-> [budget] **예산**: 약 150~225만 (Dynamixel 풀세트, 보유 3D 프린터 활용)
+
+> **기간**: 2026.10~2027.04 (Stage 1: 3개월, Stage 2: 3개월)
+> **목표**: VLA 통합 엔지니어로서 *Brain ↔ Body 통합* 의 가장 완전한 증거 — 자작 6DOF 팔 + URDF + ROS2 드라이버 + 안전 인터록
+> **언어**: **ROS2 (Python/C++)** + **URDF/XACRO**
+> **하드웨어**: Dynamixel 6DOF + U2D2 + 3D 프린트 부품 + 카메라 (보유 ELP Stereo 활용)
+> **예산**: 약 150~225만 (Dynamixel 풀세트, 보유 3D 프린터 활용)
+
 
 ---
+
 
 ## -> **단계별 가이드**: `Studies/Hardware-Arm/` (Stage 별 단계 문서 — week 단위 아님)
 > Stage 1 가이드 + Stage 2 가이드 미리 작성됨. **진입 시 (Stage 1: 2026.10, Stage 2: 2027.02) 다시 체크**.
 
+
 ---
+
 
 ## 왜 자작 팔인가
 
+
 *"Brain ↔ Body 통합 SW 엔지니어"* 의 가장 완전한 증거. 본인 약점 (VLA 신입급) 을 본인 강점 (펌웨어 2년 + 자동차 R&D 보조 2년 + AMR ROS 5년) 으로 직접 깨는 카드.
+
 
 ### 박사·연구생이 못 만드는 결과물 3가지
 - **latency**: 추론 → 모터 명령까지 ms 단위 측정
 - **안전 메커니즘**: e-stop, 토크 한계, 충돌 감지 직접 구현
 - **양산 비용 이해**: DIY 팔 BOM 표 — "이 가격대에 이 성능까지"
 
+
 ### 보너스
 - **Dynamixel 제조사이자 휴머노이드 양산 상장사 (2순위 C)** 지원 시 직접 매칭 (모터 제조사 = 회사 자체).
 - 펌웨어 직무로 지원하지 않지만 *이해의 폭* 으로 차별화.
 
+
 ---
 
+
 ## BOM 합계 (Dynamixel 풀세트, 보유 3D 프린터 활용)
+
 
 | 항목 | 권장 | 비용 |
 |---|---|---|
@@ -39,11 +50,15 @@
 | 3D 프린터 | 보유 시 그대로 | 0 |
 | **합계** | | **약 150~225만** |
 
+
 **대안 (AR4 저예산, ~50~100만)**: 스테퍼 기반이라 토크 피드백 없음 → "안전 메커니즘" 증거 약화 → **추천 안 함**.
+
 
 ---
 
+
 ## Stage 1 (2026.10~12, 3개월, 약 30~50만원 — Dynamixel 일부)
+
 
 ### 목표
 - pick-and-place 단순 동작
@@ -51,8 +66,10 @@
 - Isaac Sim 디지털 트윈 첫 사이클
 - **산출물 #2.5**: 동작 영상 + URDF + Sim 임포트 영상 (1분, 2026.12까지)
 
+
 ### 이유
 첫 사이클을 작게 돌려 시행착오 비용 분산. 두 번째 사이클 (Stage 2) 압축에 결정적.
+
 
 ### 단계
 | 월 | 내용 | 산출물 |
@@ -60,6 +77,7 @@
 | 2026.10 | Dynamixel XL330 2~3개 + U2D2 구매. 3D 프린트 부품 디자인 또는 오픈소스 fork. | 부품 준비 + 조립 사진 |
 | 2026.11 | URDF 작성 + ROS2 드라이버 (`dynamixel_hardware`) 셋업. 위치 제어 dry-run. | URDF + ROS2 launch |
 | 2026.12 | pick-and-place 단순 동작. Isaac Sim URDF 임포트 첫 사이클. 1분 영상 마감. | **산출물 #2.5** |
+
 
 ### Stage 1 완료 체크리스트
 - [ ] Dynamixel 2~3DOF 조립 완료 + 동작 확인
@@ -69,9 +87,12 @@
 - [ ] Isaac Sim URDF 임포트 + Sim Joint State 매칭 (첫 사이클)
 - [ ] 1분 영상 + 산출물 #2.5 디렉토리 정리
 
+
 ---
 
+
 ## Stage 2 (2027.02~04, 3개월, 약 100~150만원 추가 — 6DOF 확장)
+
 
 ### 목표
 - 6DOF 확장 (Dynamixel XM430 추가)
@@ -80,9 +101,11 @@
 - 안전 인터록 (위치/속도/토크 한계 + e-stop)
 - Sim 물리 파라미터 매칭 (Phase 6 토대)
 
+
 ### 출력
 - Phase 6 (Isaac Sim) 의 자연스러운 토대
 - Phase 7 산출물 #4 의 하드웨어 기반
+
 
 ### 단계
 | 월 | 내용 | 산출물 |
@@ -90,6 +113,7 @@
 | 2027.02 | XM430 추가 + 6DOF 확장 + URDF 갱신. RViz 검증. | 6DOF URDF + RViz |
 | 2027.03 | teleop 입력 (leader-follower 또는 PS4) + 데이터 수집 파이프라인. 카메라-팔 base 캘리브. | teleop 동작 + 캘리브 결과 |
 | 2027.04 | 안전 인터록 (C++ 노드, 위치/속도/토크 한계 + e-stop). Sim 물리 파라미터 매칭. | 안전 인터록 동작 + Sim 매칭 |
+
 
 ### Stage 2 완료 체크리스트
 - [ ] 6DOF 조립 + 동작 확인
@@ -100,11 +124,15 @@
 - [ ] 안전 인터록 (C++) — 위치/속도/토크 한계 + e-stop 동작
 - [ ] Sim 물리 파라미터 매칭 (Phase 6 준비도)
 
+
 ---
+
 
 ## 안전 메커니즘 설계 노트
 
-> [!] VLA / 양산 시스템의 "안전 메커니즘 부족" 의 직접 해결 증거. 면접에서 가장 강한 질문 영역.
+
+> VLA / 양산 시스템의 "안전 메커니즘 부족" 의 직접 해결 증거. 면접에서 가장 강한 질문 영역.
+
 
 - **위치 한계**: Joint 별 min/max position 검증. 위반 시 즉시 정지.
 - **속도 한계**: rad/s 단위 한계. 위반 시 감속.
@@ -113,25 +141,33 @@
 - **인터록 노드는 C++** — Python GIL latency 회피.
 - **dual-channel**: 정상 명령 채널과 안전 채널 분리. 안전 채널이 우선.
 
+
 ---
 
+
 ## 참고 자료
+
 
 ### 모터 / 컨트롤러
 - Dynamixel 공식: https://emanual.robotis.com/
 - `dynamixel_hardware` (ROS2): https://github.com/dynamixel-community/dynamixel_hardware
 
+
 ### 오픈소스 자작 팔 디자인 (참고)
 - AR4 (스테퍼 기반, 저예산): https://www.anninrobotics.com/
 - BCN3D MOVEO: https://github.com/BCN3D/BCN3D-Moveo
+
 
 ### URDF / Isaac Sim 임포트
 - URDF Tutorials: https://wiki.ros.org/urdf/Tutorials
 - Isaac Sim URDF Importer: ([Phase 6.md](Phase%206.md))
 
+
 ---
 
+
 ## 일정 정렬 (전체 로드맵 내)
+
 
 | 시점 | 활동 |
 |---|---|

@@ -1,10 +1,14 @@
 # Hardware-Arm Stage 1 - ROS2 Driver Setup
 
-> [time] 2026.11
+
+> 2026.11
+
 
 ---
 
+
 ## dynamixel_hardware 패키지 설치
+
 
 ```bash
 # Source 설치 (ROS2 humble)
@@ -16,13 +20,17 @@ colcon build --packages-select dynamixel_hardware
 source install/setup.bash
 ```
 
+
 ---
 
+
 ## my_arm_description 패키지 생성
+
 
 ```bash
 cd ~/ros2_ws/src
 ros2 pkg create my_arm_description --build-type ament_cmake
+
 
 # 디렉토리 구조
 my_arm_description/
@@ -40,22 +48,29 @@ my_arm_description/
     bringup.launch.py
 ```
 
+
 ---
+
 
 ## Controller config
 
+
 `config/my_arm_controllers.yaml`:
+
 
 ```yaml
 controller_manager:
   ros__parameters:
     update_rate: 100
 
+
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
+
     position_controller:
       type: forward_command_controller/ForwardCommandController
+
 
 position_controller:
   ros__parameters:
@@ -66,16 +81,21 @@ position_controller:
     interface_name: position
 ```
 
+
 ---
+
 
 ## Launch file (bringup)
 
+
 `launch/bringup.launch.py`:
+
 
 ```python
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch.actions import ExecuteProcess
+
 
 def generate_launch_description():
     return LaunchDescription([
@@ -83,9 +103,11 @@ def generate_launch_description():
         Node(package='robot_state_publisher', executable='robot_state_publisher',
              parameters=[{'robot_description': open('urdf/my_arm.urdf').read()}]),
 
+
         # ros2_control_node
         Node(package='controller_manager', executable='ros2_control_node',
              parameters=[robot_description, controllers_yaml]),
+
 
         # Controllers
         ExecuteProcess(cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
@@ -95,28 +117,37 @@ def generate_launch_description():
     ])
 ```
 
+
 ---
 
+
 ## 동작 검증
+
 
 ```bash
 # Terminal 1: Launch
 ros2 launch my_arm_description bringup.launch.py
 
+
 # Terminal 2: Topic 확인
 ros2 topic list
 # 기대: /joint_states, /position_controller/commands
+
 
 # Terminal 3: 명령 발행
 ros2 topic pub --once /position_controller/commands std_msgs/Float64MultiArray \
     "data: [0.5, 0.3, -0.2]"
 
+
 # 모터가 움직임 확인
 ```
 
+
 ---
 
+
 ## 자주 발생 문제
+
 
 | 증상 | 해결 |
 |---|---|
@@ -125,7 +156,9 @@ ros2 topic pub --once /position_controller/commands std_msgs/Float64MultiArray \
 | Joint 이름 mismatch | URDF 와 yaml 의 joint name 동일 |
 | Position 단위 | URDF: rad, Dynamixel: position step (0.088 deg) |
 
+
 ---
+
 
 ## 체크리스트
 - [ ] dynamixel_hardware 빌드 성공

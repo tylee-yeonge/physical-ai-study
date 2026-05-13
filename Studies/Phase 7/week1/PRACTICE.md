@@ -1,10 +1,14 @@
 # Week 1 실습: Fork + 데이터 + 변환
 
-> [time] **예상 시간**: 5시간
+
+> **예상 시간**: 5시간
+
 
 ---
 
+
 ## 실습 1: OpenVLA fork
+
 
 ```bash
 gh repo fork openvla/openvla --clone
@@ -12,7 +16,9 @@ cd openvla
 git checkout -b my-arm-finetune
 ```
 
+
 ## 실습 2: Teleop 데이터 수집
+
 
 자작 6DOF 팔 (Hardware-Arm Stage 2) 에서:
 ```python
@@ -21,7 +27,9 @@ git checkout -b my-arm-finetune
 # 50 steps per episode, 300 episodes
 ```
 
+
 ## 실습 3: OpenX 변환
+
 
 ```python
 # convert_to_rlds.py
@@ -35,19 +43,23 @@ def episode_to_rlds(episode):
         for step in episode
     ]}
 
+
 # HDF5 또는 TFRecord 저장
 ```
 
+
 ## 실습 4: LoRA config + 학습 시작
+
 
 ```python
 from peft import LoraConfig, get_peft_model
 config = LoraConfig(r=32, lora_alpha=64, ...)
 model = get_peft_model(vla, config)
-model.print_trainable_parameters()  # ~95M
+model.print_trainable_parameters() # ~95M
 ```
 
-## [O] 체크리스트
+
+## 체크리스트
 - [ ] OpenVLA fork
 - [ ] Teleop 300 demos 수집
 - [ ] OpenX format 변환

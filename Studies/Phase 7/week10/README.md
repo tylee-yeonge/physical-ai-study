@@ -1,7 +1,9 @@
 # Week 10: 통합 영상 1-3분 마감 (산출물 #4 의 결정타)
 
-> [goal] **이번 주 목표**: Real-to-Sim-to-Real 통합 영상 마감. 면접관 진입점.
-> [time] **예상 시간**: 10시간
+
+> **이번 주 목표**: Real-to-Sim-to-Real 통합 영상 마감. 면접관 진입점.
+> **예상 시간**: 10시간
+
 
 ## 학습 순서
 1. Storyboard
@@ -10,9 +12,12 @@
 4. Final export
 5. 퀴즈
 
+
 ## 핵심 개념
 
+
 ### Storyboard (3분 권장)
+
 
 ```
 0:00-0:15 인트로 (Title + 본인 + 메시지)
@@ -24,20 +29,24 @@
 2:50-3:00 Next + thanks
 ```
 
+
 ### 자막 (한국어)
 - 핵심 수치 강조 (165 ms / 6 Hz / 65% / 1 ms safety)
 - 본인 차별화 메시지 1줄 ("9년 AMR ROS 양산 SW")
+
 
 ### 영상 spec
 - 1920x1080, 30 fps, H.264
 - 2-3 분 길이
 - < 100 MB
 
+
 ### Phase 4 영상 (1분) 과의 차이
 - 더 깁니다 (3분 vs 1분)
 - 실 자작 팔 (vs Sim only Phase 4)
 - 정량 측정 풍부 (4 gap + safety + latency)
 - 결정타 메시지: "Real-to-Sim-to-Real"
+
 
 ## 자체 점검
 Q1. 영상 길이? > 2-3 분.
@@ -46,6 +55,7 @@ Q3. 정량 메시지? > 165ms inference / 184ms e2e / 65% success / 1ms safety.
 Q4. 자막 언어? > 한국어 우선.
 Q5. 핵심 차별화? > 자작 실 팔 + 양산 SW 관점.
 
+
 ## 요약
 1. Storyboard 3분
 2. Real-Sim 동시 (핵심)
@@ -53,4 +63,5 @@ Q5. 핵심 차별화? > 자작 실 팔 + 양산 SW 관점.
 4. 한국어 자막
 5. 산출물 #4 결정타 완성
 
-[O] [Week 9](../week9/README.md) | [Week 11](../week11/README.md)
+
+- [Week 9](../week9/README.md) | [Week 11](../week11/README.md)

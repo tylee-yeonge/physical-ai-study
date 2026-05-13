@@ -1,20 +1,27 @@
 # Hardware-Arm Stage 2 - 안전 인터록 (C++)
 
-> [time] 2027.04
+
+> 2027.04
+
 
 ---
 
+
 ## C++ 안전 인터록 노드
+
 
 ### Phase 7 week 4-6 의 사전 작업
 
+
 본 Stage 2 의 마무리 = Phase 7 의 안전 노드의 토대.
+
 
 ```cpp
 // safety_node.cpp (간략)
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "std_msgs/msg/bool.hpp"
+
 
 class SafetyNode : public rclcpp::Node {
 public:
@@ -27,7 +34,8 @@ public:
         // 속도 한계 (rad/s)
         velocity_limits_ = std::vector<double>(6, 3.14);
         // 토크 한계 (Nm)
-        torque_limits_ = std::vector<double>(6, 2.0);  // XM430 80%
+        torque_limits_ = std::vector<double>(6, 2.0); // XM430 80%
+
 
         cmd_sub_ = create_subscription<JointState>(
             "/inference/joint_command", 10,
@@ -39,8 +47,10 @@ public:
             "/emergency_stop", 10,
             std::bind(&SafetyNode::on_estop, this, _1));
 
+
         safe_pub_ = create_publisher<JointState>("/joint_command", 10);
     }
+
 
     bool check_safety(const JointState& cmd) {
         // Position
@@ -69,6 +79,7 @@ public:
         return true;
     }
 
+
     void on_cmd(JointState::SharedPtr cmd) {
         if (estop_active_) return;
         if (check_safety(*cmd)) {
@@ -79,25 +90,31 @@ public:
 };
 ```
 
+
 ---
 
+
 ## 충돌 감지
+
 
 ```cpp
 bool collision_detected(JointState state) {
     for (int i = 0; i < 6; i++) {
         double delta = std::abs(state.effort[i] - prev_effort_[i]);
         if (delta > collision_threshold_[i]) {
-            return true;  // 1ms 토크 급증
+            return true; // 1ms 토크 급증
         }
     }
     return false;
 }
 ```
 
+
 ---
 
+
 ## e-stop
+
 
 Hardware button (RPi GPIO) 또는 keyboard (test):
 ```python
@@ -105,19 +122,24 @@ Hardware button (RPi GPIO) 또는 keyboard (test):
 ros2 topic pub /emergency_stop std_msgs/Bool "data: true"
 ```
 
+
 ---
 
+
 ## 오버헤드 측정
+
 
 ```cpp
 auto t0 = this->now();
 bool safe = check_safety(*cmd);
 auto t1 = this->now();
-double overhead = (t1 - t0).seconds() * 1000;  // ms
+double overhead = (t1 - t0).seconds() * 1000; // ms
 // 기대 ~ 1 ms
 ```
 
+
 ---
+
 
 ## 체크리스트
 - [ ] C++ 안전 노드 빌드

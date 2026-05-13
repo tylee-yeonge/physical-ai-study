@@ -1,9 +1,11 @@
 # Week 4 실습: 안전 인터록 C++ 노드
 
+
 ```cpp
 // safety_node.cpp
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
+
 
 class SafetyNode : public rclcpp::Node {
 public:
@@ -18,6 +20,7 @@ public:
             "/joint_command", 10);
     }
 
+
 private:
     void on_cmd(JointState::SharedPtr cmd) {
         if (check_safety(cmd, current_)) {
@@ -29,6 +32,7 @@ private:
     // ...
 };
 ```
+
 
 체크리스트:
 - [ ] C++ 노드 빌드

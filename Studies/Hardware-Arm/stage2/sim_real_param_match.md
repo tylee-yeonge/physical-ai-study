@@ -1,10 +1,14 @@
 # Hardware-Arm Stage 2 - Sim 물리 파라미터 매칭
 
-> [time] 2027.04 (Phase 6 진입 직전)
+
+> 2027.04 (Phase 6 진입 직전)
+
 
 ---
 
+
 ## 매칭할 물리 파라미터
+
 
 | 항목 | Real (자작 팔) | Sim (Isaac Sim) |
 |---|---|---|
@@ -14,11 +18,15 @@
 | Link inertia | 추정 (mesh) | URDF inertial |
 | Gravity | 9.81 m/s^2 | Default |
 
+
 ---
+
 
 ## 측정 절차
 
+
 ### 1. Friction 측정 (Real)
+
 
 ```bash
 # Joint 를 천천히 움직여 stall 시점 토크 측정
@@ -26,7 +34,9 @@ ros2 topic pub /joint_command ... "data: [slow speed]"
 # Joint 가 stop 하는 토크 = friction limit
 ```
 
+
 ### 2. Inertia 추정
+
 
 ```
 3D 프린트 부품:
@@ -36,40 +46,51 @@ ros2 topic pub /joint_command ... "data: [slow speed]"
 - inertia: mesh-based (Fusion 360 또는 trimesh)
 ```
 
+
 ### 3. URDF 의 inertial 갱신
+
 
 ```xml
 <link name="link_1">
   <inertial>
     <origin xyz="..." rpy="..."/>
-    <mass value="0.150"/>  <!-- 실측 -->
+    <mass value="0.150"/> <!-- 실측 -->
     <inertia ixx="..." iyy="..." izz="..." ixy="..." ixz="..." iyz="..."/>
   </inertial>
 </link>
 ```
 
+
 ### 4. PhysX joint property 설정
+
 
 ```python
 # Isaac Sim
-joint.GetFrictionAttr().Set(0.05)  # 실측 friction
+joint.GetFrictionAttr().Set(0.05) # 실측 friction
 joint.GetDampingAttr().Set(0.1)
 ```
 
+
 ---
 
+
 ## 매칭 검증
+
 
 ```python
 # Same trajectory in Sim and Real
 # 비교: ee position, joint angle, force
 ```
 
+
 기대: Sim/Real gap 줄어듦 (Phase 6 의 측정 baseline).
+
 
 ---
 
+
 ## Phase 6 / 7 와의 연결
+
 
 ```
 Stage 2 의 sim param matching:
@@ -78,7 +99,9 @@ Stage 2 의 sim param matching:
   -> Domain Randomization 의 시작점
 ```
 
+
 ---
+
 
 ## 체크리스트
 - [ ] Friction 측정
@@ -89,10 +112,14 @@ Stage 2 의 sim param matching:
 - [ ] gap 줄어듦 확인
 - [ ] Phase 6 진입 준비 완료
 
+
 ---
+
 
 ## 다음 단계
 
+
 Phase 6 (2027.02~05) 와 병행 + Phase 7 (2027.05~07) 산출물 #4 의 hardware 기반 완성.
+
 
 Stage 2 의 모든 산출물 git tag stage2.

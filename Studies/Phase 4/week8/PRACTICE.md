@@ -1,16 +1,21 @@
 # Week 8 실습: VLAInference class + image pipeline + 100회 stress test
 
-> [goal] **실습 목표**: ROS2 통합 직전의 안정적 inference 모듈 완성.
-> [time] **예상 시간**: 6~8시간
+
+> **실습 목표**: ROS2 통합 직전의 안정적 inference 모듈 완성.
+> **예상 시간**: 6~8시간
+
 
 ---
 
-## [tool] 환경 설정
+
+## 환경 설정
+
 
 ```bash
 conda activate phase4
 pip install -r requirements.txt
 ```
+
 
 ```bash
 # 작업 디렉토리
@@ -18,11 +23,15 @@ mkdir -p ~/phase4_notes/week8/vla_inference
 cd ~/phase4_notes/week8/vla_inference
 ```
 
+
 ---
 
-## [note] 실습 1: VLAInference class
+
+## 실습 1: VLAInference class
+
 
 **파일명**: `vla_inference/inference.py`
+
 
 ```python
 """
@@ -31,6 +40,7 @@ VLAInference: OpenVLA 의 inference 를 wrap. ROS2 노드의 직접 입력.
 import logging
 import time
 
+
 import numpy as np
 import torch
 from PIL import Image
@@ -38,16 +48,21 @@ from transformers import (
     AutoModelForVision2Seq, AutoProcessor, BitsAndBytesConfig,
 )
 
+
 from .exceptions import (
     VLAInferenceError, VLAOOMError, VLAInputError, VLAOutputError, VLAModelError,
 )
 from .config import MODEL_ID, QUANT_TYPE, DEVICE, UNNORM_KEY
 
+
 logger = logging.getLogger(__name__)
+
+
 
 
 class VLAInference:
     """OpenVLA inference wrapper for ROS2 integration."""
+
 
     def __init__(
         self,
@@ -61,9 +76,11 @@ class VLAInference:
         self.device = device
         self.unnorm_key = unnorm_key
 
+
         logger.info(f"Loading VLA: model={model_id}, quant={quant_type}, device={device}")
         self._load_model()
         self._warmed_up = False
+
 
     def _load_model(self):
         """모델 + processor 로드"""
@@ -71,6 +88,7 @@ class VLAInference:
             self.processor = AutoProcessor.from_pretrained(
                 self.model_id, trust_remote_code=True,
             )
+
 
             bnb_config = None
             if self.quant_type == '4bit':
@@ -84,6 +102,7 @@ class VLAInference:
                 bnb_config = BitsAndBytesConfig(load_in_8bit=True)
             # fp16 는 quantization_config 없음
 
+
             self.model = AutoModelForVision2Seq.from_pretrained(
                 self.model_id,
                 attn_implementation='eager',
@@ -93,10 +112,12 @@ class VLAInference:
                 quantization_config=bnb_config,
             )
 
+
             vram_gb = torch.cuda.memory_allocated(self.device) / 1e9
             logger.info(f"VLA loaded: vram={vram_gb:.2f} GB")
         except Exception as e:
             raise VLAModelError(f"Model load failed: {e}") from e
+
 
     def warm_up(self, n_iter: int = 5):
         """warm-up inference (latency outlier 제거)"""
@@ -106,15 +127,19 @@ class VLAInference:
         self._warmed_up = True
         logger.info(f"VLA warmed up ({n_iter} iter)")
 
+
     def predict(self, image_pil: Image.Image, instruction: str) -> np.ndarray:
         """한 번의 inference 호출.
+
 
         Args:
             image_pil: PIL Image (RGB)
             instruction: 자연어 명령
 
+
         Returns:
             7-DoF action [dx, dy, dz, rx, ry, rz, gripper]
+
 
         Raises:
             VLAInputError: 입력 형식 잘못
@@ -129,8 +154,10 @@ class VLAInference:
         if not isinstance(instruction, str) or len(instruction) == 0:
             raise VLAInputError(f"instruction must be non-empty str")
 
+
         if not self._warmed_up:
             logger.warning("Predict before warm_up — first latency may be high")
+
 
         # 2. predict
         try:
@@ -141,13 +168,16 @@ class VLAInference:
         except Exception as e:
             raise VLAInferenceError(f"Inference failed: {e}") from e
 
+
         # 3. validate output
         if action.shape != (7,):
             raise VLAOutputError(f"action shape must be (7,), got {action.shape}")
         if np.isnan(action).any():
             raise VLAOutputError(f"action contains NaN: {action}")
 
+
         return action
+
 
     def _predict_internal(self, image_pil, instruction) -> np.ndarray:
         prompt = f"In: What action should the robot take to {instruction}?\nOut:"
@@ -158,6 +188,7 @@ class VLAInference:
             )
         return np.asarray(action).astype(np.float32)
 
+
     def close(self):
         """자원 해제"""
         del self.model
@@ -166,11 +197,15 @@ class VLAInference:
         logger.info("VLA closed")
 ```
 
+
 ---
 
-## [note] 실습 2: image preprocess
+
+## 실습 2: image preprocess
+
 
 **파일명**: `vla_inference/preprocess.py`
+
 
 ```python
 """
@@ -178,17 +213,23 @@ OpenCV (BGR) <-> PIL (RGB) 변환 + 검증.
 """
 import logging
 
+
 import cv2
 import numpy as np
 from PIL import Image
 
+
 from .exceptions import VLAInputError
+
 
 logger = logging.getLogger(__name__)
 
 
+
+
 def opencv_to_pil(img_bgr: np.ndarray) -> Image.Image:
     """OpenCV BGR uint8 -> PIL RGB Image.
+
 
     Raises:
         VLAInputError: 입력 shape / dtype 가 잘못
@@ -200,13 +241,18 @@ def opencv_to_pil(img_bgr: np.ndarray) -> Image.Image:
     if img_bgr.ndim != 3 or img_bgr.shape[2] != 3:
         raise VLAInputError(f"img shape must be (H,W,3), got {img_bgr.shape}")
 
+
     img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
     return Image.fromarray(img_rgb)
+
+
 
 
 def resize_for_vla(img_pil: Image.Image, target: int = 224) -> Image.Image:
     """OpenVLA 의 표준 입력 크기로 resize. processor 가 알아서 하지만 명시적."""
     return img_pil.resize((target, target), Image.BILINEAR)
+
+
 
 
 def validate_image(img_pil: Image.Image):
@@ -218,37 +264,52 @@ def validate_image(img_pil: Image.Image):
         raise VLAInputError(f"image too small: {w}x{h}")
 ```
 
+
 ---
 
-## [note] 실습 3: exceptions + config
+
+## 실습 3: exceptions + config
+
 
 **파일명**: `vla_inference/exceptions.py`
+
 
 ```python
 class VLAInferenceError(Exception):
     """Base VLA inference error"""
 
 
+
+
 class VLAModelError(VLAInferenceError):
     """모델 로드 / 파일 손상"""
+
+
 
 
 class VLAInputError(VLAInferenceError):
     """입력 검증 실패"""
 
 
+
+
 class VLAOutputError(VLAInferenceError):
     """출력 검증 실패 (NaN, shape 등)"""
+
+
 
 
 class VLAOOMError(VLAInferenceError):
     """GPU memory 부족"""
 ```
 
+
 **파일명**: `vla_inference/config.py`
+
 
 ```python
 import os
+
 
 MODEL_ID = os.environ.get('VLA_MODEL_ID', 'openvla/openvla-7b')
 QUANT_TYPE = os.environ.get('VLA_QUANT', '4bit')
@@ -256,11 +317,15 @@ DEVICE = os.environ.get('VLA_DEVICE', 'cuda:0')
 UNNORM_KEY = os.environ.get('VLA_UNNORM_KEY', 'bridge_orig')
 ```
 
+
 ---
 
-## [note] 실습 4: 100회 Stress Test
+
+## 실습 4: 100회 Stress Test
+
 
 **파일명**: `practice_stress_test.py`
+
 
 ```python
 """
@@ -271,25 +336,32 @@ import numpy as np
 from PIL import Image
 import time
 
+
 from vla_inference.inference import VLAInference
 from vla_inference.exceptions import VLAInferenceError
 
+
 logging.basicConfig(level=logging.INFO)
+
 
 print("=" * 60)
 print("실습 4: 100회 stress test")
 print("=" * 60)
 
+
 vla = VLAInference()
 vla.warm_up(n_iter=5)
+
 
 n_test = 100
 latencies = []
 fails = []
 
+
 for i in range(n_test):
     img = Image.fromarray((np.random.rand(224, 224, 3) * 255).astype(np.uint8))
     inst = "pick up the can"
+
 
     try:
         t0 = time.time()
@@ -298,29 +370,35 @@ for i in range(n_test):
         latencies.append(elapsed)
     except VLAInferenceError as e:
         fails.append((i, str(e)))
-        print(f"  [{i}] FAIL: {e}")
+        print(f"[{i}] FAIL: {e}")
+
 
 print(f"\n결과:")
-print(f"  Success: {len(latencies)}/{n_test}")
-print(f"  Failures: {len(fails)}")
+print(f"Success: {len(latencies)}/{n_test}")
+print(f"Failures: {len(fails)}")
 if latencies:
     arr = np.array(latencies)
-    print(f"  Mean latency: {arr.mean():.1f} ms")
-    print(f"  p95 latency : {np.percentile(arr, 95):.1f} ms")
+    print(f"Mean latency: {arr.mean():.1f} ms")
+    print(f"p95 latency : {np.percentile(arr, 95):.1f} ms")
+
 
 if len(fails) == 0:
-    print("\n  [O] PASS: 100 회 연속 inference 성공!")
+    print("\n PASS: 100 회 연속 inference 성공!")
 else:
-    print(f"\n  [X] FAIL: {len(fails)} fails - 원인 분석 필요")
+    print(f"\n FAIL: {len(fails)} fails - 원인 분석 필요")
     for i, msg in fails[:5]:
-        print(f"    {i}: {msg}")
+        print(f"{i}: {msg}")
+
 
 vla.close()
 ```
 
+
 ---
 
-## [O] 실습 체크리스트
+
+## 실습 체크리스트
+
 
 - [ ] `vla_inference/` 패키지 4 파일 작성
 - [ ] `practice_stress_test.py` 실행
@@ -330,9 +408,12 @@ vla.close()
 - [ ] git commit
 - [ ] quiz_easy / quiz_medium
 
+
 ---
 
-## [link] 참고 자료
+
+## 참고 자료
+
 
 - [HuggingFace transformers logging](https://huggingface.co/docs/transformers/main_classes/logging)
 - [PyTorch CUDA memory management](https://pytorch.org/docs/stable/notes/cuda.html)

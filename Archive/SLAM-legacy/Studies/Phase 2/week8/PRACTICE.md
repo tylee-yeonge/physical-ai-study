@@ -1,18 +1,23 @@
 # Week 8: 광류 (Optical Flow) 실습 (C++)
 
-> [goal] **목표**: Lucas-Kanade Optical Flow 실시간 구현 및 Dense Flow 시각화
-> [code] **언어**: C++ (OpenCV 4.x)
-> [tool] **하드웨어**: Jetson Orin Nano + ELP Stereo Camera 또는 MacBook (내장 카메라)
-> [time] **예상 시간**: 6-8시간
+
+> **목표**: Lucas-Kanade Optical Flow 실시간 구현 및 Dense Flow 시각화
+> **언어**: C++ (OpenCV 4.x)
+> **하드웨어**: Jetson Orin Nano + ELP Stereo Camera 또는 MacBook (내장 카메라)
+> **예상 시간**: 6-8시간
+
 
 ---
 
-## [list] 준비사항
+
+## 준비사항
+
 
 **Jetson (Linux):**
 ```bash
 sudo apt install libopencv-dev cmake build-essential
 ```
+
 
 **MacBook (macOS):**
 ```bash
@@ -20,70 +25,92 @@ brew install opencv
 # 카메라 권한: 시스템 설정 → 개인 정보 보호 및 보안 → 카메라 → 터미널 허용
 ```
 
+
 > 코드에서 `cv::VideoCapture(0)`은 MacBook 내장 FaceTime 카메라를 자동으로 사용합니다.
+
 
 ---
 
-## [list] 전제 조건
+
+## 전제 조건
+
 
 - [ ] Week 3-4 특징점 검출/매칭 이해
 - [ ] Lucas-Kanade 원리 이해 (README.md 참조)
 
+
 ---
 
-## [tool] 실습 1: KLT Feature Tracker
+
+## 실습 1: KLT Feature Tracker
+
 
 ### KLTTracker 클래스
+
 
 **include/klt_tracker.hpp**:
 ```cpp
 #ifndef KLT_TRACKER_HPP
 #define KLT_TRACKER_HPP
 
+
 #include <opencv2/opencv.hpp>
 #include <opencv2/video/tracking.hpp>
 #include <vector>
+
 
 class KLTTracker {
 public:
     KLTTracker(int max_corners = 200, int min_distance = 30);
 
+
     void detectFeatures(const cv::Mat& gray);
+
 
     bool track(const cv::Mat& prev_gray, const cv::Mat& curr_gray);
 
+
     void drawTracks(cv::Mat& display, int trail_length = 10);
+
 
     const std::vector<cv::Point2f>& getPrevPoints() const { return prev_pts_; }
     const std::vector<cv::Point2f>& getCurrPoints() const { return curr_pts_; }
     int getTrackedCount() const { return tracked_count_; }
+
 
 private:
     int max_corners_;
     int min_distance_;
     int tracked_count_;
 
+
     std::vector<cv::Point2f> prev_pts_;
     std::vector<cv::Point2f> curr_pts_;
     std::vector<std::vector<cv::Point2f>> track_history_;
+
 
     // LK 파라미터
     cv::Size win_size_;
     int max_level_;
     cv::TermCriteria criteria_;
 
+
     void refillFeatures(const cv::Mat& gray);
 };
+
 
 #endif
 ```
 
+
 ### 구현 파일
+
 
 **src/klt_tracker.cpp**:
 ```cpp
 #include "../include/klt_tracker.hpp"
 #include <iostream>
+
 
 KLTTracker::KLTTracker(int max_corners, int min_distance)
     : max_corners_(max_corners),
@@ -93,16 +120,19 @@ KLTTracker::KLTTracker(int max_corners, int min_distance)
       max_level_(3),
       criteria_(cv::TermCriteria::EPS | cv::TermCriteria::COUNT, 30, 0.01) {}
 
+
 void KLTTracker::detectFeatures(const cv::Mat& gray) {
     prev_pts_.clear();
     track_history_.clear();
 
+
     cv::goodFeaturesToTrack(
         gray, prev_pts_,
         max_corners_,
-        0.01,          // qualityLevel
+        0.01, // qualityLevel
         min_distance_
     );
+
 
     // 각 특징점의 이력 초기화
     track_history_.resize(prev_pts_.size());
@@ -110,15 +140,19 @@ void KLTTracker::detectFeatures(const cv::Mat& gray) {
         track_history_[i].push_back(prev_pts_[i]);
     }
 
+
     tracked_count_ = prev_pts_.size();
     std::cout << "Detected " << tracked_count_ << " features" << std::endl;
 }
 
+
 bool KLTTracker::track(const cv::Mat& prev_gray, const cv::Mat& curr_gray) {
     if (prev_pts_.empty()) return false;
 
+
     std::vector<uchar> status;
     std::vector<float> err;
+
 
     // Lucas-Kanade Optical Flow
     cv::calcOpticalFlowPyrLK(
@@ -128,14 +162,17 @@ bool KLTTracker::track(const cv::Mat& prev_gray, const cv::Mat& curr_gray) {
         win_size_, max_level_, criteria_
     );
 
+
     // 추적 성공한 점만 유지
     std::vector<cv::Point2f> good_prev, good_curr;
     std::vector<std::vector<cv::Point2f>> good_history;
+
 
     for (size_t i = 0; i < status.size(); i++) {
         if (status[i] && err[i] < 30.0f) {
             good_prev.push_back(prev_pts_[i]);
             good_curr.push_back(curr_pts_[i]);
+
 
             if (i < track_history_.size()) {
                 track_history_[i].push_back(curr_pts_[i]);
@@ -144,18 +181,22 @@ bool KLTTracker::track(const cv::Mat& prev_gray, const cv::Mat& curr_gray) {
         }
     }
 
+
     prev_pts_ = good_curr;
     curr_pts_ = good_curr;
     track_history_ = good_history;
     tracked_count_ = good_curr.size();
+
 
     // 특징점이 부족하면 보충
     if (tracked_count_ < max_corners_ / 2) {
         refillFeatures(curr_gray);
     }
 
+
     return tracked_count_ > 0;
 }
+
 
 void KLTTracker::refillFeatures(const cv::Mat& gray) {
     // 마스크: 기존 특징점 주변 제외
@@ -164,6 +205,7 @@ void KLTTracker::refillFeatures(const cv::Mat& gray) {
         cv::circle(mask, pt, min_distance_, 0, -1);
     }
 
+
     std::vector<cv::Point2f> new_pts;
     cv::goodFeaturesToTrack(
         gray, new_pts,
@@ -171,17 +213,21 @@ void KLTTracker::refillFeatures(const cv::Mat& gray) {
         0.01, min_distance_, mask
     );
 
+
     for (const auto& pt : new_pts) {
         prev_pts_.push_back(pt);
         track_history_.push_back({pt});
     }
 
+
     tracked_count_ = prev_pts_.size();
 }
+
 
 void KLTTracker::drawTracks(cv::Mat& display, int trail_length) {
     for (size_t i = 0; i < track_history_.size(); i++) {
         const auto& history = track_history_[i];
+
 
         // 최근 trail_length개 궤적 그리기
         int start = std::max(0, (int)history.size() - trail_length);
@@ -192,6 +238,7 @@ void KLTTracker::drawTracks(cv::Mat& display, int trail_length) {
             cv::line(display, history[j], history[j + 1], color, 2);
         }
 
+
         // 현재 위치 표시
         if (!history.empty()) {
             cv::circle(display, history.back(), 4, cv::Scalar(0, 255, 0), -1);
@@ -200,14 +247,18 @@ void KLTTracker::drawTracks(cv::Mat& display, int trail_length) {
 }
 ```
 
+
 ---
 
-## [tool] 실습 2: 실시간 KLT 추적 데모
+
+## 실습 2: 실시간 KLT 추적 데모
+
 
 **src/optical_flow_demo.cpp**:
 ```cpp
 #include "../include/klt_tracker.hpp"
 #include <chrono>
+
 
 int main() {
     cv::VideoCapture cap(0);
@@ -216,23 +267,30 @@ int main() {
         return -1;
     }
 
+
     KLTTracker tracker(200, 30);
+
 
     cv::Mat frame, gray, prev_gray;
     bool initialized = false;
 
-    std::cout << "\n[video] KLT Optical Flow 추적 시작" << std::endl;
+
+    std::cout << "\nKLT Optical Flow 추적 시작" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
     std::cout << "R: 특징점 재검출" << std::endl;
     std::cout << "ESC: 종료\n" << std::endl;
 
+
     while (true) {
         auto start = std::chrono::high_resolution_clock::now();
+
 
         cap >> frame;
         if (frame.empty()) break;
 
+
         cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
+
 
         if (!initialized) {
             tracker.detectFeatures(gray);
@@ -241,19 +299,24 @@ int main() {
             tracker.track(prev_gray, gray);
         }
 
+
         // 시각화
         cv::Mat display = frame.clone();
         tracker.drawTracks(display, 15);
 
+
         auto end = std::chrono::high_resolution_clock::now();
         double fps = 1000.0 / std::chrono::duration<double, std::milli>(end - start).count();
+
 
         cv::putText(display,
                    cv::format("FPS: %.1f | Tracked: %d", fps, tracker.getTrackedCount()),
                    cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX,
                    0.8, cv::Scalar(0, 255, 0), 2);
 
+
         cv::imshow("KLT Optical Flow", display);
+
 
         int key = cv::waitKey(1);
         if (key == 27) break;
@@ -262,16 +325,21 @@ int main() {
             std::cout << "Re-detected features" << std::endl;
         }
 
+
         prev_gray = gray.clone();
     }
+
 
     return 0;
 }
 ```
 
+
 ---
 
-## [tool] 실습 3: Dense Optical Flow 시각화
+
+## 실습 3: Dense Optical Flow 시각화
+
 
 **src/dense_flow_demo.cpp**:
 ```cpp
@@ -279,10 +347,12 @@ int main() {
 #include <opencv2/video.hpp>
 #include <chrono>
 
+
 void drawFlowField(const cv::Mat& flow, cv::Mat& display, int step = 16) {
     for (int y = 0; y < flow.rows; y += step) {
         for (int x = 0; x < flow.cols; x += step) {
             cv::Point2f fxy = flow.at<cv::Point2f>(y, x);
+
 
             float magnitude = cv::sqrt(fxy.x * fxy.x + fxy.y * fxy.y);
             if (magnitude > 1.0f) {
@@ -295,17 +365,21 @@ void drawFlowField(const cv::Mat& flow, cv::Mat& display, int step = 16) {
     }
 }
 
+
 void flowToHSV(const cv::Mat& flow, cv::Mat& hsv_display) {
     cv::Mat flow_parts[2];
     cv::split(flow, flow_parts);
 
+
     cv::Mat magnitude, angle;
     cv::cartToPolar(flow_parts[0], flow_parts[1], magnitude, angle, true);
 
+
     cv::Mat hsv_channels[3];
-    hsv_channels[0] = angle;                    // Hue: 방향
-    hsv_channels[1] = cv::Mat::ones(flow.size(), CV_32F) * 255;  // Saturation
-    cv::normalize(magnitude, hsv_channels[2], 0, 255, cv::NORM_MINMAX);  // Value: 크기
+    hsv_channels[0] = angle; // Hue: 방향
+    hsv_channels[1] = cv::Mat::ones(flow.size(), CV_32F) * 255; // Saturation
+    cv::normalize(magnitude, hsv_channels[2], 0, 255, cv::NORM_MINMAX); // Value: 크기
+
 
     cv::Mat hsv;
     cv::merge(hsv_channels, 3, hsv);
@@ -313,27 +387,35 @@ void flowToHSV(const cv::Mat& flow, cv::Mat& hsv_display) {
     cv::cvtColor(hsv, hsv_display, cv::COLOR_HSV2BGR);
 }
 
+
 int main() {
     cv::VideoCapture cap(0);
     if (!cap.isOpened()) return -1;
+
 
     cv::Mat frame, gray, prev_gray;
     cap >> frame;
     cv::cvtColor(frame, prev_gray, cv::COLOR_BGR2GRAY);
 
-    std::cout << "\n[video] Dense Optical Flow 시작" << std::endl;
+
+    std::cout << "\nDense Optical Flow 시작" << std::endl;
     std::cout << "1: Arrow 시각화 / 2: HSV 시각화" << std::endl;
     std::cout << "ESC: 종료\n" << std::endl;
 
+
     int vis_mode = 1;
+
 
     while (true) {
         auto start = std::chrono::high_resolution_clock::now();
 
+
         cap >> frame;
         if (frame.empty()) break;
 
+
         cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
+
 
         // Farneback Dense Flow
         cv::Mat flow;
@@ -342,7 +424,9 @@ int main() {
             0.5, 3, 15, 3, 5, 1.2, 0
         );
 
+
         cv::Mat display = frame.clone();
+
 
         if (vis_mode == 1) {
             drawFlowField(flow, display);
@@ -350,30 +434,39 @@ int main() {
             flowToHSV(flow, display);
         }
 
+
         auto end = std::chrono::high_resolution_clock::now();
         double fps = 1000.0 / std::chrono::duration<double, std::milli>(end - start).count();
+
 
         cv::putText(display, cv::format("Dense Flow FPS: %.1f", fps),
                    cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX,
                    0.8, cv::Scalar(0, 255, 0), 2);
 
+
         cv::imshow("Dense Optical Flow", display);
+
 
         int key = cv::waitKey(1);
         if (key == 27) break;
         if (key == '1') vis_mode = 1;
         if (key == '2') vis_mode = 2;
 
+
         prev_gray = gray.clone();
     }
+
 
     return 0;
 }
 ```
 
+
 ---
 
-## [O] 체크리스트
+
+## 체크리스트
+
 
 ### Sparse Flow (KLT)
 - [ ] `KLTTracker` 클래스 구현
@@ -382,23 +475,29 @@ int main() {
 - [ ] 궤적 시각화 (trail)
 - [ ] 실시간 30fps 달성
 
+
 ### Dense Flow
 - [ ] Farneback Dense Flow 구현
 - [ ] Arrow 시각화
 - [ ] HSV 색상 시각화 (방향 → 색상, 크기 → 밝기)
+
 
 ### VINS 연계
 - [ ] VINS feature_tracker 코드 구조 이해
 - [ ] `goodFeaturesToTrack` + `calcOpticalFlowPyrLK` 패턴 이해
 - [ ] Fundamental Matrix로 outlier 제거 패턴 이해
 
+
 ---
 
-## [tip] VINS-Fusion feature_tracker 비교
+
+## VINS-Fusion feature_tracker 비교
+
 
 ```cpp
 // VINS-Fusion 패턴 (참고)
 // feature_tracker/src/feature_tracker.cpp
+
 
 void FeatureTracker::trackImage(...) {
     // 1. LK로 추적
@@ -406,9 +505,11 @@ void FeatureTracker::trackImage(...) {
         prev_pts, cur_pts, status, err,
         cv::Size(21, 21), 3);
 
+
     // 2. Fundamental Matrix로 outlier 제거
     cv::findFundamentalMat(prev_pts, cur_pts,
         cv::FM_RANSAC, F_THRESHOLD, 0.99, status);
+
 
     // 3. 부족한 특징점 보충
     if (pts.size() < MAX_CNT)
@@ -416,36 +517,47 @@ void FeatureTracker::trackImage(...) {
 }
 ```
 
+
 ---
 
-##  mini_vo 구현 (이번 주 핵심 + Phase 2 완성)
+
+## mini_vo 구현 (이번 주 핵심 + Phase 2 완성)
+
 
 **구현 파일**: `Studies/Phase 2/mini_vo/src/tracker.cpp`
 
+
 ### 구현해야 할 내용
+
 
 | 함수 | 내용 |
 |------|------|
 | `track()` | LK 직접 구현: 이미지 피라미드 구성 → 레벨별 AᵀA(Structure Tensor) 계산 → 반복 최소제곱으로 (u, v) 추정 → 상위 레벨로 전파 |
 
+
 ### 완성 기준
+
 
 ```bash
 ./mini_vo
 
+
 # W8 출력 예시 (전체 파이프라인)
 # [Phase 2 mini_vo 파이프라인]
-#   입력: 이미지 시퀀스 (N 프레임)
-#   W3  FAST 검출:      87개 특징점
-#   W8  LK 추적:        74개 추적 성공 (85%)
-#   W5  E Matrix 계산:  완료
-#   W6  R, t 복원:      inlier 68개
-#   W7  삼각측량:       68개 3D 점
-#   결과: w3_fast_result.png, pipeline_result.png 저장
+# 입력: 이미지 시퀀스 (N 프레임)
+# W3 FAST 검출: 87개 특징점
+# W8 LK 추적: 74개 추적 성공 (85%)
+# W5 E Matrix 계산: 완료
+# W6 R, t 복원: inlier 68개
+# W7 삼각측량: 68개 3D 점
+# 결과: w3_fast_result.png, pipeline_result.png 저장
 ```
+
 
 tracker.cpp를 완성하면 Phase 2 전체 파이프라인이 동작한다.
 
+
 ---
+
 
 **Phase 2 완료! 다음: Phase 3 - Visual Odometry & Bundle Adjustment**
