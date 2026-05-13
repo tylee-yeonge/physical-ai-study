@@ -1,364 +1,367 @@
-# Week 2 실습: 좌표계 변환 및 3D BBox 이미지 투영
+# Week 2 실습: SentencePiece + Action Tokenization + Loss 시뮬레이션
 
-> **목표**: KITTI 좌표계 규약을 코드로 구현하고, 3D bbox를 이미지에 투영하는 전체 파이프라인을 완성
-> **언어**: Python (NumPy, Matplotlib, OpenCV)
-> **예상 시간**: 4시간
-
----
-
-## 실습 개요
-
-이번 실습에서는 KITTI 좌표계를 기반으로 3D bbox의 corners를 계산하고, 이를 이미지 평면과 BEV 평면에 투영합니다.
+> [goal] **실습 목표**: VLM 의 토크나이저를 직접 다루고, action token 의 추출/복원 사이클을 코드로 검증한다.
+> [time] **예상 시간**: 6~8시간
 
 ---
 
-## 환경 설정
+## [tool] 환경 설정
 
 ```bash
-pip install numpy matplotlib opencv-python
+conda activate phase4
+pip install -r requirements.txt
+# 추가: sentencepiece, transformers (tokenizer 만), torch (loss 계산용)
 ```
 
 ---
 
-## Step 1: KITTI 캘리브레이션 파일 파싱
+## [note] 실습 1: SentencePiece 토크나이저 사용
+
+**파일명**: `practice_sentencepiece.py`
 
 ```python
+"""
+실습 1: SentencePiece 토크나이저로 직접 토큰화 / 복원
+목적: VLM 의 입력/출력이 token ID sequence 임을 손에 익힌다.
+"""
+from transformers import AutoTokenizer
+
+print("=" * 60)
+print("실습 1: SentencePiece 토크나이저 사용")
+print("=" * 60)
+
+# -- 1-1. 토크나이저 로드 --
+# PaLI-X 의 정확한 vocab 은 공개되지 않았으므로 비슷한 다국어 모델로 대체
+tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-base")
+print(f"\n[1-1] Tokenizer info")
+print(f"  Vocab size: {tokenizer.vocab_size}")
+print(f"  Special tokens: {tokenizer.special_tokens_map}")
+
+# -- 1-2. 텍스트 -> token ID --
+text = "pick up the can"
+ids = tokenizer.encode(text)
+tokens = tokenizer.convert_ids_to_tokens(ids)
+print(f"\n[1-2] Encode")
+print(f"  Text   : '{text}'")
+print(f"  IDs    : {ids}")
+print(f"  Tokens : {tokens}")
+
+# -- 1-3. token ID -> 텍스트 --
+recovered = tokenizer.decode(ids)
+print(f"\n[1-3] Decode")
+print(f"  Recovered: '{recovered}'")
+
+# -- 1-4. 한 단어가 여러 토큰으로 나뉘는 사례 --
+for word in ["supersonic", "anthropomorphic", "tokenization", "Pyongyang"]:
+    ids = tokenizer.encode(word, add_special_tokens=False)
+    tokens = tokenizer.convert_ids_to_tokens(ids)
+    print(f"  '{word}' -> {tokens} (n_tokens={len(ids)})")
+
+# -- 1-5. 빈도 낮은 token 의 ID 분포 확인 (RT-2 가 마지막 256개를 쓰는 이유) --
+print("\n[1-5] Vocab 의 마지막 부분 token 확인 (RT-2 가 재사용한 범위)")
+last_n = 10
+last_tokens = []
+for tid in range(tokenizer.vocab_size - last_n, tokenizer.vocab_size):
+    t = tokenizer.convert_ids_to_tokens(tid)
+    last_tokens.append((tid, t))
+    print(f"  ID {tid:>6}: '{t}'")
+
+print("\n  -> 마지막 token 들은 사용 빈도가 낮은 sub-word.")
+print("     RT-2 는 이런 'rare token' 들을 action bin 으로 재사용한다.")
+
+print("\n[O] 실습 1 완료!")
+```
+
+**실행**:
+```bash
+python practice_sentencepiece.py
+```
+
+**확인 포인트**:
+- "pick up the can" 이 4~6 개 토큰으로 분해됨
+- 흔하지 않은 단어는 더 많은 sub-word 로 분해
+- vocab 의 마지막 token 들은 의미 없는 부분 문자열
+
+---
+
+## [note] 실습 2: Action Token 추출/복원 사이클
+
+**파일명**: `practice_action_token_simulation.py`
+
+```python
+"""
+실습 2: continuous action -> token ID -> 다시 continuous 까지의 사이클
+목적: RT-2 의 inference / 학습 시 action 의 표현 방식을 코드로 본다.
+"""
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
 
-def parse_calib(calib_str):
-    """
-    KITTI 캘리브레이션 문자열을 파싱합니다.
-    (실제 파일 대신 문자열로 연습)
-    """
-    # KITTI 전형적인 P2 값 (단위: 픽셀)
-    P2 = np.array([
-        [721.5377, 0.0,      609.5593, 44.85728],
-        [0.0,      721.5377, 172.854,  0.216379],
-        [0.0,      0.0,      1.0,      0.002746]
-    ])
+print("=" * 60)
+print("실습 2: Action Token 추출/복원 사이클")
+print("=" * 60)
 
-    # 스테레오 정류 행렬 (단위 행렬에 가까움)
-    R0_rect = np.eye(4)
-    R0_rect[:3, :3] = np.array([
-        [0.9999, 0.0098, -0.0074],
-        [-0.0099, 0.9999, -0.0044],
-        [0.0074, 0.0045, 0.9999]
-    ])
+# -- 2-1. Vocab / Action 설정 --
+VOCAB_SIZE = 256000
+N_BIN = 256
+ACTION_TOKEN_START = VOCAB_SIZE - N_BIN
 
-    # LiDAR → Camera 변환
-    Tr_velo_to_cam = np.eye(4)
-    Tr_velo_to_cam[:3, :4] = np.array([
-        [7.533745e-03, -9.999714e-01, -6.166020e-04, -4.069766e-03],
-        [1.480249e-02,  7.280733e-04, -9.998902e-01, -7.631618e-02],
-        [9.998621e-01,  7.523790e-03,  1.480755e-02, -2.717806e-01]
-    ])
+action_dims = ['dx', 'dy', 'dz', 'rx', 'ry', 'rz', 'gripper']
+a_min = np.array([-0.10, -0.10, -0.10, -np.pi, -np.pi, -np.pi, 0.0])
+a_max = np.array([ 0.10,  0.10,  0.10,  np.pi,  np.pi,  np.pi, 1.0])
 
-    return {'P2': P2, 'R0_rect': R0_rect, 'Tr_velo_to_cam': Tr_velo_to_cam}
+print(f"\n[2-1] 설정")
+print(f"  VOCAB_SIZE          : {VOCAB_SIZE}")
+print(f"  ACTION_TOKEN_START  : {ACTION_TOKEN_START}")
+print(f"  Action dims         : {action_dims}")
 
 
-calib = parse_calib(None)
-print("P2 투영 행렬:")
-print(calib['P2'])
-print(f"\nfx = {calib['P2'][0, 0]:.2f}")
-print(f"fy = {calib['P2'][1, 1]:.2f}")
-print(f"cx = {calib['P2'][0, 2]:.2f}")
-print(f"cy = {calib['P2'][1, 2]:.2f}")
+# -- 2-2. discretize / token_map / de-tokenize 함수 --
+def discretize(action, low, high, n_bins):
+    normalized = (np.clip(action, low, high) - low) / (high - low)
+    return np.minimum((normalized * n_bins).astype(int), n_bins - 1)
+
+
+def to_token_ids(bin_idx, start):
+    return bin_idx + start
+
+
+def from_token_ids(token_ids, start):
+    return np.asarray(token_ids) - start
+
+
+def de_discretize(bin_idx, low, high, n_bins):
+    return low + (bin_idx + 0.5) / n_bins * (high - low)
+
+
+# -- 2-3. 학습 시: continuous action -> token sequence --
+print("\n[2-3] 학습 시: continuous action -> token sequence")
+original_action = np.array([0.05, -0.03, 0.02, 0.5, -1.2, 0.0, 0.9])
+bin_idx = discretize(original_action, a_min, a_max, N_BIN)
+token_ids = to_token_ids(bin_idx, ACTION_TOKEN_START)
+
+print(f"  원본 action       : {original_action}")
+print(f"  bin index         : {bin_idx}")
+print(f"  output token ID   : {token_ids.tolist()}")
+
+
+# -- 2-4. inference 시: token sequence -> continuous action --
+print("\n[2-4] inference 시: token sequence -> continuous action")
+recovered_bin = from_token_ids(token_ids, ACTION_TOKEN_START)
+recovered_action = de_discretize(recovered_bin, a_min, a_max, N_BIN)
+
+print(f"  output token ID   : {token_ids.tolist()}")
+print(f"  복원된 bin index  : {recovered_bin.tolist()}")
+print(f"  복원된 action     : {np.round(recovered_action, 5)}")
+
+err = recovered_action - original_action
+print(f"\n  Quantization 오차 :")
+for i, name in enumerate(action_dims):
+    unit = "m" if i < 3 else ("rad" if i < 6 else "")
+    print(f"    {name:7s}: {err[i]:+.5f} {unit}")
+
+
+# -- 2-5. 통계적 quantization 오차 분석 --
+print("\n[2-5] 통계적 quantization 오차 (10000 random action)")
+np.random.seed(42)
+n_samples = 10000
+errors = []
+for _ in range(n_samples):
+    a = np.random.uniform(a_min, a_max)
+    b = discretize(a, a_min, a_max, N_BIN)
+    a_recovered = de_discretize(b, a_min, a_max, N_BIN)
+    errors.append(a_recovered - a)
+errors = np.array(errors)
+
+print(f"  Mean error (per dim) : {np.round(errors.mean(axis=0), 6)}")
+print(f"  Max  error (per dim) : {np.round(np.abs(errors).max(axis=0), 5)}")
+print(f"  RMS  error (per dim) : {np.round(np.sqrt((errors**2).mean(axis=0)), 5)}")
+
+print("\n  -> mean 은 0 근처 (bin 중심값을 쓰는 이유)")
+print("  -> max 는 step/2 근처 (bin 의 가장자리 case)")
+print("  -> RMS 는 step / sqrt(12) (uniform 분포의 표준편차 공식)")
+
+print("\n[O] 실습 2 완료!")
 ```
+
+**실행**:
+```bash
+python practice_action_token_simulation.py
+```
+
+**확인 포인트**:
+- Mean quantization error 가 거의 0
+- Max error 가 약 step/2
+- RMS error 가 약 step/sqrt(12) (이론값)
 
 ---
 
-## Step 2: 3D BBox Corners 계산 (KITTI 규약)
+## [note] 실습 3: Co-fine-tuning Loss 시뮬레이션
+
+**파일명**: `practice_loss_simulation.py`
 
 ```python
-def compute_box_3d_kitti(h, w, l, x, y, z, ry):
-    """
-    KITTI 규약에 따른 3D bbox corners 계산
+"""
+실습 3: web sample 과 robot sample 의 loss 가 어떻게 합산되는지 시뮬레이션
+목적: co-fine-tuning 시 두 종류 데이터가 같은 loss 로 학습된다는 것을 확인.
+"""
+import torch
+import torch.nn.functional as F
+import numpy as np
 
-    Parameters:
-        h, w, l: 높이, 폭, 길이 (KITTI 순서)
-        x, y, z: 중심 좌표 (Camera 좌표계)
-        ry: yaw 회전각 (y축 회전)
+print("=" * 60)
+print("실습 3: Co-fine-tuning Loss 시뮬레이션")
+print("=" * 60)
 
-    Returns:
-        corners: (8, 3) 꼭짓점 좌표
-    """
-    c = np.cos(ry)
-    s = np.sin(ry)
-    R = np.array([
-        [ c, 0, s],
-        [ 0, 1, 0],
-        [-s, 0, c]
-    ])
+torch.manual_seed(42)
 
-    # 8개 꼭짓점 (중심 기준)
-    x_c = [ l/2,  l/2, -l/2, -l/2,  l/2,  l/2, -l/2, -l/2]
-    y_c = [   0,    0,    0,    0,   -h,   -h,   -h,   -h ]
-    z_c = [ w/2, -w/2, -w/2,  w/2,  w/2, -w/2, -w/2,  w/2]
+# -- 3-1. Mock VLM 의 출력 (logits) 생성 --
+VOCAB_SIZE = 1000  # 실제는 256K, 여기선 축약
+SEQ_LEN = 10
+BATCH = 4
 
-    corners = np.array([x_c, y_c, z_c])  # (3, 8)
-    corners = R @ corners
+# Mock 모델 출력: [batch, seq_len, vocab]
+fake_logits = torch.randn(BATCH, SEQ_LEN, VOCAB_SIZE)
 
-    corners[0, :] += x
-    corners[1, :] += y
-    corners[2, :] += z
+# Target token sequence
+fake_target = torch.randint(0, VOCAB_SIZE, (BATCH, SEQ_LEN))
 
-    return corners.T  # (8, 3)
+print(f"\n[3-1] Mock 출력")
+print(f"  logits shape : {fake_logits.shape}  [B, L, V]")
+print(f"  target shape : {fake_target.shape}  [B, L]")
 
 
-# 테스트: KITTI 전형적인 Car 레이블
-# Car 0.0 0 -1.56 ... 1.65 1.67 3.64 -0.65 1.71 46.70 -1.59
-h, w, l = 1.65, 1.67, 3.64
-x, y, z = -0.65, 1.71, 46.70
-ry = -1.59
+# -- 3-2. standard next-token-prediction loss --
+print("\n[3-2] Standard cross-entropy loss")
+loss_per_token = F.cross_entropy(
+    fake_logits.reshape(-1, VOCAB_SIZE),
+    fake_target.reshape(-1),
+    reduction='none',
+)
+loss_per_token = loss_per_token.reshape(BATCH, SEQ_LEN)
+print(f"  Per-token loss shape : {loss_per_token.shape}")
+print(f"  Per-token loss (sample 0): {loss_per_token[0].numpy().round(3)}")
 
-corners = compute_box_3d_kitti(h, w, l, x, y, z, ry)
-print("3D BBox Corners (KITTI Car):")
-for i, c in enumerate(corners):
-    print(f"  Corner {i}: ({c[0]:>7.2f}, {c[1]:>7.2f}, {c[2]:>7.2f})")
+
+# -- 3-3. Web sample vs Robot sample loss --
+# 가정: batch 4 개 중 처음 3 개는 web, 마지막 1 개는 robot
+# (mixture ratio 75% web : 25% robot)
+print("\n[3-3] Web vs Robot sample 의 loss")
+web_loss = loss_per_token[:3].mean()
+robot_loss = loss_per_token[3].mean()
+combined_loss = loss_per_token.mean()
+
+print(f"  Web   loss (3 sample) : {web_loss.item():.4f}")
+print(f"  Robot loss (1 sample) : {robot_loss.item():.4f}")
+print(f"  Combined loss         : {combined_loss.item():.4f}")
+
+print("\n  -> 두 종류 sample 의 loss 가 동일한 cross-entropy.")
+print("     RT-2 는 batch 단위로 averaged 된 loss 로 backprop.")
+
+
+# -- 3-4. Action token 만 loss 에 포함하려면 (선택적 mask) --
+print("\n[3-4] Action token 만 loss 에 (mask 사용)")
+# Robot sample 에서 마지막 7 token 이 action 이라고 가정
+ACTION_LEN = 7
+mask = torch.zeros_like(fake_target, dtype=torch.float)
+mask[3, -ACTION_LEN:] = 1.0  # robot sample (idx 3) 의 마지막 7 token 만
+
+masked_loss = (loss_per_token * mask).sum() / mask.sum().clamp(min=1)
+print(f"  Masked loss (robot action 만): {masked_loss.item():.4f}")
+
+print("\n  -> 이 방식이 'action 만 학습' 하고 싶을 때 쓸 수 있음.")
+print("     단 RT-2 는 mask 없이 standard loss 그대로 씀 (논문 Sec 3.3).")
+
+
+# -- 3-5. Data mixture 비율의 효과 시뮬레이션 --
+print("\n[3-5] Data mixture 비율 별 loss 비교")
+ratios = [(1.0, 0.0), (0.8, 0.2), (0.5, 0.5), (0.0, 1.0)]
+fake_web_loss = 2.5
+fake_robot_loss = 4.0  # robot data 는 새로 배우는 거라 초기 loss 높다 가정
+
+print("  (Web sample 평균 loss = 2.5, Robot sample 평균 loss = 4.0 가정)")
+print()
+print(f"  {'Web:Robot':<15} {'Combined loss':>20}")
+print(f"  {'-'*15:<15} {'-'*20:>20}")
+for w, r in ratios:
+    combined = w * fake_web_loss + r * fake_robot_loss
+    print(f"  {w:.1f} : {r:.1f}      {combined:>20.4f}")
+
+print("\n  -> robot 비율이 클수록 combined loss 가 높아짐.")
+print("     하지만 robot 비율이 너무 작으면 robot task 학습이 안 됨.")
+print("     RT-2 는 ~ 20% robot 으로 균형을 맞춤.")
+
+print("\n[O] 실습 3 완료!")
+```
+
+**실행**:
+```bash
+python practice_loss_simulation.py
 ```
 
 ---
 
-## Step 3: 3D Corners를 이미지에 투영
+## [note] 실습 4: 한 페이지 노트 산출
 
-```python
-def project_to_image(corners_3d, P2):
-    """
-    3D Camera 좌표를 이미지 좌표로 투영
+**파일명**: `~/phase4_notes/week2/action_token_one_page.md`
 
-    Parameters:
-        corners_3d: (N, 3) Camera 좌표계의 3D 점
-        P2: (3, 4) 투영 행렬
+이번 주의 산출물은 **week 3 블로그의 절반** 이 될 수 있는 한 페이지 노트:
 
-    Returns:
-        corners_2d: (N, 2) 이미지 좌표 (u, v)
-    """
-    N = corners_3d.shape[0]
-    pts_hom = np.hstack([corners_3d, np.ones((N, 1))])  # (N, 4)
+```markdown
+# RT-2 Action Tokenization & Co-fine-tuning - 한 페이지
 
-    pts_2d = (P2 @ pts_hom.T).T  # (N, 3)
+## 1. 핵심 한 줄
+> Action 도 token. VLM 의 vocab 마지막 256개를 action bin 으로 재사용.
 
-    # z로 나누어 정규화 (원근 투영)
-    pts_2d[:, 0] /= pts_2d[:, 2]
-    pts_2d[:, 1] /= pts_2d[:, 2]
+## 2. 수식 3개
+1. Discretize:   b = min( floor((a - a_min) / (a_max - a_min) * 256), 255 )
+2. Token map:    t = ACTION_TOKEN_START + b
+3. De-tokenize:  a = a_min + (b + 0.5) / 256 * (a_max - a_min)
 
-    return pts_2d[:, :2]
+## 3. Quantization step 수치 (실습 결과)
+- dx, dy, dz : ~ 0.78 mm
+- rx, ry, rz : ~ 1.40 deg
+- gripper   : ~ 0.004 (256단계)
 
+## 4. Co-fine-tuning mixture
+| 데이터 | 비율 |
+|---|---|
+| WebLI (image-caption) | 50% |
+| OCR / VQA | 30% |
+| Robot (RT-1 dataset) | 20% |
 
-# 투영 테스트
-P2 = calib['P2']
-corners_2d = project_to_image(corners, P2)
+## 5. Loss 의 일관성
+모든 sample 이 standard next-token-prediction CE loss 로 학습.
+Robot sample 에서 output 의 처음 7~11 token 이 action 으로 해석.
 
-print("\n이미지에 투영된 2D 좌표:")
-for i, pt in enumerate(corners_2d):
-    print(f"  Corner {i}: ({pt[0]:>7.1f}, {pt[1]:>7.1f})")
+## 6. 학습 시 자주 놓치는 포인트
+- vocab 마지막 256개를 쓰는 이유: rare token 이라 원 의미 손실 최소
+- robot data 만 fine-tune 하면 catastrophic forgetting
+- mixture 비율은 absolute size 가 아닌 'sample 등장 빈도' 임
+
+## 7. 본 로드맵 관점
+- Phase 7 산출물 #4 에서 OpenVLA (동일한 discrete action token) 사용
+- Quantization step 수치를 면접에서 'fine motion 한계' 의 정량적 근거로 인용
 ```
 
 ---
 
-## Step 4: 3D BBox를 이미지에 시각화
+## [O] 실습 체크리스트
 
-```python
-def draw_3d_bbox_on_image(ax, corners_2d, color='lime', linewidth=2):
-    """
-    이미지 위에 3D bbox의 12개 edge를 그립니다.
-    """
-    edges = [
-        [0, 1], [1, 2], [2, 3], [3, 0],  # 바닥면
-        [4, 5], [5, 6], [6, 7], [7, 4],  # 윗면
-        [0, 4], [1, 5], [2, 6], [3, 7],  # 기둥
-    ]
-
-    for i, j in edges:
-        ax.plot([corners_2d[i, 0], corners_2d[j, 0]],
-                [corners_2d[i, 1], corners_2d[j, 1]],
-                color=color, linewidth=linewidth)
-
-
-def visualize_3d_bbox_projection():
-    """
-    여러 객체의 3D bbox를 가상 이미지에 투영하여 시각화합니다.
-    """
-    fig, ax = plt.subplots(1, 1, figsize=(14, 5))
-
-    # 가상 이미지 배경 (회색)
-    img = np.ones((375, 1242, 3), dtype=np.uint8) * 200
-    ax.imshow(img)
-
-    # 여러 객체
-    objects = [
-        # (h, w, l, x, y, z, ry, color, label)
-        (1.5, 1.8, 4.5, 2.0, 1.65, 15.0, 0.1, 'lime', 'Car A (15m)'),
-        (1.5, 1.7, 4.2, -3.0, 1.65, 25.0, -0.05, 'cyan', 'Car B (25m)'),
-        (1.8, 2.0, 4.8, 0.5, 1.65, 8.0, 0.0, 'red', 'Car C (8m)'),
-    ]
-
-    P2 = calib['P2']
-
-    for (h, w, l, x, y, z, ry, color, label) in objects:
-        corners_3d = compute_box_3d_kitti(h, w, l, x, y, z, ry)
-        corners_2d = project_to_image(corners_3d, P2)
-
-        # 유효 범위 체크
-        if np.all(corners_2d[:, 0] > 0) and np.all(corners_2d[:, 0] < 1242):
-            draw_3d_bbox_on_image(ax, corners_2d, color=color)
-            # 라벨
-            center_2d = corners_2d.mean(axis=0)
-            ax.text(center_2d[0], center_2d[1] - 20, label,
-                    fontsize=10, color=color, fontweight='bold',
-                    ha='center', bbox=dict(boxstyle='round', facecolor='black', alpha=0.7))
-
-    ax.set_xlim(0, 1242)
-    ax.set_ylim(375, 0)
-    ax.set_title('3D BBox -> 이미지 투영', fontsize=14)
-    ax.set_xlabel('u (pixels)')
-    ax.set_ylabel('v (pixels)')
-
-    plt.tight_layout()
-    plt.savefig('3d_bbox_projection.png', dpi=150)
-    plt.show()
-    print("3D bbox 이미지 투영 시각화 완료!")
-
-
-visualize_3d_bbox_projection()
-```
+- [ ] `practice_sentencepiece.py` 실행, vocab 마지막 token 의 sparsity 확인
+- [ ] `practice_action_token_simulation.py` 실행
+  - [ ] discretize -> token_id -> de-tokenize 사이클 동작 확인
+  - [ ] quantization 오차 통계 (mean ~ 0, RMS ~ step/sqrt(12)) 확인
+- [ ] `practice_loss_simulation.py` 실행
+  - [ ] web/robot loss 가 같은 CE 임을 확인
+  - [ ] mixture ratio 별 combined loss 변화 확인
+- [ ] `action_token_one_page.md` 노트 산출
+- [ ] quiz_easy / quiz_medium 풀고 solutions 확인
+- [ ] git commit
 
 ---
 
-## Step 5: BEV 시각화
+## [link] 참고 자료
 
-```python
-def visualize_bev_with_coordinates():
-    """
-    BEV 시각화와 함께 좌표계를 표시합니다.
-    """
-    fig, axes = plt.subplots(1, 2, figsize=(16, 8))
-
-    objects = [
-        (1.5, 1.8, 4.5, 2.0, 1.65, 15.0, 0.1, 'green', 'Car A'),
-        (1.5, 1.7, 4.2, -3.0, 1.65, 25.0, -0.05, 'blue', 'Car B'),
-        (1.8, 2.0, 4.8, 0.5, 1.65, 8.0, 0.0, 'red', 'Car C'),
-        (1.7, 0.8, 1.8, 5.0, 1.5, 20.0, 1.57, 'orange', 'Ped'),
-    ]
-
-    # --- 3D 시각화 (측면) ---
-    ax1 = axes[0]
-    ax1.set_title('측면 시점 (X-Z)', fontsize=14)
-    for (h, w, l, x, y, z, ry, color, label) in objects:
-        corners = compute_box_3d_kitti(h, w, l, x, y, z, ry)
-        # 측면: x vs z
-        bev = corners[:4, [0, 2]]
-        polygon = plt.Polygon(bev, fill=True, alpha=0.3,
-                             facecolor=color, edgecolor=color, linewidth=2)
-        ax1.add_patch(polygon)
-        ax1.text(x, z, label, fontsize=9, ha='center', color=color, fontweight='bold')
-
-    ax1.plot(0, 0, 'k^', markersize=15, label='Camera')
-    ax1.set_xlabel('X (좌우) [m]')
-    ax1.set_ylabel('Z (전방) [m]')
-    ax1.set_xlim(-10, 10)
-    ax1.set_ylim(-2, 35)
-    ax1.set_aspect('equal')
-    ax1.grid(True, alpha=0.3)
-    ax1.legend()
-
-    # --- 좌표계 비교 ---
-    ax2 = axes[1]
-    ax2.set_title('좌표계 비교', fontsize=14)
-    ax2.set_xlim(-5, 5)
-    ax2.set_ylim(-5, 5)
-
-    # Camera 좌표계
-    ax2.annotate('', xy=(2, 0), xytext=(0, 0),
-                arrowprops=dict(arrowstyle='->', color='blue', lw=2))
-    ax2.text(2.2, 0, 'Camera X\n(오른쪽)', fontsize=9, color='blue')
-    ax2.annotate('', xy=(0, -2), xytext=(0, 0),
-                arrowprops=dict(arrowstyle='->', color='blue', lw=2))
-    ax2.text(0.2, -2.3, 'Camera Z\n(전방)', fontsize=9, color='blue')
-
-    # LiDAR 좌표계
-    ax2.annotate('', xy=(0, -2), xytext=(0, 0),
-                arrowprops=dict(arrowstyle='->', color='red', lw=2, linestyle='--'))
-    ax2.text(-1.8, -2.3, 'LiDAR X\n(전방)', fontsize=9, color='red')
-    ax2.annotate('', xy=(-2, 0), xytext=(0, 0),
-                arrowprops=dict(arrowstyle='->', color='red', lw=2, linestyle='--'))
-    ax2.text(-2.5, 0.3, 'LiDAR Y\n(왼쪽)', fontsize=9, color='red')
-
-    ax2.plot(0, 0, 'ko', markersize=10)
-    ax2.text(0.2, 0.3, '원점', fontsize=10, fontweight='bold')
-    ax2.grid(True, alpha=0.3)
-    ax2.set_aspect('equal')
-
-    plt.tight_layout()
-    plt.savefig('bev_and_coordinates.png', dpi=150)
-    plt.show()
-    print("BEV 및 좌표계 비교 시각화 완료!")
-
-
-visualize_bev_with_coordinates()
-```
-
----
-
-## Step 6: LiDAR -> Camera 좌표 변환
-
-```python
-def lidar_to_camera(pts_lidar, calib):
-    """
-    LiDAR 좌표를 Camera 좌표로 변환
-
-    변환 순서:
-      LiDAR → Camera = R0_rect @ Tr_velo_to_cam @ pts_lidar
-    """
-    N = pts_lidar.shape[0]
-    pts_hom = np.hstack([pts_lidar, np.ones((N, 1))])  # (N, 4)
-
-    # LiDAR → Camera
-    pts_cam = (calib['R0_rect'] @ calib['Tr_velo_to_cam'] @ pts_hom.T).T
-
-    return pts_cam[:, :3]
-
-
-# 테스트: LiDAR 좌표의 점
-pts_lidar = np.array([
-    [10.0, 0.0, 0.5],    # 전방 10m, 지면 위 0.5m
-    [20.0, -2.0, 1.0],   # 전방 20m, 오른쪽 2m, 높이 1m
-    [5.0, 3.0, -0.5],    # 전방 5m, 왼쪽 3m, 지면 아래 0.5m
-])
-
-pts_cam = lidar_to_camera(pts_lidar, calib)
-
-print("LiDAR → Camera 변환:")
-for i in range(len(pts_lidar)):
-    print(f"  LiDAR ({pts_lidar[i][0]:>6.1f}, {pts_lidar[i][1]:>6.1f}, {pts_lidar[i][2]:>6.1f})")
-    print(f"  → Cam ({pts_cam[i][0]:>6.2f}, {pts_cam[i][1]:>6.2f}, {pts_cam[i][2]:>6.2f})")
-    print()
-```
-
----
-
-## 체크리스트
-
-- [ ] KITTI P2 투영 행렬의 구성요소(fx, fy, cx, cy) 이해
-- [ ] 3D bbox corners 계산 (KITTI 규약: h, w, l 순서)
-- [ ] 3D → 2D 이미지 투영 (P2 행렬 사용)
-- [ ] 3D bbox를 이미지에 시각화
-- [ ] BEV 시각화 및 좌표계 비교 이해
-- [ ] LiDAR → Camera 좌표 변환 이해
-
----
-
-## 추가 실험 아이디어
-
-1. **다양한 ry 값**: ry를 0, pi/4, pi/2, pi로 바꿔서 투영 확인
-2. **거리에 따른 크기**: z=5, 10, 30, 50m에 같은 차를 배치하여 원근 효과 확인
-3. **LiDAR 점군 투영**: 가상 LiDAR 점군을 이미지에 투영
-4. **역투영**: 이미지 좌표 + depth에서 3D 좌표 복원
-
----
-
-이전: [Week 1 실습](../week1/PRACTICE.md)
-
-**다음**: Week 3에서 실제 KITTI 데이터를 다루고 시각화합니다!
+- [RT-2 paper Section 3.2 / 3.3](https://arxiv.org/abs/2307.15818)
+- [SentencePiece paper](https://arxiv.org/abs/1808.06226)
+- [HuggingFace Tokenizers tutorial](https://huggingface.co/docs/transformers/tokenizer_summary)
+- [Andrej Karpathy: Tokenizer 강의](https://www.youtube.com/watch?v=zduSFxRajkE)

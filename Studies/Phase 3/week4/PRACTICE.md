@@ -1,6 +1,6 @@
-# Week 4 실습: YOLOv8 학습 파이프라인
+# Week 4 실습: YOLO11 학습 파이프라인
 
-> [goal] **실습 목표**: YOLOv8을 COCO128으로 학습하고, 커스텀 데이터셋을 준비하며, 평가 결과를 분석한다.
+> [goal] **실습 목표**: YOLO11을 COCO128으로 학습하고, 커스텀 데이터셋을 준비하며, 평가 결과를 분석한다.
 > [time] **예상 시간**: 6~8시간
 
 ---
@@ -21,14 +21,14 @@ python quiz_medium.py
 
 ---
 
-## [note] 실습 1: YOLOv8 기본 추론
+## [note] 실습 1: YOLO11 기본 추론
 
 **파일명**: `practice_inference.py`
 
 ```python
 """
-실습 1: YOLOv8 기본 추론
-목표: Pretrained YOLOv8으로 이미지/영상 추론을 수행한다.
+실습 1: YOLO11 기본 추론
+목표: Pretrained YOLO11으로 이미지/영상 추론을 수행한다.
 """
 from ultralytics import YOLO
 import cv2
@@ -38,12 +38,12 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 print("=" * 50)
-print("실습 1: YOLOv8 기본 추론")
+print("실습 1: YOLO11 기본 추론")
 print("=" * 50)
 
 # -- 모델 로드 --
-model = YOLO('yolov8n.pt')  # 자동 다운로드
-print(f"\n모델 로드 완료: yolov8n.pt")
+model = YOLO('yolo11n.pt')  # 자동 다운로드
+print(f"\n모델 로드 완료: yolo11n.pt")
 
 # -- 테스트 이미지 생성 (실제로는 이미지 경로 사용) --
 # 실제 이미지가 있으면: results = model('image.jpg')
@@ -95,7 +95,7 @@ python practice_inference.py
 
 ```python
 """
-실습 2: COCO128로 YOLOv8 학습
+실습 2: COCO128로 YOLO11 학습
 목표: 기본 학습을 수행하고 결과를 분석한다.
 """
 from ultralytics import YOLO
@@ -106,7 +106,7 @@ print("실습 2: COCO128 학습")
 print("=" * 50)
 
 # -- 모델 로드 --
-model = YOLO('yolov8n.pt')
+model = YOLO('yolo11n.pt')
 
 # -- 학습 --
 print("\n학습 시작...")
@@ -211,7 +211,7 @@ for exp in experiments:
     print(f"실험: {exp['desc']}")
     print(f"{'='*50}")
 
-    model = YOLO('yolov8n.pt')
+    model = YOLO('yolo11n.pt')
 
     try:
         result = model.train(
@@ -539,18 +539,18 @@ print("\n[2] 모델 크기별 성능 (참고)")
 print(f"  {'모델':10s} | {'파라미터':>10s} | {'mAP@0.5:0.95':>12s} | {'용도':12s}")
 print("  " + "-" * 55)
 model_info = [
-    ('YOLOv8n', '3.2M', '37.3', 'Edge/실시간'),
-    ('YOLOv8s', '11.2M', '44.9', '경량 서버'),
-    ('YOLOv8m', '25.9M', '50.2', '균형'),
-    ('YOLOv8l', '43.7M', '52.9', '높은 정확도'),
-    ('YOLOv8x', '68.2M', '53.9', '최고 성능'),
+    ('YOLO11n', '2.6M',  '39.5', 'Edge/실시간'),
+    ('YOLO11s', '9.4M',  '47.0', '경량 서버'),
+    ('YOLO11m', '20.1M', '51.5', '균형'),
+    ('YOLO11l', '25.3M', '53.4', '높은 정확도'),
+    ('YOLO11x', '56.9M', '54.7', '최고 성능'),
 ]
 for name, params, mAP, usage in model_info:
     print(f"  {name:10s} | {params:>10s} | {mAP:>12s} | {usage:12s}")
 
 # -- 3. 개선 제안 --
 print("\n[3] 성능 개선 체크리스트")
-print("  [ ] 더 큰 모델 시도 (n → s → m)")
+print("  [ ] 더 큰 모델 시도 (yolo11n → yolo11s → yolo11m)")
 print("  [ ] 이미지 크기 증가 (640 → 960)")
 print("  [ ] 학습 에폭 증가 (30 → 100)")
 print("  [ ] Augmentation 강화 (mosaic, mixup)")
@@ -569,7 +569,7 @@ python practice_analysis.py
 
 ## [O] 실습 체크리스트
 
-- [ ] YOLOv8 Pretrained 모델로 추론 성공
+- [ ] YOLO11 Pretrained 모델로 추론 성공
 - [ ] COCO128 학습 완료 (30+ 에폭)
 - [ ] 학습 결과 파일 확인 (results.png, confusion_matrix.png)
 - [ ] mAP@0.5, mAP@0.5:0.95 결과 기록
@@ -581,11 +581,11 @@ python practice_analysis.py
 
 ## [link] 참고 자료
 
-- [Ultralytics YOLOv8 공식 문서](https://docs.ultralytics.com/)
+- [Ultralytics YOLO11 공식 문서](https://docs.ultralytics.com/models/yolo11/)
 - [COCO Dataset](https://cocodataset.org/)
 - [Roboflow](https://roboflow.com/)
 - [LabelImg GitHub](https://github.com/heartexlabs/labelImg)
-- [YOLOv8 학습 가이드](https://docs.ultralytics.com/modes/train/)
+- [YOLO 학습 가이드 (Ultralytics)](https://docs.ultralytics.com/modes/train/)
 
 ---
 

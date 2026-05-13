@@ -1,82 +1,64 @@
 """
-Quiz Easy - Week 6: 성능 분석 및 개선 (Section 6.2)
-4문제 - 기본 개념 확인
+Phase 4 Week 6 - HuggingFace + Inference 기초 퀴즈
 """
 
 
-def problem1_error_types():
-    print("\n" + "━" * 28)
-    print("문제 1: 오류 유형 분류")
-    print("━" * 28 + "\n")
-
-    print("Q: 3D Detection에서 발생하는 주요 오류 유형 4가지를 나열하고,")
-    print("   각각이 성능(AP3D)에 미치는 영향을 간단히 설명하세요.\n")
-    print("   1. _____ : _____")
-    print("   2. _____ : _____")
-    print("   3. _____ : _____")
-    print("   4. _____ : _____\n")
-
-
-def problem2_depth_error_impact():
-    print("\n" + "━" * 28)
-    print("문제 2: Depth 오류와 3D IoU")
-    print("━" * 28 + "\n")
-
-    print("Q: Monocular 3D Detection에서 Depth 오차가 3D IoU에 미치는")
-    print("   영향에 대한 설명 중 올바른 것을 모두 고르세요.\n")
-    print("   a) Depth 1m 오차면 Car의 3D IoU가 0.7 이하로 떨어질 수 있다")
-    print("   b) 원거리(40m+)에서 Depth 오차는 보통 1m 미만이다")
-    print("   c) AP2D가 85%라도 AP3D는 15% 이하일 수 있다")
-    print("   d) Depth 오차는 2D bbox 정확도와 무관하다")
-    print()
-    print("   답: _____\n")
+def problem1_quantization():
+    print("\n" + "=" * 50)
+    print("문제 1: 4-bit quantization 의 라이브러리")
+    print("=" * 50 + "\n")
+    print("질문: OpenVLA 의 4-bit nf4 quantization 에 가장 자주 쓰이는 라이브러리?\n")
+    print("보기:")
+    print("  A) bitsandbytes")
+    print("  B) GPTQ")
+    print("  C) AWQ")
+    print("  D) torch.quantization")
 
 
-def problem3_augmentation_flip():
-    print("\n" + "━" * 28)
-    print("문제 3: Random Flip과 3D 레이블")
-    print("━" * 28 + "\n")
-
-    print("Q: 이미지를 좌우 반전(Random Flip)할 때, 3D 레이블에서")
-    print("   반드시 함께 변환해야 하는 값은 무엇인가요?\n")
-    print("   다음 중 변환이 필요한 항목을 모두 고르세요.")
-    print("   a) 3D 중심 좌표의 x값")
-    print("   b) 3D 중심 좌표의 z값 (깊이)")
-    print("   c) rotation_y (yaw 회전각)")
-    print("   d) 3D 크기 (l, w, h)")
-    print()
-    print("   답: _____\n")
+def problem2_predict_action():
+    print("\n" + "=" * 50)
+    print("문제 2: OpenVLA 의 inference API")
+    print("=" * 50 + "\n")
+    print("질문: OpenVLA 에서 action 추론 시 호출하는 method 는?\n")
+    print("보기:")
+    print("  A) model.forward()")
+    print("  B) model.generate()")
+    print("  C) model.predict_action() (custom method)")
+    print("  D) model.predict()")
 
 
-def problem4_nms_comparison():
-    print("\n" + "━" * 28)
-    print("문제 4: 2D NMS vs 3D NMS")
-    print("━" * 28 + "\n")
-
-    print("Q: 다음 시나리오에서 2D NMS와 BEV NMS의 결과 차이를 설명하세요.\n")
-    print("   이미지에서 두 차량이 겹쳐 보이지만:")
-    print("     Car A: z=10m, score=0.92")
-    print("     Car B: z=25m, score=0.85")
-    print("   두 차량의 2D bbox가 IoU 0.6으로 겹칩니다.\n")
-    print("   2D NMS (threshold=0.5) 결과: _____")
-    print("   BEV NMS (threshold=0.25) 결과: _____")
-    print("   이유: _____\n")
+def problem3_unnormalize_key():
+    print("\n" + "=" * 50)
+    print("문제 3: unnormalize_key 의 의미")
+    print("=" * 50 + "\n")
+    print("질문: predict_action(..., unnormalize_key='bridge_orig') 의 의미는?\n")
+    print("보기:")
+    print("  A) 모델 weights 의 normalization key")
+    print("  B) OpenX-Embodiment 의 어떤 dataset 의 action normalization 통계로")
+    print("     de-normalize 할지 지정")
+    print("  C) 이미지 preprocess 의 mean/std 지정")
+    print("  D) tokenizer 의 vocab 지정")
 
 
-def main():
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    print("Week 6 Quiz - Easy (성능 분석 및 개선)")
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-
-    problem1_error_types()
-    problem2_depth_error_impact()
-    problem3_augmentation_flip()
-    problem4_nms_comparison()
-
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    print("정답은 quiz_solutions/easy_sol.py 참고")
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+def problem4_latency_component():
+    print("\n" + "=" * 50)
+    print("문제 4: Latency 의 가장 큰 component")
+    print("=" * 50 + "\n")
+    print("질문: OpenVLA inference 의 한 frame latency (~150 ms) 에서")
+    print("      가장 큰 비중을 차지하는 component 는?\n")
+    print("보기:")
+    print("  A) Image preprocess (resize, normalize)")
+    print("  B) Vision encoder forward (DINOv2 + SigLIP)")
+    print("  C) LM decoder generate (token 단위 autoregressive)")
+    print("  D) Action de-tokenize")
 
 
 if __name__ == "__main__":
-    main()
+    print("=" * 50)
+    problem1_quantization()
+    problem2_predict_action()
+    problem3_unnormalize_key()
+    problem4_latency_component()
+    print("=" * 50)
+    print("정답은 quiz_solutions/easy_sol.py 참고")
+    print("=" * 50)

@@ -1,5 +1,7 @@
-numpy
-matplotlib
-opencv-python
-torch
-scikit-learn
+# 이번 주는 ROS2 패키지 골격 작성 - 시스템 의존성 우선
+# 시스템 패키지:
+#   sudo apt install ros-humble-rclpy ros-humble-sensor-msgs
+#   sudo apt install ros-humble-cv-bridge python3-colcon-common-extensions
+# Python 의존성:
+opencv-python>=4.8.0
+numpy>=1.24.0

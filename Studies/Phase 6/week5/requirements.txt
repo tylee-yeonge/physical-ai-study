@@ -1,0 +1,4 @@
+numpy>=1.24.0
+# PyKDL 또는 robotics-toolbox-python (FK 계산)
+# pip install pykdl
+# 또는 sudo apt install ros-humble-orocos-kdl

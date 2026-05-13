@@ -1,88 +1,150 @@
 """
-Quiz Medium - Week 5: MMDetection3D 실습 (Section 6.2)
-3문제 - 심화 이해
+Phase 4 Week 5 - OpenX-Embodiment + Fine-tuning 중급 퀴즈
 """
 
 
-def problem1_fcos3d_multitask():
-    print("\n" + "━" * 28)
-    print("문제 1: FCOS3D Multi-task Learning")
-    print("━" * 28 + "\n")
+def problem1_step_count_estimation():
+    """
+    문제 1: 자작 팔 데이터 수집 계획의 step 수 추정
 
-    print("Q: FCOS3D는 하나의 네트워크에서 여러 Task를 동시에 예측합니다.")
-    print("   아래 표를 완성하고, 각 Task의 Loss 가중치가 성능에 미치는")
-    print("   영향을 설명하세요.\n")
-    print("   ┌─────────────────┬────────────────┬──────────────┐")
-    print("   │ Task            │ 예측값          │ Loss 종류    │")
-    print("   ├─────────────────┼────────────────┼──────────────┤")
-    print("   │ Classification  │ _____          │ _____        │")
-    print("   │ 2D Offset       │ _____          │ _____        │")
-    print("   │ Depth           │ _____          │ _____        │")
-    print("   │ Size            │ _____          │ _____        │")
-    print("   │ Rotation        │ _____          │ _____        │")
-    print("   └─────────────────┴────────────────┴──────────────┘")
+    Phase 7 의 산출물 #4 fine-tune 을 위한 데이터 수집 계획:
+      - 3 종류 task (pick-and-place, stacking, push)
+      - 각 task 당 80 demonstrations
+      - 평균 episode 길이 50 step (10초 at 5Hz)
+
+    이때:
+      (a) 총 episode 수: ?
+      (b) 총 step 수: ?
+      (c) RTX 4090 1대 가정 시 LoRA 학습 시간 (1 step ~ 1.5초 가정):  ?
+
+    TODO: 각 값을 계산.
+    """
+    print("\n" + "=" * 60)
+    print("문제 1: 자작 팔 데이터 수집 + 학습 시간 추정")
+    print("=" * 60 + "\n")
+
+    n_tasks = 3
+    demos_per_task = 80
+    steps_per_episode = 50
+    sec_per_step = 1.5  # GPU 학습 시 1 step (forward+backward) 의 시간
+
+    # TODO
+    total_episodes = 0
+    total_steps = 0
+    train_time_hours = 0.0
+
+    expected_episodes = n_tasks * demos_per_task
+    expected_steps = expected_episodes * steps_per_episode
+    expected_time = expected_steps * sec_per_step / 3600
+
+    print(f"  당신의 답:")
+    print(f"    (a) total_episodes : {total_episodes}  (기대: {expected_episodes})")
+    print(f"    (b) total_steps    : {total_steps}    (기대: {expected_steps})")
+    print(f"    (c) train_time_hr  : {train_time_hours:.2f} (기대: {expected_time:.2f})")
+
+    if total_episodes == expected_episodes and total_steps == expected_steps:
+        if abs(train_time_hours - expected_time) < 0.1:
+            print("\n  [O] 정답!")
+            return
+    print("\n  [X] 다시 계산해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
+
+
+def problem2_lora_memory_budget():
+    """
+    문제 2: LoRA 학습 시 GPU 메모리 budget 분석
+
+    RTX 4070 12GB 에서 OpenVLA 7B + LoRA 학습 가능?
+    아래 항목 별 메모리 추정값을 채우시오.
+
+      - base model (int4)        : ? GB (7B * 0.5 byte * 1.2 overhead)
+      - LoRA weights (fp16, ~70M) : ? GB
+      - activation (batch=1)      : ~4 GB
+      - gradient (LoRA, fp16)     : ~0.2 GB
+      - optimizer state (Adam, ~3x of grad) : ?
+      - buffer + KV cache        : ~1 GB
+
+    TODO: 각 GB 값을 채우고 12GB 에 fit 하는지 판단.
+    """
+    print("\n" + "=" * 60)
+    print("문제 2: LoRA 학습 시 GPU memory budget")
+    print("=" * 60 + "\n")
+
+    # TODO
+    base_int4 = 0.0   # 7e9 * 0.5 / 1e9 * 1.2
+    lora_fp16 = 0.0   # 70e6 * 2 / 1e9
+    activation = 4.0
+    gradient = 0.2
+    optimizer = 0.0   # ~ 3 * gradient
+    buffer = 1.0
+
+    total = base_int4 + lora_fp16 + activation + gradient + optimizer + buffer
+    fits = total < 12.0
+
+    expected_base = 7e9 * 0.5 * 1.2 / 1e9
+    expected_lora = 70e6 * 2 / 1e9
+    expected_opt = 3 * gradient
+    expected_total = expected_base + expected_lora + activation + gradient + expected_opt + buffer
+
+    print(f"  당신의 추정 (GB):")
+    print(f"    base (int4)  : {base_int4:.2f}  (기대 ~ {expected_base:.2f})")
+    print(f"    LoRA (fp16)  : {lora_fp16:.2f}  (기대 ~ {expected_lora:.2f})")
+    print(f"    activation   : {activation:.2f}")
+    print(f"    gradient     : {gradient:.2f}")
+    print(f"    optimizer    : {optimizer:.2f}  (기대 ~ {expected_opt:.2f})")
+    print(f"    buffer       : {buffer:.2f}")
+    print(f"    ---")
+    print(f"    total        : {total:.2f}  (기대 ~ {expected_total:.2f})")
     print()
-    print("   Loss 가중치의 영향: _____\n")
+    print(f"  RTX 4070 12GB fit?  {fits}  (기대: True)")
 
 
-def problem2_ap3d_vs_ap2d():
-    print("\n" + "━" * 28)
-    print("문제 2: AP3D vs AP2D 성능 격차 분석")
-    print("━" * 28 + "\n")
+def problem3_finetune_strategy():
+    """
+    문제 3: 자작 팔 fine-tune 전략 결정
 
-    print("Q: 한 Monocular 3D Detection 모델의 평가 결과가 다음과 같습니다.\n")
-    print("   Car (Moderate 기준):")
-    print("     AP2D (IoU 0.7): 85.2%")
-    print("     AP3D (IoU 0.7): 13.8%\n")
-    print("   AP2D와 AP3D의 격차가 이렇게 큰 이유를 분석하고,")
-    print("   AP3D를 높이기 위해 가장 먼저 개선해야 할 부분은 무엇인지")
-    print("   설명하세요.\n")
-    print("   격차 원인: _____")
-    print("   개선 방향: _____\n")
+    자작 6DOF 팔에 OpenVLA 를 적응시키려 한다.
+    아래 시나리오에서 가장 좋은 전략은?
 
+    상황:
+      - 자작 팔 demonstrations: 240 episodes (3 task × 80)
+      - GPU: RTX 4070 12GB
+      - 가용 시간: 약 5 ~ 10 시간
+      - 목표: pick-and-place success rate > 70%
 
-def problem3_config_debug():
-    print("\n" + "━" * 28)
-    print("문제 3: Config 디버깅")
-    print("━" * 28 + "\n")
+    선택지:
+    A) Full 7B fine-tune (모든 파라미터 학습)
+    B) LoRA fine-tune (rank=32, attention + FFN target)
+    C) Vision encoder 만 학습
+    D) 무 fine-tune, zero-shot inference
 
-    print("Q: 아래 MMDetection3D config에서 문제점을 3가지 이상 찾고")
-    print("   수정하세요.\n")
-    print("   _base_ = [")
-    print("       '../_base_/datasets/nuscenes-mono3d.py',  # 문제 1?")
-    print("       '../_base_/models/fcos3d.py',")
-    print("   ]")
+    답: 'A'/'B'/'C'/'D' 중 하나 채우고 이유를 설명.
+    """
+    print("\n" + "=" * 60)
+    print("문제 3: Fine-tune 전략 결정")
+    print("=" * 60 + "\n")
+
+    # TODO
+    answer = ""
+    reasoning = ""
+
+    expected = "B"
+
+    print(f"  당신의 답 : {answer}")
+    print(f"  당신의 이유: {reasoning}")
     print()
-    print("   model = dict(")
-    print("       backbone=dict(type='ResNet', depth=101),")
-    print("       bbox_head=dict(num_classes=10),           # 문제 2?")
-    print("   )")
-    print()
-    print("   data = dict(")
-    print("       samples_per_gpu=16,                       # 문제 3?")
-    print("       workers_per_gpu=8,")
-    print("   )")
-    print()
-    print("   optimizer = dict(type='SGD', lr=0.1)          # 문제 4?")
-    print()
-    print("   (힌트: KITTI 데이터셋으로 학습할 때를 기준으로 생각하세요)")
-    print()
-    print("   문제점과 수정: _____\n")
+    print(f"  기대 답  : {expected}")
 
-
-def main():
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    print("Week 5 Quiz - Medium (MMDetection3D 실습)")
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-
-    problem1_fcos3d_multitask()
-    problem2_ap3d_vs_ap2d()
-    problem3_config_debug()
-
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    print("정답은 quiz_solutions/medium_sol.py 참고")
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    if answer == expected:
+        print("\n  [O] 정답!")
+    else:
+        print("\n  [X] 다시 생각해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
 
 
 if __name__ == "__main__":
-    main()
+    print("=" * 60)
+    print("  Phase 4 Week 5 Quiz - Medium")
+    print("=" * 60)
+    problem1_step_count_estimation()
+    problem2_lora_memory_budget()
+    problem3_finetune_strategy()
+    print("\n" + "=" * 60)

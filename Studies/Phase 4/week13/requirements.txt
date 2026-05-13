@@ -1,0 +1,3 @@
+# 이번 주는 글쓰기 + 퇴고 주차. 코드 의존성 거의 없음.
+# Mermaid CLI 권장:
+#   npm install -g @mermaid-js/mermaid-cli

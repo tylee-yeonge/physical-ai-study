@@ -1,594 +1,222 @@
-# Week 9: BEVFormer 이해 - 카메라로 Bird's Eye View 만들기
+# Week 9: Inference 입출력 인터페이스 정리 + ROS2 msg 매핑
 
-> [goal] **이번 주 목표**: BEVFormer의 전체 구조를 이해하고, Spatial Cross-Attention과 Temporal Self-Attention의 원리를 파악한다.
-> [time] **예상 시간**: 12-15시간
-> [tip] **핵심 질문**: "Multi-view 카메라 이미지로부터 어떻게 Bird's Eye View 표현을 생성하고, 시간 정보를 활용하는가?"
+> [goal] **이번 주 목표**: OpenVLA inference 의 입출력을 ROS2 msg 와 명확히 매핑한 spec 1 페이지를 산출. week 10 의 ROS2 패키지 골격 작성의 진입 spec.
+> [time] **예상 시간**: 8시간 (spec 설계 3h + msg 변환 코드 3h + 검증 2h)
+> [tip] **핵심 질문**: "내 VLA 노드는 어떤 topic 을 subscribe 하고 어떤 topic 을 publish 하는가? 각 msg 의 frame_id / timestamp / 좌표계는?"
 
 ---
 
 ## [list] 학습 순서
 
-| 순서 | 단계 | 파일 | 설명 |
-|:----:|------|------|------|
-| 1 | 환경 설정 | `requirements.txt` | `pip install -r requirements.txt` |
-| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 3 | Python 퀴즈 (초급) | `quiz_easy.py` | BEV Query 커버 범위, Spatial/Temporal Attention |
-| 4 | Python 퀴즈 (중급) | `quiz_medium.py` | BEV Query 파라미터 수 계산, Reference Point 투영 코드 실습 |
-| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | BEVFormer 논문 분석, Attention 메커니즘 구현 실습 |
+| 순서 | 단계 | 파일/자료 | 설명 |
+|:----:|------|----------|------|
+| 1 | spec 1 페이지 작성 | `PRACTICE.md` 1 | input topic / output topic / 좌표계 |
+| 2 | msg 타입 결정 | `PRACTICE.md` 2 | sensor_msgs vs custom |
+| 3 | image -> PIL 변환 | `PRACTICE.md` 3 | cv_bridge 사용 |
+| 4 | action -> Twist 변환 | `PRACTICE.md` 4 | 7-DoF -> geometry_msgs/Twist + gripper |
+| 5 | 퀴즈 | quiz_easy / quiz_medium | msg 변환 / 좌표계 |
 
 ---
 
-## [*] 시작하기 전에
+## [*] 시작하기 전에 — ROS2 토픽 설계의 원칙
 
-### Week 8에서 배운 것
+본 phase 의 ROS2 minimal demo 의 토픽 구조 (Roadmap Phase 4.md):
 
-**BEV 개념 복습:**
 ```
-Side View (Camera):       BEV (Top-down):
-    |  [car] |                  +---------+
-    |     |                  |    ^    |
-    +-----+   ⇒              |    |    |
-  Road                       |  [car]    |
-                             +---------+
-```
+Input topics:
+  /camera/image_raw          (sensor_msgs/Image)
+  /vla/instruction          (std_msgs/String)
 
-**BEV 생성 방법 분류:**
-```
-1. IPM (Inverse Perspective Mapping)
-   → 단순 기하 변환, 평면 가정 필요
-
-2. MLP 기반 (Lift-Splat-Shoot)
-   → 학습으로 Camera → BEV, Depth 예측 필요
-
-3. Transformer 기반 (BEVFormer) ← 이번 주!
-   → Query 기반, Attention으로 BEV 생성
-   → 현재 SOTA 방법론
+Output topics:
+  /vla/action                (geometry_msgs/Twist 또는 custom)
 ```
 
-**이번 주 핵심:**
-```
-BEVFormer는 "Transformer의 Attention 메커니즘"을 활용하여
-Multi-view 카메라 이미지에서 BEV 표현을 생성하는 모델이다.
-
-기존 방법 대비 장점:
-  - Depth 명시적 예측 불필요
-  - Temporal 정보 자연스럽게 활용
-  - End-to-end 학습 가능
-```
+이게 본 phase 의 spec. 본 주가 이를 정밀하게 다듬는다.
 
 ---
 
-## [ref] 핵심 개념 자세히 알아보기
+## [ref] 핵심 개념
 
-### 1. BEVFormer 전체 구조
+### 1. ROS2 msg 타입 결정 trade-off
 
-#### 파이프라인 개요
+| 옵션 | 장점 | 단점 |
+|---|---|---|
+| `sensor_msgs/Image` | 표준, 모든 ROS 도구 호환 | image 변환 (cv_bridge) 필요 |
+| `geometry_msgs/Twist` | 표준, 6-DoF velocity | gripper 별도 처리 필요 |
+| custom msg `vla_msgs/Action` | 7-DoF + metadata 한 번에 | custom package 빌드 필요 |
 
-```
-+-----------------------------------------------------------+
-|                    BEVFormer Pipeline                      |
-|                                                           |
-|  Multi-view Images (6대 카메라)                            |
-|       ↓                                                   |
-|  Backbone (ResNet-101 / VoVNet)                           |
-|       ↓                                                   |
-|  FPN (Feature Pyramid Network)                            |
-|       ↓                                                   |
-|  Multi-scale Image Features                               |
-|       ↓                                                   |
-|  +-------------------------------------------------+      |
-|  |          BEV Encoder (6 layers)                 |      |
-|  |                                                 |      |
-|  |  BEV Queries (200×200)                         |      |
-|  |       ↓                                         |      |
-|  |  Temporal Self-Attention ← 이전 프레임 BEV      |      |
-|  |       ↓                                         |      |
-|  |  Spatial Cross-Attention ← Image Features       |      |
-|  |       ↓                                         |      |
-|  |  Feed Forward Network                           |      |
-|  |                                                 |      |
-|  +-------------------------------------------------+      |
-|       ↓                                                   |
-|  BEV Feature Map (200×200×256)                            |
-|       ↓                                                   |
-|  Detection Head (3D bbox + Velocity)                      |
-|       ↓                                                   |
-|  Output: [x, y, z, l, w, h, θ, vx, vy]                  |
-+-----------------------------------------------------------+
-```
+본 phase 권장: minimal demo 단계에서는 **표준 msg**:
+- `sensor_msgs/Image`
+- `geometry_msgs/Twist` (linear, angular) + `std_msgs/Float64` (gripper)
+- 또는 `geometry_msgs/PoseStamped` 로 absolute pose 출력
 
-#### 논문 정보
+Phase 7 의 산출물 #4 에서 custom msg 로 전환 권장:
 
 ```
-"BEVFormer: Learning Bird's-Eye-View Representation
- from Multi-Camera Images via Spatiotemporal Transformers"
-
-저자: Zhiqi Li et al.
-학회: ECCV 2022
-핵심 기여:
-  1. Spatiotemporal Transformer로 BEV 생성
-  2. 시간 정보를 활용한 3D Detection
-  3. nuScenes SOTA 달성 (발표 시점)
+# vla_msgs/msg/Action.msg
+std_msgs/Header header
+float64[7] action       # [dx, dy, dz, rx, ry, rz, gripper]
+string instruction
+float64 latency_ms       # 측정 latency
 ```
 
----
+### 2. 좌표계 (frame_id) 설계
 
-### 2. BEV Queries - 학습 가능한 BEV 그리드
+| 좌표계 | 의미 | 본 phase 에서 |
+|---|---|---|
+| `base_link` | robot base | action 의 origin |
+| `tool0` 또는 `ee_link` | end-effector | OpenVLA action 이 측정되는 곳 |
+| `camera_link` | 카메라 | image 의 frame_id |
 
-#### BEV Query란?
-
-```
-BEV Queries:
-  - 형태: H_bev × W_bev × C = 200 × 200 × 256
-  - 물리적 의미: BEV 공간의 각 셀을 대표하는 벡터
-  - 셀 크기: 0.5m × 0.5m
-  - 커버 범위: 100m × 100m (200 × 0.5m)
-  - 종류: Learnable Embedding (학습으로 최적화)
-
-+-----------------------------------------+
-|  BEV Query Grid (200 × 200)             |
-|                                         |
-|  +---+---+---+---+- - -+---+           |
-|  |q₀₀|q₀₁|q₀₂|q₀₃|     |q₀,₁₉₉|      |
-|  +---+---+---+---+     +---+           |
-|  |q₁₀|q₁₁|   |   |     |   |           |
-|  +---+---+   |   |     |   |           |
-|  |   |   |   |   |     |   |           |
-|  |   |   |   |   |     |   |           |
-|  +---+---+---+---+     +---+           |
-|  |q₁₉₉,₀|  |   |     |q₁₉₉,₁₉₉|     |
-|  +---+---+---+---+- - -+---+           |
-|                                         |
-|  각 qᵢⱼ ∈ ℝ²⁵⁶ (256차원 벡터)          |
-|  각 셀 = 0.5m × 0.5m 물리 공간          |
-+-----------------------------------------+
-```
-
-#### BEV Query의 직관적 이해
+OpenVLA action 은 **end-effector 좌표계의 delta** 가 표준. tf 로 변환:
 
 ```
-비유: "질문하는 그리드"
-
-각 BEV Query는 다음과 같은 질문을 한다:
-  "나는 BEV 공간의 (i, j) 위치를 담당하는데,
-   6대 카메라 이미지 중 어디를 봐야
-   나의 위치에 무엇이 있는지 알 수 있을까?"
-
-→ 이 질문에 대한 답을 Spatial Cross-Attention이 해준다!
+action (ee frame) -> 자신의 좌표계 (base_link) -> joint command
 ```
 
-#### 구현 관점
+### 3. cv_bridge 사용
+
+ROS2 의 `sensor_msgs/Image` <-> OpenCV `np.ndarray` 변환:
 
 ```python
-# BEV Queries 초기화 (학습 파라미터)
-import torch
-import torch.nn as nn
+from cv_bridge import CvBridge
 
-class BEVFormerEncoder(nn.Module):
-    def __init__(self, bev_h=200, bev_w=200, embed_dim=256):
-        super().__init__()
-        # Learnable BEV Queries
-        self.bev_queries = nn.Embedding(bev_h * bev_w, embed_dim)
-        # 각 query의 BEV 공간 위치 인코딩
-        self.bev_pos = nn.Embedding(bev_h * bev_w, embed_dim)
+bridge = CvBridge()
 
-    def forward(self):
-        bev_q = self.bev_queries.weight  # [40000, 256]
-        bev_p = self.bev_pos.weight      # [40000, 256]
-        return bev_q + bev_p
+# 수신: ROS msg -> OpenCV BGR
+img_bgr = bridge.imgmsg_to_cv2(image_msg, desired_encoding='bgr8')
+
+# 송신: OpenCV BGR -> ROS msg
+image_msg = bridge.cv2_to_imgmsg(img_bgr, encoding='bgr8')
 ```
+
+> [tip] OpenVLA 는 RGB 입력이므로 추가로 BGR -> RGB 변환 필요 (week 8 의 preprocess).
+
+### 4. Timestamp / Synchronization
+
+`header.stamp` 의 정확성이 양산에서 매우 중요:
+
+- **subscribe 한 image** 의 timestamp = inference 시작 시점
+- **publish 한 action** 의 timestamp = inference 완료 시점
+- 둘의 차이 = inference latency
+
+```python
+# subscribe callback
+def image_callback(self, msg):
+    t_recv = self.get_clock().now()
+    t_image = rclpy.time.Time.from_msg(msg.header.stamp)
+    age_ms = (t_recv - t_image).nanoseconds / 1e6
+    self.get_logger().info(f"Image age: {age_ms:.1f} ms")
+    # inference -> publish
+```
+
+### 5. 입출력 spec 1 페이지 (산출물 #2 의 일부)
+
+```
++------------------------+
+| /camera/image_raw      |  (sensor_msgs/Image, BGR8, 224x224 or 640x480)
+| /vla/instruction       |  (std_msgs/String)
++------------------------+
+            v
+     vla_node (subscribe)
+     - image age check
+     - preprocess (BGR->RGB)
+     - VLAInference.predict()
+     - validate output
+            |
+            v
++------------------------+
+| /vla/action            |  (geometry_msgs/Twist + gripper float)
+|   linear  x,y,z (m)    |  end-effector delta translation
+|   angular x,y,z (rad)  |  end-effector delta rotation
+| /vla/gripper           |  (std_msgs/Float64, 0~1)
+| /vla/latency_ms        |  (std_msgs/Float64)
++------------------------+
+            v
+     downstream:
+     - joint controller
+     - safety policy
+     - rerun visualization
+```
+
+### 6. QoS 설정
+
+ROS2 의 QoS (Quality of Service) 가 중요:
+
+| Topic | QoS | 이유 |
+|---|---|---|
+| /camera/image_raw | best_effort, depth 1 | drop 허용, 최신 image 만 |
+| /vla/action | reliable, depth 10 | 모든 action 보존, 순서 중요 |
+| /vla/instruction | transient_local, depth 1 | 한 번 보내면 latch (새 노드도 받음) |
+
+### 7. 노드 lifecycle
+
+ROS2 의 lifecycle node (선택):
+
+```
+configure() -> activate() -> running -> deactivate() -> cleanup()
+       |             |                       |              |
+   모델 로드      warm-up               topic 닫음       모델 unload
+```
+
+본 phase 의 minimal demo 는 lifecycle 안 써도 OK. Phase 7 의 결정타에서는 lifecycle 권장.
+
+### 8. 디버깅 toolchain
+
+| Tool | 용도 |
+|---|---|
+| `ros2 topic echo /vla/action` | action 직접 확인 |
+| `ros2 topic hz /camera/image_raw` | image rate |
+| `rqt_image_view` | image 시각화 |
+| `rerun.io` | 양쪽 + action 통합 시각화 (week 12) |
+| `ros2 bag record` | 시연 영상 데이터 보존 |
 
 ---
 
-### 3. Spatial Cross-Attention - 이미지를 BEV로 변환
+## [search] 자체 점검
 
-#### 핵심 아이디어
+**Q1. OpenVLA action 의 7-DoF 를 ROS2 msg 로 어떻게 publish 하는 게 표준?**
+> minimal demo: geometry_msgs/Twist (6-DoF, 좌표축 + rotation) + std_msgs/Float64 (gripper). 결정타 (Phase 7): custom vla_msgs/Action 로 한 번에.
 
-```
-문제: BEV Query가 이미지의 "어디"를 봐야 하는가?
+**Q2. image age 측정의 의미는?**
+> subscribe 받은 시점 - image header timestamp = image 가 카메라에서 노드까지 도달한 latency. 양산에서 30ms+ 면 통신 병목.
 
-해결: 3D Reference Points → 2D 투영
+**Q3. `cv_bridge` 의 BGR8 vs RGB8 차이는?**
+> ROS 의 image msg encoding 옵션. OpenCV 표준은 BGR8. RGB8 은 OpenVLA 입력 호환. 변환 안 하면 색 정보 swap.
 
-Step 1: BEV Query (i, j) → 3D 공간 좌표 (x, y, z_ref) 매핑
-        z_ref = 미리 정한 높이 (예: [-5m, -3m, -1m, 1m])
+**Q4. QoS depth=1 best_effort 의 의미는?**
+> 메시지 큐 1개만 유지, 손실 허용. 최신 image 만 보고 처리할 때 적합 (image 가 자주 새로 옴, 옛날 image 는 무의미).
 
-Step 2: 3D 좌표를 각 카메라에 투영 → 2D 점 (u, v) 획득
-        [u, v, 1]^T = K × [R|t] × [x, y, z_ref, 1]^T
-
-Step 3: 투영된 (u, v) 위치의 Image Feature를 가져옴
-
-Step 4: Deformable Attention으로 주변 정보까지 수집
-```
-
-#### Reference Points 생성
-
-```
-BEV Query (i, j) 하나에 대해:
-
-              카메라 1    카메라 2    카메라 3
-z = 1m:    (u₁¹, v₁¹)  (u₁², v₁²)  (u₁³, v₁³)
-z = -1m:   (u₂¹, v₂¹)  (u₂², v₂²)  (u₂³, v₂³)
-z = -3m:   (u₃¹, v₃¹)  (u₃², v₃²)  (u₃³, v₃³)
-z = -5m:   (u₄¹, v₄¹)  (u₄², v₄²)  (u₄³, v₄³)
-
-→ 4개 높이 × 6대 카메라 = 24개 reference point
-→ 이 중 이미지 범위 내에 있는 점만 사용
-```
-
-#### Deformable Attention
-
-```
-기존 Attention:
-  모든 이미지 pixel에 대해 attention 계산
-  → 너무 비용이 큼! (O(N²))
-
-Deformable Attention:
-  Reference Point 주변 K개 점에 대해서만 attention
-  → 효율적! (O(K), K ≈ 4~8)
-
-+--------------------------------+
-|  Image Feature Map             |
-|                                |
-|           o  o                 |
-|         o  *  o               |
-|           o  o                 |
-|                                |
-|  * = Reference Point           |
-|  o = Learnable Offset Points  |
-|  (학습으로 최적 위치 결정)      |
-+--------------------------------+
-```
-
-#### 수식
-
-```
-SpatialCrossAttention(Q_p, F_cam):
-
-  1. reference_points = project(BEV_to_3D(p), cam_params)
-
-  2. for each camera c:
-       for each height z_ref:
-         ref_2d = project_3D_to_2D(x_p, y_p, z_ref, K_c, [R|t]_c)
-         if ref_2d in image_bounds:
-           feature = DeformAttn(Q_p, ref_2d, F_c)
-
-  3. output = weighted_sum(features)
-
-여기서:
-  Q_p: BEV Query at position p
-  F_cam: 각 카메라의 Feature Map
-  K_c: 카메라 c의 내부 파라미터
-  [R|t]_c: 카메라 c의 외부 파라미터
-```
-
----
-
-### 4. Temporal Self-Attention - 시간 정보 활용
-
-#### 왜 Temporal 정보가 중요한가?
-
-```
-문제 상황:
-
-Frame t:                      Frame t-1:
-+--------------+              +--------------+
-|    [car]        |              |  [car]          |
-|  (가려짐!)   |              | (잘 보임!)   |
-|    [truck]       |              |   [truck]         |
-+--------------+              +--------------+
-
-→ 현재 프레임에서 가려진 차량도
-  이전 프레임 정보로 검출 가능!
-
-추가 장점:
-  - 속도(Velocity) 추정 가능
-  - 움직이는 물체 추적 용이
-  - 검출 안정성 향상
-```
-
-#### Temporal Self-Attention 동작 방식
-
-```
-Step 1: 이전 프레임의 BEV Feature를 가져옴
-        B_{t-1} (200 × 200 × 256)
-
-Step 2: Ego-motion으로 좌표 정렬
-        B_{t-1}' = warp(B_{t-1}, ego_motion_{t-1→t})
-
-Step 3: 현재 BEV Query와 정렬된 이전 BEV를 합침
-        output = SelfAttention(Q_t, concat(Q_t, B_{t-1}'))
-
-+---------------------------------------------+
-|                                             |
-|  Q_t (현재 BEV Query)                       |
-|       ↓                                     |
-|  Self-Attention                             |
-|       ↑                                     |
-|  [Q_t, warp(B_{t-1})] (concat)             |
-|                                             |
-|  warp: ego-motion으로 좌표 정렬              |
-|    - 차량이 앞으로 1m 이동했으면              |
-|    - 이전 BEV를 1m 만큼 shift               |
-|                                             |
-+---------------------------------------------+
-```
-
-#### Ego-motion 보상
-
-```
-왜 필요한가?
-
-t-1 시점:                 t 시점:
-  +---------+              +---------+
-  |  A       |              |         |
-  |    ego→  |              |    ego  |
-  |  B       |     →        |  A      |
-  +---------+              |  B      |
-                           +---------+
-
-ego-motion 없이 합치면 → A, B 위치가 어긋남!
-ego-motion으로 보정 후 합치면 → 정확한 정렬!
-
-보정 수식:
-  p_{t-1→t} = R_ego × p_{t-1} + t_ego
-  여기서 R_ego, t_ego = t-1에서 t로의 차량 이동
-```
-
----
-
-### 5. Detection Head - 최종 검출
-
-#### 출력 형식
-
-```
-BEV Feature (200 × 200 × 256)
-       ↓
-Detection Head (Deformable DETR 기반)
-       ↓
-예측 결과:
-  - 3D Bounding Box: [x, y, z, l, w, h, θ]
-  - 속도 (Velocity): [vx, vy]
-  - 클래스: Car, Truck, Pedestrian, ... (10 classes)
-  - 신뢰도: confidence score
-
-nuScenes 기준 출력:
-  [cx, cy, cz, w, l, h, rot, vx, vy, class, score]
-```
-
-#### Detection Head 구조
-
-```
-+---------------------------------------+
-|  Detection Head (DETR style)          |
-|                                       |
-|  Object Queries (900개)               |
-|       ↓                               |
-|  Decoder (6 layers)                   |
-|       ↓                               |
-|  +-- Classification Head → 클래스     |
-|  +-- Regression Head → 3D bbox       |
-|  +-- Velocity Head → vx, vy         |
-|                                       |
-|  Loss:                                |
-|  - Classification: Focal Loss        |
-|  - Regression: L1 Loss               |
-|  - Hungarian Matching (GT 매칭)      |
-+---------------------------------------+
-```
-
----
-
-### 6. 논문 핵심 Figure 분석
-
-#### Figure 2: 전체 아키텍처
-
-```
-논문 Figure 2에서 확인할 것:
-
-1. 입력: 6대 카메라 이미지 (FRONT, FRONT_LEFT, FRONT_RIGHT,
-         BACK, BACK_LEFT, BACK_RIGHT)
-
-2. Backbone → FPN → Multi-scale Features
-   - 보통 4개 스케일 (1/8, 1/16, 1/32, 1/64)
-
-3. BEV Encoder:
-   - BEV Queries가 핵심
-   - Temporal + Spatial Attention 순서 확인
-   - 6개 Layer 반복
-
-4. Detection Head:
-   - DETR 스타일의 Object Query + Decoder
-```
-
-#### Figure 3: Spatial Cross-Attention 상세
-
-```
-논문 Figure 3에서 확인할 것:
-
-1. BEV Query 하나가 여러 높이의 Reference Point 생성
-2. 각 Reference Point를 6대 카메라에 투영
-3. 투영된 위치에서 Deformable Attention 수행
-4. 결과를 가중합하여 BEV Feature 업데이트
-
-핵심 수식:
-  SCA(z_p, {F_t^i}_{i=1}^{N_cam}) =
-    1/|V_hit| Σ_{i∈V_hit} DeformAttn(z_p, P(p, i, j), F_t^i)
-
-  V_hit: reference point가 이미지 범위 안에 있는 카메라 집합
-```
-
----
-
-### 7. Ablation Study 분석
-
-#### 주요 Ablation 결과
-
-```
-표: BEVFormer Ablation Study (nuScenes val set)
-
-| 설정                          | NDS   | mAP   |
-|-------------------------------|-------|-------|
-| Baseline (Spatial만)          | 0.478 | 0.370 |
-| + Temporal (1 frame)          | 0.502 | 0.396 |
-| + Temporal (4 frames)         | 0.517 | 0.416 |
-| + Multi-scale Features        | 0.525 | 0.423 |
-| BEVFormer-Base (최종)          | 0.517 | 0.416 |
-
-핵심 관찰:
-  1. Temporal Attention → NDS +2.4% 향상 (가장 큰 기여)
-  2. Multi-frame 사용 시 추가 향상
-  3. Spatial Cross-Attention 자체가 이미 강력
-
-왜 Temporal이 효과적인가?
-  - 가려진 객체 복구
-  - 속도 추정 정확도 향상
-  - 검출 일관성 증가
-```
-
-#### BEV Resolution의 영향
-
-```
-| BEV 해상도    | 셀 크기  | NDS   | FPS  |
-|--------------|---------|-------|------|
-| 50 × 50      | 2.0m    | 0.451 | 5.2  |
-| 100 × 100    | 1.0m    | 0.489 | 3.8  |
-| 200 × 200    | 0.5m    | 0.517 | 1.7  |
-
-→ 해상도 높을수록 성능 UP, 속도 DOWN
-→ 200×200이 성능/속도 균형점
-```
-
----
-
-### 8. BEVFormer vs 다른 BEV 방법론 비교
-
-```
-+--------------+------------+--------------+------------+
-| 방법          | BEV 생성    | Temporal     | NDS        |
-+--------------+------------+--------------+------------+
-| DETR3D       | Query→3D   | [x]           | 0.412      |
-| PETR         | 3D PE      | [x]           | 0.455      |
-| BEVDet       | Lift-Splat | [x]           | 0.392      |
-| BEVFormer    | Query+Attn | [v]           | 0.517      |
-| BEVFormer v2 | 개선 버전   | [v]           | 0.556      |
-+--------------+------------+--------------+------------+
-
-BEVFormer의 핵심 차별점:
-  1. Explicit Depth 예측 불필요 (vs BEVDet)
-  2. Temporal 정보 활용 (vs DETR3D, PETR)
-  3. Deformable Attention으로 효율적 (vs naive Attention)
-```
-
----
-
-## [tip] 꼭 이해해야 할 핵심 개념
-
-### 1. BEV Query의 역할
-
-```
-BEV Query = "BEV 공간을 대표하는 학습 가능한 벡터"
-
-일반 Transformer:
-  - NLP: 단어 → Query
-  - ViT: 이미지 패치 → Query
-
-BEVFormer:
-  - BEV 그리드 셀 → Query
-  - 각 Query가 "내 위치에 뭐가 있어?" 라고 질문
-  - Image Feature에서 답을 가져옴 (Cross-Attention)
-```
-
-### 2. Spatial Cross-Attention의 핵심
-
-```
-핵심: "어디를 봐야 하는지" 를 기하학으로 결정
-
-3D Reference Points → Camera Projection → 2D Points
-→ 해당 위치의 Feature를 가져옴
-
-이것이 가능한 이유:
-  - 카메라 내부/외부 파라미터를 알고 있음
-  - BEV Query의 3D 위치를 알고 있음
-  → 정확한 투영이 가능!
-```
-
-### 3. Temporal Self-Attention의 원리
-
-```
-핵심: "이전 프레임의 BEV를 현재에 활용"
-
-1. 이전 BEV Feature를 ego-motion으로 정렬
-2. 현재 BEV Query와 concat
-3. Self-Attention으로 필요한 정보 선택
-
-→ 가려진 객체, 속도 추정에 큰 도움
-```
-
-### 4. Deformable Attention이 필요한 이유
-
-```
-일반 Cross-Attention:
-  Query × 모든 Image pixel = O(H×W×N_cam) → 너무 느림!
-
-Deformable Cross-Attention:
-  Query × K개 학습된 offset 점 = O(K) → 빠름!
-
-K = 4~8: Reference Point 주변에서 가장 유용한 점을 학습
-→ 정확도 유지 + 속도 대폭 향상
-```
-
----
-
-## [search] 자체 점검 - 이해했는지 확인!
-
-**Q1. BEV Queries의 크기가 200x200이고 셀 크기가 0.5m일 때, 커버하는 실제 범위는?**
-
-> 200 x 0.5m = 100m, 즉 차량 중심으로 100m x 100m 영역을 커버한다. 이는 nuScenes 데이터셋의 검출 범위(50m 반경)와 일치하며, 도로 위 대부분의 객체를 포함하기에 충분한 범위이다.
-
-**Q2. Spatial Cross-Attention에서 Reference Point를 여러 높이(z)로 만드는 이유는?**
-
-> BEV 공간은 X-Y 평면이므로 높이 정보가 없다. 하지만 실제 3D 공간에서 객체는 다양한 높이에 있을 수 있다 (도로면의 차량 vs 교통 표지판). 여러 높이에 Reference Point를 만들어 각각을 카메라에 투영하면, 다양한 높이의 정보를 모두 수집할 수 있다. 네트워크가 학습을 통해 각 높이의 중요도를 결정한다.
-
-**Q3. Temporal Self-Attention에서 ego-motion 보상이 없으면 어떤 문제가 발생하는가?**
-
-> 차량이 이동하면 동일한 BEV 위치가 다른 실세계 좌표를 가리키게 된다. ego-motion 보상 없이 이전 프레임의 BEV Feature를 합치면, 정적 객체의 위치가 어긋나고 (이중으로 보임), 속도 추정이 부정확해진다. ego-motion으로 이전 BEV를 현재 좌표계에 맞춰 정렬해야 올바른 시간 정보 융합이 가능하다.
-
-**Q4. BEVFormer가 BEVDet(Lift-Splat-Shoot 기반)보다 Depth 추정에 유리한 이유는?**
-
-> BEVDet는 각 픽셀에 대해 명시적으로 Depth를 예측해야 하며, 이 Depth 예측의 정확도가 전체 성능에 직접적인 영향을 미친다. 반면 BEVFormer는 Attention 메커니즘으로 암묵적으로(implicitly) 3D 정보를 학습하므로, 명시적 Depth 예측의 오류에 덜 민감하다. 카메라 파라미터를 통한 기하학적 투영으로 Reference Point를 생성하고, Deformable Attention이 적절한 Feature를 선택한다.
+**Q5. inference latency 를 measure 하는 가장 정확한 방법은?**
+> image header.stamp - action header.stamp. ROS2 의 모든 timestamp 가 ROS time 으로 일치. clock skew 영향 없음.
 
 ---
 
 ## [note] 이번 주 실습 & 다음 주 준비
 
 ### 이번 주 실습 과제
+1. spec 1 페이지 작성 (`vla_io_spec.md`)
+2. `practice_msg_conversion.py` - msg <-> Python 변환 코드
+3. cv_bridge 사용법 익히기
+4. timestamp 측정 시뮬레이션
+5. quiz_easy / quiz_medium
 
-1. **논문 정독**: BEVFormer 논문 (ECCV 2022) 읽기, Figure 2와 3에 집중
-2. **BEV Query 구현 실습**: PRACTICE.md의 코드를 따라 BEV Query와 Reference Point 생성 실습
-3. **Spatial Cross-Attention 이해**: 3D → 2D 투영 과정을 코드로 구현
-4. **Temporal Self-Attention 이해**: ego-motion 보상 과정 시각화
-5. **Ablation Study 분석**: 논문의 Table 결과를 자신의 말로 정리
-6. **비교 분석**: BEVFormer vs BEVDet vs DETR3D 장단점 정리
-
-### 다음 주 준비
-
-- BEVFormer GitHub 저장소 클론: `git clone https://github.com/fundamentalvision/BEVFormer.git`
-- MMDetection3D 환경 설정 확인
-- nuScenes Mini 데이터셋 다운로드 (아직 안 했다면)
-- Pretrained weight 다운로드 (용량이 크므로 미리)
+### 다음 주 (week 10) 준비
+- ROS2 Humble 또는 Iron 환경 점검 (`ros2 doctor`)
+- `vla_node` 패키지 디렉토리 구조 미리 계획
 
 ---
 
 ## [goal] 이번 주 핵심 요약
 
-1. **BEVFormer**는 Transformer 기반으로 Multi-view 이미지에서 BEV 표현을 생성하는 모델이며, ECCV 2022에서 발표되었다.
-2. **BEV Queries**는 200x200 그리드의 learnable embedding으로, BEV 공간의 각 셀을 대표하며 0.5m 해상도로 100m x 100m 영역을 커버한다.
-3. **Spatial Cross-Attention**은 BEV Query에서 3D Reference Point를 생성하고, 카메라에 투영하여 Image Feature를 가져오는 메커니즘이다.
-4. **Temporal Self-Attention**은 이전 프레임의 BEV Feature를 ego-motion으로 정렬한 후 현재 정보와 합쳐, 가려진 객체 검출과 속도 추정을 돕는다.
-5. **Deformable Attention**을 사용하여 계산 효율을 높이면서도 정확한 Feature 추출이 가능하다.
+1. **표준 msg 우선**, custom msg 는 Phase 7 에서.
+2. **cv_bridge** 로 ROS Image <-> OpenCV 변환, 추가로 BGR -> RGB.
+3. **header.stamp** 가 모든 latency 측정의 근간.
+4. **QoS** image=best_effort, action=reliable.
+5. **spec 1 페이지** 가 week 10 의 진입 input.
 
 ---
 
-[O] 이전: [Week 8 - BEV 개념 이해](../week8/README.md)
+[O] 이전: [Week 8 - inference 안정화](../week8/README.md)
 
-다음: [Week 10 - BEVFormer 실습](../week10/README.md)
+다음: [Week 10 - ROS2 패키지 골격](../week10/README.md)

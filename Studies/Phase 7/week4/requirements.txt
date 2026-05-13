@@ -1,0 +1,2 @@
+# 시스템: rclcpp / C++ 빌드 환경
+# sudo apt install ros-humble-rclcpp ros-humble-sensor-msgs

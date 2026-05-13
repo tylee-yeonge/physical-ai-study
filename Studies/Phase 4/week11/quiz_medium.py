@@ -1,182 +1,130 @@
 """
-Phase 6 Week 11 - 코드 및 문서 정리 중급 퀴즈
-코드를 직접 실행하고 결과를 확인하세요.
+Phase 4 Week 11 - 중급 퀴즈
 """
-import ast
-import os
 
 
-def problem1_refactoring():
+def problem1_compute_throughput():
     """
-    문제 1: 코드 리팩토링
+    문제 1: dry-run 결과 분석
 
-    아래 코드에는 여러 가지 코드 품질 문제가 있다.
-    문제점을 식별하고, 개선된 코드를 작성하시오.
+    1분 dry-run 결과:
+      - inference 총 횟수: 280
+      - mean latency: 175 ms
+      - p95 latency:  240 ms
+      - 0 fail
 
-    문제점:
-    1. 함수 이름이 불명확하다
-    2. 매직 넘버가 사용되었다
-    3. docstring이 없다
-    4. type hint가 없다
-    5. 한 함수에서 너무 많은 일을 한다
+    질문:
+      (a) actual throughput (Hz)?
+      (b) 기대 throughput (1000/mean)?
+      (c) 두 차이의 원인 한 가지?
 
-    TODO: 아래 bad_code의 문제점을 3가지 이상 나열하시오.
+    TODO 채우기.
     """
-    print("\n" + "━" * 36)
-    print("문제 1: 코드 리팩토링")
-    print("━" * 36 + "\n")
+    print("\n" + "=" * 60)
+    print("문제 1: dry-run throughput 분석")
+    print("=" * 60 + "\n")
 
-    bad_code = '''
-def process(d, t):
-    r = []
-    for item in d:
-        if item[0] in ['Car', 'Pedestrian', 'Cyclist']:
-            x = float(item[11])
-            z = float(item[13])
-            dist = (x**2 + z**2)**0.5
-            if dist < 50:
-                r.append({'type': item[0], 'dist': dist})
-    if t == 1:
-        for obj in r:
-            print(f"{obj['type']}: {obj['dist']:.1f}m")
-    return r
-'''
+    n = 280
+    duration_s = 60
+    mean_ms = 175
 
-    print("  나쁜 코드:")
-    print(bad_code)
+    actual_hz = 0.0  # TODO
+    expected_hz = 0.0  # TODO
 
-    print("  문제점을 3가지 이상 나열하시오:")
-    print("  1. ___________")
-    print("  2. ___________")
-    print("  3. ___________")
+    expected_actual = n / duration_s
+    expected_expected = 1000 / mean_ms
+
+    print(f"  당신의 답:")
+    print(f"    (a) actual_hz   : {actual_hz:.2f} (기대: {expected_actual:.2f})")
+    print(f"    (b) expected_hz : {expected_hz:.2f} (기대: {expected_expected:.2f})")
+    print(f"    (c) 차이의 원인 : ?")
     print()
-
-    # 힌트
-    print("  힌트:")
-    print("  - 함수 이름 'process'가 의미하는 바는?")
-    print("  - 'd', 't', 'r' 같은 변수명은?")
-    print("  - 50이라는 숫자의 의미는?")
-    print("  - 한 함수에서 필터링과 출력을 모두 하고 있는가?")
-    print()
-    print("  정답은 quiz_solutions/medium_sol.py 참고")
+    print("  (c) 의 가능한 원인 (정답은 medium_sol.py):")
+    print("    - image 가 30Hz 로 들어오지만 inference 가 5~6Hz 라 image skip")
+    print("    - image_age_threshold 로 일부 skip")
+    print("    - instruction 없을 때 skip")
+    print("    - GPU 다른 일이 있어 잠시 느려짐")
 
 
-def problem2_docstring_writing():
+def problem2_design_status_msg():
     """
-    문제 2: Docstring 작성
+    문제 2: status topic 의 구체 설계
 
-    아래 함수의 docstring을 Google 스타일로 작성하시오.
+    /vla/status 토픽으로 노드의 현재 상태를 publish 하려고 한다.
 
-    함수 설명:
-    - KITTI 좌표계에서 3D 점을 2D 이미지에 투영
-    - P2 투영 행렬 사용
-    - 카메라 앞에 있는 점만 유효
+    아래 4 가지 상태에 대해 적절한 string 을 작성:
+      - 모델 로딩 중
+      - inference ready
+      - OOM 발생
+      - 모델 fail
 
-    TODO: docstring을 작성하시오 (Args, Returns, Examples 포함).
+    TODO statuses 채우기.
     """
-    print("\n" + "━" * 36)
-    print("문제 2: Docstring 작성")
-    print("━" * 36 + "\n")
+    print("\n" + "=" * 60)
+    print("문제 2: /vla/status 설계")
+    print("=" * 60 + "\n")
 
-    code = '''
-import numpy as np
+    # TODO
+    statuses = {
+        "loading": "",
+        "ready": "",
+        "oom": "",
+        "model_fail": "",
+    }
+    expected = {
+        "loading": "loading",
+        "ready": "ready",
+        "oom": "error: oom",
+        "model_fail": "error: model_load_failed",
+    }
+    for k, v in statuses.items():
+        mark = "[O]" if v == expected[k] else "[X]"
+        print(f"  {mark} {k}: '{v}'  (기대 예시: '{expected[k]}')")
 
-def project_to_2d(points_3d, P2):
+
+def problem3_failure_handling_table():
     """
-    TODO: 여기에 docstring을 작성하시오.
+    문제 3: 실패 시 노드 동작 매핑
 
-    Args:
-        points_3d: ???
-        P2: ???
+    아래 실패 종류에 대해 노드의 적절한 동작:
 
-    Returns:
-        ???
+      A) cv_bridge 변환 실패
+      B) image_age 초과
+      C) VLAOOMError
+      D) VLAOutputError (NaN)
+      E) VLAInputError
 
-    Examples:
-        ???
+    동작 옵션:
+      1) log + skip (action publish 안 함)
+      2) zero action publish + warning log
+      3) torch.cuda.empty_cache + log error
+      4) 노드 종료
+      5) instruction reset
+
+    TODO 매핑.
     """
-    N = points_3d.shape[0]
-    pts_homo = np.hstack([points_3d, np.ones((N, 1))])
-    projected = P2 @ pts_homo.T
-    projected = projected.T
-    valid = projected[:, 2] > 0
-    pts_2d = projected[:, :2] / projected[:, 2:3]
-    return pts_2d, valid
-'''
-    print("  함수 코드:")
-    print(code)
+    print("\n" + "=" * 60)
+    print("문제 3: 실패 시 동작 매핑")
+    print("=" * 60 + "\n")
 
-    print("  docstring을 작성해보세요. 포함해야 할 내용:")
-    print("  1. 함수 설명 (한 줄)")
-    print("  2. Args (각 인자의 shape과 설명)")
-    print("  3. Returns (반환값의 shape과 설명)")
-    print("  4. Examples (간단한 사용 예시)")
-    print()
-    print("  정답은 quiz_solutions/medium_sol.py 참고")
+    # TODO
+    mapping = {"A": 0, "B": 0, "C": 0, "D": 0, "E": 0}
 
-
-def problem3_project_structure():
-    """
-    문제 3: 프로젝트 구조 설계
-
-    아래 파일 목록을 체계적인 프로젝트 구조로 재배치하시오.
-
-    현재 파일:
-      train.py
-      test.py
-      kitti_loader.py
-      nuscenes_loader.py
-      fcos3d_model.py
-      bevformer_model.py
-      draw_3d_bbox.py
-      bev_viz.py
-      compute_ap3d.py
-      compute_nds.py
-      README.md
-      requirements.txt
-
-    TODO: 각 파일을 어느 디렉토리에 넣을지 결정하시오.
-    """
-    print("\n" + "━" * 36)
-    print("문제 3: 프로젝트 구조 설계")
-    print("━" * 36 + "\n")
-
-    files = [
-        'train.py', 'test.py',
-        'kitti_loader.py', 'nuscenes_loader.py',
-        'fcos3d_model.py', 'bevformer_model.py',
-        'draw_3d_bbox.py', 'bev_viz.py',
-        'compute_ap3d.py', 'compute_nds.py',
-        'README.md', 'requirements.txt',
-    ]
-
-    print("  재배치할 파일 목록:")
-    for f in files:
-        print(f"    {f}")
-
-    print()
-    print("  폴더 구조 예시:")
-    print("    project/")
-    print("    ├── src/")
-    print("    │   ├── models/       → ???")
-    print("    │   ├── datasets/     → ???")
-    print("    │   ├── evaluation/   → ???")
-    print("    │   └── visualization/→ ???")
-    print("    ├── scripts/          → ???")
-    print("    ├── README.md")
-    print("    └── requirements.txt")
-    print()
-    print("  각 파일을 어디에 넣을지 결정해보세요.")
-    print("  정답은 quiz_solutions/medium_sol.py 참고")
+    expected = {
+        "A": 1,  # cv_bridge 변환 실패 -> skip + log
+        "B": 1,  # image age 초과 -> skip
+        "C": 3,  # OOM -> empty_cache + log
+        "D": 2,  # NaN -> zero action + warning
+        "E": 1,  # input error -> skip + log
+    }
+    for k, v in mapping.items():
+        mark = "[O]" if v == expected[k] else "[X]"
+        print(f"  {mark} {k}: {v} (기대: {expected[k]})")
 
 
 if __name__ == "__main__":
-    print("━" * 40)
-    print("  Week 11 Quiz - Medium")
-    print("━" * 40)
-    problem1_refactoring()
-    problem2_docstring_writing()
-    problem3_project_structure()
-    print("\n" + "━" * 40)
-    print("정답은 quiz_solutions/medium_sol.py 참고")
-    print("━" * 40)
+    print("=" * 60)
+    problem1_compute_throughput()
+    problem2_design_status_msg()
+    problem3_failure_handling_table()
+    print("=" * 60)

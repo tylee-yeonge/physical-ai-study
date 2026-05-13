@@ -1,478 +1,360 @@
-# Week 3 실습: KITTI 데이터셋 로드, 파싱, 시각화
+# Week 3 실습: RT-2 블로그 1편 작성 + 발행
 
-> **목표**: KITTI 레이블을 파싱하고, 2D/3D/BEV 시각화를 구현
-> **언어**: Python (NumPy, Matplotlib, OpenCV)
-> **예상 시간**: 5시간
-
----
-
-## 실습 개요
-
-실제 KITTI 데이터가 없어도 가상 레이블로 파이프라인을 구축하고, 데이터를 받으면 바로 적용할 수 있도록 준비합니다.
+> [goal] **실습 목표**: 공개 가능한 RT-2 블로그 1편을 마감하고, 본 레포 `Studies/Phase 4/blog/rt2.md` 에 사본 보관.
+> [time] **예상 시간**: 8~10시간
 
 ---
 
-## 환경 설정
+## [tool] 환경 설정
+
+이번 주는 거의 코드 없음. 블로그 작성 + Mermaid 다이어그램 도구만 필요.
 
 ```bash
-pip install numpy matplotlib opencv-python
+# Mermaid CLI (선택, Markdown 미리보기)
+npm install -g @mermaid-js/mermaid-cli
+
+# 또는 Mermaid live editor 사용 (브라우저)
+# https://mermaid.live/
+
+# 본 레포 blog 디렉토리 준비
+mkdir -p "$(git rev-parse --show-toplevel)/Studies/Phase 4/blog"
 ```
 
 ---
 
-## Step 1: KITTI 레이블 파싱
+## [note] 실습 1: 블로그 플랫폼 결정
 
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
+### 1-1. 후보 비교
 
+| 플랫폼 | 장점 | 단점 |
+|---|---|---|
+| Velog | 한국어 검색 노출 우수, 무료, 마크다운 지원 | 글로벌 노출 부족 |
+| Medium | 글로벌 노출, 디자인 깔끔 | 한국어 검색 약함, paywall 가능 |
+| Notion (Public) | 빠른 설정, 멀티미디어 | 검색 노출 약함 |
+| 본 레포 `Studies/Phase 4/blog/` | version control | 검색 노출 거의 없음 |
 
-def parse_kitti_label(label_str):
-    """
-    KITTI 레이블 문자열을 파싱하여 객체 딕셔너리 리스트 반환
+### 1-2. 추천 조합 (본 로드맵)
 
-    Parameters:
-        label_str: KITTI label 파일의 전체 텍스트
+**Velog + 본 레포 사본**:
+- 메인 발행: Velog (한국어 면접관이 가장 자주 검색)
+- 사본 보관: `Studies/Phase 4/blog/rt2.md` (version control + 면접 시 직접 링크)
 
-    Returns:
-        objects: list of dict
-    """
-    objects = []
-    for line in label_str.strip().split('\n'):
-        parts = line.strip().split()
-        if len(parts) < 15:
-            continue
+### 1-3. Velog 계정 준비 (했다면 skip)
 
-        obj = {
-            'class': parts[0],
-            'truncated': float(parts[1]),
-            'occluded': int(parts[2]),
-            'alpha': float(parts[3]),
-            'x1': float(parts[4]),
-            'y1': float(parts[5]),
-            'x2': float(parts[6]),
-            'y2': float(parts[7]),
-            'h': float(parts[8]),
-            'w': float(parts[9]),
-            'l': float(parts[10]),
-            'x': float(parts[11]),
-            'y': float(parts[12]),
-            'z': float(parts[13]),
-            'ry': float(parts[14]),
-        }
-        objects.append(obj)
-
-    return objects
-
-
-# 가상 KITTI 레이블 (실제 데이터 형식과 동일)
-sample_label = """Car 0.00 0 -1.56 587.01 173.33 614.12 200.12 1.65 1.67 3.64 -0.65 1.71 46.70 -1.59
-Car 0.00 0 1.85 387.63 181.54 423.81 203.12 1.52 1.64 3.88 -2.01 1.74 22.17 1.58
-Pedestrian 0.00 0 -0.20 712.40 143.00 810.73 307.92 1.89 0.48 0.88 1.84 1.47 8.41 0.01
-Cyclist 0.00 0 -1.65 548.00 171.33 572.40 194.42 1.75 0.50 1.95 -2.60 1.55 18.61 -1.63
-DontCare -1 -1 -10 527.08 174.91 547.75 186.95 -1 -1 -1 -1000 -1000 -1000 -10"""
-
-objects = parse_kitti_label(sample_label)
-
-print(f"파싱된 객체 수: {len(objects)}")
-for obj in objects:
-    print(f"  {obj['class']:12s} | 2D: ({obj['x1']:.0f},{obj['y1']:.0f})-({obj['x2']:.0f},{obj['y2']:.0f}) | "
-          f"3D: ({obj['x']:.1f},{obj['y']:.1f},{obj['z']:.1f}) | "
-          f"size: h={obj['h']:.2f} w={obj['w']:.2f} l={obj['l']:.2f} | "
-          f"ry={obj['ry']:.2f}")
+```
+1. https://velog.io 에서 GitHub 로그인
+2. 프로필 설정: bio, github, linkedin 링크
+3. 첫 글 (이게 RT-2 블로그) 작성 준비
 ```
 
 ---
 
-## Step 2: DontCare 필터링 및 클래스별 분리
+## [note] 실습 2: 블로그 outline 잡기
 
-```python
-def filter_objects(objects, classes=None, max_truncation=0.5, max_occlusion=2):
-    """
-    객체 필터링
+**파일명**: `rt2_blog_outline.md` (먼저 outline 만 작성)
 
-    Parameters:
-        objects: 파싱된 객체 리스트
-        classes: 허용할 클래스 목록 (None이면 DontCare 제외 전부)
-        max_truncation: 최대 잘림 비율
-        max_occlusion: 최대 가려짐 단계
-    """
-    filtered = []
-    for obj in objects:
-        if obj['class'] == 'DontCare':
-            continue
-        if classes and obj['class'] not in classes:
-            continue
-        if obj['truncated'] > max_truncation:
-            continue
-        if obj['occluded'] > max_occlusion:
-            continue
-        filtered.append(obj)
-    return filtered
+```markdown
+# RT-2 정독 노트: VLM 이 어떻게 로봇 행동을 생성하는가
 
+## Section 1: 한 줄 요약
+- (작성 예정: 50자)
 
-# Car만 필터링
-cars = filter_objects(objects, classes=['Car'])
-print(f"\nCar만 필터링: {len(cars)}대")
-for car in cars:
-    print(f"  위치: ({car['x']:.1f}, {car['y']:.1f}, {car['z']:.1f})m, "
-          f"크기: {car['l']:.1f}x{car['w']:.1f}x{car['h']:.1f}m")
+## Section 2: 배경
+- VLA 분야의 등장 배경
+- RT-1 의 한계
+- web-scale VLM 의 등장
+- (300자)
 
-# 모든 클래스 (DontCare 제외)
-valid_objects = filter_objects(objects)
-print(f"\n유효 객체: {len(valid_objects)}개")
+## Section 3: 한 페이지 요약
+- Architecture diagram (Mermaid)
+- 입출력 인터페이스
+- 핵심 3가지 설계 결정
+- (600자)
+
+## Section 4: 자세한 동작
+- 4-1. VLM 의 standard 흐름
+- 4-2. Action Tokenization 수식
+- 4-3. Co-fine-tuning mixture
+- 4-4. Training loss 의 일관성
+- (1000자)
+
+## Section 5: 결과 / 사례
+- Real-world setup
+- baseline 대비 성공률
+- Emergent capability 4 사례
+- (600자)
+
+## Section 6: 한계 5가지
+- latency
+- closed-source
+- quantization
+- single-arm
+- VRAM
+- (600자)
+
+## Section 7: 양산 SW 엔지니어의 관점
+- latency 의 실무 의미
+- 안전 인터록의 필요성
+- 양산 비용
+- 본 로드맵의 다음 단계
+- (400자)
+
+## Section 8: 다음 학습 + Reference
+- OpenVLA / π0 / Helix
+- 참고 자료 5~10개
+- (150자)
+```
+
+> [tip] outline 을 본문 작성 전에 먼저 마감하면 작성 시간이 절반으로 줄어든다.
+
+---
+
+## [note] 실습 3: 다이어그램 작성
+
+### 3-1. Mermaid 다이어그램 1: RT-2 Architecture
+
+```mermaid
+flowchart LR
+    img[RGB Image<br/>224x224] --> ViT[ViT<br/>Vision Encoder]
+    inst["Text Instruction<br/>'pick up the can'"] --> SP[SentencePiece<br/>Tokenizer]
+    ViT --> imgTok[Image Tokens<br/>~196 tokens]
+    SP --> txtTok[Text Tokens<br/>~5-20 tokens]
+    imgTok --> concat[Concat]
+    txtTok --> concat
+    concat --> dec[Transformer Decoder<br/>PaLI-X 5B / 55B]
+    dec --> out[Output Tokens<br/>'255879 255698 ...']
+    out --> detok[De-tokenize]
+    detok --> action[7-DoF Action]
+```
+
+### 3-2. Mermaid 다이어그램 2: Co-fine-tuning Data Mixture
+
+```mermaid
+pie title "Co-fine-tuning Mini-batch"
+    "WebLI (image-caption)" : 50
+    "OCR / VQA" : 30
+    "Robot Trajectory" : 20
+```
+
+### 3-3. Mermaid 다이어그램 3 (선택): Action Token 의 흐름
+
+```mermaid
+flowchart TD
+    A["Continuous Action<br/>dx=0.05 m"] --> B["Normalize<br/>(0.05 + 0.1)/0.2 = 0.75"]
+    B --> C["Discretize<br/>floor(0.75 * 256) = 192"]
+    C --> D["Token Map<br/>255744 + 192 = 255936"]
+    D --> E["Output Token ID<br/>255936"]
+```
+
+> [tip] 본문에는 다이어그램 1 (Architecture) 은 필수, 2~3 은 선택.
+
+---
+
+## [note] 실습 4: 본문 작성 가이드 (Section 4 의 예시)
+
+가장 큰 비중인 Section 4 (자세한 동작) 의 예시:
+
+````markdown
+## 4. RT-2 의 자세한 동작
+
+### 4-1. VLM 의 standard 흐름 복습
+
+VLM (Vision-Language Model) 은 이미지와 텍스트를 입력 받아 텍스트를 출력하는
+large model 이다. 입력의 단위는 모두 **token**:
+
+- 이미지 → Vision Transformer (ViT) → patch token 196개 (224x224 이미지 기준)
+- 텍스트 → SentencePiece tokenizer → sub-word token
+
+두 종류 토큰이 concat 되어 Transformer Decoder 의 입력이 된다. 출력은 다시
+token sequence. 일반적인 VLM 은 이 출력 token 을 caption 이나 답변 텍스트로
+변환해 사용한다.
+
+### 4-2. Action Tokenization: "Action 도 token"
+
+RT-2 의 가장 영리한 아이디어는 robot action 도 동일하게 token 으로 표현하는 것.
+구체적으로, VLM 의 vocabulary 의 마지막 256 개 token 을 "action discrete bin"
+으로 재해석한다.
+
+수식 3 개:
+
+1. Discretize:   `b = min(floor((a - a_min) / (a_max - a_min) * 256), 255)`
+2. Token map:    `t = ACTION_TOKEN_START + b`
+3. De-tokenize:  `a = a_min + (b + 0.5) / 256 * (a_max - a_min)`
+
+여기서 `ACTION_TOKEN_START` 는 vocab size 에서 256 을 뺀 값. 예를 들어 PaLI-X
+의 vocab size 가 256000 이라면 ACTION_TOKEN_START = 255744.
+
+이 방식의 quantization step 을 계산해 보면:
+
+| 차원 | 범위 | step |
+|---|---|---|
+| dx, dy, dz | [-0.1, +0.1] m | 0.78 mm |
+| rx, ry, rz | [-pi, +pi] rad | 1.40 deg |
+| gripper | [0, 1] | 0.004 |
+
+0.78 mm 의 정밀도는 cm 단위 manipulation (잡기 / 놓기) 에는 충분하지만, sub-mm
+정밀 조립 (자동차 부품 / 반도체) 에는 한계가 있다. **이 수치가 RT-2 의 실무적
+한계를 정량적으로 보여주는 첫 번째 지표**.
+
+### 4-3. Co-fine-tuning mixture
+
+(작성)
+
+### 4-4. Training loss 의 일관성
+
+(작성)
+````
+
+> [tip] 본 예시처럼 "수치 → 의미 → 한계" 순서로 작성하면 자연스럽게 깊이가 드러난다.
+
+---
+
+## [note] 실습 5: 본문 작성 (전체)
+
+본 실습이 본 주의 핵심. 위 outline + 다이어그램을 가지고 전체 본문을 작성한다.
+
+### 5-1. 작성 순서 권장
+
+1. Section 1 (한 줄 요약) → 매우 짧게 마감
+2. Section 3 (한 페이지 요약) → 다이어그램 먼저
+3. Section 4 (자세한 동작) → 가장 큰 분량, 가장 정성 들임
+4. Section 5 (결과)
+5. Section 6 (한계)
+6. Section 7 (양산 SW 엔지니어의 관점) → 본인 차별화 메시지
+7. Section 2 (배경) → 마지막에 작성 (전체 보고 도입 설계)
+8. Section 8 (다음 + Reference)
+
+### 5-2. 본문 작성 위치
+
+```bash
+# 본 레포에 사본 보관 (version control)
+$EDITOR "$(git rev-parse --show-toplevel)/Studies/Phase 4/blog/rt2.md"
+
+# Velog 에 발행 (사본을 그대로 복사하여 plate)
 ```
 
 ---
 
-## Step 3: 2D BBox 시각화
+## [note] 실습 6: Self-review 체크리스트
 
-```python
-# 클래스별 색상
-CLASS_COLORS = {
-    'Car': 'lime',
-    'Pedestrian': 'cyan',
-    'Cyclist': 'yellow',
-    'Van': 'orange',
-    'Truck': 'red',
-    'Person_sitting': 'magenta',
-}
+**파일명**: `~/phase4_notes/week3/self_review.md` (자기 글을 다시 읽으면서 체크)
 
+```markdown
+# RT-2 블로그 self-review
 
-def visualize_2d_bbox(objects, img_size=(1242, 375)):
-    """
-    2D bounding box를 이미지에 시각화
-    """
-    fig, ax = plt.subplots(1, 1, figsize=(14, 5))
+## 구조
+- [ ] 8 section 모두 있음
+- [ ] Section 1 (한 줄 요약) 이 50자 이하로 명확
+- [ ] Section 3 에 다이어그램 1 ~ 2 개
+- [ ] Section 4 가 가장 큰 분량 (대략 1000자)
+- [ ] Section 6 의 한계가 5 가지
 
-    # 가상 이미지 배경
-    img = np.ones((img_size[1], img_size[0], 3), dtype=np.uint8) * 180
-    ax.imshow(img)
+## 내용
+- [ ] 모든 정량 표현에 수치 + 단위
+- [ ] 본인 해석 한 줄이 단락마다 있음
+- [ ] 표 1 ~ 2 개로 비교가 깔끔함
+- [ ] 코드 / 수식 / diagram 의 균형
+- [ ] 다른 모델 (RT-1, OpenVLA 등) 과 비교
 
-    for obj in objects:
-        if obj['class'] == 'DontCare':
-            continue
+## 톤
+- [ ] "혁신적" / "획기적" 같은 과장 없음
+- [ ] 한계 5가지를 정직하게
+- [ ] 어조가 일관됨 (전부 일관된 격식)
 
-        color = CLASS_COLORS.get(obj['class'], 'white')
-        x1, y1, x2, y2 = obj['x1'], obj['y1'], obj['x2'], obj['y2']
+## SEO / 검색
+- [ ] 제목이 검색 가능한 키워드 포함 (RT-2, VLA, ...)
+- [ ] 첫 단락에 핵심 정보 포함 (검색 노출용)
+- [ ] 태그 5 개 이상
 
-        # 2D bbox 그리기
-        rect = patches.Rectangle(
-            (x1, y1), x2 - x1, y2 - y1,
-            linewidth=2, edgecolor=color, facecolor='none'
-        )
-        ax.add_patch(rect)
-
-        # 클래스 + 거리 표시
-        label = f"{obj['class']} z={obj['z']:.0f}m"
-        ax.text(x1, y1 - 5, label, fontsize=8, color=color,
-                fontweight='bold', bbox=dict(facecolor='black', alpha=0.7, pad=1))
-
-    ax.set_xlim(0, img_size[0])
-    ax.set_ylim(img_size[1], 0)
-    ax.set_title('KITTI 2D BBox 시각화', fontsize=14)
-    ax.set_xlabel('u (pixels)')
-    ax.set_ylabel('v (pixels)')
-
-    plt.tight_layout()
-    plt.savefig('kitti_2d_bbox.png', dpi=150)
-    plt.show()
-    print("2D bbox 시각화 완료!")
-
-
-visualize_2d_bbox(objects)
+## 분량
+- [ ] 한국어 3000 ~ 4000 자 범위
+- [ ] 표 / 다이어그램 제외하고 본문이 너무 짧지 않음
 ```
 
 ---
 
-## Step 4: 3D BBox 이미지 투영 및 시각화
+## [note] 실습 7: 발행 + 기록
 
-```python
-def compute_box_3d_kitti(h, w, l, x, y, z, ry):
-    """KITTI 규약에 따른 3D bbox 8개 꼭짓점 계산"""
-    c, s = np.cos(ry), np.sin(ry)
-    R = np.array([[ c, 0, s], [ 0, 1, 0], [-s, 0, c]])
+### 7-1. Velog 발행
 
-    x_c = [ l/2,  l/2, -l/2, -l/2,  l/2,  l/2, -l/2, -l/2]
-    y_c = [   0,    0,    0,    0,   -h,   -h,   -h,   -h ]
-    z_c = [ w/2, -w/2, -w/2,  w/2,  w/2, -w/2, -w/2,  w/2]
+1. https://velog.io 에 마크다운 그대로 paste
+2. 제목 / 태그 설정
+3. 첨부 이미지 (다이어그램) 업로드
+4. Publish
 
-    corners = R @ np.array([x_c, y_c, z_c])
-    corners[0, :] += x
-    corners[1, :] += y
-    corners[2, :] += z
+### 7-2. 본 레포 사본 commit
 
-    return corners.T  # (8, 3)
+```bash
+cd "$(git rev-parse --show-toplevel)"
+git add "Studies/Phase 4/blog/rt2.md"
+git commit -m "phase4 w3: rt-2 blog post draft (velog 발행)"
+```
 
+### 7-3. URL 기록
 
-def project_to_image(pts_3d, P2):
-    """3D Camera 좌표를 이미지 좌표로 투영"""
-    N = pts_3d.shape[0]
-    pts_hom = np.hstack([pts_3d, np.ones((N, 1))])
-    pts_2d = (P2 @ pts_hom.T).T
-    pts_2d[:, 0] /= pts_2d[:, 2]
-    pts_2d[:, 1] /= pts_2d[:, 2]
-    return pts_2d[:, :2]
+`~/phase4_notes/week3/published_urls.md`:
 
+```markdown
+# 발행 기록
 
-def draw_3d_bbox(ax, corners_2d, color='lime', linewidth=2):
-    """3D bbox의 12개 edge를 이미지에 그리기"""
-    edges = [
-        [0, 1], [1, 2], [2, 3], [3, 0],  # 바닥
-        [4, 5], [5, 6], [6, 7], [7, 4],  # 윗면
-        [0, 4], [1, 5], [2, 6], [3, 7],  # 기둥
-    ]
-    for i, j in edges:
-        ax.plot([corners_2d[i, 0], corners_2d[j, 0]],
-                [corners_2d[i, 1], corners_2d[j, 1]],
-                color=color, linewidth=linewidth)
+- RT-2 블로그: https://velog.io/@<your-id>/rt-2-vla-deep-dive
+- 발행 날짜: 2026-09-XX
+- 본 레포 사본: Studies/Phase 4/blog/rt2.md
+- 글자 수: 약 ____자
+- 다이어그램: ____개
+```
 
-    # 전면(front face) 강조 (0-1-5-4)
-    front_edges = [[0, 1], [1, 5], [5, 4], [4, 0]]
-    for i, j in front_edges:
-        ax.plot([corners_2d[i, 0], corners_2d[j, 0]],
-                [corners_2d[i, 1], corners_2d[j, 1]],
-                color='red', linewidth=linewidth + 1)
+### 7-4. LinkedIn / Twitter 공유 (선택)
 
+```
+형식 예시:
 
-def visualize_3d_bbox(objects, img_size=(1242, 375)):
-    """3D bbox를 이미지에 투영하여 시각화"""
-    fig, ax = plt.subplots(1, 1, figsize=(14, 5))
-
-    img = np.ones((img_size[1], img_size[0], 3), dtype=np.uint8) * 180
-    ax.imshow(img)
-
-    # KITTI 전형적인 P2
-    P2 = np.array([
-        [721.5377, 0.0,      609.5593, 44.85728],
-        [0.0,      721.5377, 172.854,  0.216379],
-        [0.0,      0.0,      1.0,      0.002746]
-    ])
-
-    for obj in objects:
-        if obj['class'] == 'DontCare':
-            continue
-
-        color = CLASS_COLORS.get(obj['class'], 'white')
-
-        # 3D corners 계산
-        corners_3d = compute_box_3d_kitti(
-            obj['h'], obj['w'], obj['l'],
-            obj['x'], obj['y'], obj['z'], obj['ry']
-        )
-
-        # 이미지에 투영
-        corners_2d = project_to_image(corners_3d, P2)
-
-        # 유효 범위 체크
-        if np.any(corners_2d[:, 0] < 0) or np.any(corners_2d[:, 0] > img_size[0]):
-            continue
-
-        draw_3d_bbox(ax, corners_2d, color=color)
-
-        # 라벨
-        center = corners_2d.mean(axis=0)
-        ax.text(center[0], center[1] - 25,
-                f"{obj['class']} z={obj['z']:.0f}m",
-                fontsize=8, color=color, fontweight='bold', ha='center',
-                bbox=dict(facecolor='black', alpha=0.7, pad=1))
-
-    ax.set_xlim(0, img_size[0])
-    ax.set_ylim(img_size[1], 0)
-    ax.set_title('KITTI 3D BBox 이미지 투영', fontsize=14)
-
-    plt.tight_layout()
-    plt.savefig('kitti_3d_bbox.png', dpi=150)
-    plt.show()
-    print("3D bbox 이미지 투영 시각화 완료!")
-
-
-valid_objects = [o for o in objects if o['class'] != 'DontCare']
-visualize_3d_bbox(valid_objects)
+VLA 분야 정독 노트 첫 번째 글: RT-2.
+VLM 의 web knowledge 가 어떻게 robot 행동으로 transfer 되는가를 정리했습니다.
+양산 SW 엔지니어 관점에서 latency / quantization 의 의미도 함께 적었습니다.
+[link]
 ```
 
 ---
 
-## Step 5: BEV 시각화
+## [O] 실습 체크리스트
 
-```python
-def visualize_bev(objects, bev_range=(-20, 20, 0, 60)):
-    """
-    Bird's Eye View (BEV) 시각화
-
-    Parameters:
-        objects: 파싱된 객체 리스트
-        bev_range: (x_min, x_max, z_min, z_max) 미터
-    """
-    fig, ax = plt.subplots(1, 1, figsize=(10, 12))
-
-    x_min, x_max, z_min, z_max = bev_range
-
-    for obj in objects:
-        if obj['class'] == 'DontCare':
-            continue
-
-        color = CLASS_COLORS.get(obj['class'], 'gray')
-
-        # 바닥면 4개 corners
-        corners_3d = compute_box_3d_kitti(
-            obj['h'], obj['w'], obj['l'],
-            obj['x'], obj['y'], obj['z'], obj['ry']
-        )
-        bev_corners = corners_3d[:4, [0, 2]]  # 바닥면의 x, z
-
-        # 폴리곤
-        polygon = plt.Polygon(bev_corners, fill=True, alpha=0.4,
-                             facecolor=color, edgecolor=color, linewidth=2)
-        ax.add_patch(polygon)
-
-        # 방향 화살표 (전면 중심)
-        front = (corners_3d[0, [0, 2]] + corners_3d[3, [0, 2]]) / 2
-        center = np.array([obj['x'], obj['z']])
-        ax.annotate('', xy=front, xytext=center,
-                    arrowprops=dict(arrowstyle='->', color=color, lw=2))
-
-        # 라벨
-        ax.text(obj['x'], obj['z'] + 1.5,
-                f"{obj['class']}\nz={obj['z']:.0f}m",
-                fontsize=8, ha='center', color=color, fontweight='bold')
-
-    # 카메라(Ego) 위치
-    ax.plot(0, 0, 'k^', markersize=15, label='Camera (Ego)')
-
-    # FOV 표시 (약 90도)
-    fov_range = z_max
-    ax.plot([0, -fov_range * 0.7], [0, fov_range], 'k--', alpha=0.2)
-    ax.plot([0, fov_range * 0.7], [0, fov_range], 'k--', alpha=0.2)
-
-    # 거리 원
-    for d in [10, 20, 30, 40, 50]:
-        circle = plt.Circle((0, 0), d, fill=False, linestyle='--',
-                           alpha=0.15, color='gray')
-        ax.add_patch(circle)
-        ax.text(0.5, d, f'{d}m', fontsize=7, color='gray', alpha=0.5)
-
-    ax.set_xlabel('X (좌우) [m]', fontsize=12)
-    ax.set_ylabel('Z (전방) [m]', fontsize=12)
-    ax.set_title('KITTI BEV (Bird\'s Eye View)', fontsize=14)
-    ax.set_xlim(x_min, x_max)
-    ax.set_ylim(z_min - 2, z_max)
-    ax.set_aspect('equal')
-    ax.grid(True, alpha=0.2)
-    ax.legend(fontsize=10, loc='upper right')
-
-    plt.tight_layout()
-    plt.savefig('kitti_bev.png', dpi=150)
-    plt.show()
-    print("BEV 시각화 완료!")
-
-
-visualize_bev(valid_objects)
-```
+- [ ] 블로그 플랫폼 결정 (Velog 권장)
+- [ ] outline 작성 완료 (`rt2_blog_outline.md`)
+- [ ] Mermaid 다이어그램 1 ~ 2 개 작성
+- [ ] 본문 작성 완료 (한국어 3000 ~ 4000 자)
+- [ ] self-review 체크리스트 통과
+- [ ] Velog 발행
+- [ ] 본 레포 `Studies/Phase 4/blog/rt2.md` 에 사본 commit
+- [ ] URL 기록
+- [ ] (선택) LinkedIn 공유
+- [ ] quiz_easy / quiz_medium 풀기
 
 ---
 
-## Step 6: 통합 시각화 (2D + 3D + BEV)
+## [link] 참고 자료
 
-```python
-def visualize_all(objects, img_size=(1242, 375)):
-    """2D bbox, 3D bbox, BEV를 한 화면에 통합 시각화"""
-    fig = plt.figure(figsize=(18, 12))
+### 블로그 작성 기법
+- [좋은 기술 글쓰기 가이드 (Tech Writing Course)](https://developers.google.com/tech-writing)
+- [Velog 사용 가이드](https://velog.io/about)
 
-    P2 = np.array([
-        [721.5377, 0.0,      609.5593, 44.85728],
-        [0.0,      721.5377, 172.854,  0.216379],
-        [0.0,      0.0,      1.0,      0.002746]
-    ])
+### Mermaid
+- [Mermaid 공식 문서](https://mermaid.js.org/)
+- [Mermaid Live Editor](https://mermaid.live/)
 
-    valid = [o for o in objects if o['class'] != 'DontCare']
-
-    # --- 2D BBox ---
-    ax1 = fig.add_subplot(2, 2, 1)
-    img = np.ones((img_size[1], img_size[0], 3), dtype=np.uint8) * 180
-    ax1.imshow(img)
-    for obj in valid:
-        color = CLASS_COLORS.get(obj['class'], 'white')
-        rect = patches.Rectangle(
-            (obj['x1'], obj['y1']),
-            obj['x2'] - obj['x1'], obj['y2'] - obj['y1'],
-            linewidth=2, edgecolor=color, facecolor='none')
-        ax1.add_patch(rect)
-        ax1.text(obj['x1'], obj['y1'] - 3, obj['class'], fontsize=7, color=color)
-    ax1.set_title('2D BBox')
-    ax1.set_xlim(0, img_size[0])
-    ax1.set_ylim(img_size[1], 0)
-
-    # --- 3D BBox ---
-    ax2 = fig.add_subplot(2, 2, 2)
-    ax2.imshow(img)
-    for obj in valid:
-        color = CLASS_COLORS.get(obj['class'], 'white')
-        c3d = compute_box_3d_kitti(obj['h'], obj['w'], obj['l'],
-                                    obj['x'], obj['y'], obj['z'], obj['ry'])
-        c2d = project_to_image(c3d, P2)
-        if np.all(c2d[:, 0] > -100) and np.all(c2d[:, 0] < img_size[0] + 100):
-            draw_3d_bbox(ax2, c2d, color=color, linewidth=1)
-    ax2.set_title('3D BBox Projection')
-    ax2.set_xlim(0, img_size[0])
-    ax2.set_ylim(img_size[1], 0)
-
-    # --- BEV ---
-    ax3 = fig.add_subplot(2, 1, 2)
-    for obj in valid:
-        color = CLASS_COLORS.get(obj['class'], 'gray')
-        c3d = compute_box_3d_kitti(obj['h'], obj['w'], obj['l'],
-                                    obj['x'], obj['y'], obj['z'], obj['ry'])
-        bev = c3d[:4, [0, 2]]
-        polygon = plt.Polygon(bev, fill=True, alpha=0.4,
-                             facecolor=color, edgecolor=color, linewidth=2)
-        ax3.add_patch(polygon)
-        ax3.text(obj['x'], obj['z'] + 1, f"{obj['class']} z={obj['z']:.0f}m",
-                fontsize=8, ha='center', color=color, fontweight='bold')
-
-    ax3.plot(0, 0, 'k^', markersize=12, label='Camera')
-    ax3.set_xlabel('X [m]')
-    ax3.set_ylabel('Z [m]')
-    ax3.set_title('BEV (Bird\'s Eye View)')
-    ax3.set_xlim(-20, 20)
-    ax3.set_ylim(-2, 55)
-    ax3.set_aspect('equal')
-    ax3.grid(True, alpha=0.2)
-    ax3.legend()
-
-    plt.suptitle('KITTI 통합 시각화: 2D + 3D + BEV', fontsize=16, fontweight='bold')
-    plt.tight_layout()
-    plt.savefig('kitti_all_views.png', dpi=150)
-    plt.show()
-    print("통합 시각화 완료!")
-
-
-visualize_all(objects)
-```
+### RT-2 (블로그에서 인용할 source)
+- [RT-2 paper](https://arxiv.org/abs/2307.15818)
+- [RT-2 project page](https://robotics-transformer2.github.io/)
+- [DeepMind RT-2 blog](https://www.deepmind.com/blog/rt-2-new-model-translates-vision-and-language-into-action)
 
 ---
 
-## 체크리스트
+## [tip] 트러블슈팅
 
-- [ ] KITTI 레이블 파싱 함수 구현 및 테스트
-- [ ] DontCare 필터링 및 클래스별 분리
-- [ ] 2D bbox 시각화 (이미지 위 사각형)
-- [ ] 3D bbox 이미지 투영 (12개 edge + 전면 강조)
-- [ ] BEV 시각화 (X-Z 평면, 방향 화살표)
-- [ ] 통합 시각화 (2D + 3D + BEV 한 화면)
-
----
-
-## 추가 실험 아이디어
-
-1. **실제 KITTI 데이터**: 다운로드 후 image_2에 실제 이미지를 배경으로 사용
-2. **통계 분석**: 레이블의 거리(z) 분포, 크기 분포 히스토그램
-3. **난이도 필터링**: Easy/Moderate/Hard 객체 분리 시각화
-4. **alpha vs ry**: 같은 객체에 대해 alpha와 ry의 차이를 시각적으로 비교
-
----
-
-이전: [Week 2 실습](../week2/PRACTICE.md)
-
-**다음**: Week 4에서 Monocular 3D Detection 모델의 원리를 학습합니다!
+| 증상 | 해결 |
+|---|---|
+| 본문이 안 써짐 | outline 부터 다시. outline 이 안 되면 본문도 안 된다 |
+| 분량이 너무 길어짐 | Section 4 외에는 압축. 표/다이어그램으로 본문 대체 |
+| 한계가 안 떠오름 | week 1 README 의 한계 5가지 그대로 인용 |
+| 다이어그램이 너무 복잡 | 핵심 6 노드만. 나머지는 본문 텍스트로 |
+| Velog 가 안 됨 | tistory / Medium / 본 레포 README 으로 대체 가능 |

@@ -52,14 +52,14 @@ week5_onnx/
 
 ```python
 """
-PyTorch YOLOv8 → ONNX 변환
+PyTorch YOLO11 → ONNX 변환
 """
 import torch
 from ultralytics import YOLO
 
 def export_static():
     """Static shape 변환 (Jetson 배포용)"""
-    model = YOLO('yolov8n.pt')
+    model = YOLO('yolo11n.pt')
 
     # ONNX 변환
     model.export(
@@ -69,11 +69,11 @@ def export_static():
         simplify=True,
         half=False,  # FP32
     )
-    print("[O] Static ONNX 변환 완료: yolov8n.onnx")
+    print("[O] Static ONNX 변환 완료: yolo11n.onnx")
 
 def export_dynamic():
     """Dynamic shape 변환 (서버 배포용)"""
-    model = YOLO('yolov8n.pt')
+    model = YOLO('yolo11n.pt')
 
     model.export(
         format='onnx',
@@ -176,8 +176,8 @@ def compare_outputs(pt_path, onnx_path):
     print(f"[chart] 출력 범위: [{onnx_out[0].min():.4f}, {onnx_out[0].max():.4f}]")
 
 if __name__ == "__main__":
-    check_model("yolov8n.onnx")
-    compare_outputs("yolov8n.pt", "yolov8n.onnx")
+    check_model("yolo11n.onnx")
+    compare_outputs("yolo11n.pt", "yolo11n.onnx")
 ```
 
 ---
@@ -188,7 +188,7 @@ if __name__ == "__main__":
 
 ```python
 """
-ONNX Runtime으로 YOLOv8 추론
+ONNX Runtime으로 YOLO11 추론
 """
 import onnxruntime as ort
 import numpy as np
@@ -231,7 +231,7 @@ class ONNXDetector:
 
     def postprocess(self, outputs, orig_shape):
         """후처리: NMS + bbox 변환"""
-        predictions = outputs[0]  # [1, 84, 8400] for YOLOv8
+        predictions = outputs[0]  # [1, 84, 8400] for YOLO11
         predictions = np.transpose(predictions, (0, 2, 1))  # [1, 8400, 84]
 
         boxes = []
@@ -315,7 +315,7 @@ def draw_detections(image, boxes, scores, class_ids):
 
 if __name__ == "__main__":
     # 검출기 초기화
-    detector = ONNXDetector("yolov8n.onnx")
+    detector = ONNXDetector("yolo11n.onnx")
 
     # 이미지 추론
     image = cv2.imread("test.jpg")
@@ -398,9 +398,9 @@ if __name__ == "__main__":
     print("  속도 벤치마크: PyTorch vs ONNX")
     print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
 
-    pt_time = benchmark_pytorch("yolov8n.pt")
-    onnx_cpu = benchmark_onnx("yolov8n.onnx", "CPUExecutionProvider")
-    onnx_gpu = benchmark_onnx("yolov8n.onnx", "CUDAExecutionProvider")
+    pt_time = benchmark_pytorch("yolo11n.pt")
+    onnx_cpu = benchmark_onnx("yolo11n.onnx", "CPUExecutionProvider")
+    onnx_gpu = benchmark_onnx("yolo11n.onnx", "CUDAExecutionProvider")
 
     print(f"\n[chart] 결과 요약:")
     print(f"  ONNX GPU vs PyTorch: {pt_time/onnx_gpu:.1f}x 빠름")
@@ -458,12 +458,12 @@ if __name__ == "__main__":
     print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
 
     # FP16
-    convert_fp16("yolov8n.onnx", "yolov8n_fp16.onnx")
+    convert_fp16("yolo11n.onnx", "yolo11n_fp16.onnx")
 
     print()
 
     # INT8
-    quantize_int8_dynamic("yolov8n.onnx", "yolov8n_int8.onnx")
+    quantize_int8_dynamic("yolo11n.onnx", "yolo11n_int8.onnx")
 ```
 
 ---

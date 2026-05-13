@@ -1,480 +1,322 @@
-# Week 1: 3D Detection 개념 - 왜 3D를 검출해야 하는가?
+# Week 1: RT-2 1회독 + Architecture Diagram 정독
 
-> [goal] **이번 주 목표**: 3D Object Detection의 필요성과 기본 개념을 이해하고, 2D와 3D Detection의 차이를 명확히 파악
-> [time] **예상 시간**: 12-15시간
-> [tip] **핵심 질문**: "2D Detection만으로 왜 자율주행과 로봇에 부족하고, 3D Detection이 필수인가?"
+> [goal] **이번 주 목표**: RT-2 논문을 처음부터 끝까지 1회독하고, Architecture Diagram을 분해해서 "Vision-Language Model이 어떻게 로봇 행동을 생성하는가" 를 한 페이지로 설명할 수 있는 수준에 도달한다.
+> [time] **예상 시간**: 10~12시간 (논문 정독 6h + 다이어그램 분해 2h + 노트 정리 2~4h)
+> [tip] **핵심 질문**: "VLM은 text token을 출력한다. Robot은 7-DoF continuous action을 받는다. 둘은 어떻게 연결되는가?"
 
 ---
 
 ## [list] 학습 순서
 
-| 순서 | 단계 | 파일 | 설명 |
-|:----:|------|------|------|
-| 1 | 환경 설정 | `requirements.txt` | `pip install -r requirements.txt` |
-| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 3 | Python 퀴즈 (초급) | `quiz_easy.py` | 3D BBox 파라미터, Detection 방법론 분류 |
-| 4 | Python 퀴즈 (중급) | `quiz_medium.py` | 3D BBox Corners 계산, Depth Ambiguity 코드 실습 |
-| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | 3D Detection 개념 종합 실습 |
+| 순서 | 단계 | 파일/자료 | 설명 |
+|:----:|------|----------|------|
+| 1 | 환경 준비 | `requirements.txt` | `pip install -r requirements.txt` (논문 reading note 도구만) |
+| 2 | 사전 지식 점검 | `README.md` 2장 | Transformer / VLM / RT-1 의 큰 그림 |
+| 3 | 논문 1회독 (Sec 1~3) | RT-2 PDF | Introduction + Related Work + Approach |
+| 4 | 논문 1회독 (Sec 4~6) | RT-2 PDF | Experiments + Emergent Capability + Conclusion |
+| 5 | Architecture Diagram 분해 | `PRACTICE.md` 1~3 | 그림 1, 2, 3 을 손으로 다시 그려서 설명 |
+| 6 | 퀴즈 (개념) | `quiz_easy.py` | RT-2 핵심 용어 / 다이어그램 이해 |
+| 7 | 퀴즈 (코드/계산) | `quiz_medium.py` | Action tokenization 계산 / VLM 토큰 분포 추정 |
+| 8 | 1주 reading note 정리 | `PRACTICE.md` 4 | "한 페이지 RT-2 다이어그램" 노트 산출 |
 
 ---
 
-## [*] 시작하기 전에
+## [*] 시작하기 전에 — Phase 4 의 큰 그림
 
-### Phase 4은 커리어 준비의 핵심입니다
+Phase 4는 **VLA (Vision-Language-Action) 의 논문 이해 + ROS2 통합 첫 사이클** 이다. 4개월 (16주) 동안:
 
-Phase 4는 단순한 학습이 아닙니다. **자율주행, AMR, 로봇 분야 이직을 위한 포트폴리오의 핵심**이 되는 Phase입니다. 3D Perception은 면접에서 가장 자주 묻는 주제 중 하나이며, KITTI/nuScenes 데이터셋 경험은 실무 역량의 증거가 됩니다.
+- **week 1~3**: RT-2 정독 + 블로그 1편 (이번 주는 1주)
+- **week 4~7**: OpenVLA 정독 + 블로그 1편
+- **week 8~12**: OpenVLA HuggingFace inference → ROS2 토픽 minimal demo (산출물 #2)
+- **week 13~16**: 블로그 2편 마무리 + 산출물 #2 패키징
 
-```
- 포트폴리오 가치:
-+----------------------------------------------+
-|  Phase 2-4: SLAM 기초 (이론 역량)              |
-|  Phase 3:   2D Detection (기본기)              |
-|  Phase 4:   3D Perception (* 핵심 어필 포인트)  |
-|              → "카메라만으로 3D 검출 가능합니다"    |
-|              → "KITTI AP3D 지표를 이해합니다"     |
-|              → "BEV 기반 접근을 설명할 수 있습니다" |
-+----------------------------------------------+
-```
+본 phase의 최종 산출물 #2 (2026.12 공개):
+- RT-2 + OpenVLA 블로그 2편
+- OpenVLA inference → ROS2 토픽 `vla_action` publish 하는 minimal demo + 1분 영상
 
-### 2D Detection의 한계를 느껴봅시다
+> [!] Phase 4 의 ROS2 demo 는 Phase 7 의 **Real-to-Sim-to-Real (산출물 #4 결정타)** 의 토대다. 여기서 익힌 inference 파이프라인이 Phase 7 에서 자작 6DOF 팔 + Isaac Sim 과 결합된다.
 
-**비유: 사진 한 장으로 물체 잡기**
-```
-2D Detection으로 본 세상:
-+-----------------------------+
-|    [Car: 0.95]              |
-|    +----------+             |
-|    |  [car]      |             |
-|    +----------+             |
-|                             |
-|         [Car: 0.87]         |
-|         +----+              |
-|         | [car] |              |
-|         +----+              |
-+-----------------------------+
+### 왜 RT-2 부터 시작하는가
 
-질문:
-  - 두 차의 실제 거리는? → [X] 알 수 없음
-  - 두 차의 실제 크기는? → [X] 알 수 없음 (작은 차가 가까이? 큰 차가 멀리?)
-  - 두 차 사이를 지나갈 수 있나? → [X] 판단 불가
-```
+RT-2 는 "VLM (Vision-Language Model) 에 web-scale 데이터로 학습된 지식이 로봇 제어 능력으로 transfer 된다" 는 것을 처음으로 대규모로 보여준 논문이다. 이 한 줄이 VLA 라는 분야의 시작점이다. OpenVLA (week 4~7) 는 이 아이디어의 open-source 버전이며, RT-2 를 이해하지 않고 OpenVLA 만 보면 "왜 이런 구조인가" 가 흐릿하다.
 
-```
-3D Detection으로 본 세상:
-+-----------------------------+
-|    [Car: x=2.1, y=0, z=8.5] |
-|    +----------+  l=4.5m     |
-|    |  [car]      |  w=1.8m     |
-|    +----------+  h=1.5m     |
-|                  θ=0.1rad   |
-|    [Car: x=-1.2, y=0, z=25] |
-|         +----+  l=4.2m     |
-|         | [car] |  w=1.7m     |
-|         +----+  θ=-0.05rad |
-+-----------------------------+
-
-답변:
-  - 첫 번째 차: 전방 8.5m, 오른쪽 2.1m [O]
-  - 두 번째 차: 전방 25m, 왼쪽 1.2m [O]
-  - 사이 통과 가능 여부: 계산 가능! [O]
-```
+| Phase 4 학습 순서 | 이유 |
+|---|---|
+| RT-2 먼저 (closed, Google) | VLA 의 아이디어/구조 표준 정립 |
+| OpenVLA 다음 (open, Stanford) | RT-2 를 open-source 로 재현 + 개선 |
+| ROS2 demo 마지막 | open-source 이므로 실제 inference 가능 |
 
 ---
 
 ## [ref] 핵심 개념 자세히 알아보기
 
-### 1. 2D Detection의 한계
+### 1. RT-2 의 한 줄 요약
 
-2D Object Detection은 이미지 평면 위에서 객체의 위치를 bounding box `[x, y, w, h]`로 표현합니다. 이 방식은 아래와 같은 근본적인 한계가 있습니다.
+> *"Vision-Language Model (PaLI-X / PaLM-E) 을 robot action token 까지 출력하도록 co-fine-tune 한 모델."*
 
-#### 한계 1: 거리 정보 부족
-```
-카메라 이미지에서:
-  - 멀리 있는 큰 차 vs 가까이 있는 작은 차 → 같은 크기로 보임
-  - "이 물체가 3m 앞에 있는지, 30m 앞에 있는지" 알 수 없음
+이 한 줄 안에 세 가지 핵심 결정이 들어있다:
 
-실제 상황:
-  +------------------------------------+
-  |                                    |
-  |     +------+                       |
-  |     | 트럭  |  ← 50m 거리, 큰 차    |
-  |     +------+                       |
-  |     +------+                       |
-  |     | 승용차|  ← 10m 거리, 작은 차   |
-  |     +------+                       |
-  |                                    |
-  |  두 2D bbox 크기가 비슷할 수 있음!    |
-  +------------------------------------+
-```
+1. **무엇을 backbone 으로 쓸 것인가**: large-scale VLM (PaLI-X 또는 PaLM-E)
+2. **Action 을 어떻게 표현할 것인가**: continuous action 을 **text token** 으로 discretize
+3. **어떻게 학습할 것인가**: web data + robot data 를 섞어서 **co-fine-tune**
 
-#### 한계 2: Occlusion (가림)
-```
-실제 3D 공간:           카메라에서 보이는 것:
-  [car]A  [car]B               [car]A만 보임 (B는 가려짐)
-   ↑    ↑
-  10m  12m               2D: A만 검출
-                         3D: A(10m), B(12m) 둘 다 알 수 있음
-```
+이 세 가지가 RT-2 의 architecture 와 학습 흐름 전체를 결정한다.
 
-#### 한계 3: 경로 계획 불가
-```
-자율주행 시나리오:
-  - "앞 차까지 거리가 5m이니 브레이크를 밟아라"
-  - "옆 차선의 차가 3m 옆에 있으니 차선 변경하지 마라"
-  → 이 모든 것이 3D 정보 없이는 불가능!
-```
+### 2. 사전 지식: VLM (Vision-Language Model) 의 큰 그림
 
-### 2. 3D Detection이 필요한 이유
-
-| 응용 분야 | 필요한 3D 정보 | 이유 |
-|-----------|---------------|------|
-| **AMR (자율주행 로봇)** | 장애물 위치, 크기 | 충돌 회피, 경로 계획 |
-| **자율주행** | 차량 간 거리, 속도 | 안전 거리 유지, 경로 예측 |
-| **로봇 조작 (Grasping)** | 물체 3D 위치, 방향 | 로봇 팔이 물체를 정확히 잡기 |
-| **드론** | 장애물 3D 위치 | 3D 공간에서의 회피 기동 |
-| **AR/VR** | 현실 물체 3D 배치 | 가상 물체의 자연스러운 배치 |
-
-### 3. 3D Bounding Box
-
-3D Detection의 출력은 **7개 파라미터**로 구성됩니다.
+VLM 은 "이미지 + 텍스트" 를 입력받아 "텍스트" 를 출력하는 large model 이다.
 
 ```
-2D Bounding Box:
-  [x, y, w, h]        ← 4개 파라미터
-  (이미지 좌표)
+입력  : <image>  + "What is on the table?"
+       (vision)    (language instruction)
 
-3D Bounding Box:
-  [x, y, z, l, w, h, θ]  ← 7개 파라미터
-  +- 중심 -+ + 크기 + +회전+
+내부  : Vision Encoder → image tokens
+       Text Tokenizer → text tokens
+       두 종류 token 을 합쳐 Transformer Decoder 에 통과
 
-  x, y, z : 3D 공간에서의 중심 좌표 (카메라 또는 월드 좌표계)
-  l       : length (길이, 전후 방향)
-  w       : width (폭, 좌우 방향)
-  h       : height (높이, 상하 방향)
-  θ       : yaw 각도 (수평면에서의 회전, BEV 관점)
+출력  : "A red apple"  (text tokens)
 ```
 
-**3D BBox의 8개 꼭짓점 (corners):**
-```
-        5 ------- 6
-       /|        /|
-      / |       / |
-     4 ------- 7  |        ↑ y (높이)
-     |  1 -----|- 2        |
-     | /       | /          |
-     |/        |/           +--→ x (좌우)
-     0 ------- 3           /
-                          z (전방)
-```
+대표 VLM 계보 (RT-2 시점, 2023):
 
-```python
-# 3D bbox corners 계산 (기본 개념)
-import numpy as np
+| 모델 | 출시 | 특징 | RT-2 와의 관계 |
+|---|---|---|---|
+| CLIP (2021) | OpenAI | image-text contrastive | RT-2 backbone 아님 (참고용) |
+| Flamingo (2022) | DeepMind | few-shot VLM | RT-2 의 선조 |
+| **PaLM-E (2023)** | Google | embodied multimodal | **RT-2 backbone 옵션** |
+| **PaLI-X (2023)** | Google | 55B parameter VLM | **RT-2 backbone 옵션** |
 
-def compute_box_3d(x, y, z, l, w, h, theta):
-    """
-    3D bounding box의 8개 꼭짓점 좌표 계산
+RT-2 논문은 둘 다 시도한다 (RT-2-PaLI-X 와 RT-2-PaLM-E). 본 phase 에서는 PaLI-X 기반을 중심으로 본다 (open VLM 의 표준 형태에 더 가깝다).
 
-    Parameters:
-        x, y, z: 중심 좌표
-        l, w, h: 크기 (length, width, height)
-        theta: yaw 회전각 (라디안)
+### 3. 사전 지식: RT-1 → RT-2 의 차이
 
-    Returns:
-        corners: (8, 3) 꼭짓점 좌표
-    """
-    # 회전 행렬 (yaw만 고려)
-    R = np.array([
-        [np.cos(theta), 0, np.sin(theta)],
-        [0,             1, 0            ],
-        [-np.sin(theta), 0, np.cos(theta)]
-    ])
+RT-1 (Robotics Transformer 1, Google 2022) 은 RT-2 의 직전 모델이다. 동일한 데이터셋 (Google 의 RT-1 robot data, 130k episodes) 을 쓴다. 차이는 **backbone**:
 
-    # 중심 기준 8개 꼭짓점 (회전 전)
-    x_corners = [l/2, l/2, -l/2, -l/2, l/2, l/2, -l/2, -l/2]
-    y_corners = [0, 0, 0, 0, -h, -h, -h, -h]
-    z_corners = [w/2, -w/2, -w/2, w/2, w/2, -w/2, -w/2, w/2]
+| 항목 | RT-1 | RT-2 |
+|---|---|---|
+| Backbone | 35M parameter transformer (from scratch) | 5B/55B VLM (pre-trained) |
+| 학습 데이터 | robot data only | robot data + web data co-fine-tune |
+| Action 표현 | discretized bins (FiLM-conditioned) | text token (VLM vocab 의 일부) |
+| Emergent capability | 약함 | 강함 (semantic generalization) |
+| Inference latency | 빠름 (~50ms) | 느림 (~200ms~) |
 
-    corners = np.array([x_corners, y_corners, z_corners])  # (3, 8)
+**핵심**: RT-2 는 "Big VLM 의 web knowledge 가 robot 으로 transfer 된다" 를 증명. 이게 VLA 라는 분야의 출발점.
 
-    # 회전 적용
-    corners = R @ corners  # (3, 8)
+### 4. 사전 지식: Transformer / Tokenization 의 정확한 정의
 
-    # 중심으로 이동
-    corners[0, :] += x
-    corners[1, :] += y
-    corners[2, :] += z
-
-    return corners.T  # (8, 3)
-```
-
-### 4. 3D Detection 방법론 분류
-
-3D Object Detection은 사용하는 센서에 따라 크게 3가지로 나뉩니다.
+Token 은 모델 입력의 **최소 단위**다. Text 의 경우 BPE / WordPiece / SentencePiece 등 sub-word 단위. VLM 의 경우:
 
 ```
-+-----------------------------------------------------+
-|              3D Object Detection 방법론               |
-+--------------+--------------+-----------------------+
-|  LiDAR 기반   |  Camera 기반  |  Fusion (융합)         |
-+--------------+--------------+-----------------------+
-| PointPillars  | SMOKE        | BEVFusion             |
-| VoxelNet      | FCOS3D       | TransFusion           |
-| CenterPoint   | BEVFormer    | PointPainting         |
-+--------------+--------------+-----------------------+
-| 장점:         | 장점:         | 장점:                  |
-| - 정확한 거리  | - 저렴한 센서  | - 두 장점 결합          |
-| - 직접 3D 측정 | - 텍스처 정보  | - 최고 성능            |
-|              | - 색상 정보    |                       |
-+--------------+--------------+-----------------------+
-| 단점:         | 단점:         | 단점:                  |
-| - 비싼 센서    | - Depth 모호성 | - 캘리브레이션 복잡      |
-| - 날씨 영향    | - 어두운 환경  | - 시스템 복잡도 높음     |
-| - 해상도 제한  | - 정확도 낮음  | - 센서 동기화 필요      |
-+--------------+--------------+-----------------------+
+이미지 → ViT (Vision Transformer) → patch token (16x16 patch -> 1 token)
+                                      ex) 224x224 image → 196 image token
+
+텍스트 → SentencePiece / BPE → text token
+        "pick up the can" → ["pick", "up", "the", "can"] → token id 4 개
+
+[이미지 토큰 196 개] + [텍스트 토큰 N 개] → Transformer Decoder → 텍스트 토큰 출력
 ```
 
-| 방법 | 대표 모델 | 입력 | KITTI AP3D (Car, Mod.) |
-|------|----------|------|----------------------|
-| LiDAR | PointPillars | Point Cloud | ~77% |
-| Camera (Mono) | FCOS3D | 단안 이미지 | ~15-25% |
-| Camera (Multi) | BEVFormer | 다시점 이미지 | ~40% (nuScenes) |
-| Fusion | BEVFusion | Camera + LiDAR | ~72% (nuScenes NDS) |
-
-### 5. 이 Phase의 초점: Camera 기반 3D Detection
+**RT-2 의 핵심 아이디어**: 출력 텍스트 토큰의 vocabulary 중 **256 개를 action 으로 재해석**한다. 즉:
 
 ```
-Camera 기반 3D Detection의 세부 분류:
-
-1. Monocular (단안)
-   - 입력: 단일 카메라 이미지 1장
-   - 예: SMOKE, FCOS3D, MonoDLE
-   - 장점: 가장 간단, 센서 1개
-   - 단점: Depth 추정이 매우 어려움
-
-2. Stereo (스테레오)
-   - 입력: 좌우 카메라 이미지 2장
-   - 예: DSGN, Pseudo-LiDAR
-   - 장점: 시차(disparity)로 depth 계산
-   - 단점: 카메라 2개 필요, 베이스라인 제한
-
-3. Multi-view (다시점)
-   - 입력: 여러 방향 카메라 이미지 (보통 6장)
-   - 예: BEVFormer, DETR3D, PETR
-   - 장점: 360도 커버리지, BEV 생성
-   - 단점: 카메라 여러 개 필요, 연산량 큼
+VLM vocabulary 의 마지막 256 개 token ID:
+  token_id [V-256 ... V-1]
+  → 이들을 "action discrete bin" 으로 재사용
 ```
 
-**왜 Camera 기반에 집중하는가?**
+이 부분이 week 2 의 핵심 (action tokenization). 이번 주에는 "그렇게 한다" 만 이해하면 된다.
+
+### 5. RT-2 의 Architecture Diagram (논문 Figure 1)
+
 ```
-현실적 이유:
-1. LiDAR는 비쌈 ($10,000~$75,000) vs 카메라 ($50~$500)
-2. Tesla의 Pure Vision 접근 → 업계 트렌드
-3. AMR/로봇에서 카메라가 기본 센서
-4. Camera 기반이 면접에서 더 깊은 이해를 보여줌
-   → "LiDAR 없이 어떻게 3D를 알 수 있나요?" 질문에 답변 가능!
++----------------------+        +--------------------+
+| Vision Encoder       |  ----> | Image Tokens       |
+| (ViT-22B in PaLI-X)  |        | (about 64-256)     |
++----------------------+        +--------------------+
+                                          |
+                                          v
++----------------------+        +--------------------+
+| Text "Pick the can"  | -----> | Text Tokens        |
++----------------------+        +--------------------+
+                                          |
+                                          v
+                                +--------------------+
+                                | Concatenated Tokens|
+                                +--------------------+
+                                          |
+                                          v
+                                +--------------------+
+                                | Transformer Decoder|
+                                | (PaLM / PaLI core) |
+                                +--------------------+
+                                          |
+                                          v
+                                +--------------------+
+                                | Output Tokens      |
+                                | "1 128 91 241 ..." |  <- 7-DoF action
+                                +--------------------+
+                                          |
+                                          v (de-tokenize)
+                                +--------------------+
+                                | Action [dx,dy,dz,  |
+                                |  rx,ry,rz,grip]    |
+                                +--------------------+
 ```
+
+이번 주 핵심 정리 포인트:
+- Vision Encoder 와 Text Tokenizer 가 **독립적으로** token 을 만든다
+- 두 종류 token 이 **concat** 되어 한 sequence 로 Decoder 에 들어간다
+- 출력 token sequence 의 **앞부분 7~11 개** 가 action 으로 해석된다
+- 출력 token sequence 의 **그 뒤** 가 일반적인 text (예: "<terminate>") 이면 episode 종료
+
+### 6. Co-fine-tuning 이란 (week 2 의 예고편)
+
+RT-2 의 학습은 **세 종류 데이터를 섞어서** 한다:
+
+```
+Mini-batch 한 개:
+  +-------------------------------+
+  | 50%: Web image-caption pair   |  (VLM 의 일반적 학습 데이터)
+  | 30%: Web VQA                  |
+  | 20%: Robot trajectory + label |  (RT-1 dataset, 130k episodes)
+  +-------------------------------+
+```
+
+이 비율로 매 step 학습 → VLM 이 web knowledge 를 잃지 않으면서 robot action 도 학습.
+
+**왜 중요한가**: robot data 만으로 fine-tune 하면 catastrophic forgetting 발생 (VLM 이 일반 visual reasoning 능력을 잃음). 이걸 막는 게 co-fine-tuning.
+
+### 7. Emergent Capability (논문 Sec 5 의 가장 중요한 부분)
+
+RT-2 의 가장 인상적인 결과는 robot data 에 명시적으로 없는 **새로운 명령** 을 수행할 수 있다는 것:
+
+| 사례 | 학습 데이터에 있나 | RT-2 의 행동 |
+|---|---|---|
+| "pick up the can" | O | O 학습된 그대로 |
+| "pick up the **red** can" | X (색상 명시 없음) | O 색상 인식 후 집음 |
+| "pick up the **almost-empty** can" | X | O VQA 지식 활용 |
+| "pick up the **animal**" | X (구체 명사만) | O 봉제 인형 집음 |
+| "**move close to** the dirty table" | X | O 의미 추론 |
+
+이게 가능한 이유: VLM 의 web knowledge (이미지 + 자연어 추론) 가 사라지지 않고 action 생성에 transfer 됨.
+
+> [tip] 이번 주 reading note 에 "emergent capability 의 4가지 사례" 를 꼭 한 줄씩 적어둘 것. week 3 블로그의 핵심 장면이 된다.
+
+### 8. 한계 및 비판 (RT-2 의 정직한 결점)
+
+블로그를 쓸 때 반드시 들어가야 할 부분:
+
+1. **속도**: 5B/55B 모델은 inference latency 가 ~200ms 이상. 실시간 30Hz 제어 어려움.
+2. **closed source**: weight 공개 안 됨. 재현 불가능 → OpenVLA 의 동기.
+3. **데이터 의존**: RT-1 dataset 의 분포에 강하게 의존. domain gap 시 성능 급락.
+4. **action discretization**: 256 bin 으로 양자화 → fine motion 어려움.
+5. **single-arm 위주**: bimanual / mobile manipulation 부족.
+
+> [tip] 이 5가지 한계는 OpenVLA / π0 / Helix 등 후속 연구의 동기다. week 4 OpenVLA 정독 시 다시 비교한다.
 
 ---
 
-## [tip] 꼭 이해해야 할 핵심 개념
+## [list] 이번 주 학습 자료 위치
 
-### Depth Ambiguity (깊이 모호성)
+### 필수
+- 논문 PDF: https://arxiv.org/abs/2307.15818 (RT-2 paper)
+- 프로젝트 페이지: https://robotics-transformer2.github.io/
+- Architecture diagram 원본: 논문 Figure 1 (page 2)
 
-Camera 기반 3D Detection의 가장 큰 도전은 **단일 이미지에서 깊이를 추정**하는 것입니다.
+### 보조 (선택)
+- RT-1 paper (배경): https://arxiv.org/abs/2212.06817
+- PaLI-X paper (backbone): https://arxiv.org/abs/2305.18565
+- PaLM-E paper (backbone): https://arxiv.org/abs/2303.03378
+- DeepMind blog: https://www.deepmind.com/blog/rt-2-new-model-translates-vision-and-language-into-action
 
-```
-핀홀 카메라 모델 복습 (Phase 2):
-
-  u = fx * X/Z + cx
-  v = fy * Y/Z + cy
-
-  X, Y, Z: 3D 좌표
-  u, v: 이미지 좌표 (픽셀)
-  fx, fy: 초점 거리
-  cx, cy: 주점
-
-문제: (u, v) → (X, Y, Z) 변환 시
-  X = (u - cx) * Z / fx
-  Y = (v - cy) * Z / fy
-
-  → Z (깊이)를 모르면 X, Y도 알 수 없음!
-  → 하나의 픽셀은 무한한 3D 점에 대응
-```
-
-```
-깊이 모호성 시각화:
-
-카메라 ----→ Z (깊이)
-  |
-  |    * 작은 물체 (가까이)
-  |         * 중간 물체 (중간)
-  |              * 큰 물체 (멀리)
-  |
-  ↓ 세 물체 모두 이미지에서 같은 크기로 보임!
-```
-
-**해결 방법들:**
-1. **학습 기반 Depth 추정**: 네트워크가 단서(원근법, 그림자, 크기)로 깊이 학습
-2. **기하학적 제약**: 차량 크기의 사전 지식 활용 (승용차 ~4.5m)
-3. **Keypoint 기반**: 2D-3D 대응점으로 PnP 문제 풀기
-4. **Multi-view**: 여러 시점에서 삼각측량
-
-### 3D IoU (Intersection over Union)
-
-3D Detection의 평가 지표로 **3D IoU**가 사용됩니다.
-
-```
-2D IoU: 두 사각형의 겹치는 면적 / 전체 면적
-3D IoU: 두 직육면체의 겹치는 부피 / 전체 부피
-
-3D IoU 계산:
-  IoU_3D = Volume(A ∩ B) / Volume(A ∪ B)
-
-  Volume(A ∪ B) = Volume(A) + Volume(B) - Volume(A ∩ B)
-
-KITTI 평가 기준:
-  - Car:        IoU ≥ 0.7 → True Positive
-  - Pedestrian: IoU ≥ 0.5 → True Positive
-  - Cyclist:    IoU ≥ 0.5 → True Positive
-```
-
-### AP3D (Average Precision 3D)
-
-```
-AP3D 계산 과정:
-1. 모든 예측에 대해 confidence 순으로 정렬
-2. 각 예측에 대해 GT와 3D IoU 계산
-3. IoU ≥ threshold이면 TP, 아니면 FP
-4. Precision-Recall 곡선 계산
-5. 곡선 아래 면적 = AP3D
-
-KITTI 난이도:
-  Easy:     가려짐 없음, 충분히 큼, 잘 보임
-  Moderate: 일부 가려짐, 중간 크기
-  Hard:     많이 가려짐, 작은 크기
-
-모노큘러 3D Detection 성능 (참고):
-  Car (Moderate): ~15-25% AP3D
-  → LiDAR 기반 (~77%)에 비해 훨씬 어려움!
-```
+> [!] PaLI-X / PaLM-E 논문은 부분 정독 권장 (Section 1, 3 만). RT-2 정독이 우선.
 
 ---
 
-## [search] 자체 점검 - 이해했는지 확인!
+## [tip] 꼭 이해해야 할 핵심 개념 (한 페이지 요약)
 
-### Q1: 2D vs 3D Detection 차이
-**Q:** 2D Detection의 출력은 `[x, y, w, h]` 4개인데, 3D Detection은 왜 7개 파라미터가 필요한가요?
+### 1. RT-2 의 핵심 3가지
 
-**A:**
+| 결정 | 내용 | 왜 중요한가 |
+|---|---|---|
+| Backbone | 5B/55B VLM (PaLI-X / PaLM-E) | web knowledge transfer 의 출발점 |
+| Action 표현 | text token (vocab 중 256 개 재사용) | LM 의 표준 generation 으로 action 도 출력 |
+| 학습 방식 | web data + robot data co-fine-tune | catastrophic forgetting 방지 |
+
+### 2. RT-2 의 입출력 인터페이스
+
 ```
-2D: [x, y, w, h] → 이미지 평면 위의 위치와 크기
-  - 2D 좌표로 위치 표현 (x, y)
-  - 2D 크기로 범위 표현 (w, h)
-
-3D: [x, y, z, l, w, h, θ] → 3D 공간에서의 위치, 크기, 방향
-  - 3D 좌표로 위치 표현 (x, y, z) → +1차원 (깊이)
-  - 3D 크기로 범위 표현 (l, w, h) → +1차원 (depth 방향)
-  - 회전 각도 (θ) → +1 (물체의 방향)
-
-추가된 정보:
-  - z (깊이): "물체가 얼마나 멀리 있는가"
-  - l (길이): "물체가 깊이 방향으로 얼마나 긴가"
-  - θ (회전): "물체가 어느 방향을 향하고 있는가"
+입력  : RGB image (1장) + text instruction (예: "pick up the can")
+출력  : 7-DoF action  [dx, dy, dz, rx, ry, rz, gripper]  +  <terminate?>
+주기  : 약 5Hz (200ms latency)
 ```
 
-### Q2: Camera 기반의 장단점
-**Q:** Camera 기반 3D Detection이 LiDAR보다 성능이 낮은데도 연구되는 이유는?
+### 3. RT-2 다이어그램의 6 가지 부품
 
-**A:**
+1. Vision Encoder (ViT-22B in PaLI-X)
+2. Text Tokenizer (SentencePiece)
+3. Token concat 모듈
+4. Transformer Decoder (PaLM / PaLI core)
+5. Action de-tokenization 모듈
+6. 안전/종료 토큰 핸들러
+
+### 4. 데이터 흐름의 핵심 관문 3 가지
+
 ```
-1. 비용: LiDAR ($10K+) vs Camera ($50~500) → 100배 이상 차이
-2. 정보 풍부: 색상, 텍스처, 의미 정보 → 객체 분류에 유리
-3. 해상도: 카메라 수백만 픽셀 vs LiDAR 수만~수십만 포인트
-4. 산업 트렌드: Tesla Pure Vision → 카메라만으로 자율주행
-5. AMR/로봇: 대부분 카메라가 기본 센서
-6. 기술 발전: BEVFormer 등으로 격차가 줄어들고 있음
-```
-
-### Q3: 3D IoU의 의미
-**Q:** KITTI에서 Car의 3D IoU threshold가 0.7인 이유는 무엇일까요?
-
-**A:**
-```
-IoU 0.7은 "두 3D 박스가 70% 이상 겹쳐야 정답으로 인정"하는 것입니다.
-
-왜 높은 기준인가:
-  - 자율주행에서는 정확한 위치 추정이 안전과 직결
-  - 위치가 조금만 틀려도 충돌 위험
-  - 0.5면 너무 느슨해서 실용적이지 않음
-
-왜 Pedestrian은 0.5인가:
-  - 보행자는 크기가 작아서 IoU가 자연스럽게 낮음
-  - 같은 오차라도 작은 물체에서 IoU가 더 크게 떨어짐
-  - 예: 0.5m 오차 → 차(4.5m)는 IoU 영향 작음, 사람(0.6m)은 IoU 크게 감소
+관문 1: image -> patch tokens     (ViT가 담당)
+관문 2: text  -> token id sequence (SentencePiece)
+관문 3: action <- token id sequence  (RT-2 의 유일한 RT-specific 부분)
 ```
 
-### Q4: 포트폴리오 관점
-**Q:** 면접에서 "왜 LiDAR 없이 Camera만으로 3D Detection을 했나요?"라고 물으면 어떻게 답하시겠습니까?
+관문 1 과 2 는 표준 VLM 그대로. **관문 3 만이 RT-2 의 핵심 contribution.**
 
-**A:**
-```
-좋은 답변 예시:
-"Camera 기반 3D Detection은 더 도전적인 문제이며,
-깊이 추정, 좌표 변환, 기하학적 이해를 깊이 있게 요구합니다.
+---
 
-1. 비용 효율성: 실제 AMR/로봇에서는 카메라가 기본 센서
-2. 기술 깊이: Depth Ambiguity를 이해하고 해결하는 과정에서
-   핀홀 모델, 좌표 변환, 기하학적 제약을 깊이 학습했습니다
-3. 최신 트렌드: BEVFormer 등 Camera 기반 방법이
-   LiDAR와의 격차를 빠르게 줄이고 있습니다
-4. 확장성: Monocular → Multi-view → Fusion으로
-   자연스럽게 확장할 수 있는 기반을 마련했습니다"
-```
+## [search] 자체 점검 - 이해했는지 확인
+
+**Q1. RT-2 가 RT-1 과 다른 가장 본질적인 차이 한 가지는?**
+> RT-1 은 small transformer 를 robot data 만으로 학습. RT-2 는 web-scale pre-trained VLM 을 robot data 와 web data **co-fine-tune**. 결과적으로 RT-2 만 emergent capability (학습되지 않은 명령 수행) 가 발현된다.
+
+**Q2. RT-2 의 "Action 도 token 이다" 가 정확히 무슨 의미인가?**
+> VLM 의 vocabulary 중 마지막 256 개 token 을 action discrete bin 으로 재해석. 즉 LM 의 표준 next-token-prediction 으로 action 도 생성 가능. 별도의 action head 가 필요 없다.
+
+**Q3. RT-2 의 emergent capability 사례 3 가지를 들어보라.**
+> (1) "red can" 처럼 색상이 명시된 명령 수행 (학습 데이터엔 색상 명시 없음), (2) "almost-empty can" 같은 VQA 적 표현 이해, (3) "move close to the dirty table" 같은 의미 추론, (4) "pick up the animal" 같은 추상 명사 처리.
+
+**Q4. RT-2 의 한계 중 양산 SW 엔지니어에게 가장 치명적인 것은?**
+> Inference latency (~200ms+). 5Hz 정도라 실시간 30Hz 제어 어려움. Phase 7 의 산출물 #4 에서 이 latency 를 측정해 "양산 시점 비용" 으로 증거화하는 것이 본 로드맵의 핵심 차별화 포인트.
+
+**Q5. Co-fine-tuning 의 비율 (Web : Robot) 이 8:2 인 이유는?**
+> Robot data 만으로 fine-tune 하면 VLM 이 일반 visual/language 능력을 잃는 (catastrophic forgetting) 것을 방지. Web data 가 다수여야 일반 지식이 보존되며, robot data 가 적정 비율이어야 action 학습도 가능.
 
 ---
 
 ## [note] 이번 주 실습 & 다음 주 준비
 
-### 이번 주 체크리스트
+### 이번 주 실습 과제
+1. RT-2 논문을 처음부터 끝까지 1회독 (대략 12 페이지, 한 번에 다 안 봐도 됨)
+2. Figure 1 (Architecture) 을 손으로 다시 그리기 - `PRACTICE.md` 실습 1
+3. Section 5 (Emergent Capability) 의 사례 표를 노트에 정리
+4. quiz_easy.py / quiz_medium.py 풀고 solutions 확인
+5. "한 페이지 RT-2" reading note 산출 (PRACTICE.md 실습 4)
 
-- [ ] 2D Detection의 3가지 한계 (거리, Occlusion, 경로계획) 이해
-- [ ] 3D BBox 7개 파라미터 `[x, y, z, l, w, h, θ]` 의미 파악
-- [ ] 3D BBox의 8개 corners 계산 원리 이해
-- [ ] 3D Detection 방법론 분류 (LiDAR, Camera, Fusion) 비교
-- [ ] Camera 기반 3D Detection의 세부 분류 (Mono, Stereo, Multi-view) 이해
-- [ ] Depth Ambiguity 개념 파악
-- [ ] AP3D 평가 지표 이해
-- [ ] `PRACTICE.md` 실습 완료
-- [ ] `quiz_easy.py`, `quiz_medium.py` 풀기
-
-### 다음 주 미리보기: 좌표계 이해
-
-```
-다음 주에는:
-  - Camera / World / LiDAR / BEV 좌표계
-  - KITTI 좌표계 규약 [h, w, l, x, y, z, ry]
-  - 좌표 변환 실습 (Camera <-> World)
-  - 3D bbox corners → 2D 이미지 투영
-  → Phase 2에서 배운 좌표 변환을 3D Detection에 적용합니다!
-```
+### 다음 주 (week 2) 준비
+- RT-2 Section 3.2 "Action Tokenization" 부분 다시 1회 읽어보기
+- "256 bin 으로 7-DoF action 을 표현하면 quantization error 는 얼마인가" 에 대해 한 번 생각해보기 (week 2 의 시작 질문)
+- (선택) Andrej Karpathy 의 SentencePiece / BPE 강의 1편: https://www.youtube.com/@AndrejKarpathy (Tokenizer 의 직관)
 
 ---
 
 ## [goal] 이번 주 핵심 요약
 
-1. **2D Detection의 한계**: 거리 정보 부족, Occlusion 처리 어려움, 경로 계획 불가 → 3D 공간 이해가 필수
-
-2. **3D Bounding Box = 7개 파라미터**: `[x, y, z, l, w, h, θ]` (중심 좌표 + 크기 + yaw 회전)
-
-3. **3D Detection 방법론**: LiDAR 기반 (정확), Camera 기반 (저렴), Fusion (최고 성능) → 이 Phase는 Camera 기반에 집중
-
-4. **Camera 기반의 핵심 도전**: Depth Ambiguity → 단일 이미지에서 깊이를 어떻게 추정할 것인가가 핵심 문제
-
-5. **포트폴리오 가치**: 3D Perception 경험은 자율주행/로봇 면접의 핵심 어필 포인트 → GitHub + 블로그 + 데모로 증명
+1. **RT-2 는 VLA 의 출발점**: web-scale VLM 의 지식이 robot 으로 transfer 된다는 첫 대규모 증명.
+2. **Architecture 의 본질**: vision token + text token → Transformer Decoder → text token (그 중 일부가 action).
+3. **Co-fine-tuning**: web data + robot data 8:2 비율로 섞어 학습 → catastrophic forgetting 방지.
+4. **Emergent capability**: 학습되지 않은 명령도 수행 가능 → VLM 의 web knowledge transfer 의 증거.
+5. **한계 5가지**: latency / closed / 데이터 의존 / quantization / single-arm.
 
 ---
 
-이전: [Phase 3 - Detection + Depth](../../../Roadmap/Phase%205.md)
+[O] 이전: [Phase 3 - Detection + Depth → PC TensorRT + ROS2 노드](../../../Roadmap/Phase%203.md)
 
-다음: [Week 2 - 좌표계 이해](../week2/README.md)
+다음: [Week 2 - Co-fine-tuning + Action tokenization](../week2/README.md)

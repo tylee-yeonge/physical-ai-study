@@ -23,7 +23,7 @@
 
 **지금까지의 흐름:**
 ```
-Week 1-4: YOLOv8 학습 → .pt 모델 (PyTorch)
+Week 3-4: YOLO11 학습 → .pt 모델 (PyTorch)
 Week 5:   .pt → .onnx 변환 (ONNX Runtime 추론)
 
 [!] 문제: Jetson에서 ONNX Runtime만으로는 30 FPS 달성 어려움!
@@ -164,22 +164,22 @@ RTX 4090:        Ada Lovelace, 16384 CUDA cores
 **trtexec 도구:**
 ```bash
 # 기본 변환 (FP32)
-trtexec --onnx=yolov8n.onnx \
-        --saveEngine=yolov8n.trt
+trtexec --onnx=yolo11n.onnx \
+        --saveEngine=yolo11n.trt
 
 # FP16 변환 (권장!)
-trtexec --onnx=yolov8n.onnx \
-        --saveEngine=yolov8n_fp16.trt \
+trtexec --onnx=yolo11n.onnx \
+        --saveEngine=yolo11n_fp16.trt \
         --fp16
 
 # INT8 변환 (캘리브레이션 필요)
-trtexec --onnx=yolov8n.onnx \
-        --saveEngine=yolov8n_int8.trt \
+trtexec --onnx=yolo11n.onnx \
+        --saveEngine=yolo11n_int8.trt \
         --int8 \
         --calib=calibration_data/
 
 # 벤치마크
-trtexec --loadEngine=yolov8n_fp16.trt \
+trtexec --loadEngine=yolo11n_fp16.trt \
         --batch=1 \
         --warmUp=500 \
         --avgRuns=100

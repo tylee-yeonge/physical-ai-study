@@ -1,5 +1,6 @@
-numpy
-matplotlib
-opencv-python
-torch
-scipy
+numpy>=1.24.0
+opencv-python>=4.8.0
+Pillow>=9.5.0
+matplotlib>=3.7.0
+# ROS2 cv_bridge 는 시스템 패키지로 설치:
+#   sudo apt install ros-humble-cv-bridge

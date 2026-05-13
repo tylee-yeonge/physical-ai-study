@@ -31,10 +31,10 @@ int main()
     std::cout << "     -> 메모리 절약 + 연산 속도 향상" << std::endl;
     std::cout << "     -> FP16은 정확도 손실 거의 없음 (< 1%)" << std::endl;
 
-    std::cout << "\nQ2. 정답: b) --saveEngine=yolov8n_fp16.trt --fp16" << std::endl;
+    std::cout << "\nQ2. 정답: b) --saveEngine=yolo11n_fp16.trt --fp16" << std::endl;
     std::cout << "    해설:" << std::endl;
-    std::cout << "    trtexec --onnx=yolov8n.onnx \\" << std::endl;
-    std::cout << "            --saveEngine=yolov8n_fp16.trt \\" << std::endl;
+    std::cout << "    trtexec --onnx=yolo11n.onnx \\" << std::endl;
+    std::cout << "            --saveEngine=yolo11n_fp16.trt \\" << std::endl;
     std::cout << "            --fp16" << std::endl;
     std::cout << "    -> --fp16 플래그로 FP16 정밀도 활성화" << std::endl;
     std::cout << "    -> --half, --float16은 존재하지 않는 옵션" << std::endl;

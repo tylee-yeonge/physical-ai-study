@@ -1,72 +1,86 @@
 """
-Solutions - Medium Quiz (Week 6: 성능 분석 및 개선)
+Phase 4 Week 6 - 중급 퀴즈 정답
 """
 
 
-def main():
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    print("Week 6 Quiz - Medium 정답")
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+def problem1_solution():
+    print("\n" + "=" * 60)
+    print("문제 1 정답: latency -> throughput")
+    print("=" * 60 + "\n")
+    mean_hz = 1000 / 165
+    p95_hz = 1000 / 220
 
-    print("Q1. Ablation Study 해석:")
-    print("    1) 가장 기여도가 높은 단일 기법: Multi-scale FPN (+1.5%)")
-    print("       -> 다양한 크기의 객체에 대한 검출 능력을 향상시킴")
-    print("       -> 특히 원거리(작은) 객체의 검출률이 크게 개선됨")
+    print(f"  (a) mean throughput : 1000 / 165 = {mean_hz:.2f} Hz")
+    print(f"  (b) p95  throughput : 1000 / 220 = {p95_hz:.2f} Hz")
     print()
-    print("    2) Multi-scale과 Augmentation의 시너지 효과:")
-    print("       -> 개별 합: 1.5 + 1.3 = 2.8%p 향상 가능")
-    print("       -> 실제 함께 사용: 2.7%p 향상")
-    print("       -> 이는 두 기법이 일부 겹치는 효과가 있음을 의미")
-    print("       -> 하지만 거의 가산적(additive)이므로 보완적 관계임")
+    print(f"  (c) 5Hz 가능?  {mean_hz >= 5} (mean = {mean_hz:.2f} > 5)")
+    print(f"  (d) 30Hz 가능? {mean_hz >= 30} (mean = {mean_hz:.2f} << 30)")
     print()
-    print("    3) 3D NMS 단독 효과가 작은 이유:")
-    print("       -> NMS는 이미 검출된 결과의 후처리 단계")
-    print("       -> 검출 자체의 품질(Depth 정확도)을 개선하지 않음")
-    print("       -> 주로 Precision 향상에 기여하며, Recall에는 기여하지 않음")
-    print("       -> Monocular에서는 중복 검출보다 미검출이 더 큰 문제\n")
+    print("  [tip] '5Hz 가능' 의 의미:")
+    print("       OpenVLA 가 매 200ms 마다 action 생성 가능.")
+    print("       robot 의 low-level controller 가 200ms 사이를 보간하면")
+    print("       smooth motion 가능. (Phase 7 의 hierarchical 구조)")
+    print()
+    print("  '30Hz 불가' 의 의미:")
+    print("       OpenVLA 만으로 30Hz 폐쇄 루프 제어 불가능.")
+    print("       반드시 fast safety policy (joint-level PD controller 등)")
+    print("       와 함께 hierarchical 구조 필요.")
 
-    print("Q2. Depth 추정 개선 3가지 전략:")
-    print("    전략 1 - Direct Regression:")
-    print("      네트워크가 Depth 값(z)을 직접 회귀(regression)")
-    print("      장점: 구현이 간단, end-to-end 학습 가능")
-    print("      단점: 학습 데이터 분포에 의존, 원거리 정확도 낮음")
-    print()
-    print("    전략 2 - Depth Bin Classification:")
-    print("      Depth를 구간(bin)으로 나눠 분류 + 잔차(offset) 회귀")
-    print("      예: [0-5m, 5-10m, ..., 45-50m] 10개 bin")
-    print("      장점: 분류 문제는 회귀보다 안정적, 이상치에 강건")
-    print("      단점: bin 크기 설계에 민감, 연속적 예측이 아님")
-    print()
-    print("    전략 3 - 기하학적 제약 활용:")
-    print("      차량 크기의 사전 지식과 2D bbox를 이용")
-    print("      z = f * H_real / h_pixel (초점거리, 실제높이, 픽셀높이)")
-    print("      장점: 물리적 의미가 있음, 학습 데이터 적어도 효과적")
-    print("      단점: 정확한 클래스 분류 필요, 차량 크기 편차에 취약\n")
 
-    print("Q3. 거리별 성능 진단:")
-    print("    0-10m (AP3D 20.5% - 예상보다 낮음):")
-    print("      주요 원인: Truncation (이미지 경계에서 잘림)")
-    print("      가까운 객체는 이미지에서 크기가 커서 경계 밖으로 나감")
-    print("      해결: Truncation 객체에 대한 보강 학습")
-    print()
-    print("    10-20m (AP3D 28.3% - 가장 좋은 구간):")
-    print("      적절한 크기 + 적절한 거리 -> 시각적 단서 풍부")
-    print()
-    print("    20-30m (AP3D 12.1% - 급격한 성능 하락):")
-    print("      주요 원인: Depth 오차 증가 (평균 ~3m)")
-    print("      객체 크기가 줄어 시각적 단서 부족")
-    print("      해결: Multi-scale feature, Depth 보조 Loss")
-    print()
-    print("    30-40m (AP3D 4.2% - 거의 실패):")
-    print("      주요 원인: 심각한 Depth 오차 + 작은 객체 크기")
-    print("      해결: 고해상도 feature map 사용, Depth prior 활용")
-    print()
-    print("    40m+ (AP3D 0.8% - 검출 불가):")
-    print("      주요 원인: 매우 작은 객체, Depth 오차 5m+")
-    print("      Monocular의 한계, Multi-view나 LiDAR fusion 필요")
+def problem2_solution():
+    print("\n" + "=" * 60)
+    print("문제 2 정답: VRAM 추정")
+    print("=" * 60 + "\n")
+    model_loaded = 5.3
+    kv_cache = 0.5
+    vision_act = 0.5
+    buffer = 0.3
+    available = 12.0
 
-    print("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    total_b1 = model_loaded + kv_cache + vision_act + buffer
+    activation_b1 = kv_cache + vision_act
+    max_batch = int((available - model_loaded - buffer) / activation_b1)
+
+    print(f"  total_b1     : {model_loaded} + {kv_cache} + {vision_act} + {buffer}")
+    print(f"               = {total_b1:.2f} GB")
+    print()
+    print(f"  activation_b1 (batch 변동 부분): {kv_cache} + {vision_act} = {activation_b1:.2f} GB")
+    print()
+    print(f"  max_batch    : (12 - 5.3 - 0.3) / 1.0 = {max_batch}")
+    print()
+    print("  [tip] 실제 OpenVLA inference 는 보통 batch_size=1.")
+    print("       여러 robot 의 동시 inference 가 필요한 경우 max_batch=6 정도까지 가능.")
+    print("       단 KV cache 의 sequence length 가 길어지면 batch 줄여야 할 수 있음.")
+
+
+def problem3_solution():
+    print("\n" + "=" * 60)
+    print("문제 3 정답: A, C, D")
+    print("=" * 60 + "\n")
+    print("  A) 첫 5 회 제외 - O")
+    print("     warm-up 동안 CUDA kernel JIT compile, model weights GPU 로드 등")
+    print("     첫 1~3 measure 는 outlier (보통 2~10배 느림)")
+    print()
+    print("  B) 모든 데이터로 mean 후 outlier 제거 - X (덜 권장)")
+    print("     mean 자체가 outlier 의 영향 받음 -> warm-up 부터 제외하는 게 더 깔끔")
+    print()
+    print("  C) torch.cuda.synchronize() - O")
+    print("     CUDA 는 비동기 실행. python 의 time.time() 측정 직전 sync 필요.")
+    print("     sync 없으면 kernel 이 다 안 끝났는데 시간 측정 -> 짧게 측정됨")
+    print()
+    print("  D) outlier 포함 mean -> throughput 과소평가 - O")
+    print("     mean latency 가 outlier 로 늘어남 -> 1/mean 이 줄어듦")
+    print()
+    print("  [tip] 표준 latency 측정 패턴:")
+    print("       1. warm-up 5~10 회")
+    print("       2. 100 회 측정 (매번 cuda.synchronize)")
+    print("       3. mean / median / p95 / p99 보고")
+    print("       4. throughput = 1000 / mean_ms")
 
 
 if __name__ == "__main__":
-    main()
+    print("=" * 60)
+    problem1_solution()
+    problem2_solution()
+    problem3_solution()
+    print("=" * 60)

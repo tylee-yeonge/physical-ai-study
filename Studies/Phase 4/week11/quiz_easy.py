@@ -1,73 +1,60 @@
 """
-Phase 6 Week 11 - 코드 및 문서 정리 기초 퀴즈
+Phase 4 Week 11 - 실 inference 통합 기초 퀴즈
 """
 
 
-def problem1_readme_essentials():
-    print("\n" + "━" * 28)
-    print("문제 1: README 필수 요소")
-    print("━" * 28 + "\n")
-
-    print("질문: 포트폴리오용 GitHub README에 반드시 포함해야 할")
-    print("      요소로 가장 적절하지 않은 것은?\n")
-
+def problem1_callback_first_step():
+    print("\n" + "=" * 50)
+    print("문제 1: image_callback 의 첫 단계")
+    print("=" * 50 + "\n")
+    print("질문: image_callback 에서 inference 직전 가장 먼저 해야 할 것은?\n")
     print("보기:")
-    print("  A) 프로젝트 설명과 결과 이미지")
-    print("  B) 설치 방법과 실행 예시")
-    print("  C) 개발 일지와 일일 작업 로그")
-    print("  D) 사용한 방법론과 참고 논문")
+    print("  A) image preprocess (BGR -> RGB)")
+    print("  B) image age check (header.stamp 기반)")
+    print("  C) GPU memory 확인")
+    print("  D) instruction 길이 확인")
 
 
-def problem2_gitignore():
-    print("\n" + "━" * 28)
-    print("문제 2: .gitignore 설정")
-    print("━" * 28 + "\n")
-
-    print("질문: Git 저장소에 포함하지 말아야 할 파일은?\n")
-
+def problem2_executor():
+    print("\n" + "=" * 50)
+    print("문제 2: rclpy default executor")
+    print("=" * 50 + "\n")
+    print("질문: 본 phase 의 vla_node 에 적합한 executor 는?\n")
     print("보기:")
-    print("  A) requirements.txt")
-    print("  B) src/models/fcos3d_wrapper.py")
-    print("  C) data/kitti/training/image_2/000000.png (대용량 데이터)")
-    print("  D) README.md")
+    print("  A) Single-threaded (default)")
+    print("  B) Multi-threaded")
+    print("  C) AsyncIO")
+    print("  D) Custom thread pool")
 
 
-def problem3_docstring():
-    print("\n" + "━" * 28)
-    print("문제 3: Docstring 작성")
-    print("━" * 28 + "\n")
-
-    print("질문: 좋은 Docstring에 포함되어야 할 항목은?\n")
-
+def problem3_dry_run_criteria():
+    print("\n" + "=" * 50)
+    print("문제 3: 1분 dry-run 의 success criteria")
+    print("=" * 50 + "\n")
+    print("질문: 1분 dry-run 의 가장 엄격한 기준은?\n")
     print("보기:")
-    print("  A) 함수의 Git 커밋 해시")
-    print("  B) Args(인자 설명), Returns(반환값 설명), 간단한 사용 예시")
-    print("  C) 함수를 작성한 날짜와 작성자 이름")
-    print("  D) 함수의 실행 시간 벤치마크")
+    print("  A) Mean latency < 200ms")
+    print("  B) p95 latency < 300ms")
+    print("  C) 0 fail (모든 inference 성공)")
+    print("  D) Throughput > 5 Hz")
 
 
-def problem4_commit_message():
-    print("\n" + "━" * 28)
-    print("문제 4: 커밋 메시지 규칙")
-    print("━" * 28 + "\n")
-
-    print("질문: 다음 중 가장 좋은 커밋 메시지는?\n")
-
+def problem4_bag_use():
+    print("\n" + "=" * 50)
+    print("문제 4: ros2 bag 의 사용 목적")
+    print("=" * 50 + "\n")
+    print("질문: 본 phase 에서 ros2 bag 의 가장 큰 가치는?\n")
     print("보기:")
-    print("  A) 'update'")
-    print("  B) 'fix bug'")
-    print("  C) 'feat(visualization): 3D bbox BEV 시각화 함수 추가'")
-    print("  D) '2024-01-15 작업'")
+    print("  A) GPU memory 절약")
+    print("  B) 재현 가능한 테스트 (동일 image input)")
+    print("  C) inference 속도 향상")
+    print("  D) 모델 weight 저장")
 
 
 if __name__ == "__main__":
-    print("━" * 33)
-    print("  Week 11 Quiz - Easy")
-    print("━" * 33)
-    problem1_readme_essentials()
-    problem2_gitignore()
-    problem3_docstring()
-    problem4_commit_message()
-    print("\n" + "━" * 33)
-    print("정답은 quiz_solutions/easy_sol.py 참고")
-    print("━" * 33)
+    print("=" * 50)
+    problem1_callback_first_step()
+    problem2_executor()
+    problem3_dry_run_criteria()
+    problem4_bag_use()
+    print("=" * 50)

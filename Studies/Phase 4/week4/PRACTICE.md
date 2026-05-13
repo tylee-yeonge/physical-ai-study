@@ -1,484 +1,213 @@
-# Week 4 실습: Monocular 3D Detection 핵심 구성요소 구현
+# Week 4 실습: OpenVLA 논문 정독 + Hybrid Vision Encoder 분석
 
-> **목표**: SMOKE/FCOS3D의 핵심 구성요소를 직접 구현하여 모델 원리를 체득
-> **언어**: Python (NumPy, PyTorch)
-> **예상 시간**: 5시간
-
----
-
-## 실습 개요
-
-이번 실습에서는 Monocular 3D Detection 모델의 핵심 구성요소를 단계별로 구현합니다. 전체 모델을 학습하지는 않지만, 각 구성요소의 원리를 코드로 이해합니다.
+> [goal] **실습 목표**: OpenVLA 의 hybrid vision encoder 의 효과를 코드로 확인하고, RT-2 와의 비교 표를 완성한다.
+> [time] **예상 시간**: 6~8시간
 
 ---
 
-## 환경 설정
+## [tool] 환경 설정
 
 ```bash
-pip install numpy matplotlib torch torchvision
+conda activate phase4
+pip install -r requirements.txt
+# 추가: transformers (이미 설치됨), Pillow
+```
+
+```bash
+# OpenVLA 논문 다운로드
+wget -O ~/phase4_notes/papers/openvla.pdf "https://arxiv.org/pdf/2406.09246.pdf"
 ```
 
 ---
 
-## Step 1: Gaussian Heatmap 생성 (SMOKE 스타일)
+## [note] 실습 1: OpenVLA 논문 reading note 템플릿
+
+**파일명**: `~/phase4_notes/week4/openvla_reading_note.md`
+
+RT-2 reading note 템플릿 (week 1) 와 동일 형식. 단 다음 항목 추가:
+
+```markdown
+# OpenVLA Reading Note
+
+## 0. Meta
+- 제목: OpenVLA: An Open-Source Vision-Language-Action Model
+- 저자: Stanford / Princeton / UC Berkeley (2024)
+- 1회독 소요: __h __m
+
+## 1. One-liner
+## 2. 핵심 contribution 4가지
+## 3. Architecture diagram (손그림)
+## 4. Hybrid vision encoder
+   - DINOv2 의 역할: _____
+   - SigLIP 의 역할: _____
+   - 두 encoder 의 fusion 방식: _____
+## 5. OpenX-Embodiment 데이터
+   - 총 episode 수: ___
+   - Embodiment 수: ___
+## 6. Fine-tuning / LoRA
+   - LoRA rank, alpha 설정: _____
+   - 새 robot 적응 시간: ___ GPU hr
+## 7. RT-2 와의 비교 (본 README 7장 표)
+## 8. Limitations 5가지
+## 9. 본 로드맵 관점
+   - Phase 7 산출물 #4 에서 어떻게 쓸 것인가: _____
+## 10. 다음 (week 5) 시작 질문
+```
+
+---
+
+## [note] 실습 2: DINOv2 vs SigLIP feature 시각화
+
+**파일명**: `practice_dinov2_siglip.py`
 
 ```python
-import numpy as np
-import matplotlib.pyplot as plt
+"""
+실습 2: DINOv2 와 SigLIP 의 patch feature 를 시각화하여 차이를 본다.
+"""
 import torch
-import torch.nn as nn
+import numpy as np
+from PIL import Image
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
+from transformers import AutoModel, AutoImageProcessor
 
-def generate_gaussian_heatmap(heatmap, center, radius):
-    """
-    Gaussian heatmap 생성 (CenterNet/SMOKE 스타일)
+print("=" * 60)
+print("실습 2: DINOv2 vs SigLIP feature 비교")
+print("=" * 60)
 
-    Parameters:
-        heatmap: (H, W) ndarray - 기존 heatmap (여러 객체 누적)
-        center: (cx, cy) - 객체 중심 좌표
-        radius: int - Gaussian 반경
-    """
-    x, y = int(center[0]), int(center[1])
-    h, w = heatmap.shape
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    # Gaussian 범위
-    left = min(x, radius)
-    right = min(w - x, radius + 1)
-    top = min(y, radius)
-    bottom = min(h - y, radius + 1)
+# -- 2-1. DINOv2 로드 --
+print("\n[2-1] DINOv2 로드")
+dino_proc = AutoImageProcessor.from_pretrained("facebook/dinov2-base")
+dino_model = AutoModel.from_pretrained("facebook/dinov2-base").to(device).eval()
+print(f"  DINOv2 hidden size: {dino_model.config.hidden_size}")
 
-    # 2D Gaussian
-    sigma = radius / 3.0  # 3-sigma rule
-    y_range = np.arange(-top, bottom)
-    x_range = np.arange(-left, right)
-    yy, xx = np.meshgrid(y_range, x_range, indexing='ij')
+# -- 2-2. SigLIP 로드 --
+print("\n[2-2] SigLIP 로드")
+sig_proc = AutoImageProcessor.from_pretrained("google/siglip-base-patch16-224")
+sig_model = AutoModel.from_pretrained("google/siglip-base-patch16-224").to(device).eval()
+print(f"  SigLIP hidden size: {sig_model.config.vision_config.hidden_size}")
 
-    gaussian = np.exp(-(xx**2 + yy**2) / (2 * sigma**2))
+# -- 2-3. 테스트 이미지 (랜덤 ImageNet 1장 또는 본인 이미지) --
+img = Image.open("/path/to/your/test_image.jpg").convert("RGB") if False else Image.fromarray(
+    (np.random.rand(224, 224, 3) * 255).astype(np.uint8)
+)
+print(f"\n[2-3] Test image size: {img.size}")
 
-    # 기존 값과 max 취하기 (여러 객체가 겹칠 때)
-    masked_heatmap = heatmap[y - top:y + bottom, x - left:x + right]
-    masked_gaussian = gaussian[:bottom + top, :right + left]
+# -- 2-4. DINOv2 forward --
+with torch.no_grad():
+    dino_inputs = dino_proc(images=img, return_tensors="pt").to(device)
+    dino_out = dino_model(**dino_inputs)
+    dino_feat = dino_out.last_hidden_state  # [1, n_patches+1, hidden]
+print(f"\n[2-4] DINOv2 출력 shape: {dino_feat.shape}")
 
-    if masked_heatmap.shape == masked_gaussian.shape:
-        np.maximum(masked_heatmap, masked_gaussian, out=masked_heatmap)
+# -- 2-5. SigLIP vision encoder forward --
+with torch.no_grad():
+    sig_inputs = sig_proc(images=img, return_tensors="pt").to(device)
+    sig_out = sig_model.vision_model(**sig_inputs)
+    sig_feat = sig_out.last_hidden_state  # [1, n_patches, hidden]
+print(f"[2-5] SigLIP 출력 shape: {sig_feat.shape}")
 
-    return heatmap
+# -- 2-6. patch feature 의 PCA 시각화 --
+def pca_2d(feat):
+    f = feat.squeeze(0).cpu().numpy()  # [N, D]
+    # CLS / pooling token 제거 (DINOv2 의 경우 첫 token)
+    if f.shape[0] % 2 == 1:
+        f = f[1:]
+    n = int(np.sqrt(f.shape[0]))
+    f = f[:n*n]
+    # 가장 분산 큰 3 방향 (RGB 채널처럼 사용)
+    mean = f.mean(axis=0, keepdims=True)
+    centered = f - mean
+    U, S, Vt = np.linalg.svd(centered, full_matrices=False)
+    proj = centered @ Vt[:3].T  # [N, 3]
+    proj = (proj - proj.min(axis=0)) / (proj.max(axis=0) - proj.min(axis=0) + 1e-9)
+    return proj.reshape(n, n, 3)
 
+dino_pca = pca_2d(dino_feat)
+sig_pca = pca_2d(sig_feat)
 
-def visualize_heatmap():
-    """여러 객체의 Gaussian heatmap을 생성하고 시각화"""
-    H, W = 96, 312  # Feature map 크기 (원본의 1/4)
+fig, ax = plt.subplots(1, 3, figsize=(12, 4))
+ax[0].imshow(img); ax[0].set_title("RGB"); ax[0].axis('off')
+ax[1].imshow(dino_pca); ax[1].set_title("DINOv2 PCA"); ax[1].axis('off')
+ax[2].imshow(sig_pca); ax[2].set_title("SigLIP PCA"); ax[2].axis('off')
+plt.tight_layout()
+plt.savefig("dino_vs_siglip.png", dpi=100)
+print("\n[2-6] 시각화 저장: dino_vs_siglip.png")
 
-    # 각 클래스별 heatmap
-    heatmap_car = np.zeros((H, W))
-    heatmap_ped = np.zeros((H, W))
+print("\n[O] 실습 2 완료!")
+print("    -> 직접 비교: DINOv2 는 공간 경계가 선명, SigLIP 은 semantic 영역이 묶임")
+```
 
-    # 가상 객체 중심 (feature map 좌표)
-    cars = [(150, 45, 15), (100, 50, 8), (200, 48, 6)]  # (cx, cy, radius)
-    peds = [(250, 40, 5), (80, 35, 4)]
+> [tip] 실제 robot 환경 사진으로 시도해보면 차이가 더 명확. 책상 위 물체들이 있는 사진을 권장.
 
-    for cx, cy, r in cars:
-        generate_gaussian_heatmap(heatmap_car, (cx, cy), r)
-    for cx, cy, r in peds:
-        generate_gaussian_heatmap(heatmap_ped, (cx, cy), r)
+---
 
-    # 시각화
-    fig, axes = plt.subplots(1, 3, figsize=(18, 4))
+## [note] 실습 3: 한 페이지 OpenVLA 노트 산출
 
-    axes[0].imshow(heatmap_car, cmap='hot', aspect='auto')
-    axes[0].set_title('Car Heatmap')
-    for cx, cy, _ in cars:
-        axes[0].plot(cx, cy, 'g+', markersize=10, markeredgewidth=2)
+**파일명**: `~/phase4_notes/week4/openvla_one_page.md`
 
-    axes[1].imshow(heatmap_ped, cmap='hot', aspect='auto')
-    axes[1].set_title('Pedestrian Heatmap')
-    for cx, cy, _ in peds:
-        axes[1].plot(cx, cy, 'g+', markersize=10, markeredgewidth=2)
+```markdown
+# OpenVLA 한 페이지
 
-    # 합성
-    combined = np.stack([heatmap_car, heatmap_ped, np.zeros_like(heatmap_car)], axis=2)
-    axes[2].imshow(combined, aspect='auto')
-    axes[2].set_title('Combined (R=Car, G=Ped)')
+## 1. One-liner
+> _____________________________________________________________
 
-    plt.suptitle('SMOKE 스타일 Gaussian Heatmap', fontsize=14)
-    plt.tight_layout()
-    plt.savefig('heatmap_generation.png', dpi=150)
-    plt.show()
-    print("Heatmap 생성 및 시각화 완료!")
+## 2. 4가지 핵심 결정
+1. Backbone LM      : Llama 2 7B
+2. Vision encoder   : DINOv2 + SigLIP hybrid
+3. 데이터           : OpenX-Embodiment 970K
+4. Fine-tuning      : LoRA 지원
 
+## 3. Architecture (손그림)
+[이미지 첨부]
 
-visualize_heatmap()
+## 4. Hybrid vision encoder 의 의도
+- DINOv2: spatial / geometric
+- SigLIP: semantic / category
+- concat 후 projector (MLP) -> LM
+
+## 5. RT-2 vs OpenVLA 비교 (한 페이지)
+| 항목 | RT-2 | OpenVLA |
+| ... | ... | ... |
+
+## 6. Limitations 5가지
+1. 데이터 분포 의존
+2. VRAM (4-bit 필수)
+3. Latency 100~150ms
+4. Single-arm
+5. No teleop policy
+
+## 7. 본 로드맵 관점
+- Phase 7 산출물 #4 에서 LoRA fine-tuning 으로 자작 6DOF 팔 적응
+- 4-bit quantization 으로 RTX 4070 inference 가능
+
+## 8. 다음 주 (week 5) 시작 질문
+- OpenX-Embodiment 의 22 embodiments 중 자작 팔에 가장 가까운 것은?
 ```
 
 ---
 
-## Step 2: sin/cos Rotation 인코딩/디코딩
+## [O] 실습 체크리스트
 
-```python
-def encode_rotation(theta):
-    """회전각을 sin/cos로 인코딩"""
-    return np.sin(theta), np.cos(theta)
-
-
-def decode_rotation(sin_val, cos_val):
-    """sin/cos에서 회전각 복원"""
-    return np.arctan2(sin_val, cos_val)
-
-
-def rotation_encoding_demo():
-    """sin/cos 인코딩의 장점을 시각적으로 보여줍니다"""
-
-    # 다양한 각도 테스트
-    thetas = np.linspace(-np.pi, np.pi, 100)
-
-    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-
-    # 1. 원래 각도
-    axes[0, 0].plot(thetas, thetas)
-    axes[0, 0].set_title('원래 각도 (theta)')
-    axes[0, 0].set_xlabel('GT theta')
-    axes[0, 0].set_ylabel('theta 값')
-    axes[0, 0].grid(True)
-
-    # 2. sin/cos 인코딩
-    sin_vals = np.sin(thetas)
-    cos_vals = np.cos(thetas)
-    axes[0, 1].plot(thetas, sin_vals, label='sin(theta)', color='blue')
-    axes[0, 1].plot(thetas, cos_vals, label='cos(theta)', color='red')
-    axes[0, 1].set_title('sin/cos 인코딩')
-    axes[0, 1].set_xlabel('theta')
-    axes[0, 1].legend()
-    axes[0, 1].grid(True)
-
-    # 3. 직접 회귀 시 문제점
-    # theta=pi 근처에서 -pi와 pi의 불연속
-    axes[1, 0].set_title('직접 회귀 문제: 불연속점')
-    gt = np.pi - 0.01  # pi에 가까운 각도
-    preds = np.linspace(-np.pi, np.pi, 100)
-    l1_direct = np.abs(preds - gt)
-    axes[1, 0].plot(preds, l1_direct, label='L1 Loss (직접)')
-    axes[1, 0].axvline(x=-np.pi + 0.01, color='r', linestyle='--', label='실제로 가까운 예측')
-    axes[1, 0].set_xlabel('예측 theta')
-    axes[1, 0].set_ylabel('L1 Loss')
-    axes[1, 0].legend()
-    axes[1, 0].grid(True)
-
-    # 4. sin/cos 회귀의 해결
-    gt_sin, gt_cos = np.sin(gt), np.cos(gt)
-    l1_sincos = np.sqrt((np.sin(preds) - gt_sin)**2 + (np.cos(preds) - gt_cos)**2)
-    axes[1, 1].plot(preds, l1_sincos, label='L2 Loss (sin/cos)', color='green')
-    axes[1, 1].set_title('sin/cos 인코딩: 연속적 손실')
-    axes[1, 1].set_xlabel('예측 theta')
-    axes[1, 1].set_ylabel('sin/cos L2 Loss')
-    axes[1, 1].legend()
-    axes[1, 1].grid(True)
-
-    plt.suptitle('Rotation 인코딩 비교: 직접 회귀 vs sin/cos', fontsize=14)
-    plt.tight_layout()
-    plt.savefig('rotation_encoding.png', dpi=150)
-    plt.show()
-    print("Rotation 인코딩 비교 시각화 완료!")
-
-    # 인코딩/디코딩 테스트
-    print("\n인코딩/디코딩 테스트:")
-    test_thetas = [0, np.pi/4, np.pi/2, np.pi, -np.pi/2, -np.pi + 0.01]
-    for theta in test_thetas:
-        s, c = encode_rotation(theta)
-        recovered = decode_rotation(s, c)
-        print(f"  theta={theta:>7.4f} -> sin={s:>7.4f}, cos={c:>7.4f} -> recovered={recovered:>7.4f}")
-
-
-rotation_encoding_demo()
-```
+- [ ] OpenVLA 논문 1회독 (대략 15페이지)
+- [ ] reading note 빈칸 채움
+- [ ] `practice_dinov2_siglip.py` 실행, 시각화 비교
+- [ ] RT-2 vs OpenVLA 비교 표 완성
+- [ ] 한 페이지 노트 산출
+- [ ] quiz_easy / quiz_medium 풀기
+- [ ] git commit
 
 ---
 
-## Step 3: Depth 예측 실험
+## [link] 참고 자료
 
-```python
-def depth_estimation_comparison():
-    """
-    다양한 depth 예측 방법을 비교합니다.
-    """
-    # GT depth 범위 (KITTI 전형적)
-    z_gt = np.linspace(1, 80, 100)
-
-    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-
-    # 방법 1: Direct regression
-    z_max = 80.0
-    output_direct = z_gt / z_max  # sigmoid 출력 (0~1)
-    z_pred_direct = output_direct * z_max
-
-    axes[0, 0].plot(z_gt, z_pred_direct, 'b-', label='예측')
-    axes[0, 0].plot(z_gt, z_gt, 'r--', label='GT')
-    axes[0, 0].set_title('방법 1: Direct Regression\nz = sigmoid(out) * z_max')
-    axes[0, 0].set_xlabel('GT Depth [m]')
-    axes[0, 0].set_ylabel('Predicted Depth [m]')
-    axes[0, 0].legend()
-    axes[0, 0].grid(True)
-
-    # 방법 2: Log-space regression
-    output_log = np.log(z_gt)
-    z_pred_log = np.exp(output_log)
-
-    axes[0, 1].plot(z_gt, output_log, 'b-', label='네트워크 출력 (log(z))')
-    axes[0, 1].set_title('방법 2: Log-space\noutput = log(z), z = exp(output)')
-    axes[0, 1].set_xlabel('GT Depth [m]')
-    axes[0, 1].set_ylabel('Log(depth)')
-    axes[0, 1].legend()
-    axes[0, 1].grid(True)
-
-    # 방법 3: 같은 절대 오차에 대한 상대적 영향
-    abs_error = 2.0  # 2m 오차
-    relative_error = abs_error / z_gt * 100
-
-    axes[1, 0].plot(z_gt, relative_error, 'r-')
-    axes[1, 0].set_title(f'절대 오차 {abs_error}m의 상대적 영향')
-    axes[1, 0].set_xlabel('GT Depth [m]')
-    axes[1, 0].set_ylabel('상대 오차 [%]')
-    axes[1, 0].grid(True)
-    axes[1, 0].axhline(y=10, color='gray', linestyle='--', alpha=0.5, label='10%')
-    axes[1, 0].legend()
-
-    # 방법 4: 기하학적 방법
-    fx = 720.0
-    H_real = 1.5  # 차 높이 (m)
-    h_pixels = fx * H_real / z_gt  # 이미지에서의 높이 (pixels)
-
-    axes[1, 1].plot(z_gt, h_pixels, 'g-')
-    axes[1, 1].set_title('기하학적 방법: h_pixel = fx * H_real / z')
-    axes[1, 1].set_xlabel('GT Depth [m]')
-    axes[1, 1].set_ylabel('이미지 높이 [pixels]')
-    axes[1, 1].grid(True)
-    axes[1, 1].axhline(y=25, color='gray', linestyle='--', alpha=0.5, label='25px (Moderate 기준)')
-    axes[1, 1].legend()
-
-    plt.suptitle('Depth 추정 방법 비교', fontsize=14)
-    plt.tight_layout()
-    plt.savefig('depth_comparison.png', dpi=150)
-    plt.show()
-    print("Depth 추정 방법 비교 완료!")
-
-    # Log-space의 장점 계산
-    print("\nLog-space의 장점:")
-    print("  z=5m에서 2m 오차:")
-    print(f"    L1(direct): |5 - 3| = 2.0")
-    print(f"    L1(log):    |log(5) - log(3)| = |{np.log(5):.3f} - {np.log(3):.3f}| = {abs(np.log(5) - np.log(3)):.3f}")
-    print("  z=50m에서 2m 오차:")
-    print(f"    L1(direct): |50 - 48| = 2.0")
-    print(f"    L1(log):    |log(50) - log(48)| = |{np.log(50):.3f} - {np.log(48):.3f}| = {abs(np.log(50) - np.log(48)):.3f}")
-    print()
-    print("  → Direct: 가까이든 멀든 같은 loss (2.0)")
-    print("  → Log: 가까울 때 loss가 크고, 멀 때 작음")
-    print("  → Log가 가까운 객체의 정확도를 더 중시 (자율주행에 유리)")
-
-
-depth_estimation_comparison()
-```
-
----
-
-## Step 4: 간단한 3D Detection Head (PyTorch)
-
-```python
-class Simple3DHead(nn.Module):
-    """
-    SMOKE/FCOS3D 스타일의 간단한 3D Detection Head
-
-    입력: backbone feature map (B, C, H, W)
-    출력: heatmap, offset, depth, size, rotation
-    """
-    def __init__(self, in_channels=64, num_classes=3):
-        super().__init__()
-
-        # 공유 convolution
-        self.shared_conv = nn.Sequential(
-            nn.Conv2d(in_channels, 64, 3, padding=1),
-            nn.BatchNorm2d(64),
-            nn.ReLU(inplace=True),
-        )
-
-        # 분류 분기: Heatmap (각 클래스별 중심점 확률)
-        self.cls_head = nn.Sequential(
-            nn.Conv2d(64, 64, 3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(64, num_classes, 1),  # (B, C, H, W) C=클래스 수
-        )
-
-        # 회귀 분기
-        self.offset_head = nn.Conv2d(64, 2, 1)     # 2D offset (dx, dy)
-        self.depth_head = nn.Conv2d(64, 1, 1)       # Depth (z)
-        self.size_head = nn.Conv2d(64, 3, 1)         # Size (h, w, l)
-        self.rot_head = nn.Conv2d(64, 2, 1)          # Rotation (sin, cos)
-
-    def forward(self, x):
-        """
-        Parameters:
-            x: (B, C, H, W) backbone feature
-
-        Returns:
-            dict of predictions
-        """
-        feat = self.shared_conv(x)
-
-        heatmap = torch.sigmoid(self.cls_head(feat))   # (B, num_cls, H, W)
-        offset = self.offset_head(feat)                  # (B, 2, H, W)
-        depth = torch.relu(self.depth_head(feat)) + 1.0  # (B, 1, H, W), 최소 1m
-        size = self.size_head(feat)                       # (B, 3, H, W)
-        rotation = self.rot_head(feat)                    # (B, 2, H, W)
-
-        return {
-            'heatmap': heatmap,
-            'offset': offset,
-            'depth': depth,
-            'size': size,
-            'rotation': rotation,
-        }
-
-
-# 테스트
-head = Simple3DHead(in_channels=64, num_classes=3)
-dummy_input = torch.randn(2, 64, 96, 312)  # (B, C, H, W)
-
-outputs = head(dummy_input)
-
-print("3D Detection Head 출력:")
-for key, val in outputs.items():
-    print(f"  {key:12s}: shape={list(val.shape)}")
-
-# 파라미터 수
-total_params = sum(p.numel() for p in head.parameters())
-print(f"\n총 파라미터 수: {total_params:,}")
-```
-
----
-
-## Step 5: Focal Loss 구현
-
-```python
-def focal_loss(pred, target, alpha=2.0, beta=4.0):
-    """
-    CenterNet/SMOKE 스타일 Focal Loss
-
-    Parameters:
-        pred: (B, C, H, W) - sigmoid 후 예측값
-        target: (B, C, H, W) - Gaussian heatmap GT
-
-    Positive: target == 1 인 위치
-    Negative: target < 1 인 위치 (가중치 감소)
-    """
-    pos_mask = target.eq(1).float()
-    neg_mask = target.lt(1).float()
-
-    # Positive loss
-    pos_loss = -torch.log(pred + 1e-8) * torch.pow(1 - pred, alpha) * pos_mask
-
-    # Negative loss (배경 위치에서의 손실 감소)
-    neg_loss = (-torch.log(1 - pred + 1e-8) *
-                torch.pow(pred, alpha) *
-                torch.pow(1 - target, beta) * neg_mask)
-
-    num_pos = pos_mask.sum()
-    pos_loss = pos_loss.sum()
-    neg_loss = neg_loss.sum()
-
-    if num_pos == 0:
-        return neg_loss
-    return (pos_loss + neg_loss) / num_pos
-
-
-# 테스트
-pred = torch.rand(1, 3, 10, 10)
-target = torch.zeros(1, 3, 10, 10)
-target[0, 0, 5, 5] = 1.0  # 하나의 positive
-
-loss = focal_loss(pred, target)
-print(f"Focal Loss: {loss.item():.4f}")
-```
-
----
-
-## Step 6: 전체 파이프라인 시뮬레이션
-
-```python
-def full_pipeline_demo():
-    """
-    3D Detection 전체 파이프라인을 시뮬레이션합니다.
-    (실제 이미지 없이 가상 데이터로)
-    """
-    print("=" * 50)
-    print("Monocular 3D Detection 파이프라인 시뮬레이션")
-    print("=" * 50)
-
-    # 1. 가상 GT
-    gt_objects = [
-        {'class': 'Car', 'x': 2.0, 'y': 1.65, 'z': 15.0,
-         'h': 1.5, 'w': 1.8, 'l': 4.5, 'ry': 0.1},
-        {'class': 'Car', 'x': -3.0, 'y': 1.65, 'z': 25.0,
-         'h': 1.5, 'w': 1.7, 'l': 4.2, 'ry': -0.05},
-    ]
-
-    print("\n1. Ground Truth:")
-    for obj in gt_objects:
-        print(f"   {obj['class']}: pos=({obj['x']}, {obj['y']}, {obj['z']}) "
-              f"size=({obj['l']}, {obj['w']}, {obj['h']}) ry={obj['ry']}")
-
-    # 2. 가상 모델 출력 (약간의 오차 포함)
-    print("\n2. 모델 예측 (가상):")
-    for obj in gt_objects:
-        # 오차 추가
-        pred_z = obj['z'] + np.random.normal(0, 1.5)  # depth 오차 ~1.5m
-        pred_ry_sin = np.sin(obj['ry']) + np.random.normal(0, 0.05)
-        pred_ry_cos = np.cos(obj['ry']) + np.random.normal(0, 0.05)
-        pred_ry = np.arctan2(pred_ry_sin, pred_ry_cos)
-
-        print(f"   {obj['class']}:")
-        print(f"     GT depth: {obj['z']:.1f}m, Pred depth: {pred_z:.1f}m, "
-              f"오차: {abs(pred_z - obj['z']):.1f}m")
-        print(f"     GT ry: {obj['ry']:.3f}, Pred ry: {pred_ry:.3f}, "
-              f"오차: {abs(pred_ry - obj['ry']):.3f} rad "
-              f"({np.degrees(abs(pred_ry - obj['ry'])):.1f}도)")
-
-    # 3. Depth 오차의 영향
-    print("\n3. Depth 오차가 3D IoU에 미치는 영향:")
-    for dz in [0.5, 1.0, 2.0, 5.0]:
-        # 간단한 IoU 근사 (축 정렬, 같은 크기)
-        l, w, h = 4.5, 1.8, 1.5
-        vol = l * w * h
-        overlap_z = max(0, l - dz)
-        intersection = w * h * overlap_z
-        iou = intersection / (2 * vol - intersection) if (2 * vol - intersection) > 0 else 0
-        status = "TP" if iou >= 0.7 else "FP"
-        print(f"   dz={dz:.1f}m: IoU~{iou:.3f} ({status}) "
-              f"{'<- KITTI Car 통과!' if iou >= 0.7 else ''}")
-
-
-full_pipeline_demo()
-```
-
----
-
-## 체크리스트
-
-- [ ] Gaussian Heatmap 생성 이해 및 시각화
-- [ ] sin/cos rotation 인코딩/디코딩 구현
-- [ ] Depth 추정 방법 비교 (Direct, Log-space, 기하학적)
-- [ ] Simple 3D Detection Head (PyTorch) 구조 이해
-- [ ] Focal Loss 원리 이해
-- [ ] 전체 파이프라인 시뮬레이션 실행
-
----
-
-## 추가 실험 아이디어
-
-1. **Multi-bin rotation**: 2-bin 방법 구현하여 sin/cos와 비교
-2. **Size residual**: 카테고리 평균 + 잔차 방식 구현
-3. **NMS (Non-Maximum Suppression)**: 3D NMS 구현
-4. **Depth uncertainty**: 깊이 예측의 불확실성을 함께 출력하도록 head 수정
-
----
-
-이전: [Week 3 실습](../week3/PRACTICE.md)
-
-**다음**: Week 5에서 MMDetection3D를 사용하여 실제 모델을 학습합니다!
+- [OpenVLA paper](https://arxiv.org/abs/2406.09246)
+- [OpenVLA project page](https://openvla.github.io/)
+- [OpenVLA GitHub](https://github.com/openvla/openvla)
+- [DINOv2 paper](https://arxiv.org/abs/2304.07193)
+- [SigLIP paper](https://arxiv.org/abs/2303.15343)
+- [Llama 2 paper](https://arxiv.org/abs/2307.09288)

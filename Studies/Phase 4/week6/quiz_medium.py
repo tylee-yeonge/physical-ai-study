@@ -1,84 +1,132 @@
 """
-Quiz Medium - Week 6: 성능 분석 및 개선 (Section 6.2)
-3문제 - 심화 이해
+Phase 4 Week 6 - HuggingFace + Inference 중급 퀴즈
 """
+import numpy as np
 
 
-def problem1_ablation_analysis():
-    print("\n" + "━" * 28)
-    print("문제 1: Ablation Study 해석")
-    print("━" * 28 + "\n")
+def problem1_latency_to_throughput():
+    """
+    문제 1: latency -> throughput 변환
 
-    print("Q: 다음 Ablation Study 결과를 분석하세요.\n")
-    print("   ┌──────────────────────────┬──────────────┐")
-    print("   │ 실험                      │ AP3D (%)     │")
-    print("   ├──────────────────────────┼──────────────┤")
-    print("   │ Baseline                 │ 12.5         │")
-    print("   │ + Multi-scale FPN        │ 14.0         │")
-    print("   │ + Data Augmentation      │ 13.8         │")
-    print("   │ + Multi-scale + Augment  │ 15.2         │")
-    print("   │ + 3D NMS                 │ 13.1         │")
-    print("   │ All combined             │ 15.8         │")
-    print("   └──────────────────────────┴──────────────┘\n")
-    print("   1) 가장 기여도가 높은 단일 기법은 무엇인가?")
-    print("   2) Multi-scale과 Augmentation을 함께 사용하면")
-    print("      개별 기여도의 합(1.5+1.3=2.8)보다 높은 2.7이 나왔습니다.")
-    print("      이것이 의미하는 바는?")
-    print("   3) 3D NMS 단독 효과가 작은 이유는?\n")
-    print("   답: _____\n")
+    아래 latency 측정 결과가 주어졌을 때:
+      - mean: 165 ms
+      - p95 : 220 ms
 
+    질문:
+      (a) mean throughput (Hz) = ?
+      (b) p95 throughput (Hz) = ?
+      (c) 5Hz 폐쇄 루프 제어 가능?
+      (d) 30Hz 가능?
 
-def problem2_depth_improvement():
-    print("\n" + "━" * 28)
-    print("문제 2: Depth 추정 개선 전략")
-    print("━" * 28 + "\n")
+    TODO 값 채우기.
+    """
+    print("\n" + "=" * 60)
+    print("문제 1: latency -> throughput")
+    print("=" * 60 + "\n")
 
-    print("Q: Monocular 3D Detection에서 Depth 추정을 개선하기 위한")
-    print("   3가지 전략을 설명하고, 각각의 장단점을 비교하세요.\n")
-    print("   전략 1 (Direct Regression): _____")
-    print("     장점: _____")
-    print("     단점: _____\n")
-    print("   전략 2 (Depth Bin Classification): _____")
-    print("     장점: _____")
-    print("     단점: _____\n")
-    print("   전략 3 (기하학적 제약 활용): _____")
-    print("     장점: _____")
-    print("     단점: _____\n")
+    mean_ms = 165
+    p95_ms = 220
+
+    # TODO
+    mean_hz = 0.0
+    p95_hz = 0.0
+    can_5hz = None  # True / False
+    can_30hz = None
+
+    expected_mean = 1000 / mean_ms
+    expected_p95 = 1000 / p95_ms
+
+    print(f"  당신의 답:")
+    print(f"    (a) mean throughput : {mean_hz:.2f} Hz (기대: {expected_mean:.2f})")
+    print(f"    (b) p95  throughput : {p95_hz:.2f} Hz (기대: {expected_p95:.2f})")
+    print(f"    (c) 5Hz 가능?        : {can_5hz}  (기대: True)")
+    print(f"    (d) 30Hz 가능?       : {can_30hz} (기대: False)")
 
 
-def problem3_performance_diagnosis():
-    print("\n" + "━" * 28)
-    print("문제 3: 성능 진단 시나리오")
-    print("━" * 28 + "\n")
+def problem2_vram_check():
+    """
+    문제 2: 본인의 측정값으로 VRAM 추정
 
-    print("Q: 모델의 거리별 성능이 다음과 같을 때, 각 구간의 주요 실패 원인을")
-    print("   분석하고 개선 방법을 제안하세요.\n")
-    print("   ┌──────────┬──────────┬──────────────────────┐")
-    print("   │ 거리 구간 │ AP3D (%) │ 주요 실패 원인 (추론) │")
-    print("   ├──────────┼──────────┼──────────────────────┤")
-    print("   │ 0-10m    │ 20.5     │ _____                │")
-    print("   │ 10-20m   │ 28.3     │ (가장 좋은 구간)      │")
-    print("   │ 20-30m   │ 12.1     │ _____                │")
-    print("   │ 30-40m   │ 4.2      │ _____                │")
-    print("   │ 40m+     │ 0.8      │ _____                │")
-    print("   └──────────┴──────────┴──────────────────────┘\n")
-    print("   힌트: 0-10m에서 성능이 10-20m보다 낮은 이유는 무엇일까요?")
-    print("   답: _____\n")
+    RTX 4070 12GB 에서 OpenVLA 4-bit nf4 로딩 후
+    `torch.cuda.memory_allocated()` 가 출력한 값이 ~ 5.3 GB 였다.
+
+    이 값에 활성화 (forward 시 추가 메모리) 가 batch=1 inference 시
+    얼마나 더 필요한지 추정하시오.
+
+    가정:
+      - LM decoder generate 시 KV cache 메모리 ~ 0.5 GB
+      - Vision encoder activation ~ 0.5 GB
+      - 기타 buffer ~ 0.3 GB
+
+    총 inference 시 GPU 메모리 = ? GB
+    12GB 에 fit 하는 batch_size 의 최대값은? (activation 이 batch 비례한다 가정)
+
+    TODO 값 채우기.
+    """
+    print("\n" + "=" * 60)
+    print("문제 2: VRAM 추정 + max batch_size")
+    print("=" * 60 + "\n")
+
+    model_loaded = 5.3
+    kv_cache = 0.5
+    vision_act = 0.5
+    buffer = 0.3
+    available = 12.0
+
+    # TODO
+    total_b1 = 0.0
+    activation_b1 = 0.0
+    max_batch = 0
+
+    expected_total = model_loaded + kv_cache + vision_act + buffer
+    expected_act = kv_cache + vision_act
+    expected_max_b = int((available - model_loaded - buffer) / expected_act)
+
+    print(f"  당신의 답:")
+    print(f"    total_b1     : {total_b1:.2f} GB (기대: {expected_total:.2f})")
+    print(f"    activation_b1 : {activation_b1:.2f} GB (기대: {expected_act:.2f})")
+    print(f"    max_batch    : {max_batch}        (기대: ~{expected_max_b})")
 
 
-def main():
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    print("Week 6 Quiz - Medium (성능 분석 및 개선)")
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+def problem3_warmup_outlier():
+    """
+    문제 3: Latency 측정 시 warm-up 의 의미
 
-    problem1_ablation_analysis()
-    problem2_depth_improvement()
-    problem3_performance_diagnosis()
+    100 회 inference 의 latency 데이터:
+      [800, 250, 200, 180, 170, 165, 162, 160, 165, ..., 165]
+      ^----  warm-up 효과
+      ^---- 첫 1~3 측정은 outlier
 
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    print("정답은 quiz_solutions/medium_sol.py 참고")
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    아래 중 올바른 분석 방법을 모두 고르시오.
+
+    A) 첫 5 회를 제외하고 통계 (mean, p95) 계산
+    B) 모든 데이터로 mean 계산 후 outlier 제거
+    C) torch.cuda.synchronize() 를 매 measure 시 호출
+    D) Throughput 계산 시 outlier 포함하면 throughput 이 과소평가됨
+
+    답: 옳은 것을 모두 골라 'A,C,D' 같은 형태로.
+    """
+    print("\n" + "=" * 60)
+    print("문제 3: Warm-up 처리")
+    print("=" * 60 + "\n")
+
+    # TODO
+    correct_methods = ""  # 예: "A,C,D"
+
+    expected = "A,C,D"
+
+    print(f"  당신의 답 : {correct_methods}")
+    print(f"  기대 답   : {expected}")
+
+    if sorted(correct_methods.replace(" ", "").split(",")) == sorted(expected.split(",")):
+        print("\n  [O] 정답!")
+    else:
+        print("\n  [X] 정답은 quiz_solutions/medium_sol.py")
 
 
 if __name__ == "__main__":
-    main()
+    print("=" * 60)
+    problem1_latency_to_throughput()
+    problem2_vram_check()
+    problem3_warmup_outlier()
+    print("=" * 60)

@@ -1,9 +1,7 @@
-numpy
-matplotlib
-opencv-python
-torch
-torchvision
-openmim
-mmcv-full
-mmdet
-mmdet3d
+numpy>=1.24.0
+torch>=2.0.0
+transformers>=4.40.0
+datasets>=2.18.0
+peft>=0.10.0
+h5py>=3.9.0
+sentencepiece>=0.1.99

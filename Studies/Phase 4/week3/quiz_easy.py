@@ -1,74 +1,79 @@
 """
-Phase 6 Week 3 - KITTI 데이터셋 기초 퀴즈
+Phase 4 Week 3 - RT-2 블로그 1편 작성 기초 퀴즈
+
+이번 주는 글쓰기 주차라 코드 보다는 '좋은 블로그의 기준' 을 확인하는 4문제.
 """
 
 
-def problem1_label_format():
-    print("\n" + "━" * 28)
-    print("문제 1: KITTI 레이블 포맷")
-    print("━" * 28 + "\n")
+def problem1_blog_section_priority():
+    print("\n" + "=" * 50)
+    print("문제 1: 면접관이 가장 먼저 보는 section")
+    print("=" * 50 + "\n")
 
-    print("질문: 다음 KITTI 레이블에서 객체의 '깊이(전방 거리)'는 몇 m인가?\n")
-    print("  Car 0.00 0 -1.56 587.01 173.33 614.12 200.12 1.65 1.67 3.64 -0.65 1.71 46.70 -1.59\n")
-
-    print("보기:")
-    print("  A) -0.65 m (x 좌표)")
-    print("  B) 1.71 m (y 좌표)")
-    print("  C) 46.70 m (z 좌표)")
-    print("  D) -1.59 (ry 값)")
-
-
-def problem2_directory_structure():
-    print("\n" + "━" * 28)
-    print("문제 2: KITTI 디렉토리 구조")
-    print("━" * 28 + "\n")
-
-    print("질문: KITTI에서 3D bbox 레이블 파일이 위치하는 디렉토리는?\n")
+    print("질문: 면접관이 30초 안에 블로그의 가치를 판단할 때")
+    print("      가장 먼저 보는 section 은?\n")
 
     print("보기:")
-    print("  A) training/image_2/")
-    print("  B) training/calib/")
-    print("  C) training/label_2/")
-    print("  D) training/velodyne/")
+    print("  A) Section 4 (자세한 동작 / 수식)")
+    print("  B) Section 1 (한 줄 요약) + Section 3 (한 페이지 요약)")
+    print("  C) Section 8 (Reference)")
+    print("  D) Section 5 (실험 결과)")
 
 
-def problem3_dontcare():
-    print("\n" + "━" * 28)
-    print("문제 3: DontCare 레이블")
-    print("━" * 28 + "\n")
+def problem2_blog_quality():
+    print("\n" + "=" * 50)
+    print("문제 2: 좋은 블로그의 가장 큰 특징")
+    print("=" * 50 + "\n")
 
-    print("질문: KITTI 레이블에서 'DontCare' 클래스의 역할은?\n")
-
-    print("보기:")
-    print("  A) 아직 분류되지 않은 새로운 객체를 표시")
-    print("  B) 평가 시 무시할 영역을 표시 (너무 멀거나 심하게 가려진 객체)")
-    print("  C) 배경(background)을 명시적으로 표시")
-    print("  D) 데이터 수집 시 오류가 발생한 영역")
-
-
-def problem4_difficulty():
-    print("\n" + "━" * 28)
-    print("문제 4: KITTI 난이도 기준")
-    print("━" * 28 + "\n")
-
-    print("질문: KITTI 3D Detection 벤치마크에서 가장 많이 사용되는")
-    print("      표준 난이도 기준은?\n")
+    print("질문: 좋은 기술 블로그와 나쁜 기술 블로그의")
+    print("      가장 큰 구분 기준은?\n")
 
     print("보기:")
-    print("  A) Easy")
-    print("  B) Moderate")
-    print("  C) Hard")
-    print("  D) All (전체 통합)")
+    print("  A) 분량 (길수록 좋다)")
+    print("  B) 다이어그램 수")
+    print("  C) 한계 / 비판 section 의 유무와 깊이")
+    print("  D) 영어 vs 한국어")
+
+
+def problem3_blog_length():
+    print("\n" + "=" * 50)
+    print("문제 3: 본 로드맵의 권장 블로그 분량")
+    print("=" * 50 + "\n")
+
+    print("질문: 본 로드맵에서 권장하는 한국어 블로그 1편의 분량은?\n")
+
+    print("보기:")
+    print("  A) 1000 자 이하 (짧고 강력)")
+    print("  B) 3000 ~ 4000 자 (적정)")
+    print("  C) 7000 ~ 8000 자 (자세함)")
+    print("  D) 분량은 중요하지 않음")
+
+
+def problem4_differentiation():
+    print("\n" + "=" * 50)
+    print("문제 4: 양산 SW 엔지니어의 차별화 메시지")
+    print("=" * 50 + "\n")
+
+    print("질문: RT-2 블로그에서 '박사/연구자' 블로그와 차별화될 수 있는")
+    print("      가장 효과적인 section 의 내용은?\n")
+
+    print("보기:")
+    print("  A) RT-2 의 수식을 더 자세히")
+    print("  B) PaLI-X 의 architecture 더 자세히")
+    print("  C) 'latency 200ms 가 양산 시점에 무엇을 의미하는가' 같은")
+    print("     실무 비용 관점의 해석")
+    print("  D) RT-1 의 자세한 비교")
 
 
 if __name__ == "__main__":
-    print("━" * 33)
-    print("  Phase 6 Week 3 Quiz - Easy")
-    print("━" * 33)
-    problem1_label_format()
-    problem2_directory_structure()
-    problem3_dontcare()
-    problem4_difficulty()
-    print("\n" + "━" * 33)
+    print("=" * 50)
+    print("  Phase 4 Week 3 Quiz - Easy")
+    print("  RT-2 블로그 1편 작성")
+    print("=" * 50)
+    problem1_blog_section_priority()
+    problem2_blog_quality()
+    problem3_blog_length()
+    problem4_differentiation()
+    print("\n" + "=" * 50)
     print("정답은 quiz_solutions/easy_sol.py 참고")
-    print("━" * 33)
+    print("=" * 50)

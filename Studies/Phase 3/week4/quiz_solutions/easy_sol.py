@@ -1,5 +1,5 @@
 """
-Phase 5 Week 4 - YOLOv8 학습 기초 퀴즈 정답 및 해설
+Phase 5 Week 4 - YOLO11 학습 기초 퀴즈 정답 및 해설
 """
 
 
@@ -86,7 +86,7 @@ def problem4_solution():
     print("    1. Early Stopping (patience=20): Epoch ~30에서 중단")
     print("    2. Augmentation 강화: mosaic, mixup, 회전, 스케일")
     print("    3. 데이터 추가: 학습 데이터 다양성 확보")
-    print("    4. 모델 축소: yolov8s → yolov8n")
+    print("    4. 모델 축소: yolo11s → yolo11n")
     print("    5. Weight Decay 증가: 0.0005 → 0.001")
     print()
     print("  💡 과적합 vs 미적합:")

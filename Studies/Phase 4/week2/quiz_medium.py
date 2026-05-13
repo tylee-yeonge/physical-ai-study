@@ -1,178 +1,141 @@
 """
-Phase 6 Week 2 - 좌표계 이해 중급 퀴즈
-코드를 직접 실행하고 결과를 확인하세요.
+Phase 4 Week 2 - Co-fine-tuning + Action Tokenization 중급 퀴즈
 """
 import numpy as np
 
 
-def problem1_projection():
+def problem1_recover_action_from_token():
     """
-    문제 1: 3D -> 2D 투영 계산
+    문제 1: token ID sequence 로부터 action 복원
 
-    Camera 좌표계의 3D 점 (2.0, 1.0, 10.0)을
-    P2 행렬로 이미지에 투영했을 때의 (u, v) 좌표를 구하시오.
+    어떤 inference 결과로 다음 token ID sequence 가 나왔다:
+      [255879, 255698, 255856, 255872, 255872, 255872, 255744]
 
-    P2 = [[720,   0, 600, 0],
-          [  0, 720, 180, 0],
-          [  0,   0,   1, 0]]
+    각 차원의 범위는:
+      dx, dy, dz : [-0.1, +0.1] m
+      rx, ry, rz : [-pi, +pi]   rad
+      gripper   : [0, 1]
 
-    TODO: u, v 값을 직접 계산하여 채우시오.
+    VOCAB_SIZE = 256000, ACTION_TOKEN_START = 255744 일 때
+    실제 7-DoF action 값을 복원하시오.
+
+    TODO: continuous_action 리스트를 채우시오.
     """
-    print("\n" + "━" * 36)
-    print("문제 1: 3D -> 2D 투영 계산")
-    print("━" * 36 + "\n")
+    print("\n" + "=" * 60)
+    print("문제 1: token ID -> continuous action 복원")
+    print("=" * 60 + "\n")
 
-    P2 = np.array([
-        [720,   0, 600, 0],
-        [  0, 720, 180, 0],
-        [  0,   0,   1, 0]
-    ])
+    token_ids = [255879, 255698, 255856, 255872, 255872, 255872, 255744]
+    ACTION_TOKEN_START = 255744
+    N_BIN = 256
 
-    pt_3d = np.array([2.0, 1.0, 10.0, 1.0])  # 동차 좌표
+    a_min = np.array([-0.10, -0.10, -0.10, -np.pi, -np.pi, -np.pi, 0.0])
+    a_max = np.array([ 0.10,  0.10,  0.10,  np.pi,  np.pi,  np.pi, 1.0])
 
-    # 투영
-    pt_2d_hom = P2 @ pt_3d  # [u*z, v*z, z]
+    # TODO: 직접 계산해보세요. 각 dim 에 대해
+    # 1. bin = token_id - ACTION_TOKEN_START
+    # 2. action = a_min + (bin + 0.5) / N_BIN * (a_max - a_min)
+    continuous_action = [0.0] * 7  # 여기를 채우시오
 
-    print(f"  P2 @ [2, 1, 10, 1]^T = [{pt_2d_hom[0]:.1f}, {pt_2d_hom[1]:.1f}, {pt_2d_hom[2]:.1f}]")
-    print()
-    print(f"  힌트:")
-    print(f"    u*z = 720*2 + 0*1 + 600*10 + 0 = ?")
-    print(f"    v*z = 0*2 + 720*1 + 180*10 + 0 = ?")
-    print(f"    z   = 0*2 + 0*1 + 1*10 + 0 = ?")
-    print()
-    print(f"    u = u*z / z = ?")
-    print(f"    v = v*z / z = ?")
+    # 검증
+    bin_idx = np.array(token_ids) - ACTION_TOKEN_START
+    expected = a_min + (bin_idx + 0.5) / N_BIN * (a_max - a_min)
 
-    # 정규화
-    u = pt_2d_hom[0] / pt_2d_hom[2]
-    v = pt_2d_hom[1] / pt_2d_hom[2]
+    print(f"  token_ids : {token_ids}")
+    print(f"  bin index : {bin_idx.tolist()}")
+    print(f"  당신의 답 : {[round(x, 4) for x in continuous_action]}")
+    print(f"  기대 답   : {[round(x, 4) for x in expected]}")
 
-    # TODO: 직접 계산한 값을 채우시오
-    expected_u = 0.0  # 여기를 채우시오
-    expected_v = 0.0  # 여기를 채우시오
-
-    print(f"\n  직접 계산: u={expected_u}, v={expected_v}")
-    print(f"  실제 결과: u={u:.1f}, v={v:.1f}")
-
-    if abs(expected_u - u) < 0.1 and abs(expected_v - v) < 0.1:
-        print("  정답!")
+    if all(abs(c - e) < 1e-4 for c, e in zip(continuous_action, expected)):
+        print("\n  [O] 정답!")
     else:
-        print("  다시 계산해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
+        print("\n  [X] 다시 계산해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
 
 
-def problem2_corners_and_projection():
+def problem2_vocab_overlap():
     """
-    문제 2: KITTI 3D BBox Corners 및 투영
+    문제 2: Vocab overlap 문제
 
-    KITTI 레이블: h=1.5, w=1.8, l=4.5, x=0, y=1.65, z=10, ry=0
-    P2 = [[720, 0, 600, 0], [0, 720, 180, 0], [0, 0, 1, 0]]
+    RT-2 가 vocab 의 마지막 256개를 action 으로 재사용한다.
+    만약 web 학습 데이터에서 그 256개 token 이 자주 등장하면 무슨 문제가 생기는가?
 
-    Corner 0 (바닥면 전면 오른쪽)의 3D 좌표를 구하고,
-    이를 이미지에 투영한 (u, v)를 계산하시오.
+    아래 시나리오 4 개 중 가장 큰 문제가 되는 것을 고르시오.
 
-    TODO: corner0_3d와 corner0_2d를 채우시오.
+    A) Web caption "Hello supersonic boy" 가 action_bin_5 token 으로
+       tokenize 되는 경우 (sub-word 우연 일치)
+    B) Web VQA "What is 256?" 의 답에 마지막 vocab 의 token 이 포함
+    C) Web 학습 데이터에서 마지막 vocab 의 token 들이 일정 빈도 이상
+       등장 (예: 매 batch 마다 평균 0.1% 의 token 이 그 범위)
+    D) Robot data 의 instruction text 가 action 범위 token 을 우연히 포함
+
+    답: 답 후보 emerg_problem 변수에 'A'/'B'/'C'/'D' 중 하나로 채우시오.
     """
-    print("\n" + "━" * 36)
-    print("문제 2: KITTI BBox Corner 투영")
-    print("━" * 36 + "\n")
+    print("\n" + "=" * 60)
+    print("문제 2: Vocab overlap 의 위험")
+    print("=" * 60 + "\n")
 
-    h, w, l = 1.5, 1.8, 4.5
-    x, y, z = 0.0, 1.65, 10.0
-    ry = 0.0
+    # TODO
+    emerg_problem = ""  # 여기를 채우시오
 
-    P2 = np.array([
-        [720,   0, 600, 0],
-        [  0, 720, 180, 0],
-        [  0,   0,   1, 0]
-    ])
+    expected = "C"
 
-    print(f"  KITTI 레이블: h={h}, w={w}, l={l}, x={x}, y={y}, z={z}, ry={ry}")
-    print()
-    print(f"  Corner 0 (중심 기준, 회전 전):")
-    print(f"    x_c = l/2 = {l/2}")
-    print(f"    y_c = 0")
-    print(f"    z_c = w/2 = {w/2}")
-    print()
-    print(f"  ry=0이므로 회전 없음.")
-    print(f"  전역 좌표 = (x + l/2, y + 0, z + w/2)")
-    print(f"             = ({x} + {l/2}, {y} + 0, {z} + {w/2})")
+    print(f"  당신의 답 : {emerg_problem}")
+    print(f"  기대 답   : {expected}")
 
-    # 실제 corner 0 계산
-    corner0_actual = np.array([x + l/2, y, z + w/2])
+    if emerg_problem == expected:
+        print("\n  [O] 정답!")
+    else:
+        print("\n  [X] 다시 생각해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
 
-    # 투영
-    pt_hom = np.append(corner0_actual, 1.0)
-    pt_2d = P2 @ pt_hom
-    u_actual = pt_2d[0] / pt_2d[2]
-    v_actual = pt_2d[1] / pt_2d[2]
+    print("\n  힌트: '평소에 자주 나타나는가' 가 핵심.")
+    print("        web data 에서 그 token 이 일정 빈도 이상 등장하면")
+    print("        그 embedding 이 양쪽 의미로 끌어당겨져 학습 충돌.")
+
+
+def problem3_compute_combined_loss():
+    """
+    문제 3: Combined loss 의 가중 평균 계산
+
+    한 학습 step 의 mini-batch 가 다음과 같다:
+      - WebLI sample 8개, 평균 loss 2.3
+      - VQA sample  4개, 평균 loss 3.1
+      - Robot sample 4개, 평균 loss 4.5
+
+    이때 PyTorch 의 표준 cross-entropy (reduction='mean') 가 계산하는
+    'batch 전체 평균 loss' 는 얼마인가?
+    (각 sample 의 sequence length 는 모두 동일하다고 가정)
+
+    TODO: combined_loss 를 직접 계산하시오.
+    """
+    print("\n" + "=" * 60)
+    print("문제 3: Combined loss 계산")
+    print("=" * 60 + "\n")
 
     # TODO: 직접 계산
-    corner0_3d_expected = np.array([0.0, 0.0, 0.0])  # 여기를 채우시오
-    corner0_u_expected = 0.0  # 여기를 채우시오
-    corner0_v_expected = 0.0  # 여기를 채우시오
+    combined_loss = 0.0  # 여기를 채우시오
 
-    print(f"\n  직접 계산한 corner 0 (3D): {corner0_3d_expected}")
-    print(f"  실제 corner 0 (3D): {corner0_actual}")
-    print(f"\n  직접 계산한 corner 0 (2D): u={corner0_u_expected}, v={corner0_v_expected}")
-    print(f"  실제 corner 0 (2D): u={u_actual:.1f}, v={v_actual:.1f}")
-
-    if (np.allclose(corner0_3d_expected, corner0_actual, atol=0.01) and
-        abs(corner0_u_expected - u_actual) < 0.5 and
-        abs(corner0_v_expected - v_actual) < 0.5):
-        print("  정답!")
-    else:
-        print("  다시 계산해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
-
-
-def problem3_bev_distance():
-    """
-    문제 3: BEV에서 두 객체 사이의 거리
-
-    Camera 좌표계에서 두 객체의 위치:
-      Car A: (x=2.0, y=1.65, z=15.0)
-      Car B: (x=-3.0, y=1.65, z=25.0)
-
-    BEV(X-Z 평면)에서 두 객체 사이의 유클리드 거리를 구하시오.
-    (높이 y는 무시)
-
-    TODO: distance 값을 계산하여 채우시오.
-    """
-    print("\n" + "━" * 36)
-    print("문제 3: BEV 거리 계산")
-    print("━" * 36 + "\n")
-
-    car_a = np.array([2.0, 1.65, 15.0])
-    car_b = np.array([-3.0, 1.65, 25.0])
-
-    print(f"  Car A 위치: x={car_a[0]}, y={car_a[1]}, z={car_a[2]}")
-    print(f"  Car B 위치: x={car_b[0]}, y={car_b[1]}, z={car_b[2]}")
+    expected = (8 * 2.3 + 4 * 3.1 + 4 * 4.5) / (8 + 4 + 4)
+    print(f"  Web sample (8): loss=2.3")
+    print(f"  VQA sample (4): loss=3.1")
+    print(f"  Robot (4)     : loss=4.5")
     print()
-    print(f"  BEV 거리 = sqrt((x_A - x_B)^2 + (z_A - z_B)^2)")
-    print(f"           = sqrt(({car_a[0]} - {car_b[0]})^2 + ({car_a[2]} - {car_b[2]})^2)")
-    print(f"           = sqrt(({car_a[0] - car_b[0]})^2 + ({car_a[2] - car_b[2]})^2)")
+    print(f"  당신의 답 : {combined_loss:.4f}")
+    print(f"  기대 답   : {expected:.4f}")
 
-    actual_dist = np.sqrt((car_a[0] - car_b[0])**2 + (car_a[2] - car_b[2])**2)
-
-    # TODO: 거리를 직접 계산하여 채우시오
-    expected_distance = 0.0  # 여기를 채우시오
-
-    print(f"\n  직접 계산한 거리: {expected_distance:.2f} m")
-    print(f"  실제 거리: {actual_dist:.2f} m")
-
-    if abs(expected_distance - actual_dist) < 0.1:
-        print("  정답!")
+    if abs(combined_loss - expected) < 1e-4:
+        print("\n  [O] 정답!")
     else:
-        print("  다시 계산해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
-        print(f"  힌트: sqrt(25 + 100) = sqrt(125) = ?")
+        print("\n  [X] 다시 계산해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
 
 
 if __name__ == "__main__":
-    print("━" * 40)
-    print("  Phase 6 Week 2 Quiz - Medium")
-    print("━" * 40)
-    problem1_projection()
-    problem2_corners_and_projection()
-    problem3_bev_distance()
-    print("\n" + "━" * 40)
+    print("=" * 60)
+    print("  Phase 4 Week 2 Quiz - Medium")
+    print("  Co-fine-tuning + Action Tokenization 의 수치 감각")
+    print("=" * 60)
+    problem1_recover_action_from_token()
+    problem2_vocab_overlap()
+    problem3_compute_combined_loss()
+    print("\n" + "=" * 60)
     print("정답은 quiz_solutions/medium_sol.py 참고")
-    print("━" * 40)
+    print("=" * 60)

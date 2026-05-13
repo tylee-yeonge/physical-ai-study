@@ -1,0 +1,67 @@
+"""
+Solutions - Medium Quiz (Week 5: MMDetection3D 실습)
+"""
+
+
+def main():
+    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    print("Week 5 Quiz - Medium 정답")
+    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+
+    print("Q1. FCOS3D Multi-task Learning 정답:")
+    print("   ┌─────────────────┬────────────────────┬──────────────┐")
+    print("   │ Task            │ 예측값              │ Loss 종류    │")
+    print("   ├─────────────────┼────────────────────┼──────────────┤")
+    print("   │ Classification  │ cls score (클래스)   │ Focal Loss   │")
+    print("   │ 2D Offset       │ (dx, dy)            │ L1 Loss      │")
+    print("   │ Depth           │ z (깊이)             │ L1 Loss      │")
+    print("   │ Size            │ (l, w, h)           │ L1 Loss      │")
+    print("   │ Rotation        │ (sin theta, cos theta) │ L1 Loss  │")
+    print("   └─────────────────┴────────────────────┴──────────────┘")
+    print()
+    print("   Loss 가중치의 영향:")
+    print("   - 각 Task의 Loss 가중치가 학습 균형에 큰 영향을 미침")
+    print("   - Depth Loss 가중치가 너무 크면 분류 성능이 저하됨")
+    print("   - 반대로 Depth 가중치가 작으면 3D 정확도가 떨어짐")
+    print("   - 일반적으로 cls_weight=1.0, bbox_weight=1.0,")
+    print("     depth_weight=1.0에서 시작하여 튜닝\n")
+
+    print("Q2. AP3D vs AP2D 성능 격차 분석 정답:")
+    print("   격차 원인:")
+    print("   - AP2D는 이미지 평면에서의 2D 겹침만 평가하므로,")
+    print("     Depth(깊이)가 틀려도 2D bbox가 맞으면 높은 점수를 받음")
+    print("   - AP3D는 3D 공간에서의 IoU를 계산하므로,")
+    print("     Depth가 조금만 벗어나도 3D IoU가 급격히 감소")
+    print("   - 예: Depth 2m 오차 시 2D IoU는 0.85 유지, 3D IoU는 0.15로 하락")
+    print("   - Monocular에서 Depth 추정이 본질적으로 어려움 (Scale Ambiguity)")
+    print()
+    print("   개선 방향:")
+    print("   - Depth 추정 정확도를 높이는 것이 가장 우선")
+    print("   - 방법: Depth 전용 보조 Loss 추가, Depth hint 활용,")
+    print("     기하학적 제약 (차량 크기 prior) 사용")
+    print("   - 또한 Orientation 정확도도 3D IoU에 큰 영향을 미침\n")
+
+    print("Q3. Config 디버깅 정답:")
+    print("   문제 1: nuscenes-mono3d.py를 사용하고 있음")
+    print("     → KITTI 학습이면 kitti-mono3d.py를 사용해야 함")
+    print("     수정: '../_base_/datasets/kitti-mono3d.py'")
+    print()
+    print("   문제 2: num_classes=10 (nuScenes 클래스 수)")
+    print("     → KITTI는 Car, Pedestrian, Cyclist 3개 클래스")
+    print("     수정: num_classes=3")
+    print()
+    print("   문제 3: samples_per_gpu=16")
+    print("     → FCOS3D + ResNet-101은 GPU 메모리를 많이 사용")
+    print("     → RTX 3090 (24GB) 기준 배치 2~4가 적당")
+    print("     수정: samples_per_gpu=2")
+    print()
+    print("   문제 4: lr=0.1 (SGD)")
+    print("     → 3D Detection에서 lr=0.1은 너무 큼, 학습이 발산할 수 있음")
+    print("     → AdamW 사용 시 lr=0.0002, SGD 사용 시 lr=0.001 권장")
+    print("     수정: optimizer = dict(type='AdamW', lr=0.0002, weight_decay=0.01)")
+
+    print("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+
+
+if __name__ == "__main__":
+    main()

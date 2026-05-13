@@ -14,13 +14,13 @@ def problem1_solution():
     print("    → Anchor 크기/비율을 K-means로 결정해야 함")
     print("    → 데이터셋마다 최적 Anchor가 달라짐")
     print()
-    print("  Anchor-Free (YOLOv8):")
+    print("  Anchor-Free (YOLOv8 ~ YOLO11):")
     print("    → 각 셀에서 직접 BBox 좌표를 예측")
     print("    → left, top, right, bottom 거리를 직접 예측")
     print("    → Anchor 설계 불필요, 더 유연한 예측 가능")
     print()
-    print("  💡 Anchor-Free는 FCOS, CenterNet 등에서 먼저 제안되었고,")
-    print("     YOLOv8이 이를 YOLO 계열에 성공적으로 도입했습니다.")
+    print("  TIP: Anchor-Free는 FCOS, CenterNet 등에서 먼저 제안되었고,")
+    print("     YOLOv8이 YOLO 계열에 도입, YOLO11도 동일 방식을 계승합니다.")
 
 
 def problem2_solution():
@@ -29,9 +29,10 @@ def problem2_solution():
     print("━" * 28 + "\n")
 
     print("해설:")
-    print("  Backbone (CSPDarknet):")
+    print("  Backbone (CSPDarknet + C3k2 + SPPF + C2PSA):")
     print("    → 입력 이미지에서 Multi-Scale Feature Map 추출")
     print("    → P3(80x80), P4(40x40), P5(20x20) 출력")
+    print("    → YOLO11: C2f를 C3k2로 교체, 마지막에 C2PSA(Attention) 추가")
     print()
     print("  Neck (PANet = FPN + PAN):")
     print("    → Top-Down(FPN): 고수준 의미 정보를 저해상도→고해상도로 전파")
@@ -41,7 +42,7 @@ def problem2_solution():
     print("  Head (Decoupled Head):")
     print("    → BBox Branch: BBox 좌표 예측 (DFL)")
     print("    → Cls Branch: 클래스 확률 예측 (BCE)")
-    print("    → Objectness는 제거됨 (v5와의 차이)")
+    print("    → Objectness는 제거됨 (v8부터)")
 
 
 def problem3_solution():

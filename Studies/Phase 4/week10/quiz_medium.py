@@ -1,199 +1,120 @@
 """
-Phase 6 Week 10 - BEVFormer 실습 중급 퀴즈
-코드를 직접 실행하고 결과를 확인하세요.
+Phase 4 Week 10 - 중급 퀴즈
 """
-import numpy as np
 
 
-def problem1_nds_calculation():
+def problem1_directory_structure():
     """
-    문제 1: NDS 직접 계산
+    문제 1: ament_python 패키지의 표준 디렉토리 구조
 
-    아래 모델의 NDS를 계산하시오.
+    아래 위치에 들어가는 파일/디렉토리 이름을 채우시오:
 
-    BEVFormer-Base 결과:
-      mAP  = 0.416
-      mATE = 0.673
-      mASE = 0.274
-      mAOE = 0.372
-      mAVE = 0.394
-      mAAE = 0.198
+    vla_node/
+      [A]               # package metadata
+      [B]               # build entry point + executables
+      [C]               # build config
+      [D]/              # ROS marker (빈 디렉토리)
+      [E]/              # 실제 Python 코드
+        __init__.py
+        vla_inference_node.py
 
-    NDS = 1/10 * (5*mAP + (1-mATE) + (1-mASE) + (1-mAOE) + (1-mAVE) + (1-mAAE))
-
-    TODO: nds_calculated를 직접 계산하여 채우시오.
+    TODO: A~E 채우기.
     """
-    print("\n" + "━" * 36)
-    print("문제 1: NDS 직접 계산")
-    print("━" * 36 + "\n")
+    print("\n" + "=" * 60)
+    print("문제 1: ament_python 디렉토리 구조")
+    print("=" * 60 + "\n")
 
-    mAP = 0.416
-    mATE = 0.673
-    mASE = 0.274
-    mAOE = 0.372
-    mAVE = 0.394
-    mAAE = 0.198
-
-    print(f"  mAP  = {mAP}")
-    print(f"  mATE = {mATE}")
-    print(f"  mASE = {mASE}")
-    print(f"  mAOE = {mAOE}")
-    print(f"  mAVE = {mAVE}")
-    print(f"  mAAE = {mAAE}")
-    print()
-    print("  NDS = 1/10 * (5*mAP + (1-mATE) + (1-mASE) + (1-mAOE) + (1-mAVE) + (1-mAAE))")
-    print()
-
-    # TODO: 직접 계산하시오
-    nds_calculated = 0.0  # 여기를 채우시오
-
-    # 실제 계산
-    tp_sum = (1 - mATE) + (1 - mASE) + (1 - mAOE) + (1 - mAVE) + (1 - mAAE)
-    actual_nds = (5 * mAP + tp_sum) / 10.0
-
-    print(f"  계산한 NDS: {nds_calculated:.4f}")
-    print(f"  실제 NDS:   {actual_nds:.4f}")
-
-    if abs(nds_calculated - actual_nds) < 0.01:
-        print("\n  정답!")
-    else:
-        print("\n  다시 계산해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
-        print(f"  힌트: 5*mAP = {5*mAP:.3f}")
-        print(f"  힌트: TP 합 = {tp_sum:.3f}")
+    # TODO
+    answers = {
+        "A (package metadata)": "",
+        "B (build entry point)": "",
+        "C (build config)": "",
+        "D (ROS marker dir)": "",
+        "E (실제 코드 dir)": "",
+    }
+    expected = {
+        "A (package metadata)": "package.xml",
+        "B (build entry point)": "setup.py",
+        "C (build config)": "setup.cfg",
+        "D (ROS marker dir)": "resource",
+        "E (실제 코드 dir)": "vla_node",
+    }
+    for k, v in answers.items():
+        mark = "[O]" if v == expected[k] else "[X]"
+        print(f"  {mark} {k}: '{v}'  (기대: {expected[k]})")
 
 
-def problem2_map_threshold():
+def problem2_lifecycle_skeleton():
     """
-    문제 2: mAP 거리 threshold 분석
+    문제 2: Callback 의 진입점 순서
 
-    nuScenes mAP는 4개 거리 threshold (0.5, 1.0, 2.0, 4.0 m)의
-    평균 AP로 계산된다.
+    image_callback 안에서 다음 단계의 순서:
+      A) action publish
+      B) image age check
+      C) preprocess (bgr -> rgb)
+      D) inference (predict)
+      E) instruction 비어있으면 skip
 
-    특정 모델의 Car 클래스 AP가 다음과 같을 때:
-      AP@0.5m = 0.35
-      AP@1.0m = 0.55
-      AP@2.0m = 0.72
-      AP@4.0m = 0.80
-
-    Car의 평균 AP를 계산하시오.
-
-    또한, AP@0.5m이 AP@4.0m보다 낮은 이유를 생각해보시오.
-
-    TODO: car_ap를 계산하여 채우시오.
+    TODO: 순서를 채우시오 (예: "E,B,C,D,A")
     """
-    print("\n" + "━" * 36)
-    print("문제 2: mAP 거리 threshold 분석")
-    print("━" * 36 + "\n")
+    print("\n" + "=" * 60)
+    print("문제 2: image_callback 의 단계 순서")
+    print("=" * 60 + "\n")
 
-    ap_05 = 0.35
-    ap_10 = 0.55
-    ap_20 = 0.72
-    ap_40 = 0.80
+    # TODO
+    order = ""
 
-    print(f"  Car 클래스 AP:")
-    print(f"    AP@0.5m = {ap_05}")
-    print(f"    AP@1.0m = {ap_10}")
-    print(f"    AP@2.0m = {ap_20}")
-    print(f"    AP@4.0m = {ap_40}")
+    expected = "E,B,C,D,A"
+
+    print(f"  당신의 답 : {order}")
+    print(f"  기대 답   : {expected}")
     print()
-
-    # TODO: 직접 계산하시오
-    car_ap = 0.0  # 여기를 채우시오
-
-    actual_ap = (ap_05 + ap_10 + ap_20 + ap_40) / 4.0
-
-    print(f"  계산한 Car AP: {car_ap:.4f}")
-    print(f"  실제 Car AP:   {actual_ap:.4f}")
-
-    if abs(car_ap - actual_ap) < 0.01:
-        print("\n  정답!")
-    else:
-        print("\n  다시 계산해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
-
-    print()
-    print("  생각해볼 질문:")
-    print("  AP@0.5m이 AP@4.0m보다 낮은 이유는?")
-    print("  (힌트: threshold가 엄격할수록 TP 매칭이 어려움)")
+    print("  정답 흐름:")
+    print("    1. E (instruction 비어있으면 skip)  - fail fast")
+    print("    2. B (image age check)              - 너무 오래된 image 무시")
+    print("    3. C (preprocess BGR -> RGB)        - 색공간 변환")
+    print("    4. D (inference predict)            - VLAInference.predict()")
+    print("    5. A (action publish)               - 결과 발행")
 
 
-def problem3_detection_analysis():
+def problem3_qos_match():
     """
-    문제 3: 검출 결과 분석
+    문제 3: subscribe / publish 의 QoS 매칭
 
-    아래 BEV 검출 결과에서 각 객체의 검출 상태를 판단하시오.
+    아래 시나리오 별로 reliability / depth 권장값:
 
-    GT (Ground Truth):
-      Car A: center=(10, 2), 거리=10.2m
-      Car B: center=(25, -3), 거리=25.2m
-      Pedestrian C: center=(8, 5), 거리=9.4m
+      Topic                | reliability | depth
+      /camera/image_raw   | ?            | ?
+      /vla/instruction   | ?            | ?
+      /vla/action         | ?            | ?
 
-    Predictions:
-      Pred 1: center=(10.3, 1.8), class=car, score=0.92
-      Pred 2: center=(26.5, -2.5), class=car, score=0.75
-      Pred 3: center=(8.2, 5.3), class=pedestrian, score=0.81
-      Pred 4: center=(15, 0), class=car, score=0.45
-
-    매칭 기준: BEV 중심 거리 2.0m 이내이면 TP
-
-    질문: TP, FP, FN 각각 몇 개인가?
-
-    TODO: tp, fp, fn을 채우시오.
+    TODO 채우기.
     """
-    print("\n" + "━" * 36)
-    print("문제 3: 검출 결과 분석")
-    print("━" * 36 + "\n")
+    print("\n" + "=" * 60)
+    print("문제 3: QoS 결정")
+    print("=" * 60 + "\n")
 
-    # GT
-    gts = [
-        {'name': 'Car A', 'center': np.array([10.0, 2.0])},
-        {'name': 'Car B', 'center': np.array([25.0, -3.0])},
-        {'name': 'Ped C', 'center': np.array([8.0, 5.0])},
-    ]
-
-    # Predictions
-    preds = [
-        {'name': 'Pred 1', 'center': np.array([10.3, 1.8]), 'class': 'car', 'score': 0.92},
-        {'name': 'Pred 2', 'center': np.array([26.5, -2.5]), 'class': 'car', 'score': 0.75},
-        {'name': 'Pred 3', 'center': np.array([8.2, 5.3]), 'class': 'ped', 'score': 0.81},
-        {'name': 'Pred 4', 'center': np.array([15.0, 0.0]), 'class': 'car', 'score': 0.45},
-    ]
-
-    threshold = 2.0
-
-    print("  GT:")
-    for gt in gts:
-        print(f"    {gt['name']}: center={gt['center']}")
-    print()
-    print("  Predictions:")
-    for pred in preds:
-        print(f"    {pred['name']}: center={pred['center']}, score={pred['score']}")
-    print()
-
-    # 거리 계산
-    print(f"  매칭 거리 (threshold={threshold}m):")
-    for pred in preds:
-        for gt in gts:
-            dist = np.linalg.norm(pred['center'] - gt['center'])
-            match = "TP" if dist <= threshold else "  "
-            print(f"    {pred['name']} ↔ {gt['name']}: {dist:.2f}m {match}")
-        print()
-
-    # TODO: 직접 분석하시오
-    tp = 0  # 여기를 채우시오
-    fp = 0  # 여기를 채우시오
-    fn = 0  # 여기를 채우시오
-
-    print(f"  분석 결과: TP={tp}, FP={fp}, FN={fn}")
-    print(f"  정답은 quiz_solutions/medium_sol.py 참고")
+    # TODO
+    qos = {
+        "image_raw": ("", 0),
+        "instruction": ("", 0),
+        "action": ("", 0),
+    }
+    expected = {
+        "image_raw": ("BEST_EFFORT", 1),
+        "instruction": ("RELIABLE (transient_local)", 1),
+        "action": ("RELIABLE", 10),
+    }
+    print("  당신의 QoS:")
+    for k, v in qos.items():
+        mark = "[O]" if v == expected[k] else "[X]"
+        print(f"  {mark} {k}: {v}")
+        print(f"      (기대: {expected[k]})")
 
 
 if __name__ == "__main__":
-    print("━" * 40)
-    print("  Week 10 Quiz - Medium")
-    print("━" * 40)
-    problem1_nds_calculation()
-    problem2_map_threshold()
-    problem3_detection_analysis()
-    print("\n" + "━" * 40)
-    print("정답은 quiz_solutions/medium_sol.py 참고")
-    print("━" * 40)
+    print("=" * 60)
+    problem1_directory_structure()
+    problem2_lifecycle_skeleton()
+    problem3_qos_match()
+    print("=" * 60)

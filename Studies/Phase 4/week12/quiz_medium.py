@@ -1,124 +1,116 @@
 """
-Phase 6 Week 12 - 블로그 & 영상 중급 퀴즈
-코드를 직접 실행하고 결과를 확인하세요.
+Phase 4 Week 12 - 중급 퀴즈
 """
 
 
-def problem1_blog_outline():
+def problem1_video_section_priority():
     """
-    문제 1: 블로그 포스팅 아웃라인 작성
+    문제 1: 1분 영상 의 section 별 분량 결정
 
-    "KITTI 3D Detection 입문기" 블로그의 아웃라인을 작성하시오.
-    각 섹션의 핵심 내용과 예상 분량을 포함하시오.
+    아래 5 가지 section 에 각 몇 초를 배분할지 결정 (총 60 초).
+
+    A) 인트로 (Title + 본인 정보)
+    B) System 구조 (rqt_graph 등)
+    C) 실시간 동작 (Rerun)
+    D) 결과 + 한계
+    E) Next (Phase 7 예고)
+
+    TODO: 시간 배분 (초).
     """
-    print("\n" + "━" * 36)
-    print("문제 1: 블로그 아웃라인 작성")
-    print("━" * 36 + "\n")
+    print("\n" + "=" * 60)
+    print("문제 1: 1분 영상 section 별 분량")
+    print("=" * 60 + "\n")
 
-    print("  주제: 'KITTI 3D Detection 입문기'\n")
+    # TODO
+    section_secs = {"A": 0, "B": 0, "C": 0, "D": 0, "E": 0}
 
-    print("  과제:")
-    print("  1) 블로그 제목을 작성하시오 (눈길을 끄는 제목)")
-    print("  2) 5개 이상의 섹션을 구성하시오")
-    print("  3) 각 섹션의 핵심 내용을 1~2줄로 요약하시오")
-    print("  4) 포함할 시각 자료 목록을 나열하시오")
-    print()
+    expected = {"A": 10, "B": 15, "C": 20, "D": 10, "E": 5}
+    total_expected = sum(expected.values())
 
-    print("  예시 (채워 넣으세요):")
-    print("  ─────────────────────────────")
-    print("  제목: _______________")
-    print()
-    print("  1. 도입: _______________")
-    print("  2. 배경 지식: _______________")
-    print("  3. 구현 과정: _______________")
-    print("  4. 결과 분석: _______________")
-    print("  5. 마무리: _______________")
-    print()
-    print("  시각 자료:")
-    print("  - _______________")
-    print("  - _______________")
-    print("  - _______________")
+    print("  당신의 답:")
+    your_total = sum(section_secs.values())
+    for k, v in section_secs.items():
+        mark = "[O]" if abs(v - expected[k]) <= 3 else "[X]"
+        print(f"  {mark} {k}: {v}s  (기대: {expected[k]}s)")
+    print(f"  Total: {your_total}s (기대: {total_expected}s)")
 
 
-def problem2_video_time_allocation():
+def problem2_rerun_log_design():
     """
-    문제 2: 영상 시간 배분 설계
+    문제 2: Rerun 의 entity path 설계
 
-    6분짜리 Demo 영상의 시간 배분을 설계하시오.
-    각 섹션의 시간, 화면 구성, 핵심 메시지를 포함하시오.
+    아래 5 가지 정보를 Rerun 에 log 할 때 적절한 entity path:
+      A) camera image
+      B) action linear x/y/z
+      C) action angular x/y/z
+      D) gripper position
+      E) latency
+
+    TODO 채우기.
     """
-    print("\n" + "━" * 36)
-    print("문제 2: 영상 시간 배분 설계")
-    print("━" * 36 + "\n")
+    print("\n" + "=" * 60)
+    print("문제 2: Rerun entity path 설계")
+    print("=" * 60 + "\n")
 
-    print("  총 길이: 6분\n")
+    # TODO
+    paths = {"A": "", "B": "", "C": "", "D": "", "E": ""}
 
-    print("  과제:")
-    print("  1) 5개 이상의 섹션으로 나누시오")
-    print("  2) 각 섹션의 시간(초)을 배분하시오 (합계 = 360초)")
-    print("  3) 각 섹션의 화면 구성을 설명하시오")
-    print("  4) 각 섹션의 핵심 메시지를 작성하시오")
+    expected = {
+        "A": "camera/image",
+        "B": "vla/action/linear_{x,y,z}",
+        "C": "vla/action/angular_{x,y,z}",
+        "D": "vla/gripper",
+        "E": "vla/latency_ms",
+    }
+
+    print("  당신의 답:")
+    for k, v in paths.items():
+        print(f"  {k}: '{v}'")
+        print(f"      (기대: '{expected[k]}')")
     print()
-
-    total_seconds = 360
-    print(f"  총 배분 가능 시간: {total_seconds}초 ({total_seconds // 60}분)\n")
-
-    print("  예시 (채워 넣으세요):")
-    print("  ─────────────────────────────")
-    print("  섹션 1: 인트로")
-    print("    시간: ___ 초")
-    print("    화면: _______________")
-    print("    메시지: _______________")
-    print()
-    print("  섹션 2: _______________")
-    print("    시간: ___ 초")
-    print("    화면: _______________")
-    print("    메시지: _______________")
-    print()
-    print("  ...")
-    print()
-    print(f"  합계: ___ / {total_seconds} 초")
+    print("  [tip] entity path 의 원칙:")
+    print("    - 슬래시로 계층 분리")
+    print("    - 의미 그룹별 prefix (vla/action/*, vla/gripper, etc.)")
+    print("    - 짧고 검색 쉽게")
 
 
-def problem3_interview_prep():
+def problem3_packaging_files():
     """
-    문제 3: 면접 답변 작성
+    문제 3: Portfolio/02_VLA_demo/ 의 파일 list
 
-    아래 3개 면접 질문에 대해 STAR 프레임워크로 답변을 작성하시오.
-    각 답변은 2분 이내로 말할 수 있는 분량이어야 한다.
+    `physical-ai-study/Portfolio/02_VLA_demo/` 에 들어가야 할 파일을
+    모두 고르시오.
+
+    A) vla_demo.mp4 (1분 영상)
+    B) README.md (산출물 설명)
+    C) vla_inference/ (Python wrapper)
+    D) vla_node/ (ROS2 패키지)
+    E) bag/ (1분 dry-run bag 압축)
+    F) latency_data.csv (측정 데이터)
+    G) blog_links.md (RT-2 + OpenVLA 블로그 URL)
+    H) huggingface_credentials.txt (HuggingFace token)
+
+    TODO: 포함되어야 할 항목을 모두 답.
     """
-    print("\n" + "━" * 36)
-    print("문제 3: 면접 답변 작성")
-    print("━" * 36 + "\n")
+    print("\n" + "=" * 60)
+    print("문제 3: Portfolio 패키징 파일")
+    print("=" * 60 + "\n")
 
-    questions = [
-        "3D Detection 프로젝트에서 가장 어려웠던 점은?",
-        "BEV 표현의 장점을 3가지 설명하세요.",
-        "이 프로젝트 경험을 실무에 어떻게 적용하시겠습니까?",
-    ]
+    # TODO
+    included = ""  # 예: "A,B,C"
 
-    for i, q in enumerate(questions, 1):
-        print(f"  Q{i}. {q}\n")
-        print(f"  STAR 답변:")
-        print(f"    S (상황): _______________")
-        print(f"    T (과제): _______________")
-        print(f"    A (행동): _______________")
-        print(f"    R (결과): _______________")
-        print()
+    expected = "A,B,C,D,E,F,G"  # H 는 보안상 절대 포함하면 안 됨!
 
-    print("  기준:")
-    print("  - 각 답변 200~300자 이내")
-    print("  - 구체적인 수치 포함 (AP3D, NDS 등)")
-    print("  - 소리 내어 2분 이내에 말할 수 있어야 함")
+    print(f"  당신의 답 : {included}")
+    print(f"  기대 답   : {expected}")
+    print()
+    print("  주의: H (huggingface_credentials.txt) 는 절대 포함하면 안 됨!")
+    print("        token 은 환경 변수 또는 .env (gitignore) 로 관리.")
 
 
 if __name__ == "__main__":
-    print("━" * 40)
-    print("  Week 12 Quiz - Medium")
-    print("━" * 40)
-    problem1_blog_outline()
-    problem2_video_time_allocation()
-    problem3_interview_prep()
-    print("\n" + "━" * 40)
-    print("정답은 quiz_solutions/medium_sol.py 참고")
-    print("━" * 40)
+    print("=" * 60)
+    problem1_video_section_priority()
+    problem2_rerun_log_design()
+    problem3_packaging_files()
+    print("=" * 60)

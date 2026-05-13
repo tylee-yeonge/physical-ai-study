@@ -1,633 +1,301 @@
-# Week 5 실습: MMDetection3D로 KITTI 3D Detection
+# Week 5 실습: OpenX-Embodiment 데이터 + LoRA 흐름
 
-> [goal] **목표**: MMDetection3D 환경을 세팅하고, FCOS3D 모델로 KITTI 3D Detection을 실습한다
-> [code] **언어**: Python (PyTorch, MMDetection3D)
-> [time] **예상 시간**: 10시간
-
----
-
-## [list] 실습 개요
-
-| Step | 내용 | 난이도 | 시간 |
-|------|------|--------|------|
-| 1 | MMDetection3D 환경 세팅 | 필수 | 2시간 |
-| 2 | KITTI 데이터 준비 및 변환 | 필수 | 2시간 |
-| 3 | FCOS3D 학습 실행 | 필수 | 3시간 |
-| 4 | Inference 및 3D bbox 시각화 | 필수 | 3시간 |
+> [goal] **실습 목표**: OpenX-Embodiment 의 한 dataset 을 직접 로드해 RLDS schema 를 손에 익히고, LoRA config 를 작성해 학습 가능 파라미터를 확인한다.
+> [time] **예상 시간**: 6~8시간
 
 ---
 
 ## [tool] 환경 설정
 
 ```bash
-# Conda 환경 생성
-conda create -n mmdet3d python=3.8 -y
-conda activate mmdet3d
-
-# PyTorch 설치
-pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 \
-    --extra-index-url https://download.pytorch.org/whl/cu117
-
-# OpenMMLab 도구 설치
-pip install openmim
-mim install mmcv-full==1.7.1
-mim install mmdet==2.28.2
-
-# MMDetection3D 소스 빌드
-git clone https://github.com/open-mmlab/mmdetection3d.git
-cd mmdetection3d
-git checkout v1.1.1
-pip install -e .
-
-# 추가 도구
-pip install numpy matplotlib opencv-python
+conda activate phase4
+pip install -r requirements.txt
+# 추가: datasets, h5py, peft (LoRA 라이브러리)
 ```
 
 ---
 
-## Step 1: 설치 확인 및 환경 테스트
+## [note] 실습 1: HuggingFace datasets 로 OpenX subset 로드
 
-### 1.1 설치 확인 스크립트
+**파일명**: `practice_openx_subset.py`
 
 ```python
-# check_environment.py
 """
-MMDetection3D 설치 확인 스크립트
-모든 패키지가 올바르게 설치되었는지 확인합니다.
+실습 1: OpenX-Embodiment 의 한 subset (예: bridge) 일부를 로드
 """
-import sys
+from datasets import load_dataset
+import numpy as np
 
-def check_package(name, import_name=None):
-    """패키지 설치 확인"""
-    if import_name is None:
-        import_name = name
-    try:
-        mod = __import__(import_name)
-        version = getattr(mod, '__version__', 'unknown')
-        print(f"  [O] {name}: {version}")
-        return True
-    except ImportError:
-        print(f"  [X] {name}: 설치되지 않음")
-        return False
+print("=" * 60)
+print("실습 1: OpenX-Embodiment subset 로드")
+print("=" * 60)
 
-print("=" * 50)
-print("MMDetection3D 환경 확인")
-print("=" * 50)
+# 주의: OpenX 전체는 수 TB. 일부만 streaming 으로 로드
+# 또는 robotics 공식 site 의 작은 dataset
+# 예시: bridge_v2 일부
 
-all_ok = True
-all_ok &= check_package("Python", "sys")
-print(f"  [O] Python: {sys.version.split()[0]}")
+# 방법 1: HuggingFace datasets (작은 subset 만)
+try:
+    ds = load_dataset(
+        "lerobot/bridge_orig",  # 또는 다른 RLDS 호환 dataset
+        split="train",
+        streaming=True,
+    )
+    print("\n[1-1] dataset 로드 성공")
 
-all_ok &= check_package("PyTorch", "torch")
-all_ok &= check_package("torchvision")
-all_ok &= check_package("mmcv", "mmcv")
-all_ok &= check_package("mmdet")
-all_ok &= check_package("mmdet3d")
-all_ok &= check_package("numpy")
-all_ok &= check_package("cv2", "cv2")
-all_ok &= check_package("matplotlib")
+    # 첫 3 episode 확인
+    for i, ep in enumerate(ds):
+        if i >= 3:
+            break
+        print(f"\n  Episode {i}:")
+        # observation 의 첫 step
+        if 'observation' in ep:
+            obs = ep['observation']
+            print(f"    obs keys: {list(obs.keys()) if hasattr(obs, 'keys') else 'N/A'}")
+        if 'action' in ep:
+            print(f"    action shape: {np.asarray(ep['action']).shape if ep['action'] is not None else 'None'}")
 
-# GPU 확인
+except Exception as e:
+    print(f"  [warn] HuggingFace 로드 실패: {e}")
+    print("  -> RT-X 공식 페이지 또는 OpenVLA repo 의 작은 sample 사용")
+
+# 방법 2: OpenVLA repo 의 작은 demo dataset (대안)
+print("\n[1-2] 대안: OpenVLA repo 에서 sample trajectory 확인")
+print("  $ git clone https://github.com/openvla/openvla")
+print("  $ ls openvla/data/  # 또는 OpenVLA 의 demo dataset 위치")
+
+print("\n[O] 실습 1 완료!")
+```
+
+> [tip] OpenX 전체 (4 TB+) 는 본 로드맵에서 다 다운로드 안 함. WidowX / Bridge 의 작은 subset (~ 10GB) 으로 충분.
+
+---
+
+## [note] 실습 2: RLDS schema 분석
+
+**파일명**: `practice_rlds_schema.py`
+
+```python
+"""
+실습 2: RLDS schema 의 표준 필드 시뮬레이션
+목적: 자작 팔 데이터를 OpenX-Embodiment 와 호환되게 만들기 위한 준비
+"""
+import numpy as np
+
+print("=" * 60)
+print("실습 2: RLDS schema")
+print("=" * 60)
+
+
+# -- 2-1. 자작 팔 한 episode 시뮬레이션 --
+def simulate_episode(n_steps=50, dof=6):
+    steps = []
+    for t in range(n_steps):
+        steps.append({
+            'observation': {
+                'image': np.random.randint(0, 255, (224, 224, 3), dtype=np.uint8),
+                'natural_language_instruction': "pick up the can",
+                'joint_state': np.random.randn(dof).astype(np.float32),
+            },
+            'action': np.random.uniform(-0.05, 0.05, 7).astype(np.float32),
+            'reward': 1.0 if t == n_steps - 1 else 0.0,
+            'is_first': t == 0,
+            'is_last': t == n_steps - 1,
+            'is_terminal': t == n_steps - 1,
+        })
+    return {'steps': steps}
+
+
+print("\n[2-1] 자작 팔 episode 시뮬레이션")
+ep = simulate_episode(n_steps=50, dof=6)
+print(f"  Episode step 수      : {len(ep['steps'])}")
+print(f"  Step 0 의 obs.keys() : {list(ep['steps'][0]['observation'].keys())}")
+print(f"  Step 0 의 action     : {ep['steps'][0]['action']}")
+print(f"  Step 0 의 is_first   : {ep['steps'][0]['is_first']}")
+
+# -- 2-2. OpenX schema 와의 호환성 점검 --
+print("\n[2-2] OpenX 호환성 점검")
+required_obs = ['image', 'natural_language_instruction']
+required_step = ['observation', 'action', 'is_first', 'is_last']
+
+obs_keys = set(ep['steps'][0]['observation'].keys())
+step_keys = set(ep['steps'][0].keys())
+
+obs_missing = set(required_obs) - obs_keys
+step_missing = set(required_step) - step_keys
+
+print(f"  obs 누락 : {obs_missing or '없음'}")
+print(f"  step 누락: {step_missing or '없음'}")
+
+if not obs_missing and not step_missing:
+    print("\n  [O] OpenX schema 호환!")
+
+print("\n[O] 실습 2 완료!")
+```
+
+---
+
+## [note] 실습 3: PEFT 의 LoRA config
+
+**파일명**: `practice_lora_config.py`
+
+```python
+"""
+실습 3: PEFT 의 LoRA 를 작은 mock 모델에 적용해 학습 가능 파라미터 확인
+"""
 import torch
-print(f"\n  GPU 사용 가능: {torch.cuda.is_available()}")
-if torch.cuda.is_available():
-    print(f"  GPU 이름: {torch.cuda.get_device_name(0)}")
-    print(f"  GPU 메모리: {torch.cuda.get_device_properties(0).total_mem / 1e9:.1f} GB")
+import torch.nn as nn
+from peft import LoraConfig, get_peft_model
 
-print("\n" + "=" * 50)
-if all_ok:
-    print("[O] 모든 패키지가 올바르게 설치되었습니다!")
-else:
-    print("[X] 일부 패키지 설치가 필요합니다.")
-print("=" * 50)
-```
+print("=" * 60)
+print("실습 3: LoRA config 와 학습 가능 파라미터 수")
+print("=" * 60)
 
-### 1.2 간단한 모델 로드 테스트
 
-```python
-# test_model_load.py
-"""
-MMDetection3D 모델 로드 테스트
-Config 파일에서 모델을 빌드할 수 있는지 확인합니다.
-"""
-from mmdet3d.models import build_detector
-from mmcv import Config
+# -- 3-1. Mock LM (Llama 7B 의 작은 버전) --
+class MockTransformerBlock(nn.Module):
+    def __init__(self, hidden=4096):
+        super().__init__()
+        self.q_proj = nn.Linear(hidden, hidden, bias=False)
+        self.k_proj = nn.Linear(hidden, hidden, bias=False)
+        self.v_proj = nn.Linear(hidden, hidden, bias=False)
+        self.o_proj = nn.Linear(hidden, hidden, bias=False)
+        self.gate_proj = nn.Linear(hidden, hidden * 4, bias=False)
+        self.up_proj = nn.Linear(hidden, hidden * 4, bias=False)
+        self.down_proj = nn.Linear(hidden * 4, hidden, bias=False)
 
-# Config 로드
-cfg = Config.fromfile(
-    'configs/fcos3d/fcos3d_r101_caffe_fpn_gn-head_dcn_2x8_1x_nus-mono3d.py'
+
+class MockLM(nn.Module):
+    def __init__(self, n_layers=32, hidden=4096):
+        super().__init__()
+        self.layers = nn.ModuleList([MockTransformerBlock(hidden) for _ in range(n_layers)])
+
+
+# -- 3-2. LoRA config --
+def count_params(model, trainable_only=False):
+    if trainable_only:
+        return sum(p.numel() for p in model.parameters() if p.requires_grad)
+    return sum(p.numel() for p in model.parameters())
+
+
+print("\n[3-1] Mock LM 생성 (32 layer, hidden 4096)")
+# 실제 메모리에 다 안 띄우고 layer 4 개로 축소
+model = MockLM(n_layers=4, hidden=4096)
+total_params = count_params(model)
+print(f"  전체 파라미터 (4 layer 축약): {total_params:,}")
+print(f"  추정 32 layer 전체           : {total_params * 32 // 4:,}")
+
+# -- 3-3. PEFT LoRA 적용 --
+# PEFT 가 Mock 모델에 그대로 적용은 어려우므로 LoraConfig 만 확인
+lora_config = LoraConfig(
+    r=32,
+    lora_alpha=64,
+    target_modules=['q_proj', 'k_proj', 'v_proj', 'o_proj',
+                    'gate_proj', 'up_proj', 'down_proj'],
+    lora_dropout=0.0,
+    bias='none',
+)
+print(f"\n[3-2] LoRA config")
+print(f"  r           : {lora_config.r}")
+print(f"  alpha       : {lora_config.lora_alpha}")
+print(f"  target      : {lora_config.target_modules}")
+
+# -- 3-4. LoRA 파라미터 수 직접 계산 --
+print("\n[3-3] LoRA 학습 파라미터 수 계산")
+hidden = 4096
+n_layers = 32  # Llama 7B 의 실제 layer 수
+rank = 32
+
+# attention: q,k,v,o 4 개 모두 hidden -> hidden
+attn_params = 4 * rank * (hidden + hidden) * n_layers
+# FFN: gate, up (hidden -> 4*hidden), down (4*hidden -> hidden)
+ffn_params = (
+    2 * rank * (hidden + 4 * hidden) * n_layers   # gate, up
+    + rank * (4 * hidden + hidden) * n_layers      # down
 )
 
-# 모델 빌드 (weight 없이)
-model = build_detector(cfg.model)
-print(f"모델 빌드 성공!")
-print(f"모델 타입: {type(model).__name__}")
+lora_total = attn_params + ffn_params
+base_total = 7e9
+ratio = lora_total / base_total * 100
 
-# 파라미터 수 확인
-total_params = sum(p.numel() for p in model.parameters())
-print(f"총 파라미터: {total_params / 1e6:.1f}M")
+print(f"  attention LoRA params : {attn_params:,}")
+print(f"  FFN LoRA params       : {ffn_params:,}")
+print(f"  총 LoRA params        : {lora_total:,}")
+print(f"  Base 7B 모델 대비     : {ratio:.2f}%")
+
+print("\n[O] 실습 3 완료!")
+```
+
+> [tip] 실제 OpenVLA repo 에서 학습 시 PEFT 가 자동으로 LoRA layer 를 wrap. `print_trainable_parameters()` 한 줄로 확인 가능.
+
+---
+
+## [note] 실습 4: 자작 팔 데이터 호환성 분석 노트
+
+**파일명**: `~/phase4_notes/week5/self_arm_data_compat.md`
+
+```markdown
+# 자작 6DOF 팔 데이터 호환성 분석
+
+## 1. 자작 팔 hardware
+- Robot: Dynamixel XM430 6DOF + 그리퍼
+- Camera: ELP Stereo (보유)
+- DoF: 6 + gripper = 7
+
+## 2. OpenX-Embodiment 의 가장 가까운 embodiment
+- WidowX 250 (6-DoF arm, Dynamixel 기반)
+- Bridge / Bridge V2 dataset 활용 가능
+
+## 3. RLDS schema 호환 작업
+- [ ] observation.image: RGB 224x224 (resize 필요)
+- [ ] observation.natural_language_instruction: 작업 명령
+- [ ] action: [dx, dy, dz, rx, ry, rz, gripper] (end-effector delta)
+- [ ] reward / is_first / is_last: episode 경계만 1
+
+## 4. Action space 변환
+- 자작 팔: joint position (6 dim)
+- OpenVLA: end-effector delta pose (7 dim)
+- 변환: forward kinematics 로 EE pose 계산 -> delta 계산
+
+## 5. 데이터 수집 계획 (Phase 7 의 사전 설계)
+- task: pick-and-place 1~3 종류
+- demonstrations: 50~100 episode per task
+- episode 길이: 30~100 step (5~15초)
+- 수집 방법: leader-follower teleop 또는 PS4 패드
+
+## 6. LoRA 설정 (예정)
+- rank: 32
+- alpha: 64
+- target: q,k,v,o,gate,up,down (all linear)
+- learning rate: 5e-4
+- batch_size: 1 + grad_accum 8
+
+## 7. 평가 계획
+- success rate (50 trial)
+- 비교: zero-shot OpenVLA vs LoRA fine-tuned
+- latency 측정 (Phase 7 의 핵심)
 ```
 
 ---
 
-## Step 2: KITTI 데이터 준비
+## [O] 실습 체크리스트
 
-### 2.1 데이터 다운로드 및 구조 확인
-
-```python
-# prepare_kitti.py
-"""
-KITTI 데이터 구조 확인 및 시각화
-다운로드 후 데이터가 올바른지 점검합니다.
-"""
-import os
-import numpy as np
-import cv2
-import matplotlib.pyplot as plt
-
-KITTI_ROOT = './data/kitti'
-
-def check_kitti_structure():
-    """KITTI 데이터 구조 확인"""
-    required = [
-        'training/image_2',
-        'training/calib',
-        'training/label_2',
-    ]
-
-    print("KITTI 데이터 구조 확인:")
-    for path in required:
-        full_path = os.path.join(KITTI_ROOT, path)
-        exists = os.path.exists(full_path)
-        count = len(os.listdir(full_path)) if exists else 0
-        status = "[O]" if exists else "[X]"
-        print(f"  {status} {path}: {count} 파일")
-
-def parse_kitti_label(label_file):
-    """KITTI 레이블 파싱"""
-    objects = []
-    with open(label_file, 'r') as f:
-        for line in f.readlines():
-            parts = line.strip().split()
-            obj = {
-                'type': parts[0],
-                'truncated': float(parts[1]),
-                'occluded': int(parts[2]),
-                'alpha': float(parts[3]),
-                'bbox_2d': [float(x) for x in parts[4:8]],
-                'dimensions': [float(x) for x in parts[8:11]],  # h, w, l
-                'location': [float(x) for x in parts[11:14]],   # x, y, z
-                'rotation_y': float(parts[14]),
-            }
-            objects.append(obj)
-    return objects
-
-def parse_kitti_calib(calib_file):
-    """KITTI 캘리브레이션 파싱"""
-    calib = {}
-    with open(calib_file, 'r') as f:
-        for line in f.readlines():
-            if ':' in line:
-                key, value = line.split(':', 1)
-                calib[key.strip()] = np.array(
-                    [float(x) for x in value.strip().split()]
-                )
-    # P2: 3x4 투영 행렬
-    calib['P2'] = calib['P2'].reshape(3, 4)
-    return calib
-
-def visualize_kitti_sample(idx=0):
-    """KITTI 샘플 시각화"""
-    img_file = os.path.join(KITTI_ROOT, f'training/image_2/{idx:06d}.png')
-    label_file = os.path.join(KITTI_ROOT, f'training/label_2/{idx:06d}.txt')
-    calib_file = os.path.join(KITTI_ROOT, f'training/calib/{idx:06d}.txt')
-
-    # 이미지 로드
-    img = cv2.imread(img_file)
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
-    # 레이블 파싱
-    objects = parse_kitti_label(label_file)
-    calib = parse_kitti_calib(calib_file)
-
-    print(f"\n샘플 {idx:06d}:")
-    print(f"  이미지 크기: {img.shape}")
-    print(f"  객체 수: {len(objects)}")
-    for obj in objects:
-        print(f"  - {obj['type']}: 위치=({obj['location'][0]:.1f}, "
-              f"{obj['location'][1]:.1f}, {obj['location'][2]:.1f}), "
-              f"깊이={obj['location'][2]:.1f}m")
-
-    # 2D bbox 시각화
-    for obj in objects:
-        if obj['type'] in ['Car', 'Pedestrian', 'Cyclist']:
-            x1, y1, x2, y2 = [int(v) for v in obj['bbox_2d']]
-            color = {'Car': (255, 0, 0), 'Pedestrian': (0, 255, 0),
-                     'Cyclist': (0, 0, 255)}[obj['type']]
-            cv2.rectangle(img, (x1, y1), (x2, y2), color, 2)
-            cv2.putText(img, f"{obj['type']} z={obj['location'][2]:.1f}m",
-                       (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX,
-                       0.5, color, 1)
-
-    plt.figure(figsize=(15, 5))
-    plt.imshow(img)
-    plt.title(f'KITTI Sample {idx:06d}')
-    plt.axis('off')
-    plt.savefig(f'kitti_sample_{idx:06d}.png', dpi=150, bbox_inches='tight')
-    plt.show()
-    print(f"  → 저장: kitti_sample_{idx:06d}.png")
-
-if __name__ == '__main__':
-    check_kitti_structure()
-    visualize_kitti_sample(0)
-    visualize_kitti_sample(100)
-```
-
-### 2.2 데이터 변환 (pkl 생성)
-
-```bash
-# MMDetection3D 포맷으로 변환
-cd mmdetection3d
-
-python tools/create_data.py kitti \
-    --root-path ./data/kitti \
-    --out-dir ./data/kitti \
-    --extra-tag kitti
-
-# 결과 확인
-ls -la data/kitti/*.pkl
-```
+- [ ] `practice_openx_subset.py` 실행 (또는 OpenX 공식 페이지에서 dataset 구조 확인)
+- [ ] `practice_rlds_schema.py` 실행
+  - [ ] schema 호환성 [O] 출력 확인
+- [ ] `practice_lora_config.py` 실행
+  - [ ] LoRA 비율 ~ 1% 확인
+- [ ] 자작 팔 호환성 노트 산출
+- [ ] quiz_easy / quiz_medium 풀기
+- [ ] git commit
 
 ---
 
-## Step 3: FCOS3D 학습
-
-### 3.1 Config 수정
-
-```python
-# my_fcos3d_kitti.py (커스텀 config)
-"""
-KITTI용 FCOS3D Config
-학습 환경에 맞게 수정합니다.
-"""
-
-_base_ = 'configs/fcos3d/fcos3d_r101_caffe_fpn_gn-head_dcn_2x8_1x_nus-mono3d.py'
-
-# 데이터 경로 수정
-data_root = 'data/kitti/'
-dataset_type = 'KittiMonoDataset'
-
-# 클래스 수정 (KITTI: 3 classes)
-model = dict(
-    bbox_head=dict(
-        num_classes=3,
-    ),
-)
-
-# 배치 크기 (GPU 메모리에 맞게 조절)
-data = dict(
-    samples_per_gpu=2,  # RTX 3090: 2, RTX 4090: 4
-    workers_per_gpu=2,
-)
-
-# 학습률 조정
-optimizer = dict(
-    type='AdamW',
-    lr=0.0002,
-    weight_decay=0.01,
-)
-
-# 학습 스케줄 (짧게 테스트)
-runner = dict(type='EpochBasedRunner', max_epochs=12)
-
-# 평가 설정
-evaluation = dict(interval=2, metric='mAP')
-
-# 로그 설정
-log_config = dict(
-    interval=50,
-    hooks=[
-        dict(type='TextLoggerHook'),
-    ],
-)
-```
-
-### 3.2 학습 실행
-
-```bash
-# 학습 시작
-python tools/train.py \
-    my_fcos3d_kitti.py \
-    --work-dir work_dirs/fcos3d_kitti \
-    --gpu-ids 0
-
-# 또는 Pretrained weight 사용 (권장: 빠른 수렴)
-python tools/train.py \
-    my_fcos3d_kitti.py \
-    --work-dir work_dirs/fcos3d_kitti \
-    --gpu-ids 0 \
-    --cfg-options load_from='checkpoints/fcos3d_r101_caffe_fpn_gn-head_dcn_2x8_1x_nus-mono3d.pth'
-```
-
-### 3.3 학습 로그 분석
-
-```python
-# analyze_log.py
-"""
-학습 로그 분석 및 Loss 시각화
-"""
-import json
-import matplotlib.pyplot as plt
-
-def parse_log(log_file):
-    """학습 로그에서 loss 추출"""
-    losses = {'epoch': [], 'loss': [], 'loss_cls': [], 'loss_bbox': []}
-
-    with open(log_file, 'r') as f:
-        for line in f:
-            try:
-                log = json.loads(line.strip())
-                if 'epoch' in log and 'loss' in log:
-                    losses['epoch'].append(log['epoch'])
-                    losses['loss'].append(log['loss'])
-                    losses['loss_cls'].append(log.get('loss_cls', 0))
-                    losses['loss_bbox'].append(log.get('loss_bbox', 0))
-            except json.JSONDecodeError:
-                continue
-    return losses
-
-def plot_loss(losses):
-    """Loss 커브 시각화"""
-    fig, axes = plt.subplots(1, 3, figsize=(15, 4))
-
-    axes[0].plot(losses['loss'], alpha=0.7)
-    axes[0].set_title('Total Loss')
-    axes[0].set_xlabel('Iteration')
-    axes[0].set_ylabel('Loss')
-
-    axes[1].plot(losses['loss_cls'], alpha=0.7, color='orange')
-    axes[1].set_title('Classification Loss')
-    axes[1].set_xlabel('Iteration')
-
-    axes[2].plot(losses['loss_bbox'], alpha=0.7, color='green')
-    axes[2].set_title('Bbox Regression Loss')
-    axes[2].set_xlabel('Iteration')
-
-    plt.tight_layout()
-    plt.savefig('training_loss.png', dpi=150)
-    plt.show()
-    print("→ 저장: training_loss.png")
-
-if __name__ == '__main__':
-    log_file = 'work_dirs/fcos3d_kitti/None.log.json'  # 실제 파일명으로 변경
-    losses = parse_log(log_file)
-    plot_loss(losses)
-```
-
----
-
-## Step 4: Inference 및 3D Bbox 시각화
-
-### 4.1 3D Bbox 투영 시각화
-
-```python
-# visualize_3d_detection.py
-"""
-3D Detection 결과를 이미지에 시각화합니다.
-3D bbox의 8개 꼭짓점을 2D 이미지에 투영합니다.
-"""
-import numpy as np
-import cv2
-import matplotlib.pyplot as plt
-
-
-def compute_3d_box_corners(dimensions, location, rotation_y):
-    """
-    3D bbox의 8개 꼭짓점 계산 (카메라 좌표계)
-
-    Args:
-        dimensions: [h, w, l] 높이, 너비, 길이
-        location: [x, y, z] 3D 중심 좌표
-        rotation_y: Y축 회전각 (라디안)
-
-    Returns:
-        corners: [8, 3] 꼭짓점 좌표
-    """
-    h, w, l = dimensions
-    x, y, z = location
-
-    # 회전 행렬 (Y축 기준)
-    R = np.array([
-        [ np.cos(rotation_y), 0, np.sin(rotation_y)],
-        [0,                   1, 0                  ],
-        [-np.sin(rotation_y), 0, np.cos(rotation_y)],
-    ])
-
-    # 8개 꼭짓점 (중심 기준)
-    corners = np.array([
-        [ l/2,  0,    w/2],
-        [ l/2,  0,   -w/2],
-        [-l/2,  0,   -w/2],
-        [-l/2,  0,    w/2],
-        [ l/2, -h,    w/2],
-        [ l/2, -h,   -w/2],
-        [-l/2, -h,   -w/2],
-        [-l/2, -h,    w/2],
-    ])
-
-    # 회전 적용 + 위치 이동
-    corners = (R @ corners.T).T + np.array([x, y, z])
-    return corners
-
-
-def project_to_image(points_3d, P2):
-    """
-    3D 점을 2D 이미지에 투영
-
-    Args:
-        points_3d: [N, 3] 3D 점들
-        P2: [3, 4] 투영 행렬
-
-    Returns:
-        points_2d: [N, 2] 2D 투영 좌표
-    """
-    N = points_3d.shape[0]
-    # 동차 좌표로 변환 [N, 4]
-    points_homo = np.hstack([points_3d, np.ones((N, 1))])
-
-    # 투영
-    projected = P2 @ points_homo.T  # [3, N]
-    projected = projected.T  # [N, 3]
-
-    # z로 나누기 (정규화)
-    points_2d = projected[:, :2] / projected[:, 2:3]
-    return points_2d
-
-
-def draw_3d_bbox_on_image(img, corners_2d, color=(0, 255, 0), thickness=2):
-    """
-    3D bbox의 12개 edge를 이미지에 그리기
-
-    Args:
-        img: BGR 이미지
-        corners_2d: [8, 2] 투영된 2D 좌표
-        color: BGR 색상
-        thickness: 선 두께
-    """
-    # 12개 edge 정의
-    edges = [
-        [0, 1], [1, 2], [2, 3], [3, 0],  # 아래 면
-        [4, 5], [5, 6], [6, 7], [7, 4],  # 위 면
-        [0, 4], [1, 5], [2, 6], [3, 7],  # 수직 edge
-    ]
-
-    for i, j in edges:
-        pt1 = tuple(corners_2d[i].astype(int))
-        pt2 = tuple(corners_2d[j].astype(int))
-        cv2.line(img, pt1, pt2, color, thickness)
-
-    # 전면 표시 (더 두껍게)
-    front_edges = [[0, 1], [0, 4], [1, 5], [4, 5]]
-    for i, j in front_edges:
-        pt1 = tuple(corners_2d[i].astype(int))
-        pt2 = tuple(corners_2d[j].astype(int))
-        cv2.line(img, pt1, pt2, color, thickness + 1)
-
-    return img
-
-
-def visualize_kitti_3d(idx=0, kitti_root='./data/kitti'):
-    """KITTI 샘플에 3D bbox 시각화"""
-
-    # 파일 로드
-    img_file = f'{kitti_root}/training/image_2/{idx:06d}.png'
-    label_file = f'{kitti_root}/training/label_2/{idx:06d}.txt'
-    calib_file = f'{kitti_root}/training/calib/{idx:06d}.txt'
-
-    img = cv2.imread(img_file)
-
-    # 캘리브레이션 로드
-    calib = {}
-    with open(calib_file, 'r') as f:
-        for line in f:
-            if ':' in line:
-                key, value = line.split(':', 1)
-                calib[key.strip()] = np.array(
-                    [float(x) for x in value.strip().split()]
-                )
-    P2 = calib['P2'].reshape(3, 4)
-
-    # 레이블 파싱
-    color_map = {
-        'Car': (0, 255, 0),
-        'Pedestrian': (0, 165, 255),
-        'Cyclist': (255, 0, 0),
-    }
-
-    with open(label_file, 'r') as f:
-        for line in f:
-            parts = line.strip().split()
-            obj_type = parts[0]
-            if obj_type not in color_map:
-                continue
-
-            dims = [float(x) for x in parts[8:11]]   # h, w, l
-            loc = [float(x) for x in parts[11:14]]    # x, y, z
-            ry = float(parts[14])
-
-            # 3D 꼭짓점 계산
-            corners_3d = compute_3d_box_corners(dims, loc, ry)
-
-            # 2D 투영
-            corners_2d = project_to_image(corners_3d, P2)
-
-            # 그리기
-            color = color_map[obj_type]
-            draw_3d_bbox_on_image(img, corners_2d, color=color)
-
-            # 깊이 정보 텍스트
-            center_2d = corners_2d.mean(axis=0).astype(int)
-            cv2.putText(img, f'{obj_type} {loc[2]:.1f}m',
-                       (center_2d[0], center_2d[1] - 10),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1)
-
-    # 저장
-    result_path = f'kitti_3d_vis_{idx:06d}.png'
-    cv2.imwrite(result_path, img)
-
-    # Matplotlib으로 표시
-    plt.figure(figsize=(15, 5))
-    plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-    plt.title(f'KITTI 3D Detection - Sample {idx:06d}')
-    plt.axis('off')
-    plt.savefig(result_path.replace('.png', '_plt.png'), dpi=150, bbox_inches='tight')
-    plt.show()
-    print(f"→ 저장: {result_path}")
-
-
-if __name__ == '__main__':
-    for idx in [0, 10, 50, 100]:
-        visualize_kitti_3d(idx)
-```
-
-### 4.2 AP3D 평가 실행
-
-```bash
-# 평가 실행
-python tools/test.py \
-    my_fcos3d_kitti.py \
-    work_dirs/fcos3d_kitti/latest.pth \
-    --eval mAP
-
-# 예상 출력:
-# Car AP3D @ 0.70:
-#   Easy:     18.52
-#   Moderate: 13.87
-#   Hard:     11.23
-# Pedestrian AP3D @ 0.50:
-#   Easy:     10.15
-#   Moderate:  8.42
-#   Hard:      7.11
-```
-
----
-
-## [tool] 트러블슈팅
-
-### 자주 발생하는 문제
-
-| 문제 | 원인 | 해결 |
-|------|------|------|
-| `ModuleNotFoundError: mmcv` | 버전 불일치 | `mim install mmcv-full==1.7.1` |
-| `CUDA out of memory` | 배치 크기 큼 | `samples_per_gpu=1`로 줄이기 |
-| `FileNotFoundError: pkl` | 데이터 변환 안 됨 | `create_data.py` 재실행 |
-| `KeyError: 'KittiMonoDataset'` | mmdet3d 버전 | `v1.1.1` 확인 |
-
----
-
-## [O] 체크리스트
-
-### 환경 세팅
-- [ ] conda 환경 생성 및 활성화
-- [ ] PyTorch + CUDA 설치 확인
-- [ ] mmcv, mmdet, mmdet3d 설치 확인
-- [ ] GPU 사용 가능 확인
-
-### 데이터 준비
-- [ ] KITTI 데이터셋 다운로드
-- [ ] 데이터 구조 확인 (image_2, calib, label_2)
-- [ ] pkl 파일 생성 (create_data.py)
-
-### 학습 및 평가
-- [ ] Config 파일 이해 및 수정
-- [ ] FCOS3D 학습 실행
-- [ ] Loss 커브 확인
-- [ ] AP3D 결과 확인 (Easy/Moderate/Hard)
-
-### 시각화
-- [ ] 3D bbox를 이미지에 투영하여 시각화
-- [ ] 결과 이미지 저장 (포트폴리오용)
-
----
-
-**다음**: [Week 6 - 성능 분석 및 개선](../week6/PRACTICE.md)
+## [link] 참고 자료
+
+- [OpenX-Embodiment paper](https://arxiv.org/abs/2310.08864)
+- [OpenX project page](https://robotics-transformer-x.github.io/)
+- [OpenVLA GitHub - LoRA training](https://github.com/openvla/openvla)
+- [PEFT (HuggingFace LoRA)](https://github.com/huggingface/peft)
+- [RLDS schema](https://github.com/google-research/rlds)
+- [Bridge Data V2](https://rail-berkeley.github.io/bridgedata/)

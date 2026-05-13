@@ -1,38 +1,34 @@
-# Phase 3: Detection + Depth — 학습 노트 가이드
+# Studies/Phase 3 — Detection + Depth (PC TensorRT + ROS2)
 
-> 이 디렉토리는 **학습 노트 (private)** 다. 면접관이 보지 않는다.
-> 채용 담당자가 보는 **포트폴리오 (public)** 는 별도 GitHub Repo `robotics-perception-portfolio` 에 따로 만든다.
+> [time] **학습 기간**: 2026.06~08 (2개월, 8주)
+> [doc] **마스터 가이드**: [`Roadmap/Phase 3.md`](../../Roadmap/Phase%203.md)
 
-## 분리 원칙
+---
 
-| 구분 | 위치 | 대상 | 형식 |
-|---|---|---|---|
-| **학습 노트 (private)** | 이 디렉토리 (`Studies/Phase 3/`) | 자기 이해용 | 빠르고 거친 형태 OK, 막힌 부분 솔직히 기록 |
-| **포트폴리오 (public)** | 별도 Repo `robotics-perception-portfolio` | 채용 담당자 | README + 영상 + 수치, 30초 안에 "뽑고 싶다" 판단 |
+## 디렉토리 구조
 
-두 가지를 절대 섞지 않는다.
+```
+Studies/Phase 3/
+  week1/   # PyTorch 기초 재정비
+  week2/   # 컴퓨터 비전용 라이브러리 (Albumentations / W&B / timm)
+  week3/   # YOLO 이론 (발전사 / YOLO11 / Detection 지표)
+  week4/   # YOLO11 학습 (Python)
+  week5/   # ONNX 변환 및 최적화
+  week6/   # PC TensorRT 배포 (C++)
+  week7/   # Monocular Depth 이론 + Depth Anything V2
+  week8/   # 통합 시스템 (Detection + Depth + ROS2 노드 래퍼)
+```
 
-## 각 week PRACTICE.md 진행 시 의식할 두 가지
+## week 자료 형식
 
-### 1. "이 주의 공개 가능 결과물"
-매주 끝에 다음 중 1개 이상을 **별도 Public Repo** 에 누적:
-- 작은 데모 스크립트 + README
-- 수치 측정 결과 표 (mAP, FPS, AbsRel 등)
-- 시각화 이미지 1~2장
-- 짧은 노트 (이번 주 핵심 1줄)
+각 week 디렉토리:
+- `README.md` — 이번 주 목표 + 학습 순서 + 핵심 개념
+- `PRACTICE.md` — 실습 단계별 가이드
+- `quiz_easy.{py,cpp}` / `quiz_medium.{py,cpp}` — 개념 / 코드 퀴즈
+- `quiz_solutions/` — 답
+- `requirements.txt` 또는 `CMakeLists.txt` — 의존성 (week 별 Python / C++ 여부에 따라)
 
-12주 후 한꺼번에 정리하지 말고 **매주 누적**이 핵심.
+## 참고
 
-### 2. "학습 노트는 면접관이 보지 않는다"
-이 디렉토리(`Studies/Phase 3/`)에 쌓이는 모든 것은 **본인 이해용**.
-GitHub Public Repo로 자동으로 가지 않는다.
-
-## 산출물 #1 최종 공개 시점
-
-**2026.07 (Phase 3 완료)** 까지 별도 Public Repo `robotics-perception-portfolio` 에 산출물 #1 디렉토리 공개:
-- README + 환경 세팅 + 실행 방법
-- 수치 성능 표 (mAP, FPS)
-- 1분 데모 영상
-- 기술 블로그 1개
-
-상세는 [Roadmap/Phase 3.md](../../Roadmap/Phase%203.md) 참조.
+- 정책, 산출물 #1 공개 일정, 주차별 상세 학습 내용은 모두 [`Roadmap/Phase 3.md`](../../Roadmap/Phase%203.md) 에 있음. 본 디렉토리는 학습 노트 모음.
+- 기존 12주 로드맵 중 Jetson 실기 배포 (week 9~12) 자료는 [`Archive/Phase3-jetson-legacy/`](../../Archive/Phase3-jetson-legacy/) 로 이동됨. Jetson 배포는 Phase 7 이후 옵션 #5.

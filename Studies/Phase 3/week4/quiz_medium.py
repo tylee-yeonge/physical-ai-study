@@ -1,5 +1,5 @@
 """
-Phase 5 Week 4 - YOLOv8 학습 중급 퀴즈
+Phase 5 Week 4 - YOLO11 학습 중급 퀴즈
 코드를 직접 실행하고 결과를 확인하세요.
 """
 import numpy as np
@@ -143,19 +143,20 @@ def problem3_hyperparameter_decision():
     print("━" * 36 + "\n")
 
     experiments = [
-        {"name": "Baseline", "model": "yolov8n", "imgsz": 640,
+        {"name": "Baseline", "model": "yolo11n", "imgsz": 640,
          "lr0": 0.01, "epochs": 50, "augmentation": "default",
          "map50": 0.48, "map50_95": 0.32, "train_loss": 0.8,
          "status": "val_mAP 정체"},
-        {"name": "Exp-A", "model": "yolov8s", "imgsz": 640,
+        {"name": "Exp-A", "model": "yolo11s", "imgsz": 640,
          "lr0": 0.01, "epochs": 50, "augmentation": "default",
          "map50": 0.55, "map50_95": 0.38, "train_loss": 0.5,
          "status": "개선됨"},
-        {"name": "Exp-B", "model": "yolov8s", "imgsz": 640,
+        {"name": "Exp-B", "model": "yolo11s", "imgsz": 640,
          "lr0": 0.01, "epochs": 100, "augmentation": "default",
          "map50": 0.57, "map50_95": 0.39, "train_loss": 0.15,
          "status": "과적합 의심"},
     ]
+    # model 컬럼 폭 확보 (yolo11n / yolo11s 등 8자)
 
     print(f"  {'실험':10s} │ {'모델':8s} │ {'imgsz':5s} │ {'lr0':6s} │ "
           f"{'epochs':6s} │ {'mAP50':6s} │ {'mAP50-95':8s} │ {'t_loss':6s} │ {'상태':12s}")

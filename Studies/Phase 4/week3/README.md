@@ -1,453 +1,267 @@
-# Week 3: KITTI 데이터셋 - 구조 이해, 레이블 파싱, 시각화
+# Week 3: RT-2 블로그 1편 작성
 
-> **이번 주 목표**: KITTI 3D Object Detection 데이터셋의 구조를 이해하고, 레이블 파싱 및 2D/3D/BEV 시각화를 구현
-> **예상 시간**: 12-15시간
-> **핵심 질문**: "KITTI 데이터셋을 직접 로드하고, 레이블을 파싱하여, 3D bbox를 이미지와 BEV에 시각화할 수 있는가?"
+> [goal] **이번 주 목표**: week 1~2 의 reading note 와 한 페이지 노트를 합쳐서 **공개 가능한 RT-2 블로그 1편** 의 초고를 마감한다. 산출물 #2 의 절반 (블로그 2편 중 1편).
+> [time] **예상 시간**: 10~12시간 (블로그 본문 6h + 다이어그램 2h + 퇴고 2~4h)
+> [tip] **핵심 질문**: "내 블로그 글을 처음 보는 사람이 30분 안에 RT-2 의 본질과 한계를 이해할 수 있는가?"
 
 ---
 
 ## [list] 학습 순서
 
-| 순서 | 단계 | 파일 | 설명 |
-|:----:|------|------|------|
-| 1 | 환경 설정 | `requirements.txt` | `pip install -r requirements.txt` |
-| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 3 | Python 퀴즈 (초급) | `quiz_easy.py` | KITTI 레이블 포맷, 난이도 기준 |
-| 4 | Python 퀴즈 (중급) | `quiz_medium.py` | KITTI 레이블 파싱 및 3D bbox 시각화 코드 실습 |
-| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | KITTI 데이터 로드, 레이블 파싱, 2D/3D/BEV 시각화 |
+| 순서 | 단계 | 파일/자료 | 설명 |
+|:----:|------|----------|------|
+| 1 | 블로그 플랫폼 결정 | `PRACTICE.md` 1 | Velog / Medium / 본 레포 `blog/` 중 선택 |
+| 2 | 글 구조 잡기 | `PRACTICE.md` 2 | 표준 8-section 구조로 outline |
+| 3 | 다이어그램 작성 | `PRACTICE.md` 3 | Mermaid 또는 손그림 사진 |
+| 4 | 본문 작성 | 블로그 플랫폼 | 약 3000~4000 자 한국어 |
+| 5 | 퀴즈 (블로그 평가) | `quiz_easy.py` | "이 블로그가 좋은 글인가" 자가 체크 |
+| 6 | 퀴즈 (서술/논리) | `quiz_medium.py` | 핵심 단락 글쓰기 |
+| 7 | 퇴고 + 발행 | `PRACTICE.md` 4 | 동료 1명 review 또는 self-review |
 
 ---
 
-## 시작하기 전에
+## [*] 시작하기 전에 — 블로그가 왜 산출물인가
 
-### Week 2 복습
+본 로드맵에서 블로그는 단순한 "공부 노트" 가 아니다. **면접관의 진입점** 이다.
 
-```
-Week 2에서 배운 것:
-  - Camera/LiDAR/World/BEV 좌표계 차이
-  - KITTI 규약: [h, w, l, x, y, z, ry]
-  - 캘리브레이션: P2, R0_rect, Tr_velo_to_cam
-  - 3D -> 2D 투영: P2 @ [x,y,z,1]^T / z
-  - BEV 변환: X-Z 평면 투영
-```
+| 면접관이 블로그를 보는 이유 | 어떤 평가를 하는가 |
+|---|---|
+| 후보자의 deep understanding 측정 | 논문을 흉내내는가, 자기 언어로 재구성하는가 |
+| 글쓰기 능력 측정 | 기술 문서를 잘 쓰는가 (실무에서 매일 쓰는 능력) |
+| 의지 / 일관성 측정 | 꾸준히 산출물 만드는가 |
+| 분야 적합도 측정 | VLA 의 본질을 이해하는가, 표면만 보는가 |
 
-### 이번 주 실습의 의미
+좋은 블로그 1편 = 좋은 이력서 1줄과 같은 무게.
 
-```
-지금까지 '가상 데이터'로 연습했다면,
-이번 주부터 '실제 데이터셋'을 다룹니다!
-
-Week 1-2: 개념 학습 (가상 데이터)
-Week 3:   실제 KITTI 데이터셋 ← 이번 주!
-Week 4:   모델 학습 및 추론
-
-KITTI는 3D Detection의 '표준 벤치마크'입니다.
-이 데이터를 직접 다루는 경험은 면접에서 큰 강점이 됩니다.
-```
+> [tip] 본 phase 의 산출물 #2 는 "블로그 2편 + ROS2 demo" 다. 블로그 1편이 못 나오면 산출물 자체가 흔들린다. 이번 주가 본 phase 의 첫 결정타.
 
 ---
 
-## 핵심 개념 자세히 알아보기
+## [ref] 블로그 작성 가이드
 
-### 1. KITTI 3D Object Detection 데이터셋
+### 1. 좋은 기술 블로그의 표준 구조
 
-#### 1.1 데이터셋 개요
-
-```
-KITTI (Karlsruhe Institute of Technology and Toyota Technological Institute):
-  - 2012년 공개, 3D Detection의 사실상 표준 벤치마크
-  - 독일 카를스루에 시내에서 수집
-  - 7,481장 학습, 7,518장 테스트 이미지
-  - 센서: 스테레오 카메라 + Velodyne LiDAR + GPS/IMU
-
-핵심 통계:
-  - 해상도: ~1242 x 375 픽셀
-  - 클래스: Car, Pedestrian, Cyclist (+ Van, Truck, Person_sitting, Tram, Misc, DontCare)
-  - 레이블: 2D bbox + 3D bbox + 캘리브레이션
-```
-
-#### 1.2 다운로드
+본 로드맵에서 권장하는 8-section 표준 구조:
 
 ```
-KITTI 3D Object Detection 다운로드:
-  URL: http://www.cvlibs.net/datasets/kitti/eval_object.php?obj_benchmark=3d
+1. 한 줄 요약 (Hook)
+   - 글 전체를 한 문장으로 표현
+   - 독자가 "더 읽을 가치 있는가" 판단
 
-  필요한 파일:
-  1. Left color images (12 GB)     ← 필수
-  2. Camera calibration (16 MB)    ← 필수
-  3. Training labels (5 MB)        ← 필수
-  4. Velodyne point clouds (29 GB) ← 선택 (LiDAR 사용 시)
+2. 배경 / 문제 의식
+   - 왜 이 논문을 읽었는가
+   - 어떤 질문에 답하려 하는가
 
-  미니 데이터셋 (연습용):
-  → 전체를 안 받아도 10장 정도만 수동 다운로드하여 연습 가능
+3. 핵심 아이디어 한 페이지 요약
+   - 글 전체를 끝까지 안 읽어도 핵심 파악 가능
+   - 다이어그램 1 ~ 2 개
+
+4. 자세한 동작 / 수식 / 코드
+   - week 1~2 의 reading note 의 압축본
+   - 정확하고 검증 가능한 수치
+
+5. 실험 결과 / 사례
+   - 논문에서 가장 인상적인 결과 3 ~ 5 개
+   - 자기만의 해석
+
+6. 한계 / 비판
+   - 5 가지 정도
+   - 단순 나열이 아닌 "이게 왜 한계인가"
+
+7. 본 로드맵 / 실무 관점에서의 시사점
+   - "이 모델이 양산 SW 엔지니어에게 어떤 의미인가"
+   - 차별화 메시지
+
+8. 다음 학습 방향 / Reference
+   - 자기가 다음으로 무엇을 할지 (예: OpenVLA, ROS2 integration)
+   - 참고 자료 5 ~ 10 개
 ```
 
-### 2. KITTI 디렉토리 구조
+### 2. 블로그 톤 가이드
 
+| 좋은 톤 | 나쁜 톤 |
+|---|---|
+| 정직 — 모르는 건 모른다고 적기 | 과장 — "혁신적" / "획기적" 남발 |
+| 정량 — 수치로 말하기 | 정성 — "매우 빠르다", "엄청 정확하다" |
+| 비교 — 다른 모델과의 차이 | 단독 — RT-2 만 칭찬 |
+| 한계 명시 — 직접 비판 | 한계 회피 — 장점만 나열 |
+| 본인 해석 — 자기 의견 | 논문 복붙 — abstract 의 직역 |
+
+### 3. RT-2 블로그의 8-section 권장 내용
+
+각 section 에 무엇을 쓸지 미리 정해놓고 본문을 채우면 시간 절약:
+
+#### Section 1: 한 줄 요약 (예시)
+> "RT-2 는 web 데이터로 사전학습된 VLM 을 robot action 토큰까지 출력하도록 co-fine-tune 한 모델. VLM 의 web knowledge 가 robot 으로 transfer 되는 첫 대규모 증명."
+
+#### Section 2: 배경 (예시 주제)
+- VLA 라는 분야의 등장
+- RT-1 의 한계 (small transformer, robot data only)
+- web-scale VLM 의 등장 (PaLI-X, PaLM-E)
+
+#### Section 3: 한 페이지 요약 (예시 구성)
+- Architecture diagram (Mermaid 또는 손그림)
+- 입출력 인터페이스 (image + text -> action)
+- 핵심 3 가지 설계 결정 (backbone / action token / co-fine-tuning)
+
+#### Section 4: 자세한 동작 (예시 구성)
+- VLM 의 standard 흐름 복습 (3 단락)
+- Action Tokenization (week 2 의 수식 3개)
+- Co-fine-tuning mixture (web 80 : robot 20)
+- Training loss 의 일관성
+
+#### Section 5: 결과 / 사례 (예시)
+- Real-world 평가 setup
+- RT-1 / BC-Z baseline 대비 성공률
+- Emergent capability 4 사례 (각 한 줄)
+
+#### Section 6: 한계 5가지
+- Inference latency (~200ms)
+- closed-source weight
+- Quantization step (실측 수치)
+- Single embodiment
+- VRAM 요구사항 (5B/55B)
+
+#### Section 7: 본 로드맵 관점 (예시)
+- 양산 SW 엔지니어가 이 모델을 보면:
+  - latency 의 의미 (실시간 30Hz 어려움)
+  - 안전 인터록의 필요성 (action 의 noisy quantization)
+  - 양산 비용 (GPU VRAM / 메모리)
+- Phase 7 산출물 #4 에서 이 한계들을 직접 측정할 예정
+
+#### Section 8: 다음 학습 + Reference
+- OpenVLA (open-source 버전) - week 4~7
+- HuggingFace inference 시도 - week 8~
+- π0 / Helix 등 후속 모델
+- 참고 자료 5~10 개
+
+### 4. 분량 가이드
+
+- 한국어 기준 **3000 ~ 4000 자** (대략 5~7 페이지)
+- 너무 길면 (5000+ 자): 면접관이 다 안 읽음
+- 너무 짧으면 (2000 자 미만): 깊이 없음
+
+각 section 별 권장 분량:
+- Section 1: 50자
+- Section 2: 300자
+- Section 3: 600자 (다이어그램 포함)
+- Section 4: 1000자 (가장 큰 비중)
+- Section 5: 600자
+- Section 6: 600자
+- Section 7: 400자
+- Section 8: 150자
+
+### 5. 다이어그램 작성 도구
+
+| 도구 | 장점 | 단점 |
+|---|---|---|
+| Mermaid | 마크다운에 inline, version control | 복잡한 다이어그램 한계 |
+| Graphviz | 정밀한 그래프 | 학습 곡선 |
+| draw.io | GUI, 표준 노트 도구 | 외부 도구 |
+| 손그림 (사진) | 빠름 | 검색/편집 불가 |
+| Excalidraw | 손그림 톤 + 디지털 | 외부 도구 |
+
+> [tip] 본 phase 권장: **Mermaid** 우선 (블로그에 inline 가능). 복잡한 경우 Excalidraw.
+
+### 6. RT-2 Architecture 의 Mermaid 예시
+
+````markdown
+```mermaid
+flowchart LR
+    img[RGB Image] --> ViT[ViT<br/>Vision Encoder]
+    inst["Text Instruction<br/>'pick up the can'"] --> SP[SentencePiece<br/>Tokenizer]
+    ViT --> imgTok[Image Tokens<br/>~196 tokens]
+    SP --> txtTok[Text Tokens<br/>~5-20 tokens]
+    imgTok --> concat[Concat]
+    txtTok --> concat
+    concat --> dec[Transformer Decoder<br/>PaLI-X 5B / 55B]
+    dec --> out[Output Tokens<br/>'255879 255698 ...']
+    out --> detok[De-tokenize]
+    detok --> action[7-DoF Action<br/>dx,dy,dz,rx,ry,rz,grip]
 ```
-KITTI/
-+-- training/              # 학습 데이터 (7,481개)
-|   +-- image_2/           # 좌측 컬러 카메라 이미지
-|   |   +-- 000000.png
-|   |   +-- 000001.png
-|   |   +-- ...
-|   +-- image_3/           # 우측 컬러 카메라 이미지 (스테레오)
-|   +-- calib/             # 캘리브레이션 파일
-|   |   +-- 000000.txt
-|   |   +-- ...
-|   +-- label_2/           # 레이블 파일
-|   |   +-- 000000.txt
-|   |   +-- ...
-|   +-- velodyne/          # LiDAR 포인트 클라우드 (선택)
-|       +-- 000000.bin
-|       +-- ...
-+-- testing/               # 테스트 데이터 (7,518개)
-    +-- image_2/
-    +-- calib/
-    +-- velodyne/
+````
 
-image_2: 좌측 컬러 카메라 (P2 투영 행렬에 대응)
-image_3: 우측 컬러 카메라 (P3 투영 행렬에 대응)
-calib:   각 프레임별 캘리브레이션 (P0~P3, R0_rect, Tr_velo_to_cam)
-label_2: 좌측 카메라 기준 레이블 (Camera 좌표계)
-```
+### 7. 흔히 빠지는 함정
 
-### 3. KITTI 레이블 포맷 상세
+| 함정 | 어떻게 피하나 |
+|---|---|
+| 논문 abstract 의 거의 직역 | 자기 언어로 다시 쓰기. 한 단락마다 "내 해석" 한 줄 추가 |
+| 수치 누락 ("매우 빠르다") | 모든 정량 표현은 수치 + 단위 |
+| 다이어그램이 논문과 똑같음 | 자기 강조점에 맞게 단순화 (모든 디테일 안 그림) |
+| 한계 section 이 너무 짧음 | 5가지 한계를 각 2~3문장으로 |
+| Reference 가 1~2개 | 최소 5개 (논문, 블로그, 코드, 강의) |
 
-각 레이블 파일(label_2/XXXXXX.txt)은 한 줄에 하나의 객체를 기술합니다.
+### 8. 블로그 SEO + 검색 가능성
 
-```
-포맷 (15개 필드):
-  class truncated occluded alpha x1 y1 x2 y2 h w l x y z ry
-
-예시:
-  Car 0.00 0 -1.56 587.01 173.33 614.12 200.12 1.65 1.67 3.64 -0.65 1.71 46.70 -1.59
-
-필드별 설명:
-+----------+---------------------------------------------+
-| 필드      | 설명                                        |
-+----------+---------------------------------------------+
-| class    | 객체 클래스 (Car, Pedestrian, Cyclist, ...)  |
-| truncated| 잘림 정도 (0.0~1.0, 0=안 잘림)              |
-| occluded | 가려짐 정도 (0~3, 0=안 가려짐)              |
-| alpha    | 관측 각도 (-pi ~ pi)                         |
-| x1,y1    | 2D bbox 좌상단 (pixels)                     |
-| x2,y2    | 2D bbox 우하단 (pixels)                     |
-| h        | 높이 (m) ← Camera 좌표계                    |
-| w        | 폭 (m)                                      |
-| l        | 길이 (m)                                    |
-| x        | 중심 x좌표 (m) ← Camera 좌표계              |
-| y        | 바닥 y좌표 (m) ← Camera 좌표계              |
-| z        | 중심 z좌표 (m) ← Camera 좌표계 (깊이)       |
-| ry       | y축 회전각 (라디안) ← Camera 좌표계          |
-+----------+---------------------------------------------+
-```
-
-#### alpha vs ry 차이
-
-```
-alpha (관측 각도):
-  - 카메라에서 바라본 객체의 방향
-  - 카메라 원점 → 객체 중심 벡터와 객체 방향의 상대 각도
-  - 이미지 위치에 따라 변함
-
-ry (rotation_y):
-  - 객체의 전역 방향 (Camera 좌표계)
-  - 카메라 시점에 관계없이 일정
-  - 3D bbox 계산에 사용하는 것은 ry!
-
-관계:
-  alpha = ry - arctan2(x, z)
-```
-
-### 4. 캘리브레이션 파일 상세
-
-```python
-# KITTI 캘리브레이션 파일 파싱 함수
-import numpy as np
-
-def read_kitti_calib(calib_path):
-    """
-    KITTI 캘리브레이션 파일을 읽어 딕셔너리로 반환
-
-    Parameters:
-        calib_path: 캘리브레이션 파일 경로 (예: calib/000000.txt)
-
-    Returns:
-        calib: dict with P2(3x4), R0_rect(4x4), Tr_velo_to_cam(4x4)
-    """
-    data = {}
-    with open(calib_path, 'r') as f:
-        for line in f.readlines():
-            if ':' not in line:
-                continue
-            key, value = line.split(':', 1)
-            data[key.strip()] = np.array([float(x) for x in value.split()])
-
-    calib = {}
-
-    # P2: 3x4 투영 행렬 (좌측 컬러 카메라)
-    calib['P2'] = data['P2'].reshape(3, 4)
-
-    # R0_rect: 3x3 -> 4x4 확장
-    R0 = np.eye(4)
-    R0[:3, :3] = data['R0_rect'].reshape(3, 3)
-    calib['R0_rect'] = R0
-
-    # Tr_velo_to_cam: 3x4 -> 4x4 확장
-    Tr = np.eye(4)
-    Tr[:3, :4] = data['Tr_velo_to_cam'].reshape(3, 4)
-    calib['Tr_velo_to_cam'] = Tr
-
-    return calib
-```
-
-### 5. 레이블 파싱
-
-```python
-def read_kitti_label(label_path):
-    """
-    KITTI 레이블 파일을 읽어 객체 리스트로 반환
-
-    Parameters:
-        label_path: 레이블 파일 경로 (예: label_2/000000.txt)
-
-    Returns:
-        objects: list of dict
-    """
-    objects = []
-    with open(label_path, 'r') as f:
-        for line in f.readlines():
-            parts = line.strip().split()
-            if len(parts) < 15:
-                continue
-
-            obj = {
-                'class': parts[0],
-                'truncated': float(parts[1]),
-                'occluded': int(parts[2]),
-                'alpha': float(parts[3]),
-                'bbox_2d': [float(parts[4]), float(parts[5]),
-                           float(parts[6]), float(parts[7])],
-                'h': float(parts[8]),
-                'w': float(parts[9]),
-                'l': float(parts[10]),
-                'x': float(parts[11]),
-                'y': float(parts[12]),
-                'z': float(parts[13]),
-                'ry': float(parts[14]),
-            }
-            objects.append(obj)
-
-    return objects
-```
-
-### 6. 시각화 파이프라인
-
-3D Detection 시각화는 크게 3가지입니다.
-
-#### 6.1 2D BBox 시각화
-
-```
-가장 기본적인 시각화:
-  - label에서 x1, y1, x2, y2를 읽어 이미지에 사각형 그리기
-  - 클래스와 함께 표시
-```
-
-#### 6.2 3D BBox 이미지 투영
-
-```
-파이프라인:
-  1. label에서 [h, w, l, x, y, z, ry] 읽기
-  2. compute_box_3d()로 8개 corners 계산
-  3. project_to_image()로 2D 투영
-  4. 12개 edge를 이미지에 그리기
-
-  전면(front face)을 다른 색으로 표시하면
-  객체의 방향을 한눈에 파악할 수 있습니다.
-```
-
-#### 6.3 BEV 시각화
-
-```
-파이프라인:
-  1. label에서 [x, z, l, w, ry] 읽기
-  2. 4개 바닥면 corners 계산
-  3. X-Z 평면에 폴리곤으로 그리기
-  4. 방향 화살표 추가
-
-BEV는 자율주행에서 가장 직관적인 시각화입니다.
-```
+| 요소 | 가이드 |
+|---|---|
+| 제목 | "RT-2 가 무엇인가" 가 아니라 "RT-2 정독 노트: VLM 이 어떻게 로봇 행동을 생성하는가" |
+| URL slug | "rt2-vla-deep-dive" 같은 영어 short |
+| 태그 | VLA, RT-2, OpenVLA, Robot Manipulation, Foundation Model |
+| 첫 단락 | 검색 결과에 노출되는 부분, 한 줄 요약 포함 |
+| 외부 링크 | RT-2 공식 페이지, arXiv 링크 명시 |
 
 ---
 
-## 꼭 이해해야 할 핵심 개념
+## [tip] 본 로드맵의 블로그 활용 전략
 
-### DontCare 레이블
+1. **블로그 1편 = 산출물 #2 의 1/3** (총: 블로그 2편 + ROS2 demo)
+2. **블로그 2편이 모이면 LinkedIn 컨택 시 첫 명함**
+3. **면접 시 "내 블로그 봤어요?" 가 가장 좋은 첫 마디**
+4. **블로그 → Velog 또는 Medium 둘 다 발행 권장** (검색 노출 다양화)
+5. **본 레포 `Studies/Phase 4/blog/rt2.md` 에도 사본 보관** (version control)
 
-```
-KITTI에는 'DontCare' 클래스가 있습니다:
-  - 평가 시 무시할 영역을 표시
-  - 너무 먼 객체, 극심하게 가려진 객체 등
-  - 이 영역의 검출은 TP도 FP도 아닌 무시(Ignored)
-
-레이블 파싱 시:
-  objects = [obj for obj in objects if obj['class'] != 'DontCare']
-```
-
-### 난이도 기준 (Easy / Moderate / Hard)
-
-```
-KITTI 3D Detection 평가 난이도:
-
-+----------+--------------+--------------+--------------+
-|          | Easy         | Moderate     | Hard         |
-+----------+--------------+--------------+--------------+
-| 최소 높이 | 40 pixels    | 25 pixels    | 25 pixels    |
-| 최대 가림 | 0 (안 가림)  | 1 (부분)     | 2 (대부분)   |
-| 최대 잘림 | 0.15         | 0.30         | 0.50         |
-+----------+--------------+--------------+--------------+
-
-Moderate가 표준 벤치마크:
-  - 대부분의 논문이 Moderate AP3D를 보고
-  - Easy는 너무 쉬움, Hard는 너무 어려움
-```
-
-### Train/Val Split
-
-```
-KITTI 공식 학습 데이터 (7,481장)는 통상적으로:
-  - Train: ~3,712장 (전반부)
-  - Val:   ~3,769장 (후반부)
-
-Chen et al.의 분할이 표준으로 사용됩니다.
-많은 논문/코드가 이 분할을 따릅니다.
-```
+> [!] 본인의 블로그가 검색에서 노출되려면 최소 2~3편의 같은 분야 글이 누적되어야 한다. 본 phase 끝에 블로그 2편이 있으면 검색 노출 시작.
 
 ---
 
-## 자체 점검 - 이해했는지 확인!
+## [search] 자체 점검
 
-### Q1: 레이블 필드 이해
-**Q:** KITTI 레이블에서 `Car 0.50 1 -1.20 400 180 550 280 1.5 1.8 4.0 3.0 1.65 20.0 0.10`
-에서 각 값의 의미를 설명하시오.
+**Q1. 블로그의 8-section 구조에서 가장 분량이 큰 section 은?**
+> Section 4 (자세한 동작 / 수식 / 코드). 권장 1000자. 글의 깊이를 결정.
 
-**A:**
-```
-Car: 클래스 (승용차)
-0.50: truncated (50% 잘림)
-1: occluded (부분적 가려짐)
--1.20: alpha (관측 각도)
-400 180 550 280: 2D bbox (x1,y1,x2,y2) - 이미지 좌표 픽셀
-1.5: height (높이 1.5m)
-1.8: width (폭 1.8m)
-4.0: length (길이 4.0m)
-3.0: x (Camera 좌표계 오른쪽 3m)
-1.65: y (Camera 좌표계 아래 1.65m - 도로면)
-20.0: z (Camera 좌표계 전방 20m)
-0.10: ry (yaw 회전 0.1 라디안 - 거의 전방)
-```
+**Q2. 면접관이 블로그를 보고 가장 빠르게 평가하는 부분은?**
+> Section 1 (한 줄 요약) 과 Section 3 (한 페이지 요약). 30초 안에 글의 가치 판단.
 
-### Q2: image_2 vs image_3
-**Q:** image_2와 image_3의 차이는 무엇이며, label_2는 어느 카메라 기준인가?
+**Q3. 좋은 블로그와 나쁜 블로그의 가장 큰 차이는?**
+> "한계 / 비판" 의 유무. 좋은 블로그는 모델의 단점을 정직하게 5가지 언급. 나쁜 블로그는 장점만 나열.
 
-**A:**
-```
-image_2: 좌측 컬러 카메라 (P2 투영 행렬에 대응)
-image_3: 우측 컬러 카메라 (P3 투영 행렬에 대응)
+**Q4. 본 로드맵의 블로그 1편의 분량 권장 범위는?**
+> 한국어 3000 ~ 4000 자. 너무 길면 다 안 읽힘, 너무 짧으면 깊이 부족.
 
-label_2는 좌측 카메라(image_2) 기준입니다.
-따라서 3D bbox를 이미지에 투영할 때 P2를 사용해야 합니다.
-
-번호 규약:
-  0: 좌측 흑백
-  1: 우측 흑백
-  2: 좌측 컬러 ← 주로 사용!
-  3: 우측 컬러
-```
-
-### Q3: truncated vs occluded
-**Q:** truncated와 occluded의 차이는?
-
-**A:**
-```
-truncated (잘림):
-  - 이미지 경계에서 잘린 정도
-  - 0.0: 완전히 보임
-  - 1.0: 완전히 잘림 (이미지 밖으로 나감)
-
-occluded (가려짐):
-  - 다른 객체에 의해 가려진 정도
-  - 0: 완전히 보임
-  - 1: 부분적으로 가려짐
-  - 2: 대부분 가려짐
-  - 3: 알 수 없음
-
-차이:
-  truncated = 이미지 경계 문제 (카메라 시야각)
-  occluded = 다른 물체 뒤에 숨김 (3D 공간 문제)
-```
-
-### Q4: 데이터셋 크기와 한계
-**Q:** KITTI가 2012년 데이터셋인데도 아직 사용되는 이유는?
-
-**A:**
-```
-1. 표준 벤치마크: 많은 논문이 KITTI로 비교하므로 공정한 비교 가능
-2. 적절한 크기: 7,481장은 연구 실험에 적합 (nuScenes는 ~400GB)
-3. 캘리브레이션 품질: 정밀한 센서 캘리브레이션 제공
-4. 다양한 Task: 3D Detection, Depth, Flow, Stereo 등
-
-단, 한계도 있습니다:
-  - 독일 도시 한 곳의 데이터 (다양성 부족)
-  - 전방 카메라 1대 (360도 커버리지 없음)
-  - 야간/악천후 데이터 없음
-  → 이 한계를 보완하기 위해 nuScenes, Waymo 등이 등장
-```
+**Q5. RT-2 블로그에서 자기 차별화 메시지는 무엇에 쓸 수 있나?**
+> Section 7 (본 로드맵 관점). "양산 SW 엔지니어로서 이 모델의 latency / quantization 의 의미" 같은 본인 강점이 드러나는 해석. 박사/연구자 블로그와 가장 큰 차이.
 
 ---
 
-## 이번 주 실습 & 다음 주 준비
+## [note] 이번 주 실습 & 다음 주 준비
 
-### 이번 주 체크리스트
+### 이번 주 실습 과제
+1. 블로그 플랫폼 결정 (Velog 권장 - 한국어 / 검색 노출 / 무료)
+2. 8-section 구조로 outline 먼저 작성 (1 시간)
+3. Section 별 본문 작성 (5 ~ 6 시간)
+4. Mermaid diagram 1 ~ 2 개 제작 (1 시간)
+5. Self-review + 퇴고 (2 시간)
+6. 발행 + URL 을 `~/phase4_notes/` 에 기록
+7. quiz_easy / quiz_medium 풀기
 
-- [ ] KITTI 데이터셋 다운로드 (또는 일부만)
-- [ ] 디렉토리 구조 (image_2, calib, label_2) 이해
-- [ ] 캘리브레이션 파일 파싱 구현
-- [ ] 레이블 파일 파싱 구현
-- [ ] 2D bbox 시각화
-- [ ] 3D bbox 이미지 투영 및 시각화
-- [ ] BEV 시각화
-- [ ] `PRACTICE.md` 실습 완료
-- [ ] `quiz_easy.py`, `quiz_medium.py` 풀기
-
-### 다음 주 미리보기: Monocular 3D Detection 모델
-
-```
-다음 주에는:
-  - SMOKE (Keypoint 기반 3D Detection)
-  - FCOS3D (Anchor-free, Multi-task Head)
-  - Depth 추정 방법론
-  - 3D Box 인코딩 (sin/cos rotation)
-  → 실제 모델이 어떻게 3D bbox를 예측하는지 학습합니다!
-```
+### 다음 주 (week 4) 준비
+- OpenVLA 논문 다운로드 (https://arxiv.org/abs/2406.09246)
+- OpenVLA HuggingFace 모델 카드 한 번 훑어보기 (https://huggingface.co/openvla)
+- RT-2 블로그 발행 직후의 피드백 모니터링 (LinkedIn / Twitter 등)
 
 ---
 
-## 이번 주 핵심 요약
+## [goal] 이번 주 핵심 요약
 
-1. **KITTI 데이터셋**: 3D Detection 표준 벤치마크. 7,481장 학습 + 7,518장 테스트. 센서: 스테레오 카메라 + LiDAR + GPS/IMU
-
-2. **디렉토리 구조**: image_2(이미지), calib(캘리브레이션), label_2(레이블). 모두 6자리 숫자(000000~007480)로 정렬
-
-3. **레이블 15개 필드**: class, truncated, occluded, alpha, bbox_2d(4), h, w, l, x, y, z, ry. [h,w,l] 순서에 주의
-
-4. **시각화 3종류**: 2D bbox(이미지), 3D bbox(이미지 투영), BEV(X-Z 평면). 각각 다른 정보를 제공하며 모두 구현해야 함
-
-5. **난이도 기준**: Easy/Moderate/Hard. Moderate가 표준 벤치마크 기준이며 대부분의 논문이 이를 보고
+1. **블로그는 면접관의 진입점**: 단순 노트가 아닌 산출물.
+2. **8-section 표준 구조**: 한 줄 / 배경 / 한 페이지 / 자세한 동작 / 결과 / 한계 / 시사점 / 다음.
+3. **분량 3000~4000자**: 너무 길면 안 읽히고, 너무 짧으면 깊이 부족.
+4. **한계 5가지를 정직하게**: latency / closed / quantization / single-arm / VRAM.
+5. **본인 차별화 메시지 1개는 반드시 포함**: 양산 SW 엔지니어의 관점.
 
 ---
 
-이전: [Week 2 - 좌표계 이해](../week2/README.md)
+[O] 이전: [Week 2 - Co-fine-tuning + Action Tokenization](../week2/README.md)
 
-다음: [Week 4 - Monocular 3D Detection 모델](../week4/README.md)
+다음: [Week 4 - OpenVLA 1회독 + Architecture](../week4/README.md)

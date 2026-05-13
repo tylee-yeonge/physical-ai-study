@@ -61,7 +61,7 @@ week6_tensorrt/
 |   +-- nms.cpp               # NMS 구현
 |   +-- main.cpp              # 메인 실행
 +-- models/
-|   +-- yolov8n.onnx          # Week 5에서 변환한 모델
+|   +-- yolo11n.onnx          # Week 5에서 변환한 모델
 +-- data/
     +-- test.jpg              # 테스트 이미지
 ```
@@ -74,8 +74,8 @@ week6_tensorrt/
 
 ```bash
 # 기본 FP32 변환
-trtexec --onnx=models/yolov8n.onnx \
-        --saveEngine=models/yolov8n_fp32.trt \
+trtexec --onnx=models/yolo11n.onnx \
+        --saveEngine=models/yolo11n_fp32.trt \
         --verbose
 
 # 빌드 시간: 약 5-10분
@@ -85,8 +85,8 @@ trtexec --onnx=models/yolov8n.onnx \
 
 ```bash
 # FP16 변환 (속도 2배 향상)
-trtexec --onnx=models/yolov8n.onnx \
-        --saveEngine=models/yolov8n_fp16.trt \
+trtexec --onnx=models/yolo11n.onnx \
+        --saveEngine=models/yolo11n_fp16.trt \
         --fp16 \
         --verbose
 
@@ -97,11 +97,11 @@ trtexec --onnx=models/yolov8n.onnx \
 
 ```bash
 # FP32 벤치마크
-trtexec --loadEngine=models/yolov8n_fp32.trt \
+trtexec --loadEngine=models/yolo11n_fp32.trt \
         --batch=1 --warmUp=500 --avgRuns=100
 
 # FP16 벤치마크
-trtexec --loadEngine=models/yolov8n_fp16.trt \
+trtexec --loadEngine=models/yolo11n_fp16.trt \
         --batch=1 --warmUp=500 --avgRuns=100
 ```
 
@@ -400,7 +400,7 @@ private:
 
     std::vector<Detection> postprocess(const std::vector<float>& output,
                                         cv::Size orig_size) {
-        // YOLOv8 출력: [1, 84, 8400] → 전치 → [8400, 84]
+        // YOLO11 출력: [1, 84, 8400] → 전치 → [8400, 84]
         const int num_classes = 80;
         const int num_boxes = 8400;
 
@@ -458,14 +458,14 @@ private:
 #include "nms.h"
 
 int main(int argc, char** argv) {
-    std::string engine_path = "models/yolov8n_fp16.trt";
+    std::string engine_path = "models/yolo11n_fp16.trt";
     std::string image_path = "data/test.jpg";
 
     if (argc >= 2) engine_path = argv[1];
     if (argc >= 3) image_path = argv[2];
 
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
-    std::cout << "  TensorRT YOLOv8 추론 테스트" << std::endl;
+    std::cout << "  TensorRT YOLO11 추론 테스트" << std::endl;
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
 
     // 엔진 로드
@@ -521,19 +521,19 @@ cmake ..
 make -j$(nproc)
 
 # 실행
-./phase5_week6_tensorrt models/yolov8n_fp16.trt data/test.jpg
+./phase5_week6_tensorrt models/yolo11n_fp16.trt data/test.jpg
 
 # 카메라 실시간 테스트 (선택)
-./phase5_week6_tensorrt models/yolov8n_fp16.trt --camera 0
+./phase5_week6_tensorrt models/yolo11n_fp16.trt --camera 0
 ```
 
 ### 예상 출력
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  TensorRT YOLOv8 추론 테스트
+  TensorRT YOLO11 추론 테스트
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[TRT] Loaded engine: models/yolov8n_fp16.trt
+[TRT] Loaded engine: models/yolo11n_fp16.trt
 [INFO] TensorRT 엔진 로드 완료
 [INFO] 입력 크기: 1228800 floats
 [INFO] 출력 크기: 705600 floats

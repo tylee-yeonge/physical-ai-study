@@ -1,383 +1,358 @@
-# Week 1 실습: 3D Detection 개념 탐구 및 3D BBox 시각화
+# Week 1 실습: RT-2 논문 정독 + Architecture Diagram 분해
 
-> [goal] **목표**: 3D BBox의 파라미터를 이해하고, 기본적인 3D 시각화를 Python으로 구현
-> [code] **언어**: Python (NumPy, Matplotlib)
-> [time] **예상 시간**: 4시간
-
----
-
-## [list] 실습 개요
-
-이번 실습에서는 3D Bounding Box의 7개 파라미터를 코드로 다루고, matplotlib을 이용해 3D 공간에서 시각화합니다. 이후 2D 이미지에 투영하는 기초도 실습합니다.
+> [goal] **실습 목표**: 논문을 닫고도 RT-2 의 입출력 / Architecture / 학습 흐름 / Emergent capability 를 한 페이지로 그릴 수 있게 한다.
+> [time] **예상 시간**: 6~8시간
 
 ---
 
 ## [tool] 환경 설정
 
+이번 주는 코드 실행이 거의 없다. 논문 정독 + 다이어그램 작성이 중심.
+
 ```bash
-pip install numpy matplotlib opencv-python
+# 가상환경
+conda create -n phase4 python=3.10 -y
+conda activate phase4
+
+# 의존성 설치 (논문 reading note 도구 + diagram 도구)
+pip install -r requirements.txt
+
+# 다이어그램 자동 렌더링 (선택)
+# Mermaid 또는 Graphviz 사용
+pip install graphviz
+```
+
+실습용 디렉토리:
+
+```bash
+mkdir -p ~/phase4_notes/week1
+cd ~/phase4_notes/week1
 ```
 
 ---
 
-## Step 1: 3D BBox Corners 계산
+## [note] 실습 1: 논문 1회독 + Reading Note 템플릿 채우기
+
+**파일명**: `rt2_reading_note.md` (직접 작성)
+
+### 1-1. 논문 다운로드
+
+```bash
+# arxiv 에서 RT-2 논문 PDF 다운로드
+mkdir -p ~/phase4_notes/papers
+wget -O ~/phase4_notes/papers/rt2.pdf "https://arxiv.org/pdf/2307.15818.pdf"
+```
+
+### 1-2. Reading Note 템플릿 (직접 채우기)
+
+`~/phase4_notes/week1/rt2_reading_note.md`:
+
+```markdown
+# RT-2 Reading Note
+
+## 0. Meta
+- 제목: RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control
+- 저자: Google DeepMind (2023)
+- 분야: VLA / Robot Manipulation
+- 읽은 날짜: 2026-09-XX
+- 1회독 소요: __h __m
+
+## 1. One-liner
+> _____________________________________________________________
+
+## 2. 핵심 contribution 3가지
+1. _____________________________________________________________
+2. _____________________________________________________________
+3. _____________________________________________________________
+
+## 3. Architecture (Figure 1 손그림)
+[종이에 그린 그림을 사진으로 또는 ASCII 로 옮기기]
+
+## 4. Action Tokenization (Section 3.2)
+- Action 차원: ___
+- Discretize bin 수: ___
+- VLM vocab 의 어디를 재사용: ___
+- 한 줄 설명: _______________________________________________
+
+## 5. Co-fine-tuning (Section 3.3)
+- 데이터 비율 (Web : Robot): ___ : ___
+- 왜 robot only 안 되는가: __________________________________
+- 학습 step 수 (대략): ___
+
+## 6. Experiments (Section 4)
+- Real-world 평가 대수: ___
+- Baseline (RT-1, BC-Z 등) 대비 성공률 차이: ___%
+- 가장 인상적인 사례: _________________________________________
+
+## 7. Emergent Capability (Section 5)
+사례 4가지를 한 줄씩:
+1. _____________________________________________________________
+2. _____________________________________________________________
+3. _____________________________________________________________
+4. _____________________________________________________________
+
+## 8. Limitations (Section 6)
+- Latency: ___ ms (RTX 4070 추정?: ___)
+- closed-source 의 영향: ____________________________________
+- Single-arm 한정: ___________________________________________
+
+## 9. 본 로드맵 관점에서의 시사점
+- 산출물 #4 (Real-to-Sim-to-Real) 에 어떤 영향: ______________
+- 양산 SW 엔지니어 면접에서 강조할 포인트: _____________________
+
+## 10. 추가로 읽어야 할 것
+- _____________________________________________________________
+```
+
+### 1-3. 정독 페이스 가이드 (총 6시간)
+
+| 시간 | 범위 | 목표 |
+|---|---|---|
+| 0:00 ~ 0:30 | Abstract + Sec 1 | One-liner + contribution 3 적기 |
+| 0:30 ~ 1:30 | Sec 2 (Related Work) | RT-1 / Gato / Flamingo 와의 관계 표 1줄씩 |
+| 1:30 ~ 3:00 | Sec 3 (Approach) | Architecture / Action Tokenization / Co-fine-tuning |
+| 3:00 ~ 4:30 | Sec 4 (Experiments) | 결과 표를 한 장으로 요약 |
+| 4:30 ~ 5:30 | Sec 5 (Emergent Cap.) | 4가지 사례 한 줄씩 |
+| 5:30 ~ 6:00 | Sec 6 (Limitations) | 5가지 한계 노트 |
+
+> [tip] 6시간 안에 다 안 끝나도 OK. 우선 Sec 1+3+5 만 끝내도 80% 도달. Sec 2 (Related Work) 는 마지막에 봐도 된다.
+
+---
+
+## [note] 실습 2: Architecture Diagram 손으로 다시 그리기
+
+**파일명**: `rt2_arch_diagram.txt` (ASCII 또는 사진)
+
+### 2-1. 단계별 그리기
+
+논문 Figure 1 을 보지 말고 (이미 본 후) 다음 흐름으로 직접 그려본다:
+
+1. 왼쪽 위: RGB image 입력
+2. 그 아래: Vision Encoder (ViT) → image token 196 개
+3. 왼쪽 아래: Text instruction 입력
+4. 그 아래: Text Tokenizer → text token N 개
+5. 가운데: Concat 모듈
+6. 오른쪽 위: Transformer Decoder
+7. 오른쪽 아래: Output token sequence
+8. 오른쪽 끝: De-tokenize → 7-DoF action
+
+### 2-2. ASCII 버전 예시 (이미 README에 있음, 자기 손으로 다시 그릴 것)
+
+```
+            +---------+
+            | RGB image| -> ViT -> 196 image tokens \
+            +---------+                              \
+                                                      ----> [concat]
+                                                     /
++-------------------------+        +-------------+ /
+| "pick up the can"       | -----> | SentPiece   |
++-------------------------+        | text tokens |
+                                   +-------------+
+                                          |
+                                          v
+                            +----------------------+
+                            | Transformer Decoder  |
+                            |  (PaLI-X / PaLM core)|
+                            +----------------------+
+                                          |
+                                          v
+                            +----------------------+
+                            | output token sequence|
+                            | "1 128 91 ... <eos>" |
+                            +----------------------+
+                                          |
+                                          v (de-tokenize)
+                            +----------------------+
+                            | 7-DoF action vector  |
+                            | [dx,dy,dz,rx,ry,rz,g]|
+                            +----------------------+
+```
+
+### 2-3. 그림 위에 직접 메모 (필수)
+
+자기가 그린 다이어그램 위에 다음을 적는다:
+
+- Vision Encoder 옆: "ViT, 224x224 input, 14x14 patch, 196 tokens"
+- Text Tokenizer 옆: "SentencePiece, vocab=256K"
+- Decoder 옆: "PaLI-X 5B 또는 55B"
+- Output token 옆: "256 bin per dim, 7 dims = 7 tokens"
+- 화살표 옆: "input 60 token + output 11 token (action 7 + EOS 등)"
+
+---
+
+## [note] 실습 3: Action Tokenization 의 수학 계산
+
+**파일명**: `practice_action_tokenization.py`
 
 ```python
+"""
+실습 3: RT-2 의 Action Tokenization 정확히 계산하기
+
+목적: "7-DoF continuous action 을 256 bin token 으로 양자화" 의 의미를
+      수치로 직접 확인한다.
+"""
 import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
-def compute_box_3d(x, y, z, l, w, h, theta):
-    """
-    3D bounding box의 8개 꼭짓점 좌표 계산
+print("=" * 60)
+print("실습 3: RT-2 Action Tokenization")
+print("=" * 60)
 
-    KITTI 좌표계 기준:
-      - x: 오른쪽 (+)
-      - y: 아래쪽 (+)
-      - z: 전방 (+)
-      - theta (ry): y축 회전 (yaw)
+# -- 3-1. Action 의 차원과 범위 가정 --
+# RT-2 의 실제 action space (논문 Sec 3.2 + RT-1 paper 참고)
+# 예시: end-effector delta pose (x,y,z) + axis-angle rotation + gripper
+print("\n[3-1] Action space 정의")
+action_names = ['dx', 'dy', 'dz', 'rx', 'ry', 'rz', 'gripper']
+# 단위: meter (x,y,z), radian (r), [0,1] (gripper)
+action_min = np.array([-0.1, -0.1, -0.1, -np.pi, -np.pi, -np.pi, 0.0])
+action_max = np.array([ 0.1,  0.1,  0.1,  np.pi,  np.pi,  np.pi, 1.0])
+N_BIN = 256
 
-    Parameters:
-        x, y, z: 중심 좌표
-        l: length (z 방향, 전후)
-        w: width (x 방향, 좌우)
-        h: height (y 방향, 상하)
-        theta: yaw 회전각 (라디안)
+print(f"  Action dim: {len(action_names)}")
+print(f"  Dims: {action_names}")
+print(f"  Min : {action_min}")
+print(f"  Max : {action_max}")
+print(f"  Bin per dim: {N_BIN}")
 
-    Returns:
-        corners: (8, 3) ndarray - 8개 꼭짓점의 [x, y, z] 좌표
-    """
-    # yaw 회전 행렬 (y축 회전)
-    c = np.cos(theta)
-    s = np.sin(theta)
-    R = np.array([
-        [ c, 0, s],
-        [ 0, 1, 0],
-        [-s, 0, c]
-    ])
+# -- 3-2. Discretize (continuous -> bin index) --
+def discretize(action, low, high, n_bins):
+    """연속 action 을 [0, n_bins-1] 범위의 정수로 양자화"""
+    clipped = np.clip(action, low, high)
+    normalized = (clipped - low) / (high - low)
+    return np.minimum((normalized * n_bins).astype(int), n_bins - 1)
 
-    # 중심 기준 8개 꼭짓점 (회전 전)
-    # 순서: 바닥 4개 → 윗면 4개
-    x_corners = [ w/2,  w/2, -w/2, -w/2,  w/2,  w/2, -w/2, -w/2]
-    y_corners = [   0,    0,    0,    0,   -h,   -h,   -h,   -h ]
-    z_corners = [ l/2, -l/2, -l/2,  l/2,  l/2, -l/2, -l/2,  l/2]
+def de_discretize(bin_idx, low, high, n_bins):
+    """bin index 를 다시 continuous action 으로 복원 (bin 중심값 사용)"""
+    return low + (bin_idx + 0.5) / n_bins * (high - low)
 
-    corners_3d = np.array([x_corners, y_corners, z_corners])  # (3, 8)
+print("\n[3-2] 양자화 예시")
+example_action = np.array([0.05, -0.03, 0.02, 0.5, -1.2, 0.0, 1.0])
+bin_idx = discretize(example_action, action_min, action_max, N_BIN)
+recovered = de_discretize(bin_idx, action_min, action_max, N_BIN)
+err = recovered - example_action
 
-    # 회전 적용
-    corners_3d = R @ corners_3d
+print(f"  원본 action : {example_action}")
+print(f"  bin index   : {bin_idx}")
+print(f"  복원 action : {np.round(recovered, 4)}")
+print(f"  양자화 오차 : {np.round(err, 5)}")
 
-    # 중심으로 이동
-    corners_3d[0, :] += x
-    corners_3d[1, :] += y
-    corners_3d[2, :] += z
+# -- 3-3. Vocabulary 매핑 --
+# RT-2 는 VLM vocab 의 마지막 256 개 토큰을 action 으로 재해석
+VOCAB_SIZE = 256000  # PaLI-X 의 SentencePiece vocab (대략)
+ACTION_TOKEN_START = VOCAB_SIZE - N_BIN  # 마지막 256 개
 
-    return corners_3d.T  # (8, 3)
+print("\n[3-3] Vocabulary 매핑")
+print(f"  VLM vocab size : {VOCAB_SIZE}")
+print(f"  Action token start id : {ACTION_TOKEN_START}")
+print(f"  Action token id range : [{ACTION_TOKEN_START}, {VOCAB_SIZE - 1}]")
+print(f"  Example bin 128 -> token id {ACTION_TOKEN_START + 128}")
 
+# -- 3-4. Output token sequence 구조 --
+# 한 frame 의 RT-2 출력 token sequence
+output_token_ids = [ACTION_TOKEN_START + b for b in bin_idx]
+EOS_TOKEN_ID = 2  # 가정
+output_token_ids.append(EOS_TOKEN_ID)
 
-# 테스트: 전형적인 승용차
-car_corners = compute_box_3d(
-    x=2.0, y=1.65, z=15.0,   # 중심 (오른쪽 2m, 카메라 높이, 전방 15m)
-    l=4.5, w=1.8, h=1.5,     # 크기 (길이, 폭, 높이)
-    theta=0.1                 # yaw (약간 돌아간 상태)
-)
+print("\n[3-4] 한 frame 의 output token sequence")
+print(f"  Sequence length : {len(output_token_ids)} (action 7 + EOS 1)")
+print(f"  Token IDs       : {output_token_ids}")
 
-print("3D BBox corners:")
-print(f"Shape: {car_corners.shape}")
-for i, corner in enumerate(car_corners):
-    print(f"  Corner {i}: ({corner[0]:.2f}, {corner[1]:.2f}, {corner[2]:.2f})")
+# -- 3-5. 양자화 오차의 영향 --
+print("\n[3-5] 양자화 오차의 직관")
+print("  dx 의 양자화 step :")
+step_dx = (action_max[0] - action_min[0]) / N_BIN
+print(f"    range = {action_max[0] - action_min[0]:.4f} m, bin = {N_BIN}")
+print(f"    step  = {step_dx*1000:.4f} mm")
+print()
+print("  rx (rotation) 의 양자화 step :")
+step_rx = (action_max[3] - action_min[3]) / N_BIN
+print(f"    range = {action_max[3] - action_min[3]:.4f} rad, bin = {N_BIN}")
+print(f"    step  = {np.degrees(step_rx):.4f} deg")
+
+print("\n[3-6] 질문: gripper (range 0~1) 의 256 bin 양자화")
+print("       quantization step 은 1/256 = {:.4f}".format(1/N_BIN))
+print("       => gripper close/open 의 'fine motion' 이 어디서 한계인가?")
+
+print("\n[O] 실습 3 완료!")
 ```
 
----
-
-## Step 2: 3D 공간에서 BBox 시각화
-
-```python
-def draw_box_3d(ax, corners, color='green', linewidth=2):
-    """
-    matplotlib 3D axes에 3D bounding box를 그립니다.
-
-    Parameters:
-        ax: matplotlib 3D axes
-        corners: (8, 3) ndarray - 8개 꼭짓점
-        color: 선 색상
-        linewidth: 선 두께
-    """
-    # 12개 엣지 정의 (바닥 4, 윗면 4, 기둥 4)
-    edges = [
-        [0, 1], [1, 2], [2, 3], [3, 0],  # 바닥면
-        [4, 5], [5, 6], [6, 7], [7, 4],  # 윗면
-        [0, 4], [1, 5], [2, 6], [3, 7],  # 기둥
-    ]
-
-    for i, j in edges:
-        ax.plot3D(
-            [corners[i, 0], corners[j, 0]],
-            [corners[i, 2], corners[j, 2]],  # z를 y축으로 (전방 = 위쪽)
-            [corners[i, 1], corners[j, 1]],  # y를 z축으로
-            color=color, linewidth=linewidth
-        )
-
-
-def visualize_scene_3d():
-    """
-    여러 3D 객체가 있는 장면을 시각화합니다.
-    """
-    fig = plt.figure(figsize=(14, 10))
-    ax = fig.add_subplot(111, projection='3d')
-
-    # 장면 구성: 여러 차량
-    objects = [
-        # (x, y, z, l, w, h, theta, color, label)
-        (2.0, 1.65, 15.0, 4.5, 1.8, 1.5, 0.1, 'green', 'Car A (15m)'),
-        (-3.0, 1.65, 25.0, 4.2, 1.7, 1.5, -0.05, 'blue', 'Car B (25m)'),
-        (0.5, 1.65, 8.0, 4.8, 2.0, 1.8, 0.0, 'red', 'Car C (8m)'),
-        (5.0, 1.5, 20.0, 1.8, 0.8, 1.7, 1.57, 'orange', 'Pedestrian (20m)'),
-    ]
-
-    for (x, y, z, l, w, h, theta, color, label) in objects:
-        corners = compute_box_3d(x, y, z, l, w, h, theta)
-        draw_box_3d(ax, corners, color=color)
-        # 라벨 표시
-        ax.text(x, z, y - h, label, fontsize=8, color=color)
-
-    # 카메라 위치 표시
-    ax.scatter([0], [0], [0], color='black', s=100, marker='^', label='Camera')
-
-    # 축 설정
-    ax.set_xlabel('X (좌우)')
-    ax.set_ylabel('Z (전방)')
-    ax.set_zlabel('Y (높이)')
-    ax.set_title('3D Object Detection - 장면 시각화')
-    ax.legend()
-
-    plt.tight_layout()
-    plt.savefig('scene_3d.png', dpi=150)
-    plt.show()
-    print("[O] 3D 장면 시각화 완료! → scene_3d.png 저장됨")
-
-
-visualize_scene_3d()
+**실행**:
+```bash
+python practice_action_tokenization.py
 ```
 
----
+**예상 출력 핵심**:
+- `dx` 의 step = 약 0.78 mm (cm 단위 manipulation 에 적당)
+- `rx` (rotation) 의 step = 약 1.4 도 (대부분 OK, 정밀 조립은 어려움)
+- gripper step = 약 0.004 (256 단계)
 
-## Step 3: BEV (Bird's Eye View) 시각화
-
-```python
-def visualize_bev():
-    """
-    위에서 본 시점(BEV)으로 장면을 시각화합니다.
-    """
-    fig, ax = plt.subplots(1, 1, figsize=(10, 10))
-
-    objects = [
-        (2.0, 1.65, 15.0, 4.5, 1.8, 1.5, 0.1, 'green', 'Car A'),
-        (-3.0, 1.65, 25.0, 4.2, 1.7, 1.5, -0.05, 'blue', 'Car B'),
-        (0.5, 1.65, 8.0, 4.8, 2.0, 1.8, 0.0, 'red', 'Car C'),
-        (5.0, 1.5, 20.0, 1.8, 0.8, 1.7, 1.57, 'orange', 'Pedestrian'),
-    ]
-
-    for (x, y, z, l, w, h, theta, color, label) in objects:
-        corners = compute_box_3d(x, y, z, l, w, h, theta)
-
-        # BEV: x-z 평면 (위에서 본 시점)
-        bev_corners = corners[:4, [0, 2]]  # 바닥면의 x, z 좌표
-
-        # 폴리곤 그리기
-        polygon = plt.Polygon(bev_corners, fill=True, alpha=0.3,
-                             facecolor=color, edgecolor=color, linewidth=2)
-        ax.add_patch(polygon)
-
-        # 라벨
-        ax.text(x, z, label, fontsize=10, ha='center', color=color, fontweight='bold')
-
-        # 방향 표시 (전면 = 화살표)
-        front_center = (corners[0, [0, 2]] + corners[3, [0, 2]]) / 2
-        center = np.array([x, z])
-        ax.annotate('', xy=front_center, xytext=center,
-                    arrowprops=dict(arrowstyle='->', color=color, lw=2))
-
-    # 카메라 표시
-    ax.plot(0, 0, 'k^', markersize=15, label='Camera (Ego)')
-    ax.annotate('Camera', (0, 0), textcoords="offset points",
-                xytext=(10, -15), fontsize=10)
-
-    # 시야각 표시 (FOV ~90도)
-    fov_range = 40
-    ax.plot([0, -fov_range], [0, fov_range], 'k--', alpha=0.3)
-    ax.plot([0, fov_range], [0, fov_range], 'k--', alpha=0.3)
-
-    ax.set_xlabel('X (좌우) [m]', fontsize=12)
-    ax.set_ylabel('Z (전방) [m]', fontsize=12)
-    ax.set_title('Bird\'s Eye View (BEV) - 위에서 본 시점', fontsize=14)
-    ax.set_xlim(-15, 15)
-    ax.set_ylim(-5, 40)
-    ax.set_aspect('equal')
-    ax.grid(True, alpha=0.3)
-    ax.legend(fontsize=10)
-
-    plt.tight_layout()
-    plt.savefig('bev_view.png', dpi=150)
-    plt.show()
-    print("[O] BEV 시각화 완료! → bev_view.png 저장됨")
-
-
-visualize_bev()
-```
+> [tip] 이 수치가 RT-2 의 "fine motion 한계" 의 정량적 근거. week 3 블로그에서 인용할 수 있다.
 
 ---
 
-## Step 4: 2D vs 3D Detection 비교 시각화
+## [note] 실습 4: 한 페이지 RT-2 다이어그램 노트 산출
 
-```python
-def compare_2d_3d():
-    """
-    2D Detection과 3D Detection의 차이를 시각적으로 비교합니다.
-    """
-    fig, axes = plt.subplots(1, 2, figsize=(16, 6))
+**파일명**: `~/phase4_notes/week1/rt2_one_page.md`
 
-    # --- 2D Detection ---
-    ax1 = axes[0]
-    ax1.set_xlim(0, 640)
-    ax1.set_ylim(480, 0)
-    ax1.set_title('2D Detection', fontsize=14, fontweight='bold')
+이번 주 학습의 최종 산출물은 **한 페이지짜리 RT-2 요약 노트** 다. 형식 자유, 단 다음 8 가지 항목이 반드시 들어가야 한다:
 
-    # 2D bbox 그리기
-    bboxes_2d = [
-        (200, 200, 150, 100, 'Car A (0.95)', 'green'),
-        (350, 220, 80, 60, 'Car B (0.87)', 'blue'),
-        (100, 250, 120, 80, 'Car C (0.92)', 'red'),
-    ]
+1. **One-liner**: RT-2 가 무엇인가 (한 줄)
+2. **Architecture 다이어그램**: 손그림 또는 ASCII (실습 2 결과물)
+3. **Action Tokenization**: 256 bin / VLM vocab 재사용 / quantization step 수치
+4. **Co-fine-tuning**: web : robot 비율 / 이유
+5. **Emergent Capability 4 사례**: 한 줄씩
+6. **Limitations 5 가지**: 한 줄씩 (latency / closed / etc.)
+7. **본 로드맵 관점**: 산출물 #4 와의 연결 / 면접 포인트
+8. **다음 주 (week 2) 시작 질문**: 적어도 1 개
 
-    for (x, y, w, h, label, color) in bboxes_2d:
-        rect = plt.Rectangle((x, y), w, h, fill=False,
-                             edgecolor=color, linewidth=2)
-        ax1.add_patch(rect)
-        ax1.text(x, y - 5, label, fontsize=9, color=color, fontweight='bold')
+### 산출물 권장 포맷
 
-    ax1.text(320, 460, '[X] 거리 정보 없음', fontsize=12, ha='center', color='red')
-    ax1.set_xlabel('u (pixels)')
-    ax1.set_ylabel('v (pixels)')
+- 형식: Markdown 또는 PDF (Markdown 추천 → 나중에 블로그로 재활용 가능)
+- 분량: A4 1 페이지에 들어가게 (글자 크기 조절)
+- 위치: `~/phase4_notes/week1/rt2_one_page.md`
 
-    # --- 3D Detection (BEV 표현) ---
-    ax2 = axes[1]
-    ax2.set_title('3D Detection (BEV)', fontsize=14, fontweight='bold')
-
-    objects_3d = [
-        (2.0, 15.0, 4.5, 1.8, 0.1, 'Car A (z=15m)', 'green'),
-        (-3.0, 25.0, 4.2, 1.7, -0.05, 'Car B (z=25m)', 'blue'),
-        (0.5, 8.0, 4.8, 2.0, 0.0, 'Car C (z=8m)', 'red'),
-    ]
-
-    for (x, z, l, w, theta, label, color) in objects_3d:
-        corners = compute_box_3d(x, 1.65, z, l, w, 1.5, theta)
-        bev = corners[:4, [0, 2]]
-        polygon = plt.Polygon(bev, fill=True, alpha=0.3,
-                             facecolor=color, edgecolor=color, linewidth=2)
-        ax2.add_patch(polygon)
-        ax2.text(x, z + 2, label, fontsize=9, ha='center', color=color, fontweight='bold')
-
-    ax2.plot(0, 0, 'k^', markersize=12)
-    ax2.set_xlabel('X [m]')
-    ax2.set_ylabel('Z [m]')
-    ax2.set_xlim(-10, 10)
-    ax2.set_ylim(-2, 35)
-    ax2.set_aspect('equal')
-    ax2.grid(True, alpha=0.3)
-    ax2.text(0, -1, '[O] 정확한 3D 위치 & 크기', fontsize=12, ha='center', color='green')
-
-    plt.tight_layout()
-    plt.savefig('2d_vs_3d.png', dpi=150)
-    plt.show()
-    print("[O] 2D vs 3D 비교 시각화 완료! → 2d_vs_3d.png 저장됨")
-
-
-compare_2d_3d()
-```
+> [tip] 이 한 페이지가 week 3 (RT-2 블로그) 의 골격이 된다. 정성껏 작성하자.
 
 ---
 
-## Step 5: 3D IoU 개념 이해
+## [O] 실습 체크리스트
 
-```python
-def compute_3d_iou_simple(box1, box2):
-    """
-    축 정렬된 (axis-aligned) 3D 박스의 IoU를 계산합니다.
-    (간소화 버전 - 회전 무시)
-
-    Parameters:
-        box1, box2: dict with keys 'center' (x,y,z), 'size' (l,w,h)
-
-    Returns:
-        iou: 3D IoU 값
-    """
-    # 각 축에서의 겹침 계산
-    def overlap_1d(min1, max1, min2, max2):
-        return max(0, min(max1, max2) - max(min1, min2))
-
-    c1, s1 = box1['center'], box1['size']
-    c2, s2 = box2['center'], box2['size']
-
-    # 각 축의 min, max
-    overlap_x = overlap_1d(c1[0]-s1[1]/2, c1[0]+s1[1]/2,
-                           c2[0]-s2[1]/2, c2[0]+s2[1]/2)
-    overlap_y = overlap_1d(c1[1]-s1[2]/2, c1[1]+s1[2]/2,
-                           c2[1]-s2[2]/2, c2[1]+s2[2]/2)
-    overlap_z = overlap_1d(c1[2]-s1[0]/2, c1[2]+s1[0]/2,
-                           c2[2]-s2[0]/2, c2[2]+s2[0]/2)
-
-    # 겹치는 부피
-    intersection = overlap_x * overlap_y * overlap_z
-
-    # 각 박스의 부피
-    vol1 = s1[0] * s1[1] * s1[2]
-    vol2 = s2[0] * s2[1] * s2[2]
-
-    # IoU
-    union = vol1 + vol2 - intersection
-    iou = intersection / union if union > 0 else 0
-
-    return iou
-
-
-# 테스트
-gt_box = {'center': [2.0, 1.65, 15.0], 'size': [4.5, 1.8, 1.5]}
-pred_box_good = {'center': [2.1, 1.60, 15.2], 'size': [4.4, 1.7, 1.5]}
-pred_box_bad = {'center': [3.5, 1.65, 18.0], 'size': [4.0, 1.6, 1.4]}
-
-iou_good = compute_3d_iou_simple(gt_box, pred_box_good)
-iou_bad = compute_3d_iou_simple(gt_box, pred_box_bad)
-
-print("=== 3D IoU 계산 결과 ===")
-print(f"GT Box:          center={gt_box['center']}, size={gt_box['size']}")
-print(f"Good Prediction: center={pred_box_good['center']}, size={pred_box_good['size']}")
-print(f"  → 3D IoU = {iou_good:.4f} {'[O] TP (≥0.7)' if iou_good >= 0.7 else '[X] FP (<0.7)'}")
-print(f"Bad Prediction:  center={pred_box_bad['center']}, size={pred_box_bad['size']}")
-print(f"  → 3D IoU = {iou_bad:.4f} {'[O] TP (≥0.7)' if iou_bad >= 0.7 else '[X] FP (<0.7)'}")
-```
+- [ ] RT-2 논문 1회독 완료 (대략 12 페이지)
+- [ ] `rt2_reading_note.md` 의 빈칸 모두 채움
+- [ ] Architecture diagram 손으로 다시 그려서 사진 또는 ASCII 로 저장
+- [ ] `practice_action_tokenization.py` 실행 + 출력 수치 확인
+  - [ ] dx 의 step 이 약 0.78 mm 임을 확인
+  - [ ] rx 의 step 이 약 1.4 deg 임을 확인
+- [ ] `rt2_one_page.md` 한 페이지 요약 산출
+- [ ] quiz_easy.py / quiz_medium.py 풀고 solutions 확인
+- [ ] 이번 주 reading note 를 git 에 commit
+  - `git add ~/phase4_notes/week1/*`
+  - `git commit -m "phase4 w1: rt2 reading note"`
 
 ---
 
-## [O] 체크리스트
+## [link] 참고 자료
 
-- [ ] 3D BBox corners 계산 함수 이해 및 실행
-- [ ] 3D 장면 시각화 (matplotlib 3D) 확인
-- [ ] BEV 시각화 이해 (x-z 평면)
-- [ ] 2D vs 3D Detection 비교 시각화 확인
-- [ ] 3D IoU 계산 원리 이해
-- [ ] 파라미터 변경 실험 (위치, 크기, 각도)
+### 필수
+- [RT-2 paper (arXiv)](https://arxiv.org/abs/2307.15818)
+- [RT-2 project page](https://robotics-transformer2.github.io/)
 
----
+### 보조 (선택, 시간 여유 시)
+- [RT-1 paper (arXiv)](https://arxiv.org/abs/2212.06817) - RT-2 의 직전 모델
+- [PaLI-X paper](https://arxiv.org/abs/2305.18565) - RT-2 backbone 중 하나
+- [PaLM-E paper](https://arxiv.org/abs/2303.03378) - RT-2 backbone 중 하나
+- [DeepMind RT-2 blog post](https://www.deepmind.com/blog/rt-2-new-model-translates-vision-and-language-into-action) - 가벼운 개요
 
-## [tip] 추가 실험 아이디어
-
-1. **다양한 yaw 각도**: theta를 0, pi/4, pi/2, pi로 바꿔서 회전 확인
-2. **크기 변경**: 트럭 (l=12, w=2.5, h=3.5) vs 자전거 (l=1.8, w=0.6, h=1.5)
-3. **IoU 실험**: 예측 박스를 조금씩 이동하면서 IoU 변화 관찰
-4. **여러 객체 장면**: 10개 이상의 객체로 복잡한 장면 구성
+### Tokenization 사전 지식 (있으면 좋음)
+- [Andrej Karpathy: Let's build the GPT Tokenizer](https://www.youtube.com/watch?v=zduSFxRajkE) - 2h 강의
+- [SentencePiece paper](https://arxiv.org/abs/1808.06226) - PaLI-X 의 tokenizer
 
 ---
 
-**다음**: Week 2에서 좌표계를 자세히 학습하고, 좌표 변환을 실습합니다!
+## [tip] 트러블슈팅
+
+| 증상 | 원인 | 해결 |
+|---|---|---|
+| 논문이 너무 길어 막힘 | 한 번에 다 보려 함 | Sec 1+3+5 만 우선, Sec 2 (Related Work) 는 마지막에 |
+| Architecture 가 이해 안 됨 | VLM 사전 지식 부족 | Phase 5 의 ViT/CLIP 자료 미리 훑기 (1~2시간) |
+| Action tokenization 이 이해 안 됨 | tokenizer 의 개념 자체가 모호 | Karpathy 강의 30분만 보기 |
+| 시간 부족 | Sec 1+3+5+reading_note 만 끝내도 OK | Sec 2/4 는 week 2 에 흡수 |

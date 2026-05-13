@@ -24,7 +24,7 @@
 
 **지금까지의 흐름:**
 ```
-Week 1-2: YOLOv8 학습 (PyTorch) → .pt 모델 생성
+Week 3-4: YOLO11 학습 (PyTorch) → .pt 모델 생성
 Week 3-4: 커스텀 데이터셋 학습 + 평가
 
 [!] 문제: .pt 파일은 PyTorch에서만 사용 가능!
@@ -91,7 +91,7 @@ JAX        --→ ONNX --→ OpenVINO (Intel)
 **단계별 과정:**
 ```
 Step 1: PyTorch 모델 로드
-  model = YOLO('yolov8n.pt')
+  model = YOLO('yolo11n.pt')
 
 Step 2: 모델을 eval() 모드로 전환
   model.eval()  # BatchNorm, Dropout 고정
@@ -292,7 +292,7 @@ quantize_dynamic(model, "model_int8.onnx")
 **벤치마크 실험 설계:**
 ```
 조건:
-- 모델: YOLOv8n
+- 모델: YOLO11n
 - 입력: 640 × 640 × 3
 - GPU: NVIDIA GPU (CUDA)
 - 반복: 100회 평균
@@ -436,7 +436,7 @@ INT8: 스케일 + 제로포인트 계산 필요
 ### 실습 항목
 
 1. **PyTorch → ONNX 변환**
-   - YOLOv8n 모델 ONNX 변환
+   - YOLO11n 모델 ONNX 변환
    - Static/Dynamic shape 모두 테스트
    - onnx.checker로 검증
 

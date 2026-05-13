@@ -1,74 +1,77 @@
 """
-Phase 6 Week 1 - 3D Detection 개념 기초 퀴즈
+Phase 4 Week 1 - RT-2 1회독 + Architecture 기초 퀴즈
+
+논문 1회독 후 핵심 개념이 정확하게 잡혔는지 확인하는 4문제.
 """
 
 
-def problem1_3d_bbox_params():
-    print("\n" + "━" * 28)
-    print("문제 1: 3D BBox 파라미터")
-    print("━" * 28 + "\n")
+def problem1_rt2_backbone():
+    print("\n" + "=" * 50)
+    print("문제 1: RT-2 의 backbone")
+    print("=" * 50 + "\n")
 
-    print("질문: 3D Bounding Box를 표현하는 7개 파라미터 [x, y, z, l, w, h, theta] 중")
-    print("      2D Bounding Box [x, y, w, h]에는 없는 파라미터는?\n")
-
-    print("보기:")
-    print("  A) x, y (위치)")
-    print("  B) w, h (크기)")
-    print("  C) z, l, theta (깊이, 길이, 회전)")
-    print("  D) x, y, z (3D 위치)")
-
-
-def problem2_depth_ambiguity():
-    print("\n" + "━" * 28)
-    print("문제 2: Depth Ambiguity")
-    print("━" * 28 + "\n")
-
-    print("질문: 단안 카메라에서 'Depth Ambiguity(깊이 모호성)'란 무엇인가?\n")
+    print("질문: RT-2 가 backbone 으로 사용한 모델은?\n")
 
     print("보기:")
-    print("  A) 카메라 렌즈에 의한 왜곡으로 깊이가 왜곡되는 현상")
-    print("  B) 하나의 픽셀이 무한한 3D 점에 대응하여 깊이를 특정할 수 없는 현상")
-    print("  C) LiDAR 없이는 절대로 깊이를 추정할 수 없다는 원리")
-    print("  D) 카메라 해상도가 낮아서 깊이 정보가 손실되는 현상")
+    print("  A) BERT-large")
+    print("  B) CLIP ViT-L/14")
+    print("  C) PaLI-X 또는 PaLM-E (5B/55B VLM)")
+    print("  D) GPT-3.5")
 
 
-def problem3_detection_methods():
-    print("\n" + "━" * 28)
-    print("문제 3: 3D Detection 방법론")
-    print("━" * 28 + "\n")
+def problem2_action_tokenization():
+    print("\n" + "=" * 50)
+    print("문제 2: Action Tokenization")
+    print("=" * 50 + "\n")
 
-    print("질문: 다음 중 Camera 기반 3D Detection의 장점으로 올바른 것은?\n")
-
-    print("보기:")
-    print("  A) LiDAR보다 정확한 거리 측정이 가능하다")
-    print("  B) 센서 비용이 저렴하고, 색상/텍스처 정보를 활용할 수 있다")
-    print("  C) 어두운 환경에서도 LiDAR보다 성능이 좋다")
-    print("  D) 날씨(비, 안개)의 영향을 전혀 받지 않는다")
-
-
-def problem4_3d_iou():
-    print("\n" + "━" * 28)
-    print("문제 4: 3D IoU 평가 기준")
-    print("━" * 28 + "\n")
-
-    print("질문: KITTI 3D Detection 평가에서 Car 클래스의 IoU threshold는 0.7이고")
-    print("      Pedestrian은 0.5인 이유로 가장 적절한 것은?\n")
+    print("질문: RT-2 는 robot action 을 어떻게 표현하는가?\n")
 
     print("보기:")
-    print("  A) Car가 Pedestrian보다 검출이 더 쉽기 때문")
-    print("  B) Pedestrian은 크기가 작아서 같은 위치 오차에도 IoU가 더 크게 떨어지기 때문")
-    print("  C) Car 데이터가 Pedestrian 데이터보다 더 많기 때문")
-    print("  D) KITTI 데이터셋 제작자의 임의적인 결정이기 때문")
+    print("  A) 별도의 action head (MLP) 가 7-DoF continuous 값을 직접 출력")
+    print("  B) VLM vocabulary 의 마지막 256 개 토큰을 action discrete bin 으로 재사용")
+    print("  C) 7 개의 별도 classification head 를 추가")
+    print("  D) action 을 image 로 변환하여 vision token 으로 출력")
+
+
+def problem3_cofinetuning():
+    print("\n" + "=" * 50)
+    print("문제 3: Co-fine-tuning 의 목적")
+    print("=" * 50 + "\n")
+
+    print("질문: RT-2 가 robot data 만으로 fine-tune 하지 않고")
+    print("      web data 와 함께 co-fine-tune 하는 가장 큰 이유는?\n")
+
+    print("보기:")
+    print("  A) robot data 가 부족하기 때문")
+    print("  B) Web data 만 학습하면 robot 이 동작하지 않음")
+    print("  C) Robot data 만 학습하면 VLM 의 web knowledge 가 사라짐 (catastrophic forgetting)")
+    print("  D) GPU 메모리 절약을 위해")
+
+
+def problem4_emergent_capability():
+    print("\n" + "=" * 50)
+    print("문제 4: Emergent Capability")
+    print("=" * 50 + "\n")
+
+    print("질문: RT-2 의 emergent capability 의 예시로 가장 적절한 것은?\n")
+
+    print("보기:")
+    print("  A) 학습 데이터에 있는 'pick up the can' 명령을 99% 정확도로 수행")
+    print("  B) 학습 데이터에 없는 'pick up the almost-empty can' 같은")
+    print("     의미 추론이 필요한 명령을 수행")
+    print("  C) 추론 속도가 RT-1 보다 빠름")
+    print("  D) 다른 로봇 hardware 에서도 그대로 동작")
 
 
 if __name__ == "__main__":
-    print("━" * 33)
-    print("  Phase 6 Week 1 Quiz - Easy")
-    print("━" * 33)
-    problem1_3d_bbox_params()
-    problem2_depth_ambiguity()
-    problem3_detection_methods()
-    problem4_3d_iou()
-    print("\n" + "━" * 33)
+    print("=" * 50)
+    print("  Phase 4 Week 1 Quiz - Easy")
+    print("  RT-2 정독 + Architecture")
+    print("=" * 50)
+    problem1_rt2_backbone()
+    problem2_action_tokenization()
+    problem3_cofinetuning()
+    problem4_emergent_capability()
+    print("\n" + "=" * 50)
     print("정답은 quiz_solutions/easy_sol.py 참고")
-    print("━" * 33)
+    print("=" * 50)

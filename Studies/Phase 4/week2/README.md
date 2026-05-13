@@ -1,550 +1,275 @@
-# Week 2: 좌표계 이해 - Camera/World/LiDAR/BEV 좌표 변환
+# Week 2: Co-fine-tuning + Action tokenization 정밀 분석
 
-> **이번 주 목표**: 3D Detection에 필수적인 좌표계 개념을 이해하고, 좌표 변환 및 3D bbox 투영을 구현
-> **예상 시간**: 12-15시간
-> **핵심 질문**: "Camera, World, LiDAR, BEV 좌표계의 차이는 무엇이며, 이들 사이의 변환은 어떻게 하는가?"
+> [goal] **이번 주 목표**: "Action 도 token 이다" 의 의미를 손으로 계산할 수 있는 수준까지 내려간다. Co-fine-tuning 의 데이터 비율 / loss / 학습 step 을 한 페이지에 정리.
+> [time] **예상 시간**: 10~12시간 (Sec 3.2~3.3 재정독 4h + 토크나이저 실습 3h + 노트 정리 3h)
+> [tip] **핵심 질문**: "VLM 의 vocab 의 마지막 256 개를 action 으로 쓰는 게 정말로 가능한가? 학습 시 web data 의 마지막 token 들과 충돌하지 않는가?"
 
 ---
 
 ## [list] 학습 순서
 
-| 순서 | 단계 | 파일 | 설명 |
-|:----:|------|------|------|
-| 1 | 환경 설정 | `requirements.txt` | `pip install -r requirements.txt` |
-| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 3 | Python 퀴즈 (초급) | `quiz_easy.py` | Camera 좌표계, KITTI 레이블 순서 |
-| 4 | Python 퀴즈 (중급) | `quiz_medium.py` | 3D→2D 투영 계산, BEV 변환 코드 실습 |
-| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | 좌표 변환 및 3D bbox 투영 실습 |
+| 순서 | 단계 | 파일/자료 | 설명 |
+|:----:|------|----------|------|
+| 1 | 환경 (week1 그대로) | `requirements.txt` | numpy / sentencepiece 추가 |
+| 2 | RT-2 Sec 3.2 재정독 | RT-2 PDF | Action Tokenization |
+| 3 | RT-2 Sec 3.3 재정독 | RT-2 PDF | Co-fine-tuning |
+| 4 | 토크나이저 실습 | `PRACTICE.md` 1~3 | SentencePiece + action token 시뮬레이션 |
+| 5 | 퀴즈 (개념) | `quiz_easy.py` | tokenization / data mixture 개념 |
+| 6 | 퀴즈 (코드/수학) | `quiz_medium.py` | loss 비율 계산 / vocab overlap 분석 |
+| 7 | 노트 정리 | `PRACTICE.md` 4 | "한 페이지 Action Tokenization" 노트 |
 
 ---
 
-## 시작하기 전에
+## [*] 시작하기 전에 — 이번 주의 한 가지 핵심 질문
 
-### Week 1 복습
+> "VLM 의 vocab 의 마지막 256 개 token 을 action 으로 재사용하면, 원래 그 token 들이 web data 에서 가지던 의미는 어떻게 되는가?"
 
-```
-Week 1에서 배운 것:
-  - 2D Detection의 한계 (거리, Occlusion, 경로 계획)
-  - 3D BBox: [x, y, z, l, w, h, theta] 7개 파라미터
-  - 3D Detection 방법론: LiDAR / Camera / Fusion
-  - Depth Ambiguity 개념
-```
+답을 미리 말하면: **원래 의미를 덮어쓴다**. 그 256 개 token 은 RT-2 fine-tune 이후 "action discrete bin" 만 의미하게 된다. 단, 학습 시:
+- Web data sample 에서는 그 256 개 token 이 거의 등장하지 않도록 vocab 의 빈도가 낮은 끝부분을 선택 (low-frequency token 을 재사용)
+- Robot data sample 에서만 그 256 개 token 이 등장하도록 sequence 구조 보장
 
-### 이번 주가 중요한 이유
-
-3D Detection에서 **좌표계**를 이해하지 못하면:
-- 레이블 데이터를 잘못 해석합니다
-- 3D bbox를 이미지에 투영할 수 없습니다
-- 모델 출력을 올바르게 변환할 수 없습니다
-
-```
-좌표계는 3D Perception의 '언어'입니다:
-+----------------------------------------+
-|  데이터셋 레이블 → 어떤 좌표계 기준?     |
-|  모델 출력       → 어떤 좌표계로 나옴?   |
-|  시각화          → 어떤 좌표계로 변환?   |
-|  평가            → 어떤 좌표계에서 비교?  |
-+----------------------------------------+
-→ 전부 좌표계를 알아야 합니다!
-```
+이 한 줄을 이해하는 게 이번 주의 핵심.
 
 ---
 
-## 핵심 개념 자세히 알아보기
+## [ref] 핵심 개념 자세히 알아보기
 
-### 1. 주요 좌표계 4가지
+### 1. Tokenization 의 정확한 정의 복습
 
-#### 1.1 Camera 좌표계 (Camera Coordinate System)
-
-```
-카메라를 원점으로 하는 좌표계:
-
-        Y (아래)
-        |
-        |
-        |----→ X (오른쪽)
-       /
-      /
-     Z (전방, 카메라가 바라보는 방향)
-
-특징:
-  - 원점: 카메라 광학 중심
-  - X: 오른쪽 (+)
-  - Y: 아래쪽 (+)    ← 주의! 일반적인 위쪽이 아님
-  - Z: 전방 (+)      ← 카메라가 바라보는 방향
-  - 단위: 미터 (m)
-  - KITTI의 기본 좌표계
-```
-
-#### 1.2 World 좌표계 (World Coordinate System)
+VLM 의 입력/출력은 모두 **token sequence** 다. Token 은 vocabulary 안의 한 entry. 예시:
 
 ```
-고정된 기준점(보통 지도의 원점)에 대한 좌표계:
-
-     Z (위)
-     |
-     |
-     |----→ Y (왼쪽 또는 오른쪽, 규약에 따라 다름)
-    /
-   /
-  X (전방)
-
-특징:
-  - 원점: 지도의 기준점
-  - 위쪽이 Z+ (중력 반대 방향)
-  - 자율주행에서는 IMU/GPS 기준
-  - 여러 프레임의 데이터를 통합할 때 사용
+Vocabulary (SentencePiece, PaLI-X):
+  Token ID 0    : <pad>
+  Token ID 1    : <bos>
+  Token ID 2    : <eos>
+  Token ID 3    : "the"
+  Token ID 4    : "_"
+  Token ID 5    : "a"
+  ...
+  Token ID 255743 : "_supersonic"
+  Token ID 255744 : <action_bin_0>     <-- RT-2 가 재해석한 token
+  ...
+  Token ID 255999 : <action_bin_255>   <-- RT-2 가 재해석한 token
 ```
 
-#### 1.3 LiDAR 좌표계 (Velodyne Coordinate System)
+**핵심**: VLM 입장에서 `<action_bin_5>` 는 그냥 ID 가 255749 인 token 일 뿐이다. "action" 이라는 특별한 의미를 모른다. 학습 데이터에서 그 token 이 어떤 context 에서 나오는지에 따라 그 token 의 임베딩 벡터가 적응된다.
+
+### 2. SentencePiece / BPE 토크나이저의 동작
 
 ```
-LiDAR 센서를 원점으로 하는 좌표계:
-
-     Z (위)
-     |
-     |
-     |----→ Y (왼쪽)
-    /
-   /
-  X (전방)
-
-특징:
-  - 원점: LiDAR 센서 중심
-  - X: 전방 (+)
-  - Y: 왼쪽 (+)
-  - Z: 위쪽 (+)
-  - Camera 좌표계와 축 방향이 다름!
+원문   : "pick up the can"
+       v
+SentencePiece:
+       v
+Token  : ["_pick", "_up", "_the", "_can"]
+       v
+Token ID: [3421, 891, 3, 1247]
 ```
 
-#### 1.4 BEV 좌표계 (Bird's Eye View)
+이 token ID 들이 VLM 의 입력. 출력도 token ID sequence.
+
+RT-2 는 학습 시 **robot data sample** 의 sequence 를 다음과 같이 구성한다:
 
 ```
-위에서 내려다본 시점의 2D 좌표계:
+Input (image + text):
+  <image>...</image> "pick up the can. action: "
 
-  ←----- X (왼쪽, 또는 오른쪽)
-  |
-  |
-  ↓
-  Z (전방)
-
-특징:
-  - 높이(Y) 정보를 무시한 2D 표현
-  - X-Z 평면 (또는 X-Y 평면, 규약에 따라)
-  - 자율주행에서 경로 계획에 직접 사용
-  - BEVFormer 등 최신 모델의 출력 형태
+Output target:
+  "<action_bin_135> <action_bin_201> <action_bin_128> <action_bin_64> <action_bin_128> <action_bin_99> <action_bin_255> <eos>"
+   ^---- dx          ^---- dy           ^---- dz          ^---- rx          ^---- ry          ^---- rz          ^---- gripper
 ```
 
-### 2. 좌표계 비교 및 변환
+이때 출력 target 의 token ID 는 모두 [255744, 255999] 범위. Cross-entropy loss 는 이 256 개 token 위에서만 계산되도록 mask 처리 가능 (또는 standard next-token-pred loss 그대로 사용 - 어느 쪽이든 동작).
+
+### 3. Action Tokenization 의 정확한 수식
+
+연속 action $a_i \in [a_{i,\min}, a_{i,\max}]$ 에 대해:
 
 ```
-4가지 좌표계 비교:
-+----------+----------+----------+----------+
-|          | 전방     | 오른쪽   | 위쪽     |
-+----------+----------+----------+----------+
-| Camera   | +Z       | +X       | -Y       |
-| LiDAR    | +X       | -Y       | +Z       |
-| World    | +X       | -(규약)  | +Z       |
-| BEV      | +Z(2D)   | +X(2D)   | (없음)   |
-+----------+----------+----------+----------+
+1. Normalize:    n = (a_i - a_min) / (a_max - a_min)         in [0, 1]
+2. Discretize:   b = min( floor(n * 256), 255 )                in [0, 255]
+3. Token map:    t = ACTION_TOKEN_START + b                    in [255744, 255999]
 ```
 
-#### Camera <-> LiDAR 변환
+de-tokenize (inference 시):
 
 ```
-LiDAR → Camera 변환:
-  Pc = R_rect @ Tr_velo_to_cam @ Pl
-
-  Tr_velo_to_cam: LiDAR → Camera 외부 파라미터 (4x4)
-  R_rect: 스테레오 정류 회전 (3x3 → 4x4로 확장)
-  Pl: LiDAR 좌표 [x, y, z, 1]
-  Pc: Camera 좌표 [x, y, z, 1]
-
-Camera → 이미지 투영:
-  p = P2 @ Pc
-
-  P2: 투영 행렬 (3x4)
-  Pc: Camera 좌표 [x, y, z, 1]
-  p: 이미지 좌표 [u*z, v*z, z] → (u, v) = (p[0]/p[2], p[1]/p[2])
+1. Token map^-1: b = t - ACTION_TOKEN_START
+2. De-normalize: a_i = a_min + (b + 0.5) / 256 * (a_max - a_min)
 ```
 
-### 3. KITTI 좌표계 규약
+`+0.5` 가 들어가는 이유: bin 의 **중심값** 을 사용해 quantization 오차를 평균적으로 0 으로 만들기 위함.
 
-KITTI 데이터셋은 고유한 좌표계 규약을 사용합니다.
+### 4. Co-fine-tuning 의 데이터 mixture 표
 
-```
-KITTI 3D 레이블 포맷 (label_2):
-  Car 0.0 0 -1.56 587.01 173.33 614.12 200.12 1.65 1.67 3.64 -0.65 1.71 46.70 -1.59
-  |   |   |  |    +------- 2D bbox ------+ |    |    |    |    |    |     |
-  |   |   |  alpha                         h    w    l    x    y    z     ry
-  |   |   occluded
-  |   truncated
-  class
+RT-2 논문 Table 4 (또는 비슷한 표) 의 데이터 비율 (논문에 따라 약간씩 다름, 일반적 패턴):
 
-KITTI 3D 정보: [h, w, l, x, y, z, ry]
-                |  |  |  +- 중심 -+  |
-                + 크기 +            yaw
+| 데이터 종류 | 비율 (대략) | 예시 |
+|---|---|---|
+| WebLI (image-caption) | 50% | "A red apple on a wooden table." |
+| OCR / VQA | 30% | Q: "What color is the apple?" A: "Red" |
+| Robot trajectory | 20% | <image> "pick up the can. action: <action_bin_...> ..." |
 
-주의: KITTI는 [h, w, l] 순서 (일반적인 [l, w, h]와 다름!)
-```
+학습 step:
+- 매 batch 마다 위 비율로 sample 추출
+- Loss = standard cross-entropy on next-token-prediction
+- 다른 학습 trick 거의 없음 (이게 핵심: 표준 LM 학습 그대로)
 
-#### KITTI 좌표계 세부사항
+### 5. Catastrophic Forgetting 의 정확한 메커니즘
 
-```
-KITTI Camera 좌표계:
-  - x: 오른쪽 (+)
-  - y: 아래쪽 (+)      ← y가 아래로!
-  - z: 전방 (+)
-
-  중요: y 좌표의 의미
-    - 3D bbox의 y는 객체 '바닥'의 y 좌표
-    - 도로면의 y ≈ 1.65m (카메라 높이)
-    - 차량 중심의 y ≈ 1.65 - h/2
-
-  ry (rotation_y):
-    - y축 기준 회전 (yaw)
-    - 0: 전방(+z)을 바라봄
-    - pi/2: 오른쪽(+x)을 바라봄
-    - -pi/2: 왼쪽(-x)을 바라봄
-    - pi: 뒤(−z)를 바라봄
-```
-
-### 4. 캘리브레이션 행렬
-
-KITTI 캘리브레이션 파일에는 여러 변환 행렬이 있습니다.
+만약 robot data 만으로 fine-tune 하면:
 
 ```
-calib/000000.txt 내용:
-  P0: ...  # 좌측 흑백 카메라 투영 행렬 (3x4)
-  P1: ...  # 우측 흑백 카메라 투영 행렬 (3x4)
-  P2: ...  # 좌측 컬러 카메라 투영 행렬 (3x4) ← 이것을 주로 사용!
-  P3: ...  # 우측 컬러 카메라 투영 행렬 (3x4)
-  R0_rect: ...  # 스테레오 정류 행렬 (3x3)
-  Tr_velo_to_cam: ...  # LiDAR → Camera 변환 (3x4)
-  Tr_imu_to_velo: ...  # IMU → LiDAR 변환 (3x4)
+초기 weight (web 학습 완료):
+  word embedding "red" 의 의미 -> [..., 0.43, -0.12, 0.71, ...]
+  (web data 의 수많은 'red' context 에서 학습된 분포)
+
+Robot data 만으로 fine-tune (10000 step):
+  word embedding "red" 의 의미 -> [..., 0.41, -0.10, 0.73, ...]
+  거의 안 변함 (robot data 에 'red' 거의 없음)
+
+  하지만 다른 일반 단어는?
+  word embedding "physics" 의 의미 -> [..., random drift, ...]
+  (robot data 에 'physics' 가 한 번도 안 나옴, gradient 가 작아도 drift 누적)
 ```
 
-```python
-# 캘리브레이션 파일 파싱
-def read_calib(calib_path):
-    """KITTI 캘리브레이션 파일을 읽어 행렬로 반환"""
-    calib = {}
-    with open(calib_path, 'r') as f:
-        for line in f.readlines():
-            if ':' not in line:
-                continue
-            key, value = line.split(':', 1)
-            calib[key.strip()] = np.array([float(x) for x in value.split()])
+Web data 가 mix 되면:
+- 일반 단어들의 embedding 이 web sample 에서 계속 reinforce
+- robot-specific token (action bin 등) 만 새로 학습
+- 양쪽 능력이 공존
 
-    # P2: 3x4 투영 행렬
-    P2 = calib['P2'].reshape(3, 4)
+### 6. Loss 계산 시 실수하기 쉬운 점
 
-    # R0_rect: 3x3 → 4x4 확장
-    R0 = np.eye(4)
-    R0[:3, :3] = calib['R0_rect'].reshape(3, 3)
-
-    # Tr_velo_to_cam: 3x4 → 4x4 확장
-    Tr = np.eye(4)
-    Tr[:3, :4] = calib['Tr_velo_to_cam'].reshape(3, 4)
-
-    return {'P2': P2, 'R0_rect': R0, 'Tr_velo_to_cam': Tr}
-```
-
-### 5. 3D BBox Corners 계산 및 이미지 투영
-
-3D bbox를 이미지에 투영하는 전체 파이프라인:
+학습 loss 는 next-token-prediction:
 
 ```
-파이프라인:
-  1. 3D BBox 파라미터 [h,w,l,x,y,z,ry] 파싱
-  2. 8개 corners 계산 (Camera 좌표계)
-  3. corners → 이미지 좌표 투영 (P2 사용)
-  4. 이미지 위에 12개 edge 그리기
+L = -sum_{t} log p(token_t | token_<t)
 ```
 
-```python
-import numpy as np
+이 loss 가 web sample 과 robot sample 에 **모두 같은 형태로** 적용된다는 게 중요.
 
-def compute_box_3d_kitti(h, w, l, x, y, z, ry):
-    """
-    KITTI 좌표계에서 3D bbox의 8개 꼭짓점 계산
+- Web sample: caption 의 모든 token 에 대해 prediction
+- Robot sample: instruction 뒤의 action token sequence 에 대해 prediction
 
-    KITTI 규약:
-      - (x, y, z)는 객체 바닥면 중심
-      - y는 아래쪽이 양수
-      - ry는 y축 회전 (yaw)
+이게 가능한 이유: 두 sample 모두 "이전 token 으로 다음 token 예측" 이라는 동일한 task 로 환원 가능.
 
-    Returns:
-        corners_3d: (8, 3) ndarray
-    """
-    # 회전 행렬 (y축 회전)
-    c = np.cos(ry)
-    s = np.sin(ry)
-    R = np.array([
-        [ c, 0, s],
-        [ 0, 1, 0],
-        [-s, 0, c]
-    ])
+### 7. Inference 시 action 추출
 
-    # 8개 꼭짓점 (중심 기준, 회전 전)
-    # KITTI: x=width, y=height, z=length
-    x_corners = [ l/2,  l/2, -l/2, -l/2,  l/2,  l/2, -l/2, -l/2]
-    y_corners = [   0,    0,    0,    0,   -h,   -h,   -h,   -h ]
-    z_corners = [ w/2, -w/2, -w/2,  w/2,  w/2, -w/2, -w/2,  w/2]
-
-    corners = np.array([x_corners, y_corners, z_corners])  # (3, 8)
-
-    # 회전 적용
-    corners = R @ corners
-
-    # 중심으로 이동 (KITTI: y는 바닥 중심)
-    corners[0, :] += x
-    corners[1, :] += y
-    corners[2, :] += z
-
-    return corners.T  # (8, 3)
-
-
-def project_to_image(corners_3d, P2):
-    """
-    3D 좌표를 이미지 좌표로 투영
-
-    Parameters:
-        corners_3d: (N, 3) Camera 좌표
-        P2: (3, 4) 투영 행렬
-
-    Returns:
-        corners_2d: (N, 2) 이미지 좌표
-    """
-    # 동차 좌표로 변환 (N, 4)
-    N = corners_3d.shape[0]
-    pts_3d_hom = np.hstack([corners_3d, np.ones((N, 1))])
-
-    # 투영
-    pts_2d_hom = (P2 @ pts_3d_hom.T).T  # (N, 3)
-
-    # 정규화
-    pts_2d = pts_2d_hom[:, :2] / pts_2d_hom[:, 2:3]
-
-    return pts_2d  # (N, 2)
-```
-
-### 6. BEV (Bird's Eye View) 변환
+inference 시 흐름:
 
 ```
-BEV 변환 = 3D 좌표에서 높이(y)를 무시하고 x-z 평면으로 투영
+입력 image + "pick up the can. action: "
+                                       ^ 여기까지 prompt
+모델이 next token 생성 시작:
+  step 1: token ID 255744 + b_dx
+  step 2: token ID 255744 + b_dy
+  ...
+  step 7: token ID 255744 + b_grip
+  step 8: <eos>
 
-Camera 좌표 (x, y, z) → BEV 좌표 (x, z)
-
-용도:
-  - 자율주행 경로 계획 (2D 평면에서 동작)
-  - 주차장 매핑
-  - 물체 간 거리/방향 파악
-  - BEVFormer 등 최신 모델의 출력 표현
+후처리:
+  각 token ID - 255744 = bin index
+  de-normalize -> continuous action
 ```
 
-```python
-def camera_to_bev(corners_3d, bev_range=(-40, 40, 0, 70), bev_size=(800, 700)):
-    """
-    Camera 좌표를 BEV 이미지 좌표로 변환
+특별한 decoding 알고리즘 (greedy / beam search / temperature) 은 표준 LM 과 동일. RT-2 는 보통 **greedy** 또는 **temperature ~ 0** 으로 deterministic action 생성.
 
-    Parameters:
-        corners_3d: (N, 3) Camera 좌표
-        bev_range: (x_min, x_max, z_min, z_max) 미터 단위
-        bev_size: (width, height) 픽셀 단위
+### 8. 다른 action representation 과의 비교
 
-    Returns:
-        bev_pts: (N, 2) BEV 이미지 좌표
-    """
-    x_min, x_max, z_min, z_max = bev_range
-    bev_w, bev_h = bev_size
+| 방식 | 장점 | 단점 | 사용 모델 |
+|---|---|---|---|
+| Discrete token (RT-2) | LM 표준 흐름 그대로, 다양한 action 분포 표현 가능 | quantization 오차 | RT-2, OpenVLA |
+| Continuous regression head | quantization 없음 | LM 흐름과 단절, multi-modal 분포 어려움 | RT-1, BC-Z |
+| Diffusion head | multi-modal 분포 표현, smooth | inference 느림 (multi-step denoising) | Diffusion Policy, π0 |
+| Flow matching | diffusion 보다 빠름 | 비교적 새로움 | Helix, π0 |
 
-    x = corners_3d[:, 0]
-    z = corners_3d[:, 2]
-
-    # 미터 → 픽셀 변환
-    bev_x = ((x - x_min) / (x_max - x_min) * bev_w).astype(int)
-    bev_z = ((z_max - z) / (z_max - z_min) * bev_h).astype(int)  # z 반전 (전방이 위)
-
-    return np.stack([bev_x, bev_z], axis=1)
-```
+> [tip] 본 로드맵의 Phase 7 산출물 #4 에서 OpenVLA (discrete token) 를 사용. Phase 4 의 분기 재평가 (2026.11) 에서 π0 / Helix 등으로 갱신될 수 있음.
 
 ---
 
-## 꼭 이해해야 할 핵심 개념
+## [tip] 한 페이지 요약
 
-### Camera 좌표계 vs LiDAR 좌표계
-
-```
-가장 흔한 실수: 축 방향 혼동!
-
-Camera:                LiDAR:
-  Y (아래)              Z (위)
-  |                     |
-  |--→ X (오른쪽)       |--→ Y (왼쪽)
- /                     /
-Z (전방)              X (전방)
-
-변환 관계:
-  Camera_x =  LiDAR_y (부호 반대는 Tr에 포함)
-  Camera_y = -LiDAR_z
-  Camera_z =  LiDAR_x
-```
-
-### KITTI 레이블에서 y 좌표의 의미
+### 핵심 수식 3개
 
 ```
-KITTI의 y 좌표는 객체 '바닥면 중심':
-  - 도로 위 승용차: y ≈ 1.65 (카메라 높이)
-  - 객체의 3D 중심: y - h/2
-
-  카메라 (y=0)
-  |
-  |  (y 증가 = 아래로)
-  |
-  +-- 객체 윗면: y - h
-  |
-  +-- 객체 중심: y - h/2
-  |
-  +-- 객체 바닥: y ← KITTI label의 y
-  |
-  -- 도로면: y ≈ 1.65m
+1. Discretize:   b = min( floor((a - a_min) / (a_max - a_min) * 256), 255 )
+2. Token map:    t = ACTION_TOKEN_START + b
+3. De-tokenize:  a = a_min + (b + 0.5) / 256 * (a_max - a_min)
 ```
 
-### P2 투영 행렬의 구조
+### 핵심 데이터 mixture
 
 ```
-P2 = [fx  0  cx  tx]    (3x4)
-     [ 0 fy  cy  ty]
-     [ 0  0   1  tz]
-
-  fx, fy: 초점 거리 (픽셀 단위)
-  cx, cy: 주점 (이미지 중심 근처)
-  tx, ty, tz: 스테레오 베이스라인 보정값
-
-KITTI 전형적인 값:
-  fx ≈ 721
-  fy ≈ 721
-  cx ≈ 609
-  cy ≈ 173
+Mini-batch 비율:
+  WebLI (image-caption)      : 50%
+  OCR / VQA / etc.           : 30%
+  Robot trajectory (RT-1 ds) : 20%
 ```
+
+### 핵심 학습 흐름
+
+```
+모든 sample 을 "image+text -> output text" 의 표준 next-token-prediction 으로 환원.
+Robot sample 에서 output text 의 처음 7~11 token 이 action 으로 해석됨.
+별도 loss / 별도 head 없음.
+```
+
+### 핵심 한계
+
+- Quantization step ~ 0.78 mm (dx), 1.4 deg (rx)
+- Inference latency ~ 200ms (5Hz)
+- Vocab 의 마지막 256 개 token 의 원 의미는 덮어써짐 (단 low-frequency token 이라 영향 최소)
 
 ---
 
-## 자체 점검 - 이해했는지 확인!
+## [search] 자체 점검
 
-### Q1: 좌표계 축 방향
-**Q:** KITTI Camera 좌표계에서 '위쪽'은 어느 축의 어느 방향인가?
+**Q1. "Action 도 token 이다" 의 정확한 의미는?**
+> VLM 의 vocabulary (예: 256000 개) 중 마지막 256 개 token 을 action discrete bin (0~255) 으로 재해석. 즉 별도의 action head 없이 VLM 의 표준 next-token-prediction 으로 action 도 생성 가능. 학습 시에도 표준 cross-entropy loss 그대로 사용.
 
-**A:**
-```
--Y 방향입니다.
-KITTI Camera 좌표계에서 Y축은 '아래쪽'이 양수이므로,
-위쪽은 -Y 방향입니다.
+**Q2. 왜 vocab 의 마지막 256 개를 선택하는가?**
+> 그 token 들이 web data 에서 가장 빈도가 낮은 token (rare token) 이라, 원래 의미를 덮어써도 web 성능에 거의 영향이 없기 때문. 또한 low-frequency token 은 web pretraining 시 충분히 학습되지 못한 token 이라 새로 의미 할당이 용이.
 
-이것은 이미지 좌표계와 일관성을 가집니다:
-  이미지에서도 v 좌표는 아래로 갈수록 증가합니다.
-```
+**Q3. Co-fine-tuning 의 비율이 web 8 : robot 2 인 이유 정확히는?**
+> Robot data 의 절대량이 web data 대비 압도적으로 적기 때문에 (130k episodes vs 수십억 image-text pair), 그 차이를 학습 시 sample 비율로 보정. 만약 1:1 로 잡으면 robot data 가 너무 자주 반복되어 overfit. 8:2 가 catastrophic forgetting 방지와 action 학습의 균형점.
 
-### Q2: KITTI 레이블 순서
-**Q:** KITTI 레이블에서 3D 크기가 [h, w, l] 순서인 이유는 무엇일까?
+**Q4. Inference 시 quantization 오차의 영향은?**
+> dx step ~ 0.78mm 으로 cm 단위 manipulation 에는 충분. 단 sub-mm 정밀 조립 / 미세 force control 은 불가. 본 로드맵 Phase 7 의 산출물 #4 에서 이 quantization 오차를 직접 측정해 "양산 시점 비용" 의 증거로 사용 가능.
 
-**A:**
-```
-KITTI는 [height, width, length] 순서를 사용합니다.
-이것은 KITTI 데이터셋의 규약(convention)입니다.
-
-주의할 점:
-  - 많은 논문/코드는 [l, w, h] 순서를 사용
-  - 데이터셋마다 순서가 다를 수 있음
-  - 변환 시 순서를 반드시 확인해야 함!
-
-nuScenes: [w, l, h] (또 다른 순서!)
-→ 데이터셋 규약을 항상 확인하는 습관이 중요합니다.
-```
-
-### Q3: 투영의 의미
-**Q:** P2 행렬로 3D 점을 투영할 때 z로 나누는 이유는?
-
-**A:**
-```
-원근 투영(perspective projection)의 원리입니다.
-
-P2 @ [X, Y, Z, 1]^T = [u*Z, v*Z, Z]^T
-
-(u, v) = (u*Z / Z, v*Z / Z)
-
-Z로 나누는 것이 '원근감'을 만듭니다:
-  - 가까운 물체(Z 작음) → u, v 변화 큼 → 크게 보임
-  - 먼 물체(Z 큼) → u, v 변화 작음 → 작게 보임
-
-이것이 핀홀 카메라 모델의 핵심입니다 (Phase 2 복습).
-```
-
-### Q4: BEV의 장점
-**Q:** BEV 표현이 자율주행에서 특히 유용한 이유는?
-
-**A:**
-```
-1. 경로 계획에 직접 사용 가능:
-   - 차량은 2D 평면 위에서 이동
-   - BEV = 2D 평면 표현 → 경로 계획에 자연스러움
-
-2. 물체 간 관계 파악 용이:
-   - 거리, 방향이 실제 물리 공간과 일치
-   - Occlusion 없이 모든 객체를 볼 수 있음
-
-3. 다중 센서 융합에 적합:
-   - Camera, LiDAR 모두 BEV로 변환 가능
-   - BEV 공간에서 feature fusion
-
-4. 이미지 왜곡 없음:
-   - 원근 투영에 의한 왜곡이 없음
-   - 물체 크기가 거리에 무관하게 일정
-```
+**Q5. RT-2 의 action representation 이 Diffusion Policy 대비 가지는 차이는?**
+> RT-2 는 discrete categorical distribution (256 bin) 으로 action 표현 → multi-modal 분포 어느 정도 가능, 단 quantization 오차 있음. Diffusion Policy 는 continuous distribution → quantization 없음, multi-modal 표현 우수, 단 inference 가 multi-step denoising 으로 느림. π0 / Helix 같은 최근 모델은 flow matching 으로 둘의 단점 보완.
 
 ---
 
-## 이번 주 실습 & 다음 주 준비
+## [note] 이번 주 실습 & 다음 주 준비
 
-### 이번 주 체크리스트
+### 이번 주 실습 과제
+1. RT-2 Section 3.2 (Action Tokenization) 정독 + 메모
+2. RT-2 Section 3.3 (Co-fine-tuning) 정독 + 데이터 mixture 표 정리
+3. `practice_sentencepiece.py` 실행 - SentencePiece 의 토큰화 직접 확인
+4. `practice_action_token_simulation.py` 실행 - action token 추출/복원 시뮬레이션
+5. `practice_loss_simulation.py` 실행 - mock data 로 cross-entropy 계산
+6. quiz_easy / quiz_medium 풀기
+7. "한 페이지 Action Tokenization" 노트 산출 (week 3 블로그의 절반)
 
-- [ ] Camera / LiDAR / World / BEV 좌표계 축 방향 이해
-- [ ] KITTI 좌표계 규약 [h, w, l, x, y, z, ry] 숙지
-- [ ] 캘리브레이션 파일 (P2, R0_rect, Tr_velo_to_cam) 파싱
-- [ ] 3D bbox corners 계산 (KITTI 규약)
-- [ ] 3D → 2D 이미지 투영 (P2 사용)
-- [ ] BEV 변환 이해
-- [ ] `PRACTICE.md` 실습 완료
-- [ ] `quiz_easy.py`, `quiz_medium.py` 풀기
-
-### 다음 주 미리보기: KITTI 데이터셋
-
-```
-다음 주에는:
-  - KITTI 3D Object Detection 데이터셋 다운로드
-  - 데이터 구조 (image_2, calib, label_2) 탐색
-  - 레이블 파싱 파이프라인 구현
-  - 2D bbox, 3D bbox, BEV 시각화
-  → 이번 주의 좌표 변환 지식이 직접 활용됩니다!
-```
+### 다음 주 (week 3) 준비
+- 블로그 플랫폼 선정 (Velog / Medium / 본 레포의 `Studies/Phase 4/blog/`)
+- week 1, 2 의 reading note 와 한 페이지 노트 통합
+- 블로그 1편 (RT-2) 의 초안 작성 시작 (week 3 의 중심 작업)
 
 ---
 
-## 이번 주 핵심 요약
+## [goal] 이번 주 핵심 요약
 
-1. **좌표계 4종류**: Camera(Z전방, Y아래), LiDAR(X전방, Z위), World(X전방, Z위), BEV(X-Z 평면)
-
-2. **KITTI 규약**: 레이블은 [h, w, l, x, y, z, ry] 순서이며, Camera 좌표계 기준. y는 객체 바닥의 y좌표
-
-3. **캘리브레이션 행렬**: P2(3x4 투영), R0_rect(3x3 정류), Tr_velo_to_cam(3x4 변환)으로 좌표계 간 변환
-
-4. **3D→2D 투영**: corners_3d → P2 @ [x,y,z,1]^T → z로 나누기 → 이미지 좌표 (u, v)
-
-5. **BEV 변환**: 높이(y)를 무시하고 x-z 평면에 투영. 자율주행 경로 계획과 물체 관계 파악에 필수
+1. **Tokenization 의 본질**: VLM 의 vocab 마지막 256 개 token 을 action discrete bin 으로 재사용.
+2. **Quantization 수식 3개**: discretize / token map / de-tokenize.
+3. **Co-fine-tuning mixture**: WebLI 50% + OCR/VQA 30% + Robot 20%.
+4. **Loss 의 일관성**: 모든 sample 이 표준 next-token-prediction 으로 환원.
+5. **Diffusion 등 대안 비교**: discrete (RT-2) / continuous (RT-1) / diffusion (DP) / flow matching (π0).
 
 ---
 
-이전: [Week 1 - 3D Detection 개념](../week1/README.md)
+[O] 이전: [Week 1 - RT-2 1회독 + Architecture](../week1/README.md)
 
-다음: [Week 3 - KITTI 데이터셋](../week3/README.md)
+다음: [Week 3 - RT-2 블로그 1편 작성](../week3/README.md)

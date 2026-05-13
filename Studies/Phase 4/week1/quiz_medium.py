@@ -1,199 +1,139 @@
 """
-Phase 6 Week 1 - 3D Detection 개념 중급 퀴즈
-코드를 직접 실행하고 결과를 확인하세요.
+Phase 4 Week 1 - RT-2 Architecture / Action Tokenization 중급 퀴즈
+
+논문의 수치/계산이 손에 잡혔는지 확인하는 3문제.
 """
 import numpy as np
 
 
-def problem1_compute_box_corners():
+def problem1_quantization_step():
     """
-    문제 1: 3D BBox Corners 계산
+    문제 1: Action Quantization step 계산
 
-    중심이 (0, 0, 10), 크기가 l=4.0, w=2.0, h=1.5인
-    3D Bounding Box의 8개 꼭짓점 좌표를 구하시오.
-    (yaw = 0, 회전 없음)
+    RT-2 는 7-DoF action 의 각 차원을 256 bin 으로 양자화한다.
+    각 차원의 범위가 아래와 같을 때, quantization step 을 계산하시오.
 
-    TODO: corners 배열의 첫 번째 꼭짓점(corner 0) 좌표를 채우시오.
-          corner 0 = (w/2, 0, l/2) + center
+    - dx, dy, dz : [-0.10, 0.10] m
+    - rx, ry, rz : [-pi,  pi]   rad
+    - gripper   : [ 0.00, 1.00]
+
+    TODO: step_dx, step_rx, step_grip 를 직접 계산해 보세요.
     """
-    print("\n" + "━" * 36)
-    print("문제 1: 3D BBox Corners 계산")
-    print("━" * 36 + "\n")
+    print("\n" + "=" * 60)
+    print("문제 1: Quantization step 계산")
+    print("=" * 60 + "\n")
 
-    x, y, z = 0.0, 0.0, 10.0  # 중심 좌표
-    l, w, h = 4.0, 2.0, 1.5   # 크기 (length, width, height)
-    theta = 0.0                 # yaw (회전 없음)
+    N_BIN = 256
 
-    # 8개 꼭짓점 (회전 전, 중심 기준)
-    # 순서: 바닥면 4개 -> 윗면 4개
-    # KITTI 좌표계: x(오른쪽), y(아래쪽), z(전방)
-    x_corners = [ w/2,  w/2, -w/2, -w/2,  w/2,  w/2, -w/2, -w/2]
-    y_corners = [  0,     0,    0,    0,   -h,   -h,   -h,   -h ]
-    z_corners = [ l/2, -l/2, -l/2,  l/2,  l/2, -l/2, -l/2,  l/2]
+    # TODO: 직접 계산
+    step_dx = 0.0  # dx 의 step (단위: m)
+    step_rx = 0.0  # rx 의 step (단위: rad)
+    step_grip = 0.0  # gripper 의 step
 
-    corners = np.array([x_corners, y_corners, z_corners])  # (3, 8)
-    corners[0, :] += x
-    corners[1, :] += y
-    corners[2, :] += z
+    # 검증용
+    expected_dx = (0.10 - (-0.10)) / N_BIN
+    expected_rx = (np.pi - (-np.pi)) / N_BIN
+    expected_grip = 1.0 / N_BIN
 
-    print(f"  중심: ({x}, {y}, {z})")
-    print(f"  크기: l={l}, w={w}, h={h}")
-    print(f"  회전: theta={theta}")
-    print()
-    print("  계산된 8개 꼭짓점:")
-    for i in range(8):
-        print(f"    Corner {i}: ({corners[0, i]:>6.1f}, {corners[1, i]:>6.1f}, {corners[2, i]:>6.1f})")
+    print(f"  계산한 step_dx   : {step_dx:.6f} m = {step_dx*1000:.4f} mm")
+    print(f"  계산한 step_rx   : {step_rx:.6f} rad = {np.degrees(step_rx):.4f} deg")
+    print(f"  계산한 step_grip : {step_grip:.6f}")
+    print(f"\n  기대 step_dx   : {expected_dx:.6f} m = {expected_dx*1000:.4f} mm")
+    print(f"  기대 step_rx   : {expected_rx:.6f} rad = {np.degrees(expected_rx):.4f} deg")
+    print(f"  기대 step_grip : {expected_grip:.6f}")
 
-    # TODO: corner 0의 좌표를 직접 계산하여 채우시오
-    expected_corner0 = np.array([0.0, 0.0, 0.0])  # 여기를 채우시오
-
-    print(f"\n  직접 계산한 corner 0: {expected_corner0}")
-
-    actual_corner0 = corners[:, 0]
-    if np.allclose(expected_corner0, actual_corner0, atol=0.01):
-        print("  정답!")
+    if (
+        abs(step_dx - expected_dx) < 1e-9
+        and abs(step_rx - expected_rx) < 1e-9
+        and abs(step_grip - expected_grip) < 1e-9
+    ):
+        print("\n  [O] 정답!")
     else:
-        print(f"  다시 계산해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
-        print(f"  힌트: corner 0 = (x + w/2, y + 0, z + l/2)")
+        print("\n  [X] 다시 계산해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
 
 
-def problem2_box_volume_iou():
+def problem2_output_token_length():
     """
-    문제 2: 3D Box 부피와 IoU 계산
+    문제 2: 한 frame 의 output token 길이
 
-    두 3D 박스(축 정렬, 회전 없음)의 IoU를 계산하시오.
+    RT-2 는 매 frame 마다 다음을 output 으로 생성한다:
+    - action 7 개 (각 1 token, 총 7 token)
+    - episode termination 등 special token 1 ~ 4 개
 
-    Box A: 중심 (0, 0, 10), 크기 l=4, w=2, h=1.5
-    Box B: 중심 (1, 0, 11), 크기 l=4, w=2, h=1.5
+    이때, 1초에 5 frame 을 처리하려면 (5Hz) decoder 가 1초에 생성해야 하는
+    총 token 수를 계산하시오. special token 은 평균 2 개로 가정.
 
-    TODO: 각 축의 겹침(overlap)을 계산하고, 3D IoU를 구하시오.
+    추가: 이 token 수와 일반적인 LLM (예: GPT-3.5) 의 generation speed
+    (~100 token/s on RTX 4070) 를 비교했을 때, 5Hz 가 가능한가?
+
+    TODO: tokens_per_frame, tokens_per_second 를 채우시오.
     """
-    print("\n" + "━" * 36)
-    print("문제 2: 3D Box 부피와 IoU 계산")
-    print("━" * 36 + "\n")
+    print("\n" + "=" * 60)
+    print("문제 2: 한 frame 의 output token 길이 계산")
+    print("=" * 60 + "\n")
 
-    # Box A
-    a_center = np.array([0.0, 0.0, 10.0])
-    a_size = np.array([4.0, 2.0, 1.5])  # l, w, h
+    action_tokens = 7
+    special_tokens = 2
+    fps = 5
 
-    # Box B
-    b_center = np.array([1.0, 0.0, 11.0])
-    b_size = np.array([4.0, 2.0, 1.5])
+    # TODO: 직접 계산
+    tokens_per_frame = 0
+    tokens_per_second = 0
 
-    print(f"  Box A: 중심={a_center}, 크기(l,w,h)={a_size}")
-    print(f"  Box B: 중심={b_center}, 크기(l,w,h)={b_size}")
+    print(f"  Action tokens per frame   : {action_tokens}")
+    print(f"  Special tokens per frame  : {special_tokens}")
+    print(f"  Tokens per frame          : {tokens_per_frame} (기대: {action_tokens + special_tokens})")
+    print(f"  Frames per second         : {fps}")
+    print(f"  Tokens per second         : {tokens_per_second} (기대: {(action_tokens + special_tokens) * fps})")
 
-    # 각 축 범위 (x: width, y: height, z: length)
-    # x축: center_x +/- w/2
-    a_x_min, a_x_max = a_center[0] - a_size[1]/2, a_center[0] + a_size[1]/2
-    b_x_min, b_x_max = b_center[0] - b_size[1]/2, b_center[0] + b_size[1]/2
+    print("\n  질문: 일반 LLM 이 RTX 4070 에서 약 100 token/s 라고 할 때,")
+    print(f"        RT-2 의 {tokens_per_second} token/s 는 가능한 수치인가?")
+    print("  -> 답은 quiz_solutions/medium_sol.py 참고")
 
-    # y축: center_y - h ~ center_y (KITTI: y가 아래로 양수)
-    a_y_min, a_y_max = a_center[1] - a_size[2], a_center[1]
-    b_y_min, b_y_max = b_center[1] - b_size[2], b_center[1]
 
-    # z축: center_z +/- l/2
-    a_z_min, a_z_max = a_center[2] - a_size[0]/2, a_center[2] + a_size[0]/2
-    b_z_min, b_z_max = b_center[2] - b_size[0]/2, b_center[2] + b_size[0]/2
+def problem3_emergent_capability_classification():
+    """
+    문제 3: Emergent capability 사례 분류
 
-    print(f"\n  Box A 범위: x=[{a_x_min}, {a_x_max}], y=[{a_y_min}, {a_y_max}], z=[{a_z_min}, {a_z_max}]")
-    print(f"  Box B 범위: x=[{b_x_min}, {b_x_max}], y=[{b_y_min}, {b_y_max}], z=[{b_z_min}, {b_z_max}]")
+    아래 5 가지 명령 중 "RT-1 (small transformer, robot data only) 으로는
+    수행 불가능 / RT-2 만 가능" 한 emergent capability 사례를 모두 고르시오.
 
-    # 겹침 계산
-    overlap_x = max(0, min(a_x_max, b_x_max) - max(a_x_min, b_x_min))
-    overlap_y = max(0, min(a_y_max, b_y_max) - max(a_y_min, b_y_min))
-    overlap_z = max(0, min(a_z_max, b_z_max) - max(a_z_min, b_z_min))
+    A) "pick up the green can"   (학습 데이터에 색상 명시 없음)
+    B) "pick up the can"          (정확히 학습된 명령)
+    C) "move toward the dirty cup" ('dirty' 라는 의미 추론 필요)
+    D) "pick up the leftmost object"  (공간 추론 필요, 학습엔 없음)
+    E) "pick up the apple"        (apple 이 robot data 에 있는 경우)
 
-    intersection = overlap_x * overlap_y * overlap_z
-    vol_a = a_size[0] * a_size[1] * a_size[2]
-    vol_b = b_size[0] * b_size[1] * b_size[2]
-    union = vol_a + vol_b - intersection
-    iou = intersection / union if union > 0 else 0
+    답: emergent capability 사례를 모두 골라 emergent_cases 리스트에 채우시오.
+    """
+    print("\n" + "=" * 60)
+    print("문제 3: Emergent capability 사례 분류")
+    print("=" * 60 + "\n")
 
-    print(f"\n  힌트:")
-    print(f"    x축 겹침: min({a_x_max}, {b_x_max}) - max({a_x_min}, {b_x_min}) = ?")
-    print(f"    y축 겹침: min({a_y_max}, {b_y_max}) - max({a_y_min}, {b_y_min}) = ?")
-    print(f"    z축 겹침: min({a_z_max}, {b_z_max}) - max({a_z_min}, {b_z_min}) = ?")
+    # TODO: emergent capability 인 사례를 모두 채우시오
+    emergent_cases = []  # 예: ["A", "C"]
 
-    # TODO: IoU를 직접 계산하여 채우시오
-    expected_iou = 0.0  # 여기를 채우시오
+    expected = sorted(["A", "C", "D"])
+    print(f"  당신의 답: {sorted(emergent_cases)}")
+    print(f"  기대 답  : {expected}")
 
-    print(f"\n  직접 계산한 IoU: {expected_iou}")
-    print(f"  실제 IoU: {iou:.4f}")
-
-    if abs(expected_iou - iou) < 0.01:
-        print("  정답!")
+    if sorted(emergent_cases) == expected:
+        print("\n  [O] 정답!")
     else:
-        print("  다시 계산해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
+        print("\n  [X] 다시 생각해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
 
-
-def problem3_rotation_effect():
-    """
-    문제 3: Yaw 회전이 Corner에 미치는 영향
-
-    중심 (0, 0, 10), 크기 l=4, w=2, h=1.5의 3D Box가 있을 때,
-    theta = pi/2 (90도 회전)를 적용하면 corner 0의 좌표가 어떻게 바뀌는가?
-
-    회전 행렬 (y축 회전):
-    R = [[cos(theta), 0, sin(theta)],
-         [0,          1, 0         ],
-         [-sin(theta), 0, cos(theta)]]
-
-    TODO: 회전 후 corner 0의 좌표를 계산하시오.
-    """
-    print("\n" + "━" * 36)
-    print("문제 3: Yaw 회전 효과 계산")
-    print("━" * 36 + "\n")
-
-    x, y, z = 0.0, 0.0, 10.0
-    l, w, h = 4.0, 2.0, 1.5
-    theta = np.pi / 2  # 90도
-
-    c = np.cos(theta)
-    s = np.sin(theta)
-    R = np.array([
-        [ c, 0, s],
-        [ 0, 1, 0],
-        [-s, 0, c]
-    ])
-
-    # corner 0 (회전 전, 중심 기준): (w/2, 0, l/2) = (1.0, 0, 2.0)
-    corner0_before = np.array([w/2, 0, l/2])
-
-    print(f"  회전 전 corner 0 (중심 기준): {corner0_before}")
-    print(f"  회전 각도: theta = pi/2 (90도)")
-    print(f"\n  회전 행렬 R:")
-    print(f"    [[ {c:>6.3f}, 0, {s:>6.3f}],")
-    print(f"     [ 0,       1, 0      ],")
-    print(f"     [{-s:>6.3f}, 0, {c:>6.3f}]]")
-
-    # 회전 적용
-    corner0_after_local = R @ corner0_before
-    corner0_after = corner0_after_local + np.array([x, y, z])
-
-    print(f"\n  R @ corner0 = ?")
-    print(f"  힌트: cos(pi/2) = 0, sin(pi/2) = 1")
-    print(f"  R @ [1, 0, 2] = [{c}*1 + {s}*2, 0, {-s}*1 + {c}*2]")
-
-    # TODO: 회전 후 corner 0 좌표를 채우시오 (전역 좌표)
-    expected_corner0 = np.array([0.0, 0.0, 0.0])  # 여기를 채우시오
-
-    print(f"\n  직접 계산한 corner 0 (전역): {expected_corner0}")
-    print(f"  실제 corner 0 (전역): [{corner0_after[0]:.3f}, {corner0_after[1]:.3f}, {corner0_after[2]:.3f}]")
-
-    if np.allclose(expected_corner0, corner0_after, atol=0.1):
-        print("  정답!")
-    else:
-        print("  다시 계산해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
+    print("\n  힌트: emergent capability 는 'web knowledge transfer' 가 필요한 사례.")
+    print("        학습 데이터에 정확히 같은 형태가 있으면 emergent 가 아니다.")
 
 
 if __name__ == "__main__":
-    print("━" * 40)
-    print("  Phase 6 Week 1 Quiz - Medium")
-    print("━" * 40)
-    problem1_compute_box_corners()
-    problem2_box_volume_iou()
-    problem3_rotation_effect()
-    print("\n" + "━" * 40)
+    print("=" * 60)
+    print("  Phase 4 Week 1 Quiz - Medium")
+    print("  RT-2 Architecture / Action Tokenization 의 수치 감각")
+    print("=" * 60)
+    problem1_quantization_step()
+    problem2_output_token_length()
+    problem3_emergent_capability_classification()
+    print("\n" + "=" * 60)
     print("정답은 quiz_solutions/medium_sol.py 참고")
-    print("━" * 40)
+    print("=" * 60)

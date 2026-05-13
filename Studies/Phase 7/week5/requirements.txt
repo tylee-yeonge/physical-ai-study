@@ -1,0 +1,2 @@
+# C++ ROS2 환경
+# (선택) RPi GPIO 또는 USB button

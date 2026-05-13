@@ -1,165 +1,168 @@
 """
-Phase 6 Week 3 - KITTI 데이터셋 중급 퀴즈
-코드를 직접 실행하고 결과를 확인하세요.
+Phase 4 Week 3 - RT-2 블로그 1편 작성 중급 퀴즈
+
+글쓰기 주차이므로 코드 대신 '핵심 단락 글쓰기' 3문제.
+직접 본인 단어로 작성한 뒤 quiz_solutions/medium_sol.py 의 예시와 비교.
 """
-import numpy as np
 
 
-def problem1_parse_label():
+def problem1_write_one_liner():
     """
-    문제 1: KITTI 레이블 파싱 및 해석
+    문제 1: RT-2 의 한 줄 요약 작성
 
-    아래 KITTI 레이블을 파싱하여 각 객체의 정보를 추출하시오.
-    Car 클래스만 필터링하고, 가장 가까운 차의 거리(z)를 구하시오.
+    아래 조건을 만족하는 한 줄 요약을 작성하시오.
 
-    TODO: closest_z 값을 채우시오.
+    조건:
+      1) 50 자 이하 (공백 포함)
+      2) "VLM" 또는 "Vision-Language Model" 포함
+      3) "robot" 또는 "로봇" 포함
+      4) "co-fine-tune" / "transfer" 등 핵심 기법 1개 이상
+
+    TODO: my_one_liner 에 본인의 한 줄을 작성하시오.
     """
-    print("\n" + "━" * 36)
-    print("문제 1: KITTI 레이블 파싱")
-    print("━" * 36 + "\n")
+    print("\n" + "=" * 60)
+    print("문제 1: RT-2 한 줄 요약")
+    print("=" * 60 + "\n")
 
-    label_text = """Car 0.00 0 -1.56 587.01 173.33 614.12 200.12 1.65 1.67 3.64 -0.65 1.71 46.70 -1.59
-Pedestrian 0.00 0 -0.20 712.40 143.00 810.73 307.92 1.89 0.48 0.88 1.84 1.47 8.41 0.01
-Car 0.00 0 1.85 387.63 181.54 423.81 203.12 1.52 1.64 3.88 -2.01 1.74 22.17 1.58
-Cyclist 0.00 0 -1.65 548.00 171.33 572.40 194.42 1.75 0.50 1.95 -2.60 1.55 18.61 -1.63
-Car 0.20 1 0.50 100.00 180.00 250.00 230.00 1.48 1.70 4.20 5.30 1.68 35.50 0.30"""
+    # TODO
+    my_one_liner = ""  # 여기에 본인의 한 줄
 
-    print("  레이블:")
-    for line in label_text.strip().split('\n'):
-        parts = line.split()
-        print(f"    {parts[0]:12s} z={float(parts[13]):>6.1f}m")
+    print(f"  당신의 한 줄: '{my_one_liner}'")
+    print(f"  글자 수     : {len(my_one_liner)}")
 
-    # Car만 필터링
-    cars = []
-    for line in label_text.strip().split('\n'):
-        parts = line.split()
-        if parts[0] == 'Car':
-            z = float(parts[13])
-            cars.append(z)
-            print(f"\n  Car 발견: z = {z}m")
+    # 자체 평가
+    checks = {
+        "<=50자": len(my_one_liner) <= 50 and len(my_one_liner) > 0,
+        "VLM 또는 Vision-Language Model 포함": (
+            "VLM" in my_one_liner or "Vision-Language" in my_one_liner
+        ),
+        "robot 또는 로봇 포함": (
+            "robot" in my_one_liner.lower() or "로봇" in my_one_liner
+        ),
+        "핵심 기법 포함": any(
+            kw in my_one_liner.lower()
+            for kw in ["co-fine", "transfer", "토큰", "action token", "fine-tune"]
+        ),
+    }
 
-    actual_closest = min(cars)
-    print(f"\n  Car 거리 목록: {cars}")
-    print(f"  힌트: 가장 작은 z 값을 찾으세요.")
+    print("\n  자가 점검:")
+    for k, v in checks.items():
+        mark = "[O]" if v else "[X]"
+        print(f"    {mark} {k}")
 
-    # TODO: 가장 가까운 Car의 z 값을 채우시오
-    closest_z = 0.0  # 여기를 채우시오
-
-    print(f"\n  직접 찾은 가장 가까운 Car의 z: {closest_z}m")
-    print(f"  실제 가장 가까운 Car의 z: {actual_closest}m")
-
-    if abs(closest_z - actual_closest) < 0.01:
-        print("  정답!")
+    if all(checks.values()):
+        print("\n  [O] 모든 조건 만족!")
     else:
-        print("  다시 확인해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
+        print("\n  [X] 다시 작성해보세요. 예시는 quiz_solutions/medium_sol.py 참고")
 
 
-def problem2_3d_bbox_projection():
+def problem2_write_limitation_paragraph():
     """
-    문제 2: 3D BBox의 2D 투영 크기
+    문제 2: 한계 단락 1개 작성
 
-    같은 크기의 Car (h=1.5, w=1.8, l=4.5)가 z=10m와 z=30m에 있을 때,
-    이미지에 투영된 2D bbox의 대략적인 폭(pixel)을 비교하시오.
+    "RT-2 의 inference latency 가 양산 SW 엔지니어에게 어떤 의미인가" 를
+    200~300 자의 단락 1개로 작성하시오.
 
-    간단한 근사: 투영 폭 ~ fx * w / z
-    fx = 720
+    조건:
+      1) "200ms" 또는 비슷한 수치 포함
+      2) "30Hz" / "실시간" / "안전 인터록" 중 1개 이상 언급
+      3) 단순 "느리다" 가 아닌 '왜 양산에 문제인가' 의 인과 관계
 
-    TODO: width_10m과 width_30m을 계산하시오.
+    TODO: my_paragraph 에 본인의 단락을 작성.
     """
-    print("\n" + "━" * 36)
-    print("문제 2: 거리에 따른 투영 크기 비교")
-    print("━" * 36 + "\n")
+    print("\n" + "=" * 60)
+    print("문제 2: RT-2 inference latency 한계 단락")
+    print("=" * 60 + "\n")
 
-    fx = 720.0
-    w = 1.8  # 차 폭 (미터)
+    # TODO
+    my_paragraph = """
+    여기에 본인의 200~300자 단락을 작성하시오.
+    """.strip()
 
-    z_near = 10.0
-    z_far = 30.0
+    print(f"  당신의 단락 ({len(my_paragraph)}자):")
+    print(f"  ---")
+    print(f"  {my_paragraph}")
+    print(f"  ---")
 
-    actual_width_near = fx * w / z_near
-    actual_width_far = fx * w / z_far
+    checks = {
+        "200~400자 (대략)": 200 <= len(my_paragraph) <= 400,
+        "200ms 또는 수치 포함": any(
+            kw in my_paragraph
+            for kw in ["200ms", "200 ms", "200밀리", "0.2초", "5Hz"]
+        ),
+        "30Hz/실시간/안전 중 1개": any(
+            kw in my_paragraph for kw in ["30Hz", "30 Hz", "실시간", "안전", "인터록"]
+        ),
+    }
 
-    print(f"  Car 폭: w = {w}m")
-    print(f"  초점 거리: fx = {fx}")
-    print()
-    print(f"  근사 공식: 투영 폭 (pixels) ~ fx * w / z")
-    print()
-    print(f"  z = {z_near}m: 투영 폭 = {fx} * {w} / {z_near} = ?")
-    print(f"  z = {z_far}m: 투영 폭 = {fx} * {w} / {z_far} = ?")
+    print("\n  자가 점검:")
+    for k, v in checks.items():
+        mark = "[O]" if v else "[X]"
+        print(f"    {mark} {k}")
 
-    # TODO: 각 거리에서의 투영 폭을 계산하시오
-    width_10m = 0.0  # 여기를 채우시오
-    width_30m = 0.0  # 여기를 채우시오
-
-    print(f"\n  직접 계산:")
-    print(f"    z=10m 투영 폭: {width_10m:.1f} pixels")
-    print(f"    z=30m 투영 폭: {width_30m:.1f} pixels")
-    print(f"\n  실제 계산:")
-    print(f"    z=10m 투영 폭: {actual_width_near:.1f} pixels")
-    print(f"    z=30m 투영 폭: {actual_width_far:.1f} pixels")
-    print(f"    비율: {actual_width_near:.1f} / {actual_width_far:.1f} = {actual_width_near/actual_width_far:.1f}배")
-
-    if abs(width_10m - actual_width_near) < 1 and abs(width_30m - actual_width_far) < 1:
-        print("  정답!")
+    if all(checks.values()):
+        print("\n  [O] 모든 조건 만족! 예시 단락도 quiz_solutions/medium_sol.py 참고")
     else:
-        print("  다시 계산해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
+        print("\n  [X] 다시 작성해보세요. 예시는 quiz_solutions/medium_sol.py 참고")
 
 
-def problem3_alpha_vs_ry():
+def problem3_write_differentiation_sentence():
     """
-    문제 3: alpha와 ry의 관계
+    문제 3: 양산 SW 엔지니어의 차별화 한 문장
 
-    alpha = ry - arctan2(x, z)
+    RT-2 블로그 Section 7 에 들어갈 '본인의 차별화 메시지' 를 한 문장으로 작성.
+    이 문장은 면접관에게 "이 블로그를 쓴 사람이 왜 다른가" 를 보여주는 핵심.
 
-    객체 위치: x=5.0, z=20.0, ry=0.0 (전방을 향함)
-    이 객체의 alpha 값을 계산하시오.
+    조건:
+      1) 80~150 자
+      2) "양산" / "9년" / "AMR ROS" / "펌웨어" / "자동차 R&D 보조" 중 1개 이상
+      3) RT-2 또는 VLA 의 한계 / 비용을 본인 강점으로 연결
 
-    TODO: expected_alpha를 계산하시오.
+    TODO: my_sentence 에 본인의 한 문장을 작성.
     """
-    print("\n" + "━" * 36)
-    print("문제 3: alpha vs ry 계산")
-    print("━" * 36 + "\n")
+    print("\n" + "=" * 60)
+    print("문제 3: 양산 SW 엔지니어의 차별화 한 문장")
+    print("=" * 60 + "\n")
 
-    x = 5.0
-    z = 20.0
-    ry = 0.0
+    # TODO
+    my_sentence = ""  # 여기에 본인의 한 문장
 
-    actual_alpha = ry - np.arctan2(x, z)
+    print(f"  당신의 문장 ({len(my_sentence)}자):")
+    print(f"  ---")
+    print(f"  {my_sentence}")
+    print(f"  ---")
 
-    print(f"  객체 위치: x={x}, z={z}")
-    print(f"  ry = {ry} (전방을 향함)")
-    print()
-    print(f"  공식: alpha = ry - arctan2(x, z)")
-    print(f"       alpha = {ry} - arctan2({x}, {z})")
-    print(f"       alpha = {ry} - arctan({x}/{z})")
-    print(f"       alpha = {ry} - arctan({x/z})")
-    print()
-    print(f"  힌트: arctan(0.25) = {np.arctan(0.25):.4f} 라디안")
-    print(f"        = {np.degrees(np.arctan(0.25)):.2f}도")
+    checks = {
+        "80~150자": 80 <= len(my_sentence) <= 150,
+        "본인 경력 키워드 1개": any(
+            kw in my_sentence
+            for kw in ["양산", "9년", "AMR", "ROS", "펌웨어", "자동차"]
+        ),
+        "RT-2/VLA 한계 연결": any(
+            kw in my_sentence
+            for kw in ["latency", "200ms", "quantization", "안전", "비용", "한계"]
+        ),
+    }
 
-    # TODO: alpha 값을 계산하시오
-    expected_alpha = 0.0  # 여기를 채우시오
+    print("\n  자가 점검:")
+    for k, v in checks.items():
+        mark = "[O]" if v else "[X]"
+        print(f"    {mark} {k}")
 
-    print(f"\n  직접 계산한 alpha: {expected_alpha:.4f}")
-    print(f"  실제 alpha: {actual_alpha:.4f}")
-
-    if abs(expected_alpha - actual_alpha) < 0.01:
-        print("  정답!")
+    if all(checks.values()):
+        print("\n  [O] 모든 조건 만족!")
     else:
-        print("  다시 계산해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
-        print(f"\n  의미:")
-        print(f"    ry=0이므로 차는 전방(+Z)을 향합니다.")
-        print(f"    하지만 카메라에서 보면 오른쪽에 있으므로 (x=5)")
-        print(f"    관측 각도(alpha)는 음수입니다 (왼쪽으로 돌아간 것처럼 보임)")
+        print("\n  [X] 다시 작성. 예시는 quiz_solutions/medium_sol.py 참고")
 
 
 if __name__ == "__main__":
-    print("━" * 40)
-    print("  Phase 6 Week 3 Quiz - Medium")
-    print("━" * 40)
-    problem1_parse_label()
-    problem2_3d_bbox_projection()
-    problem3_alpha_vs_ry()
-    print("\n" + "━" * 40)
-    print("정답은 quiz_solutions/medium_sol.py 참고")
-    print("━" * 40)
+    print("=" * 60)
+    print("  Phase 4 Week 3 Quiz - Medium")
+    print("  RT-2 블로그 작성: 글쓰기 3문제")
+    print("=" * 60)
+    problem1_write_one_liner()
+    problem2_write_limitation_paragraph()
+    problem3_write_differentiation_sentence()
+    print("\n" + "=" * 60)
+    print("정답 예시는 quiz_solutions/medium_sol.py 참고")
+    print("=" * 60)

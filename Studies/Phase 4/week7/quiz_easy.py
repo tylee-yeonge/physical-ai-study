@@ -1,87 +1,61 @@
 """
-Quiz Easy - Week 7: nuScenes 데이터셋 (Section 6.3)
-4문제 - 기본 개념 확인
+Phase 4 Week 7 - OpenVLA 블로그 1편 작성 기초 퀴즈
 """
 
 
-def problem1_nuscenes_features():
-    print("\n" + "━" * 28)
-    print("문제 1: nuScenes 핵심 특징")
-    print("━" * 28 + "\n")
-
-    print("Q: nuScenes 데이터셋의 핵심 특징을 빈칸에 채우세요.\n")
-    print("   카메라 수:    _____대")
-    print("   장면 수:      _____개")
-    print("   클래스 수:    _____개")
-    print("   커버리지:     _____도")
-    print("   Key Frame:   _____Hz\n")
-
-
-def problem2_kitti_vs_nuscenes():
-    print("\n" + "━" * 28)
-    print("문제 2: KITTI vs nuScenes 비교")
-    print("━" * 28 + "\n")
-
-    print("Q: KITTI와 nuScenes의 차이점을 설명하세요.")
-    print("   다음 중 올바른 설명을 모두 고르세요.\n")
-    print("   a) KITTI는 전방 1대 카메라, nuScenes는 6대 카메라를 사용한다")
-    print("   b) KITTI는 23개 클래스, nuScenes는 3개 클래스이다")
-    print("   c) nuScenes는 객체 속도(velocity) 정보도 포함한다")
-    print("   d) KITTI의 평가 지표는 AP3D, nuScenes는 NDS이다")
-    print("   e) nuScenes Mini 데이터셋은 약 300GB이다")
-    print()
-    print("   답: _____\n")
+def problem1_differentiation():
+    print("\n" + "=" * 50)
+    print("문제 1: RT-2 vs OpenVLA 블로그 차별점")
+    print("=" * 50 + "\n")
+    print("질문: OpenVLA 블로그가 RT-2 블로그 (week 3) 와 가장 다른 점?\n")
+    print("보기:")
+    print("  A) 분량이 더 길다")
+    print("  B) 본인이 직접 RTX 4070 에서 inference 한 실측 데이터 포함")
+    print("  C) 영어로 쓰인다")
+    print("  D) 다이어그램이 더 많다")
 
 
-def problem3_data_structure():
-    print("\n" + "━" * 28)
-    print("문제 3: 데이터 구조 이해")
-    print("━" * 28 + "\n")
-
-    print("Q: nuScenes의 관계형 데이터 구조에서")
-    print("   다음 관계를 올바르게 연결하세요.\n")
-    print("   ┌───────────────────┐     ┌──────────────────────┐")
-    print("   │ scene             │ ──→ │ _____ (첫 Key Frame) │")
-    print("   │ sample            │ ──→ │ _____ (센서 데이터)   │")
-    print("   │ sample            │ ──→ │ _____ (3D bbox)      │")
-    print("   │ sample_annotation │ ──→ │ _____ (같은 객체 추적)│")
-    print("   └───────────────────┘     └──────────────────────┘\n")
-    print("   보기: instance, sample_data, sample, sample_annotation")
-    print()
-    print("   답: _____\n")
+def problem2_data_for_blog():
+    print("\n" + "=" * 50)
+    print("문제 2: week 6 의 latency 데이터 활용")
+    print("=" * 50 + "\n")
+    print("질문: week 6 에서 저장한 `openvla_latency_4070_int4.npy` 데이터는")
+    print("      OpenVLA 블로그의 어디에 인용되는가?\n")
+    print("보기:")
+    print("  A) Section 1 한 줄 요약")
+    print("  B) Section 5 실측 결과 표")
+    print("  C) Section 8 Reference")
+    print("  D) Section 2 배경")
 
 
-def problem4_nds_metric():
-    print("\n" + "━" * 28)
-    print("문제 4: NDS 평가 지표")
-    print("━" * 28 + "\n")
-
-    print("Q: nuScenes Detection Score (NDS)는 어떤 메트릭들의 조합인가요?")
-    print("   NDS를 구성하는 6가지 요소를 나열하세요.\n")
-    print("   1. _____ (검출 정확도)")
-    print("   2. _____ (위치 오차)")
-    print("   3. _____ (크기 오차)")
-    print("   4. _____ (방향 오차)")
-    print("   5. _____ (속도 오차)")
-    print("   6. _____ (속성 오차)")
-    print()
-    print("   NDS가 AP3D보다 종합적인 이유: _____\n")
+def problem3_throughput_at_4070():
+    print("\n" + "=" * 50)
+    print("문제 3: 5~6Hz 로 가능한 작업")
+    print("=" * 50 + "\n")
+    print("질문: OpenVLA 의 5~6Hz throughput 으로 무리없이 가능한 작업은?\n")
+    print("보기:")
+    print("  A) 60Hz 폐쇄 루프 동적 제어 (catching, juggling)")
+    print("  B) cm 단위 pick-and-place (10cm/s 이동)")
+    print("  C) mm 단위 자동차 부품 조립")
+    print("  D) 실시간 force control")
 
 
-def main():
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    print("Week 7 Quiz - Easy (nuScenes 데이터셋)")
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-
-    problem1_nuscenes_features()
-    problem2_kitti_vs_nuscenes()
-    problem3_data_structure()
-    problem4_nds_metric()
-
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    print("정답은 quiz_solutions/easy_sol.py 참고")
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+def problem4_blog_target_audience():
+    print("\n" + "=" * 50)
+    print("문제 4: 블로그의 1순위 독자")
+    print("=" * 50 + "\n")
+    print("질문: 본 로드맵에서 블로그의 1순위 독자는?\n")
+    print("보기:")
+    print("  A) 같은 분야 박사 / 연구자")
+    print("  B) 1순위 타깃 회사의 채용 담당자 + 면접관")
+    print("  C) 일반 대중 (테크 블로그 독자)")
+    print("  D) 본인 (학습 기록용)")
 
 
 if __name__ == "__main__":
-    main()
+    print("=" * 50)
+    problem1_differentiation()
+    problem2_data_for_blog()
+    problem3_throughput_at_4070()
+    problem4_blog_target_audience()
+    print("=" * 50)

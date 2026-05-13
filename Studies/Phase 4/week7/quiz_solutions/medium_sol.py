@@ -1,72 +1,78 @@
 """
-Solutions - Medium Quiz (Week 7: nuScenes 데이터셋)
+Phase 4 Week 7 - 중급 퀴즈 정답 예시
 """
 
 
-def main():
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    print("Week 7 Quiz - Medium 정답")
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+def problem1_solution():
+    print("\n" + "=" * 60)
+    print("문제 1 정답 예시: Section 5 표")
+    print("=" * 60 + "\n")
 
-    print("Q1. 좌표계 변환 (Global -> Ego):")
-    print("    Step 1: ego_pose에서 Ego Vehicle의 위치(translation)와")
-    print("            회전(rotation)을 가져온다.")
-    print("            ego_translation = ego_pose['translation']")
-    print("            ego_rotation = Quaternion(ego_pose['rotation'])")
-    print()
-    print("    Step 2: Global 좌표에서 Ego 위치를 빼서 상대 위치를 구한다.")
-    print("            relative_pos = global_pos - ego_translation")
-    print()
-    print("    Step 3: Ego 회전의 역변환을 적용하여 Ego 좌표계로 변환한다.")
-    print("            ego_pos = ego_rotation.inverse.rotate(relative_pos)")
-    print()
-    print("    Ego -> 카메라 좌표계 추가 변환:")
-    print("    calibrated_sensor 테이블에서 해당 카메라의:")
-    print("    - translation: Ego에서 카메라까지의 위치 오프셋")
-    print("    - rotation: Ego에서 카메라까지의 회전")
-    print("    - camera_intrinsic: 카메라 내부 파라미터 (K 행렬)")
-    print("    이 세 가지 정보가 추가로 필요합니다.\n")
+    example = """
+| Metric | Value |
+|---|---|
+| mean latency | 165 ms |
+| p95 latency  | 220 ms |
+| p99 latency  | 250 ms |
+| Throughput (mean) | 6.0 Hz |
+| Throughput (p95)  | 4.5 Hz |
+| Model GPU memory  | 5.3 GB |
+| Peak GPU memory   | 6.5 GB |
+""".strip()
 
-    print("Q2. Multi-camera 도전 과제:")
-    print("    도전 과제 1: 카메라 겹침(overlap) 영역에서 중복 검출")
-    print("      - 인접 카메라의 FOV가 겹치는 영역에서 같은 객체를")
-    print("        두 번 검출할 수 있음")
-    print("      해결 방법: BEV 공간에서 NMS 적용, 또는 Multi-view")
-    print("      모델에서 통합적으로 처리 (BEVFormer 등)")
+    print(example)
     print()
-    print("    도전 과제 2: 후방 카메라(CAM_BACK)의 넓은 화각과 왜곡")
-    print("      - 후방 카메라는 110도 화각으로 왜곡이 더 심하고,")
-    print("        객체가 더 작게 보여 검출이 어려움")
-    print("      해결 방법: 카메라별 별도 Feature 추출, 왜곡 보정,")
-    print("      또는 카메라별 적응적 학습")
-    print()
-    print("    도전 과제 3: 시점 간 3D 일관성 유지")
-    print("      - 여러 카메라의 예측 결과가 3D 공간에서 일관되어야 함")
-    print("      - 각 카메라별 독립 예측은 일관성이 떨어질 수 있음")
-    print("      해결 방법: BEV 표현으로 통합 (Lift-Splat-Shoot,")
-    print("      BEVFormer), 또는 3D Query 기반 방법 (DETR3D)\n")
+    print("  [tip] 표의 핵심은 mean / p95 / p99 의 분리 표시.")
+    print("       p99 가 너무 크면 worst-case 가 양산에 문제.")
+    print("       p95 throughput 까지 보고 robot 제어 frequency 결정해야 함.")
 
-    print("Q3. Quaternion 회전 표현:")
-    print("    1) Quaternion의 장점:")
-    print("       - Gimbal Lock 없음: Euler 각도에서는 두 축이 겹칠 때")
-    print("         자유도를 잃는 Gimbal Lock이 발생하지만,")
-    print("         Quaternion은 이 문제가 없음")
-    print("       - 부드러운 보간: SLERP(Spherical Linear Interpolation)으로")
-    print("         두 회전 사이를 자연스럽게 보간 가능")
-    print("       - 연산 효율: 회전 합성이 곱셈 한 번으로 가능 (4차원)")
-    print("       - 수치 안정성: 정규화만 하면 유효한 회전을 보장")
-    print()
-    print("    2) q = [1, 0, 0, 0]: 회전 없음 (단위 Quaternion)")
-    print("       항등 회전(identity rotation)을 나타냄")
-    print()
-    print("    3) 90도 yaw 회전 (z축 기준):")
-    print("       theta = 90도 = pi/2 라디안")
-    print("       q = [cos(pi/4), 0, 0, sin(pi/4)]")
-    print("       q = [0.707, 0, 0, 0.707]")
-    print("       (nuScenes의 z축이 위쪽이므로 z 성분에 sin 값)")
 
-    print("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+def problem2_solution():
+    print("\n" + "=" * 60)
+    print("문제 2 정답 예시: 양산 SW 엔지니어 차별화 단락")
+    print("=" * 60 + "\n")
+
+    example = """
+RTX 4070 에서 OpenVLA 의 mean latency 가 165 ms (6 Hz) 라는 사실은,
+9년의 AMR ROS 양산 SW 경험에서 봤을 때 자동차 부품 조립 같은 정밀
+작업에 직접 사용할 수 없는 수치다. 자동차 양산 라인은 60 Hz 폐쇄 루프
+제어를 기본으로 하며, action 명령과 모터 응답 사이의 16 ms 마진
+안에서 안전 인터록이 동작해야 한다. OpenVLA 의 165 ms 는 그 마진의
+10 배 이상. 따라서 OpenVLA 같은 'slow brain' 은 반드시 자체 안전
+루프 (fast safety policy, joint-level PD + 토크 한계) 와 결합된
+hierarchical 구조 안에서만 양산 통합이 가능하다.
+""".strip()
+
+    print(f"({len(example)}자)")
+    print(example)
+    print()
+    print("  [tip] 좋은 단락의 구조:")
+    print("    1) 사실 (165ms, 6Hz)")
+    print("    2) 본인 경력의 관점 (9년 AMR ROS)")
+    print("    3) 양산 비교 기준 (60Hz, 16ms 마진)")
+    print("    4) 결론 (hierarchical 구조 필수)")
+
+
+def problem3_solution():
+    print("\n" + "=" * 60)
+    print("문제 3 정답 예시: RT-2 vs OpenVLA 블로그 한 줄 차별점")
+    print("=" * 60 + "\n")
+
+    examples = [
+        "RT-2 블로그가 학술적 흐름의 이해라면, OpenVLA 블로그는 본인 RTX 4070 에서 직접 측정한 165 ms latency 의 양산 의미 해석이다.",
+        "두 블로그를 함께 보면, RT-2 정독으로 학술적 흐름을 알고 OpenVLA 실측으로 양산 비용을 직접 검증한 엔지니어임이 드러난다.",
+    ]
+
+    for i, ex in enumerate(examples, 1):
+        print(f"  ({len(ex)}자) {i}) {ex}")
+
+    print()
+    print("  [tip] 한 줄 차별점은 LinkedIn / 이력서 / 면접 자기소개의 hook 으로 재활용 가능.")
 
 
 if __name__ == "__main__":
-    main()
+    print("=" * 60)
+    problem1_solution()
+    problem2_solution()
+    problem3_solution()
+    print("=" * 60)

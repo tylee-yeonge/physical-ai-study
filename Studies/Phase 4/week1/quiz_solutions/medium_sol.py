@@ -1,153 +1,112 @@
 """
-Phase 6 Week 1 - 3D Detection 개념 중급 퀴즈 정답 및 해설
+Phase 4 Week 1 - RT-2 Architecture / Action Tokenization 중급 퀴즈 정답
 """
 import numpy as np
 
 
 def problem1_solution():
-    print("\n" + "━" * 36)
-    print("문제 1 정답: 3D BBox Corners 계산")
-    print("━" * 36 + "\n")
+    print("\n" + "=" * 60)
+    print("문제 1 정답: Quantization step 계산")
+    print("=" * 60 + "\n")
 
-    x, y, z = 0.0, 0.0, 10.0
-    l, w, h = 4.0, 2.0, 1.5
+    N_BIN = 256
 
-    print("  중심: (0, 0, 10), 크기: l=4, w=2, h=1.5, theta=0")
+    step_dx = (0.10 - (-0.10)) / N_BIN
+    step_rx = (np.pi - (-np.pi)) / N_BIN
+    step_grip = (1.0 - 0.0) / N_BIN
+
+    print("  공식: step = (max - min) / N_BIN")
+    print(f"  N_BIN = {N_BIN}")
     print()
-    print("  Corner 0은 (w/2, 0, l/2) + center:")
-    print(f"    x: 0 + {w}/2 = {x + w/2}")
-    print(f"    y: 0 + 0 = {y + 0}")
-    print(f"    z: 10 + {l}/2 = {z + l/2}")
-    print()
-    print(f"  정답: corner 0 = ({x + w/2}, {y}, {z + l/2})")
-    print(f"       즉, (1.0, 0.0, 12.0)")
-    print()
+    print(f"  dx  : ( 0.10 - (-0.10) ) / 256 = {step_dx:.6f} m = {step_dx*1000:.4f} mm")
+    print(f"  rx  : ( pi   - (-pi)   ) / 256 = {step_rx:.6f} rad = {np.degrees(step_rx):.4f} deg")
+    print(f"  grip: ( 1.0  -  0.0    ) / 256 = {step_grip:.6f}")
 
-    # 전체 8개 꼭짓점 검증
-    x_corners = [ w/2,  w/2, -w/2, -w/2,  w/2,  w/2, -w/2, -w/2]
-    y_corners = [  0,     0,    0,    0,   -h,   -h,   -h,   -h ]
-    z_corners = [ l/2, -l/2, -l/2,  l/2,  l/2, -l/2, -l/2,  l/2]
-
-    print("  전체 8개 꼭짓점 (전역 좌표):")
-    for i in range(8):
-        cx = x_corners[i] + x
-        cy = y_corners[i] + y
-        cz = z_corners[i] + z
-        print(f"    Corner {i}: ({cx:>5.1f}, {cy:>5.1f}, {cz:>5.1f})")
-
+    print("\n  [tip] 양자화 오차의 직관:")
+    print("    - dx step ~ 0.78 mm: 컵 잡기 (cm 단위) 에는 충분, 정밀 조립 (sub-mm) 은 한계")
+    print("    - rx step ~ 1.4 deg: 대부분 OK, mechanical assembly 같은 정밀 회전은 한계")
+    print("    - grip step ~ 0.004: 잡기/놓기에는 충분, 미세 force control 은 불가")
     print()
-    print("  핵심:")
-    print("    - 바닥면 (0-3): y = 0 (중심의 y와 같음)")
-    print("    - 윗면 (4-7): y = -h (높이만큼 위로)")
-    print("    - KITTI에서 y축은 아래가 양수이므로 윗면이 -h")
+    print("  이 수치들이 RT-2 의 'fine motion 한계' 의 정량적 근거.")
+    print("  Phase 7 의 산출물 #4 에서 'VLA latency / quantization 의 양산 비용'")
+    print("  으로 면접 포인트가 된다.")
 
 
 def problem2_solution():
-    print("\n" + "━" * 36)
-    print("문제 2 정답: 3D Box 부피와 IoU")
-    print("━" * 36 + "\n")
+    print("\n" + "=" * 60)
+    print("문제 2 정답: 한 frame 의 output token 길이")
+    print("=" * 60 + "\n")
 
-    # Box A
-    a_center = np.array([0.0, 0.0, 10.0])
-    a_size = np.array([4.0, 2.0, 1.5])  # l, w, h
+    action_tokens = 7
+    special_tokens = 2
+    fps = 5
 
-    # Box B
-    b_center = np.array([1.0, 0.0, 11.0])
-    b_size = np.array([4.0, 2.0, 1.5])
+    tokens_per_frame = action_tokens + special_tokens  # = 9
+    tokens_per_second = tokens_per_frame * fps  # = 45
 
-    # x축 겹침 (width 방향)
-    a_x_min, a_x_max = 0.0 - 1.0, 0.0 + 1.0  # [-1, 1]
-    b_x_min, b_x_max = 1.0 - 1.0, 1.0 + 1.0  # [0, 2]
-    overlap_x = min(1.0, 2.0) - max(-1.0, 0.0)  # 1.0 - 0.0 = 1.0
-
-    # y축 겹침 (height 방향)
-    a_y_min, a_y_max = 0.0 - 1.5, 0.0  # [-1.5, 0]
-    b_y_min, b_y_max = 0.0 - 1.5, 0.0  # [-1.5, 0]
-    overlap_y = min(0.0, 0.0) - max(-1.5, -1.5)  # 0.0 - (-1.5) = 1.5
-
-    # z축 겹침 (length 방향)
-    a_z_min, a_z_max = 10.0 - 2.0, 10.0 + 2.0  # [8, 12]
-    b_z_min, b_z_max = 11.0 - 2.0, 11.0 + 2.0  # [9, 13]
-    overlap_z = min(12.0, 13.0) - max(8.0, 9.0)  # 12.0 - 9.0 = 3.0
-
-    intersection = overlap_x * overlap_y * overlap_z
-    vol_a = 4.0 * 2.0 * 1.5  # 12.0
-    vol_b = 4.0 * 2.0 * 1.5  # 12.0
-    union = vol_a + vol_b - intersection
-    iou = intersection / union
-
-    print("  단계별 계산:")
+    print(f"  tokens_per_frame = {action_tokens} + {special_tokens} = {tokens_per_frame}")
+    print(f"  tokens_per_second = {tokens_per_frame} * {fps} = {tokens_per_second}")
     print()
-    print(f"  1. x축 (width) 겹침:")
-    print(f"     A: [{a_x_min}, {a_x_max}], B: [{b_x_min}, {b_x_max}]")
-    print(f"     overlap_x = min(1, 2) - max(-1, 0) = 1.0 - 0.0 = {overlap_x}")
+    print("  비교:")
+    print("    - RTX 4070 에서 일반 LLM (Llama 7B fp16) 의 token/s : ~ 100 token/s")
+    print("    - PaLI-X 5B 의 token/s 도 비슷 (~50~100, 양자화 시 더 빠름)")
+    print(f"    - RT-2 가 필요로 하는 속도 : {tokens_per_second} token/s")
     print()
-    print(f"  2. y축 (height) 겹침:")
-    print(f"     A: [{a_y_min}, {a_y_max}], B: [{b_y_min}, {b_y_max}]")
-    print(f"     overlap_y = min(0, 0) - max(-1.5, -1.5) = 0 - (-1.5) = {overlap_y}")
+    print("  결론: 5Hz 는 RTX 4070 으로 *간신히* 가능한 수치이다.")
+    print("       단, prompt processing time (input 196+N image tokens) 이 추가되어")
+    print("       실제 latency 는 200~300ms 가 일반적.")
     print()
-    print(f"  3. z축 (length) 겹침:")
-    print(f"     A: [{a_z_min}, {a_z_max}], B: [{b_z_min}, {b_z_max}]")
-    print(f"     overlap_z = min(12, 13) - max(8, 9) = 12 - 9 = {overlap_z}")
+    print("  [tip] 30Hz 실시간 제어를 원한다면:")
+    print("       - quantization (4-bit 등) → 2x 속도")
+    print("       - speculative decoding → 1.5~2x 속도")
+    print("       - smaller backbone → 모델 변경")
+    print("       - parallel decoding of action tokens → action 7 개를 한 번에")
     print()
-    print(f"  4. Intersection = {overlap_x} * {overlap_y} * {overlap_z} = {intersection}")
-    print(f"  5. Vol_A = {vol_a}, Vol_B = {vol_b}")
-    print(f"  6. Union = {vol_a} + {vol_b} - {intersection} = {union}")
-    print(f"  7. IoU = {intersection} / {union} = {iou:.4f}")
-    print()
-    print(f"  정답: IoU = {iou:.4f}")
-    print()
-    print(f"  KITTI 기준 (Car IoU >= 0.7): {'TP' if iou >= 0.7 else 'FP'}")
-    print(f"  -> 1m의 x, z 오차만으로도 IoU가 0.7 미만이 됩니다!")
+    print("  본 로드맵의 Phase 7 산출물 #4 에서 'latency 측정' 의 핵심 근거.")
 
 
 def problem3_solution():
-    print("\n" + "━" * 36)
-    print("문제 3 정답: Yaw 회전 효과")
-    print("━" * 36 + "\n")
+    print("\n" + "=" * 60)
+    print("문제 3 정답: Emergent capability 사례 분류")
+    print("=" * 60 + "\n")
 
-    theta = np.pi / 2
-    c = np.cos(theta)  # ~0
-    s = np.sin(theta)  # ~1
-
-    print(f"  회전 각도: theta = pi/2")
-    print(f"  cos(pi/2) = {c:.6f} (약 0)")
-    print(f"  sin(pi/2) = {s:.6f} (약 1)")
+    print("  정답: A, C, D")
     print()
-    print("  회전 전 corner 0 (중심 기준): (1.0, 0, 2.0)")
+    print("  분석:")
+    print("    A) 'pick up the green can'")
+    print("       -> 학습 데이터에 색상 명시 없음")
+    print("       -> VLM 의 'green' 인식 능력이 transfer 됨")
+    print("       => Emergent")
     print()
-    print("  R @ [1, 0, 2]:")
-    print(f"    x' = cos(pi/2)*1 + sin(pi/2)*2 = 0*1 + 1*2 = 2.0")
-    print(f"    y' = 0 (y축 회전이므로 y 불변)")
-    print(f"    z' = -sin(pi/2)*1 + cos(pi/2)*2 = -1*1 + 0*2 = -1.0")
+    print("    B) 'pick up the can'")
+    print("       -> 정확히 학습된 명령")
+    print("       -> 학습 분포 내")
+    print("       => Not emergent (정상 동작)")
     print()
-    print("  회전 후 (중심 기준): (2.0, 0, -1.0)")
-    print("  전역 좌표: (2.0 + 0, 0 + 0, -1.0 + 10) = (2.0, 0, 9.0)")
+    print("    C) 'move toward the dirty cup'")
+    print("       -> 'dirty' 라는 형용사 의미 추론 필요")
+    print("       -> VLM 의 VQA 능력이 transfer 됨")
+    print("       => Emergent")
     print()
-    print("  정답: corner 0 (전역) = (2.0, 0.0, 9.0)")
+    print("    D) 'pick up the leftmost object'")
+    print("       -> 공간적 추론 (relative position)")
+    print("       -> 학습 데이터엔 명시적 spatial reasoning 없음")
+    print("       => Emergent")
     print()
-
-    # 검증
-    R = np.array([
-        [ c, 0, s],
-        [ 0, 1, 0],
-        [-s, 0, c]
-    ])
-    corner0 = np.array([1.0, 0, 2.0])
-    rotated = R @ corner0
-    result = rotated + np.array([0, 0, 10])
-    print(f"  검증: {result}")
+    print("    E) 'pick up the apple' (apple 이 robot data 에 있는 경우)")
+    print("       -> 학습 분포 내")
+    print("       => Not emergent")
     print()
-    print("  의미: 90도 회전하면 length 방향과 width 방향이 바뀝니다.")
-    print("  원래 전방을 향하던 차가 이제 옆을 향하게 됩니다.")
-    print("  이것이 yaw(heading) 각도가 자율주행에서 중요한 이유입니다.")
+    print("  [tip] 'web knowledge transfer 가 필요했는가' 가 판별 기준.")
+    print("       - 색상/속성/공간/추론/상식 등이 동원되면 emergent")
+    print("       - 학습 데이터에 정확히 같은 형태가 있으면 not emergent")
 
 
 if __name__ == "__main__":
-    print("━" * 40)
-    print("  Phase 6 Week 1 Quiz - Medium 정답")
-    print("━" * 40)
+    print("=" * 60)
+    print("  Phase 4 Week 1 Quiz - Medium 정답")
+    print("=" * 60)
     problem1_solution()
     problem2_solution()
     problem3_solution()
-    print("\n" + "━" * 40)
+    print("\n" + "=" * 60)

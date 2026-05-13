@@ -8,7 +8,7 @@ def problem1_anchor_free():
     print("문제 1: Anchor-Free 방식")
     print("━" * 28 + "\n")
 
-    print("질문: YOLOv8이 Anchor-Free 방식을 채택한 주된 이유는?\n")
+    print("질문: YOLOv8 / YOLO11이 Anchor-Free 방식을 채택한 주된 이유는?\n")
     print("보기:")
     print("  A) GPU 메모리를 절약하기 위해")
     print("  B) Anchor 설계/튜닝 부담을 없애고 더 유연한 BBox 예측을 위해")
@@ -16,12 +16,12 @@ def problem1_anchor_free():
     print("  D) 클래스 수를 늘리기 위해")
 
 
-def problem2_yolov8_structure():
+def problem2_yolo11_structure():
     print("\n" + "━" * 28)
-    print("문제 2: YOLOv8 구조")
+    print("문제 2: YOLO11 구조")
     print("━" * 28 + "\n")
 
-    print("질문: YOLOv8의 Backbone-Neck-Head 각각의 역할로 올바른 것은?\n")
+    print("질문: YOLO11의 Backbone-Neck-Head 각각의 역할로 올바른 것은?\n")
     print("보기:")
     print("  A) Backbone: 특징 융합, Neck: 특징 추출, Head: 예측")
     print("  B) Backbone: 특징 추출, Neck: 특징 융합, Head: BBox+Class 예측")
@@ -60,7 +60,7 @@ if __name__ == "__main__":
     print("  Week 3 Quiz - Easy")
     print("━" * 33)
     problem1_anchor_free()
-    problem2_yolov8_structure()
+    problem2_yolo11_structure()
     problem3_ciou()
     problem4_map()
     print("\n" + "━" * 33)

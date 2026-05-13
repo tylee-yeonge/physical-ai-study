@@ -1,76 +1,70 @@
 """
-Phase 6 Week 4 - Monocular 3D Detection 모델 기초 퀴즈
+Phase 4 Week 4 - OpenVLA 1회독 + Architecture 기초 퀴즈
 """
 
 
-def problem1_smoke_keypoint():
-    print("\n" + "━" * 28)
-    print("문제 1: SMOKE 핵심 아이디어")
-    print("━" * 28 + "\n")
+def problem1_backbone():
+    print("\n" + "=" * 50)
+    print("문제 1: OpenVLA 의 LM backbone")
+    print("=" * 50 + "\n")
 
-    print("질문: SMOKE 모델에서 객체의 3D 위치(X, Y, Z)를 결정하는 과정은?\n")
-
+    print("질문: OpenVLA 의 LM backbone 으로 가장 가까운 것은?\n")
     print("보기:")
-    print("  A) Anchor box를 3D로 확장하여 매칭")
-    print("  B) Heatmap으로 중심점(u,v) 검출 → Z 회귀 → X,Y는 카메라 모델로 계산")
-    print("  C) Depth map을 먼저 추정한 후 BBox 영역의 depth 추출")
-    print("  D) 3D 점구름을 입력으로 받아 직접 3D box 회귀")
+    print("  A) PaLI-X 5B / 55B")
+    print("  B) Llama 2 7B")
+    print("  C) GPT-3.5")
+    print("  D) Mistral 8x7B")
 
 
-def problem2_fcos3d_fpn():
-    print("\n" + "━" * 28)
-    print("문제 2: FCOS3D FPN 할당")
-    print("━" * 28 + "\n")
+def problem2_vision_encoder():
+    print("\n" + "=" * 50)
+    print("문제 2: Hybrid vision encoder")
+    print("=" * 50 + "\n")
 
-    print("질문: FCOS3D에서 FPN 레벨 할당 기준은?\n")
-    print("  (기존 FCOS는 2D bbox '크기'로 할당)\n")
-
+    print("질문: OpenVLA 가 결합하는 두 vision encoder 의 역할?\n")
     print("보기:")
-    print("  A) 2D bbox의 크기 (면적)")
-    print("  B) 객체의 클래스 (Car, Pedestrian 등)")
-    print("  C) 객체의 깊이 (depth)")
-    print("  D) 객체의 회전 각도 (yaw)")
+    print("  A) DINOv2 (spatial) + SigLIP (semantic)")
+    print("  B) CLIP (semantic) + ViT (spatial)")
+    print("  C) DINOv2 (semantic) + SigLIP (spatial)")
+    print("  D) ResNet (low-level) + ViT (high-level)")
 
 
-def problem3_sincos_encoding():
-    print("\n" + "━" * 28)
-    print("문제 3: sin/cos 인코딩")
-    print("━" * 28 + "\n")
+def problem3_dataset():
+    print("\n" + "=" * 50)
+    print("문제 3: OpenVLA 학습 데이터")
+    print("=" * 50 + "\n")
 
-    print("질문: 3D 회전각(yaw)을 sin/cos로 인코딩하는 이유는?\n")
-
+    print("질문: OpenVLA 의 학습에 사용된 robot dataset 은?\n")
     print("보기:")
-    print("  A) 계산 속도를 높이기 위해")
-    print("  B) 각도의 주기성(0도=360도) 문제를 해결하기 위해")
-    print("  C) GPU 메모리를 줄이기 위해")
-    print("  D) 3D bbox 크기를 함께 인코딩하기 위해")
+    print("  A) RT-1 dataset (130K episodes, single embodiment)")
+    print("  B) OpenX-Embodiment (970K episodes, 22 embodiments)")
+    print("  C) Bridge Dataset only")
+    print("  D) DROID dataset only")
 
 
-def problem4_depth_difficulty():
-    print("\n" + "━" * 28)
-    print("문제 4: Depth 추정의 어려움")
-    print("━" * 28 + "\n")
+def problem4_lora():
+    print("\n" + "=" * 50)
+    print("문제 4: LoRA 의 의미")
+    print("=" * 50 + "\n")
 
-    print("질문: Monocular 3D Detection에서 depth 추정이")
-    print("      가장 어려운 근본적인 이유는?\n")
-
+    print("질문: OpenVLA 에서 LoRA fine-tuning 이 중요한 가장 큰 이유는?\n")
     print("보기:")
-    print("  A) GPU 메모리가 부족해서")
-    print("  B) 학습 데이터가 적어서")
-    print("  C) 단안 이미지에서 깊이가 근본적으로 모호(Depth Ambiguity)하므로")
-    print("  D) Loss function 설계가 어려워서")
+    print("  A) 7B 모델 전체 fine-tuning 보다 메모리 / 시간 부담이 적어")
+    print("     새 robot 에 빠르게 적응 가능")
+    print("  B) Inference latency 가 낮아짐")
+    print("  C) 모델 정확도가 항상 올라감")
+    print("  D) Quantization 과 동일한 효과")
 
 
 if __name__ == "__main__":
-    print("━" * 33)
-    print("  Phase 6 Week 4 Quiz - Easy")
-    print("━" * 33)
-
-    problem1_smoke_keypoint()
-    problem2_fcos3d_fpn()
-    problem3_sincos_encoding()
-    problem4_depth_difficulty()
-
-    print("\n" + "━" * 33)
+    print("=" * 50)
+    print("  Phase 4 Week 4 Quiz - Easy")
+    print("  OpenVLA 1회독 + Architecture")
+    print("=" * 50)
+    problem1_backbone()
+    problem2_vision_encoder()
+    problem3_dataset()
+    problem4_lora()
+    print("\n" + "=" * 50)
     print("정답은 quiz_solutions/easy_sol.py 참고")
-    print("━" * 33)
+    print("=" * 50)

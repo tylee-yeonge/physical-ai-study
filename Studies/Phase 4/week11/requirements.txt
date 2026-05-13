@@ -1,6 +1,10 @@
-numpy
-matplotlib
-opencv-python
-black
-flake8
-mypy
+numpy>=1.24.0
+torch>=2.0.0
+transformers>=4.40.0
+bitsandbytes>=0.43.0
+accelerate>=0.30.0
+Pillow>=9.5.0
+opencv-python>=4.8.0
+sentencepiece>=0.1.99
+# ROS2 시스템 패키지:
+#   sudo apt install ros-humble-cv-bridge ros-humble-rosbag2-py

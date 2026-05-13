@@ -1,423 +1,221 @@
-# Week 12: 블로그 & 영상 - 포트폴리오 공개 및 커뮤니케이션
+# Week 12: Rerun 시각화 + 1분 데모 영상 마감
 
-> [goal] **이번 주 목표**: Phase 4 전체를 정리한 블로그 포스팅을 작성하고, Demo 영상을 제작하며, LinkedIn을 통해 프로젝트를 공개한다.
-> [time] **예상 시간**: 12-15시간
-> [tip] **핵심 질문**: "내 3D Perception 프로젝트를 기술적 깊이와 임팩트를 모두 갖춘 글과 영상으로 전달할 수 있는가?"
+> [goal] **이번 주 목표**: Rerun.io 로 inference 시각화 (image / instruction / action / latency) + 1분 영상 제작. Phase 4 의 산출물 #2 의 마지막 1/3 (ROS2 minimal demo + 1분 영상) 완성.
+> [time] **예상 시간**: 10시간 (Rerun 통합 4h + 영상 녹화 3h + 편집 + 자막 3h)
+> [tip] **핵심 질문**: "면접관이 1분 영상만 봐도 'OpenVLA inference + ROS2 통합' 의 핵심 흐름을 이해할 수 있는가?"
 
 ---
 
 ## [list] 학습 순서
 
-| 순서 | 단계 | 파일 | 설명 |
-|:----:|------|------|------|
-| 1 | 환경 설정 | `requirements.txt` | `pip install -r requirements.txt` |
-| 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
-| 3 | Python 퀴즈 (초급) | `quiz_easy.py` | 블로그 구조, Demo 영상 기획, LinkedIn 활용 |
-| 4 | Python 퀴즈 (중급) | `quiz_medium.py` | 블로그 아웃라인 작성, 면접 답변 구조화 실습 |
-| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | 블로그 포스팅 작성, Demo 영상 제작, LinkedIn 공유 |
+| 순서 | 단계 | 파일/자료 | 설명 |
+|:----:|------|----------|------|
+| 1 | Rerun 설치 + 기본 사용 | `PRACTICE.md` 1 | rerun-sdk |
+| 2 | rerun_logger 노드 | `PRACTICE.md` 2 | ROS topic 들 -> Rerun |
+| 3 | 영상 시나리오 작성 | `PRACTICE.md` 3 | 1분 절차 1~3 단계 |
+| 4 | 녹화 + 편집 | `PRACTICE.md` 4 | OBS / Kazam |
+| 5 | 자막 + 패키징 | `PRACTICE.md` 5 | 한글 자막 |
+| 6 | 퀴즈 | quiz_easy / quiz_medium | 시각화 / 영상 |
 
 ---
 
-## [*] 시작하기 전에
+## [*] 시작하기 전에 — Phase 4 의 결말
 
-### 왜 블로그와 영상이 중요한가?
-
-```
-포트폴리오 전달력 공식:
-
-  GitHub 코드 (Week 11)  → "이 사람이 코드를 짤 수 있는가?"
-  블로그 포스팅 (Week 12) → "이 사람이 기술을 이해하고 설명할 수 있는가?"
-  Demo 영상 (Week 12)     → "이 사람의 결과물이 실제로 동작하는가?"
-  LinkedIn 공유 (Week 12)  → "이 사람이 전문 네트워크에서 신뢰를 줄 수 있는가?"
-
-→ 코드만으로는 부족, 전달력이 합격을 결정!
-```
-
-**면접관의 관점:**
-```
-서류 검토 시:
-  1. 이력서에 GitHub 링크 확인 (10초)
-  2. README와 결과 이미지 확인 (30초)
-  3. 블로그가 있으면 기술 이해도 확인 (2분)
-  4. Demo 영상이 있으면 동작 확인 (1분)
-
-→ 블로그+영상이 있는 후보자는 확실히 차별화됨
-→ "이 사람은 정리 능력과 커뮤니케이션 역량이 있다"
-```
+이번 주가 끝나면 **산출물 #2 완성**:
+- [O] 블로그 2 편 (RT-2 + OpenVLA, week 3 + week 7)
+- [O] OpenVLA -> ROS2 토픽 minimal demo (week 8~11)
+- [O] **1분 데모 영상** (이번 주)
+- 발행: `physical-ai-study` 레포의 `Portfolio/02_VLA_demo/`
 
 ---
 
-## [ref] 핵심 개념 자세히 알아보기
+## [ref] 핵심 개념
 
-### 1. 기술 블로그 작성법
+### 1. Rerun.io 의 큰 그림
 
-#### 1.1 블로그 포스팅 전략
+Rerun 은 시각화 도구로 다음을 지원:
+- 시간 동기화된 multi-modal data (image, point cloud, scalar, etc.)
+- ROS topic 직접 연동 가능
+- Python SDK 로 임의 data logging
+- 웹 / desktop 양쪽
 
-```
-3D Perception 블로그 시리즈 (3~4편):
+### 2. Rerun 기본 사용 패턴
 
-1편: "KITTI 3D Detection 입문기"
-  - 대상: 3D Detection을 처음 접하는 엔지니어
-  - 핵심: 데이터셋 소개, 좌표계 설명, 첫 구현 경험
+```python
+import rerun as rr
+import numpy as np
 
-2편: "nuScenes와 BEV 표현의 이해"
-  - 대상: BEV에 관심 있는 CV 엔지니어
-  - 핵심: 왜 BEV인가, BEVFormer 핵심 아이디어, 시각화
+# 초기화
+rr.init("vla_demo", spawn=True)
 
-3편: "3D Perception 면접 대비 정리"
-  - 대상: 자율주행/로봇 이직 준비 엔지니어
-  - 핵심: 자주 나오는 질문, 핵심 개념 요약, 경험담
-```
+# Image logging
+img = np.random.rand(480, 640, 3) * 255
+rr.log("camera/image", rr.Image(img.astype(np.uint8)))
 
-#### 1.2 좋은 기술 블로그의 구조
+# Scalar (latency)
+rr.log("vla/latency_ms", rr.Scalar(165.0))
 
-```
-기술 블로그 포스팅 구조:
+# Text (instruction)
+rr.log("vla/instruction", rr.TextLog("pick up the can"))
 
-1. 제목 (눈길을 끄는 제목)
-   [x] "KITTI 3D Detection"
-   [v] "카메라 한 대로 3D 물체를 잡는다? — KITTI Monocular 3D Detection 도전기"
-
-2. 도입 (왜 이 글을 읽어야 하는가)
-   - 독자의 문제 상황 제시
-   - 이 글에서 얻을 수 있는 것 명시
-   - 예상 독자 수준 안내
-
-3. 배경 지식 (필요한 만큼만)
-   - 3D Detection이란?
-   - KITTI 데이터셋 소개
-   - 핵심 개념 다이어그램
-
-4. 본문 (실제 과정)
-   - 코드 스니펫 + 설명
-   - 결과 이미지
-   - 어려웠던 점 + 해결 과정
-
-5. 결과 및 분석
-   - 정량적 결과 (표, 그래프)
-   - 정성적 결과 (시각화 이미지)
-   - 실패 사례도 공유 (진정성)
-
-6. 마무리
-   - 배운 점 요약
-   - 다음 단계 예고
-   - 참고 자료 링크
+# Action (vector visualization)
+action = np.array([0.05, -0.03, 0.02])
+rr.log("vla/action_xyz", rr.Arrows3D(vectors=[action]))
 ```
 
-#### 1.3 기술 글쓰기 팁
+### 3. ROS topic -> Rerun
 
-```
-기술 블로그 작성 원칙:
+방법 A: rerun_logger ROS 노드 작성 (rclpy + rerun_sdk):
 
-1. "나를 위한 메모"가 아닌 "독자를 위한 글"
-   - 독자가 모르는 것을 가정하고 설명
-   - 전문 용어는 첫 등장 시 정의
+```python
+import rclpy
+from rclpy.node import Node
+import rerun as rr
 
-2. 시각 자료 활용
-   - 코드만 나열하지 않기
-   - 다이어그램, 시각화, 결과 이미지 필수
-   - 한 섹션에 최소 1개 이미지
+class RerunLogger(Node):
+    def __init__(self):
+        super().__init__('rerun_logger')
+        rr.init('vla_demo', spawn=True)
 
-3. 코드는 핵심만
-   - 전체 코드를 붙여넣지 않기
-   - 핵심 로직 + 주석으로 설명
-   - GitHub 링크로 전체 코드 연결
+        self.image_sub = self.create_subscription(
+            Image, '/camera/image_raw', self.on_image, 1)
+        self.action_sub = self.create_subscription(
+            Twist, '/vla/action', self.on_action, 10)
+        self.lat_sub = self.create_subscription(
+            Float64, '/vla/latency_ms', self.on_latency, 10)
 
-4. 정직한 서술
-   - 잘 안 된 부분도 솔직히 공유
-   - "처음에 이렇게 했는데 안 됐다 → 이유는 ~ → 이렇게 바꿨다"
-   - 이런 과정이 오히려 전문성을 보여줌
-```
+    def on_image(self, msg):
+        img = cv_bridge.imgmsg_to_cv2(msg, 'rgb8')
+        rr.log("camera/image", rr.Image(img))
 
----
+    def on_action(self, msg):
+        rr.log("vla/action", rr.Scalar(msg.linear.x), entity_path_suffix="dx")
+        ...
 
-### 2. Demo 영상 제작
-
-#### 2.1 영상 기획
-
-```
-Demo 영상 구성 (5~7분):
-
-[00:00 ~ 00:30] 인트로
-  - 프로젝트 한 줄 소개
-  - 목차 안내
-
-[00:30 ~ 02:30] KITTI 3D Detection
-  - 데이터셋 구조 간단 설명
-  - 학습 과정 (터미널 화면)
-  - Inference 결과 시각화 (3D bbox on image)
-  - AP3D 성능 지표
-
-[02:30 ~ 04:30] nuScenes & BEV
-  - nuScenes 데이터 탐색
-  - BEV 시각화 결과
-  - Multi-camera fusion 시연
-  - NDS/mAP 성능 지표
-
-[04:30 ~ 05:30] 기술적 인사이트
-  - 가장 어려웠던 점
-  - 핵심 배운 점
-  - 개선 방향
-
-[05:30 ~ 06:00] 마무리
-  - GitHub 링크
-  - 감사 인사
+    def on_latency(self, msg):
+        rr.log("vla/latency_ms", rr.Scalar(msg.data))
 ```
 
-#### 2.2 녹화 도구
+방법 B: rerun-ros2 패키지 (커뮤니티):
+- https://github.com/rerun-io/rerun-loader-python-example
+
+### 4. 1분 영상의 권장 스토리
 
 ```
-녹화 환경:
+0:00 ~ 0:10  Intro
+  - "Phase 4 산출물 #2: OpenVLA + ROS2 minimal demo"
+  - 본인 정보 / 로드맵 한 줄
 
-1. 화면 녹화: OBS Studio (무료, 크로스 플랫폼)
-   - 해상도: 1920x1080 (Full HD)
-   - FPS: 30
-   - 인코더: x264 또는 NVENC
+0:10 ~ 0:25  System 구조 (Rerun + ROS graph)
+  - ros2 node 다이어그램
+  - rqt_graph 화면 캡처
 
-2. 편집: DaVinci Resolve (무료) 또는 CapCut
-   - 간단한 컷 편집
-   - 자막 추가
-   - 인트로/아웃트로
+0:25 ~ 0:45  실시간 동작
+  - 카메라 image
+  - instruction 발행
+  - action 발행 (Rerun 의 line chart)
+  - latency 통계 (real-time)
 
-3. 음성:
-   - 조용한 환경에서 녹음
-   - 마이크 권장 (노트북 내장 마이크도 가능)
-   - 속도: 보통 ~ 약간 느리게
+0:45 ~ 0:55  결과 + 한계
+  - mean latency 165ms / 6Hz
+  - "양산에서 의미하는 것" (hierarchical 구조 필요)
 
-4. 자막:
-   - 기술 용어는 반드시 자막으로 표기
-   - 코드 부분은 화면에 크게 보여주기
+0:55 ~ 1:00  Next
+  - Phase 7 산출물 #4 의 예고편
 ```
 
-#### 2.3 영상 품질 체크리스트
+### 5. 자막 작성 가이드
+
+- 한국어 (1순위 회사 한국 기반)
+- 한 줄 ~ 15자 이내, 2초 이상 유지
+- 핵심 수치 (165ms, 6Hz, OpenVLA-7B 등) 강조
+- 화면 하단 가운데
+
+### 6. 영상 편집 도구
+
+| 도구 | 가격 | 특징 |
+|---|---|---|
+| OBS (녹화) | 무료 | Ubuntu / Windows 호환 |
+| Kazam (녹화) | 무료 | Ubuntu 전용, 간단 |
+| DaVinci Resolve (편집) | 무료 | 강력 |
+| Shotcut (편집) | 무료 | 가벼움 |
+| OpenShot (편집) | 무료 | 초보 친화 |
+
+### 7. 영상 spec
+
+- 해상도: 1920x1080 (or 1280x720 가벼움)
+- 프레임률: 30 fps (60 도 OK)
+- 형식: mp4 (H.264 codec)
+- 길이: 60 ~ 80 초 (60 권장)
+- 용량: < 50 MB (GitHub 직접 호스팅 가능)
+
+### 8. GitHub Portfolio 패키징
+
+`physical-ai-study` 레포의 구조:
 
 ```
-영상 품질 기준:
-
-[ ] 해상도: 최소 1080p
-[ ] 음질: 잡음 없이 목소리가 명확
-[ ] 자막: 핵심 용어와 수치에 자막
-[ ] 코드 가독성: 폰트 크기 충분히 크게
-[ ] 결과 시각화: 고해상도 이미지 사용
-[ ] 길이: 5~7분 (집중력 유지)
-[ ] 흐름: 논리적 순서 (배경→과정→결과)
-[ ] 마무리: GitHub 링크 화면에 표시
+physical-ai-study/
+  README.md                  # 전체 진입점
+  Portfolio/
+    01_Detection_Depth/     # 산출물 #1 (Phase 3)
+    02_VLA_demo/             # 산출물 #2 (Phase 4) <- 본 주의 산출물
+      README.md
+      vla_demo.mp4
+      blog_links.md
+      vla_node/             # ROS2 패키지
+      vla_inference/        # Python 패키지
+      bag/                  # 1분 dry-run bag 의 압축
+      latency_data.csv
 ```
 
 ---
 
-### 3. LinkedIn 활용 전략
+## [search] 자체 점검
 
-#### 3.1 LinkedIn 포스팅 작성법
+**Q1. Rerun 이 단순 rqt_image_view 보다 좋은 이유?**
+> 시간 동기화된 multi-modal (image / action / latency) 한 화면에. ROS topic 별로 흩어진 monitor 를 통합.
 
-```
-LinkedIn 포스팅 구조:
+**Q2. 1분 영상의 권장 구조는?**
+> Intro (10s) + System 구조 (15s) + 실시간 동작 (20s) + 결과/한계 (10s) + Next (5s).
 
-1. 첫 줄 (Hook):
-   "카메라 한 대로 3D 물체 검출이 가능할까?"
-   → 스크롤을 멈추게 하는 질문
+**Q3. 자막을 한국어로 하는 이유는?**
+> 본 로드맵의 1순위 회사 (마음AI WoRV / 카카오모빌리티 VLA / 신생 휴머노이드 스타트업) 가 한국 기반. 한국어 면접관에게 직접 어필.
 
-2. 본문 (3-5줄):
-   - 프로젝트 요약
-   - 사용한 기술 (FCOS3D, BEVFormer)
-   - 핵심 결과 (수치)
+**Q4. 영상 용량 < 50 MB 의 이유는?**
+> GitHub Portfolio 에 직접 호스팅 가능 (file size limit 100MB, 권장 50MB 이하). 별도 YouTube / Vimeo 없이 link 만으로 공유.
 
-3. 시각 자료:
-   - 결과 이미지 1-2장
-   - 또는 Demo 영상 링크
-
-4. CTA (Call to Action):
-   - GitHub 링크
-   - 블로그 링크
-   - "피드백 환영합니다!"
-
-5. 해시태그 (5-10개):
-   #3DDetection #ComputerVision #AutonomousDriving
-   #BEV #KITTI #nuScenes #DeepLearning
-   #MachineLearning #Robotics #Portfolio
-```
-
-#### 3.2 프로필 최적화
-
-```
-LinkedIn 프로필 체크리스트:
-
-[ ] 헤드라인: 직무 + 핵심 기술
-  예: "Robotics Software Engineer | 3D Perception | Visual SLAM"
-
-[ ] 소개(About): 경력 요약 + 관심 분야 + 프로젝트 링크
-
-[ ] 경험(Experience): 각 직무에서의 기술적 성과 중심 서술
-
-[ ] 프로젝트(Projects): GitHub 링크 + 간단한 설명
-
-[ ] 기술(Skills):
-  Python, C++, PyTorch, ROS2, SLAM, 3D Detection, BEV,
-  Computer Vision, Deep Learning, Jetson
-```
+**Q5. 영상 마무리 (0:55 ~ 1:00) 에 무엇을 넣나?**
+> Phase 7 산출물 #4 의 예고편. "다음은 자작 6DOF 팔과 통합" 같은 한 줄. 면접관에게 다음 산출물의 기대 만들기.
 
 ---
 
-### 4. 블로그 플랫폼 비교
-
-#### 4.1 플랫폼 선택 기준
-
-```
-한국어 블로그 플랫폼:
-
-| 플랫폼 | 장점 | 단점 | 추천 |
-|--------|------|------|------|
-| Tistory | 커스텀 자유, 코드 하이라이팅 | 초기 셋업 필요 | **** |
-| Velog | 개발자 특화, Markdown | 커스텀 제한 | ***** |
-| Medium | 글로벌 노출 | 유료화 트렌드 | *** |
-| GitHub Pages | 완전 커스텀, 무료 | 셋업 어려움 | *** |
-| Notion | 쉬운 편집 | SEO 약함 | ** |
-
-추천: Velog (한국 개발자 커뮤니티) 또는 Tistory (커스텀)
-글로벌 타겟이면 Medium 병행
-```
-
----
-
-### 5. 면접 대비 콘텐츠
-
-#### 5.1 자주 나오는 면접 질문
-
-```
-3D Perception 면접 예상 질문:
-
-기초:
-  Q: "2D Detection과 3D Detection의 차이는?"
-  Q: "Monocular vs Stereo vs LiDAR 3D Detection의 장단점은?"
-  Q: "3D Bounding Box의 파라미터 7개를 설명하세요."
-
-중급:
-  Q: "BEV 표현의 장점은 무엇인가?"
-  Q: "Lift-Splat-Shoot의 각 단계를 설명하세요."
-  Q: "BEVFormer의 Spatial Cross-Attention은 어떻게 동작하는가?"
-  Q: "Depth 추정의 어려움과 해결 방법은?"
-
-실무:
-  Q: "실제 로봇에 3D Detection을 적용할 때 고려 사항은?"
-  Q: "Inference 속도를 어떻게 최적화하시겠습니까?"
-  Q: "누락 검출(False Negative)을 줄이기 위한 전략은?"
-```
-
-#### 5.2 면접 답변 프레임워크
-
-```
-STAR 프레임워크:
-
-Situation: "프로젝트 배경/문제 상황"
-Task:      "내가 맡은 역할/목표"
-Action:    "구체적으로 한 일"
-Result:    "정량적 결과 + 배운 점"
-
-예시:
-  S: "KITTI에서 Monocular 3D Detection을 구현했습니다."
-  T: "FCOS3D 모델을 학습하고 AP3D 15% 이상 달성이 목표였습니다."
-  A: "Multi-scale training과 3D augmentation을 적용하고,
-      Depth 추정 오차 분석을 통해 loss weight를 조정했습니다."
-  R: "AP3D(Moderate) 13.87%를 달성했고, 원거리 객체의
-      Depth 추정이 핵심 병목임을 파악했습니다."
-```
-
----
-
-## [tip] 꼭 이해해야 할 핵심 개념
-
-### 1. 블로그는 "설명 능력"의 증거
-
-```
-코드 = "구현 능력"
-블로그 = "설명 능력" + "이해 깊이"
-영상 = "커뮤니케이션 능력"
-
-→ 세 가지를 갖추면 면접에서 압도적으로 유리
-→ "이 사람은 팀에서 지식을 공유하고 전달할 수 있겠다"
-```
-
-### 2. Demo 영상의 임팩트
-
-```
-Demo 영상의 효과:
-  - 코드가 실제로 동작함을 증명
-  - README만으로는 전달이 어려운 동적 결과 보여주기
-  - 면접 전에 면접관이 미리 시청 → 좋은 인상
-  - 포트폴리오 차별화의 핵심
-
-5분 짜리 영상 하나 > 긴 README 10페이지
-```
-
-### 3. LinkedIn은 전문 네트워크
-
-```
-LinkedIn의 가치:
-  - 리크루터가 직접 연락하는 채널
-  - 프로젝트 공유 → 전문성 인정
-  - 업계 동향 파악 + 네트워킹
-  - 꾸준한 활동이 중요 (월 1-2회 포스팅)
-```
-
----
-
-## [search] 자체 점검 - 이해했는지 확인!
-
-**Q1. 기술 블로그에서 실패 사례를 공유하는 것이 좋은 이유는?**
-
-> 실패 사례를 공유하면 글의 진정성이 높아지고, 독자가 같은 실수를 피할 수 있다. 또한 "실패 → 원인 분석 → 해결"의 과정이 오히려 기술적 깊이와 문제 해결 능력을 보여준다. 면접관 입장에서도 성공만 나열한 글보다 시행착오를 솔직히 공유한 글에서 실무 경험을 느낀다.
-
-**Q2. Demo 영상의 적정 길이가 5~7분인 이유는?**
-
-> 5분 미만이면 기술적 내용을 충분히 전달하기 어렵고, 10분 이상이면 시청자의 집중력이 떨어진다. 5~7분은 인트로(30초) + KITTI 결과(2분) + BEV 결과(2분) + 인사이트(1분) + 마무리(30초)로 핵심 내용을 모두 담되 집중력을 유지할 수 있는 최적의 길이다.
-
-**Q3. LinkedIn 포스팅에서 첫 줄(Hook)이 중요한 이유는?**
-
-> LinkedIn 피드에서는 첫 2-3줄만 보이고, "더 보기"를 눌러야 전체를 볼 수 있다. 따라서 첫 줄이 흥미롭지 않으면 아무도 클릭하지 않는다. 질문형("~이 가능할까?"), 수치 제시("AP3D 15%를 달성한 과정"), 또는 도발적 서술("카메라 한 대면 충분합니다")로 스크롤을 멈추게 해야 한다.
-
-**Q4. 블로그에 코드 전체를 붙여넣지 않는 이유는?**
-
-> 전체 코드를 붙여넣으면 글이 장황해지고 독자가 핵심을 파악하기 어렵다. 핵심 로직만 10~20줄 정도 발췌하고, 주석으로 설명을 추가하며, GitHub 링크로 전체 코드를 연결하는 것이 효과적이다. 블로그의 목적은 "이해시키기"이지 "코드 배포"가 아니다.
-
----
-
-## [note] 이번 주 실습 & Phase 4 마무리
+## [note] 이번 주 실습 & 다음 주 준비
 
 ### 이번 주 실습 과제
+1. Rerun 설치 + 기본 사용
+2. rerun_logger ROS 노드 작성
+3. 1분 영상 시나리오 작성
+4. OBS / Kazam 으로 녹화
+5. 편집 + 자막
+6. `Portfolio/02_VLA_demo/` 에 packaging
+7. quiz_easy / quiz_medium
 
-1. **블로그 포스팅 작성**: KITTI 3D Detection 입문기 (1편 필수)
-2. **Demo 영상 제작**: 5~7분 분량의 프로젝트 시연 영상
-3. **LinkedIn 포스팅**: 프로젝트 공유 + GitHub 링크
-4. **면접 대비**: 예상 질문 5개에 대한 답변 준비
-
-자세한 내용은 [PRACTICE.md](./PRACTICE.md) 참고
-
-### Phase 4 완료 후 다음 단계
-
-```
-Phase 4 완료!
-
-축하합니다! 3D Perception의 핵심을 학습하고,
-포트폴리오를 완성했습니다.
-
-다음 단계:
-  1. 이직 활동 시작
-  2. 병행: Blender 시뮬레이션 학습 (선택)
-  3. 이직 후: BEV Segmentation, Isaac Sim
-```
+### 다음 주 (week 13) 준비
+- 블로그 2편 다시 읽고 부족한 부분 메모
+- Portfolio 의 다른 산출물 (#1, #2.5) 정리 상태 점검
 
 ---
 
 ## [goal] 이번 주 핵심 요약
 
-1. **기술 블로그**는 "설명 능력"의 증거로, 면접관이 기술 이해도를 빠르게 판단하는 자료이다. 핵심만 간결하게, 시각 자료와 함께 작성한다.
-2. **Demo 영상**은 프로젝트가 실제로 동작함을 증명하는 가장 강력한 수단이다. 5~7분 길이로, KITTI + BEV 결과를 시각적으로 보여준다.
-3. **LinkedIn 포스팅**은 전문 네트워크에서의 존재감을 만들며, 리크루터에게 직접 어필하는 채널이다. 첫 줄(Hook)이 핵심이다.
-4. **면접 대비**는 STAR 프레임워크로 경험을 구조화하고, 예상 질문에 대한 답변을 미리 준비하는 것이 중요하다.
-5. **Phase 4의 궁극적 목표**는 "KITTI와 nuScenes에서 3D Detection을 경험하고, 이를 GitHub + 블로그 + 영상으로 증명하여 이직을 준비하는 것"이다.
+1. **Rerun.io 로 multi-modal 시각화** — image / action / latency 한 화면.
+2. **1분 영상 = Phase 4 산출물 #2 의 결정타** — 면접관의 가장 짧은 진입점.
+3. **한국어 자막** + 핵심 수치 강조.
+4. **GitHub Portfolio 직접 호스팅** (< 50 MB).
+5. **Next 한 줄** 로 Phase 7 산출물 #4 예고편.
 
 ---
 
-이전: [Week 11 - 코드 및 문서 정리](../week11/README.md)
+[O] 이전: [Week 11 - 실 inference 통합](../week11/README.md)
 
-Phase 4 완료! [Phase 4 로드맵으로 돌아가기](../../../Roadmap/Phase%206.md)
+다음: [Week 13 - 블로그 2편 퇴고 + 다이어그램](../week13/README.md)

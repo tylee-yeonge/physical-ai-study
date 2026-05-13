@@ -1,5 +1,5 @@
 """
-Phase 5 Week 4 - YOLOv8 학습 중급 퀴즈 정답 및 해설
+Phase 5 Week 4 - YOLO11 학습 중급 퀴즈 정답 및 해설
 """
 
 
@@ -112,7 +112,7 @@ def problem3_solution():
     print("━" * 36 + "\n")
 
     print("  실험 결과 분석:")
-    print("    Baseline(yolov8n) → Exp-A(yolov8s): 모델 크기 ↑ → 성능 ↑ (효과적)")
+    print("    Baseline(yolo11n) → Exp-A(yolo11s): 모델 크기 ↑ → 성능 ↑ (효과적)")
     print("    Exp-A → Exp-B: 에폭 ↑ → 약간 성능 ↑, 하지만 과적합 의심")
     print("    Exp-B: train_loss=0.15 (매우 낮음), map50_95=0.39 (정체)")
     print()
@@ -122,7 +122,7 @@ def problem3_solution():
 
     print("  방안 1: 과적합 해결 + Augmentation 강화")
     print("    {")
-    print('      "model": "yolov8s",')
+    print('      "model": "yolo11s",')
     print('      "imgsz": 640,')
     print('      "lr0": 0.01,')
     print('      "augmentation": "heavy",')
@@ -132,7 +132,7 @@ def problem3_solution():
 
     print("  방안 2: 이미지 크기 증가")
     print("    {")
-    print('      "model": "yolov8s",')
+    print('      "model": "yolo11s",')
     print('      "imgsz": 960,')
     print('      "lr0": 0.01,')
     print('      "augmentation": "heavy",')
@@ -142,7 +142,7 @@ def problem3_solution():
 
     print("  방안 3: 모델 크기 추가 증가")
     print("    {")
-    print('      "model": "yolov8m",')
+    print('      "model": "yolo11m",')
     print('      "imgsz": 640,')
     print('      "lr0": 0.01,')
     print('      "augmentation": "heavy",')

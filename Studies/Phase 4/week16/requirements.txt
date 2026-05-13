@@ -1,0 +1,3 @@
+# 산출물 공개 + 회고 주차. 코드 의존성 없음.
+# gh CLI 권장 (GitHub release tag 자동화):
+#   sudo apt install gh

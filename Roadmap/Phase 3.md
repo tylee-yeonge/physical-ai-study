@@ -1,29 +1,25 @@
-# Phase 3: Detection + Depth Estimation
+# Phase 3 (축소): Detection + Depth → PC TensorRT + ROS2 노드
 
-> [time] **기간**: 3개월  
-> [goal] **목표**: 2D Perception 마스터 + Jetson 실시간 배포  
-> [code] **언어**: **Python** (학습) + **C++/TensorRT** (배포)  
-> [tool] **하드웨어**: Ubuntu PC (RTX 4070) — 주 학습/실험 장비 / Jetson Orin Nano — 하드웨어 실습 시간 확보 시 재도입 (TensorRT 배포 파트)  
+> [time] **기간**: 약 2개월 (2026.06~08, F안)
+> [goal] **목표**: Detection + Depth 의 핵심 + Foundation Model latency 사전 학습용 PC TensorRT 경험
+> [code] **언어**: **Python** (학습) + **C++/TensorRT** (PC 배포) + **ROS2** (노드 래퍼)
+> [tool] **하드웨어**: Ubuntu PC (RTX 4070) — 주 학습/실험/배포 장비 / Jetson Orin Nano — **Phase 7 이후 옵션 #5**
 > [time] **주간 시간**: 약 8~12시간 (출장 주 50% 보정)
 
 ---
 
 ## -> **실습 가이드**: [`Studies/Phase 3/PRACTICE.md`](../Studies/Phase%203/PRACTICE.md)
 
-**핵심 산출물**:
-- YOLO 실시간 객체 검출 (Jetson 30+ FPS)
-- Depth Estimation (Depth Anything V2)
-- 통합 시스템: Detection + Depth → 3D 위치 추정
+**핵심 산출물 (#1)**:
+- YOLO11 실시간 객체 검출 (PC TensorRT)
+- Depth Anything V2 (PC TensorRT)
+- 통합 시스템: Detection + Depth → 3D 위치 추정 + ROS2 노드 래퍼
 
-**산출물 #1 모델 예시**: YOLO11 + Depth Anything V2 → Jetson Orin Nano TensorRT, KITTI raw 또는 자체 stereo 데이터 → **30+ FPS, 1분 데모 영상** (2026.07까지 별도 Public Repo 공개)
+**산출물 #1**: YOLO11 + Depth Anything V2 → **PC TensorRT 추론 + ROS2 노드 래퍼 + 1분 데모 영상** (2026.08까지 `physical-ai-study` 레포에 공개. Jetson 실기 배포는 Phase 7 이후 옵션 #5)
 
-> [!] **언어 전략**: 학습은 Python, 배포는 C++/TensorRT
+> [!] **언어 전략**: 학습은 Python, 배포는 C++/TensorRT (PC), 통합은 ROS2.
 
-> [!] **학습 노트 vs 포트폴리오 분리 원칙**:
-> - **학습 노트 (private)**: `Studies/Phase 3/` — 자기 이해용, 빠르고 거친 형태 OK
-> - **포트폴리오 (public)**: 별도 GitHub Repo `robotics-perception-portfolio` — 채용 담당자 진입점, README + 영상 + 수치
->
-> 두 가지를 절대 섞지 않는다. Studies/ 노트는 면접관이 보지 않는다.
+> [!] **포트폴리오 통합 원칙 (v3 변경)**: 별도 Repo (`robotics-perception-portfolio`) 분리 폐기. `physical-ai-study` 단일 레포에 *Studies/* (학습 노트) 와 *Portfolio/* (또는 산출물 디렉토리) 를 디렉토리 수준에서만 분리. 채용 담당자 진입점은 README → 산출물 디렉토리.
 
 ---
 
@@ -32,27 +28,28 @@
 | 단계 | 주 장비 | 출장지 가능 여부 |
 |---|---|---|
 | PyTorch 복습 / YOLO 학습 | Ubuntu PC (원격) | O |
-| TensorRT 변환 (PC 환경) | Ubuntu PC (원격) | O |
-| Jetson 실기 배포 / 실측 FPS | Jetson (하드웨어 확보 시) | 보류 |
-| Depth Anything V2 실습 | Ubuntu PC (원격) | O |
-| 통합 시스템 (Detection + Depth) | Ubuntu PC (원격) | O (Jetson 배포는 보류) |
+| PC TensorRT 변환 + C++ 추론 | Ubuntu PC (원격) | O |
+| Depth Anything V2 실습 + PC TensorRT | Ubuntu PC (원격) | O |
+| 통합 시스템 + ROS2 노드 래퍼 | Ubuntu PC (원격) | O |
+| Jetson 실기 배포 / 실측 FPS | Jetson (Phase 7 이후 옵션 #5) | 보류 |
 
 - 데이터셋 (COCO, KITTI, Middlebury): Ubuntu PC 디스크 상시 보관
 - 상세: [ENVIRONMENT.md](../ENVIRONMENT.md)
 
-> [note] **Jetson 배포 파트**는 하드웨어 실습 시간 확보 시점까지 "개념 이해 + PC 에서의 TensorRT 변환 실습" 수준으로 진행. 실기 배포는 보류.
+> [note] Phase 3 (축소판) 에서는 **PC TensorRT + ROS2 노드까지만**. Jetson 실기 배포는 전체 학습 (Phase 2~7) 완료 후 옵션 (#5).
 
 ---
 
-## [list] Section 5.0: 시작 전 (0주, 이번 달 안)
+## [list] Section 5.0: 시작 전 (0주, 2026.05 말~6월 초)
 
 > Phase 3 진입 전에 반드시 완료. 학습이 채용 라인에서 이탈하지 않게 하는 출발점.
 
-- [ ] 타깃 회사 JD 3개 정독 — 베어로보틱스 / 우아한형제들 / 로보티즈 + 카카오모빌리티 자율주행팀 로보틱스 엔지니어 JD
+- [ ] 1순위 3개사 JD 정독 — **VLA 모델 직접 개발 코스닥 상장사 / 대기업 SW 자회사 (VLA 자율주행) / 신생 휴머노이드 스타트업**
+- [ ] 2순위 3개사 JD 정독 — 대기업 자율주행 SW 자회사 (CV/ML) / ADAS 양산 SW 중견기업 / Dynamixel 제조사 + 휴머노이드 양산 상장사 (모터 직접 매칭)
 - [ ] 공통 요구 스택 추출 → 학습 우선순위 매핑 표 작성
-- [ ] **Phase 3 산출물 #1 스펙 1페이지 확정** (타깃 모델 / 데이터 / 수치 목표 / 데모 형태)
-- [ ] 별도 포트폴리오 Public GitHub Repo 생성 (`robotics-perception-portfolio`) — Studies/와 분리
-- [ ] **TensorRT C++ Quick Start 1회 따라하기** — Section 5.2 Week 6 (Jetson 배포) 학습 곡선 단축용 사전 워밍업
+- [ ] **Phase 3 산출물 #1 스펙 1페이지 확정** (타깃 모델 / 데이터 / 수치 목표 / 데모 형태, Jetson 제외)
+- [x] `physical-ai-study` 레포 Public 전환 완료 (별도 Portfolio repo 분리 폐기)
+- [ ] **TensorRT C++ Quick Start 1회 따라하기** — Section 5.2 Week 6 (PC TensorRT 배포) 학습 곡선 단축용 사전 워밍업
   - 공식 가이드: https://docs.nvidia.com/deeplearning/tensorrt/latest/getting-started/quick-start-guide.html
   - 샘플 코드 (Semantic Segmentation, C++): https://github.com/NVIDIA/TensorRT/tree/main/quickstart/SemanticSegmentation
   - 사전 환경: CUDA + TensorRT (Ubuntu PC 에서 진행 — Jetson 불필요)
@@ -68,17 +65,14 @@
 ### Week 1: PyTorch 기초 재정비
 
 #### 딥러닝 환경 세팅
-- [ ] **PC (학습용)**
+- [ ] **PC (학습 + PC TensorRT 배포)**
   - [ ] CUDA 11.8+ 설치
   - [ ] PyTorch 2.0+ 설치 (GPU 버전)
+  - [ ] TensorRT 8.6+ 설치 (`trtexec` 동작 확인)
   - [ ] conda 가상환경 구성
   - [ ] Jupyter Lab 세팅
 
-- [ ] **Jetson Orin Nano (배포용)**
-  - [ ] JetPack 6.0 설치
-  - [ ] TensorRT 8.6+ 확인
-  - [ ] PyTorch 2.x (ARM64) 설치
-  - [ ] OpenCV with CUDA 빌드
+> [note] Jetson Orin Nano 배포는 **Phase 7 이후 옵션 (#5)** 으로 분리. Phase 3 에서는 PC TensorRT 만 진행.
 
 #### PyTorch 핵심 복습
 - [ ] Tensor 연산
@@ -200,7 +194,7 @@ pip install ultralytics
 - [ ] Quantization (선택)
   - FP32 → FP16 → INT8
 
-### Week 6: Jetson 배포 (TensorRT)
+### Week 6: PC TensorRT 배포
 
 #### TensorRT 이론
 - [ ] Layer fusion (레이어 합치기)
@@ -208,7 +202,7 @@ pip install ultralytics
 - [ ] FP16, INT8 precision
 - [ ] **속도 향상**: 2-5배
 
-#### ONNX → TensorRT 변환
+#### ONNX → TensorRT 변환 (PC)
 ```bash
 trtexec --onnx=yolo11n.onnx \
         --saveEngine=yolo11n.trt \
@@ -216,16 +210,17 @@ trtexec --onnx=yolo11n.onnx \
         --workspace=4096
 ```
 
-#### C++ Inference 구현
+#### C++ Inference 구현 (PC)
 - [ ] TensorRT API 사용
 - [ ] 전처리 (OpenCV)
 - [ ] NMS (Non-Maximum Suppression) 구현
 - [ ] 후처리 및 시각화
 
-#### 성능 측정
-- [ ] **목표**: 640×480 @ 30 FPS (YOLO11n)
-- [ ] Latency 분석 (전처리/추론/후처리)
+#### 성능 측정 (PC, RTX 4070 기준)
+- [ ] Latency 분석 (전처리/추론/후처리) — Foundation Model latency 사전 학습
 - [ ] Multi-threading (카메라 읽기 병렬화)
+
+> [note] Jetson 실기 배포 (30+ FPS 목표) 는 **Phase 7 이후 옵션 (#5)** 으로 분리.
 
 ### [search] Section 5.2 자체 점검
 1. mAP@0.5와 mAP@0.5:0.95의 차이는?
@@ -274,20 +269,17 @@ pipe = pipeline(task="depth-estimation",
 - [ ] Custom 데이터 (stereo 카메라로 GT 생성)
 - [ ] Loss: Scale-invariant log loss
 
-### Week 9: ONNX & TensorRT 변환
+### Week 9: ONNX & PC TensorRT 변환 (Depth Anything V2)
 
 #### Depth Anything V2 → ONNX
 - [ ] Hugging Face 모델 변환
 - [ ] Input size 고정 (384×512 권장)
 - [ ] 출력 shape 확인
 
-#### TensorRT 최적화
+#### PC TensorRT 최적화
 - [ ] FP16 변환
 - [ ] 메모리 사용량 체크
-- [ ] Jetson에서 추론 속도 측정
-
-#### 목표 성능
-- [ ] Jetson Orin: **15-20 FPS** @ 384×512
+- [ ] PC (RTX 4070) 추론 속도 + Latency 분포 측정 (Foundation Model 사전 학습)
 
 ### Week 10: Depth 정확도 검증
 
@@ -333,34 +325,32 @@ pipe = pipeline(task="depth-estimation",
   Z = depth
   ```
 
-#### ROS2 통합 (선택)
+#### ROS2 노드 래퍼 (필수, F안)
 - [ ] Detection 결과 publish (`vision_msgs/Detection3DArray`)
 - [ ] Depth map publish (`sensor_msgs/Image`)
-- [ ] TF로 좌표계 변환
+- [ ] 통합 결과 publish + TF로 좌표계 변환
+- [ ] `ros2 run` 으로 실행 가능한 패키지 형태
 
 ### Week 12: 최종 데모 및 최적화
 
 #### 통합 시스템 최적화
 - [ ] YOLO + Depth 병렬 처리
-- [ ] Zero-copy (GPU 메모리 공유)
-- [ ] Batch inference (가능하면)
+- [ ] PC TensorRT 추론 안정화
 
-#### 최종 성능 목표
-- [ ] **전체 FPS**: 25-30 (Jetson Orin)
-- [ ] Latency: < 50ms
+#### 최종 성능 목표 (PC, RTX 4070)
+- [ ] Latency 측정 (전체 파이프라인 ms 단위) — Foundation Model latency 사전 학습
 - [ ] 정확도: Detection mAP > 0.6, Depth AbsRel < 0.15
 
 #### 데모 영상 제작
-- [ ] 실시간 Detection + Depth 시각화
+- [ ] 실시간 Detection + Depth 시각화 (Rerun.io)
 - [ ] 3D 좌표 표시
 - [ ] 다양한 실내/실외 환경
 
-#### 포트폴리오 정리 (산출물 #1 공개)
-- [ ] **별도 Public Repo `robotics-perception-portfolio`** 에 산출물 #1 디렉토리 추가 (Studies/와 분리)
-- [ ] **README**: 환경 세팅 + 실행 방법 + **수치 성능 표** (mAP, FPS, AbsRel)
-- [ ] **1분 데모 영상** (Detection + Depth + 3D 위치 시각화)
-- [ ] **기술 블로그 1개** (YOLO/Depth 학습 + Jetson 배포 정리)
-- [ ] **공개 시점**: 2026.07까지 (Phase 3 완료 시점)
+#### 산출물 #1 공개 (2026.08까지)
+- [ ] `physical-ai-study` 레포에 산출물 #1 디렉토리 추가 (Studies/ 와 별도 Portfolio 구조 분리)
+- [ ] **README**: 환경 세팅 + 실행 방법 + 수치 성능 표 (mAP, AbsRel, Latency)
+- [ ] **1분 데모 영상** (Detection + Depth + 3D 위치 + ROS2 노드 시연)
+- [ ] **기술 블로그 1개** (YOLO/Depth 학습 + PC TensorRT + ROS2 노드 정리)
 
 ### [search] Section 5.4 자체 점검
 1. Depth map과 Detection bbox를 어떻게 융합하는가?
@@ -369,36 +359,36 @@ pipe = pipeline(task="depth-estimation",
 
 ---
 
-## [O] Phase 3 완료 체크리스트
+## [O] Phase 3 (축소판) 완료 체크리스트
 
 ### Object Detection
 - [ ] YOLO11 커스텀 데이터 학습
 - [ ] mAP > 0.6 달성
 - [ ] ONNX 변환 및 검증
-- [ ] Jetson TensorRT 배포 (30+ FPS)
+- [ ] **PC TensorRT 변환 + C++ 추론** (Jetson 30+ FPS 는 Phase 7 이후 옵션 #5)
 
 ### Depth Estimation
 - [ ] Depth Anything V2 사용법 이해
-- [ ] ONNX & TensorRT 변환
-- [ ] Jetson에서 15+ FPS 달성
+- [ ] ONNX & PC TensorRT 변환
+- [ ] PC 추론 속도 + Latency 분포 측정
 - [ ] 정확도 검증
 
-### 통합 시스템
+### 통합 시스템 + ROS2
 - [ ] Detection + Depth 융합 구현
 - [ ] 3D 위치 추정 동작
-- [ ] 전체 25+ FPS 달성
-- [ ] Demo 영상 제작
+- [ ] **ROS2 노드 래퍼** (필수, F안) — `vision_msgs` publish + TF
+- [ ] Demo 영상 제작 (1분)
 
-### 포트폴리오
-- [ ] GitHub 정리 (README, 코드)
-- [ ] 블로그 포스팅 (2-3개)
-- [ ] Demo 영상 (3-5분)
+### 산출물 #1 공개
+- [ ] `physical-ai-study` 레포 산출물 #1 디렉토리 정리 (README, 코드)
+- [ ] 블로그 포스팅 1~2개
+- [ ] Demo 영상 1분
 
 ---
 
 ## [goal] Phase 3 완료 기준
 
-> "Jetson Orin에서 실시간 객체 검출 + Depth 기반 3D 위치 추정 시스템을 30fps로 구동하고, 이를 데모 영상으로 증명"
+> "PC TensorRT 위에서 Detection + Depth → 3D 위치 추정 + ROS2 노드 래퍼를 구동하고, 이를 1분 데모 영상으로 증명. Jetson 30+ FPS 는 Phase 7 이후 옵션 (#5)."
 
 ---
 
@@ -442,7 +432,11 @@ pipe = pipeline(task="depth-estimation",
 
 ## [?] 다음 단계
 
-Phase 3 완료 후:
-- **Phase 4** (3D Perception)로 진행
-- KITTI 3D Detection → nuScenes BEV
-- 이직 포트폴리오 준비
+Phase 3 완료 후 (2026.08):
+- **Phase 4: VLA 논문 reading + OpenVLA → ROS2 minimal demo** (2026.09~12)
+- 산출물 #2 목표: RT-2 + OpenVLA 블로그 2편 + ROS2 토픽 demo (2026.12)
+- 동시기 진행: **Hardware-Arm Stage 1** (2026.10~12)
+- 동시기 진행: **정찰 지원 2~3건** (2026.11~12, 합격 기대 X, 면접관 반응 측정)
+- 2026.11 **6개월 분기 재평가 #1**
+
+> [!] 기존 Phase 4 (3D Perception/KITTI/BEV) 는 `Archive/Perception-3D-legacy/` 로 이동 예정 (F안). 본 레포의 새 Phase 4 는 VLA 트랙.

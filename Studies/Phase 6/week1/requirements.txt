@@ -1,0 +1,7 @@
+# Isaac Sim 4.x (pip 으로 설치)
+# pip install --extra-index-url https://pypi.nvidia.com isaacsim==4.5.0.0
+#                                                       isaacsim-extscache-physics==4.5.0.0
+#                                                       isaacsim-extscache-kit==4.5.0.0
+# 별도 pip requirements:
+numpy>=1.24.0
+torch>=2.0.0

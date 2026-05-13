@@ -1,0 +1,4 @@
+# Phase 5 마지막 주. 회고 + 보강 위주.
+torch>=2.0.0
+transformers>=4.40.0
+numpy>=1.24.0

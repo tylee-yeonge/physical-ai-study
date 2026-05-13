@@ -1,145 +1,128 @@
 """
-Phase 6 Week 8 - BEV 개념 이해 중급 퀴즈
-코드를 직접 실행하고 결과를 확인하세요.
+Phase 4 Week 8 - 중급 퀴즈: inference wrapper 설계 + 에러 처리
 """
-import numpy as np
 
 
-def problem1_bev_grid_calculation():
+def problem1_class_responsibilities():
     """
-    문제 1: BEV 그리드 설계
+    문제 1: VLAInference class 의 책임 분리
 
-    자율주행 시스템의 BEV 그리드를 설계하시오.
+    아래 동작 중 VLAInference class 의 책임은? (multi-answer)
+      A) 모델 로드
+      B) image preprocess (cv2 -> PIL)
+      C) predict_action 호출
+      D) NaN 검출
+      E) ROS2 topic 발행
+      F) Stress test 실행
 
-    요구사항:
-    - 커버 범위: 전방 50m, 후방 10m, 좌우 각 25m
-    - 셀 크기: 0.5m x 0.5m
+    답: 책임에 해당하는 것을 모두 골라 'A,B,...' 형태.
     """
-    print("\n" + "━" * 36)
-    print("문제 1: BEV 그리드 설계")
-    print("━" * 36 + "\n")
+    print("\n" + "=" * 60)
+    print("문제 1: VLAInference class 의 책임 범위")
+    print("=" * 60 + "\n")
 
-    print("  요구사항:")
-    print("    커버 범위: 전방 50m, 후방 10m, 좌우 25m")
-    print("    셀 크기: 0.5m x 0.5m")
+    # TODO
+    answers = ""
+
+    # A: 모델 로드 - O
+    # B: image preprocess - X (preprocess.py 가 담당, 별도 모듈)
+    # C: predict_action - O
+    # D: NaN 검출 - O
+    # E: ROS2 topic - X (ROS2 노드의 책임)
+    # F: Stress test - X (테스트 스크립트의 책임)
+    expected = sorted(["A", "C", "D"])
+
+    print(f"  당신의 답 : {sorted(answers.replace(' ', '').split(',')) if answers else '(empty)'}")
+    print(f"  기대 답   : {expected}")
     print()
-
-    print("  과제:")
-    print("  1) BEV 그리드의 크기(H x W)는? (셀 단위)")
-    print("  2) 총 셀 수는?")
-    print("  3) Feature dim = 256일 때 BEV Feature의 메모리는? (FP32)")
-    print("  4) 셀 크기를 0.25m로 줄이면 메모리가 몇 배 증가하는가?")
-    print()
-
-    # TODO: 학생이 계산
-    print("  BEV 그리드 크기: ___ x ___")
-    print("  총 셀 수: ___")
-    print("  메모리 (FP32): ___ MB")
-    print("  0.25m 셀 시 메모리 증가: ___배")
+    print("  자가 평가:")
+    print("    A 모델 로드      : O (VLAInference 의 일)")
+    print("    B image preprocess: X (preprocess.py 가 따로)")
+    print("    C predict_action : O")
+    print("    D NaN 검출       : O (output validation)")
+    print("    E ROS2 topic 발행: X (ROS2 노드)")
+    print("    F Stress test    : X (test script)")
 
 
-def problem2_ipm_projection():
+def problem2_exception_mapping():
     """
-    문제 2: IPM 좌표 변환 계산
+    문제 2: Exception 클래스 매핑
 
-    카메라 파라미터가 주어졌을 때, 지면 위의 3D 점을
-    이미지에 투영하시오.
+    아래 시나리오 - exception 매핑:
+      Scenario                              | Exception
+      --------------------------------------|--------------------
+      1) model file 손상                     | A) VLAModelError
+      2) image 가 numpy array 가 아님       | B) VLAInputError
+      3) inference 결과에 NaN               | C) VLAOutputError
+      4) CUDA OOM                            | D) VLAOOMError
+      5) 알 수 없는 에러                     | E) VLAInferenceError (base)
 
-    카메라: fx=721.5, fy=721.5, cx=609.6, cy=172.9
-    카메라 높이: 1.65m (지면에서)
-    카메라 pitch: 0 (수평)
+    TODO: mapping 딕셔너리를 채우시오.
     """
-    print("\n" + "━" * 36)
-    print("문제 2: IPM 좌표 변환")
-    print("━" * 36 + "\n")
+    print("\n" + "=" * 60)
+    print("문제 2: Exception 클래스 매핑")
+    print("=" * 60 + "\n")
 
-    fx, fy = 721.5, 721.5
-    cx, cy = 609.6, 172.9
-    cam_height = 1.65
+    # TODO
+    mapping = {
+        1: "",  # model file 손상
+        2: "",  # image type error
+        3: "",  # NaN 결과
+        4: "",  # OOM
+        5: "",  # base
+    }
 
-    print(f"  카메라: fx={fx}, fy={fy}, cx={cx}, cy={cy}")
-    print(f"  카메라 높이: {cam_height}m")
-    print()
+    expected = {
+        1: "VLAModelError",
+        2: "VLAInputError",
+        3: "VLAOutputError",
+        4: "VLAOOMError",
+        5: "VLAInferenceError",
+    }
 
-    # 지면 위의 3D 점 (카메라 좌표계: X=오른쪽, Y=아래, Z=전방)
-    ground_points = [
-        {"name": "A", "X": 0.0, "Z": 10.0},    # 정면 10m
-        {"name": "B", "X": 3.0, "Z": 20.0},     # 오른쪽 3m, 전방 20m
-        {"name": "C", "X": -5.0, "Z": 40.0},    # 왼쪽 5m, 전방 40m
-    ]
-
-    print("  지면 위의 3D 점 (Y = cam_height, 지면에 있음):")
-    for pt in ground_points:
-        print(f"    점 {pt['name']}: X={pt['X']:.1f}m, Z={pt['Z']:.1f}m")
-    print()
-
-    print("  과제:")
-    print("  1) 각 점의 카메라 좌표계 Y값은? (힌트: 카메라가 지면 위에 있음)")
-    print("  2) 각 점을 이미지 좌표 (u, v)로 투영하시오.")
-    print("     u = fx * X/Z + cx")
-    print("     v = fy * Y/Z + cy")
-    print("  3) 점 C는 이미지 밖에 있는가? (이미지 크기: 1242 x 375)")
+    print(f"  당신의 답:")
+    for k, v in mapping.items():
+        match = v == expected[k]
+        mark = "[O]" if match else "[X]"
+        print(f"    {mark} {k}: {v}  (기대: {expected[k]})")
 
 
-def problem3_depth_distribution():
+def problem3_pipeline_order():
     """
-    문제 3: Lift-Splat의 Depth 분포 분석
+    문제 3: predict() 의 단계 순서
 
-    3개 픽셀의 Depth 분포가 주어졌을 때,
-    BEV Feature에 대한 영향을 분석하시오.
+    아래 단계를 올바른 순서로 나열:
+      A) prompt 생성
+      B) input validation
+      C) model.predict_action 호출
+      D) output validation (NaN / shape)
+      E) processor 로 tensor 변환
+
+    TODO: 순서를 채우시오 (예: "B,A,E,C,D")
     """
-    print("\n" + "━" * 36)
-    print("문제 3: Depth 분포 → BEV 영향")
-    print("━" * 36 + "\n")
+    print("\n" + "=" * 60)
+    print("문제 3: predict() 의 단계 순서")
+    print("=" * 60 + "\n")
 
-    depth_bins = np.arange(2, 62, 2)  # 2m ~ 60m, 2m 간격 (30 bins)
+    # TODO
+    order = ""  # 예: "B,A,E,C,D"
 
-    # 픽셀 A: 가까운 차량 (명확한 depth)
-    dist_a = np.zeros(30)
-    dist_a[4] = 0.8   # 10m
-    dist_a[3] = 0.1   # 8m
-    dist_a[5] = 0.1   # 12m
+    expected = "B,A,E,C,D"
 
-    # 픽셀 B: 먼 차량 (불확실한 depth)
-    dist_b = np.zeros(30)
-    for i in range(12, 20):
-        dist_b[i] = np.exp(-0.3 * (i - 16)**2)
-    dist_b /= dist_b.sum()
-
-    # 픽셀 C: 하늘 (depth 없음)
-    dist_c = np.ones(30) / 30
-
-    print("  Depth bins: 2m ~ 60m (2m 간격, 30 bins)")
+    print(f"  당신의 답 : {order}")
+    print(f"  기대 답   : {expected}")
     print()
-    print("  픽셀 A (가까운 차량):")
-    peak_a = depth_bins[np.argmax(dist_a)]
-    print(f"    피크: {peak_a}m, 확률: {max(dist_a):.1f}")
-    print()
-    print("  픽셀 B (먼 차량):")
-    peak_b = depth_bins[np.argmax(dist_b)]
-    print(f"    피크: {peak_b}m, 확률: {max(dist_b):.2f}")
-    print()
-    print("  픽셀 C (하늘):")
-    print(f"    균일 분포, 각 bin 확률: {1/30:.4f}")
-    print()
-
-    print("  과제:")
-    print("  1) 각 픽셀의 Feature가 BEV에서 어떻게 분포되는가?")
-    print("     (집중 vs 분산)")
-    print("  2) 하늘 픽셀(C)이 BEV에 미치는 영향은?")
-    print("  3) Depth 분포의 '확신도'가 높을수록 BEV에 미치는 영향은?")
-    print("  4) Depth GT를 사용한 감독(supervision)이 중요한 이유는?")
+    print("  정답 흐름:")
+    print("    1. B (input validation)        - 잘못된 입력은 일찍 catch")
+    print("    2. A (prompt 생성)              - instruction + 'In: ...' template")
+    print("    3. E (processor tensor 변환)    - HuggingFace processor")
+    print("    4. C (model.predict_action)     - 실제 inference")
+    print("    5. D (output validation)        - NaN / shape 검증")
 
 
 if __name__ == "__main__":
-    print("━" * 40)
-    print("  Phase 6 Week 8 Quiz - Medium")
-    print("━" * 40)
-
-    problem1_bev_grid_calculation()
-    problem2_ipm_projection()
-    problem3_depth_distribution()
-
-    print("\n" + "━" * 40)
-    print("정답은 quiz_solutions/medium_sol.py 참고")
-    print("━" * 40)
+    print("=" * 60)
+    problem1_class_responsibilities()
+    problem2_exception_mapping()
+    problem3_pipeline_order()
+    print("=" * 60)

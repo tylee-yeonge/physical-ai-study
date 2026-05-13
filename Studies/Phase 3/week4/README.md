@@ -1,8 +1,8 @@
-# Week 4: YOLOv8 학습 (Section 5.2)
+# Week 4: YOLO11 학습 (Section 5.2)
 
-> [goal] **이번 주 목표**: Ultralytics를 사용하여 YOLOv8을 직접 학습시키고, 커스텀 데이터셋 준비부터 모델 평가까지 전체 파이프라인을 구축한다.
+> [goal] **이번 주 목표**: Ultralytics를 사용하여 YOLO11을 직접 학습시키고, 커스텀 데이터셋 준비부터 모델 평가까지 전체 파이프라인을 구축한다.
 > [time] **예상 시간**: 12시간
-> [tip] **핵심 질문**: "커스텀 데이터셋으로 YOLOv8을 학습하고, mAP를 기반으로 모델을 평가할 수 있는가?"
+> [tip] **핵심 질문**: "커스텀 데이터셋으로 YOLO11을 학습하고, mAP를 기반으로 모델을 평가할 수 있는가?"
 
 ---
 
@@ -14,7 +14,7 @@
 | 2 | 이론 학습 | `README.md` | 아래 핵심 개념 읽기 |
 | 3 | Python 퀴즈 (초급) | `quiz_easy.py` | Ultralytics 사용법, 데이터셋 구조 개념 확인 |
 | 4 | Python 퀴즈 (중급) | `quiz_medium.py` | Hyperparameter 튜닝, 학습 결과 분석 |
-| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | YOLOv8 학습 파이프라인 구축 |
+| 5 | 실습 | [PRACTICE.md](./PRACTICE.md) | YOLO11 학습 파이프라인 구축 |
 
 ---
 
@@ -47,25 +47,25 @@
 
 ### 1. Ultralytics 사용법
 
-Ultralytics는 YOLOv8의 공식 라이브러리로, 학습/추론/내보내기를 매우 간단하게 수행합니다.
+Ultralytics는 YOLO11의 공식 라이브러리로, 학습/추론/내보내기를 매우 간단하게 수행합니다.
 
 ```bash
 # 설치
 pip install ultralytics
 
 # CLI로 추론
-yolo detect predict model=yolov8n.pt source='image.jpg'
+yolo detect predict model=yolo11n.pt source='image.jpg'
 
 # CLI로 학습
-yolo detect train data=coco128.yaml model=yolov8n.pt epochs=100 imgsz=640
+yolo detect train data=coco128.yaml model=yolo11n.pt epochs=100 imgsz=640
 ```
 
 ```python
 from ultralytics import YOLO
 
 # -- 모델 로드 --
-model = YOLO('yolov8n.pt')         # Pretrained 모델
-model = YOLO('yolov8n.yaml')       # 새 모델 (from scratch)
+model = YOLO('yolo11n.pt')         # Pretrained 모델
+model = YOLO('yolo11n.yaml')       # 새 모델 (from scratch)
 model = YOLO('best.pt')            # 학습된 모델
 
 # -- 추론 --
@@ -94,7 +94,7 @@ model.export(format='engine')      # TensorRT
 ```python
 from ultralytics import YOLO
 
-model = YOLO('yolov8n.pt')
+model = YOLO('yolo11n.pt')
 results = model('image.jpg')
 
 # 결과 접근
@@ -235,7 +235,7 @@ COCO128은 COCO 데이터셋에서 128장을 추출한 미니 데이터셋으로
 from ultralytics import YOLO
 
 # -- 기본 학습 --
-model = YOLO('yolov8n.pt')  # Pretrained nano 모델
+model = YOLO('yolo11n.pt')  # Pretrained nano 모델
 
 results = model.train(
     data='coco128.yaml',     # 내장 데이터셋 (자동 다운로드)
@@ -340,10 +340,10 @@ Mosaic: 4장의 이미지를 하나로 합쳐 학습
 
 ```
 1단계: 기본값으로 Baseline 확립
-  → yolov8n.pt, epochs=50, imgsz=640, batch=16
+  → yolo11n.pt, epochs=50, imgsz=640, batch=16
 
 2단계: 모델 크기 실험
-  → yolov8n → yolov8s → yolov8m (데이터/GPU 여유 시)
+  → yolo11n → yolo11s → yolo11m (데이터/GPU 여유 시)
 
 3단계: 학습률 조절
   → lr0: 0.001, 0.005, 0.01, 0.02
@@ -494,13 +494,13 @@ for result in results:
 
 ### 2. 모델 크기 선택 가이드
 
-| 모델 | 파라미터 | mAP@0.5:0.95 | 추론 속도 | 용도 |
-|------|---------|--------------|----------|------|
-| YOLOv8n | 3.2M | 37.3 | 가장 빠름 | Edge 디바이스 |
-| YOLOv8s | 11.2M | 44.9 | 빠름 | 실시간 응용 |
-| YOLOv8m | 25.9M | 50.2 | 보통 | 균형 |
-| YOLOv8l | 43.7M | 52.9 | 느림 | 높은 정확도 |
-| YOLOv8x | 68.2M | 53.9 | 가장 느림 | 최고 정확도 |
+| 모델 | 파라미터 | mAP@0.5:0.95 (COCO) | 추론 속도 | 용도 |
+|------|---------|---------------------|----------|------|
+| YOLO11n | 2.6M  | 39.5 | 가장 빠름 | Edge 디바이스 |
+| YOLO11s | 9.4M  | 47.0 | 빠름      | 실시간 응용 |
+| YOLO11m | 20.1M | 51.5 | 보통      | 균형 |
+| YOLO11l | 25.3M | 53.4 | 느림      | 높은 정확도 |
+| YOLO11x | 56.9M | 54.7 | 가장 느림 | 최고 정확도 |
 
 ### 3. Overfitting 판단법
 
@@ -539,7 +539,7 @@ for result in results:
 
 - [ ] Ultralytics 설치 및 기본 추론 성공
 - [ ] YOLO 데이터셋 포맷 (디렉토리 구조, 라벨 형식) 이해
-- [ ] COCO128로 YOLOv8n 학습 완료
+- [ ] COCO128로 YOLO11n 학습 완료
 - [ ] 학습 결과 파일 (results.png, confusion_matrix.png) 확인
 - [ ] mAP@0.5, mAP@0.5:0.95 결과 해석
 - [ ] Hyperparameter 변경 후 재학습 실험
@@ -552,7 +552,7 @@ for result in results:
 
 ```
 +---------------------------------------------------------+
-|  YOLOv8 학습 핵심 정리                                   |
+|  YOLO11 학습 핵심 정리                                   |
 |                                                         |
 |  1. Ultralytics: pip install ultralytics (간편한 API)    |
 |  2. 데이터셋: YOLO format (class x_c y_c w h, 정규화)   |

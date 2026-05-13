@@ -1,3 +1,8 @@
 numpy>=1.24.0
-matplotlib>=3.7.0
+rerun-sdk>=0.15.0
+opencv-python>=4.8.0
 Pillow>=9.5.0
+# 시스템 패키지:
+#   sudo apt install ros-humble-cv-bridge
+#   sudo apt install kazam   # 녹화 (또는 obs-studio)
+#   sudo apt install shotcut # 편집 (또는 openshot-qt)

@@ -1,5 +1,5 @@
 """
-Phase 5 Week 4 - YOLOv8 학습 기초 퀴즈
+Phase 5 Week 4 - YOLO11 학습 기초 퀴즈
 """
 
 

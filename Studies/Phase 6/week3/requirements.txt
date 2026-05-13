@@ -1,0 +1,4 @@
+numpy>=1.24.0
+# ROS2 시스템:
+#   sudo apt install ros-humble-rclpy ros-humble-tf2-msgs ros-humble-sensor-msgs
+# Isaac Sim 4.x 의 omni.isaac.ros2_bridge extension 사용

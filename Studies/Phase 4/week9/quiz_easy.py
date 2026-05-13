@@ -1,77 +1,62 @@
 """
-Phase 6 Week 9 - BEVFormer 이해 기초 퀴즈
+Phase 4 Week 9 - I/O Spec + msg 변환 기초 퀴즈
 """
 
 
-def problem1_bev_coverage():
-    print("\n" + "━" * 28)
-    print("문제 1: BEV Query 커버 범위")
-    print("━" * 28 + "\n")
-
-    print("질문: BEV Query Grid가 200x200이고 셀 크기가 0.5m일 때,")
-    print("      커버하는 물리적 범위는?\n")
-
+def problem1_minimal_msg():
+    print("\n" + "=" * 50)
+    print("문제 1: 7-DoF action 의 minimal demo msg")
+    print("=" * 50 + "\n")
+    print("질문: minimal demo 단계에서 OpenVLA 7-DoF action 발행에")
+    print("      가장 적합한 표준 msg 조합은?\n")
     print("보기:")
-    print("  A) 50m x 50m")
-    print("  B) 100m x 100m")
-    print("  C) 200m x 200m")
-    print("  D) 400m x 400m")
+    print("  A) sensor_msgs/JointState 하나로 전부")
+    print("  B) geometry_msgs/Twist (6-DoF) + std_msgs/Float64 (gripper)")
+    print("  C) geometry_msgs/Pose (3 + 4 quat) - 1개")
+    print("  D) custom vla_msgs/Action 필수")
 
 
-def problem2_spatial_cross_attention():
-    print("\n" + "━" * 28)
-    print("문제 2: Spatial Cross-Attention")
-    print("━" * 28 + "\n")
-
-    print("질문: Spatial Cross-Attention에서 BEV Query 하나에 대해")
-    print("      4개 높이, 6대 카메라를 사용하면 총 몇 개의")
-    print("      Reference Point가 생성되는가?\n")
-
+def problem2_cv_bridge_encoding():
+    print("\n" + "=" * 50)
+    print("문제 2: cv_bridge encoding")
+    print("=" * 50 + "\n")
+    print("질문: OpenCV 의 표준 색공간 + OpenVLA 입력 색공간 매핑은?\n")
     print("보기:")
-    print("  A) 4개")
-    print("  B) 6개")
-    print("  C) 10개")
-    print("  D) 24개")
+    print("  A) OpenCV BGR8, OpenVLA RGB → cvtColor 로 BGR2RGB 필요")
+    print("  B) OpenCV RGB8, OpenVLA RGB → 변환 불필요")
+    print("  C) OpenCV YUV, OpenVLA RGB → 변환 필요")
+    print("  D) OpenCV BGR8, OpenVLA BGR → 변환 불필요")
 
 
-def problem3_temporal_attention():
-    print("\n" + "━" * 28)
-    print("문제 3: Temporal Self-Attention")
-    print("━" * 28 + "\n")
-
-    print("질문: Temporal Self-Attention에서 ego-motion 보상이 필요한")
-    print("      가장 핵심적인 이유는?\n")
-
+def problem3_qos_image():
+    print("\n" + "=" * 50)
+    print("문제 3: image topic 의 적절한 QoS")
+    print("=" * 50 + "\n")
+    print("질문: /camera/image_raw 에 적합한 QoS 설정은?\n")
     print("보기:")
-    print("  A) GPU 메모리를 절약하기 위해")
-    print("  B) 차량 이동으로 인해 이전 BEV와 현재 BEV의 좌표가 어긋나기 때문에")
-    print("  C) 이미지 해상도를 높이기 위해")
-    print("  D) Backbone의 학습 속도를 높이기 위해")
+    print("  A) reliable, depth=100 (모든 frame 보존)")
+    print("  B) best_effort, depth=1 (drop 허용, 최신 1개만)")
+    print("  C) transient_local, depth=10 (latch)")
+    print("  D) reliable, depth=10")
 
 
-def problem4_bevformer_advantage():
-    print("\n" + "━" * 28)
-    print("문제 4: BEVFormer vs BEVDet")
-    print("━" * 28 + "\n")
-
-    print("질문: BEVFormer가 BEVDet(Lift-Splat-Shoot 기반)에 비해")
-    print("      가지는 핵심적인 장점은?\n")
-
+def problem4_inference_latency():
+    print("\n" + "=" * 50)
+    print("문제 4: inference latency 측정 방법")
+    print("=" * 50 + "\n")
+    print("질문: ROS2 환경에서 OpenVLA inference latency 를 정확히")
+    print("      측정하는 방법은?\n")
     print("보기:")
-    print("  A) 더 적은 카메라를 사용할 수 있다")
-    print("  B) 명시적 Depth 예측이 필요 없고, Temporal 정보를 활용할 수 있다")
-    print("  C) LiDAR 데이터를 함께 사용할 수 있다")
-    print("  D) 더 적은 GPU 메모리를 사용한다")
+    print("  A) action.header.stamp - image.header.stamp")
+    print("  B) system clock (time.time()) 호출 차이")
+    print("  C) GPU clock 측정")
+    print("  D) 매 1초마다 평균만 측정")
 
 
 if __name__ == "__main__":
-    print("━" * 33)
-    print("  Week 9 Quiz - Easy")
-    print("━" * 33)
-    problem1_bev_coverage()
-    problem2_spatial_cross_attention()
-    problem3_temporal_attention()
-    problem4_bevformer_advantage()
-    print("\n" + "━" * 33)
-    print("정답은 quiz_solutions/easy_sol.py 참고")
-    print("━" * 33)
+    print("=" * 50)
+    problem1_minimal_msg()
+    problem2_cv_bridge_encoding()
+    problem3_qos_image()
+    problem4_inference_latency()
+    print("=" * 50)

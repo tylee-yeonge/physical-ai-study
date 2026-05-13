@@ -451,44 +451,45 @@ python practice_nms.py
 
 ---
 
-## [note] 실습 4: YOLOv8 구조 살펴보기
+## [note] 실습 4: YOLO11 구조 살펴보기
 
-**파일명**: `practice_yolov8_structure.py`
+**파일명**: `practice_yolo11_structure.py`
 
 ```python
 """
-실습 4: YOLOv8 모델 구조 분석
-목표: Ultralytics YOLOv8 모델의 실제 구조를 확인한다.
+실습 4: YOLO11 모델 구조 분석
+목표: Ultralytics YOLO11 모델의 실제 구조를 확인하고,
+      YOLOv8과의 차이(C2f -> C3k2, C2PSA 추가)를 눈으로 확인한다.
 """
 from ultralytics import YOLO
 
 print("=" * 50)
-print("실습 4: YOLOv8 구조 분석")
+print("실습 4: YOLO11 구조 분석")
 print("=" * 50)
 
 # -- 모델 로드 --
-model = YOLO('yolov8n.pt')  # nano 모델 (가장 작음)
+model = YOLO('yolo11n.pt')  # nano 모델 (가장 작음)
 
 # -- 모델 정보 출력 --
 print("\n[1] 모델 기본 정보")
-print(f"  모델명: {model.model.yaml.get('yaml_file', 'yolov8n')}")
+print(f"  모델명: {model.model.yaml.get('yaml_file', 'yolo11n')}")
 print(f"  총 파라미터: {sum(p.numel() for p in model.model.parameters()):,}")
 print(f"  학습 가능 파라미터: {sum(p.numel() for p in model.model.parameters() if p.requires_grad):,}")
 
-# -- 레이어별 구조 --
+# -- 레이어별 구조 (C3k2, C2PSA가 보이는지 확인) --
 print("\n[2] 모델 레이어 구조")
 for i, layer in enumerate(model.model.model):
     params = sum(p.numel() for p in layer.parameters())
     print(f"  Layer {i:2d}: {layer.__class__.__name__:20s} → 파라미터: {params:>8,}")
 
-# -- 모델 크기 비교 --
-print("\n[3] YOLOv8 모델 크기 비교")
+# -- 모델 크기 비교 (COCO val2017, mAP@0.5:0.95) --
+print("\n[3] YOLO11 모델 크기 비교")
 model_sizes = {
-    'yolov8n': '3.2M params, 8.7 GFLOPs',
-    'yolov8s': '11.2M params, 28.6 GFLOPs',
-    'yolov8m': '25.9M params, 78.9 GFLOPs',
-    'yolov8l': '43.7M params, 165.2 GFLOPs',
-    'yolov8x': '68.2M params, 257.8 GFLOPs',
+    'yolo11n': '2.6M params,  6.5 GFLOPs, mAP 39.5',
+    'yolo11s': '9.4M params, 21.5 GFLOPs, mAP 47.0',
+    'yolo11m': '20.1M params, 68.0 GFLOPs, mAP 51.5',
+    'yolo11l': '25.3M params, 86.9 GFLOPs, mAP 53.4',
+    'yolo11x': '56.9M params, 194.9 GFLOPs, mAP 54.7',
 }
 for name, info in model_sizes.items():
     print(f"  {name}: {info}")
@@ -499,7 +500,7 @@ print("\n[O] 실습 4 완료!")
 **실행**:
 ```bash
 pip install ultralytics
-python practice_yolov8_structure.py
+python practice_yolo11_structure.py
 ```
 
 ---
@@ -510,7 +511,7 @@ python practice_yolov8_structure.py
 - [ ] Precision, Recall, AP 수동 계산
 - [ ] PR Curve 시각화 확인
 - [ ] NMS 직접 구현 및 결과 확인
-- [ ] YOLOv8 모델 구조 분석
+- [ ] YOLO11 모델 구조 분석 (C3k2, C2PSA 확인)
 
 ---
 
@@ -518,7 +519,7 @@ python practice_yolov8_structure.py
 
 - [YOLO 원본 논문 (Redmon et al., 2015)](https://arxiv.org/abs/1506.02640)
 - [YOLOv3 논문](https://arxiv.org/abs/1804.02767)
-- [Ultralytics YOLOv8 문서](https://docs.ultralytics.com/)
+- [Ultralytics YOLO11 문서](https://docs.ultralytics.com/models/yolo11/)
 - [CIoU 논문 (Zheng et al., 2020)](https://arxiv.org/abs/1911.08287)
 - [mAP 계산 설명 (Jonathan Hui)](https://jonathan-hui.medium.com/map-mean-average-precision-for-object-detection-45c121a31173)
 

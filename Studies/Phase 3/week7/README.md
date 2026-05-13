@@ -24,7 +24,7 @@
 
 **지금까지의 흐름:**
 ```
-Week 1-4: YOLOv8으로 '무엇(What)'을 검출
+Week 3-4: YOLO11로 '무엇(What)'을 검출
 Week 5-6: 모델 배포 최적화 (ONNX, TensorRT)
 
 [!] 문제: 객체를 찾았지만 '얼마나 멀리(How far)' 있는지 모름!
