@@ -62,10 +62,10 @@ def parse_label_line(line: str) -> KittiLabel:
         DontCare 행도 같은 포맷이지만 좌표 일부가 -1. 호출 측에서 type 으로 거른다.
     """
     # TODO:
-    #   1) line.split() 로 토큰 리스트 만들기
-    #   2) tokens[0] = type_, tokens[4:8] = 2D bbox, tokens[8:11] = dim,
-    #      tokens[11:14] = location, tokens[14] = ry
-    #   3) float 캐스팅 후 KittiLabel 생성하여 반환
+    #   - docstring 의 컬럼 표를 보고 슬라이스 인덱스를 정할 것
+    #   - split 결과는 모두 문자열 → 숫자 필드는 float 으로 캐스팅
+    #   - bbox / dim / location 은 각각 4, 3, 3 개 값으로 묶이는지 길이 확인
+    #   - KittiLabel 은 dataclass 이므로 위치 인자 순서대로 한 번에 생성 가능
     raise NotImplementedError
 
 
@@ -87,10 +87,9 @@ def parse_calib_p2(calib_path: Path) -> np.ndarray:
         rectified 좌표계라 R0_rect 추가 곱셈 불필요.
     """
     # TODO:
-    #   1) calib_path.read_text().splitlines() 순회
-    #   2) line.startswith("P2:") 인 줄을 찾으면
-    #      값들 = line.split()[1:] (콜론 뒤 12 개 숫자)
-    #   3) np.array(값, dtype=float).reshape(3, 4) 반환
+    #   - 파일을 줄 단위로 훑어 "P2:" 라벨로 시작하는 줄만 골라낼 것
+    #   - 콜론 뒤 토큰 12 개를 numpy 배열로 만들고 (3, 4) 로 reshape
+    #   - 못 찾았을 때는 조용히 None 대신 예외를 던지는 편이 디버깅에 유리
     raise NotImplementedError
 
 
@@ -121,22 +120,15 @@ def compute_3d_corners(label: KittiLabel) -> np.ndarray:
                    [-sin(ry), 0, cos(ry)]]
     """
     # TODO:
-    #   h, w, l = label.dim
-    #   ry      = label.rotation_y
-    #
-    #   # 로컬 박스 (회전/이동 적용 전), 바닥 = y=0
-    #   x_corners = np.array([ l/2,  l/2, -l/2, -l/2,  l/2,  l/2, -l/2, -l/2])
-    #   y_corners = np.array([   0,    0,    0,    0,   -h,   -h,   -h,   -h])
-    #   z_corners = np.array([ w/2, -w/2, -w/2,  w/2,  w/2, -w/2, -w/2,  w/2])
-    #
-    #   c, s = np.cos(ry), np.sin(ry)
-    #   R = np.array([[ c, 0, s],
-    #                 [ 0, 1, 0],
-    #                 [-s, 0, c]])
-    #
-    #   corners = R @ np.stack([x_corners, y_corners, z_corners], axis=0)   # (3, 8)
-    #   corners += np.array(label.location).reshape(3, 1)
-    #   return corners
+    #   1) 회전/이동을 적용하기 전 *로컬 박스* 8 점을 만든다
+    #      - 부피 축: x 는 +-l/2, z 는 +-w/2 부호 조합으로 4 가지
+    #      - y 는 바닥 4 점 = 0, 천장 4 점 = -h (location 이 바닥 중심이므로)
+    #      - 인덱스 순서는 docstring 의 '앞좌-앞우-뒤우-뒤좌' 를 지킬 것
+    #        (EDGES 가 이 순서를 가정한다 → 어긋나면 모서리가 X 자로 꼬임)
+    #   2) docstring 에 있는 KITTI 컨벤션 R_y 로 회전 적용
+    #      - shape: (3,3) @ (3,8) = (3,8). np.stack 으로 점을 열-축에 쌓을 것
+    #   3) location 을 더해 world 위치로 평행이동
+    #      - (3,8) 에 (3,) 를 더하려면 (3,1) 로 reshape 해 broadcasting
     raise NotImplementedError
 
 
@@ -159,13 +151,12 @@ def project_corners(
         rectified P2 는 이미 K · [R|t] 가 합쳐져 있어 한 번의 행렬곱으로 충분.
     """
     # TODO:
-    #   ones        = np.ones((1, corners_cam.shape[1]))
-    #   corners_h   = np.vstack([corners_cam, ones])      # (4, 8)
-    #   proj        = P2 @ corners_h                       # (3, 8)
-    #   cam_z       = proj[2]                              # (8,)
-    #   uv          = proj[:2] / cam_z                     # (2, 8)
-    #   visible     = cam_z > 0
-    #   return uv, visible
+    #   - (3, 8) 코너 아래에 1 행을 붙여 동차좌표 (4, 8) 로 확장
+    #     (vstack / concatenate 등 어떤 방법이든 OK)
+    #   - P2 @ corners_h = (3, 8). 세 번째 행이 cam 의 +z = 깊이
+    #   - u, v 는 처음 두 행을 깊이로 나누는 perspective divide 로 구한다
+    #     (broadcasting: (2,8) / (8,) 는 자동으로 행 단위로 나눠짐)
+    #   - 가시성은 depth > 0 만 검사 (시야각 안인지는 호출자에서 추가 검증 가능)
     raise NotImplementedError
 
 
@@ -186,10 +177,10 @@ def bbox_from_corners(
         ValueError: 가시 코너가 0 개일 때.
     """
     # TODO:
-    #   if not visible.any(): raise ValueError("no visible corner")
-    #   uv_v = uv[:, visible]
-    #   return (float(uv_v[0].min()), float(uv_v[1].min()),
-    #           float(uv_v[0].max()), float(uv_v[1].max()))
+    #   - 가시 코너가 0 개면 박스를 정의할 수 없으니 ValueError
+    #   - boolean 인덱싱으로 visible 한 코너만 골라내고
+    #     u 행과 v 행 각각의 min / max 를 추출하면 그대로 (x1, y1, x2, y2)
+    #   - 반환은 plain float tuple. numpy 스칼라가 섞이면 IoU 계산 시 dtype 사고 잦음
     raise NotImplementedError
 
 
@@ -202,13 +193,11 @@ def bbox_iou(
         IoU > 0.7 또는 max corner diff < 5 px 면 정합도 양호.
     """
     # TODO:
-    #   ix1, iy1 = max(a[0], b[0]), max(a[1], b[1])
-    #   ix2, iy2 = min(a[2], b[2]), min(a[3], b[3])
-    #   iw, ih   = max(0, ix2 - ix1), max(0, iy2 - iy1)
-    #   inter    = iw * ih
-    #   area_a   = (a[2] - a[0]) * (a[3] - a[1])
-    #   area_b   = (b[2] - b[0]) * (b[3] - b[1])
-    #   return inter / (area_a + area_b - inter)
+    #   - 교집합 박스 좌상단 = 두 박스 좌상단의 *큰 쪽*
+    #     교집합 박스 우하단 = 두 박스 우하단의 *작은 쪽*
+    #   - 폭/높이가 음수면 두 박스가 안 겹친 것 → 0 으로 clip
+    #   - IoU = inter / (areaA + areaB - inter)
+    #     (분모가 0 인 케이스는 호출 측에서 막혔다고 가정)
     raise NotImplementedError
 
 
@@ -240,12 +229,10 @@ def draw_box_3d(
         그려진 이미지 (참조).
     """
     # TODO:
-    #   for i, j in EDGES:
-    #       if visible[i] and visible[j]:
-    #           p1 = (int(uv[0, i]), int(uv[1, i]))
-    #           p2 = (int(uv[0, j]), int(uv[1, j]))
-    #           cv2.line(img_bgr, p1, p2, color, thickness)
-    #   return img_bgr
+    #   - 위에 정의된 EDGES (12 모서리의 코너 인덱스 쌍) 을 순회
+    #   - 양 끝 코너가 *둘 다 visible* 일 때만 그린다
+    #     (한 쪽만 보이는 모서리를 그리면 화면 밖으로 뻗는 잘못된 선이 나옴)
+    #   - cv2.line 의 좌표 인자는 int tuple → uv 값을 캐스팅해 전달
     raise NotImplementedError
 
 
@@ -271,20 +258,16 @@ def log_to_rerun(
         원격 (Tunnel) 환경에서는 rr.serve_web() 또는 rr.save("xxx.rrd") 가 더 편함.
     """
     # TODO:
-    #   rr.log("image", rr.Image(img_rgb))
-    #   rr.log("image/proj_corners",
-    #          rr.Points2D(uv.T, radii=3, colors=[(0, 255, 0)]))
-    #   rr.log("image/gt_bbox",
-    #          rr.Boxes2D(array=np.array([gt_bbox]),
-    #                     array_format=rr.Box2DFormat.XYXY,
-    #                     colors=[(255, 0, 0)]))
+    #   2D 트리 (image/...) - 위 docstring 의 엔티티 구조와 1:1 대응:
+    #     - 원본 RGB 이미지를 rr.Image 로 로깅
+    #     - uv 8 코너를 Points2D 로. rr 의 Points2D 는 (N, 2) 모양을 요구하므로
+    #       (2, N) 인 uv 는 전치해서 넘긴다 (color 는 녹)
+    #     - 정답 2D bbox 는 Boxes2D 로. XYXY 포맷을 명시할 것 (적)
     #
-    #   K = P2[:, :3]
-    #   H, W = img_rgb.shape[:2]
-    #   rr.log("world/cam",
-    #          rr.Pinhole(image_from_camera=K, width=W, height=H))
-    #   rr.log("world/box_corners",
-    #          rr.Points3D(corners_cam.T, radii=0.05))
+    #   3D 트리 (world/...):
+    #     - rectified P2 는 K | [R0|t] 가 합쳐진 형태 → 앞 3 열이 곧 K
+    #     - 이미지 해상도는 img_rgb.shape 의 (H, W). Pinhole 인자 순서 주의
+    #     - corners_cam 도 Points3D 로 같이 찍어두면 2D 와 3D 정합을 눈으로 비교 가능
     raise NotImplementedError
 
 

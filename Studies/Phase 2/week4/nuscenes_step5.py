@@ -74,7 +74,9 @@ def load_nuscenes() -> NuScenes:
         v1.0-mini 는 10 scene, 약 3GB. 첫 로드 시 수 초 걸린다.
     """
     # TODO:
-    #   return NuScenes(version=NUSC_VERSION, dataroot=str(NUSC_ROOT), verbose=False)
+    #   - 위에 정의된 NUSC_VERSION / NUSC_ROOT 상수를 그대로 사용
+    #   - dataroot 는 문자열 경로를 받으므로 Path 를 str() 로 변환
+    #   - 디버깅이 끝났다면 verbose 를 꺼서 로그 노이즈 줄이기
     raise NotImplementedError
 
 
@@ -103,24 +105,17 @@ def build_camera_view(nusc: NuScenes, sample: dict, channel: str) -> CameraView:
         Quaternion(quat_list) 둘 다 OK.
     """
     # TODO:
-    #   1) sd = nusc.get('sample_data', sample['data'][channel])
-    #
-    #   2) calib  = nusc.get('calibrated_sensor', sd['calibrated_sensor_token'])
-    #      ego    = nusc.get('ego_pose',          sd['ego_pose_token'])
-    #
-    #   3) K = np.array(calib['camera_intrinsic'])                       # (3, 3)
-    #
-    #   4) ego_from_sensor   = transform_matrix(calib['translation'],
-    #                                           Quaternion(calib['rotation']))
-    #      world_from_ego    = transform_matrix(ego['translation'],
-    #                                           Quaternion(ego['rotation']))
-    #      world_from_sensor = world_from_ego @ ego_from_sensor
-    #      cam_from_world    = np.linalg.inv(world_from_sensor)
-    #
-    #   5) image_path = NUSC_ROOT / sd['filename']
-    #      W, H       = sd['width'], sd['height']
-    #
-    #   6) return CameraView(channel, image_path, K, cam_from_world, W, H)
+    #   1) sample['data'][channel] 토큰을 nusc.get('sample_data', ...) 로 dict 조회
+    #      → 여기에 calibrated_sensor_token / ego_pose_token / filename / width / height 가 들어있다
+    #   2) 두 token 으로 calib (sensor->ego) 와 ego_pose (ego->world) dict 를 추가 조회
+    #   3) 카메라 내부행렬 K 는 calib['camera_intrinsic'] (이미 (3,3) 리스트)
+    #   4) 두 변환을 합성해 world->cam 만들기
+    #      - 각 (translation, rotation) → 아래 transform_matrix 로 4x4 변환
+    #      - rotation 은 [w,x,y,z] 순서 quaternion → pyquaternion.Quaternion 로 감싸기
+    #      - world_from_sensor = world_from_ego @ ego_from_sensor (순서 주의)
+    #      - cam_from_world 는 그 *역행렬*
+    #   5) image_path 는 NUSC_ROOT / sd['filename'] 로 절대경로 만들기
+    #   6) CameraView 의 필드 순서대로 채워 반환
     raise NotImplementedError
 
 
@@ -135,10 +130,9 @@ def transform_matrix(translation: List[float], rotation: Quaternion) -> np.ndarr
         (4, 4) numpy 배열. 마지막 행은 [0, 0, 0, 1].
     """
     # TODO:
-    #   T = np.eye(4)
-    #   T[:3, :3] = rotation.rotation_matrix
-    #   T[:3, 3]  = translation
-    #   return T
+    #   - 4x4 항등행렬에서 시작 (마지막 행 [0,0,0,1] 자동 충족)
+    #   - 좌상단 3x3 블록에 pyquaternion 의 rotation_matrix 속성을 채운다
+    #   - 마지막 열 3x1 블록에 translation 채우기
     raise NotImplementedError
 
 
@@ -163,18 +157,12 @@ def project_world_point(
             (3) 0 <= v < height             : 세로 시야 내
     """
     # TODO:
-    #   p_h    = np.append(point_world, 1.0)                  # (4,)
-    #   p_cam  = view.cam_from_world @ p_h                    # (4,)
-    #   depth  = p_cam[2]
-    #   if depth <= 0:
-    #       return None, depth
-    #
-    #   uvw    = view.K @ p_cam[:3]                           # (3,)
-    #   u, v   = uvw[0] / uvw[2], uvw[1] / uvw[2]
-    #
-    #   if 0 <= u < view.width and 0 <= v < view.height:
-    #       return (float(u), float(v)), float(depth)
-    #   return None, float(depth)
+    #   1) point_world 에 동차좌표 1 을 붙여 (4,) 로 만든 뒤 cam_from_world 와 곱하기
+    #   2) cam 좌표 z 성분이 곧 depth. <= 0 이면 카메라 뒤이므로 일찍 종료 (None, depth)
+    #   3) K (3x3) 와 cam 좌표 앞 3 성분의 곱 후 perspective divide → (u, v)
+    #      (직접 / 로 나누거나, 처음 두 성분을 세 번째로 나누는 방식 둘 다 OK)
+    #   4) (u, v) 가 [0, width) x [0, height) 안일 때만 좌표 반환, 그 외엔 None
+    #   - depth 는 가시성과 무관하게 항상 반환 (디버깅에서 음수/원거리 객체 분류용)
     raise NotImplementedError
 
 
@@ -197,20 +185,11 @@ def find_common_annotation(
         (annotation, uv_a, uv_b) 또는 None.
     """
     # TODO:
-    #   for ann_token in sample['anns']:
-    #       ann = nusc.get('sample_annotation', ann_token)
-    #       p_world = np.array(ann['translation'])
-    #
-    #       uv_a, _ = project_world_point(p_world, view_a)
-    #       if uv_a is None:
-    #           continue
-    #
-    #       uv_b, _ = project_world_point(p_world, view_b)
-    #       if uv_b is None:
-    #           continue
-    #
-    #       return ann, uv_a, uv_b
-    #   return None
+    #   - sample['anns'] 의 각 토큰을 'sample_annotation' 으로 조회하여 ann dict 획득
+    #   - ann['translation'] 이 world 좌표 3D 중심 (numpy 배열로 감싸 두면 편하다)
+    #   - project_world_point 를 두 view 모두에 호출해 *둘 다* uv 가 not None 일 때만 hit
+    #     (한 쪽 view 에서 일찍 실패하면 두 번째 view 호출은 굳이 안 해도 됨)
+    #   - 가장 먼저 발견된 hit 를 즉시 반환, 모두 실패하면 None
     raise NotImplementedError
 
 
@@ -231,9 +210,10 @@ def build_projection_matrix(view: CameraView) -> np.ndarray:
         cam_from_world 의 앞 3 행 4 열이 곧 [R | t]. 마지막 행 [0,0,0,1] 은 버린다.
     """
     # TODO:
-    #   Rt = view.cam_from_world[:3, :]      # (3, 4)
-    #   P  = view.K @ Rt                     # (3, 4)
-    #   return P
+    #   - cam_from_world 의 마지막 행 [0,0,0,1] 은 P 행렬에 불필요 → 앞 3 행만 슬라이스
+    #     (앞 3 행 4 열의 의미가 정확히 [R | t])
+    #   - K (3x3) @ [R | t] (3x4) = P (3x4)
+    #   - 두 카메라의 P 가 *같은 world 좌표계* 기준이어야 cv2.triangulatePoints 가 동작
     raise NotImplementedError
 
 
@@ -260,12 +240,11 @@ def triangulate(
         앞 3 성분을 마지막 w 로 나눠야 실제 (X, Y, Z).
     """
     # TODO:
-    #   pts_a = np.array([[uv_a[0]], [uv_a[1]]], dtype=np.float64)   # (2, 1)
-    #   pts_b = np.array([[uv_b[0]], [uv_b[1]]], dtype=np.float64)   # (2, 1)
-    #
-    #   X_h = cv2.triangulatePoints(P_a, P_b, pts_a, pts_b)           # (4, 1)
-    #   X   = (X_h[:3] / X_h[3]).flatten()                            # (3,)
-    #   return X
+    #   - cv2.triangulatePoints 는 점 좌표를 (2, N) 모양으로 받는다
+    #     (한 점이면 (2, 1). u 가 첫 행, v 가 둘째 행이 되도록 배치)
+    #   - 반환은 (4, N) 동차좌표 → 앞 3 성분을 마지막 성분(w)으로 나눠야 (X, Y, Z)
+    #   - 결과는 (3,) 모양으로 정리해 반환 (호출 측은 ndarray 의 elementwise 연산을 가정)
+    #   - dtype 은 float64 로 통일하는 편이 OpenCV 내부 변환 비용을 줄여준다
     raise NotImplementedError
 
 
@@ -290,9 +269,8 @@ def draw_observation(
         그려진 이미지 (참조).
     """
     # TODO:
-    #   center = (int(round(uv[0])), int(round(uv[1])))
-    #   cv2.circle(img_bgr, center, radius, color, thickness)
-    #   return img_bgr
+    #   - uv 는 float 이므로 round 후 int 캐스팅이 필요 (cv2.circle 의 center 는 int tuple)
+    #   - cv2.circle 한 번 호출이면 끝. thickness 음수면 채워진 원
     raise NotImplementedError
 
 
@@ -317,25 +295,17 @@ def log_to_rerun(
         부모 frame 에 상대적이라는 점에 주의.
     """
     # TODO:
-    #   for v in views:
-    #       prefix = f"world/cam/{v.channel}"
-    #       world_from_cam = np.linalg.inv(v.cam_from_world)
-    #       rr.log(prefix,
-    #              rr.Transform3D(translation=world_from_cam[:3, 3],
-    #                             mat3x3=world_from_cam[:3, :3]))
-    #       rr.log(prefix,
-    #              rr.Pinhole(image_from_camera=v.K,
-    #                         width=v.width, height=v.height))
-    #       rr.log(f"{prefix}/image", rr.Image(images_rgb[v.channel]))
-    #       if v.channel in obs:
-    #           u, v_ = obs[v.channel]
-    #           rr.log(f"{prefix}/observation",
-    #                  rr.Points2D([[u, v_]], radii=5, colors=[(0, 255, 0)]))
+    #   각 view 별로 (위 docstring 의 엔티티 트리를 그대로 따라가면 된다):
+    #     - 채널별 prefix 를 짓는다 (예: f"world/cam/{v.channel}")
+    #     - cam_from_world 의 역행렬 = world_from_cam → Transform3D 로 카메라 pose 로깅
+    #       (translation 은 마지막 열 3 성분, mat3x3 은 좌상단 3x3 블록)
+    #     - 같은 prefix 에 Pinhole 로 K + 이미지 해상도 등록
+    #     - prefix 아래 child 엔티티에 이미지 / 관측 픽셀 추가
+    #       (Rerun 은 child 가 parent frame 에 *상대적* 으로 배치된다)
+    #     - obs 에 그 채널 키가 있을 때만 Points2D 로 관측 픽셀 찍기
     #
-    #   rr.log("world/gt_point",
-    #          rr.Points3D([gt_world],  radii=0.2, colors=[(255, 0, 0)]))
-    #   rr.log("world/triangulated_point",
-    #          rr.Points3D([est_world], radii=0.2, colors=[(0, 255, 0)]))
+    #   world 노드 자체에 정답/복원 3D 점도 Points3D 로 색 다르게 (적/녹) 로깅
+    #   (단일 점이라도 [[x,y,z]] 형태의 (N, 3) shape 으로 넘긴다)
     raise NotImplementedError
 
 
