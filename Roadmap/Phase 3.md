@@ -1,4 +1,4 @@
-# Phase 3 (축소): Detection + Depth → PC TensorRT + ROS2 노드
+# Phase 3 : Detection + Depth → PC TensorRT + ROS2 노드
 
 
 > **기간**: 약 2개월 (2026.06-08, F안)

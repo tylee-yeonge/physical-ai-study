@@ -167,11 +167,11 @@ graph LR
 
 
 #### 핵심 개념
-- [ ] 에피폴라 제약 (Epipolar Constraint) — 두 뷰 사이 점이 만족해야 하는 선형 관계
-- [ ] Essential Matrix `E` / Fundamental Matrix `F` — 두 카메라의 상대 자세
-- [ ] Stereo Rectification — 두 이미지를 같은 평면에 정렬, epipolar line 이 수평이 되도록
-- [ ] 디스패리티 <-> 깊이 관계 `Z = fB/d`
-- [ ] (보조) RANSAC — outlier 가 많은 매칭에서 robust 하게 모델 추정
+- [x] 에피폴라 제약 (Epipolar Constraint) — 두 뷰 사이 점이 만족해야 하는 선형 관계
+- [x] Essential Matrix `E` / Fundamental Matrix `F` — 두 카메라의 상대 자세
+- [x] Stereo Rectification — 두 이미지를 같은 평면에 정렬, epipolar line 이 수평이 되도록
+- [x] 디스패리티 <-> 깊이 관계 `Z = fB/d`
+- [x] (보조) RANSAC — outlier 가 많은 매칭에서 robust 하게 모델 추정
 
 
 #### Perception에서 어디에 쓰이나
@@ -214,10 +214,10 @@ graph LR
 
 
 #### 핵심 개념
-- [ ] DLT (Direct Linear Transform) 삼각측량 — 두 시점에서 보인 점의 3D 위치
-- [ ] PnP 알고리즘 — 3D-2D 대응으로부터 카메라 포즈 추정 (P3P, EPnP, Iterative)
-- [ ] RANSAC + PnP — outlier 에 강건한 포즈 추정
-- [ ] 재투영 오차 (Reprojection Error) — 3D 점을 다시 2D 에 투영했을 때의 픽셀 오차
+- [x] DLT (Direct Linear Transform) 삼각측량 — 두 시점에서 보인 점의 3D 위치
+- [x] PnP 알고리즘 — 3D-2D 대응으로부터 카메라 포즈 추정 (P3P, EPnP, Iterative)
+- [x] RANSAC + PnP — outlier 에 강건한 포즈 추정
+- [x] 재투영 오차 (Reprojection Error) — 3D 점을 다시 2D 에 투영했을 때의 픽셀 오차
 
 
 #### Perception에서 어디에 쓰이나
