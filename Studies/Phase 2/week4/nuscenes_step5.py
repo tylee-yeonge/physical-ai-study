@@ -359,8 +359,8 @@ def main() -> None:
         images_rgb[view.channel] = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
         print(f"저장: {out_path}")
 
-    # Rerun: RRD 파일로 저장. 로컬에서 `rerun kitti_step4.rrd` 로 열어볼 것
-    rr.init("nuscenes_step5", spawn=True)
+    # Rerun: RRD 파일로 저장. 로컬에서 `rerun nuscenes_step5_<channel>.rrd` 로 열어볼 것
+    rr.init("nuscenes_step5", spawn=False)
     log_to_rerun(
         views=[view_a, view_b],
         images_rgb=images_rgb,
