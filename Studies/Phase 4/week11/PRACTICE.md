@@ -309,7 +309,160 @@ print(f"p95 < 300ms: {np.percentile(arr, 95) < 300}")
 ---
 
 
-## 실습 4: 자작 영상 입력 (선택)
+## 실습 4 (옵션): Rerun 으로 dry-run 라이브 시각화
+
+
+> **요구사항**: 로컬 (맥북 등) 에 `rerun-sdk` 설치 + (실시간 보기 시) VSCode Tunnel PORTS 에서 9876 forward. 자세한 설치/사용은 [`ENVIRONMENT.md` Section 4-1](../../../ENVIRONMENT.md) 참조.
+> **학습 효과**: action vector 의 "reasonable 함" 을 시각적으로 즉시 검증. week 12 의 rerun_logger ROS 노드 작성 전에 패턴을 가볍게 익혀둔다 (week 12 의 10시간 부담 경감).
+> **건너뛰기 OK**: 환경 준비 안 됐으면 실습 3 의 텍스트 latency 분석으로 합격 검증 가능.
+
+
+### vla_rerun_logger.py
+
+
+vla_node 와 별개의 **read-only 노드** 로 토픽을 구독해 Rerun 에 로깅. 메인 inference 노드 코드는 손대지 않는다.
+
+
+**파일명**: `~/ros2_ws/src/vla_node/vla_node/rerun_dryrun.py`
+
+
+```python
+"""
+실습 4 (옵션): vla_node 의 토픽을 Rerun 으로 라이브 시각화.
+
+vla_inference_node 와 동시에 실행. 이미지 / action / latency / status 를
+한 화면에서 시간축 동기화해 본다.
+"""
+import numpy as np
+import rclpy
+import rerun as rr
+from cv_bridge import CvBridge
+from geometry_msgs.msg import Twist
+from rclpy.node import Node
+from sensor_msgs.msg import Image
+from std_msgs.msg import Float64, String
+
+
+class RerunDryRunLogger(Node):
+    def __init__(self):
+        super().__init__("rerun_dryrun")
+
+        # Rerun: gRPC 서버로 띄워 로컬 viewer 가 connect
+        # (또는 rr.save("dryrun.rrd") 로 파일 저장 후 사후 분석)
+        rr.init("vla_dryrun", spawn=False)
+        rr.serve_grpc(grpc_port=9876)
+
+        self.bridge = CvBridge()
+
+        # subscribers
+        self.create_subscription(Image, "/camera/image_raw", self.on_image, 1)
+        self.create_subscription(Twist, "/vla/action", self.on_action, 10)
+        self.create_subscription(Float64, "/vla/latency_ms", self.on_latency, 10)
+        self.create_subscription(String, "/vla/status", self.on_status, 10)
+        self.create_subscription(String, "/vla/instruction", self.on_instr, 1)
+
+        self.get_logger().info("Rerun dry-run logger ready (gRPC 9876)")
+
+    def on_image(self, msg: Image):
+        img = self.bridge.imgmsg_to_cv2(msg, desired_encoding="rgb8")
+        rr.log("camera/image", rr.Image(img))
+
+    def on_action(self, msg: Twist):
+        # 7-DoF action 을 한 채널로 묶어 plot
+        action = np.array([
+            msg.linear.x, msg.linear.y, msg.linear.z,
+            msg.angular.x, msg.angular.y, msg.angular.z,
+        ])
+        # 축별 line chart
+        for i, name in enumerate(["lin_x", "lin_y", "lin_z", "ang_x", "ang_y", "ang_z"]):
+            rr.log(f"vla/action/{name}", rr.Scalars(float(action[i])))
+
+    def on_latency(self, msg: Float64):
+        rr.log("vla/latency_ms", rr.Scalars(float(msg.data)))
+
+    def on_status(self, msg: String):
+        rr.log("vla/status", rr.TextLog(msg.data))
+
+    def on_instr(self, msg: String):
+        rr.log("vla/instruction", rr.TextLog(msg.data))
+
+
+def main():
+    rclpy.init()
+    node = RerunDryRunLogger()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
+
+
+if __name__ == "__main__":
+    main()
+```
+
+
+**setup.py entry point** 등록:
+
+
+```python
+'rerun_dryrun = vla_node.rerun_dryrun:main',
+```
+
+
+**실행 절차**:
+
+
+```bash
+# Terminal 1: vla_inference_node (week 11 메인 실습)
+ros2 run vla_node vla_inference_node
+
+# Terminal 2: rerun dry-run logger
+ros2 run vla_node rerun_dryrun
+
+# Terminal 3: instruction + bag 재생 (실습 2 동일)
+ros2 topic pub --once /vla/instruction std_msgs/String "data: 'pick up the can'"
+ros2 bag play my_test_bag --loop --clock
+```
+
+
+**로컬 (맥북) 에서 viewer 연결** (ENVIRONMENT.md 방법 C):
+
+
+```bash
+conda activate rerun
+rerun --connect rerun+http://localhost:9876/proxy
+```
+
+
+> VSCode Tunnel PORTS 패널에서 9876 이 forwarded 되어 있어야 한다.
+
+
+**확인 포인트**:
+- image / action / latency 가 같은 시간축에 정렬되어 보이는가
+- 1분 dry-run 동안 status 가 `ready` 만 표시되고 `error: *` 가 안 뜨는가
+- action 의 6 축이 갑자기 ±크기 폭주하지 않는가 (정상 inference 면 보통 ±0.1 이내)
+
+
+**저장하고 싶다면** (사후 분석용):
+
+
+```python
+# rerun_dryrun.py 의 init 부분 교체
+rr.init("vla_dryrun", spawn=False)
+# rr.serve_grpc 대신
+# 노드 종료 시 atexit 으로 save 호출
+import atexit
+atexit.register(lambda: rr.save("dryrun.rrd"))
+```
+
+
+---
+
+
+## 실습 5: 자작 영상 입력 (선택)
 
 
 ```bash
@@ -342,6 +495,7 @@ ros2 launch video_stream_opencv camera.launch.py \
 - [ ] image bag 재생 시 action publish
 - [ ] 1분 dry-run 0 fail
 - [ ] latency 통계 확보 (mean < 200ms)
+- [ ] (옵션) rerun_dryrun 노드로 라이브 시각화 확인
 - [ ] quiz_easy / quiz_medium
 
 

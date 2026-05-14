@@ -53,7 +53,8 @@ print('Depth Anything 로드 성공!')
 week8_depth_anything/
 +-- infer_pipeline.py # Pipeline API 추론
 +-- infer_manual.py # 직접 모델 로드 추론
-+-- visualize_depth.py # 깊이맵 시각화
++-- visualize_depth.py # 깊이맵 시각화 (PNG)
++-- visualize_depth_3d.py # depth -> 3D point cloud (옵션, Rerun)
 +-- metric_depth.py # Metric Depth 변환
 +-- realtime_depth.py # 실시간 카메라 깊이
 +-- yolo_depth_combine.py # YOLO + Depth 결합 (미리보기)
@@ -521,6 +522,136 @@ if __name__ == "__main__":
 
     print("\n 모든 시각화 완료!")
 ```
+
+
+---
+
+
+## Step 3-B (옵션): Rerun 으로 3D point cloud 시각화
+
+
+> **요구사항**: 로컬 (맥북 등) 에 `rerun-sdk` 설치. 자세한 설치/사용은 [`ENVIRONMENT.md` Section 4-1](../../../ENVIRONMENT.md) 참조.
+> **학습 효과**: depth map 의 "공간감" 을 직접 확인. depth -> camera intrinsics 로 unproject 해서 3D point cloud 로 펼치는 패턴은 Phase 4 / Phase 6 에서 반복 등장한다.
+> **건너뛰기 OK**: 환경 준비 안 됐으면 Step 3 의 PNG 시각화로 충분히 학습 검증 가능.
+
+
+### visualize_depth_3d.py
+
+
+```python
+"""
+Step 3-B (옵션): depth map -> 3D point cloud + Rerun 시각화
+
+depth 의 각 픽셀을 카메라 intrinsics 로 unproject 해 3D 점으로 만들고,
+원본 이미지 색을 그대로 입혀 색칠된 point cloud 로 띄운다.
+
+PNG 의 colored depth 가 보여주지 못하는 "공간감" 을 회전/줌으로 직접 확인.
+"""
+import numpy as np
+import rerun as rr
+from PIL import Image
+from transformers import pipeline
+
+
+def depth_to_pointcloud(depth_map, image_rgb, fx, fy, cx, cy):
+    """depth (H, W) + RGB (H, W, 3) -> points (N, 3), colors (N, 3).
+
+    Args:
+        depth_map: relative depth 또는 metric depth. (H, W).
+        image_rgb: 원본 RGB. (H, W, 3) uint8.
+        fx, fy, cx, cy: 카메라 intrinsics (픽셀 단위).
+
+    Returns:
+        points: (N, 3) [X, Y, Z]
+        colors: (N, 3) uint8
+
+    Note:
+        Depth Anything 의 출력은 relative depth (스케일 미상) 라서
+        절대 거리 (미터) 가 필요하면 Step 4 의 metric_depth 변환 적용 후 사용.
+    """
+    H, W = depth_map.shape
+    xs, ys = np.meshgrid(np.arange(W), np.arange(H))
+
+    # 핀홀 unproject: (u, v, Z) -> (X, Y, Z)
+    Z = depth_map.astype(np.float32)
+    X = (xs - cx) * Z / fx
+    Y = (ys - cy) * Z / fy
+
+    points = np.stack([X, Y, Z], axis=-1).reshape(-1, 3)
+    colors = image_rgb.reshape(-1, 3)
+    return points, colors
+
+
+def main():
+    image_path = "data/indoor.jpg"
+
+    # 1) 깊이 추론
+    pipe = pipeline("depth-estimation", model="LiheYoung/depth-anything-small-hf")
+    result = pipe(image_path)
+    depth_map = np.array(result["depth"]).astype(np.float32)
+
+    image_pil = Image.open(image_path).convert("RGB").resize(
+        (depth_map.shape[1], depth_map.shape[0])
+    )
+    image_rgb = np.array(image_pil)
+
+    # 2) 카메라 intrinsics 추정 (실측 K 없을 때 대략값)
+    #    fx = fy = W (FOV 약 53도 가정). cx, cy 는 이미지 중앙
+    H, W = depth_map.shape
+    fx = fy = float(W)
+    cx, cy = W / 2.0, H / 2.0
+
+    # 3) point cloud 구성
+    points, colors = depth_to_pointcloud(depth_map, image_rgb, fx, fy, cx, cy)
+    print(f"point count: {points.shape[0]}")
+
+    # 4) Rerun 로깅
+    rr.init("depth_anything", spawn=False)
+
+    # 2D: 원본 이미지 + colored depth
+    rr.log("image/rgb", rr.Image(image_rgb))
+    rr.log("image/depth", rr.DepthImage(depth_map))
+
+    # 3D: point cloud + 카메라
+    rr.log(
+        "world/cam",
+        rr.Pinhole(image_from_camera=np.array([[fx, 0, cx], [0, fy, cy], [0, 0, 1]]),
+                   width=W, height=H),
+    )
+    rr.log("world/points", rr.Points3D(points, colors=colors, radii=0.005))
+
+    # 5) RRD 저장 (로컬 viewer 에서 열기)
+    rr.save("depth_pointcloud.rrd")
+    print("저장: depth_pointcloud.rrd")
+    print("로컬에서 확인: rerun depth_pointcloud.rrd")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+
+**실행 + 로컬 확인 절차** (ENVIRONMENT.md 의 방법 A):
+
+
+1. 원격에서 `python visualize_depth_3d.py` -> `depth_pointcloud.rrd` 생성
+2. VSCode 파일트리에서 우클릭 -> Download -> 로컬로 받기
+3. 로컬 (맥북) 에서:
+   ```bash
+   conda activate rerun
+   rerun ~/Downloads/depth_pointcloud.rrd
+   ```
+
+
+**확인 포인트**:
+- 3D 패널에서 회전/줌. 가까운 물체 vs 먼 벽이 공간적으로 분리되어 보이는가
+- 2D 패널의 colored depth 와 3D 의 point cloud 가 같은 장면임을 비교
+- `image/rgb` 만 켜면 원본, `image/depth` 만 켜면 depth — 엔티티 토글로 비교 가능
+
+
+**한 단계 더**:
+- Step 4 의 `metric_depth` 변환 결과를 `depth_map` 대신 넣으면 미터 단위 절대 거리로 point cloud 가 펼쳐진다
+- relative depth 와 metric depth 의 차이를 3D 에서 시각적으로 비교 가능
 
 
 ---

@@ -64,6 +64,59 @@
 기본 원칙: **Rerun.io + Jupyter inline** 으로 대부분 해결. VNC 는 최후의 수단.
 
 
+### 4-1. Rerun 사용 시나리오 (원격 PC + 로컬 viewer)
+
+
+Ubuntu PC (원격) 에서 코드 실행 -> 맥북/노트북 (로컬) 에서 viewer 보기 가 표준 흐름.
+세 가지 방법이 있고 상황에 맞게 골라쓴다.
+
+
+| 방법 | 원격 코드 | 로컬 필요 | 포트포워딩 | 언제 좋은가 |
+|---|---|---|---|---|
+| **A. RRD 파일** | `rr.save("out.rrd")` | rerun viewer | 불필요 | 결과 한 번 확인. 가장 안정 |
+| **B. serve_web** | `rr.serve_web(...)` | 브라우저만 | 9090 + 9876 | 빠른 반복 확인 |
+| **C. gRPC connect** | `rr.serve_grpc(...)` | rerun viewer | 9876 | 큰 데이터 / 부드러운 3D 인터랙션 |
+
+
+**로컬 (맥북) viewer 설치 — conda 권장**:
+
+
+```bash
+# conda 가 없다면 한 번만
+brew install --cask miniforge
+conda init "$(basename "${SHELL}")"   # zsh / bash
+
+# rerun 전용 env
+conda create -n rerun python=3.12 -c conda-forge -y
+conda activate rerun
+conda install -c conda-forge "rerun-sdk=0.23.1" -y
+rerun --version
+```
+
+
+> **버전 고정 중요**: RRD 포맷이 버전 간 비호환적일 수 있어, 원격 컨테이너의 `rerun-sdk` 와 같은 버전으로 맞춘다. `python3 -c "import rerun; print(rerun.__version__)"` 로 원격 버전 확인.
+
+
+**방법 A 표준 패턴** (가장 추천):
+
+
+```python
+# 원격 코드
+rr.init("my_app", spawn=False)
+log_to_rerun(...)
+rr.save("output/result.rrd")
+```
+
+
+VSCode 파일트리에서 RRD 우클릭 -> Download -> 로컬에서 `rerun result.rrd`.
+
+
+**VSCode Tunnel + serve_web (방법 B)**:
+
+
+PORTS 패널에서 `9090` (web), `9876` (gRPC) 두 포트 모두 forward. 9090 의 forwarded URL 을 브라우저로 열면 viewer 가 자동으로 gRPC 에 연결.
+
+
 ---
 
 
@@ -136,7 +189,13 @@
 
 ### Rerun 네트워크 포트가 방화벽에 막힐 때
 - Tailscale ACL / firewall 규칙 확인
-- `rr.serve(web_port=9090, ws_port=9877)` 로 포트 명시적 지정
+- `rr.serve_web(web_port=9090, grpc_port=9876)` 로 포트 명시적 지정
+- rerun 0.23+ 에서 `ws_port` 인자는 제거됨 (`grpc_port` 로 통합)
+
+
+### Rerun viewer 가 빈 화면으로 멈출 때 (serve_web 사용 시)
+- web (9090) 만 forward 되고 gRPC (9876) 가 누락된 경우. 두 포트 모두 forward 필요
+- 원격/로컬 `rerun-sdk` 버전 불일치 가능. `rerun --version` 과 원격 `python3 -c "import rerun; print(rerun.__version__)"` 비교
 
 
 ### Tailscale 경로가 느릴 때
