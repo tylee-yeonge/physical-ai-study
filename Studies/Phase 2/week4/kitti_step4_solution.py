@@ -343,9 +343,8 @@ def main() -> None:
     cv2.imwrite(str(out_path), out_img)
     print(f"저장: {out_path}")
 
-    # Rerun (옵션). spawn=False + save 로 RRD 파일만 만들고 싶으면
-    # rr.init("kitti_step4", spawn=False); rr.save("kitti_step4.rrd")
-    rr.init("kitti_step4", spawn=True)
+    # Rerun: RRD 파일로 저장. 로컬에서 `rerun kitti_step4.rrd` 로 열어볼 것
+    rr.init("kitti_step4", spawn=False)
     log_to_rerun(
         cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB),
         P2,
@@ -353,6 +352,9 @@ def main() -> None:
         uv,
         label.bbox_2d,
     )
+    rrd_path = Path("output") / f"kitti_step4_{SAMPLE_ID}.rrd"
+    rr.save(str(rrd_path))
+    print(f"저장: {rrd_path}  (로컬에서 `rerun {rrd_path.name}` 로 열기)")
 
 
 if __name__ == "__main__":

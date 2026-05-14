@@ -394,7 +394,7 @@ def main() -> None:
         images_rgb[view.channel] = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
         print(f"저장: {out_path}")
 
-    # Rerun 시각화 (옵션). 원격이면 spawn=False + rr.save 로 RRD 만들기
+    # Rerun: RRD 파일로 저장. 로컬에서 `rerun kitti_step4.rrd` 로 열어볼 것
     rr.init("nuscenes_step5", spawn=True)
     log_to_rerun(
         views=[view_a, view_b],
@@ -404,6 +404,9 @@ def main() -> None:
         est_world=est_world,
     )
 
+    rrd_path = Path("output") / f"nuscenes_step5_{view.channel}.rrd"
+    rr.save(str(rrd_path))
+    print(f"저장: {rrd_path}  (로컬에서 `rerun {rrd_path.name}` 로 열기)")
 
 if __name__ == "__main__":
     main()
