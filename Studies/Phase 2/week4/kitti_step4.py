@@ -149,12 +149,60 @@ def project_corners(
     Note:
         OpenCV solvePnP / projectPoints 안 써도 됨.
         rectified P2 는 이미 K · [R|t] 가 합쳐져 있어 한 번의 행렬곱으로 충분.
+
+        P2 = K · [R | t] 가 이미 합쳐진 형태:
+            KITTI 의 P2 는 단순한 K 가 아니라 K 와 외부 파라미터 [R | t] 가
+            곱해진 결과. 그래서 fx, fy, cx, cy 가 행렬 안에 섞여서 들어있다.
+
+                K = [[fx,  0, cx],
+                     [ 0, fy, cy],
+                     [ 0,  0,  1]]
+                [R | t] = (3, 4)
+                P2 = K @ [R | t]  → (3, 4)
+
+            rectified 좌표계에서는 cam0, cam2 가 동일 평면 + 광축 평행이라
+            R = I (단위행렬) 이고 baseline 평행이동만 t 에 들어간다. 따라서
+                P2 = K @ [I | t] = [K | K·t]
+            즉 P2 의 좌상단 3x3 은 *수학적으로 정확히* K 자체이고,
+            마지막 컬럼이 K · t (cam0 → cam2 baseline 보정) 이다.
+
+            실제 KITTI 000000 의 P2:
+
+                P2 = [[707.0,     0, 604.0,  45.7],   # 좌3x3 = K  → fx=707, cx=604
+                      [    0, 707.0, 181.0,  -0.3],   #            fy=707, cy=181
+                      [    0,     0,   1.0, 0.005]]   # 마지막 컬럼 = K·t
+
+            검산: cam2 의 baseline tx ≈ -0.065 m 라면
+                fx·tx ≈ 707 · 0.065 ≈ 45.96  →  P2[0, 3] = 45.7 과 일치.
+            이게 우연이 아니라 P2 = K @ [I | t] 분해의 직접적인 결과다.
+
+        왜 P2 @ corners_h 한 번이면 핀홀 공식이 다 풀리는가:
+            P2 = K · [R | t] 이고, 동차좌표 (X, Y, Z, 1) 을 곱하면
+                P2 @ [X, Y, Z, 1]^T
+                  = K @ [R @ (X,Y,Z) + t]
+                  = K @ (X', Y', Z')           # cam2 좌표로 미세 보정된 점
+                  = [fx·X' + cx·Z',
+                     fy·Y' + cy·Z',
+                            Z'     ]
+            여기서 세 번째 성분 Z' 로 나누면 (perspective divide)
+                u = fx·X'/Z' + cx
+                v = fy·Y'/Z' + cy
+            즉 핀홀 공식 u = fx·X/Z + cx, v = fy·Y/Z + cy 가 자동 등장.
+            fx/fy/cx/cy 를 직접 꺼내지 않아도 P2 안에 다 포함되어 있다.
+
+        rectified KITTI 의 [R | t] 는 cam0 → cam2 (left color) 미세 보정이고,
+        baseline 으로 인한 평행이동 (~수십 cm) 을 자동 반영해준다.
+        그래서 K 를 직접 빼서 쓰는 것보다 P2 전체를 곱하는 쪽이 더 정확.
     """
     # TODO:
     #   - (3, 8) 코너 아래에 1 행을 붙여 동차좌표 (4, 8) 로 확장
     #     (vstack / concatenate 등 어떤 방법이든 OK)
     #   - P2 @ corners_h = (3, 8). 세 번째 행이 cam 의 +z = 깊이
+    #     · row 0 = fx·X' + cx·Z'   (= u · Z', 아직 안 나눈 가짜 u)
+    #     · row 1 = fy·Y' + cy·Z'   (= v · Z')
+    #     · row 2 = Z'              (= depth)
     #   - u, v 는 처음 두 행을 깊이로 나누는 perspective divide 로 구한다
+    #     → 핀홀 공식 u = fx·X/Z + cx 가 자연스럽게 풀려나옴
     #     (broadcasting: (2,8) / (8,) 는 자동으로 행 단위로 나눠짐)
     #   - 가시성은 depth > 0 만 검사 (시야각 안인지는 호출자에서 추가 검증 가능)
     raise NotImplementedError
