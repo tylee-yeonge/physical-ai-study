@@ -10,4 +10,5 @@ my_quiz_medium.cpp
 .vscode
 .claude
 .env
+.private/
 __pycache__
