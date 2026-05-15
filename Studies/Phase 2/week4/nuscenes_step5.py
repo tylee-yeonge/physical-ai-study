@@ -134,8 +134,6 @@ def build_camera_view(nusc: NuScenes, sample: dict, channel: str) -> CameraView:
     #            world_from_[ego] @ [ego]_from_sensor  =  world_from_sensor
     #      - 필요한 건 cam_from_world. forward (world_from_sensor) 를 먼저 만들고
     #        마지막에 한 번만 np.linalg.inv 하는 편이 부호/순서 헷갈림이 적다
-    #      - sanity check: cam_from_world @ [ann_translation, 1] 의 z 성분이
-    #        양수면 그 annotation 은 카메라 앞 (음수면 뒤). 결과가 이상하면 여기서 확인.
     #
     #   5) image_path 만들기
     #      - sd['filename'] 은 dataroot 기준 상대경로
