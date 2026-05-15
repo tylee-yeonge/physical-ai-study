@@ -30,7 +30,7 @@ NUSC_ROOT = Path("/datasets/nuscenes_mini")
 NUSC_VERSION = "v1.0-mini"
 
 # 인접 카메라 쌍 (시야가 겹쳐서 같은 객체가 동시에 보일 확률이 높다).
-CAM_PAIR = ("CAM_FRONT", "CAM_FRONT_LEFT")
+CAM_PAIR = ("CAM_FRONT", "CAM_FRONT_RIGHT")
 
 # 합격 기준
 MAX_TRIANGULATION_ERROR_M = 0.5  # 50 cm 이내면 합격
