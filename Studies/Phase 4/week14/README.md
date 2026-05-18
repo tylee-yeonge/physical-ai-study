@@ -15,10 +15,10 @@
 | 순서 | 단계 | 파일/자료 | 설명 |
 |:----:|------|----------|------|
 | 1 | README 구조 잡기 | `PRACTICE.md` 1 | section 6-8 개 |
-| 2 | 환경 세팅 가이드 | `PRACTICE.md` 2 | conda + apt + pip 모두 |
+| 2 | 환경 세팅 가이드 | `PRACTICE.md` 2 | venv + apt + pip 모두 |
 | 3 | 실행 방법 | `PRACTICE.md` 3 | step-by-step |
 | 4 | 트러블슈팅 | `PRACTICE.md` 4 | 자주 발생 + 해결 |
-| 5 | 검증 (clean 환경에서) | `PRACTICE.md` 5 | Docker 또는 새 conda env |
+| 5 | 검증 (clean 환경에서) | `PRACTICE.md` 5 | Docker 또는 새 venv |
 | 6 | 퀴즈 | quiz_easy / quiz_medium | README 패턴 |
 
 
@@ -98,7 +98,7 @@ docker-compose up # 또는 ./quickstart.sh
 ```
 
 
-도커 / Quickstart 스크립트 권장. 단 본 phase minimal demo 는 conda 만으로 OK.
+도커 / Quickstart 스크립트 권장. 단 본 phase minimal demo 는 venv 만으로 OK.
 
 
 ### 5. 트러블슈팅 section
@@ -184,7 +184,7 @@ Llama 2 License (OpenVLA weights - commercial use 시 확인)
 
 
 **Q5. README 검증의 표준 방법은?**
-> Clean 환경 (새 conda env 또는 Docker) 에서 본인이 README 만 보고 처음부터 따라하기. 막히면 그 단계의 명령 추가.
+> Clean 환경 (새 venv 또는 Docker) 에서 본인이 README 만 보고 처음부터 따라하기. 막히면 그 단계의 명령 추가.
 
 
 ---
@@ -196,7 +196,7 @@ Llama 2 License (OpenVLA weights - commercial use 시 확인)
 ### 이번 주 실습 과제
 1. README 구조 잡기 + 작성
 2. 트러블슈팅 표 (5-10개)
-3. Clean 환경 검증 (선택, Docker 또는 새 conda)
+3. Clean 환경 검증 (선택, Docker 또는 새 venv)
 4. quiz_easy / quiz_medium
 
 

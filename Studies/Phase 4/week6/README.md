@@ -37,8 +37,8 @@ python --version # 3.10+
 
 
 ```bash
-# conda 환경 (week 1 그대로)
-conda activate phase4
+# venv 환경 (week 1 그대로)
+source .venv/bin/activate
 
 
 # bitsandbytes 설치 (4-bit quantization 핵심)

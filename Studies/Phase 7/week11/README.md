@@ -75,7 +75,7 @@ cd Portfolio/04_R2S2R
 Q1. 패키지 구조? > Phase 4 패턴 + 자작 팔 통합.
 Q2. README section 수? > 10.
 Q3. Quickstart 의 가치? > 면접관의 진입점.
-Q4. Clean 환경 검증? > Docker 또는 새 conda.
+Q4. Clean 환경 검증? > Docker 또는 새 venv.
 Q5. 가장 중요한 파일? > README + 영상.
 
 

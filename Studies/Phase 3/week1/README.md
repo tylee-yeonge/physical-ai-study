@@ -74,9 +74,9 @@ CUDA는 NVIDIA GPU를 활용한 병렬 연산 라이브러리입니다. 딥러�
 nvidia-smi
 
 
-# 2. conda 가상환경 생성
-conda create -n phase5 python=3.10
-conda activate phase5
+# 2. venv 가상환경 생성
+python3 -m venv .venv
+source .venv/bin/activate
 
 
 # 3. PyTorch 설치 (CUDA 11.8 기준)
@@ -631,7 +631,7 @@ Transform -+ | output = model(x)
 ### 이번 주 실습 과제
 
 
-1. **CUDA 환경 세팅**: conda 환경 만들고 PyTorch GPU 버전 설치 확인
+1. **CUDA 환경 세팅**: venv 환경 만들고 PyTorch GPU 버전 설치 확인
 2. **Tensor 연산 연습**: 다양한 shape 변환, GPU 이동 실습
 3. **CIFAR-10 CNN 학습**: SimpleCNN으로 70%+ 정확도 달성
 4. **ResNet-18 Fine-tuning**: Pretrained weights로 85%+ 달성

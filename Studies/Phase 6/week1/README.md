@@ -71,9 +71,9 @@ NVIDIA Omniverse Isaac Sim 4.x:
 
 
 ```bash
-# Conda + pip 방법 (권장)
-conda create -n phase6 python=3.10 -y
-conda activate phase6
+# venv + pip 방법 (권장)
+python3 -m venv .venv
+source .venv/bin/activate
 pip install --extra-index-url https://pypi.nvidia.com isaacsim==4.5.0.0 \
     isaacsim-extscache-physics==4.5.0.0
 ```

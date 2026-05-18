@@ -118,7 +118,7 @@ Rerun 에서 3 layer 시각화:
 환경:
 - [ ] Isaac Sim 시스템 요구사항 확인
        (RTX 4070 12GB 가능, 단 ROS2 와 동시 부하 주의)
-- [ ] conda env phase6 별도 권장
+- [ ] venv 환경 (.venv) 별도 권장
 - [ ] Studies/Phase 6/ 의 week 자료 검토
 
 
@@ -193,7 +193,7 @@ Rerun 에서 3 layer 시각화:
 
 
 **Q4. Phase 6 진입 직전 환경 점검?**
-> Isaac Sim 시스템 요구사항 + RTX 4070 OOM 가능성 + conda env 분리.
+> Isaac Sim 시스템 요구사항 + RTX 4070 OOM 가능성 + venv 환경 분리.
 
 
 **Q5. Phase 5 의 가장 큰 자산?**
