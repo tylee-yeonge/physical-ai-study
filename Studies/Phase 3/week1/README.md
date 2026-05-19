@@ -184,13 +184,17 @@ c = a @ b.T # 행렬 곱 (matmul)
 c = torch.matmul(a, b.T) # 동일
 
 
-# -- Shape 변환 --
+# -- Shape 변환 (각 연산은 원본 x에 대한 독립 예시) --
 x = torch.randn(2, 3, 4)
-x = x.view(2, 12) # reshape (메모리 연속 필요)
-x = x.reshape(2, 12) # reshape (메모리 복사 가능)
-x = x.permute(2, 0, 1) # 차원 순서 변경 (HWC → CHW 등)
-x = x.unsqueeze(0) # 차원 추가: [3,4] → [1,3,4]
-x = x.squeeze(0) # 차원 제거: [1,3,4] → [3,4]
+print(x.view(2, 12).shape)      # [2,3,4] → [2,12] (메모리 연속 필요)
+print(x.reshape(2, 12).shape)   # [2,3,4] → [2,12] (메모리 복사 가능)
+print(x.permute(2, 0, 1).shape) # [2,3,4] → [4,2,3] (차원 순서 변경, HWC → CHW 등)
+
+y = torch.randn(3, 4)
+print(y.unsqueeze(0).shape)     # [3,4] → [1,3,4] (차원 추가)
+
+z = torch.randn(1, 3, 4)
+print(z.squeeze(0).shape)       # [1,3,4] → [3,4] (차원 제거)
 
 
 # -- 이미지에서 자주 쓰는 변환 --
@@ -202,56 +206,254 @@ img_tensor = torch.from_numpy(img_np).permute(2, 0, 1).float() / 255.0
 ```
 
 
+#### 텐서 이미지 시각화
+
+
+matplotlib의 `imshow`는 `(H, W, C)` 순서를 기대합니다. 위에서 `permute(2, 0, 1)`로
+`(C, H, W)`로 바꿔놨기 때문에, 시각화하려면 다시 `(H, W, C)`로 되돌려야 합니다.
+
+
+변환 효과가 한눈에 보이도록, 무작위 노이즈 대신 색이 구분되는 구조적 이미지
+(4분할 색상 블록)를 만들어 세 가지를 나란히 비교합니다. (1) 변환 전 원본,
+(2) `permute` 없이 `reshape`만 한 잘못된 복원(깨짐), (3) `permute`로 축을
+제대로 되돌린 올바른 복원.
+
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+import torch
+
+# -- 구조가 보이는 데모 이미지 생성 (4분할 색상 블록) --
+H, W = 480, 640
+img_np = np.zeros((H, W, 3), dtype=np.uint8)
+img_np[: H // 2, : W // 2] = [220, 50, 50]   # 좌상: 빨강
+img_np[: H // 2, W // 2 :] = [50, 200, 50]   # 우상: 초록
+img_np[H // 2 :, : W // 2] = [50, 80, 220]   # 좌하: 파랑
+img_np[H // 2 :, W // 2 :] = [230, 210, 40]  # 우하: 노랑
+
+# (H, W, C) → (C, H, W), 0~1 정규화
+img_tensor = torch.from_numpy(img_np).permute(2, 0, 1).float() / 255.0
+
+plt.figure(figsize=(12, 3))
+
+# 1) 변환 전: 원본 numpy 이미지 (H, W, C) → 그대로 표시 가능
+plt.subplot(1, 3, 1)
+plt.imshow(img_np)
+plt.title("1. original img_np (H,W,C)")
+plt.axis("off")
+
+# 2) 잘못된 복원: permute 없이 reshape만 → 픽셀이 뒤섞여 깨짐
+wrong = img_tensor.reshape(H, W, 3).cpu().numpy()
+plt.subplot(1, 3, 2)
+plt.imshow(wrong)
+plt.title("2. reshape only (broken)")
+plt.axis("off")
+
+# 3) 올바른 복원: permute로 축을 (H, W, C)로 되돌림
+img_back = img_tensor.permute(1, 2, 0).cpu().numpy()  # (480, 640, 3), 0~1 float
+plt.subplot(1, 3, 3)
+plt.imshow(img_back)
+plt.title("3. permute (correct)")
+plt.axis("off")
+
+plt.tight_layout()
+plt.show()
+```
+
+
+**`img_back` 한 줄 분해**:
+
+
+`img_back = img_tensor.permute(1, 2, 0).cpu().numpy()` 는 메서드 체이닝으로
+세 변환을 순서대로 적용합니다. 시작 상태는 `(3, 480, 640)` = `(C, H, W)`, float, 0-1 범위입니다.
+
+
+1. **`.permute(1, 2, 0)`** - 차원 순서 재배치. 인자는 "새 텐서의 각 축에 기존 텐서의
+   몇 번째 축을 놓을지"를 지정합니다.
+
+
+```
+기존 축 인덱스:  0=C(3)   1=H(480)   2=W(640)
+
+permute(1, 2, 0)
+        |  |  +-- 새 축 2 <- 기존 축 0 (C, 채널)
+        |  +----- 새 축 1 <- 기존 축 2 (W, 너비)
+        +-------- 새 축 0 <- 기존 축 1 (H, 높이)
+
+결과: (480, 640, 3) = (H, W, C)
+```
+
+
+   데이터를 복사하지 않고 stride 메타데이터만 바꾼 view를 반환하므로, 결과 텐서는
+   메모리상 비연속(non-contiguous) 상태가 됩니다.
+
+2. **`.cpu()`** - 텐서가 GPU(`cuda:0`)에 있으면 CPU 메모리로 복사. numpy는 CPU 메모리만
+   접근할 수 있어 필요합니다. 이미 CPU에 있으면 아무 동작도 하지 않습니다(no-op).
+
+3. **`.numpy()`** - torch.Tensor를 numpy.ndarray로 변환. matplotlib, OpenCV 등은 numpy를
+   입력으로 받습니다. CPU 텐서와 numpy 배열은 같은 메모리를 공유합니다(가능한 경우 복사 없음).
+
+
+순서가 중요합니다. `.cpu()`가 `.numpy()`보다 먼저 와야 하며, GPU 텐서에 바로 `.numpy()`를
+호출하면 에러가 납니다. grad가 붙은 텐서라면 `.numpy()` 전에 `.detach()`가 추가로
+필요합니다(`...permute(1,2,0).detach().cpu().numpy()`).
+
+
+**알아둘 점**:
+- `permute(1, 2, 0)`: `(C, H, W)` → `(H, W, C)`. 앞서 한 `permute(2, 0, 1)`을 정확히 되돌리는 연산
+- **`reshape` != `permute`**: `reshape`는 메모리를 1차원으로 편 뒤 새 모양에 그대로 재배치할 뿐 축 순서를 바꾸지 않음. `(C, H, W)` 메모리는 채널별로 뭉쳐 있어 `(H, W, 3)`로 재해석하면 픽셀이 섞여 깨짐(패널 2). 축을 옮기려면 반드시 `permute`를 써야 함
+- `.cpu().numpy()`: 텐서가 GPU에 있거나 grad가 붙어 있으면 바로 numpy 변환이 안 되므로 `cpu()`를 거치는 것이 안전
+- dtype 차이: `imshow`는 uint8이면 0-255, float이면 0-1 범위로 해석. `img_tensor`는 `/255.0`으로 정규화돼 있어 그대로 표시됨
+- 패널 1(변환 전 원본)과 패널 3(`permute` 복원)이 동일하고 패널 2(`reshape`)만 깨져 보이면 변환이 올바른 것
+
+
 ---
 
 
 ### 3. autograd (자동 미분)
 
 
-autograd는 PyTorch의 **자동 미분 엔진**입니다. 순전파(forward)에서 수행된 연산을 기록해두었다가, `backward()`를 호출하면 자동으로 gradient를 계산합니다.
+autograd는 PyTorch의 **자동 미분 엔진**입니다. 순전파(forward)에서 수행된 연산을
+기록해두었다가, `backward()`를 호출하면 각 변수에 대한 gradient를 자동으로 계산합니다.
+미분 공식을 손으로 짤 필요가 없습니다.
 
 
-```
-순전파 (Forward) 역전파 (Backward)
------------------ -----------------
-x --+ dx ◄--+
-    +--- z = x*w + b |
-w --+ | dw ◄--+
-            | |
-            v dL/dz |
-          loss -------------> ◄-- backward()
-```
+#### gradient가 뭔가? (직관)
+
+
+`gradient`(기울기)는 한마디로 **"이 값을 아주 조금 바꾸면 loss가 얼마나 변하는가"**
+입니다. 수학적으로는 `loss`를 그 변수로 미분한 값(편미분, dL/dvar)입니다.
+
+
+- `x.grad` = dL/dx = "x를 조금 키우면 loss가 얼마나 변하나"
+- `w.grad` = dL/dw = "w를 조금 키우면 loss가 얼마나 변하나"
+
+
+딥러닝에서 `w`는 모델의 가중치(weight)입니다. 이 gradient를 보고 "loss를 줄이려면
+w를 어느 방향으로 바꿔야 하는지" 알아내서 그 방향으로 조금씩 업데이트하는 것이
+바로 **학습**입니다.
+
+
+#### 예제 코드
 
 
 ```python
 import torch
 
-
 # requires_grad=True → 이 텐서의 gradient를 추적
 x = torch.tensor([2.0, 3.0], requires_grad=True)
 w = torch.tensor([1.0, -1.0], requires_grad=True)
 
+# 순전파 (forward)
+y = x * w        # [2.0, -3.0]  (요소별 곱)
+loss = y.sum()   # -1.0         (스칼라)
 
-# 순전파
-y = x * w # [2.0, -3.0]
-loss = y.sum() # -1.0
-
-
-# 역전파
+# 역전파 (backward)
 loss.backward()
 
-
 # gradient 확인
-print(x.grad) # tensor([1., -1.]) → dL/dx
-print(w.grad) # tensor([2., 3.]) → dL/dw
+print(x.grad)    # tensor([ 1., -1.])  → dL/dx
+print(w.grad)    # tensor([2., 3.])    → dL/dw
 ```
+
+
+이 예제의 연산 흐름을 그림으로 보면 (실선 = 순전파, 점선 = `backward()` 역전파):
+
+
+```mermaid
+flowchart LR
+    x["x = [2.0, 3.0]"] --> M(("x * w"))
+    w["w = [1.0, -1.0]"] --> M
+    M --> y["y = [2.0, -3.0]"]
+    y --> S(("y.sum()"))
+    S --> L["loss = -1.0"]
+
+    L -. "backward()" .-> S
+    S -. "dL/dy = [1, 1]" .-> y
+    y -. "dL/dx = w = [1, -1]" .-> x
+    y -. "dL/dw = x = [2, 3]" .-> w
+```
+
+
+#### 순전파: 숫자 따라가기
+
+
+```
+x = [2.0,  3.0]
+w = [1.0, -1.0]
+
+y = x * w = [2.0*1.0, 3.0*(-1.0)] = [2.0, -3.0]   # 요소별 곱
+
+loss = y.sum() = 2.0 + (-3.0) = -1.0
+```
+
+
+여기까지가 forward입니다. 이 계산을 하는 동안 PyTorch는 `requires_grad=True`인
+텐서가 **어떤 연산을 거쳤는지 그래프로 기록**해 둡니다 (위 그림의 실선 부분).
+
+
+#### 역전파: gradient 값이 왜 저렇게 나오나
+
+
+`loss`를 x, w로 직접 풀어쓰면:
+
+
+```
+loss = y0 + y1 = (x0 * w0) + (x1 * w1)
+```
+
+
+핵심은 **곱셈의 미분**입니다. `x * w`를 한 변수로 미분하면 상대 변수만 남습니다.
+
+
+```
+d(x*w)/dx = w     (w를 상수 취급)
+d(x*w)/dw = x     (x를 상수 취급)
+```
+
+
+이걸 각 원소에 적용하면:
+
+
+| 변수 | 편미분 | 값 | 의미 |
+|------|--------|-----|------|
+| `x.grad[0]` | dL/dx0 = w0 |  1.0 | x0를 키우면 loss가 +1.0 비율로 변함 |
+| `x.grad[1]` | dL/dx1 = w1 | -1.0 | x1를 키우면 loss가 -1.0 비율로 변함 |
+| `w.grad[0]` | dL/dw0 = x0 |  2.0 | w0를 키우면 loss가 +2.0 비율로 변함 |
+| `w.grad[1]` | dL/dw1 = x1 |  3.0 | w1를 키우면 loss가 +3.0 비율로 변함 |
+
+
+즉 `x.grad = [1, -1]`은 우연이 아니라 **w의 값**이고, `w.grad = [2, 3]`은
+**x의 값**입니다. `loss = x*w` 형태라서 서로의 값이 상대방의 기울기가 됩니다.
+
+
+#### backward() 한 줄이 한 일
+
+
+1. 기록해 둔 연산 그래프를 **거꾸로** 따라간다 (loss -> sum -> mul -> x, w).
+2. 연쇄 법칙(chain rule)으로 각 변수의 편미분을 자동 계산한다.
+3. 결과를 각 텐서의 `.grad` 속성에 저장한다.
+
+
+forward만 정의하면 backward는 자동입니다. 신경망이 아무리 깊고 복잡해져도
+원리는 이 예제와 똑같습니다.
+
+
+#### 한 문장 요약
+
+
+> `requires_grad=True`로 추적을 켜고 -> forward로 loss를 계산하면 -> `backward()`가
+> "각 변수를 조금 바꿀 때 loss가 얼마나 변하는지(`.grad`)"를 자동으로 채워준다.
+> 그 `.grad` 값으로 가중치를 업데이트하는 것이 학습이다.
 
 
 **핵심 규칙**:
 - `requires_grad=True`인 텐서에 대해서만 gradient 계산
+- `loss`는 스칼라(숫자 하나)여야 `backward()` 호출 가능 (그래서 `.sum()`이나 `.mean()`으로 줄임)
 - `loss.backward()` 호출 후 `.grad`에 gradient 저장
-- `optimizer.zero_grad()`로 gradient 초기화 (매 iteration)
-- 추론 시에는 `with torch.no_grad():` 사용 (메모리 절약)
+- `optimizer.zero_grad()`로 gradient 초기화 (매 iteration). 안 하면 gradient가 누적됨
+- 추론 시에는 `with torch.no_grad():` 사용 (그래프 기록 안 함 -> 메모리 절약)
 
 
 ---
