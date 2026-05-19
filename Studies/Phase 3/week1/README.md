@@ -440,6 +440,64 @@ forward만 정의하면 backward는 자동입니다. 신경망이 아무리 깊�
 원리는 이 예제와 똑같습니다.
 
 
+#### backward()가 바꾸는 것 / 안 바꾸는 것
+
+
+`backward()`의 유일한 관찰 가능한 효과는 **`.grad`가 채워지는 것**입니다.
+
+
+```
+backward() 호출 전:   x.grad = None         w.grad = None
+backward() 호출 후:   x.grad = [ 1., -1.]   w.grad = [2., 3.]
+```
+
+
+반대로 **바뀌지 않는 것**:
+- `loss` 값 자체 - backward는 미분만 할 뿐 loss를 다시 계산하지 않음
+- 가중치 `x`, `w`의 값 - `backward()`는 가중치를 **업데이트하지 않음**
+
+
+가중치를 실제로 수정하는 것은 `optimizer.step()`입니다. 역할이 분리돼 있습니다:
+`backward()` = 기울기 계산, `optimizer.step()` = 그 기울기로 가중치 수정.
+
+
+#### `.grad`는 덮어쓰기가 아니라 누적(+=)
+
+
+`backward()`는 `.grad = 새값`이 아니라 `.grad += 새값`으로 동작합니다.
+`zero_grad` 없이 같은 계산을 두 번 backward 하면:
+
+
+```
+1회 후:  x.grad = [ 1., -1.]
+2회 후:  x.grad = [ 2., -2.]   # 덮어쓰지 않고 더해짐
+```
+
+
+그래서 학습 루프에서 매 iteration `optimizer.zero_grad()`로 `.grad`를 비우지
+않으면 이전 step의 gradient가 계속 쌓여 잘못된 방향으로 업데이트됩니다.
+
+
+참고: 기본적으로 `backward()` 후 연산 그래프는 메모리에서 해제됩니다. 같은 그래프에
+`backward()`를 두 번 호출하면 에러가 나며, 필요하면 `backward(retain_graph=True)`를 씁니다.
+
+
+#### 학습 루프에서 backward()의 위치
+
+
+```
+optimizer.zero_grad()   # 1. 이전 .grad 비우기 (누적 방지)
+outputs = model(x)      # 2. 순전파 (그래프 기록)
+loss = criterion(...)   # 3. loss 계산
+loss.backward()         # 4. <- 여기. .grad 채움 (가중치는 아직 그대로)
+optimizer.step()        # 5. .grad 보고 가중치 실제 업데이트
+```
+
+
+`backward()`는 4번에서 "어느 방향으로 얼마나 바꿔야 하는지(`.grad`)"만 계산하고,
+실제 수정은 5번 `optimizer.step()`이 합니다.
+
+
 #### 한 문장 요약
 
 
