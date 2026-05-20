@@ -89,7 +89,7 @@ python -c "import torch; print(torch.cuda.is_available())"
 ```
 
 
-**각 단계가 하는 일 (초심자용)**
+**각 단계가 하는 일**
 
 
 - `nvidia-smi`: NVIDIA System Management Interface. GPU 가 잡혀 있는지, **드라이버 버전 / CUDA 버전 / 메모리 사용량** 을 한 번에 보여줍니다. 첫 줄의 `CUDA Version: 12.x` 같은 표시는 **드라이버가 지원하는 최대 CUDA** 버전이지, 실제 설치된 toolkit 버전은 아닙니다.
@@ -202,7 +202,7 @@ x = x.cuda()
 ```
 
 
-**dtype 이 왜 중요한가 (초심자용)**
+**dtype 이 왜 중요한가**
 
 
 - `float32` (= `torch.float`): 학습에서 **기본 데이터 타입**. 모델 가중치/연산 결과 거의 다 이 타입.
@@ -1717,6 +1717,21 @@ optimizer 가 하는 일:        scheduler 가 하는 일:
 
 ```python
 # -- 4. 학습 루프 --
+def evaluate(model, loader):
+    """주어진 loader 에 대해 모델 정확도(%)를 반환. 검증/테스트용."""
+    model.eval()
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for images, labels in loader:
+            images, labels = images.to(device), labels.to(device)
+            outputs = model(images)
+            _, predicted = outputs.max(1)
+            total += labels.size(0)
+            correct += predicted.eq(labels).sum().item()
+    return 100. * correct / total
+
+
 num_epochs = 50
 for epoch in range(num_epochs):
     model.train()
@@ -1743,10 +1758,13 @@ for epoch in range(num_epochs):
 
 
     scheduler.step()
+    train_loss = running_loss / len(trainloader) # 배치 평균 loss
     train_acc = 100. * correct / total
+    val_acc = evaluate(model, testloader) # 검증 정확도
     print(f"Epoch [{epoch+1}/{num_epochs}] "
-          f"Loss: {running_loss/len(trainloader):.4f} "
-          f"Acc: {train_acc:.2f}%")
+          f"Loss: {train_loss:.4f} "
+          f"Acc: {train_acc:.2f}% "
+          f"Val Acc: {val_acc:.2f}%")
 ```
 
 
@@ -1787,6 +1805,134 @@ for epoch in range(num_epochs):       # 바깥: 전체 데이터셋을 50 번 �
 | 5 | `optimizer.step()` | `.grad` 와 `lr` 를 보고 실제로 파라미터를 업데이트 |
 
 
+##### 5단계를 한 단계씩 자세히
+
+
+표만으로는 추상적이라, 각 단계가 **메모리에서 무엇을 바꾸는지** 한 번씩 풀어 봅니다.
+이 5단계는 PyTorch 학습 코드의 사실상 모든 곳에 등장하는 골격이라 외워둘 가치가 있습니다.
+
+
+**1) `optimizer.zero_grad()` - 그래디언트 초기화**
+
+
+```python
+optimizer.zero_grad()
+```
+
+
+- 이전 배치에서 계산된 `.grad` 값을 0 으로 리셋.
+- **왜 필요한가**: PyTorch 의 `backward()` 는 `.grad = 새값` 이 아니라 `.grad += 새값` 으로
+  동작합니다 (autograd 섹션 참고). 안 비우면 이전 배치 gradient 가 계속 쌓여 잘못된
+  방향으로 업데이트됨.
+- 비유: 칠판에 새 계산을 쓰기 전에 지우개로 지우는 것.
+
+
+**2) `outputs = model(images)` - Forward (순전파)**
+
+
+```python
+outputs = model(images)   # [B, 3, 32, 32] -> [B, 10]
+```
+
+
+- 입력 데이터를 모델에 통과시켜 예측값 (logit) 을 계산.
+- 동시에 PyTorch 가 **계산 그래프 (computation graph)** 를 자동으로 기록.
+  이 그래프가 있어야 나중에 `backward()` 가 chain rule 을 거꾸로 타고 갈 수 있음.
+- `model.forward()` 를 직접 호출하지 않고 `model(images)` 로 호출하는 이유는 5.2 의
+  "`forward` 는 누가 호출하는가" 섹션 참고 (hook / gradient 추적 컨텍스트 누락 방지).
+
+
+**3) `loss = criterion(outputs, labels)` - Loss 계산**
+
+
+```python
+loss = criterion(outputs, labels)   # 스칼라 텐서
+```
+
+
+- 예측값 (logit) 과 정답 라벨의 차이를 **하나의 스칼라** 로 압축.
+- 이 값이 작을수록 모델이 정답을 잘 맞춘 것 -> **이 값을 줄이는 게 학습 목표**.
+- 스칼라여야 `backward()` 호출 가능. 벡터/행렬이면 `.sum()` 이나 `.mean()` 으로 줄여야 함.
+
+
+**4) `loss.backward()` - Backward (역전파)**
+
+
+```python
+loss.backward()
+```
+
+
+- `loss` 부터 시작해서 기록된 계산 그래프를 **거꾸로** 타고 가며 각 파라미터의 gradient 를
+  자동 계산 (chain rule).
+- 결과는 각 파라미터 (예: `model.features[0].weight`) 의 `.grad` 속성에 저장.
+- "이 파라미터를 어느 방향으로 움직여야 loss 가 줄어드는가" 를 계산하는 단계.
+- **주의**: 가중치 값 자체는 아직 안 바뀜. 다음 5단계가 그 일을 함.
+
+
+**5) `optimizer.step()` - 파라미터 업데이트**
+
+
+```python
+optimizer.step()
+```
+
+
+- 4단계에서 채워진 `.grad` 와 `lr` 를 보고 실제로 가중치를 업데이트.
+- SGD 의 경우: `w = w - lr * w.grad` (가장 단순한 형태).
+- Adam, RMSProp 등은 momentum / variance 같은 내부 상태까지 활용한 더 복잡한 업데이트 규칙.
+- **이 한 줄이 실행되는 순간** 모델이 한 발자국 학습됨.
+
+
+**한눈에 보는 시퀀스**
+
+
+```
+[ optimizer.zero_grad() ]   <- 이전 .grad 삭제
+        |
+        v
+[ outputs = model(x) ]      <- forward, 계산 그래프 생성
+        |
+        v
+[ loss = criterion(y_hat, y) ]   <- 스칼라 loss
+        |
+        v
+[ loss.backward() ]         <- 그래프 역추적, .grad 채움
+        |
+        v
+[ optimizer.step() ]        <- .grad 보고 가중치 수정
+        |
+        v
+(다음 배치 또는 다음 epoch 로)
+```
+
+
+##### 순서를 바꾸면 안 되는 이유
+
+
+5단계는 **순서가 곧 데이터 의존성** 입니다. 각 단계는 직전 단계의 결과를 입력으로 씁니다.
+
+
+| 잘못된 순서 | 무슨 일이 일어나나 |
+|------------|------------------|
+| `step()` 을 `backward()` 보다 먼저 | `.grad` 가 비어 있어 (또는 이전 값으로) 잘못된 업데이트 |
+| `backward()` 를 `loss` 계산 전에 | 호출할 `loss` 자체가 없음 -> AttributeError |
+| `zero_grad()` 를 빼먹음 | gradient 누적으로 학습 폭주 / 발산 |
+| `forward` 를 `zero_grad` 전에 | 동작은 하지만, 한 batch 의 grad 가 이전 batch 와 섞일 위험 |
+
+
+##### 자주 하는 실수
+
+
+| 실수 | 결과 | 처방 |
+|------|------|------|
+| `optimizer.zero_grad()` 빼먹기 | gradient 누적 -> loss 폭주 | 매 iteration 첫 줄에 고정 |
+| `loss.item()` 대신 `loss` 를 리스트에 저장 | 계산 그래프가 메모리에 누적 -> OOM | `loss.item()` 또는 `loss.detach()` 사용 |
+| 평가 시 `model.eval()` / `torch.no_grad()` 누락 | BN/Dropout 이 학습 모드로 동작, 메모리 낭비 | `evaluate()` 함수처럼 묶어두기 |
+| `images.to(device)` 빠뜨림 | "Expected all tensors on same device" 에러 | 매 batch 첫 줄에서 같이 옮기기 |
+| GPU 텐서를 바로 `.numpy()` | "can't convert cuda tensor" 에러 | `.detach().cpu().numpy()` 순서 |
+
+
 **통계 누적 코드 풀이**
 
 
@@ -1811,8 +1957,9 @@ correct += predicted.eq(labels).sum().item() # (예측 == 정답) 인 샘플 개
 
 - `scheduler.step()`: epoch 단위로 호출. 위에서 정한 `step_size=30, gamma=0.1` 에 따라
   30 epoch 마다 lr 을 1/10 로 줄임. 학습 초반엔 크게, 후반엔 정밀하게 옮기는 효과.
+- `train_loss = running_loss / len(trainloader)`: epoch 동안 누적된 loss 를 **배치 수로 나눠** 평균 loss. print 와 7번 TensorBoard 로깅이 동일 변수를 참조하도록 변수로 빼둠.
 - `train_acc = 100. * correct / total`: 누적된 (맞춘 개수 / 전체 개수) 로 epoch 정확도 계산.
-- print 의 `running_loss/len(trainloader)`: epoch 동안 누적된 loss 를 **배치 수로 나눠** 평균 loss.
+- `val_acc = evaluate(model, testloader)`: 매 epoch 끝에 검증셋으로 정확도 측정. `evaluate` 안에서 `model.eval()` + `torch.no_grad()` 로 가중치 업데이트/그래프 기록 없이 forward 만 돌림. 다음 epoch 시작 시 `model.train()` 으로 다시 학습 모드로 복귀.
 
 
 **전체 흐름을 한 번 더**
@@ -1850,7 +1997,7 @@ x --→ F(x) x --→ F(x) --→ F(x) + x
 ```
 
 
-**왜 ResNet 인가 (초심자용)**
+**왜 ResNet 인가**
 
 
 모델을 깊게 쌓을수록 (Conv layer 를 100, 1000 단으로) **gradient 가 사라지거나 폭발해서**
@@ -1911,7 +2058,7 @@ CIFAR 전용 ResNet 변형 (`resnet18_cifar`) 을 쓰기도 합니다.
 ### 7. TensorBoard 시각화
 
 
-**왜 필요한가 (초심자용)**
+**왜 필요한가**
 
 
 앞 섹션의 학습 루프는 매 epoch print 로 loss/accuracy 만 콘솔에 찍습니다. 짧은 학습이면
@@ -1980,7 +2127,7 @@ tensorboard --logdir=runs
 ### 8. Checkpoint 저장/로드
 
 
-**왜 필요한가 (초심자용)**
+**왜 필요한가**
 
 
 학습은 길고 (50 epoch 가 몇 시간), 도중에 컴퓨터가 꺼지거나 OOM 으로 죽을 수 있습니다.
@@ -2136,7 +2283,9 @@ Transform -+ | output = model(x)
 
 
 **Q4. GPU 메모리 부족(OOM) 시 해결 방법 3가지는?**
-> 1) batch_size를 줄인다. 2) `torch.cuda.amp`로 Mixed Precision 학습을 사용한다. 3) 추론 시 `with torch.no_grad():` 블록을 사용하여 gradient 기록을 비활성화한다. 추가로 Gradient Accumulation, 모델 크기 축소 등도 가능합니다.
+> 1) batch_size를 줄인다. 
+> 2) `torch.cuda.amp`로 Mixed Precision 학습을 사용한다. 
+> 3) 추론 시 `with torch.no_grad():` 블록을 사용하여 gradient 기록을 비활성화한다. 추가로 Gradient Accumulation, 모델 크기 축소 등도 가능합니다.
 
 
 ---
@@ -2181,6 +2330,4 @@ Transform -+ | output = model(x)
 
 
 - 이전: [Phase 2 - Perception 기하 기초](../../../Roadmap/Phase%202.md)
-
-
-다음: [Week 2 - CV 라이브러리](../week2/README.md)
+- 다음: [Week 2 - CV 라이브러리](../week2/README.md)
