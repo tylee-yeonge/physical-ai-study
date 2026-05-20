@@ -12,3 +12,7 @@ my_quiz_medium.cpp
 .private/
 __pycache__
 .venv
+
+# Phase 3 week1: prepare_demo_dataset.py 로 재생성 가능 (seed 고정)
+Studies/Phase 3/week1/demo_dataset/
+Studies/Phase 3/week1/data/
