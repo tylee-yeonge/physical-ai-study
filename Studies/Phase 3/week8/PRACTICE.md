@@ -91,7 +91,7 @@ def infer_with_pipeline(image_path, model_name="LiheYoung/depth-anything-small-h
 
 
     # 파이프라인 생성
-    depth_pipe = pipeline(
+    depth_pipe = pipeline( # 깊이 추정 파이프라인 (전처리+추론+후처리 일괄 수행)
         task="depth-estimation",
         model=model_name
     )
@@ -99,12 +99,12 @@ def infer_with_pipeline(image_path, model_name="LiheYoung/depth-anything-small-h
 
 
     # 추론
-    result = depth_pipe(image_path)
+    result = depth_pipe(image_path) # 이미지 -> 깊이 추정 결과 dict
 
 
     # 결과 분석
     depth_image = result["depth"] # PIL Image
-    depth_array = np.array(depth_image)
+    depth_array = np.array(depth_image) # PIL Image -> numpy 배열
 
 
     print(f"입력: {image_path}")
@@ -114,7 +114,7 @@ def infer_with_pipeline(image_path, model_name="LiheYoung/depth-anything-small-h
 
 
     # 저장
-    depth_image.save("depth_pipeline_result.png")
+    depth_image.save("depth_pipeline_result.png") # 깊이맵 이미지 파일로 저장
     print(f"저장: depth_pipeline_result.png")
 
 
@@ -131,18 +131,18 @@ def compare_models(image_path):
     import time
 
 
-    models = [
+    models = [ # 비교할 모델 2종 (경로, 표시 이름)
         ("LiheYoung/depth-anything-small-hf", "ViT-S"),
         ("LiheYoung/depth-anything-base-hf", "ViT-B"),
     ]
 
 
-    for model_name, desc in models:
+    for model_name, desc in models: # 모델별로 추론 속도 측정
         pipe = pipeline("depth-estimation", model=model_name)
 
 
         # Warm-up
-        pipe(image_path)
+        pipe(image_path) # 측정 전 1회 실행 (첫 추론은 느림)
 
 
         # 속도 측정 (5회 평균)
@@ -153,7 +153,7 @@ def compare_models(image_path):
             times.append(time.time() - start)
 
 
-        avg_ms = np.mean(times) * 1000
+        avg_ms = np.mean(times) * 1000 # 평균 추론 시간 (ms)
         print(f"{desc}: {avg_ms:.1f} ms/frame ({1000/avg_ms:.1f} FPS)")
 
 
@@ -196,7 +196,7 @@ from PIL import Image
 class DepthAnythingInference:
     def __init__(self, model_name="LiheYoung/depth-anything-small-hf", device=None):
         """Depth Anything 추론기 초기화"""
-        if device is None:
+        if device is None: # device 미지정 시 자동 선택
             self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         else:
             self.device = torch.device(device)
@@ -206,13 +206,13 @@ class DepthAnythingInference:
 
 
         # 모델 로드
-        self.model = AutoModelForDepthEstimation.from_pretrained(model_name)
-        self.model.to(self.device)
-        self.model.eval()
+        self.model = AutoModelForDepthEstimation.from_pretrained(model_name) # HuggingFace에서 모델 로드
+        self.model.to(self.device) # 디바이스로 이동
+        self.model.eval() # 평가 모드
 
 
         # 이미지 프로세서 로드
-        self.processor = AutoImageProcessor.from_pretrained(model_name)
+        self.processor = AutoImageProcessor.from_pretrained(model_name) # 모델에 맞는 전처리기
 
 
         # 파라미터 수
@@ -230,7 +230,7 @@ class DepthAnythingInference:
             depth_map: numpy array [H, W] (float32)
         """
         # numpy → PIL 변환
-        if isinstance(image, np.ndarray):
+        if isinstance(image, np.ndarray): # numpy(BGR)면 PIL(RGB)로 변환
             image_pil = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
         else:
             image_pil = image
@@ -240,12 +240,12 @@ class DepthAnythingInference:
 
 
         # 전처리
-        inputs = self.processor(images=image_pil, return_tensors="pt")
-        inputs = {k: v.to(self.device) for k, v in inputs.items()}
+        inputs = self.processor(images=image_pil, return_tensors="pt") # 모델 입력 텐서로 변환
+        inputs = {k: v.to(self.device) for k, v in inputs.items()} # 입력을 디바이스로 이동
 
 
         # 추론
-        with torch.no_grad():
+        with torch.no_grad(): # 추론이므로 gradient 계산 끔
             outputs = self.model(**inputs)
 
 
@@ -254,15 +254,15 @@ class DepthAnythingInference:
 
 
         # 원본 크기로 리사이즈
-        depth = torch.nn.functional.interpolate(
-            depth.unsqueeze(0).unsqueeze(0),
+        depth = torch.nn.functional.interpolate( # 모델 출력 크기 -> 원본 크기로 보간
+            depth.unsqueeze(0).unsqueeze(0), # interpolate는 4차원 입력 필요
             size=(orig_size[1], orig_size[0]), # (H, W)
             mode="bicubic",
             align_corners=False
         ).squeeze()
 
 
-        depth_numpy = depth.cpu().numpy()
+        depth_numpy = depth.cpu().numpy() # 텐서 -> numpy 배열
 
 
         return depth_numpy
@@ -277,7 +277,7 @@ class DepthAnythingInference:
         Returns:
             list of depth maps
         """
-        inputs = self.processor(images=images, return_tensors="pt")
+        inputs = self.processor(images=images, return_tensors="pt") # 여러 이미지를 한 배치로 묶어 전처리
         inputs = {k: v.to(self.device) for k, v in inputs.items()}
 
 
@@ -289,7 +289,7 @@ class DepthAnythingInference:
 
 
         results = []
-        for i, img in enumerate(images):
+        for i, img in enumerate(images): # 이미지별로 원본 크기 복원
             d = depths[i].unsqueeze(0).unsqueeze(0)
             d = torch.nn.functional.interpolate(
                 d, size=img.size[::-1], mode="bicubic", align_corners=False
@@ -303,7 +303,7 @@ class DepthAnythingInference:
     def benchmark(self, image, num_runs=20):
         """추론 속도 벤치마크"""
         # Warm-up
-        for _ in range(3):
+        for _ in range(3): # 측정 전 워밍업 (첫 추론은 느림)
             self.infer(image)
 
 
@@ -315,9 +315,9 @@ class DepthAnythingInference:
             times.append(time.time() - start)
 
 
-        avg_ms = np.mean(times) * 1000
-        std_ms = np.std(times) * 1000
-        fps = 1000 / avg_ms
+        avg_ms = np.mean(times) * 1000 # 평균 추론 시간 (ms)
+        std_ms = np.std(times) * 1000 # 표준편차 (ms)
+        fps = 1000 / avg_ms # 초당 프레임 수
 
 
         print(f"\n 벤치마크 결과 ({num_runs}회):")
@@ -335,7 +335,7 @@ if __name__ == "__main__":
 
 
     # 추론기 초기화
-    inferencer = DepthAnythingInference()
+    inferencer = DepthAnythingInference() # 기본 모델로 추론기 생성
 
 
     # 이미지 로드
@@ -344,7 +344,7 @@ if __name__ == "__main__":
 
 
     # 추론
-    depth_map = inferencer.infer(image)
+    depth_map = inferencer.infer(image) # 깊이맵 추론
     print(f"깊이맵 크기: {depth_map.shape}")
     print(f"깊이 범위: [{depth_map.min():.3f}, {depth_map.max():.3f}]")
 
@@ -378,23 +378,23 @@ def normalize_depth(depth_map):
     """깊이맵 정규화 (0~1)"""
     d_min = depth_map.min()
     d_max = depth_map.max()
-    if d_max - d_min < 1e-6:
+    if d_max - d_min < 1e-6: # 전부 같은 값이면 0으로 (0 나눗셈 방지)
         return np.zeros_like(depth_map)
-    return (depth_map - d_min) / (d_max - d_min)
+    return (depth_map - d_min) / (d_max - d_min) # 최소~최대를 0~1 범위로 선형 변환
 
 
 def depth_to_colormap(depth_map, colormap_name='magma'):
     """깊이맵에 컬러맵 적용"""
-    depth_norm = normalize_depth(depth_map)
-    cmap = plt.get_cmap(colormap_name)
-    colored = cmap(depth_norm)[:, :, :3] # alpha 제거
-    colored = (colored * 255).astype(np.uint8)
+    depth_norm = normalize_depth(depth_map) # 0~1로 정규화
+    cmap = plt.get_cmap(colormap_name) # 컬러맵 함수 가져오기
+    colored = cmap(depth_norm)[:, :, :3] # alpha 제거 (RGBA -> RGB)
+    colored = (colored * 255).astype(np.uint8) # 0~1 실수 -> 0~255 정수
     return colored
 
 
 def visualize_side_by_side(image_path, depth_map, save_path="depth_comparison.png"):
     """원본 이미지와 깊이맵 나란히 시각화"""
-    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5)) # 그래프 2개 가로 배치
 
 
     # 원본 이미지
@@ -408,25 +408,25 @@ def visualize_side_by_side(image_path, depth_map, save_path="depth_comparison.pn
     im = axes[1].imshow(depth_map, cmap='magma')
     axes[1].set_title('깊이맵 (Depth Anything)', fontsize=14)
     axes[1].axis('off')
-    plt.colorbar(im, ax=axes[1], fraction=0.046, pad=0.04)
+    plt.colorbar(im, ax=axes[1], fraction=0.046, pad=0.04) # 색상-깊이 대응 막대
 
 
     plt.tight_layout()
-    plt.savefig(save_path, dpi=150, bbox_inches='tight')
+    plt.savefig(save_path, dpi=150, bbox_inches='tight') # 결과 이미지 저장
     print(f"저장: {save_path}")
     plt.close()
 
 
 def visualize_colormaps(depth_map, save_path="depth_colormaps.png"):
     """다양한 컬러맵 비교"""
-    colormaps = ['magma', 'inferno', 'turbo', 'viridis', 'plasma', 'gray']
+    colormaps = ['magma', 'inferno', 'turbo', 'viridis', 'plasma', 'gray'] # 비교할 컬러맵 6종
 
 
-    fig, axes = plt.subplots(2, 3, figsize=(15, 8))
-    axes = axes.flatten()
+    fig, axes = plt.subplots(2, 3, figsize=(15, 8)) # 2x3 그리드
+    axes = axes.flatten() # 2차원 배열 -> 1차원으로 펴서 순회 편하게
 
 
-    for ax, cmap_name in zip(axes, colormaps):
+    for ax, cmap_name in zip(axes, colormaps): # 컬러맵별로 같은 깊이맵 표시
         ax.imshow(depth_map, cmap=cmap_name)
         ax.set_title(f'컬러맵: {cmap_name}', fontsize=12)
         ax.axis('off')
@@ -451,11 +451,11 @@ def visualize_depth_histogram(depth_map, save_path="depth_histogram.png"):
 
 
     # 히스토그램
-    axes[1].hist(depth_map.flatten(), bins=100, color='steelblue', alpha=0.7)
+    axes[1].hist(depth_map.flatten(), bins=100, color='steelblue', alpha=0.7) # 모든 픽셀의 깊이값 분포
     axes[1].set_xlabel('깊이 값')
     axes[1].set_ylabel('픽셀 수')
     axes[1].set_title('깊이값 분포')
-    axes[1].axvline(depth_map.mean(), color='red', linestyle='--',
+    axes[1].axvline(depth_map.mean(), color='red', linestyle='--', # 평균값 위치에 세로선
                      label=f'평균: {depth_map.mean():.2f}')
     axes[1].legend()
 
@@ -470,21 +470,21 @@ def create_overlay(image_path, depth_map, alpha=0.5, save_path="depth_overlay.pn
     """원본 이미지 위에 깊이맵 오버레이"""
     # 원본 이미지 로드
     image = cv2.imread(image_path)
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) # BGR -> RGB
 
 
     # 깊이맵 컬러맵 적용
-    depth_colored = depth_to_colormap(depth_map, 'turbo')
+    depth_colored = depth_to_colormap(depth_map, 'turbo') # 깊이맵을 컬러 이미지로
 
 
     # 크기 맞추기
-    if depth_colored.shape[:2] != image.shape[:2]:
+    if depth_colored.shape[:2] != image.shape[:2]: # 크기 다르면 깊이맵을 이미지 크기에 맞춤
         depth_colored = cv2.resize(depth_colored,
                                     (image.shape[1], image.shape[0]))
 
 
     # 오버레이
-    overlay = cv2.addWeighted(image, 1 - alpha, depth_colored, alpha, 0)
+    overlay = cv2.addWeighted(image, 1 - alpha, depth_colored, alpha, 0) # 두 이미지를 alpha 비율로 합성
 
 
     # 저장
@@ -509,15 +509,15 @@ if __name__ == "__main__":
     # 깊이 추론
     pipe = pipeline("depth-estimation", model="LiheYoung/depth-anything-small-hf")
     result = pipe(image_path)
-    depth_map = np.array(result["depth"]).astype(np.float32)
+    depth_map = np.array(result["depth"]).astype(np.float32) # 깊이맵을 numpy float32로 변환
     print(f"깊이맵 크기: {depth_map.shape}")
 
 
     # 시각화
-    visualize_side_by_side(image_path, depth_map)
-    visualize_colormaps(depth_map)
-    visualize_depth_histogram(depth_map)
-    create_overlay(image_path, depth_map, alpha=0.4)
+    visualize_side_by_side(image_path, depth_map) # 원본+깊이맵 나란히
+    visualize_colormaps(depth_map) # 컬러맵 6종 비교
+    visualize_depth_histogram(depth_map) # 깊이값 히스토그램
+    create_overlay(image_path, depth_map, alpha=0.4) # 원본 위에 깊이맵 오버레이
 
 
     print("\n 모든 시각화 완료!")
@@ -548,7 +548,7 @@ depth 의 각 픽셀을 카메라 intrinsics 로 unproject 해 3D 점으로 만�
 PNG 의 colored depth 가 보여주지 못하는 "공간감" 을 회전/줌으로 직접 확인.
 """
 import numpy as np
-import rerun as rr
+import rerun as rr # 3D 시각화 도구
 from PIL import Image
 from transformers import pipeline
 
@@ -570,15 +570,15 @@ def depth_to_pointcloud(depth_map, image_rgb, fx, fy, cx, cy):
         절대 거리 (미터) 가 필요하면 Step 4 의 metric_depth 변환 적용 후 사용.
     """
     H, W = depth_map.shape
-    xs, ys = np.meshgrid(np.arange(W), np.arange(H))
+    xs, ys = np.meshgrid(np.arange(W), np.arange(H)) # 각 픽셀의 (x, y) 좌표 격자
 
     # 핀홀 unproject: (u, v, Z) -> (X, Y, Z)
-    Z = depth_map.astype(np.float32)
-    X = (xs - cx) * Z / fx
-    Y = (ys - cy) * Z / fy
+    Z = depth_map.astype(np.float32) # 깊이값이 곧 Z 좌표
+    X = (xs - cx) * Z / fx # 핀홀 카메라 역투영으로 X 계산
+    Y = (ys - cy) * Z / fy # 핀홀 카메라 역투영으로 Y 계산
 
-    points = np.stack([X, Y, Z], axis=-1).reshape(-1, 3)
-    colors = image_rgb.reshape(-1, 3)
+    points = np.stack([X, Y, Z], axis=-1).reshape(-1, 3) # (H,W,3) -> (N,3) 점 목록
+    colors = image_rgb.reshape(-1, 3) # 각 점에 입힐 색 (원본 RGB)
     return points, colors
 
 
@@ -590,7 +590,7 @@ def main():
     result = pipe(image_path)
     depth_map = np.array(result["depth"]).astype(np.float32)
 
-    image_pil = Image.open(image_path).convert("RGB").resize(
+    image_pil = Image.open(image_path).convert("RGB").resize( # 원본을 깊이맵 크기에 맞춰 리사이즈
         (depth_map.shape[1], depth_map.shape[0])
     )
     image_rgb = np.array(image_pil)
@@ -598,30 +598,30 @@ def main():
     # 2) 카메라 intrinsics 추정 (실측 K 없을 때 대략값)
     #    fx = fy = W (FOV 약 53도 가정). cx, cy 는 이미지 중앙
     H, W = depth_map.shape
-    fx = fy = float(W)
-    cx, cy = W / 2.0, H / 2.0
+    fx = fy = float(W) # 초점거리 (픽셀 단위)
+    cx, cy = W / 2.0, H / 2.0 # 주점 (이미지 중앙)
 
     # 3) point cloud 구성
     points, colors = depth_to_pointcloud(depth_map, image_rgb, fx, fy, cx, cy)
     print(f"point count: {points.shape[0]}")
 
     # 4) Rerun 로깅
-    rr.init("depth_anything", spawn=False)
+    rr.init("depth_anything", spawn=False) # Rerun 세션 시작
 
     # 2D: 원본 이미지 + colored depth
-    rr.log("image/rgb", rr.Image(image_rgb))
-    rr.log("image/depth", rr.DepthImage(depth_map))
+    rr.log("image/rgb", rr.Image(image_rgb)) # 원본 이미지 기록
+    rr.log("image/depth", rr.DepthImage(depth_map)) # 깊이맵 기록
 
     # 3D: point cloud + 카메라
     rr.log(
         "world/cam",
-        rr.Pinhole(image_from_camera=np.array([[fx, 0, cx], [0, fy, cy], [0, 0, 1]]),
+        rr.Pinhole(image_from_camera=np.array([[fx, 0, cx], [0, fy, cy], [0, 0, 1]]), # 카메라 내부 파라미터 행렬
                    width=W, height=H),
     )
-    rr.log("world/points", rr.Points3D(points, colors=colors, radii=0.005))
+    rr.log("world/points", rr.Points3D(points, colors=colors, radii=0.005)) # 3D 점 구름 기록
 
     # 5) RRD 저장 (로컬 viewer 에서 열기)
-    rr.save("depth_pointcloud.rrd")
+    rr.save("depth_pointcloud.rrd") # 결과를 .rrd 파일로 저장
     print("저장: depth_pointcloud.rrd")
     print("로컬에서 확인: rerun depth_pointcloud.rrd")
 
@@ -686,7 +686,7 @@ def relative_to_metric(depth_map, ref_points):
     Returns:
         metric_depth: numpy array [H, W] 절대 깊이 (미터)
     """
-    if len(ref_points) < 2:
+    if len(ref_points) < 2: # 선형 회귀에는 참조점 2개 이상 필요
         print("경고: 최소 2개의 참조점 필요!")
         return None
 
@@ -699,8 +699,8 @@ def relative_to_metric(depth_map, ref_points):
     for y, x, real_depth in ref_points:
         # 주변 5x5 영역 평균 (노이즈 감소)
         region = depth_map[max(0, y-2):y+3, max(0, x-2):x+3]
-        rel_values.append(region.mean())
-        metric_values.append(real_depth)
+        rel_values.append(region.mean()) # 참조점의 상대 깊이값
+        metric_values.append(real_depth) # 참조점의 실제 거리(m)
 
 
     rel_values = np.array(rel_values)
@@ -709,8 +709,8 @@ def relative_to_metric(depth_map, ref_points):
 
     # 선형 회귀: metric = alpha * relative + beta
     # 최소제곱법 (2개 이상의 참조점)
-    A = np.column_stack([rel_values, np.ones_like(rel_values)])
-    result = np.linalg.lstsq(A, metric_values, rcond=None)
+    A = np.column_stack([rel_values, np.ones_like(rel_values)]) # [상대값, 1] 형태의 행렬
+    result = np.linalg.lstsq(A, metric_values, rcond=None) # 최소제곱법으로 alpha, beta 추정
     alpha, beta = result[0]
 
 
@@ -719,11 +719,11 @@ def relative_to_metric(depth_map, ref_points):
 
 
     # 전체 깊이맵 변환
-    metric_depth = alpha * depth_map + beta
+    metric_depth = alpha * depth_map + beta # 구한 식을 전체 픽셀에 적용
 
 
     # 음수 깊이 클리핑
-    metric_depth = np.clip(metric_depth, 0.0, None)
+    metric_depth = np.clip(metric_depth, 0.0, None) # 음수 거리는 0으로 잘라냄
 
 
     return metric_depth
@@ -740,9 +740,9 @@ def analyze_depth_regions(depth_map, image_path):
 
 
     # 3등분 (상단/중단/하단)
-    top = depth_map[:h//3, :]
-    mid = depth_map[h//3:2*h//3, :]
-    bot = depth_map[2*h//3:, :]
+    top = depth_map[:h//3, :] # 상단 1/3 영역
+    mid = depth_map[h//3:2*h//3, :] # 중단 1/3 영역
+    bot = depth_map[2*h//3:, :] # 하단 1/3 영역
 
 
     print(f"상단 (하늘/천장): 평균={top.mean():.3f}, 범위=[{top.min():.3f}, {top.max():.3f}]")
@@ -761,8 +761,8 @@ def analyze_depth_regions(depth_map, image_path):
 
     axes[0, 1].imshow(depth_map, cmap='magma')
     axes[0, 1].set_title('깊이맵')
-    axes[0, 1].axhline(h//3, color='cyan', linewidth=1, linestyle='--')
-    axes[0, 1].axhline(2*h//3, color='cyan', linewidth=1, linestyle='--')
+    axes[0, 1].axhline(h//3, color='cyan', linewidth=1, linestyle='--') # 상/중 경계선
+    axes[0, 1].axhline(2*h//3, color='cyan', linewidth=1, linestyle='--') # 중/하 경계선
 
 
     # 영역별 히스토그램
@@ -774,7 +774,7 @@ def analyze_depth_regions(depth_map, image_path):
 
 
     # 가로 프로파일 (중앙 라인)
-    center_line = depth_map[h//2, :]
+    center_line = depth_map[h//2, :] # 이미지 중앙 가로줄의 깊이값
     axes[1, 1].plot(center_line)
     axes[1, 1].set_title('중앙 수평선 깊이 프로파일')
     axes[1, 1].set_xlabel('X 좌표')
@@ -816,13 +816,13 @@ if __name__ == "__main__":
     print("(실제 사용 시 실제 거리를 아는 참조점 2개 이상 필요)")
 
 
-    ref_points = [
+    ref_points = [ # 참조점 목록: (y좌표, x좌표, 실제 거리 m)
         (240, 320, 2.0), # 이미지 중앙, 실제 2m
         (100, 320, 5.0), # 이미지 상단, 실제 5m
     ]
 
 
-    metric_depth = relative_to_metric(depth_map, ref_points)
+    metric_depth = relative_to_metric(depth_map, ref_points) # 상대 깊이 -> 절대 깊이 변환
     if metric_depth is not None:
         print(f"Metric 깊이 범위: [{metric_depth.min():.2f}m, {metric_depth.max():.2f}m]")
 ```
@@ -862,37 +862,37 @@ def combine_yolo_depth(image_path, yolo_boxes, depth_map):
 
 
     image = cv2.imread(image_path)
-    h_img, w_img = image.shape[:2]
-    h_dep, w_dep = depth_map.shape
+    h_img, w_img = image.shape[:2] # 원본 이미지 크기
+    h_dep, w_dep = depth_map.shape # 깊이맵 크기
 
 
     # 깊이맵 크기를 이미지에 맞춤
-    if (h_dep, w_dep) != (h_img, w_img):
+    if (h_dep, w_dep) != (h_img, w_img): # 크기 다르면 깊이맵을 이미지 크기로 리사이즈
         depth_resized = cv2.resize(depth_map, (w_img, h_img))
     else:
         depth_resized = depth_map
 
 
     print(f"\n 검출 결과:")
-    for box in yolo_boxes:
+    for box in yolo_boxes: # 검출된 객체마다 깊이 분석
         x1, y1, x2, y2, cls_name, conf = box
 
 
         # 바운딩 박스 내 깊이 추출
-        roi_depth = depth_resized[int(y1):int(y2), int(x1):int(x2)]
+        roi_depth = depth_resized[int(y1):int(y2), int(x1):int(x2)] # 박스 영역의 깊이값들
 
 
-        if roi_depth.size == 0:
+        if roi_depth.size == 0: # 빈 영역이면 건너뜀
             continue
 
 
-        mean_depth = roi_depth.mean()
+        mean_depth = roi_depth.mean() # 박스 영역 평균 깊이
         min_depth = roi_depth.min()
         max_depth = roi_depth.max()
 
 
         # 깊이 기반 거리 판단 (상대 깊이)
-        if mean_depth > 200:
+        if mean_depth > 200: # 상대 깊이값이 클수록 가까움
             distance_desc = "매우 가까움"
         elif mean_depth > 150:
             distance_desc = "가까움"
@@ -910,20 +910,20 @@ def combine_yolo_depth(image_path, yolo_boxes, depth_map):
 
 
         # 시각화
-        color = (0, 255, 0) if mean_depth < 150 else (0, 0, 255)
+        color = (0, 255, 0) if mean_depth < 150 else (0, 0, 255) # 멀면 초록, 가까우면 빨강
         cv2.rectangle(image, (int(x1), int(y1)), (int(x2), int(y2)), color, 2)
         label = f"{cls_name}: depth={mean_depth:.0f}"
         cv2.putText(image, label, (int(x1), int(y1) - 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
 
-    cv2.imwrite("yolo_depth_result.jpg", image)
+    cv2.imwrite("yolo_depth_result.jpg", image) # 결과 이미지 저장
     print(f"\n 저장: yolo_depth_result.jpg")
 
 
 if __name__ == "__main__":
     # 가상의 YOLO 검출 결과 (실제 사용 시 YOLO 모델로 대체)
-    yolo_boxes = [
+    yolo_boxes = [ # 각 항목: [x1, y1, x2, y2, 클래스명, confidence]
         [100, 50, 300, 400, "person", 0.92],
         [400, 200, 550, 350, "chair", 0.85],
         [50, 300, 200, 450, "dog", 0.78],
@@ -942,11 +942,11 @@ if __name__ == "__main__":
     depth_pipe = pipeline("depth-estimation",
                           model="LiheYoung/depth-anything-small-hf")
     result = depth_pipe(image_path)
-    depth_map = np.array(result["depth"]).astype(np.float32)
+    depth_map = np.array(result["depth"]).astype(np.float32) # 깊이맵을 numpy float32로
 
 
     # 결합
-    combine_yolo_depth(image_path, yolo_boxes, depth_map)
+    combine_yolo_depth(image_path, yolo_boxes, depth_map) # 박스별 깊이 분석
 ```
 
 

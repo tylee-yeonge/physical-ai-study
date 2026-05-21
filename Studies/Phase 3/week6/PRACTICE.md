@@ -160,19 +160,19 @@ Throughput: 123.5 qps
 
 ```cpp
 #pragma once
-#include <NvInfer.h>
-#include <cuda_runtime.h>
+#include <NvInfer.h> // TensorRT 핵심 헤더
+#include <cuda_runtime.h> // CUDA 런타임 (GPU 메모리 할당 등)
 #include <string>
 #include <vector>
 #include <fstream>
 #include <iostream>
 
 
-// TensorRT 로거
+// TensorRT 로거 (TensorRT 내부 메시지를 받아 콘솔에 출력)
 class TrtLogger : public nvinfer1::ILogger {
 public:
     void log(Severity severity, const char* msg) noexcept override {
-        if (severity <= Severity::kWARNING) {
+        if (severity <= Severity::kWARNING) { // WARNING 이상 심각도만 출력
             std::cout << "[TRT] " << msg << std::endl;
         }
     }
@@ -181,11 +181,11 @@ public:
 
 class TrtEngine {
 public:
-    TrtEngine(const std::string& engine_path);
+    TrtEngine(const std::string& engine_path); // 엔진 파일을 로드하며 초기화
     ~TrtEngine();
 
 
-    // 추론 실행
+    // 추론 실행 (입력 -> GPU 추론 -> 출력)
     bool infer(float* input_data, float* output_data);
 
 
@@ -196,18 +196,18 @@ public:
 
 private:
     TrtLogger logger_;
-    nvinfer1::IRuntime* runtime_ = nullptr;
-    nvinfer1::ICudaEngine* engine_ = nullptr;
-    nvinfer1::IExecutionContext* context_ = nullptr;
+    nvinfer1::IRuntime* runtime_ = nullptr; // 엔진 역직렬화용 런타임
+    nvinfer1::ICudaEngine* engine_ = nullptr; // 역직렬화된 추론 엔진
+    nvinfer1::IExecutionContext* context_ = nullptr; // 실제 추론을 실행하는 컨텍스트
 
 
     void* buffers_[2]; // [input, output] GPU 버퍼
-    int input_size_ = 0; // 입력 크기 (바이트)
-    int output_size_ = 0; // 출력 크기 (바이트)
+    int input_size_ = 0; // 입력 크기 (float 원소 개수)
+    int output_size_ = 0; // 출력 크기 (float 원소 개수)
 
 
-    bool loadEngine(const std::string& path);
-    void allocateBuffers();
+    bool loadEngine(const std::string& path); // 엔진 파일을 읽어 역직렬화
+    void allocateBuffers(); // 입출력용 GPU 메모리 할당
 };
 ```
 
@@ -220,15 +220,16 @@ private:
 
 
 TrtEngine::TrtEngine(const std::string& engine_path) {
-    if (!loadEngine(engine_path)) {
+    if (!loadEngine(engine_path)) { // 엔진 로드 실패 시 예외 발생
         throw std::runtime_error("엔진 로드 실패: " + engine_path);
     }
-    allocateBuffers();
+    allocateBuffers(); // 입출력 GPU 버퍼 준비
     std::cout << "[INFO] TensorRT 엔진 로드 완료" << std::endl;
 }
 
 
 TrtEngine::~TrtEngine() {
+    // 소멸 시 GPU 메모리와 TensorRT 객체를 모두 해제
     cudaFree(buffers_[0]);
     cudaFree(buffers_[1]);
     if (context_) context_->destroy();
@@ -240,27 +241,27 @@ TrtEngine::~TrtEngine() {
 
 bool TrtEngine::loadEngine(const std::string& path) {
     // 엔진 파일 읽기
-    std::ifstream file(path, std::ios::binary);
+    std::ifstream file(path, std::ios::binary); // 바이너리 모드로 열기
     if (!file.good()) {
         std::cerr << "[ERROR] 파일 열기 실패: " << path << std::endl;
         return false;
     }
 
 
-    file.seekg(0, std::ios::end);
-    size_t size = file.tellg();
-    file.seekg(0, std::ios::beg);
+    file.seekg(0, std::ios::end); // 파일 끝으로 이동
+    size_t size = file.tellg(); // 현재 위치 = 파일 크기
+    file.seekg(0, std::ios::beg); // 다시 파일 처음으로
 
 
-    std::vector<char> data(size);
-    file.read(data.data(), size);
+    std::vector<char> data(size); // 파일 크기만큼 버퍼 확보
+    file.read(data.data(), size); // 엔진 데이터 전체 읽기
     file.close();
 
 
     // 런타임 생성 및 엔진 역직렬화
     runtime_ = nvinfer1::createInferRuntime(logger_);
-    engine_ = runtime_->deserializeCudaEngine(data.data(), size);
-    context_ = engine_->createExecutionContext();
+    engine_ = runtime_->deserializeCudaEngine(data.data(), size); // 바이트 -> 엔진 객체
+    context_ = engine_->createExecutionContext(); // 추론 실행 컨텍스트 생성
 
 
     if (!engine_ || !context_) {
@@ -275,15 +276,15 @@ bool TrtEngine::loadEngine(const std::string& path) {
 
 void TrtEngine::allocateBuffers() {
     // 입력/출력 바인딩 정보
-    int input_idx = engine_->getBindingIndex("images");
-    int output_idx = engine_->getBindingIndex("output0");
+    int input_idx = engine_->getBindingIndex("images"); // 입력 텐서 인덱스
+    int output_idx = engine_->getBindingIndex("output0"); // 출력 텐서 인덱스
 
 
     auto input_dims = engine_->getBindingDimensions(input_idx);
     auto output_dims = engine_->getBindingDimensions(output_idx);
 
 
-    // 크기 계산 (float 기준)
+    // 크기 계산 (float 기준) - 모든 차원을 곱해 전체 원소 수를 구함
     input_size_ = 1;
     for (int i = 0; i < input_dims.nbDims; i++) {
         input_size_ *= input_dims.d[i];
@@ -296,7 +297,7 @@ void TrtEngine::allocateBuffers() {
     }
 
 
-    // GPU 메모리 할당
+    // GPU 메모리 할당 (원소 수 * float 크기)
     cudaMalloc(&buffers_[0], input_size_ * sizeof(float));
     cudaMalloc(&buffers_[1], output_size_ * sizeof(float));
 
@@ -309,16 +310,16 @@ void TrtEngine::allocateBuffers() {
 bool TrtEngine::infer(float* input_data, float* output_data) {
     // CPU → GPU 복사
     cudaMemcpy(buffers_[0], input_data,
-               input_size_ * sizeof(float), cudaMemcpyHostToDevice);
+               input_size_ * sizeof(float), cudaMemcpyHostToDevice); // 입력을 GPU로 전송
 
 
     // 추론 실행
-    bool success = context_->executeV2(buffers_);
+    bool success = context_->executeV2(buffers_); // GPU에서 추론 수행
 
 
     // GPU → CPU 복사
     cudaMemcpy(output_data, buffers_[1],
-               output_size_ * sizeof(float), cudaMemcpyDeviceToHost);
+               output_size_ * sizeof(float), cudaMemcpyDeviceToHost); // 결과를 CPU로 회수
 
 
     return success;
@@ -348,11 +349,11 @@ struct Detection {
 };
 
 
-// IoU 계산
+// IoU 계산 (두 박스가 겹치는 정도)
 float computeIoU(const Detection& a, const Detection& b);
 
 
-// NMS 실행
+// NMS 실행 (중복 검출 박스 제거)
 std::vector<Detection> nms(std::vector<Detection>& detections,
                            float iou_threshold = 0.45f);
 ```
@@ -366,55 +367,55 @@ std::vector<Detection> nms(std::vector<Detection>& detections,
 
 
 float computeIoU(const Detection& a, const Detection& b) {
-    // 교집합 계산
+    // 교집합 계산 (겹치는 영역의 좌표)
     float x1 = std::max(a.x1, b.x1);
     float y1 = std::max(a.y1, b.y1);
     float x2 = std::min(a.x2, b.x2);
     float y2 = std::min(a.y2, b.y2);
 
 
-    float intersection = std::max(0.0f, x2 - x1) * std::max(0.0f, y2 - y1);
+    float intersection = std::max(0.0f, x2 - x1) * std::max(0.0f, y2 - y1); // 교집합 넓이
 
 
     // 합집합 계산
-    float area_a = (a.x2 - a.x1) * (a.y2 - a.y1);
-    float area_b = (b.x2 - b.x1) * (b.y2 - b.y1);
-    float union_area = area_a + area_b - intersection;
+    float area_a = (a.x2 - a.x1) * (a.y2 - a.y1); // a 박스 넓이
+    float area_b = (b.x2 - b.x1) * (b.y2 - b.y1); // b 박스 넓이
+    float union_area = area_a + area_b - intersection; // 합집합 넓이
 
 
-    if (union_area <= 0.0f) return 0.0f;
-    return intersection / union_area;
+    if (union_area <= 0.0f) return 0.0f; // 0 나눗셈 방지
+    return intersection / union_area; // IoU = 교집합 / 합집합
 }
 
 
 std::vector<Detection> nms(std::vector<Detection>& detections,
                            float iou_threshold) {
-    // confidence 기준 내림차순 정렬
+    // confidence 기준 내림차순 정렬 (점수 높은 박스가 앞으로)
     std::sort(detections.begin(), detections.end(),
               [](const Detection& a, const Detection& b) {
                   return a.confidence > b.confidence;
               });
 
 
-    std::vector<bool> suppressed(detections.size(), false);
+    std::vector<bool> suppressed(detections.size(), false); // 박스별 제거 여부
     std::vector<Detection> result;
 
 
     for (size_t i = 0; i < detections.size(); i++) {
-        if (suppressed[i]) continue;
+        if (suppressed[i]) continue; // 이미 제거된 박스는 건너뜀
 
 
-        result.push_back(detections[i]);
+        result.push_back(detections[i]); // 점수가 가장 높은 박스는 유지
 
 
         // 현재 박스와 IoU가 높은 박스 제거
         for (size_t j = i + 1; j < detections.size(); j++) {
             if (suppressed[j]) continue;
-            if (detections[i].class_id != detections[j].class_id) continue;
+            if (detections[i].class_id != detections[j].class_id) continue; // 다른 클래스는 비교 안 함
 
 
             float iou = computeIoU(detections[i], detections[j]);
-            if (iou > iou_threshold) {
+            if (iou > iou_threshold) { // 많이 겹치면 중복으로 보고 제거
                 suppressed[j] = true;
             }
         }
@@ -446,7 +447,7 @@ public:
     YoloDetector(const std::string& engine_path,
                  float conf_thresh = 0.25f,
                  float iou_thresh = 0.45f)
-        : engine_(engine_path),
+        : engine_(engine_path), // 멤버 초기화 리스트로 엔진 로드
           conf_thresh_(conf_thresh),
           iou_thresh_(iou_thresh) {}
 
@@ -469,25 +470,25 @@ public:
 
 private:
     TrtEngine engine_;
-    float conf_thresh_;
-    float iou_thresh_;
+    float conf_thresh_; // confidence 임계값
+    float iou_thresh_; // NMS IoU 임계값
 
 
     void preprocess(const cv::Mat& image, cv::Mat& blob) {
         cv::Mat resized;
-        cv::resize(image, resized, cv::Size(640, 640));
-        cv::cvtColor(resized, resized, cv::COLOR_BGR2RGB);
-        resized.convertTo(resized, CV_32F, 1.0 / 255.0);
+        cv::resize(image, resized, cv::Size(640, 640)); // 모델 입력 크기로 리사이즈
+        cv::cvtColor(resized, resized, cv::COLOR_BGR2RGB); // BGR -> RGB
+        resized.convertTo(resized, CV_32F, 1.0 / 255.0); // 0~255 -> 0~1 정규화
 
 
         // HWC → CHW 변환
         std::vector<cv::Mat> channels(3);
-        cv::split(resized, channels);
+        cv::split(resized, channels); // 채널 분리 (R, G, B)
 
 
         // CHW 연속 메모리 할당
         blob = cv::Mat(3 * 640, 640, CV_32F);
-        for (int c = 0; c < 3; c++) {
+        for (int c = 0; c < 3; c++) { // 채널을 세로로 이어붙여 CHW 형태로 배치
             channels[c].copyTo(blob(cv::Rect(0, c * 640, 640, 640)));
         }
     }
@@ -503,8 +504,8 @@ private:
         std::vector<Detection> detections;
 
 
-        for (int i = 0; i < num_boxes; i++) {
-            // xywh 추출
+        for (int i = 0; i < num_boxes; i++) { // 후보 박스 8400개를 하나씩 검사
+            // xywh 추출 (박스 중심좌표와 크기)
             float cx = output[0 * num_boxes + i];
             float cy = output[1 * num_boxes + i];
             float w = output[2 * num_boxes + i];
@@ -516,17 +517,17 @@ private:
             int max_class = 0;
             for (int c = 0; c < num_classes; c++) {
                 float score = output[(4 + c) * num_boxes + i];
-                if (score > max_score) {
+                if (score > max_score) { // 점수가 가장 높은 클래스 찾기
                     max_score = score;
                     max_class = c;
                 }
             }
 
 
-            if (max_score < conf_thresh_) continue;
+            if (max_score < conf_thresh_) continue; // 임계값 미만은 버림
 
 
-            // xywh → xyxy
+            // xywh → xyxy (중심+크기 -> 좌상단/우하단, 원본 이미지 크기로 스케일링)
             Detection det;
             det.x1 = (cx - w / 2.0f) * orig_size.width / 640.0f;
             det.y1 = (cy - h / 2.0f) * orig_size.height / 640.0f;
@@ -540,7 +541,7 @@ private:
         }
 
 
-        // NMS 적용
+        // NMS 적용 (중복 박스 제거)
         return nms(detections, iou_thresh_);
     }
 };
@@ -558,19 +559,19 @@ private:
 
 ```cpp
 #include <iostream>
-#include <chrono>
+#include <chrono> // 시간 측정용
 #include <opencv2/opencv.hpp>
 #include "trt_engine.h"
 #include "nms.h"
 
 
 int main(int argc, char** argv) {
-    std::string engine_path = "models/yolo11n_fp16.trt";
-    std::string image_path = "data/test.jpg";
+    std::string engine_path = "models/yolo11n_fp16.trt"; // 기본 엔진 경로
+    std::string image_path = "data/test.jpg"; // 기본 이미지 경로
 
 
-    if (argc >= 2) engine_path = argv[1];
-    if (argc >= 3) image_path = argv[2];
+    if (argc >= 2) engine_path = argv[1]; // 첫 번째 인자로 엔진 경로 받기
+    if (argc >= 3) image_path = argv[2]; // 두 번째 인자로 이미지 경로 받기
 
 
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -584,7 +585,7 @@ int main(int argc, char** argv) {
 
     // 테스트 이미지 로드
     cv::Mat image = cv::imread(image_path);
-    if (image.empty()) {
+    if (image.empty()) { // 이미지 로드 실패 체크
         std::cerr << "[ERROR] 이미지 로드 실패: " << image_path << std::endl;
         return -1;
     }
@@ -595,27 +596,27 @@ int main(int argc, char** argv) {
     std::vector<float> output(engine.getOutputSize());
 
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; i++) { // 측정 전 워밍업 (첫 추론은 느림)
         engine.infer(input.data(), output.data());
     }
-    cudaDeviceSynchronize();
+    cudaDeviceSynchronize(); // GPU 작업 완료 대기
 
 
     // FPS 측정 (100회)
     int num_runs = 100;
-    auto start = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::high_resolution_clock::now(); // 측정 시작 시각
 
 
     for (int i = 0; i < num_runs; i++) {
         engine.infer(input.data(), output.data());
     }
-    cudaDeviceSynchronize();
+    cudaDeviceSynchronize(); // 모든 추론 완료 대기
 
 
-    auto end = std::chrono::high_resolution_clock::now();
+    auto end = std::chrono::high_resolution_clock::now(); // 측정 종료 시각
     double total_ms = std::chrono::duration<double, std::milli>(end - start).count();
-    double avg_ms = total_ms / num_runs;
-    double fps = 1000.0 / avg_ms;
+    double avg_ms = total_ms / num_runs; // 평균 추론 시간
+    double fps = 1000.0 / avg_ms; // 초당 프레임 수
 
 
     std::cout << "\n[결과]" << std::endl;

@@ -90,13 +90,13 @@ def explore_depth_map():
 
     # 1. 상대 깊이맵 (0~1)
     # 위쪽은 멀리(하늘), 아래쪽은 가까이(바닥)
-    relative_depth = np.zeros((h, w), dtype=np.float32)
-    for y in range(h):
+    relative_depth = np.zeros((h, w), dtype=np.float32) # 깊이맵 (h x w 2차원 배열)
+    for y in range(h): # 각 행을 위에서 아래로 채움
         relative_depth[y, :] = y / h # 아래쪽이 가까움 (값이 큼)
 
 
     # 가상의 장애물 추가 (가까운 물체)
-    relative_depth[200:350, 250:400] = 0.9 # 가까운 박스
+    relative_depth[200:350, 250:400] = 0.9 # 특정 사각 영역을 가까운 박스로 설정
 
 
     print(f"깊이맵 크기: {relative_depth.shape}")
@@ -107,7 +107,7 @@ def explore_depth_map():
 
     # 2. 절대 깊이로 변환 (예시)
     scale = 10.0 # 최대 10m
-    metric_depth = relative_depth * scale
+    metric_depth = relative_depth * scale # 0~1 상대값에 거리 스케일을 곱해 실제 미터로
 
 
     print(f"\n 절대 깊이 변환 (scale={scale}m):")
@@ -116,27 +116,26 @@ def explore_depth_map():
 
 
     # 시각화
-    fig, axes = plt.subplots(1, 3, figsize=(15, 4))
+    fig, axes = plt.subplots(1, 3, figsize=(15, 4)) # 그래프 3개를 가로로 배치
 
 
-    axes[0].imshow(relative_depth, cmap='magma')
+    axes[0].imshow(relative_depth, cmap='magma') # 상대 깊이맵 표시
     axes[0].set_title('상대 깊이맵 (Relative)')
-    axes[0].colorbar = plt.colorbar(axes[0].images[0], ax=axes[0])
+    axes[0].colorbar = plt.colorbar(axes[0].images[0], ax=axes[0]) # 색상-깊이 대응 막대
 
 
-    axes[1].imshow(metric_depth, cmap='magma')
+    axes[1].imshow(metric_depth, cmap='magma') # 절대 깊이맵 표시
     axes[1].set_title('절대 깊이맵 (Metric, m)')
 
 
     # 깊이별 컬러맵 비교
-    colormaps = ['magma', 'inferno', 'plasma']
-    for ax, cmap in zip([axes[2]], ['turbo']):
+    for ax, cmap in zip([axes[2]], ['turbo']): # 세 번째 칸에 turbo 컬러맵 적용
         ax.imshow(relative_depth, cmap=cmap)
         ax.set_title(f'컬러맵: {cmap}')
 
 
     plt.tight_layout()
-    plt.savefig('depth_basics.png', dpi=100)
+    plt.savefig('depth_basics.png', dpi=100) # 결과 이미지 저장
     print("\n 시각화 저장: depth_basics.png")
 
 
@@ -206,23 +205,23 @@ def explore_midas():
 
 
     # MiDaS 모델 로드 (torch.hub)
-    model_types = {
+    model_types = { # 탐구할 MiDaS 계열 모델 3종
         "MiDaS_small": "경량 모델 (모바일용)",
         "DPT_Hybrid": "DPT 하이브리드 (CNN + ViT)",
         "DPT_Large": "DPT 대형 (ViT-Large)",
     }
 
 
-    for model_type, desc in model_types.items():
+    for model_type, desc in model_types.items(): # 모델을 하나씩 로드해 분석
         print(f"\n 모델: {model_type} - {desc}")
         try:
-            model = torch.hub.load("intel-isl/MiDaS", model_type, trust_repo=True)
-            model.eval()
+            model = torch.hub.load("intel-isl/MiDaS", model_type, trust_repo=True) # torch.hub에서 다운로드
+            model.eval() # 평가 모드
 
 
             # 파라미터 수 계산
-            total_params = sum(p.numel() for p in model.parameters())
-            trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+            total_params = sum(p.numel() for p in model.parameters()) # 전체 가중치 수
+            trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad) # 그중 학습되는 것
 
 
             print(f"총 파라미터: {total_params / 1e6:.1f}M")
@@ -230,14 +229,14 @@ def explore_midas():
 
 
             # 입출력 테스트
-            dummy = torch.randn(1, 3, 384, 384)
-            with torch.no_grad():
+            dummy = torch.randn(1, 3, 384, 384) # 가짜 입력 (384x384 RGB)
+            with torch.no_grad(): # 추론이므로 gradient 계산 끔
                 output = model(dummy)
             print(f"입력: {list(dummy.shape)}")
             print(f"출력: {list(output.shape)}")
 
 
-        except Exception as e:
+        except Exception as e: # 로드 실패 시 (예: 인터넷 연결 없음)
             print(f"로드 실패: {e}")
             print("(인터넷 연결 필요)")
 
@@ -274,48 +273,48 @@ def explore_depth_anything():
     print("=" * 40)
 
 
-    models = {
+    models = { # 탐구할 Depth Anything 모델 2종
         "LiheYoung/depth-anything-small-hf": "ViT-S (Small)",
         "LiheYoung/depth-anything-base-hf": "ViT-B (Base)",
     }
 
 
-    for model_name, desc in models.items():
+    for model_name, desc in models.items(): # 모델을 하나씩 로드해 분석
         print(f"\n 모델: {desc}")
         print(f"경로: {model_name}")
 
 
         try:
             # 모델 로드
-            model = AutoModelForDepthEstimation.from_pretrained(model_name)
-            model.eval()
+            model = AutoModelForDepthEstimation.from_pretrained(model_name) # HuggingFace에서 다운로드
+            model.eval() # 평가 모드
 
 
             # 파라미터 분석
-            total_params = sum(p.numel() for p in model.parameters())
+            total_params = sum(p.numel() for p in model.parameters()) # 전체 가중치 수
             print(f"총 파라미터: {total_params / 1e6:.1f}M")
 
 
             # 모델 구조 요약
             print(f"구조:")
-            for name, module in model.named_children():
+            for name, module in model.named_children(): # 최상위 하위 모듈별 파라미터 수 출력
                 num_params = sum(p.numel() for p in module.parameters())
                 print(f"{name}: {num_params / 1e6:.1f}M 파라미터")
 
 
             # 추론 테스트
-            dummy = torch.randn(1, 3, 518, 518)
-            with torch.no_grad():
+            dummy = torch.randn(1, 3, 518, 518) # 가짜 입력 (518x518 RGB)
+            with torch.no_grad(): # 추론이므로 gradient 계산 끔
                 output = model(dummy)
 
 
-            depth = output.predicted_depth
+            depth = output.predicted_depth # 예측된 깊이맵
             print(f"입력: {list(dummy.shape)}")
             print(f"출력: {list(depth.shape)}")
             print(f"깊이 범위: [{depth.min():.3f}, {depth.max():.3f}]")
 
 
-        except Exception as e:
+        except Exception as e: # 로드 실패 시 (예: 인터넷/패키지 없음)
             print(f"로드 실패: {e}")
             print("(인터넷 연결 및 transformers 설치 필요)")
 

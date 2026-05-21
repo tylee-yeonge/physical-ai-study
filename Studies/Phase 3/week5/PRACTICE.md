@@ -76,15 +76,15 @@ from ultralytics import YOLO
 
 def export_static():
     """Static shape 변환 (Jetson 배포용)"""
-    model = YOLO('yolo11n.pt')
+    model = YOLO('yolo11n.pt') # 사전학습 nano 모델 로드
 
 
     # ONNX 변환
     model.export(
-        format='onnx',
-        imgsz=640,
-        opset=12,
-        simplify=True,
+        format='onnx', # 출력 포맷
+        imgsz=640, # 입력 크기 고정
+        opset=12, # ONNX 연산자 집합 버전
+        simplify=True, # 불필요한 연산 정리
         half=False, # FP32
     )
     print("Static ONNX 변환 완료: yolo11n.onnx")
@@ -100,7 +100,7 @@ def export_dynamic():
         imgsz=640,
         opset=12,
         simplify=True,
-        dynamic=True, # 동적 배치
+        dynamic=True, # 동적 배치 (배치 크기 가변)
     )
     print("Dynamic ONNX 변환 완료")
 
@@ -111,11 +111,11 @@ def export_manual():
 
 
     # 예시: ResNet18
-    model = models.resnet18(pretrained=True)
-    model.eval()
+    model = models.resnet18(pretrained=True) # 사전학습 ResNet18 로드
+    model.eval() # 평가 모드 (변환 전 필수)
 
 
-    # 더미 입력
+    # 더미 입력 (변환 시 그래프를 추적하기 위한 가짜 입력)
     dummy_input = torch.randn(1, 3, 224, 224)
 
 
@@ -123,11 +123,11 @@ def export_manual():
     torch.onnx.export(
         model,
         dummy_input,
-        "resnet18.onnx",
+        "resnet18.onnx", # 출력 파일명
         opset_version=12,
-        input_names=['input'],
-        output_names=['output'],
-        dynamic_axes={
+        input_names=['input'], # 입력 노드 이름
+        output_names=['output'], # 출력 노드 이름
+        dynamic_axes={ # 가변 차원 지정 (배치 크기를 동적으로)
             'input': {0: 'batch_size'},
             'output': {0: 'batch_size'}
         }
@@ -163,37 +163,37 @@ from ultralytics import YOLO
 
 def check_model(onnx_path):
     """ONNX 모델 구조 검증"""
-    model = onnx.load(onnx_path)
+    model = onnx.load(onnx_path) # ONNX 파일 로드
 
 
     # 기본 검증
-    onnx.checker.check_model(model)
+    onnx.checker.check_model(model) # 모델 구조가 유효한지 검사
     print(f"모델 검증 통과: {onnx_path}")
 
 
     # 모델 정보 출력
     print(f"\n모델 정보:")
-    print(f"Opset version: {model.opset_import[0].version}")
-    print(f"IR version: {model.ir_version}")
-    print(f"Producer: {model.producer_name}")
+    print(f"Opset version: {model.opset_import[0].version}") # 연산자 집합 버전
+    print(f"IR version: {model.ir_version}") # ONNX 내부 표현(IR) 버전
+    print(f"Producer: {model.producer_name}") # 변환에 사용된 도구 이름
 
 
     # 입력 정보
     print(f"\n[in] 입력:")
-    for inp in model.graph.input:
+    for inp in model.graph.input: # 각 입력 텐서의 이름과 shape 출력
         shape = [d.dim_value for d in inp.type.tensor_type.shape.dim]
         print(f"{inp.name}: {shape}")
 
 
     # 출력 정보
     print(f"\n[out] 출력:")
-    for out in model.graph.output:
+    for out in model.graph.output: # 각 출력 텐서의 이름과 shape 출력
         shape = [d.dim_value for d in out.type.tensor_type.shape.dim]
         print(f"{out.name}: {shape}")
 
 
     # 노드 수
-    print(f"\n 노드 수: {len(model.graph.node)}")
+    print(f"\n 노드 수: {len(model.graph.node)}") # 모델을 구성하는 연산 노드 개수
 
 
 def compare_outputs(pt_path, onnx_path):
@@ -202,13 +202,13 @@ def compare_outputs(pt_path, onnx_path):
 
 
     # 더미 입력
-    dummy = np.random.randn(1, 3, 640, 640).astype(np.float32)
+    dummy = np.random.randn(1, 3, 640, 640).astype(np.float32) # 가짜 입력 텐서
 
 
     # ONNX Runtime 추론
-    session = ort.InferenceSession(onnx_path)
-    input_name = session.get_inputs()[0].name
-    onnx_out = session.run(None, {input_name: dummy})
+    session = ort.InferenceSession(onnx_path) # 추론 세션 생성
+    input_name = session.get_inputs()[0].name # 입력 노드 이름 조회
+    onnx_out = session.run(None, {input_name: dummy}) # 추론 실행
 
 
     print(f"ONNX 출력 shape: {onnx_out[0].shape}")
@@ -234,23 +234,23 @@ if __name__ == "__main__":
 """
 ONNX Runtime으로 YOLO11 추론
 """
-import onnxruntime as ort
+import onnxruntime as ort # ONNX 모델 추론 엔진
 import numpy as np
-import cv2
+import cv2 # OpenCV (이미지 처리)
 import time
 
 
 class ONNXDetector:
     def __init__(self, model_path, conf_thresh=0.25, iou_thresh=0.45):
         # 세션 생성 (GPU 우선)
-        providers = ['CUDAExecutionProvider', 'CPUExecutionProvider']
-        self.session = ort.InferenceSession(model_path, providers=providers)
+        providers = ['CUDAExecutionProvider', 'CPUExecutionProvider'] # GPU 우선, 없으면 CPU
+        self.session = ort.InferenceSession(model_path, providers=providers) # 추론 세션 생성
 
 
-        self.input_name = self.session.get_inputs()[0].name
-        self.input_shape = self.session.get_inputs()[0].shape
-        self.conf_thresh = conf_thresh
-        self.iou_thresh = iou_thresh
+        self.input_name = self.session.get_inputs()[0].name # 입력 노드 이름
+        self.input_shape = self.session.get_inputs()[0].shape # 입력 텐서 shape
+        self.conf_thresh = conf_thresh # confidence 임계값
+        self.iou_thresh = iou_thresh # NMS IoU 임계값
 
 
         # 사용 중인 Provider 확인
@@ -260,24 +260,24 @@ class ONNXDetector:
 
     def preprocess(self, image):
         """이미지 전처리"""
-        h, w = self.input_shape[2], self.input_shape[3]
+        h, w = self.input_shape[2], self.input_shape[3] # 모델이 기대하는 입력 크기
 
 
         # Resize
-        resized = cv2.resize(image, (w, h))
+        resized = cv2.resize(image, (w, h)) # 입력 크기로 리사이즈
 
 
         # BGR → RGB
-        rgb = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
+        rgb = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB) # OpenCV BGR -> RGB
 
 
         # Normalize [0, 1]
-        normalized = rgb.astype(np.float32) / 255.0
+        normalized = rgb.astype(np.float32) / 255.0 # 0~255 -> 0~1 정규화
 
 
         # HWC → CHW → NCHW
-        transposed = np.transpose(normalized, (2, 0, 1))
-        batched = np.expand_dims(transposed, axis=0)
+        transposed = np.transpose(normalized, (2, 0, 1)) # 채널 축을 맨 앞으로
+        batched = np.expand_dims(transposed, axis=0) # 배치 차원 추가
 
 
         return batched
@@ -286,7 +286,7 @@ class ONNXDetector:
     def postprocess(self, outputs, orig_shape):
         """후처리: NMS + bbox 변환"""
         predictions = outputs[0] # [1, 84, 8400] for YOLO11
-        predictions = np.transpose(predictions, (0, 2, 1)) # [1, 8400, 84]
+        predictions = np.transpose(predictions, (0, 2, 1)) # [1, 8400, 84]로 축 변경
 
 
         boxes = []
@@ -294,18 +294,18 @@ class ONNXDetector:
         class_ids = []
 
 
-        for pred in predictions[0]:
+        for pred in predictions[0]: # 후보 박스 8400개를 하나씩 검사
             # pred: [x, y, w, h, cls0, cls1, ..., cls79]
-            x, y, w, h = pred[:4]
-            class_scores = pred[4:]
+            x, y, w, h = pred[:4] # 박스 중심좌표(x,y)와 크기(w,h)
+            class_scores = pred[4:] # 80개 클래스 점수
 
 
-            max_score = np.max(class_scores)
-            if max_score > self.conf_thresh:
-                class_id = np.argmax(class_scores)
+            max_score = np.max(class_scores) # 가장 높은 클래스 점수
+            if max_score > self.conf_thresh: # 임계값 넘는 후보만 채택
+                class_id = np.argmax(class_scores) # 점수가 가장 높은 클래스 인덱스
 
 
-                # xywh → xyxy
+                # xywh → xyxy (중심+크기 -> 좌상단/우하단 좌표)
                 x1 = x - w / 2
                 y1 = y - h / 2
                 x2 = x + w / 2
@@ -317,35 +317,35 @@ class ONNXDetector:
                 class_ids.append(int(class_id))
 
 
-        if len(boxes) == 0:
+        if len(boxes) == 0: # 검출된 것이 없으면 빈 결과 반환
             return [], [], []
 
 
-        # NMS
+        # NMS (중복 박스 제거)
         indices = cv2.dnn.NMSBoxes(
-            [[b[0], b[1], b[2]-b[0], b[3]-b[1]] for b in boxes],
+            [[b[0], b[1], b[2]-b[0], b[3]-b[1]] for b in boxes], # xyxy -> xywh 변환
             scores, self.conf_thresh, self.iou_thresh
         )
 
 
-        if len(indices) > 0:
+        if len(indices) > 0: # NMS에서 살아남은 박스만 추림
             indices = indices.flatten()
             boxes = [boxes[i] for i in indices]
             scores = [scores[i] for i in indices]
             class_ids = [class_ids[i] for i in indices]
 
 
-        # 원본 크기로 스케일링
+        # 원본 크기로 스케일링 (모델 입력 크기 기준 좌표 -> 원본 이미지 좌표)
         h_orig, w_orig = orig_shape[:2]
         h_input, w_input = self.input_shape[2], self.input_shape[3]
 
 
-        scale_x = w_orig / w_input
-        scale_y = h_orig / h_input
+        scale_x = w_orig / w_input # 가로 배율
+        scale_y = h_orig / h_input # 세로 배율
 
 
         scaled_boxes = []
-        for b in boxes:
+        for b in boxes: # 각 박스 좌표를 원본 비율로 환산
             scaled_boxes.append([
                 b[0] * scale_x, b[1] * scale_y,
                 b[2] * scale_x, b[3] * scale_y
@@ -357,9 +357,9 @@ class ONNXDetector:
 
     def detect(self, image):
         """이미지에서 객체 검출"""
-        input_tensor = self.preprocess(image)
-        outputs = self.session.run(None, {self.input_name: input_tensor})
-        boxes, scores, class_ids = self.postprocess(outputs, image.shape)
+        input_tensor = self.preprocess(image) # 전처리
+        outputs = self.session.run(None, {self.input_name: input_tensor}) # ONNX 추론
+        boxes, scores, class_ids = self.postprocess(outputs, image.shape) # 후처리
         return boxes, scores, class_ids
 
 
@@ -369,18 +369,18 @@ def draw_detections(image, boxes, scores, class_ids):
                   'bus', 'train', 'truck', 'boat', 'traffic light', ...]
 
 
-    for box, score, cls_id in zip(boxes, scores, class_ids):
-        x1, y1, x2, y2 = map(int, box)
+    for box, score, cls_id in zip(boxes, scores, class_ids): # 검출된 박스마다 그리기
+        x1, y1, x2, y2 = map(int, box) # 좌표를 정수로 변환
 
 
         # 바운딩 박스
-        cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+        cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2) # 초록색 박스
 
 
         # 라벨
         label = f"{cls_id}: {score:.2f}"
         cv2.putText(image, label, (x1, y1-10),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2) # 박스 위에 텍스트
 
 
     return image
@@ -388,12 +388,12 @@ def draw_detections(image, boxes, scores, class_ids):
 
 if __name__ == "__main__":
     # 검출기 초기화
-    detector = ONNXDetector("yolo11n.onnx")
+    detector = ONNXDetector("yolo11n.onnx") # ONNX 검출기 생성
 
 
     # 이미지 추론
-    image = cv2.imread("test.jpg")
-    boxes, scores, class_ids = detector.detect(image)
+    image = cv2.imread("test.jpg") # 테스트 이미지 읽기
+    boxes, scores, class_ids = detector.detect(image) # 객체 검출 실행
 
 
     print(f"\n검출 결과: {len(boxes)}개 객체")
@@ -403,8 +403,8 @@ if __name__ == "__main__":
 
 
     # 시각화
-    result = draw_detections(image.copy(), boxes, scores, class_ids)
-    cv2.imwrite("result_onnx.jpg", result)
+    result = draw_detections(image.copy(), boxes, scores, class_ids) # 박스 그린 이미지
+    cv2.imwrite("result_onnx.jpg", result) # 파일로 저장
     print("결과 저장: result_onnx.jpg")
 ```
 
@@ -432,40 +432,40 @@ from ultralytics import YOLO
 def benchmark_pytorch(model_path, num_runs=100):
     """PyTorch 추론 속도 측정"""
     model = YOLO(model_path)
-    dummy = np.random.randint(0, 255, (640, 640, 3), dtype=np.uint8)
+    dummy = np.random.randint(0, 255, (640, 640, 3), dtype=np.uint8) # 가짜 입력 이미지
 
 
     # Warm-up (5회)
-    for _ in range(5):
+    for _ in range(5): # 첫 추론은 느리므로 측정 전 미리 5회 실행
         model(dummy, verbose=False)
 
 
     # 벤치마크
     times = []
-    for _ in range(num_runs):
+    for _ in range(num_runs): # num_runs회 반복하며 각 추론 시간 기록
         start = time.time()
         model(dummy, verbose=False)
         times.append(time.time() - start)
 
 
-    avg_ms = np.mean(times) * 1000
-    fps = 1000 / avg_ms
+    avg_ms = np.mean(times) * 1000 # 평균 추론 시간 (밀리초)
+    fps = 1000 / avg_ms # 초당 처리 프레임 수
     print(f"PyTorch: {avg_ms:.1f} ms / {fps:.1f} FPS")
     return avg_ms
 
 
 def benchmark_onnx(model_path, provider='CUDAExecutionProvider', num_runs=100):
     """ONNX Runtime 추론 속도 측정"""
-    session = ort.InferenceSession(model_path, providers=[provider])
+    session = ort.InferenceSession(model_path, providers=[provider]) # 지정 provider로 세션 생성
     input_name = session.get_inputs()[0].name
     shape = session.get_inputs()[0].shape
 
 
-    dummy = np.random.randn(*shape).astype(np.float32)
+    dummy = np.random.randn(*shape).astype(np.float32) # 입력 shape에 맞춘 가짜 입력
 
 
     # Warm-up (5회)
-    for _ in range(5):
+    for _ in range(5): # 측정 전 워밍업
         session.run(None, {input_name: dummy})
 
 
@@ -477,8 +477,8 @@ def benchmark_onnx(model_path, provider='CUDAExecutionProvider', num_runs=100):
         times.append(time.time() - start)
 
 
-    avg_ms = np.mean(times) * 1000
-    fps = 1000 / avg_ms
+    avg_ms = np.mean(times) * 1000 # 평균 추론 시간 (밀리초)
+    fps = 1000 / avg_ms # 초당 처리 프레임 수
     print(f"ONNX ({provider[:4]}): {avg_ms:.1f} ms / {fps:.1f} FPS")
     return avg_ms
 
@@ -489,9 +489,9 @@ if __name__ == "__main__":
     print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
 
 
-    pt_time = benchmark_pytorch("yolo11n.pt")
-    onnx_cpu = benchmark_onnx("yolo11n.onnx", "CPUExecutionProvider")
-    onnx_gpu = benchmark_onnx("yolo11n.onnx", "CUDAExecutionProvider")
+    pt_time = benchmark_pytorch("yolo11n.pt") # PyTorch 속도 측정
+    onnx_cpu = benchmark_onnx("yolo11n.onnx", "CPUExecutionProvider") # ONNX CPU 측정
+    onnx_gpu = benchmark_onnx("yolo11n.onnx", "CUDAExecutionProvider") # ONNX GPU 측정
 
 
     print(f"\n 결과 요약:")
@@ -524,13 +524,13 @@ def convert_fp16(input_path, output_path):
 
 
     model = onnx.load(input_path)
-    model_fp16 = float16.convert_float_to_float16(model)
+    model_fp16 = float16.convert_float_to_float16(model) # 가중치를 FP16(반정밀도)으로 변환
     onnx.save(model_fp16, output_path)
 
 
     # 크기 비교
     import os
-    size_fp32 = os.path.getsize(input_path) / 1024 / 1024
+    size_fp32 = os.path.getsize(input_path) / 1024 / 1024 # 바이트 -> MB
     size_fp16 = os.path.getsize(output_path) / 1024 / 1024
     print(f"FP16 변환 완료")
     print(f"FP32: {size_fp32:.1f} MB")
@@ -539,7 +539,7 @@ def convert_fp16(input_path, output_path):
 
 def quantize_int8_dynamic(input_path, output_path):
     """Dynamic INT8 양자화 (캘리브레이션 불필요)"""
-    quantize_dynamic(
+    quantize_dynamic( # 가중치를 INT8(8비트 정수)로 동적 양자화
         input_path,
         output_path,
         weight_type=QuantType.QInt8
@@ -547,7 +547,7 @@ def quantize_int8_dynamic(input_path, output_path):
 
 
     import os
-    size_orig = os.path.getsize(input_path) / 1024 / 1024
+    size_orig = os.path.getsize(input_path) / 1024 / 1024 # 바이트 -> MB
     size_int8 = os.path.getsize(output_path) / 1024 / 1024
     print(f"INT8 Dynamic 양자화 완료")
     print(f"원본: {size_orig:.1f} MB")
