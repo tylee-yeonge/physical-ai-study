@@ -792,12 +792,12 @@ python practice_inference.py
 
 - [x] CUDA 환경 세팅 완료 (`torch.cuda.is_available()` = True)
 - [x] Tensor 연산 및 shape 변환 숙지
-- [ ] autograd로 gradient 계산 원리 이해
-- [ ] CIFAR-10 SimpleCNN 학습 (75%+ 달성)
-- [ ] ResNet-18 Fine-tuning (85%+ 달성)
-- [ ] TensorBoard로 학습 커브 확인
-- [ ] Checkpoint 저장/로드 성공
-- [ ] 추론 결과 시각화
+- [x] autograd로 gradient 계산 원리 이해
+- [x] CIFAR-10 SimpleCNN 학습 (75%+ 달성)
+- [x] ResNet-18 Fine-tuning (85%+ 달성)
+- [x] TensorBoard로 학습 커브 확인
+- [x] Checkpoint 저장/로드 성공
+- [x] 추론 결과 시각화
 
 
 ---
