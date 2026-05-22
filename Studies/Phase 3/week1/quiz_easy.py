@@ -1,5 +1,5 @@
 """
-Phase 5 Week 1 - PyTorch 기초 재정비 기초 퀴즈
+Phase 3 Week 1 - PyTorch 기초 재정비 기초 퀴즈
 """
 
 

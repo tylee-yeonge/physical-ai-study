@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(Phase5_Week6_TensorRT)
+project(Phase3_Week6_TensorRT)
 set(CMAKE_CXX_STANDARD 17)
 
 # CUDA
@@ -39,9 +39,9 @@ set(SOURCES
 )
 
 # 실행 파일
-add_executable(phase5_week6_tensorrt ${SOURCES})
+add_executable(phase3_week6_tensorrt ${SOURCES})
 
-target_link_libraries(phase5_week6_tensorrt
+target_link_libraries(phase3_week6_tensorrt
     ${OpenCV_LIBS}
     ${CUDA_LIBRARIES}
     ${TENSORRT_LIBRARY}
@@ -50,4 +50,4 @@ target_link_libraries(phase5_week6_tensorrt
 )
 
 # 설치
-install(TARGETS phase5_week6_tensorrt DESTINATION bin)
+install(TARGETS phase3_week6_tensorrt DESTINATION bin)

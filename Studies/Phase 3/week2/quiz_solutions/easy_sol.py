@@ -1,5 +1,5 @@
 """
-Phase 5 Week 2 - CV 라이브러리 기초 퀴즈 풀이
+Phase 3 Week 2 - CV 라이브러리 기초 퀴즈 풀이
 """
 
 

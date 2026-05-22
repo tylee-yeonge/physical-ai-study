@@ -1,5 +1,5 @@
 """
-Phase 5 Week 3 - YOLO 이론 중급 퀴즈
+Phase 3 Week 3 - YOLO 이론 중급 퀴즈
 코드를 직접 실행하고 결과를 확인하세요.
 """
 import numpy as np

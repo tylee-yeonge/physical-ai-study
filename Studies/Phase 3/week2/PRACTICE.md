@@ -14,7 +14,7 @@
 
 
 ```bash
-cd Studies/Phase\ 5/week2
+cd Studies/Phase\ 3/week2
 pip install -r requirements.txt
 python quiz_easy.py # 개념 퀴즈
 python quiz_medium.py # 코드 퀴즈

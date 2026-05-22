@@ -1,5 +1,5 @@
 """
-Phase 5 Week 2 - CV 라이브러리 중급 퀴즈
+Phase 3 Week 2 - CV 라이브러리 중급 퀴즈
 """
 import numpy as np
 

@@ -12,7 +12,7 @@
 
 
 ```bash
-cd Studies/Phase\ 5/week4
+cd Studies/Phase\ 3/week4
 pip install -r requirements.txt
 
 

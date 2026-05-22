@@ -644,11 +644,11 @@ make -j$(nproc)
 
 
 # 실행
-./phase5_week6_tensorrt models/yolo11n_fp16.trt data/test.jpg
+./phase3_week6_tensorrt models/yolo11n_fp16.trt data/test.jpg
 
 
 # 카메라 실시간 테스트 (선택)
-./phase5_week6_tensorrt models/yolo11n_fp16.trt --camera 0
+./phase3_week6_tensorrt models/yolo11n_fp16.trt --camera 0
 ```
 
 

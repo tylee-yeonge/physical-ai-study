@@ -13,8 +13,8 @@
 
 ```bash
 # 가상환경 생성 및 활성화
-conda create -n phase5 python=3.10 -y
-conda activate phase5
+conda create -n phase3 python=3.10 -y
+conda activate phase3
 
 
 # 패키지 설치

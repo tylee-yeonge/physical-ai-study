@@ -23,7 +23,7 @@ Week 5는 학습된 PyTorch 모델을 **ONNX 포맷으로 변환**하고, **ONNX
 
 ```bash
 # 가상환경 활성화
-conda activate phase5
+conda activate phase3
 
 
 # 패키지 설치

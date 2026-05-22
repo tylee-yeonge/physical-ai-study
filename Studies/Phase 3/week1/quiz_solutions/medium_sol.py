@@ -1,5 +1,5 @@
 """
-Phase 5 Week 1 - PyTorch 기초 재정비 중급 퀴즈 정답 및 해설
+Phase 3 Week 1 - PyTorch 기초 재정비 중급 퀴즈 정답 및 해설
 """
 import torch
 import torch.nn as nn

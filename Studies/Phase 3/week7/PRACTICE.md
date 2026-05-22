@@ -23,7 +23,7 @@ Week 7은 이론 중심의 주차입니다. Monocular Depth Estimation의 핵심
 
 ```bash
 # 가상환경 활성화
-conda activate phase5
+conda activate phase3
 
 
 # 패키지 설치

@@ -23,7 +23,7 @@ Week 8은 Depth Anything 모델을 실제로 사용합니다. HuggingFace에서 
 
 ```bash
 # 가상환경 활성화
-conda activate phase5
+conda activate phase3
 
 
 # 패키지 설치
