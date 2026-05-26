@@ -315,7 +315,7 @@ wandb.finish()                         # 실험 종료 (로그 업로드 마무�
 
 #### 2.4 train_loss와 val_mAP로 과적합 읽기
 
-W&B로 기록한 지표 중 가장 중요한 조합이 **학습 손실(train_loss)**과 **검증 성능(val_mAP)**이다. 둘의 움직임으로 과적합을 판단한다.
+W&B로 기록한 지표 중 가장 중요한 조합이 **학습 손실(train_loss)** 과 **검증 성능(val_mAP)** 이다. 둘의 움직임으로 과적합을 판단한다.
 
 ```
 정상 학습:   train_loss 감소  +  val_mAP 상승
@@ -420,7 +420,7 @@ Layer4 (stride 32): [1, 2048,  20,  20]   <- 640 / 32 =  20
 
 #### 4.3 Feature Pyramid와 Multi-Scale
 
-서로 다른 stride의 feature map을 모은 것을 **Feature Pyramid(특징 피라미드)**라 한다. 각 단계가 잘 잡는 객체 크기가 다르다.
+서로 다른 stride의 feature map을 모은 것을 **Feature Pyramid(특징 피라미드)** 라 한다. 각 단계가 잘 잡는 객체 크기가 다르다.
 
 ```
 작은 stride (예: 4) -> 고해상도 feature -> 작은 객체 검출에 유리
