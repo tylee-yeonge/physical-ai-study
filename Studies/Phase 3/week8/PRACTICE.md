@@ -349,6 +349,11 @@ if __name__ == "__main__":
     print(f"깊이 범위: [{depth_map.min():.3f}, {depth_map.max():.3f}]")
 
 
+    # 배치 추론 (같은 이미지를 2장 묶어 한 번에 처리)
+    depth_maps = inferencer.infer_batch([image, image]) # 결과는 이미지별 깊이맵 리스트
+    print(f"배치 결과: {len(depth_maps)}장, 각 shape={depth_maps[0].shape}")
+
+
     # 벤치마크
     inferencer.benchmark(image)
 ```

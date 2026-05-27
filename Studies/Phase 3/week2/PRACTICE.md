@@ -176,6 +176,9 @@ def train_with_wandb():
 
 
     wandb.finish() # 실험 종료 (로그 업로드 마무리)
+
+
+train_with_wandb() # 함수 실행 (계정 없이 돌리려면 README의 WANDB_MODE=offline 안내 참고)
 ```
 
 
@@ -208,6 +211,9 @@ def extract_features():
     # Feature 0: [1, 40, 80, 80]
     # Feature 1: [1, 112, 40, 40]
     # Feature 2: [1, 320, 20, 20]
+
+
+extract_features() # 함수 실행 (사전학습 가중치 다운로드 후 feature shape 출력)
 ```
 
 
