@@ -39,7 +39,7 @@ def problem2_preprocessing_debug():
     print("  from transformers import AutoModelForDepthEstimation")
     print()
     print("  model = AutoModelForDepthEstimation.from_pretrained(")
-    print("      'LiheYoung/depth-anything-small-hf'")
+    print("      'depth-anything/Depth-Anything-V2-Small-hf'")
     print("  )")
     print()
     print("  # 이미지 로드 (OpenCV)")

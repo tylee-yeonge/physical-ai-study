@@ -30,9 +30,9 @@ cat /etc/nv_tegra_release
 dpkg -l | grep TensorRT
 
 
-# TensorRT 버전 확인
+# TensorRT 버전 확인 (본 자료는 TRT 10.x 기준)
 dpkg -l | grep libnvinfer
-# 예: libnvinfer8 8.5.x
+# 예: libnvinfer10 10.x.x (JetPack 6.x 또는 dGPU TRT 10)
 
 
 # OpenCV 확인
@@ -204,6 +204,8 @@ private:
     void* buffers_[2]; // [input, output] GPU 버퍼
     int input_size_ = 0; // 입력 크기 (float 원소 개수)
     int output_size_ = 0; // 출력 크기 (float 원소 개수)
+    std::string input_name_; // 입력 텐서 이름 (TRT 10 API: setTensorAddress에 사용)
+    std::string output_name_; // 출력 텐서 이름
 
 
     bool loadEngine(const std::string& path); // 엔진 파일을 읽어 역직렬화
@@ -229,12 +231,12 @@ TrtEngine::TrtEngine(const std::string& engine_path) {
 
 
 TrtEngine::~TrtEngine() {
-    // 소멸 시 GPU 메모리와 TensorRT 객체를 모두 해제
+    // 소멸 시 GPU 메모리 해제 후 TensorRT 객체를 delete (TRT 10에서 destroy() 메서드 제거됨)
     cudaFree(buffers_[0]);
     cudaFree(buffers_[1]);
-    if (context_) context_->destroy();
-    if (engine_) engine_->destroy();
-    if (runtime_) runtime_->destroy();
+    delete context_;
+    delete engine_;
+    delete runtime_;
     std::cout << "[INFO] TensorRT 리소스 해제 완료" << std::endl;
 }
 
@@ -275,25 +277,27 @@ bool TrtEngine::loadEngine(const std::string& path) {
 
 
 void TrtEngine::allocateBuffers() {
-    // 입력/출력 바인딩 정보
-    int input_idx = engine_->getBindingIndex("images"); // 입력 텐서 인덱스
-    int output_idx = engine_->getBindingIndex("output0"); // 출력 텐서 인덱스
+    // TRT 10 API: getBindingIndex/getBindingDimensions 대신
+    // getNbIOTensors + getIOTensorName + getTensorIOMode + getTensorShape 사용
+    int n_io = engine_->getNbIOTensors(); // 입출력 텐서 총 개수
+    for (int i = 0; i < n_io; i++) {
+        const char* name = engine_->getIOTensorName(i); // i번째 텐서 이름
+        auto mode = engine_->getTensorIOMode(name); // 입력인지 출력인지
+        auto dims = engine_->getTensorShape(name); // 텐서 차원
 
+        // 모든 차원을 곱해 전체 원소 수 계산
+        int volume = 1;
+        for (int d = 0; d < dims.nbDims; d++) {
+            volume *= dims.d[d];
+        }
 
-    auto input_dims = engine_->getBindingDimensions(input_idx);
-    auto output_dims = engine_->getBindingDimensions(output_idx);
-
-
-    // 크기 계산 (float 기준) - 모든 차원을 곱해 전체 원소 수를 구함
-    input_size_ = 1;
-    for (int i = 0; i < input_dims.nbDims; i++) {
-        input_size_ *= input_dims.d[i];
-    }
-
-
-    output_size_ = 1;
-    for (int i = 0; i < output_dims.nbDims; i++) {
-        output_size_ *= output_dims.d[i];
+        if (mode == nvinfer1::TensorIOMode::kINPUT) { // 입력 텐서
+            input_size_ = volume;
+            input_name_ = name;
+        } else { // 출력 텐서
+            output_size_ = volume;
+            output_name_ = name;
+        }
     }
 
 
@@ -302,8 +306,13 @@ void TrtEngine::allocateBuffers() {
     cudaMalloc(&buffers_[1], output_size_ * sizeof(float));
 
 
-    std::cout << "[INFO] 입력 크기: " << input_size_ << " floats" << std::endl;
-    std::cout << "[INFO] 출력 크기: " << output_size_ << " floats" << std::endl;
+    // TRT 10: 텐서 이름 → 디바이스 주소를 컨텍스트에 등록 (이후 enqueueV3가 이 주소를 사용)
+    context_->setTensorAddress(input_name_.c_str(), buffers_[0]);
+    context_->setTensorAddress(output_name_.c_str(), buffers_[1]);
+
+
+    std::cout << "[INFO] 입력 (" << input_name_ << "): " << input_size_ << " floats" << std::endl;
+    std::cout << "[INFO] 출력 (" << output_name_ << "): " << output_size_ << " floats" << std::endl;
 }
 
 
@@ -313,8 +322,10 @@ bool TrtEngine::infer(float* input_data, float* output_data) {
                input_size_ * sizeof(float), cudaMemcpyHostToDevice); // 입력을 GPU로 전송
 
 
-    // 추론 실행
-    bool success = context_->executeV2(buffers_); // GPU에서 추론 수행
+    // 추론 실행 (TRT 10: executeV2 대신 enqueueV3 + stream 동기화)
+    // setTensorAddress는 allocateBuffers에서 이미 호출됨
+    bool success = context_->enqueueV3(0); // default stream(0)에 추론 작업 등록
+    cudaStreamSynchronize(0); // 추론 완료 대기 (동기 실행)
 
 
     // GPU → CPU 복사

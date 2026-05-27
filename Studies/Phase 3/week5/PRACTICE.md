@@ -110,8 +110,8 @@ def export_manual():
     import torchvision.models as models
 
 
-    # 예시: ResNet18
-    model = models.resnet18(pretrained=True) # 사전학습 ResNet18 로드
+    # 예시: ResNet18 (torchvision 0.13+ 신 API: pretrained=True 대신 weights= 사용)
+    model = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1) # 사전학습 ResNet18 로드
     model.eval() # 평가 모드 (변환 전 필수)
 
 

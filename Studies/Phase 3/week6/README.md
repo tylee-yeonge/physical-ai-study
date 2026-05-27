@@ -413,32 +413,35 @@ IRuntime* runtime = createInferRuntime(logger);                  // 런타임 �
 ICudaEngine* engine = runtime->deserializeCudaEngine(data, size); // 파일에서 엔진 복원
 IExecutionContext* context = engine->createExecutionContext();    // 추론 실행 컨텍스트 생성
 
-// --- 2. GPU 메모리 할당 (한 번만) ---
+// --- 2. GPU 메모리 할당 + 텐서 주소 등록 (한 번만, TRT 10 API) ---
 void* buffers[2];                          // [0]=입력, [1]=출력 버퍼 포인터
 cudaMalloc(&buffers[0], input_size);       // 입력용 GPU 메모리 확보
 cudaMalloc(&buffers[1], output_size);      // 출력용 GPU 메모리 확보 (둘 다 할당해야 함!)
+context->setTensorAddress("images", buffers[0]);   // 입력 텐서 이름 -> 디바이스 주소 등록
+context->setTensorAddress("output0", buffers[1]);  // 출력 텐서 이름 -> 디바이스 주소 등록
 
 // --- 3. 추론 루프 (프레임마다 반복) ---
 while (running) {
     // CPU -> GPU: 입력 데이터를 GPU로 복사 (방향 = HostToDevice)
     cudaMemcpy(buffers[0], input_data, size, cudaMemcpyHostToDevice);
 
-    // 추론 실행: GPU 버퍼들을 넘겨 모델을 한 번 통과시킴
-    context->executeV2(buffers);
+    // 추론 실행: 등록된 텐서 주소를 사용해 default stream에 작업 등록 후 동기화
+    context->enqueueV3(0);
+    cudaStreamSynchronize(0);
 
     // GPU -> CPU: 결과를 CPU로 복사 (방향 = DeviceToHost)
     cudaMemcpy(output_data, buffers[1], size, cudaMemcpyDeviceToHost);
 }
 
-// --- 4. 정리 (프로그램 종료 시, 할당의 역순으로 해제) ---
+// --- 4. 정리 (프로그램 종료 시, 할당의 역순으로 해제. TRT 10에서는 delete 사용) ---
 cudaFree(buffers[0]);   // 입력 GPU 메모리 해제
 cudaFree(buffers[1]);   // 출력 GPU 메모리 해제
-context->destroy();     // 실행 컨텍스트 해제
-engine->destroy();      // 엔진 해제
-runtime->destroy();     // 런타임 해제
+delete context;         // 실행 컨텍스트 해제 (TRT 10에서 destroy() 제거됨)
+delete engine;          // 엔진 해제
+delete runtime;         // 런타임 해제
 ```
 
-`quiz_medium.cpp` 문제 2가 이 패턴을 어긴 버그 코드를 준다 - `buffers[1]` 미할당, `cudaMemcpy` 방향 반대, `context`/`runtime` 해제 누락이 답이다. 위 표준 패턴과 비교하며 찾으면 된다.
+`quiz_medium.cpp` 문제 2가 이 패턴을 어긴 버그 코드를 준다 - `buffers[1]` 미할당, `cudaMemcpy` 방향 반대, `context`/`runtime` 해제 누락이 답이다. 위 표준 패턴과 비교하며 찾으면 된다. (참고: 문제 본문은 TRT 8.x 시점의 `executeV2 / destroy()` 코드로 작성돼 있다. TRT 10에서는 `enqueueV3 / delete`가 정답이지만 학습 의도상 "리소스 해제 누락"을 찾는 것이 핵심이므로 그대로 둔다.)
 
 > **`cudaMemcpy` 방향**: 세 번째 인자 다음에 오는 방향 플래그가 중요하다. 입력(CPU->GPU)은 `cudaMemcpyHostToDevice`, 출력(GPU->CPU)은 `cudaMemcpyDeviceToHost`다. Host가 CPU, Device가 GPU다. 방향을 반대로 쓰면 데이터가 엉뚱하게 복사된다.
 
@@ -571,10 +574,10 @@ Week 7에서는 Monocular Depth Estimation을 학습합니다!
    - 빌드한 GPU에서만 실행 가능
    - 한 번 빌드 -> 파일로 저장 -> 재사용
 
-3. **C++ 추론 파이프라인**
-   - 엔진 로드 -> 컨텍스트 생성 -> GPU 메모리 할당 (한 번만)
+3. **C++ 추론 파이프라인 (TRT 10)**
+   - 엔진 로드 -> 컨텍스트 생성 -> GPU 메모리 할당 + setTensorAddress (한 번만)
    - cudaMemcpy로 데이터 전송 (방향 주의)
-   - executeV2로 추론, 끝나면 cudaFree/destroy로 정리
+   - enqueueV3 + cudaStreamSynchronize로 추론, 끝나면 cudaFree/delete로 정리
 
 4. **NMS 구현**
    - 8400개 후보 -> 수십 개 최종 검출

@@ -58,12 +58,12 @@ int main()
     std::cout << "        (GPU에서 CPU로 복사해야 함)" << std::endl;
     std::cout << std::endl;
     std::cout << "  버그 4: 리소스 해제 누락 (context, runtime, buffers[1])" << std::endl;
-    std::cout << "  수정:" << std::endl;
+    std::cout << "  수정 (TRT 10에서는 destroy() 메서드가 제거됐으므로 delete 사용):" << std::endl;
     std::cout << "    cudaFree(buffers[0]);" << std::endl;
     std::cout << "    cudaFree(buffers[1]);    // 추가!" << std::endl;
-    std::cout << "    context->destroy();      // 추가!" << std::endl;
-    std::cout << "    engine->destroy();" << std::endl;
-    std::cout << "    runtime->destroy();      // 추가!" << std::endl;
+    std::cout << "    delete context;          // 추가! (구버전 TRT 8.x: context->destroy())" << std::endl;
+    std::cout << "    delete engine;           //         (구버전 TRT 8.x: engine->destroy())" << std::endl;
+    std::cout << "    delete runtime;          // 추가! (구버전 TRT 8.x: runtime->destroy())" << std::endl;
     std::cout << std::endl;
     std::cout << "  추가 참고: 해제 순서도 중요!" << std::endl;
     std::cout << "    GPU 메모리 해제 -> context -> engine -> runtime 순서" << std::endl;

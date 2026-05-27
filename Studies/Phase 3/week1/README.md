@@ -904,7 +904,7 @@ OOM 이 가장 흔히 나는 원인 (영향 순):
 
 ```
 1순위: batch_size 절반으로 줄이기
-2순위: torch.cuda.amp 로 Mixed Precision (float16) 학습 -> 활성화 메모리 절반
+2순위: torch.amp 로 Mixed Precision (float16) 학습 -> 활성화 메모리 절반 (PyTorch 2.4+ 표준 API. 구버전: torch.cuda.amp)
 3순위: torch.no_grad() 블록 (평가 시) / del + torch.cuda.empty_cache()
 4순위: 모델 작게 / 입력 해상도 줄이기
 ```
@@ -2470,7 +2470,10 @@ torch.save({
 
 
 # -- 로드 --
-checkpoint = torch.load('checkpoint.pth')
+# PyTorch 2.6+에서 torch.load 의 weights_only 기본값이 True 로 바뀌어
+# state_dict 가 아닌 일반 dict(checkpoint) 를 로드하려면 명시적으로 False 지정해야 함.
+# 신뢰할 수 있는 자신의 체크포인트만 이렇게 로드한다 (외부 .pth 는 보안상 위험).
+checkpoint = torch.load('checkpoint.pth', weights_only=False)
 model.load_state_dict(checkpoint['model_state_dict'])
 optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 start_epoch = checkpoint['epoch']
@@ -2493,7 +2496,7 @@ best_acc = checkpoint['best_acc']
 **로드 코드 풀이**
 
 
-- `torch.load('checkpoint.pth')`: 위에서 저장한 dict 를 그대로 메모리로 복원.
+- `torch.load('checkpoint.pth', weights_only=False)`: 위에서 저장한 dict 를 그대로 메모리로 복원. PyTorch 2.6+ 부터 `weights_only` 기본값이 `True` 가 돼서 state_dict 가 아닌 일반 dict 는 명시적으로 `False` 를 줘야 한다.
 - `model.load_state_dict(...)`: **이미 만들어 둔 `model`** 의 가중치를 dict 값으로 덮어씀.
   로드 전에 동일 구조의 `model = SimpleCNN()` 을 만들어 둬야 함.
 - `start_epoch = checkpoint['epoch']`: `for epoch in range(start_epoch, num_epochs):`
@@ -2635,7 +2638,7 @@ running 통계를 써서 출력을 **결정적 (deterministic)** 으로 만듭�
 | 전략 | 효과 | 사용법 |
 |------|------|--------|
 | batch_size 줄이기 | 메모리 직접 감소 | `batch_size=16` → `8` |
-| Mixed Precision | 메모리 50% 감소 | `torch.cuda.amp` |
+| Mixed Precision | 메모리 50% 감소 | `torch.amp` (PyTorch 2.4+) |
 | Gradient Accumulation | 큰 배치 효과 | 여러 미니배치 gradient 누적 |
 | `torch.no_grad()` | 추론 시 절약 | gradient 기록 안 함 |
 | `del` + `empty_cache()` | 즉시 해제 | 불필요한 텐서 삭제 |
@@ -2661,7 +2664,7 @@ running 통계를 써서 출력을 **결정적 (deterministic)** 으로 만듭�
 
 **Q4. GPU 메모리 부족(OOM) 시 해결 방법 3가지는?**
 > 1) batch_size를 줄인다. 
-> 2) `torch.cuda.amp`로 Mixed Precision 학습을 사용한다. 
+> 2) `torch.amp`(PyTorch 2.4+ 표준, 구버전은 `torch.cuda.amp`)로 Mixed Precision 학습을 사용한다. 
 > 3) 추론 시 `with torch.no_grad():` 블록을 사용하여 gradient 기록을 비활성화한다. 추가로 Gradient Accumulation, 모델 크기 축소 등도 가능합니다.
 
 

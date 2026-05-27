@@ -1,6 +1,6 @@
 torch
 torchvision
-transformers
+transformers>=4.45.0
 timm
 numpy
 opencv-python

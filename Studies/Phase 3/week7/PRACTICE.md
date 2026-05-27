@@ -274,8 +274,8 @@ def explore_depth_anything():
 
 
     models = { # 탐구할 Depth Anything 모델 2종
-        "LiheYoung/depth-anything-small-hf": "ViT-S (Small)",
-        "LiheYoung/depth-anything-base-hf": "ViT-B (Base)",
+        "depth-anything/Depth-Anything-V2-Small-hf": "ViT-S (Small)",
+        "depth-anything/Depth-Anything-V2-Base-hf": "ViT-B (Base)",
     }
 
 

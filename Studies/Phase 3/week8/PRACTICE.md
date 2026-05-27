@@ -37,7 +37,7 @@ pip install Pillow
 # 설치 확인
 python -c "
 from transformers import pipeline
-pipe = pipeline('depth-estimation', model='LiheYoung/depth-anything-small-hf')
+pipe = pipeline('depth-estimation', model='depth-anything/Depth-Anything-V2-Small-hf')
 print('Depth Anything 로드 성공!')
 "
 ```
@@ -83,7 +83,7 @@ from PIL import Image
 import numpy as np
 
 
-def infer_with_pipeline(image_path, model_name="LiheYoung/depth-anything-small-hf"):
+def infer_with_pipeline(image_path, model_name="depth-anything/Depth-Anything-V2-Small-hf"):
     """Pipeline API로 깊이 추론"""
     print("=" * 40)
     print("Pipeline API 깊이 추론")
@@ -132,8 +132,8 @@ def compare_models(image_path):
 
 
     models = [ # 비교할 모델 2종 (경로, 표시 이름)
-        ("LiheYoung/depth-anything-small-hf", "ViT-S"),
-        ("LiheYoung/depth-anything-base-hf", "ViT-B"),
+        ("depth-anything/Depth-Anything-V2-Small-hf", "ViT-S"),
+        ("depth-anything/Depth-Anything-V2-Base-hf", "ViT-B"),
     ]
 
 
@@ -194,7 +194,7 @@ from PIL import Image
 
 
 class DepthAnythingInference:
-    def __init__(self, model_name="LiheYoung/depth-anything-small-hf", device=None):
+    def __init__(self, model_name="depth-anything/Depth-Anything-V2-Small-hf", device=None):
         """Depth Anything 추론기 초기화"""
         if device is None: # device 미지정 시 자동 선택
             self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -507,7 +507,7 @@ if __name__ == "__main__":
 
 
     # 깊이 추론
-    pipe = pipeline("depth-estimation", model="LiheYoung/depth-anything-small-hf")
+    pipe = pipeline("depth-estimation", model="depth-anything/Depth-Anything-V2-Small-hf")
     result = pipe(image_path)
     depth_map = np.array(result["depth"]).astype(np.float32) # 깊이맵을 numpy float32로 변환
     print(f"깊이맵 크기: {depth_map.shape}")
@@ -586,7 +586,7 @@ def main():
     image_path = "data/indoor.jpg"
 
     # 1) 깊이 추론
-    pipe = pipeline("depth-estimation", model="LiheYoung/depth-anything-small-hf")
+    pipe = pipeline("depth-estimation", model="depth-anything/Depth-Anything-V2-Small-hf")
     result = pipe(image_path)
     depth_map = np.array(result["depth"]).astype(np.float32)
 
@@ -801,7 +801,7 @@ if __name__ == "__main__":
 
 
     # 깊이 추론
-    pipe = pipeline("depth-estimation", model="LiheYoung/depth-anything-small-hf")
+    pipe = pipeline("depth-estimation", model="depth-anything/Depth-Anything-V2-Small-hf")
     result = pipe(image_path)
     depth_map = np.array(result["depth"]).astype(np.float32)
 
@@ -940,7 +940,7 @@ if __name__ == "__main__":
 
 
     depth_pipe = pipeline("depth-estimation",
-                          model="LiheYoung/depth-anything-small-hf")
+                          model="depth-anything/Depth-Anything-V2-Small-hf")
     result = depth_pipe(image_path)
     depth_map = np.array(result["depth"]).astype(np.float32) # 깊이맵을 numpy float32로
 
@@ -990,7 +990,7 @@ python yolo_depth_combine.py
 ========================================
 Pipeline API 깊이 추론
 ========================================
-  모델: LiheYoung/depth-anything-small-hf
+  모델: depth-anything/Depth-Anything-V2-Small-hf
   입력: data/indoor.jpg
   출력 크기: (480, 640)
   값 범위: [0, 255]
@@ -1038,7 +1038,7 @@ Pipeline API 깊이 추론
 해결:
 1. 미러 사이트 사용: export HF_ENDPOINT=https://hf-mirror.com
 2. 또는 미리 다운로드:
-   huggingface-cli download LiheYoung/depth-anything-small-hf
+   huggingface-cli download depth-anything/Depth-Anything-V2-Small-hf
 3. 프록시 설정 확인
 ```
 

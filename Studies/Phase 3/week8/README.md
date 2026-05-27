@@ -62,7 +62,7 @@ from transformers import pipeline   # HuggingFace의 pipeline 함수
 # 깊이 추정 파이프라인 생성: 모델 로드 + 전처리/후처리 설정을 한 번에
 depth_pipe = pipeline(
     task="depth-estimation",                     # 수행할 작업 종류
-    model="LiheYoung/depth-anything-small-hf",    # 사용할 모델 (HuggingFace 모델 ID)
+    model="depth-anything/Depth-Anything-V2-Small-hf",    # 사용할 모델 (HuggingFace 모델 ID)
 )
 
 # 추론: 이미지 경로를 넣으면 결과 딕셔너리를 돌려준다
@@ -105,10 +105,10 @@ from PIL import Image # 이미지 로드용 (PIL은 RGB 순서로 읽음)
 
 # 모델과 이미지 전처리기를 각각 로드
 model = AutoModelForDepthEstimation.from_pretrained(
-    "LiheYoung/depth-anything-small-hf"
+    "depth-anything/Depth-Anything-V2-Small-hf"
 )
 processor = AutoImageProcessor.from_pretrained(
-    "LiheYoung/depth-anything-small-hf"
+    "depth-anything/Depth-Anything-V2-Small-hf"
 )
 model.eval()   # 추론 모드로 전환 (BatchNorm/Dropout 고정 - 반드시 호출!)
 
@@ -321,7 +321,7 @@ from transformers import pipeline
 # 깊이 추정 파이프라인 (device=0 으로 GPU 사용)
 depth_pipe = pipeline(
     "depth-estimation",
-    model="LiheYoung/depth-anything-small-hf",
+    model="depth-anything/Depth-Anything-V2-Small-hf",
     device=0,                       # 0 = 첫 번째 GPU
 )
 

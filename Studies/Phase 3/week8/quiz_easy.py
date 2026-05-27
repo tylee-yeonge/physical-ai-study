@@ -16,7 +16,7 @@ def problem1_huggingface_pipeline():
     print()
     print("  depth_pipe = _______(")
     print("      task='_______',")
-    print("      model='LiheYoung/depth-anything-small-hf'")
+    print("      model='depth-anything/Depth-Anything-V2-Small-hf'")
     print("  )")
     print()
     print("  result = depth_pipe('image.jpg')")

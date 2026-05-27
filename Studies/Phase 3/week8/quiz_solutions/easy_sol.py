@@ -14,7 +14,7 @@ def main():
     print()
     print("  depth_pipe = pipeline(")
     print("      task='depth-estimation',")
-    print("      model='LiheYoung/depth-anything-small-hf'")
+    print("      model='depth-anything/Depth-Anything-V2-Small-hf'")
     print("  )")
     print()
     print("  result = depth_pipe('image.jpg')")
