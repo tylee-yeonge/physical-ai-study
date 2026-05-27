@@ -47,7 +47,7 @@ def get_detection_transforms(img_size=640, train=True):
                 brightness_limit=0.2,
                 contrast_limit=0.2, p=0.3),
             A.HueSaturationValue(p=0.3), # 색조/채도/명도 무작위 변경 (30% 확률)
-            A.GaussNoise(var_limit=(10, 50), p=0.2), # 가우시안 노이즈 추가 (20% 확률)
+            A.GaussNoise(std_range=(0.012, 0.028), p=0.2), # 가우시안 노이즈 추가 (20% 확률, std는 0-1 정규화 스케일)
             A.Normalize( # ImageNet 평균/표준편차로 정규화
                 mean=[0.485, 0.456, 0.406],
                 std=[0.229, 0.224, 0.225]),
@@ -88,6 +88,52 @@ result = transform( # 이미지와 bbox를 함께 변환
 # result['image']: Tensor [C, H, W]
 # result['bboxes']: 변환된 BBox 리스트
 ```
+
+
+#### 1-1. 변환 결과 시각화 (실습 확인용)
+
+
+증강이 잘 들어갔는지 눈으로 확인한다. 같은 입력에 학습용 파이프라인을 5번 적용해서 매번 다르게 나오는지, BBox가 이미지와 함께 움직이는지(§1.6) 본다. 위 코드의 `image`, `bboxes`, `labels`, `transform`이 이미 정의되어 있다고 가정한다.
+
+
+```python
+import matplotlib.pyplot as plt # 이미지 격자 표시
+import matplotlib.patches as patches # bbox 사각형 그리기
+
+mean = np.array([0.485, 0.456, 0.406]) # 위 A.Normalize와 동일한 평균
+std = np.array([0.229, 0.224, 0.225]) # 위 A.Normalize와 동일한 표준편차
+
+fig, axes = plt.subplots(1, 6, figsize=(24, 4)) # 1행 6칸 (원본 1 + 증강 5)
+
+# 0번 칸: 원본 (증강 없음, 그대로 표시)
+axes[0].imshow(image) # uint8 이미지는 imshow가 그대로 처리
+axes[0].set_title("Original")
+H, W = image.shape[:2] # bbox 픽셀 환산용 크기
+for xc, yc, w, h in bboxes: # YOLO 정규화 -> 좌상단 픽셀 좌표 (README §1.3 역변환)
+    axes[0].add_patch(patches.Rectangle(
+        ((xc - w / 2) * W, (yc - h / 2) * H), w * W, h * H,
+        linewidth=2, edgecolor='red', facecolor='none'))
+
+# 1-5번 칸: 같은 입력에 학습 파이프라인을 매번 새로 호출 (무작위 증강이 다르게 적용됨)
+for i in range(5):
+    r = transform(image=image, bboxes=bboxes, class_labels=labels)
+    img = r['image'].permute(1, 2, 0).numpy() * std + mean # [C,H,W] -> [H,W,C], 정규화 역연산
+    img = np.clip(img, 0, 1) # 부동소수 오차 보정
+    axes[i + 1].imshow(img)
+    axes[i + 1].set_title(f"Aug {i + 1}")
+    H, W = img.shape[:2]
+    for xc, yc, w, h in r['bboxes']: # 함께 변환된 bbox를 같은 공식으로 표시
+        axes[i + 1].add_patch(patches.Rectangle(
+            ((xc - w / 2) * W, (yc - h / 2) * H), w * W, h * H,
+            linewidth=2, edgecolor='red', facecolor='none'))
+
+plt.show()
+```
+
+
+**무엇을 확인할 것인가:**
+- bbox가 객체 위치에 맞게 **이미지와 함께 움직이는가** (`bbox_params` 정상 동작 — §1.6).
+- 5번 결과가 **서로 다르게** 나오는가 (무작위 증강이 작동 중).
 
 
 ### 2. W&B 실험 추적
