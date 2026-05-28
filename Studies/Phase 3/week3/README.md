@@ -500,12 +500,21 @@ def ciou_loss(pred_box, target_box):
     """CIoU Loss 개념적 구현
 
     pred_box, target_box: [x1, y1, x2, y2] 형식 (좌상단, 우하단 좌표)
+        좌표계 컨벤션: 이미지 좌표계 (y축이 아래로 증가)를 가정.
+        OpenCV/PIL/PyTorch/YOLO/COCO 등 컴퓨터 비전 표준이며,
+        이 컨벤션에서 [x1, y1, x2, y2] = [x_min, y_min, x_max, y_max] 로
+        약속되어 항상 x1 < x2, y1 < y2 가 성립한다.
+        (수학 좌표계처럼 y가 위로 증가한다고 그리면 y1 > y2 가 되어
+         아래 max/min 방향이 반대가 되니 주의 - 본문 §7 IoU 계열 비교 참고.)
     """
     # --- 1. 교집합(Intersection) 영역 계산 ---
+    # 위 컨벤션에서 좌상단은 (x_min, y_min) = 작은 좌표, 우하단은 (x_max, y_max) = 큰 좌표.
     # 두 BBox가 겹치는 사각형의 좌상단은 각 좌상단 중 더 큰 값
+    # (두 좌상단 중 더 "안쪽"으로 들어간 쪽이 교집합의 시작점이라 max)
     inter_x1 = torch.max(pred_box[0], target_box[0])
     inter_y1 = torch.max(pred_box[1], target_box[1])
     # 겹치는 사각형의 우하단은 각 우하단 중 더 작은 값
+    # (두 우하단 중 더 "안쪽"으로 들어간 쪽이 교집합의 끝점이라 min)
     inter_x2 = torch.min(pred_box[2], target_box[2])
     inter_y2 = torch.min(pred_box[3], target_box[3])
 
@@ -541,6 +550,14 @@ def ciou_loss(pred_box, target_box):
     target_h = target_box[3] - target_box[1]             # 정답 BBox 높이
 
     # v: 두 BBox의 종횡비가 얼마나 다른지 (atan으로 비율을 각도화해 비교)
+    # atan을 쓰는 이유:
+    #   (1) bounded: atan은 (0, inf) -> (0, pi/2) 매핑이라 w/h가 폭주해도 값이 갇혀 loss가 튀지 않음
+    #       (단순히 w/h 차이를 쓰면 h가 작을 때 무한대로 발산)
+    #   (2) 기하학적 의미: atan(w/h)는 BBox 대각선이 세로축과 이루는 각도와 동치
+    #       -> 박스 "모양의 각도" 차이로 자연스럽게 해석됨
+    #   (3) (4/pi^2) 정규화와 결합: 두 atan 차이의 최대값이 pi/2 이므로
+    #       (4/pi^2) * (차이)^2 의 최대값이 1 -> v 가 [0, 1]에 정규화되어
+    #       alpha = v / (1 - IoU + v) 가중치가 안정적으로 동작함
     v = (4 / math.pi ** 2) * (
         torch.atan(target_w / (target_h + 1e-7)) -
         torch.atan(pred_w / (pred_h + 1e-7))
