@@ -2297,7 +2297,7 @@ Epoch 50 -->  학습 종료. lr 은 0.001 -> 0.0001 -> 0.00001 까지 감소했�
 ### 6. ResNet-18 이미지 분류
 
 
-**ResNet(Residual Network)**은 잔차 연결(skip connection)을 도입하여 깊은 네트워크 학습을 가능하게 한 모델입니다.
+**ResNet**(Residual Network)은 잔차 연결(skip connection)을 도입하여 깊은 네트워크 학습을 가능하게 한 모델입니다.
 
 
 ```

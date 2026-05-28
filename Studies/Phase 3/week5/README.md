@@ -276,7 +276,7 @@ ONNX Runtime Session
 
 ### 6. 양자화 (Quantization): FP32 -> FP16 -> INT8
 
-**양자화(Quantization)**는 모델의 숫자를 더 적은 비트로 표현해 모델을 가볍고 빠르게 만드는 기법이다. 정밀도(precision)를 낮추는 대가로 속도와 메모리를 얻는다.
+**양자화**(Quantization)는 모델의 숫자를 더 적은 비트로 표현해 모델을 가볍고 빠르게 만드는 기법이다. 정밀도(precision)를 낮추는 대가로 속도와 메모리를 얻는다.
 
 ```
 FP32 (32-bit 부동소수점):

@@ -233,7 +233,7 @@ undistorted = cv2.remap(distorted_image, mapx, mapy, cv2.INTER_LINEAR)
 #### 캘리브레이션이란?
 
 
-카메라의 **내부 파라미터(K)와 왜곡 계수(dist_coeffs)**를 측정하는 과정입니다.
+카메라의 **내부 파라미터**(K)와 **왜곡 계수**(dist_coeffs)를 측정하는 과정입니다.
 
 
 ```

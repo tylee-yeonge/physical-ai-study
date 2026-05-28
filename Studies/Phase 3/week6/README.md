@@ -66,7 +66,7 @@ TensorRT = NVIDIA 전문 통역사
 
 ### 1. TensorRT란?
 
-**TensorRT**는 NVIDIA가 만든 고성능 딥러닝 추론 엔진이다. ONNX 모델을 받아 NVIDIA GPU 전용으로 최적화한 **엔진(.trt 파일)**을 만든다.
+**TensorRT**는 NVIDIA가 만든 고성능 딥러닝 추론 엔진이다. ONNX 모델을 받아 NVIDIA GPU 전용으로 최적화한 **엔진**(.trt 파일)을 만든다.
 
 ```
 핵심 최적화 기법:
@@ -99,7 +99,7 @@ TensorRT = NVIDIA 전문 통역사
 
 ### 2. Layer Fusion 상세
 
-**Layer Fusion(레이어 융합)**은 여러 레이어를 하나로 합치는 최적화다. 왜 이게 빨라질까? **GPU는 연산 자체보다 메모리를 읽고 쓰는 데서 시간을 더 쓰기 때문**이다.
+**Layer Fusion**(레이어 융합)은 여러 레이어를 하나로 합치는 최적화다. 왜 이게 빨라질까? **GPU는 연산 자체보다 메모리를 읽고 쓰는 데서 시간을 더 쓰기 때문**이다.
 
 ```
 Before Fusion (일반적인 추론):

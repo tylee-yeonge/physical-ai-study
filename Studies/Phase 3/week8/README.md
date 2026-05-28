@@ -172,7 +172,7 @@ Depth Anything도 YOLO처럼 크기가 여러 가지다 (Week 7 §5 참고).
 
 ### 4. Depth Map 시각화
 
-깊이맵은 픽셀마다 깊이값 하나를 가진 **단일 채널** 데이터다. 그대로는 회색조라 보기 어렵다. **컬러맵(colormap)**으로 색을 입혀 본다.
+깊이맵은 픽셀마다 깊이값 하나를 가진 **단일 채널** 데이터다. 그대로는 회색조라 보기 어렵다. **컬러맵**(colormap)으로 색을 입혀 본다.
 
 ```
 깊이맵은 단일 채널 → 컬러맵으로 색상 매핑
@@ -227,7 +227,7 @@ depth_colored = visualize_depth(depth_numpy, "magma")
 
 ### 5. Metric Depth vs Relative Depth 변환
 
-Week 7 §6에서 봤듯, Depth Anything 기본 출력은 **상대 깊이(Relative)**다. 실제 거리(미터)가 필요하면 **절대 깊이(Metric)**로 변환해야 한다.
+Week 7 §6에서 봤듯, Depth Anything 기본 출력은 **상대 깊이**(Relative)다. 실제 거리(미터)가 필요하면 **절대 깊이**(Metric)로 변환해야 한다.
 
 변환의 기본 발상은 **선형 변환**이다. 상대 깊이 `d_relative`에 배율(alpha)을 곱하고 이동(beta)을 더해 미터 깊이를 만든다.
 

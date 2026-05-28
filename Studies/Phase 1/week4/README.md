@@ -520,7 +520,7 @@ python3 rotation_quiz.py
 ## 다음 단계
 
 
-Week 4 완료 후 → **Week 5: 강체 변환 (SE(3))**으로 이동
+Week 4 완료 후 → **Week 5: 강체 변환**(SE(3))으로 이동
 - 회전 + 평행이동 결합
 - 동차 좌표와 4x4 변환 행렬
 - ROS TF2와의 연결

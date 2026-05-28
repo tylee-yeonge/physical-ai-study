@@ -351,7 +351,7 @@ Mosaic: 4장의 이미지를 하나로 합쳐 학습
 
 ### 5. Hyperparameter 튜닝
 
-**Hyperparameter(하이퍼파라미터)**는 학습 전에 사람이 정하는 설정값이다 (모델이 학습으로 알아내는 가중치와 구별된다). 어떤 값을 쓰느냐가 성능을 크게 좌우한다.
+**Hyperparameter**(하이퍼파라미터)는 학습 전에 사람이 정하는 설정값이다 (모델이 학습으로 알아내는 가중치와 구별된다). 어떤 값을 쓰느냐가 성능을 크게 좌우한다.
 
 #### 핵심 Hyperparameter
 
@@ -455,7 +455,7 @@ runs/detect/coco128_exp/
 
 #### Confusion Matrix 분석
 
-**Confusion Matrix(혼동 행렬)**는 "실제 클래스 vs 예측 클래스"를 표로 보여준다. 어디서 모델이 헷갈리는지 진단하는 도구다.
+**Confusion Matrix**(혼동 행렬)는 "실제 클래스 vs 예측 클래스"를 표로 보여준다. 어디서 모델이 헷갈리는지 진단하는 도구다.
 
 ```
 Confusion Matrix (혼동 행렬):
@@ -478,7 +478,7 @@ Confusion Matrix (혼동 행렬):
   - bicycle → background (34): 자전거 미검출이 많음 → 데이터 부족?
 ```
 
-읽는 법: **`background` 열**(실제 객체인데 background로 예측)은 **미검출(FN)**을 뜻한다. **`background` 행**(실제는 background인데 객체로 예측)은 **오검출(FP)**을 뜻한다. 위 예시에서 bicycle은 background 열 값(34)이 커서 미검출이 많고, 이는 자전거 학습 데이터가 부족하다는 신호다. `quiz_medium.py` 문제 2가 이 행렬에서 Recall과 FN/FP가 많은 클래스를 찾게 한다.
+읽는 법: **`background` 열**(실제 객체인데 background로 예측)은 **미검출**(FN)을 뜻한다. **`background` 행**(실제는 background인데 객체로 예측)은 **오검출**(FP)을 뜻한다. 위 예시에서 bicycle은 background 열 값(34)이 커서 미검출이 많고, 이는 자전거 학습 데이터가 부족하다는 신호다. `quiz_medium.py` 문제 2가 이 행렬에서 Recall과 FN/FP가 많은 클래스를 찾게 한다.
 
 ---
 
