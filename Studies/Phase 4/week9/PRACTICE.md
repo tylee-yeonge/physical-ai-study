@@ -11,16 +11,22 @@
 ## 환경 설정
 
 
+기본 환경은 [`../SETUP.md`](../SETUP.md) §6.3 (로컬 ROS2 환경) 을 따른다. 이번 주는 cv_bridge / image_transport 시스템 패키지를 추가하는 것이 핵심.
+
+
 ```bash
+# ROS2 시스템 패키지
 sudo apt install ros-humble-cv-bridge ros-humble-image-transport
+
+
+# week 8 에서 만든 공용 venv 재사용
+source /opt/ros/humble/setup.bash
+source "/workspace/study/physical-ai-study/Studies/Phase 4/.venv-vla/bin/activate"
 pip install -r requirements.txt
 ```
 
 
-ROS2 환경:
-```bash
-source /opt/ros/humble/setup.bash
-```
+> 활성화 순서 주의: `ros/setup.bash` → `.venv-vla` 순. 반대로 하면 ROS2 Python 모듈이 venv site-packages 에 가려져 import 실패.
 
 
 ---

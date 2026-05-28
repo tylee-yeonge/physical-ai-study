@@ -39,13 +39,17 @@
 | 단계 | 주 장비 | 출장지 가능 여부 |
 |---|---|---|
 | RT-2 / OpenVLA 논문 정독 | 디바이스 무관 | O |
-| HuggingFace inference 셋업 | Ubuntu PC (원격) | O |
+| (선택) LoRA 파인튜닝 | **Colab A100/L4 (클라우드)** | O |
+| HuggingFace inference 셋업 (양자화) | Ubuntu PC (원격) | O |
 | ROS2 패키지 작성 | Ubuntu PC (원격) | O |
 | 블로그 작성 | 디바이스 무관 | O |
 
 
-- VRAM 요구사항: OpenVLA 7B 기준 ~14GB. RTX 4070 12GB 로는 *4-bit quantization* 필요할 수 있음. 또는 더 작은 변종 시도.
-- 상세: [ENVIRONMENT.md](../ENVIRONMENT.md)
+- VRAM 비대칭: OpenVLA 7B 의 BF16 가중치는 약 14-15GB → RTX 4070 12GB 로 **풀 정밀도 추론도 불가**. 4bit 양자화 시 약 6GB 로 축소되어 12GB 안에 안착. LoRA 파인튜닝은 24GB+ 필요 → 4070 으로 사실상 불가.
+- **분업 원칙**: 무거운 학습은 Colab, 가벼운 추론은 로컬 4070 + ROS2. Phase 6-7 의 Jetson 배포에서도 동일 패턴이 재사용된다.
+- 상세 (의사결정 근거, 버전 매칭, 가중치 전송, 주차별 환경 요구도, 마일스톤 체크리스트):
+  - [Studies/Phase 4/SETUP.md](../Studies/Phase%204/SETUP.md) — Phase 4 진입 전 환경 구축 단일 진실 공급원
+  - [ENVIRONMENT.md](../ENVIRONMENT.md) — 프로젝트 공용 환경 (장비/원격 접속/시각화)
 
 
 ---

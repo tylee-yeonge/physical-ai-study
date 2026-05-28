@@ -14,7 +14,8 @@
 
 | 순서 | 단계 | 파일/자료 | 설명 |
 |:----:|------|----------|------|
-| 1 | 환경 준비 | `requirements.txt` | `pip install -r requirements.txt` (논문 reading note 도구만) |
+| 0 | Phase 4 환경 1회 구축 | [`../SETUP.md`](../SETUP.md) | Colab/로컬 분업, 버전 매칭 등 (week 1 진입 전 1회) |
+| 1 | 환경 준비 | `requirements.txt` | `bash pip_install.sh` (논문 reading note 도구만) |
 | 2 | 사전 지식 점검 | `README.md` 2장 | Transformer / VLM / RT-1 의 큰 그림 |
 | 3 | 논문 1회독 (Sec 1-3) | RT-2 PDF | Introduction + Related Work + Approach |
 | 4 | 논문 1회독 (Sec 4-6) | RT-2 PDF | Experiments + Emergent Capability + Conclusion |

@@ -11,15 +11,24 @@
 ## 환경 설정
 
 
+week 8 의 양자화 inference + week 10 의 ROS2 패키지를 한 노드 안에서 결합하는 주차다. 양쪽 환경이 모두 활성화돼 있어야 한다.
+
+활성화 순서 (중요; [`../SETUP.md`](../SETUP.md) §6.3 참고): ROS2 → workspace overlay → 공용 venv.
+
+
 ```bash
 source /opt/ros/humble/setup.bash
 source ~/ros2_ws/install/setup.bash
+source "/workspace/study/physical-ai-study/Studies/Phase 4/.venv-vla/bin/activate"
 
 
 # vla_inference 를 pip 으로 (방법 2)
 cd ~/phase4_notes/week8/vla_inference
 pip install -e .
 ```
+
+
+> 통합 후 VRAM 점검 필수 — week 8 단독 측정값 (약 6GB) + ROS2 cv_bridge + image subscribe 큐 + KV 캐시가 더해진다. 12GB 4070 에서 빠듯하면 batch 1 고정 + action chunk 축소 (SETUP.md §9.3).
 
 
 ---

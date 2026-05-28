@@ -11,17 +11,29 @@
 ## 환경 설정
 
 
-```bash
-conda activate phase4
-pip install -r requirements.txt
-```
+이번 주부터 OpenVLA 양자화 추론에 진입한다 — 무거운 의존성 (torch + transformers + bitsandbytes + peft) 이 본격 사용된다.
+
+**진입 전 필수 점검**: [`../SETUP.md`](../SETUP.md) §5, §6, §7 (Colab/로컬 환경 + 버전 매칭). 특히 §7 의 버전 매트릭스는 LoRA 가중치를 Colab 에서 가져올 경우 반드시 일치해야 한다.
+
+**공용 venv 사용**: week 8-12 는 의존성이 거의 동일하므로 `Studies/Phase 4/.venv-vla` 공용 venv 를 만들어 공유한다 (week 별 .venv 가 각 8-10GB 씩 누적되는 것을 막기 위함).
 
 
 ```bash
+# Phase 4 공용 venv (week 8 진입 시 1회 생성)
+cd "/workspace/study/physical-ai-study/Studies/Phase 4"
+python3 -m venv .venv-vla
+source .venv-vla/bin/activate
+pip install --upgrade pip
+pip install -r week8/requirements.txt
+
+
 # 작업 디렉토리
 mkdir -p ~/phase4_notes/week8/vla_inference
 cd ~/phase4_notes/week8/vla_inference
 ```
+
+
+> VRAM 점검: 4bit 양자화 후 OpenVLA 가 약 6GB 를 차지하므로 12GB 4070 에 안착해야 정상. `nvidia-smi` 로 inference 직후 사용량을 측정해 두면 week 11 에서 ROS2 오버헤드를 더했을 때의 여유 판단에 사용 가능 (SETUP.md §9.3 리스크 4).
 
 
 ---

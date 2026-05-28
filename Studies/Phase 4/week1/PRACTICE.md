@@ -11,32 +11,20 @@
 ## 환경 설정
 
 
-이번 주는 코드 실행이 거의 없다. 논문 정독 + 다이어그램 작성이 중심.
+Phase 4 전체 환경 구축 (Colab + 로컬 분업, 버전 매칭, ROS2 등) 은 [`../SETUP.md`](../SETUP.md) 에서 1회 수행한다. 본 week 1 에서 추가로 할 일은 아래 두 가지 뿐 — 코드 실행이 거의 없고 논문 정독 + 다이어그램이 중심이다.
 
 
 ```bash
-# 가상환경
-conda create -n phase4 python=3.10 -y
-conda activate phase4
+# 1) week 1 venv (Phase 3 패턴 그대로; 가벼운 reading note 도구만)
+bash pip_install.sh
 
-
-# 의존성 설치 (논문 reading note 도구 + diagram 도구)
-pip install -r requirements.txt
-
-
-# 다이어그램 자동 렌더링 (선택)
-# Mermaid 또는 Graphviz 사용
-pip install graphviz
-```
-
-
-실습용 디렉토리:
-
-
-```bash
+# 2) 실습 노트용 작업 디렉토리
 mkdir -p ~/phase4_notes/week1
 cd ~/phase4_notes/week1
 ```
+
+
+> week 1-7 은 로컬 GPU 가 거의 필요 없다. SETUP.md 의 GPU/Colab 셋업은 진입 시 한 번 점검만 해두고, 본격적인 활용은 week 8 (양자화 추론) 부터 시작된다.
 
 
 ---

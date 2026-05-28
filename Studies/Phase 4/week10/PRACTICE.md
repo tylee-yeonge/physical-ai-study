@@ -11,8 +11,13 @@
 ## 환경 설정
 
 
+이번 주는 ROS2 패키지 골격만 만들고 inference 는 다음 주 (week 11) 에 통합한다. 로컬 GPU 는 필요 없음.
+
+기본 환경은 [`../SETUP.md`](../SETUP.md) §6.1 (디렉토리 구조), §6.3 (ROS2 환경) 을 따른다. lifecycle node 로 작성한다는 결정도 SETUP.md §6.3 참고.
+
+
 ```bash
-# ROS2 Humble 또는 Iron
+# ROS2 Humble 또는 Jazzy
 source /opt/ros/humble/setup.bash
 
 
@@ -20,7 +25,7 @@ source /opt/ros/humble/setup.bash
 sudo apt install python3-colcon-common-extensions ros-humble-cv-bridge
 
 
-# ROS2 workspace 생성 (없으면)
+# ROS2 workspace (없으면 SETUP.md §6.1 의 ~/phase4_workspace/ros2_ws/ 를 사용해도 무방)
 mkdir -p ~/ros2_ws/src
 cd ~/ros2_ws
 ```

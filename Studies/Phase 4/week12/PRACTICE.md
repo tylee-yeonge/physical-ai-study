@@ -11,9 +11,19 @@
 ## 환경 설정
 
 
+week 8-11 의 공용 venv (`.venv-vla`) 를 그대로 사용. Rerun SDK 버전은 [`../../../ENVIRONMENT.md`](../../../ENVIRONMENT.md) §4 의 권장 버전 (0.23+) 과 일치시킨다 — 원격 PC 와 로컬 viewer 의 RRD 포맷 호환성 때문.
+
+활성화 순서: ROS2 → workspace overlay → `.venv-vla` ([`../SETUP.md`](../SETUP.md) §6.3).
+
+
 ```bash
-# Rerun SDK 설치
-pip install rerun-sdk>=0.15.0
+source /opt/ros/humble/setup.bash
+source ~/ros2_ws/install/setup.bash
+source "/workspace/study/physical-ai-study/Studies/Phase 4/.venv-vla/bin/activate"
+
+
+# Rerun SDK 설치 (ENVIRONMENT.md 권장 버전과 일치)
+pip install "rerun-sdk>=0.23,<0.24"
 
 
 # 녹화 도구 (Ubuntu)
