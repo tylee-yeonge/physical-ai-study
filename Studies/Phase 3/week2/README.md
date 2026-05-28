@@ -479,24 +479,18 @@ Augmentation의 진짜 목적은 데이터 개수를 늘리는 게 아니라, �
 
 ## 핵심 요약
 
-```
-+---------------------------------------------------------+
-| Week 2: CV 라이브러리 도구 세트                          |
-|                                                         |
-| Albumentations: 빠른 Augmentation + BBox 자동 변환       |
-|   - 과적합 방지: 변형해도 정답 동일 -> 본질 특징 학습    |
-|   - BBox 포맷 3종, bbox_params로 함께 변환               |
-|   - ToTensorV2는 Normalize 뒤, 맨 마지막                 |
-|                                                         |
-| W&B: 실험 로깅, 시각화                                   |
-|   - init -> log -> finish                                |
-|   - train_loss + val_mAP 로 과적합 판단                  |
-|                                                         |
-| timm / torchvision: Pretrained 모델 (backbone)           |
-|   - features_only=True -> 중간 feature map 리스트        |
-|   - feature map 크기 = 입력 크기 / stride                |
-+---------------------------------------------------------+
-```
+**Week 2: CV 라이브러리 도구 세트**
+
+- **Albumentations** — 빠른 Augmentation + BBox 자동 변환
+  - 과적합 방지: 변형해도 정답 동일 -> 본질 특징 학습
+  - BBox 포맷 3종, `bbox_params`로 함께 변환
+  - `ToTensorV2`는 Normalize 뒤, 맨 마지막
+- **W&B** — 실험 로깅, 시각화
+  - `init` -> `log` -> `finish`
+  - `train_loss` + `val_mAP`로 과적합 판단
+- **timm / torchvision** — Pretrained 모델 (backbone)
+  - `features_only=True` -> 중간 feature map 리스트
+  - feature map 크기 = 입력 크기 / stride
 
 ---
 

@@ -68,32 +68,13 @@ TensorRT = NVIDIA 전문 통역사
 
 **TensorRT**는 NVIDIA가 만든 고성능 딥러닝 추론 엔진이다. ONNX 모델을 받아 NVIDIA GPU 전용으로 최적화한 **엔진**(.trt 파일)을 만든다.
 
-```
-핵심 최적화 기법:
-+-----------------------------------------+
-| TensorRT 최적화 |
-| |
-| Layer Fusion (레이어 합치기) |
-| Conv + BN + ReLU → FusedCBR |
-| → 메모리 접근 감소, 커널 호출 감소 |
-| |
-| Kernel Auto-Tuning |
-| 수백 개 커널 중 최적 선택 |
-| → GPU 아키텍처별 최적 커널 자동 탐색 |
-| |
-| Precision Calibration |
-| FP32 → FP16 → INT8 |
-| → 정확도 유지하며 속도 극대화 |
-| |
-| Dynamic Tensor Memory |
-| 메모리 재사용 최적화 |
-| → Jetson 8GB 메모리 효율적 사용 |
-| |
-| Multi-Stream Execution |
-| 여러 추론을 병렬 실행 |
-| → GPU 활용률 극대화 |
-+-----------------------------------------+
-```
+**TensorRT 핵심 최적화 기법**
+
+- **Layer Fusion** (레이어 합치기): `Conv + BN + ReLU` -> `FusedCBR` — 메모리 접근/커널 호출 감소
+- **Kernel Auto-Tuning**: 수백 개 커널 중 최적 선택 — GPU 아키텍처별 자동 탐색
+- **Precision Calibration**: FP32 -> FP16 -> INT8 — 정확도 유지하며 속도 극대화
+- **Dynamic Tensor Memory**: 메모리 재사용 최적화 — Jetson 8GB 메모리 효율적 사용
+- **Multi-Stream Execution**: 여러 추론을 병렬 실행 — GPU 활용률 극대화
 
 이 중 가장 중요한 두 가지가 Layer Fusion(§2)과 Kernel Auto-Tuning(§3)이다.
 

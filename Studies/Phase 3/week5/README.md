@@ -71,25 +71,14 @@ TensorFlow (.pb) ---> --→ CoreML (.mlmodel)
 
 ONNX 파일 안에는 무엇이 들었을까? 모델의 "계산 그래프"와 "학습된 가중치"가 들어 있다.
 
-```
-핵심 구성요소:
-+-----------------------------------------+
-| ONNX 모델 |
-| |
-| Graph (계산 그래프) |
-| +-- Node: Conv, ReLU, BatchNorm, ... |
-| +-- Input: 입력 텐서 형상 |
-| +-- Output: 출력 텐서 형상 |
-| +-- Initializer: 학습된 가중치 |
-| |
-| Opset Version (연산자 버전) |
-| Metadata (모델 정보) |
-+-----------------------------------------+
-```
+**ONNX 모델의 핵심 구성요소**
 
-- **Graph(그래프)**: 어떤 연산(Node)을 어떤 순서로 하는지를 그린 지도. Conv -> ReLU -> ... 같은 흐름.
-- **Initializer**: 학습으로 얻은 가중치 값.
-- **Opset Version**: 연산자 집합의 버전 (§3에서 설명).
+- **Graph** (계산 그래프) — 어떤 연산(Node)을 어떤 순서로 하는지를 그린 지도. Conv -> ReLU -> ... 같은 흐름.
+  - **Node**: 연산 단위 (Conv, ReLU, BatchNorm, ...)
+  - **Input / Output**: 입출력 텐서 형상
+  - **Initializer**: 학습으로 얻은 가중치 값
+- **Opset Version** — 연산자 집합의 버전 (§3에서 설명)
+- **Metadata** — 모델 정보 (저작자, 생성 도구 등)
 
 ONNX는 다양한 프레임워크와 런타임 사이의 다리 역할을 한다.
 
