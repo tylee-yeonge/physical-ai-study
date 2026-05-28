@@ -140,8 +140,16 @@ plt.show()
 
 
 ```python
+import os
 import wandb # 실험 추적 도구 (Weights & Biases)
 import torch
+
+
+# W&B 동작 모드 선택 (README §2.3 표 참고)
+# - offline (실습 권장): 로컬 ./wandb/ 폴더에만 기록, 계정/로그인 불필요
+# - online: 아래 줄을 주석 처리하면 클라우드에 기록 (wandb login 필요)
+# - disabled: "offline" 대신 "disabled" 를 넣으면 모든 wandb 호출이 no-op
+os.environ["WANDB_MODE"] = "offline" # wandb.init() 보다 앞에서 설정해야 적용됨
 
 
 def train_with_wandb():
@@ -178,7 +186,7 @@ def train_with_wandb():
     wandb.finish() # 실험 종료 (로그 업로드 마무리)
 
 
-train_with_wandb() # 함수 실행 (계정 없이 돌리려면 README의 WANDB_MODE=offline 안내 참고)
+train_with_wandb()
 ```
 
 
