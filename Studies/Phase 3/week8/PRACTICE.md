@@ -22,16 +22,14 @@ Week 8은 Depth Anything 모델을 실제로 사용합니다. HuggingFace에서 
 
 
 ```bash
-# 가상환경 활성화
-conda activate phase3
+cd Studies/Phase\ 3/week8
 
+# 가상환경 생성 및 의존성 설치 (apt 패키지 설치 포함, root 권한 필요)
+# 내부에서 .venv-week8 생성 후 requirements.txt 설치
+./pip_install.sh
 
-# 패키지 설치
-pip install torch torchvision
-pip install transformers
-pip install timm
-pip install numpy opencv-python matplotlib
-pip install Pillow
+# 가상환경 활성화 (sh 종료 후 현재 shell에서 직접 활성화 필요)
+source .venv-week8/bin/activate
 
 
 # 설치 확인

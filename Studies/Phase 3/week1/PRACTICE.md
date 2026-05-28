@@ -12,13 +12,14 @@
 
 
 ```bash
-# 가상환경 생성 및 활성화
-conda create -n phase3 python=3.10 -y
-conda activate phase3
+cd Studies/Phase\ 3/week1
 
+# 가상환경 생성 및 의존성 설치 (apt 패키지 설치 포함, root 권한 필요)
+# 내부에서 .venv-week1 생성 후 requirements.txt 설치
+./pip_install.sh
 
-# 패키지 설치
-pip install -r requirements.txt
+# 가상환경 활성화 (sh 종료 후 현재 shell에서 직접 활성화 필요)
+source .venv-week1/bin/activate
 
 
 # GPU 확인

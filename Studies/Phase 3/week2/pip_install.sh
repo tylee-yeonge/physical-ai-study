@@ -13,10 +13,10 @@ apt-get update
 apt-get install -y python3-venv python3-full
 
 # venv 생성 (이미 있으면 건너뜀)
-python3 -m venv .venv
+python3 -m venv .venv-week2
 
 # venv 활성화
-source .venv/bin/activate
+source .venv-week2/bin/activate
 
 # pip 최신화
 pip install --upgrade pip
