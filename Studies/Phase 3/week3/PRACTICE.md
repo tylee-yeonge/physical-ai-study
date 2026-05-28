@@ -152,48 +152,57 @@ def compute_ciou(box1, box2):
 
 
 # -- 시나리오 비교 --
-print("\n[시나리오 1] BBox가 겹치는 경우")
+# GT는 (100, 100)~(200, 200)의 100x100 정사각형, 중심은 (150, 150)으로 고정
 gt = torch.tensor([100., 100., 200., 200.]) # 정답 박스 (x1, y1, x2, y2)
-pred1 = torch.tensor([120., 110., 220., 210.]) # 예측 박스 (GT와 일부 겹침)
-print(f"GT: {gt.tolist()}")
-print(f"Pred: {pred1.tolist()}")
-print(f"IoU: {compute_iou(pred1, gt):.4f}")
-print(f"GIoU: {compute_giou(pred1, gt):.4f}")
-print(f"CIoU: {compute_ciou(pred1, gt):.4f}")
 
+# 6가지 시나리오: (시각화용 영어 제목, pred 박스, 콘솔 출력용 한국어 설명)
+# title은 matplotlib에 한글 폰트가 없을 때 깨지므로 영어, desc는 콘솔 출력용이라 한국어 유지
+scenarios = [
+    ("Nearly accurate",
+     torch.tensor([102., 98., 202., 198.]),
+     "GT와 거의 일치 -> IoU 1에 근접"),
 
-print("\n[시나리오 2] BBox가 떨어진 경우")
-pred2 = torch.tensor([300., 300., 400., 400.]) # GT와 전혀 안 겹치는 예측 (IoU=0)
-print(f"GT: {gt.tolist()}")
-print(f"Pred: {pred2.tolist()}")
-print(f"IoU: {compute_iou(pred2, gt):.4f}")
-print(f"GIoU: {compute_giou(pred2, gt):.4f}")
-print(f"CIoU: {compute_ciou(pred2, gt):.4f}")
+    ("Partial overlap",
+     torch.tensor([120., 110., 220., 210.]),
+     "대각선으로 약간 이동 -> 일반적인 학습 중 상황"),
 
+    ("Adjacent (IoU=0)",
+     torch.tensor([220., 100., 320., 200.]),
+     "GT 바로 옆 (IoU=0) -> GIoU는 약한 음수로 거리 신호 전달"),
 
-print("\n[시나리오 3] 거의 정확한 경우")
-pred3 = torch.tensor([102., 98., 202., 198.]) # GT와 거의 일치하는 예측
-print(f"GT: {gt.tolist()}")
-print(f"Pred: {pred3.tolist()}")
-print(f"IoU: {compute_iou(pred3, gt):.4f}")
-print(f"GIoU: {compute_giou(pred3, gt):.4f}")
-print(f"CIoU: {compute_ciou(pred3, gt):.4f}")
+    ("Far apart (IoU=0)",
+     torch.tensor([400., 400., 500., 500.]),
+     "GT에서 멀리 (IoU=0) -> GIoU가 더 작음 (GIoU의 거리 민감도)"),
+
+    ("Pred contains GT",
+     torch.tensor([50., 50., 250., 250.]),
+     "pred가 GT를 완전히 감쌈 -> 외접 영역 C = pred, GIoU=IoU"),
+
+    ("Same center, diff aspect",
+     torch.tensor([100., 130., 200., 170.]),
+     "중심점은 같으나 가로로 납작 -> CIoU의 종횡비 패널티가 드러남"),
+]
+
+print(f"\nGT: {gt.tolist()} (100x100 정사각형, 중심 (150, 150))")
+for title, pred, desc in scenarios: # 시나리오마다 IoU/GIoU/CIoU 출력
+    iou = compute_iou(pred, gt).item()
+    giou = compute_giou(pred, gt).item()
+    ciou = compute_ciou(pred, gt).item()
+    print(f"\n[{title}] {desc}")
+    print(f"  Pred: {pred.tolist()}")
+    print(f"  IoU={iou:.4f}, GIoU={giou:.4f}, CIoU={ciou:.4f}")
 
 
 # -- 시각화 --
-fig, axes = plt.subplots(1, 3, figsize=(15, 5)) # 시나리오 3개를 가로로 배치
-scenarios = [
-    ("겹치는 경우", pred1),
-    ("떨어진 경우", pred2),
-    ("거의 정확", pred3),
-]
+fig, axes = plt.subplots(2, 3, figsize=(15, 10)) # 6개 시나리오를 2x3 그리드로 배치
+axes = axes.flatten() # 2x3을 1차원으로 펴서 zip으로 순회
 
 
-for ax, (title, pred) in zip(axes, scenarios): # 시나리오마다 박스 그리기
-    ax.set_xlim(0, 500)
-    ax.set_ylim(500, 0) # y축 뒤집기 (이미지 좌표계는 위가 0)
+for ax, (title, pred, _) in zip(axes, scenarios): # 시나리오마다 박스 그리기
+    ax.set_xlim(0, 550)
+    ax.set_ylim(550, 0) # y축 뒤집기 (이미지 좌표계는 위가 0)
     ax.set_aspect('equal') # 가로세로 비율 동일하게
-    ax.set_title(title, fontsize=12)
+    ax.set_title(title, fontsize=11)
 
 
     # GT Box (녹색)
@@ -213,10 +222,12 @@ for ax, (title, pred) in zip(axes, scenarios): # 시나리오마다 박스 그�
 
 
     iou_val = compute_iou(pred, gt).item()
+    giou_val = compute_giou(pred, gt).item()
     ciou_val = compute_ciou(pred, gt).item()
-    ax.text(250, 450, f"IoU={iou_val:.3f}\nCIoU={ciou_val:.3f}", # 박스 아래에 수치 표시
-            fontsize=10, ha='center')
-    ax.legend(loc='upper right')
+    ax.text(275, 520, # 각 subplot 하단 중앙에 세 지표 모두 표시
+            f"IoU={iou_val:.3f}  GIoU={giou_val:.3f}  CIoU={ciou_val:.3f}",
+            fontsize=9, ha='center')
+    ax.legend(loc='upper right', fontsize=8)
 
 
 plt.tight_layout()
@@ -245,6 +256,15 @@ python practice_iou.py
 """
 실습 2: Precision, Recall, mAP 직접 계산
 목표: Detection 평가 지표의 의미를 코드로 확인한다.
+
+torch 대신 numpy/순수 Python을 쓰는 이유:
+- 평가 지표는 학습 손실과 별개로 미분이 필요 없다 (autograd 불필요).
+  실습 1의 IoU/GIoU/CIoU는 backward()로 gradient를 흘려야 해서 torch가 필수였다.
+- 정렬, 누적합, set 기반 매칭처럼 control flow가 많아 텐서 연산보다
+  Python 자료구조가 자연스럽다.
+- 박스 수가 한 자릿수 수준이라 GPU 가속이 의미 없다.
+- torchmetrics, pycocotools 같은 표준 라이브러리도 mAP 계산 내부는
+  대부분 CPU/numpy 연산이다.
 """
 import numpy as np
 import matplotlib
