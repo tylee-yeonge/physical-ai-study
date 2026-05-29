@@ -134,7 +134,7 @@ torch.onnx.export(
 )
 ```
 
-`quiz_medium.py` 문제 3이 이 코드의 버그를 찾게 한다 - 답은 `model.train()`을 `model.eval()`로 고치는 것과, `opset_version=7`을 12 이상으로 올리는 것이다 (§3).
+`quiz_medium.py` 문제 3이 이 코드의 버그를 찾게 한다 (§3).
 
 ---
 
@@ -168,8 +168,6 @@ CoreML: Opset 9-15 지원
 
 → 배포 타겟에 맞는 Opset 선택이 중요!
 ```
-
-`quiz_easy.py` 문제 2의 권장 답이 "Opset 12"인 것, `quiz_easy.py` 문제 4가 "Opset을 높이면 항상 좋은가?"에 "아니오"인 것이 이 이유다.
 
 ---
 
@@ -347,7 +345,7 @@ ONNX Runtime + TensorRT EP가 가장 빠르다.
    컴파일 시 계산 가능한 것은 미리 계산
 ```
 
-`quiz_medium.py` 문제 1이 "ONNX Runtime이 PyTorch보다 빠른 이유 3가지"를 묻는다 - 위 4가지가 답이다.
+`quiz_medium.py` 문제 1이 "ONNX Runtime이 PyTorch보다 빠른 이유 3가지"를 묻는다.
 
 ---
 

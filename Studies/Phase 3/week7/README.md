@@ -177,7 +177,7 @@ KITTI (야외 운전) + NYU Depth (실내) + Waymo (자율주행)
 대표 모델: MiDaS, DPT, Depth Anything
 ```
 
-**Zero-shot의 핵심 장점은 Fine-tuning이 필요 없다는 것**이다. 다양한 데이터로 미리 충분히 학습했기 때문에, 새 환경에 추가 학습 없이 바로 쓸 수 있다. `quiz_easy.py` 문제 2가 세 방법론을 구별하게 한다 (특히 "Zero-shot은 Fine-tuning이 필요하다"는 틀린 설명임에 주의).
+**Zero-shot의 핵심 장점은 Fine-tuning이 필요 없다는 것**이다. 다양한 데이터로 미리 충분히 학습했기 때문에, 새 환경에 추가 학습 없이 바로 쓸 수 있다. `quiz_easy.py` 문제 2가 세 방법론을 구별하게 한다.
 
 ---
 
@@ -307,7 +307,7 @@ Depth Anything 성능 비교:
 
 핵심: ViT-S(24.8M)로도 DPT-Large(343M)보다 좋은 성능 - 파라미터 14배 적으면서 더 나은 일반화. Jetson 배포에 최적.
 
-작은 ViT-S가 14배 큰 DPT-Large를 능가한다는 것이 핵심이다. 작고 빠르면서도 성능이 좋아 Jetson에 적합하다. `quiz_easy.py` 문제 4가 Jetson용 모델로 ViT-S를 고르게 한다.
+작은 ViT-S가 14배 큰 DPT-Large를 능가한다는 것이 핵심이다. 작고 빠르면서도 성능이 좋아 Jetson에 적합하다. `quiz_easy.py` 문제 4가 Jetson용 모델을 고르게 한다.
 
 ---
 
@@ -350,7 +350,7 @@ Metric Depth (절대 깊이):
   - SLAM 스케일 복구
 ```
 
-`quiz_easy.py` 문제 3이 시나리오별로 어느 깊이가 필요한지 고르게 한다 - "왼쪽으로 돌자"는 Relative, "정확히 2m"나 "SLAM 3D 지도"는 Metric이다.
+`quiz_easy.py` 문제 3이 시나리오별로 어느 깊이가 필요한지 고르게 한다.
 
 ---
 

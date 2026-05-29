@@ -177,7 +177,7 @@ Pascal VOC [100, 200, 300, 400] 에 스케일 적용:
 
 #### 1.6 bbox_params: BBox를 이미지와 함께 자동 변환하기
 
-`A.Compose`에 이미지만 넣으면 BBox는 변환되지 않는다. BBox도 함께 변환하려면 **`bbox_params`를 `A.Compose`에 전달**해야 한다. 이것이 `quiz_easy.py` 문제 1의 정답이 "B) bbox_params를 Compose에 전달"인 이유다.
+`A.Compose`에 이미지만 넣으면 BBox는 변환되지 않는다. BBox도 함께 변환하려면 **`bbox_params`를 `A.Compose`에 전달**해야 한다.
 
 ```python
 import albumentations as A
@@ -297,7 +297,7 @@ for epoch in range(50):                # 50 에폭 반복
 wandb.finish()                         # 실험 종료 (로그 업로드 마무리)
 ```
 
-`wandb.log()`의 역할은 "학습 메트릭을 서버에 기록하여 시각화"다 — `quiz_easy.py` 문제 2의 정답이 이것이다.
+`wandb.log()`의 역할은 "학습 메트릭을 서버에 기록하여 시각화"다.
 
 > 위 코드의 변수 `train_loss`, `val_loss`는 예시값이다. 실제 학습에서는 모델이 계산한 손실값을 넣는다. README의 코드 예시는 정의되지 않은 변수 없이 그대로 실행되도록 작성한다.
 
@@ -388,7 +388,7 @@ backbone = timm.create_model(
 # backbone(x) -> feature map들의 리스트
 ```
 
-`features_only=True`의 출력은 **최종 분류 logits가 아니라 중간 Feature map들의 리스트**다. 이것이 `quiz_easy.py` 문제 3의 정답이 "B) 중간 Feature map들의 리스트"인 이유다.
+`features_only=True`의 출력은 **최종 분류 logits가 아니라 중간 Feature map들의 리스트**다.
 
 - `features_only=True`: 모델 끝의 분류 헤드(Classification head)를 제거한다.
 - `out_indices`: 모델의 여러 단계(stage) 중 어느 것을 출력으로 뽑을지 지정한다.

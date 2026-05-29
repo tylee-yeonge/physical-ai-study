@@ -214,7 +214,7 @@ trtexec --loadEngine=yolo11n_fp16.trt \
 --verbose : 상세 로그
 ```
 
-`quiz_easy.cpp` 문제 2의 정답이 `--saveEngine=yolo11n_fp16.trt --fp16`인 것에 주의하자 - `--half`나 `--float16` 같은 옵션은 존재하지 않는다. FP16 플래그는 `--fp16`이다.
+trtexec에서 FP16 플래그는 `--fp16`이다 - `--half`나 `--float16` 같은 옵션은 존재하지 않는다.
 
 ---
 
@@ -415,7 +415,7 @@ delete engine;          // 엔진 해제
 delete runtime;         // 런타임 해제
 ```
 
-`quiz_medium.cpp` 문제 2가 이 패턴을 어긴 버그 코드를 준다 - `buffers[1]` 미할당, `cudaMemcpy` 방향 반대, `context`/`runtime` 해제 누락이 답이다. 위 표준 패턴과 비교하며 찾으면 된다. (참고: 문제 본문은 TRT 8.x 시점의 `executeV2 / destroy()` 코드로 작성돼 있다. TRT 10에서는 `enqueueV3 / delete`가 정답이지만 학습 의도상 "리소스 해제 누락"을 찾는 것이 핵심이므로 그대로 둔다.)
+`quiz_medium.cpp` 문제 2가 이 패턴을 어긴 버그 코드를 준다. 위 표준 패턴과 비교하며 찾으면 된다. (참고: 문제 본문은 TRT 8.x 시점의 `executeV2 / destroy()` 코드로 작성돼 있다. TRT 10에서는 `enqueueV3 / delete`를 쓴다.)
 
 > **`cudaMemcpy` 방향**: 세 번째 인자 다음에 오는 방향 플래그가 중요하다. 입력(CPU->GPU)은 `cudaMemcpyHostToDevice`, 출력(GPU->CPU)은 `cudaMemcpyDeviceToHost`다. Host가 CPU, Device가 GPU다. 방향을 반대로 쓰면 데이터가 엉뚱하게 복사된다.
 

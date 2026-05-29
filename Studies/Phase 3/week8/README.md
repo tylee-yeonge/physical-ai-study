@@ -72,7 +72,7 @@ depth_map = result["depth"]   # 결과의 "depth" 키에 깊이맵(PIL Image)이
 # depth_map: 깊이맵 이미지 (가까울수록 밝게 표현됨)
 ```
 
-`quiz_easy.py` 문제 1이 이 코드의 빈칸 - `pipeline`, `'depth-estimation'`, `'depth'` - 을 채우게 한다.
+`quiz_easy.py` 문제 1이 이 코드의 빈칸을 채우게 한다.
 
 `pipeline`이 내부적으로 하는 일을 펼쳐 보면:
 
@@ -142,7 +142,7 @@ depth = torch.nn.functional.interpolate(
 5. ONNX/TensorRT 변환을 위한 모델 접근
 ```
 
-`quiz_medium.py` 문제 2가 잘못된 전처리 코드를 고치게 한다. 위 코드가 올바른 형태다 - `model.eval()`, `with torch.no_grad()`, `processor` 사용, PIL로 RGB 로드가 핵심이다 (자세한 디버깅 포인트는 §전처리의 중요성).
+`quiz_medium.py` 문제 2가 잘못된 전처리 코드를 고치게 한다. 위 코드가 올바른 형태다 (자세한 디버깅 포인트는 §전처리의 중요성).
 
 ---
 
@@ -162,7 +162,7 @@ Depth Anything도 YOLO처럼 크기가 여러 가지다 (Week 7 §5 참고).
 - 데스크톱 고품질 -> ViT-B (Base)
 - 연구/최고 품질 -> ViT-L (Large)
 
-`quiz_easy.py` 문제 4가 상황별 모델 선택을 묻는다 - Jetson 실시간은 ViT-S, 서버 최고품질은 ViT-L, 데스크톱 균형은 ViT-B다.
+`quiz_easy.py` 문제 4가 상황별 모델 선택을 묻는다.
 
 ---
 
@@ -178,7 +178,7 @@ Depth Anything도 YOLO처럼 크기가 여러 가지다 (Week 7 §5 참고).
 | turbo   | 파랑 -> 초록 -> 빨강     | 직관적 (빨강=가까움, 파랑=멀리)   |
 | viridis | 보라 -> 초록 -> 노랑     | 색각 이상 친화적                  |
 
-`quiz_easy.py` 문제 3이 컬러맵과 특징을 연결하게 한다 - magma=논문 표준, turbo=직관적, viridis=색각 이상 친화적.
+`quiz_easy.py` 문제 3이 컬러맵과 특징을 연결하게 한다.
 
 ```python
 import matplotlib.pyplot as plt   # 컬러맵 제공
@@ -238,7 +238,7 @@ beta (shift): 깊이의 이동
   beta  = d1_metric - alpha * d1_rel
 ```
 
-`quiz_medium.py` 문제 1이 이 계산을 시킨다. 참조점 A(상대 0.85, 실제 1.5m)와 B(상대 0.30, 실제 6.0m)가 주어지면, `alpha = (1.5-6.0)/(0.85-0.30) ≈ -8.18`, `beta = 1.5 - (-8.18)*0.85 ≈ 8.45`다. alpha가 음수인 이유는, 상대 깊이는 "큰 값=가까움"인데 미터 깊이는 "작은 값=가까움"이라 방향이 반대이기 때문이다.
+`quiz_medium.py` 문제 1이 이 계산을 시킨다. alpha가 음수가 되는 이유는, 상대 깊이는 "큰 값=가까움"인데 미터 깊이는 "작은 값=가까움"이라 방향이 반대이기 때문이다.
 
 참조점 없이 변환하는 다른 방법들:
 
@@ -403,7 +403,7 @@ HuggingFace 모델은 처음 한 번만 다운로드되고, 이후엔 로컬 캐
 
 ### 전처리의 중요성
 
-전처리가 틀리면 모델 출력이 완전히 엉뚱해진다. `quiz_medium.py` 문제 2가 묻는 잘못된 전처리 코드의 버그가 바로 이것들이다.
+전처리가 틀리면 모델 출력이 완전히 엉뚱해진다. `quiz_medium.py` 문제 2가 잘못된 전처리 코드의 버그를 찾게 한다.
 
 ```
 Depth Anything 올바른 전처리:
@@ -421,7 +421,7 @@ Depth Anything 올바른 전처리:
       직접 전처리하면 위 항목을 빠뜨리기 쉽다.
 ```
 
-전처리 디버깅 체크리스트 (quiz_medium 문제 2의 4가지 버그):
+전처리 디버깅 체크리스트:
 
 1. **BGR -> RGB 변환 누락** - OpenCV로 읽은 이미지는 BGR이다.
 2. **ImageNet 정규화 누락** - `/255.0`만으로는 부족, mean/std 정규화 필요. `AutoImageProcessor`가 자동 처리.
