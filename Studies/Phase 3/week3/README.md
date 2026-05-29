@@ -133,7 +133,7 @@ v8 대비 YOLO11의 핵심 변경점은 두 가지다 - Backbone의 **C2f -> C3k
 flowchart TB
     Input["입력 이미지 [B, 3, 640, 640]"]
 
-    Backbone["Backbone (CSPDarknet) - 특징 추출<br/>Conv -> C3k2 -> Conv + SPPF + C2PSA<br/>(C3k2 블록과 C2PSA Attention은 YOLO11 신규)"]
+    Backbone["Backbone (CSPDarknet) - 특징 추출<br/>Conv -> C3k2 -> Conv + SPPF + C2PSA<br/>(C3k2 블록과 C2PSA Attention은<br/>YOLO11 신규)"]
 
     P3["P3 [B, 256, 80, 80]<br/>stride 8, 작은 객체"]
     P4["P4 [B, 512, 40, 40]<br/>stride 16, 중간 객체"]
@@ -467,7 +467,7 @@ B at center     B shifted left
 ```mermaid
 flowchart LR
     IoU -->|"외접 박스 면적<br/>(비겹침 신호)"| GIoU
-    GIoU -->|"중심 거리<br/>(포함 케이스 구분 + 빠른 수렴)"| DIoU
+    GIoU -->|"중심 거리<br/>(포함 케이스 구분<br/>+ 빠른 수렴)"| DIoU
     DIoU -->|"종횡비 항<br/>(박스 모양 정렬)"| CIoU
 ```
 

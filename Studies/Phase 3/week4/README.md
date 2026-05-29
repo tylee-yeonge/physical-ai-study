@@ -528,11 +528,11 @@ for result in results:                      # 이미지별로 순회
 ```mermaid
 flowchart TD
     A["데이터 수집<br/>이미지 촬영/수집"] --> T
-    B["라벨링<br/>LabelImg/Roboflow로 BBox 라벨링"] --> T
-    C["학습 설정<br/>data.yaml 작성 / 모델 크기 선택 / Hyperparameter 설정"] --> T
+    B["라벨링<br/>LabelImg/Roboflow로<br/>BBox 라벨링"] --> T
+    C["학습 설정<br/>data.yaml 작성<br/>모델 크기 선택<br/>Hyperparameter 설정"] --> T
     T["model.train(...)<br/>Epoch 1: mAP=0.10 (개선 중)<br/>Epoch 50: mAP=0.45 (수렴 중)<br/>Epoch 100: mAP=0.52 (최종)"]
-    T --> E["평가 & 분석<br/>mAP 확인 / Confusion Matrix / FP 분석"]
-    E -->|"데이터/하이퍼파라미터 개선 후 재학습"| T
+    T --> E["평가 & 분석<br/>mAP 확인<br/>Confusion Matrix<br/>FP 분석"]
+    E -->|"데이터/하이퍼파라미터<br/>개선 후 재학습"| T
 ```
 
 ### 2. 모델 크기 선택 가이드
