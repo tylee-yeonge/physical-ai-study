@@ -71,6 +71,7 @@ Monocular Depth Estimation 기초 개념 탐구
 - Relative vs Metric Depth
 - 깊이맵 시각화
 """
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -133,8 +134,9 @@ def explore_depth_map():
 
 
     plt.tight_layout()
-    plt.savefig('depth_basics.png', dpi=100) # 결과 이미지 저장
-    print("\n 시각화 저장: depth_basics.png")
+    os.makedirs('outputs', exist_ok=True) # 결과물 폴더 (시각화를 수업 자료와 분리)
+    plt.savefig('outputs/depth_basics.png', dpi=100) # 결과 이미지 저장
+    print("\n 시각화 저장: outputs/depth_basics.png")
 
 
 def compare_depth_representations():

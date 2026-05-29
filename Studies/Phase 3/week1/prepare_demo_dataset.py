@@ -10,7 +10,7 @@ PIL 만으로 3-class 도형 분류 데이터셋 (원/사각형/삼각형, 64x64
 
 사용:
     python prepare_demo_dataset.py
-    -> ./demo_dataset/images/ 에 60장 (클래스당 20장) 생성
+    -> ./data/demo_dataset/images/ 에 60장 (클래스당 20장) 생성
 """
 
 import argparse
@@ -92,13 +92,13 @@ def make_one_image(class_id: int, size: int, rng: random.Random) -> Image.Image:
 
 
 def main():
-    """간이 데이터셋을 만들어 ./demo_dataset/images/ 에 저장한다."""
+    """간이 데이터셋을 만들어 ./data/demo_dataset/images/ 에 저장한다."""
     parser = argparse.ArgumentParser(description="Demo image classification dataset generator")
     parser.add_argument(
         "--out-dir",
         type=Path,
-        default=Path(__file__).parent / "demo_dataset" / "images",
-        help="출력 디렉토리 (기본: ./demo_dataset/images)",
+        default=Path(__file__).parent / "data" / "demo_dataset" / "images",
+        help="출력 디렉토리 (기본: ./data/demo_dataset/images)",
     )
     parser.add_argument(
         "--per-class",

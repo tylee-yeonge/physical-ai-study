@@ -40,6 +40,7 @@ python quiz_medium.py # 코드 퀴즈
 실습 1: IoU, GIoU, DIoU, CIoU 직접 구현
 목표: 각 IoU 변형이 어떤 상황에서 어떤 gradient를 제공하는지 이해한다.
 """
+import os
 import math
 import torch
 import matplotlib
@@ -231,8 +232,9 @@ for ax, (title, pred, _) in zip(axes, scenarios): # 시나리오마다 박스 �
 
 
 plt.tight_layout()
-plt.savefig('iou_comparison.png', dpi=100) # 결과를 이미지 파일로 저장
-print("\n시각화 저장: iou_comparison.png")
+os.makedirs('outputs', exist_ok=True) # 결과물 폴더 (시각화를 수업 자료와 분리)
+plt.savefig('outputs/iou_comparison.png', dpi=100) # 결과를 이미지 파일로 저장
+print("\n시각화 저장: outputs/iou_comparison.png")
 print("\n 실습 1 완료!")
 ```
 
@@ -266,6 +268,7 @@ torch 대신 numpy/순수 Python을 쓰는 이유:
 - torchmetrics, pycocotools 같은 표준 라이브러리도 mAP 계산 내부는
   대부분 CPU/numpy 연산이다.
 """
+import os
 import numpy as np
 import matplotlib
 matplotlib.use('Agg') # GUI 없이 파일로 저장하는 백엔드
@@ -402,8 +405,9 @@ ax.fill_between(recalls, precisions, alpha=0.2) # 곡선 아래 영역 (넓을�
 
 
 plt.tight_layout()
-plt.savefig('pr_curve.png', dpi=100) # 결과 이미지 저장
-print("PR Curve 저장: pr_curve.png")
+os.makedirs('outputs', exist_ok=True) # 결과물 폴더 (시각화를 수업 자료와 분리)
+plt.savefig('outputs/pr_curve.png', dpi=100) # 결과 이미지 저장
+print("PR Curve 저장: outputs/pr_curve.png")
 print("\n 실습 2 완료!")
 ```
 
@@ -428,6 +432,7 @@ python practice_metrics.py
 실습 3: NMS 직접 구현
 목표: NMS가 어떻게 중복 검출을 제거하는지 직접 구현하여 이해한다.
 """
+import os
 import numpy as np
 import matplotlib
 matplotlib.use('Agg') # GUI 없이 파일로 저장하는 백엔드
@@ -560,8 +565,9 @@ for i in keep: # 살아남은 박스만 그리기
 
 
 plt.tight_layout()
-plt.savefig('nms_result.png', dpi=100) # 결과 이미지 저장
-print("\n시각화 저장: nms_result.png")
+os.makedirs('outputs', exist_ok=True) # 결과물 폴더 (시각화를 수업 자료와 분리)
+plt.savefig('outputs/nms_result.png', dpi=100) # 결과 이미지 저장
+print("\n시각화 저장: outputs/nms_result.png")
 print("\n 실습 3 완료!")
 ```
 

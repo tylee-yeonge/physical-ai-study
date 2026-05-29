@@ -76,6 +76,7 @@ week8_depth_anything/
 HuggingFace Pipeline으로 Depth Anything 추론
 가장 간단한 방법!
 """
+import os
 from transformers import pipeline
 from PIL import Image
 import numpy as np
@@ -112,8 +113,9 @@ def infer_with_pipeline(image_path, model_name="depth-anything/Depth-Anything-V2
 
 
     # 저장
-    depth_image.save("depth_pipeline_result.png") # 깊이맵 이미지 파일로 저장
-    print(f"저장: depth_pipeline_result.png")
+    os.makedirs("outputs", exist_ok=True) # 결과물 폴더 (수업 자료와 분리)
+    depth_image.save("outputs/depth_pipeline_result.png") # 깊이맵 이미지 파일로 저장
+    print(f"저장: outputs/depth_pipeline_result.png")
 
 
     return depth_array
@@ -370,6 +372,7 @@ if __name__ == "__main__":
 """
 깊이맵 시각화: 다양한 컬러맵 및 표현 방법
 """
+import os
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
@@ -395,7 +398,7 @@ def depth_to_colormap(depth_map, colormap_name='magma'):
     return colored
 
 
-def visualize_side_by_side(image_path, depth_map, save_path="depth_comparison.png"):
+def visualize_side_by_side(image_path, depth_map, save_path="outputs/depth_comparison.png"):
     """원본 이미지와 깊이맵 나란히 시각화"""
     fig, axes = plt.subplots(1, 2, figsize=(14, 5)) # 그래프 2개 가로 배치
 
@@ -420,7 +423,7 @@ def visualize_side_by_side(image_path, depth_map, save_path="depth_comparison.pn
     plt.close()
 
 
-def visualize_colormaps(depth_map, save_path="depth_colormaps.png"):
+def visualize_colormaps(depth_map, save_path="outputs/depth_colormaps.png"):
     """다양한 컬러맵 비교"""
     colormaps = ['magma', 'inferno', 'turbo', 'viridis', 'plasma', 'gray'] # 비교할 컬러맵 6종
 
@@ -442,7 +445,7 @@ def visualize_colormaps(depth_map, save_path="depth_colormaps.png"):
     plt.close()
 
 
-def visualize_depth_histogram(depth_map, save_path="depth_histogram.png"):
+def visualize_depth_histogram(depth_map, save_path="outputs/depth_histogram.png"):
     """깊이값 분포 히스토그램"""
     fig, axes = plt.subplots(1, 2, figsize=(12, 4))
 
@@ -469,7 +472,7 @@ def visualize_depth_histogram(depth_map, save_path="depth_histogram.png"):
     plt.close()
 
 
-def create_overlay(image_path, depth_map, alpha=0.5, save_path="depth_overlay.png"):
+def create_overlay(image_path, depth_map, alpha=0.5, save_path="outputs/depth_overlay.png"):
     """원본 이미지 위에 깊이맵 오버레이"""
     # 원본 이미지 로드
     image = cv2.imread(image_path)
@@ -517,6 +520,7 @@ if __name__ == "__main__":
 
 
     # 시각화
+    os.makedirs("outputs", exist_ok=True) # 결과물 폴더 (시각화를 수업 자료와 분리)
     visualize_side_by_side(image_path, depth_map) # 원본+깊이맵 나란히
     visualize_colormaps(depth_map) # 컬러맵 6종 비교
     visualize_depth_histogram(depth_map) # 깊이값 히스토그램
@@ -550,6 +554,7 @@ depth 의 각 픽셀을 카메라 intrinsics 로 unproject 해 3D 점으로 만�
 
 PNG 의 colored depth 가 보여주지 못하는 "공간감" 을 회전/줌으로 직접 확인.
 """
+import os
 import numpy as np
 import rerun as rr # 3D 시각화 도구
 from PIL import Image
@@ -624,9 +629,10 @@ def main():
     rr.log("world/points", rr.Points3D(points, colors=colors, radii=0.005)) # 3D 점 구름 기록
 
     # 5) RRD 저장 (로컬 viewer 에서 열기)
-    rr.save("depth_pointcloud.rrd") # 결과를 .rrd 파일로 저장
-    print("저장: depth_pointcloud.rrd")
-    print("로컬에서 확인: rerun depth_pointcloud.rrd")
+    os.makedirs("outputs", exist_ok=True) # 결과물 폴더 (수업 자료와 분리)
+    rr.save("outputs/depth_pointcloud.rrd") # 결과를 .rrd 파일로 저장
+    print("저장: outputs/depth_pointcloud.rrd")
+    print("로컬에서 확인: rerun outputs/depth_pointcloud.rrd")
 
 
 if __name__ == "__main__":
@@ -637,7 +643,7 @@ if __name__ == "__main__":
 **실행 + 로컬 확인 절차** (ENVIRONMENT.md 의 방법 A):
 
 
-1. 원격에서 `python visualize_depth_3d.py` -> `depth_pointcloud.rrd` 생성
+1. 원격에서 `python visualize_depth_3d.py` -> `outputs/depth_pointcloud.rrd` 생성
 2. VSCode 파일트리에서 우클릭 -> Download -> 로컬로 받기
 3. 로컬 (맥북) 에서:
    ```bash
@@ -671,6 +677,7 @@ if __name__ == "__main__":
 Relative Depth → Metric Depth 변환 실험
 참조점 기반 스케일 보정
 """
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
@@ -789,8 +796,9 @@ def analyze_depth_regions(depth_map, image_path):
 
 
     plt.tight_layout()
-    plt.savefig("depth_analysis.png", dpi=150, bbox_inches='tight')
-    print(f"저장: depth_analysis.png")
+    os.makedirs("outputs", exist_ok=True) # 결과물 폴더 (분석 그래프를 수업 자료와 분리)
+    plt.savefig("outputs/depth_analysis.png", dpi=150, bbox_inches='tight')
+    print(f"저장: outputs/depth_analysis.png")
     plt.close()
 
 
@@ -845,6 +853,7 @@ if __name__ == "__main__":
 YOLO 객체 검출 + Depth Anything 깊이 결합
 (미리보기 - Week 11에서 본격 다룸)
 """
+import os
 import numpy as np
 import cv2
 from PIL import Image
@@ -920,8 +929,9 @@ def combine_yolo_depth(image_path, yolo_boxes, depth_map):
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
 
-    cv2.imwrite("yolo_depth_result.jpg", image) # 결과 이미지 저장
-    print(f"\n 저장: yolo_depth_result.jpg")
+    os.makedirs("outputs", exist_ok=True) # 결과물 폴더 (수업 자료와 분리)
+    cv2.imwrite("outputs/yolo_depth_result.jpg", image) # 결과 이미지 저장
+    print(f"\n 저장: outputs/yolo_depth_result.jpg")
 
 
 if __name__ == "__main__":
@@ -997,16 +1007,16 @@ Pipeline API 깊이 추론
   입력: data/indoor.jpg
   출력 크기: (480, 640)
   값 범위: [0, 255]
-  저장: depth_pipeline_result.png
+  저장: outputs/depth_pipeline_result.png
 
 
 ========================================
 깊이맵 시각화
 ========================================
-  저장: depth_comparison.png
-  저장: depth_colormaps.png
-  저장: depth_histogram.png
-  저장: depth_overlay.png
+  저장: outputs/depth_comparison.png
+  저장: outputs/depth_colormaps.png
+  저장: outputs/depth_histogram.png
+  저장: outputs/depth_overlay.png
   모든 시각화 완료!
 ```
 

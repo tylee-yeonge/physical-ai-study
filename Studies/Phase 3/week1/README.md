@@ -635,7 +635,7 @@ PIL 만으로 만들어 사용합니다. 외부 다운로드 없이 즉시 생�
 ```bash
 # week1 디렉토리에서
 python prepare_demo_dataset.py
-# -> ./demo_dataset/images/ 에 클래스당 20 장, 총 60 장 생성
+# -> ./data/demo_dataset/images/ 에 클래스당 20 장, 총 60 장 생성
 ```
 
 
@@ -684,7 +684,7 @@ class ShapeDataset(Dataset):
 
 
 # 빠른 확인: 한 샘플을 꺼내 shape/label 출력
-dataset = ShapeDataset("./demo_dataset/images")
+dataset = ShapeDataset("./data/demo_dataset/images")
 print(f"총 {len(dataset)} 장")  # -> 총 60 장
 image, label = dataset[0]
 print(f"첫 샘플 - 크기: {image.size}, 라벨: {label}")  # -> (64, 64), 0
@@ -709,7 +709,7 @@ transform = transforms.Compose([
     transforms.ToTensor(),
 ])
 
-dataset = ShapeDataset("./demo_dataset/images", transform=transform)
+dataset = ShapeDataset("./data/demo_dataset/images", transform=transform)
 dataloader = DataLoader(
     dataset,
     batch_size=8,       # 데이터가 60 장이라 8 정도가 적당

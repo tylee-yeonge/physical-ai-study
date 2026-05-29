@@ -267,6 +267,7 @@ python practice_autograd.py
 실습 3: CIFAR-10 CNN 학습
 목표: Dataset, DataLoader, 학습 루프, 평가를 직접 구현한다.
 """
+import os # 파일/디렉토리 작업
 import torch
 import torch.nn as nn # 신경망 레이어 (Conv, Linear, BatchNorm 등)
 import torch.optim as optim # 옵티마이저 (Adam, SGD 등)
@@ -285,6 +286,7 @@ print("=" * 50)
 # -- 설정 --
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') # GPU 있으면 GPU 사용
 print(f"디바이스: {device}")
+os.makedirs('outputs', exist_ok=True) # 결과물 폴더 (체크포인트/로그를 수업 자료와 분리)
 
 
 # -- 데이터 준비 --
@@ -360,7 +362,7 @@ scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=15, gamma=0.5) # 15 e
 
 
 # -- TensorBoard --
-writer = SummaryWriter('runs/cifar10_simple_cnn') # 학습 로그 저장 경로
+writer = SummaryWriter('outputs/runs/cifar10_simple_cnn') # 학습 로그 저장 경로
 
 
 # -- 학습 함수 --
@@ -454,7 +456,7 @@ for epoch in range(num_epochs):
             'model_state_dict': model.state_dict(), # 모델 가중치
             'optimizer_state_dict': optimizer.state_dict(), # 옵티마이저 상태
             'best_acc': best_acc, # 그때의 정확도
-        }, 'best_cifar10_cnn.pth')
+        }, 'outputs/best_cifar10_cnn.pth')
         marker = ' *'
     else:
         marker = ''
@@ -466,7 +468,7 @@ for epoch in range(num_epochs):
 
 writer.close()
 print(f"\n최고 검증 정확도: {best_acc:.2f}%")
-print("TensorBoard 확인: tensorboard --logdir=runs")
+print("TensorBoard 확인: tensorboard --logdir=outputs/runs")
 print("\n 실습 3 완료!")
 ```
 
@@ -477,7 +479,7 @@ python practice_cifar10.py
 
 
 # TensorBoard 확인
-tensorboard --logdir=runs
+tensorboard --logdir=outputs/runs
 ```
 
 
@@ -499,6 +501,7 @@ tensorboard --logdir=runs
 실습 4: ResNet-18 Fine-tuning
 목표: Pretrained 모델을 CIFAR-10에 맞게 수정하고 학습한다.
 """
+import os # 파일/디렉토리 작업
 import torch
 import torch.nn as nn # 신경망 레이어
 import torch.optim as optim # 옵티마이저
@@ -516,6 +519,7 @@ print("=" * 50)
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') # GPU 있으면 GPU 사용
+os.makedirs('outputs', exist_ok=True) # 결과물 폴더 (체크포인트/로그를 수업 자료와 분리)
 
 
 # -- 데이터 (ResNet용 224x224) --
@@ -570,7 +574,7 @@ criterion = nn.CrossEntropyLoss() # 손실 함수: 분류용 교차 엔트로피
 optimizer = optim.Adam(model.fc.parameters(), lr=0.001) # FC 파라미터만 최적화 대상
 
 
-writer = SummaryWriter('runs/cifar10_resnet18')
+writer = SummaryWriter('outputs/runs/cifar10_resnet18')
 
 
 # -- Phase 1: FC만 학습 (5 epochs) --
@@ -656,7 +660,7 @@ for epoch in range(15): # 전체 모델 15 epoch 학습
 
     if val_acc > best_acc: # 최고 기록 갱신 시 저장
         best_acc = val_acc
-        torch.save(model.state_dict(), 'best_resnet18_cifar10.pth') # 모델 가중치 저장
+        torch.save(model.state_dict(), 'outputs/best_resnet18_cifar10.pth') # 모델 가중치 저장
 
 
     writer.add_scalar('Loss/train', running_loss/len(trainloader), epoch + 5)
@@ -698,6 +702,7 @@ python practice_resnet18.py
 실습 5: 저장된 모델 로드 후 추론
 목표: Checkpoint를 로드하고 개별 이미지에 대해 추론한다.
 """
+import os # 파일/디렉토리 작업
 import torch
 import torch.nn as nn # 신경망 레이어
 import torchvision # 이미지 데이터셋/모델 모음
@@ -716,12 +721,13 @@ print("=" * 50)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') # GPU 있으면 GPU 사용
 classes = ('airplane', 'automobile', 'bird', 'cat', 'deer', # 클래스 인덱스 -> 이름 변환용
            'dog', 'frog', 'horse', 'ship', 'truck')
+os.makedirs('outputs', exist_ok=True) # 결과물 폴더 (추론 결과를 수업 자료와 분리)
 
 
 # -- 모델 로드 --
 model = models.resnet18() # 빈 ResNet-18 구조 생성 (가중치는 랜덤)
 model.fc = nn.Linear(model.fc.in_features, 10) # 학습 때와 동일하게 FC 교체 (구조가 같아야 가중치 로드 가능)
-model.load_state_dict(torch.load('best_resnet18_cifar10.pth', map_location=device)) # 저장된 학습 가중치 로드
+model.load_state_dict(torch.load('outputs/best_resnet18_cifar10.pth', map_location=device)) # 저장된 학습 가중치 로드
 model = model.to(device)
 model.eval() # 평가 모드 (추론 시 필수)
 print("모델 로드 완료!")
@@ -773,8 +779,8 @@ for i, idx in enumerate(indices):
 
 
 plt.tight_layout()
-plt.savefig('inference_results.png', dpi=100) # 결과를 이미지 파일로 저장
-print("추론 결과 저장: inference_results.png")
+plt.savefig('outputs/inference_results.png', dpi=100) # 결과를 이미지 파일로 저장
+print("추론 결과 저장: outputs/inference_results.png")
 print("\n 실습 5 완료!")
 ```
 

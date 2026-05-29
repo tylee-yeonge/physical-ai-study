@@ -46,6 +46,8 @@ python quiz_medium.py
 실습 1: YOLO11 기본 추론
 목표: Pretrained YOLO11으로 이미지/영상 추론을 수행한다.
 """
+import os # 파일/디렉토리 작업
+import urllib.request # URL 이미지 다운로드
 from ultralytics import YOLO # YOLO 모델 로드/추론/학습
 import cv2 # OpenCV (이미지 입출력)
 import numpy as np
@@ -64,10 +66,12 @@ model = YOLO('yolo11n.pt') # nano 모델 로드 (파일 없으면 자동 다운�
 print(f"\n모델 로드 완료: yolo11n.pt")
 
 
-# -- 테스트 이미지 생성 (실제로는 이미지 경로 사용) --
-# 실제 이미지가 있으면: results = model('image.jpg')
-# 여기서는 Ultralytics 내장 이미지 사용
-results = model('https://ultralytics.com/images/bus.jpg') # URL 이미지로 추론 실행
+# -- 테스트 이미지 준비 --
+# URL 이미지를 outputs 폴더에 받아두고 추론에 재사용 (cwd가 수업 자료로 오염되는 것 방지)
+os.makedirs('outputs', exist_ok=True) # 결과물 폴더 (수업 자료와 분리)
+img_path = 'outputs/bus.jpg' # 입력 이미지 저장 위치
+urllib.request.urlretrieve('https://ultralytics.com/images/bus.jpg', img_path) # 이미지 다운로드
+results = model(img_path) # 로컬 이미지로 추론 실행
 
 
 # -- 결과 분석 --
@@ -91,15 +95,14 @@ for result in results: # 입력 이미지별 결과 (여기선 1장)
 
     # 결과 시각화 저장
     annotated = result.plot() # 박스/라벨이 그려진 이미지 생성
-    cv2.imwrite('inference_result.jpg', annotated) # 파일로 저장
-    print("\n결과 저장: inference_result.jpg")
+    cv2.imwrite('outputs/inference_result.jpg', annotated) # outputs 폴더에 저장
+    print("\n결과 저장: outputs/inference_result.jpg")
 
 
 # -- Confidence 임계값 변경 --
 print("\n[2] Confidence 임계값 비교")
 for conf_thresh in [0.25, 0.50, 0.75]: # 임계값을 바꿔가며 검출 수 비교
-    results = model('https://ultralytics.com/images/bus.jpg',
-                     conf=conf_thresh, verbose=False) # conf 이상만 검출
+    results = model(img_path, conf=conf_thresh, verbose=False) # 받아둔 로컬 이미지 재사용
     n_detections = len(results[0].boxes)
     print(f"conf={conf_thresh:.2f}: {n_detections}개 검출")
 
@@ -129,6 +132,7 @@ python practice_inference.py
 목표: 기본 학습을 수행하고 결과를 분석한다.
 """
 from ultralytics import YOLO
+from ultralytics.utils import RUNS_DIR # ultralytics 기본 저장 위치 (physical-ai-study/runs)
 import os # 파일/디렉토리 작업
 
 
@@ -141,6 +145,12 @@ print("=" * 50)
 model = YOLO('yolo11n.pt') # 사전학습 nano 모델 로드
 
 
+# RUNS_DIR(= physical-ai-study/runs)의 부모인 physical-ai-study를 기준으로 week4
+# 경로를 조립한다. /workspace/study 같은 머신 종속 경로를 하드코딩하지 않아도 되고,
+# 절대 경로라 상대 경로처럼 runs/detect가 중첩되는 문제도 없다
+project_dir = str(RUNS_DIR.parent / 'Studies/Phase 3/week4/outputs/runs/detect')
+
+
 # -- 학습 --
 print("\n학습 시작...")
 results = model.train( # 학습 실행 (아래 인자로 학습 설정 전달)
@@ -149,7 +159,7 @@ results = model.train( # 학습 실행 (아래 인자로 학습 설정 전달)
     imgsz=640, # 입력 크기
     batch=16, # 배치 크기 (GPU 메모리에 맞게 조절)
     device=0, # GPU (CPU면 'cpu')
-    project='runs/detect', # 결과 저장 경로
+    project=project_dir, # 결과 저장 경로 (week4 하위 절대 경로)
     name='coco128_baseline', # 실험 이름
     patience=10, # Early stopping
     save=True, # 체크포인트 저장
@@ -160,7 +170,7 @@ results = model.train( # 학습 실행 (아래 인자로 학습 설정 전달)
 
 # -- 결과 확인 --
 print("\n[학습 결과]")
-result_dir = 'runs/detect/coco128_baseline' # 학습 결과가 저장된 폴더
+result_dir = f'{project_dir}/coco128_baseline' # 학습 결과가 저장된 폴더
 
 
 # 생성된 파일 확인
@@ -217,6 +227,7 @@ python practice_train_coco128.py
 목표: 주요 Hyperparameter를 변경하며 성능 차이를 비교한다.
 """
 from ultralytics import YOLO
+from ultralytics.utils import RUNS_DIR # ultralytics 기본 저장 위치 (physical-ai-study/runs)
 import json # 결과를 JSON 파일로 저장
 import os
 
@@ -224,6 +235,12 @@ import os
 print("=" * 50)
 print("실습 3: Hyperparameter 비교 실험")
 print("=" * 50)
+
+
+# RUNS_DIR(= physical-ai-study/runs)의 부모를 기준으로 week4 경로를 조립한다.
+# 머신 종속 경로 하드코딩을 피하면서 절대 경로라 runs/detect 중첩도 없다
+project_dir = str(RUNS_DIR.parent / 'Studies/Phase 3/week4/outputs/runs/detect')
+os.makedirs('outputs', exist_ok=True) # 결과물 폴더 (JSON을 수업 자료와 분리)
 
 
 # -- 실험 설정 --
@@ -270,7 +287,7 @@ for exp in experiments: # 실험을 하나씩 순서대로 실행
             imgsz=640,
             batch=16,
             device=0,
-            project='runs/detect',
+            project=project_dir, # 결과 저장 경로 (week4 하위 절대 경로)
             name=exp['name'],
             patience=10,
             plots=True,
@@ -280,7 +297,7 @@ for exp in experiments: # 실험을 하나씩 순서대로 실행
 
 
         # 평가
-        best_path = f'runs/detect/{exp["name"]}/weights/best.pt'
+        best_path = f'{project_dir}/{exp["name"]}/weights/best.pt'
         if os.path.exists(best_path):
             eval_model = YOLO(best_path) # 학습된 best 가중치 로드
             metrics = eval_model.val(verbose=False) # 검증셋 평가
@@ -316,9 +333,9 @@ for r in results_summary: # 실험별 성능을 표 형태로 출력
 
 
 # 결과 저장
-with open('experiment_results.json', 'w') as f:
+with open('outputs/experiment_results.json', 'w') as f:
     json.dump(results_summary, f, indent=2, ensure_ascii=False) # 결과를 JSON 파일로 저장
-print("\n결과 저장: experiment_results.json")
+print("\n결과 저장: outputs/experiment_results.json")
 
 
 print("\n 실습 3 완료!")
@@ -364,7 +381,7 @@ print("=" * 50)
 
 # -- 1. 디렉토리 구조 생성 --
 print("\n[1] 디렉토리 구조 생성")
-base_dir = 'custom_dataset'
+base_dir = 'outputs/custom_dataset' # 생성 데이터셋을 outputs 폴더에 (수업 자료와 분리)
 for split in ['train', 'val']: # 학습/검증 각각 폴더 생성
     os.makedirs(f'{base_dir}/images/{split}', exist_ok=True) # 이미지 폴더
     os.makedirs(f'{base_dir}/labels/{split}', exist_ok=True) # 라벨 폴더
@@ -525,8 +542,8 @@ for line in lines: # 각 라벨을 이미지 위에 박스로 그리기
 
 ax.set_title('YOLO Label Visualization')
 plt.tight_layout()
-plt.savefig('label_visualization.png', dpi=100) # 결과 이미지 저장
-print("저장: label_visualization.png")
+plt.savefig('outputs/label_visualization.png', dpi=100) # 결과 이미지 저장
+print("저장: outputs/label_visualization.png")
 
 
 print("\n 실습 4 완료!")
@@ -554,6 +571,7 @@ python practice_custom_dataset.py
 목표: 학습 결과 파일을 분석하고 개선점을 도출한다.
 """
 from ultralytics import YOLO
+from ultralytics.utils import RUNS_DIR # ultralytics 기본 저장 위치 (physical-ai-study/runs)
 import csv # CSV 파일 읽기
 import os
 import matplotlib
@@ -570,8 +588,11 @@ print("=" * 50)
 print("\n[1] results.csv 분석")
 
 
-result_dir = 'runs/detect/coco128_baseline'
+# 실습 2와 동일하게 RUNS_DIR.parent(physical-ai-study) 기준으로 week4 경로 조립
+project_dir = str(RUNS_DIR.parent / 'Studies/Phase 3/week4/outputs/runs/detect')
+result_dir = f'{project_dir}/coco128_baseline'
 csv_path = f'{result_dir}/results.csv' # 학습 중 epoch별 지표가 기록된 파일
+os.makedirs('outputs', exist_ok=True) # 결과물 폴더 (분석 그래프를 수업 자료와 분리)
 
 
 if os.path.exists(csv_path):
@@ -633,8 +654,8 @@ if os.path.exists(csv_path):
 
 
     plt.tight_layout()
-    plt.savefig('training_analysis.png', dpi=100) # 결과 이미지 저장
-    print("학습 커브 저장: training_analysis.png")
+    plt.savefig('outputs/training_analysis.png', dpi=100) # 결과 이미지 저장
+    print("학습 커브 저장: outputs/training_analysis.png")
     print(f"최종 mAP@0.5: {val_map50[-1]:.4f}")
     print(f"최종 mAP@0.5:0.95: {val_map50_95[-1]:.4f}")
 else:

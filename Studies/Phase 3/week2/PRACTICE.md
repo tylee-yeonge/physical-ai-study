@@ -153,9 +153,11 @@ import torch
 
 
 # W&B 동작 모드 선택 (README §2.3 표 참고)
-# - offline (실습 권장): 로컬 ./wandb/ 폴더에만 기록, 계정/로그인 불필요
+# - offline (실습 권장): 로컬 outputs/wandb/ 폴더에만 기록, 계정/로그인 불필요
 # - online: 아래 줄을 주석 처리하면 클라우드에 기록 (wandb login 필요)
 # - disabled: "offline" 대신 "disabled" 를 넣으면 모든 wandb 호출이 no-op
+os.makedirs("outputs", exist_ok=True) # 결과물 폴더 (wandb 로그를 수업 자료와 분리)
+os.environ["WANDB_DIR"] = "outputs" # wandb가 outputs/wandb/ 에 기록하도록 (cwd 오염 방지)
 os.environ["WANDB_MODE"] = "offline" # wandb.init() 보다 앞에서 설정해야 적용됨
 
 

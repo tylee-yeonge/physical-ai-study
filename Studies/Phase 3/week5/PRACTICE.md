@@ -233,6 +233,7 @@ if __name__ == "__main__":
 """
 ONNX Runtime으로 YOLO11 추론
 """
+import os # 파일/디렉토리 작업
 import onnxruntime as ort # ONNX 모델 추론 엔진
 import numpy as np
 import cv2 # OpenCV (이미지 처리)
@@ -403,8 +404,9 @@ if __name__ == "__main__":
 
     # 시각화
     result = draw_detections(image.copy(), boxes, scores, class_ids) # 박스 그린 이미지
-    cv2.imwrite("result_onnx.jpg", result) # 파일로 저장
-    print("결과 저장: result_onnx.jpg")
+    os.makedirs("outputs", exist_ok=True) # 결과물 폴더 (수업 자료와 분리)
+    cv2.imwrite("outputs/result_onnx.jpg", result) # 파일로 저장
+    print("결과 저장: outputs/result_onnx.jpg")
 ```
 
 
