@@ -201,6 +201,7 @@ results = model.train( # 학습 실행 (아래 인자로 학습 설정 전달)
     device=0, # GPU (CPU면 'cpu')
     project=project_dir, # 결과 저장 경로 (week4 하위 절대 경로)
     name='coco128_baseline', # 실험 이름
+    exist_ok=True, # 같은 이름 폴더에 덮어쓴다. 미지정 시 재실행마다 coco128_baseline-2처럼 자동 증가해, coco128_baseline을 하드코딩으로 읽는 실습 5 분석이 옛 결과를 읽는다
     patience=10, # Early stopping
     save=True, # 체크포인트 저장
     plots=True, # 결과 시각화
@@ -210,7 +211,7 @@ results = model.train( # 학습 실행 (아래 인자로 학습 설정 전달)
 
 # -- 결과 확인 --
 print("\n[학습 결과]")
-result_dir = f'{project_dir}/coco128_baseline' # 학습 결과가 저장된 폴더
+result_dir = str(results.save_dir) # 경로를 재조립하지 말고 train이 실제로 저장한 디렉터리를 쓴다
 
 
 # 생성된 파일 확인
@@ -223,7 +224,7 @@ if os.path.exists(result_dir): # 결과 폴더가 있으면
 # -- 평가 --
 print("\n[모델 평가]")
 best_model = YOLO(f'{result_dir}/weights/best.pt') # 학습 중 가장 좋았던 가중치 로드
-metrics = best_model.val(project=project_dir, name='coco128_baseline_val') # 검증셋으로 평가 (project 미지정 시 루트 runs/로 샘)
+metrics = best_model.val(project=project_dir, name='coco128_baseline_val', exist_ok=True) # 검증셋으로 평가 (project 미지정 시 루트 runs/로 샘)
 
 
 print(f"\n mAP@0.5: {metrics.box.map50:.4f}") # IoU 0.5 기준 평균 정밀도
@@ -274,8 +275,10 @@ python practice_train_coco128.py
 
 ### 핵심 포인트
 
+- **lr 실험을 하려면 `optimizer`를 명시해야 한다.** 기본값 `optimizer='auto'`는 클래스 수 기반으로 `lr0`와 `momentum`을 자체 계산해 **사용자가 넘긴 `lr0`를 덮어쓴다**(ultralytics가 "ignoring lr0=..." 로그를 찍는다). 그래서 auto 상태로 `lr0`만 0.001/0.02로 바꾸면 두 실험이 완전히 동일한 결과가 나온다. `optimizer='SGD'`처럼 명시해야 `lr0`가 실제로 적용된다.
+- **평가 경로는 `result.save_dir`로 받는다.** `name='exp_lr_low'`로 학습할 때 같은 이름 디렉터리가 이미 있으면 `exist_ok=False`(기본값) 때문에 `exp_lr_low-2`로 자동 증가한다. 경로를 `f'.../{name}/...'`로 하드코딩하면 재실행 시 학습은 새 폴더에 저장되는데 평가는 옛 폴더의 가중치를 읽는다. `exist_ok=True`로 덮어쓰거나, train이 반환한 `result.save_dir`를 그대로 쓰면 항상 올바른 폴더를 가리킨다.
 - `try`/`except`로 실패한 실험도 0점으로 기록하고 계속 진행한다. 한 실험이 깨져도 전체가 멈추지 않게 하기 위함이다.
-- COCO128은 128장이라 실험 간 mAP 차이가 작거나 불안정할 수 있다. 하이퍼파라미터 튜닝보다 데이터가 중요하다는 것을 체감하는 것이 진짜 목적이다.
+- COCO128은 128장이라 실험 간 mAP 차이가 작거나 불안정할 수 있다. 하이퍼파라미터 튜닝보다 데이터가 중요하다는 것을 체감하는 것이 진짜 목적이다. 또한 COCO128은 train과 val이 같은 128장이라, 여기서 나오는 mAP는 일반화 성능이 아니라 학습셋 적합도다. 실험 간 상대 비교 용도로만 본다.
 
 
 **파일명**: `practice_hyperparameter.py`
@@ -349,6 +352,8 @@ for exp in experiments: # 실험을 하나씩 순서대로 실행
             device=0,
             project=project_dir, # 결과 저장 경로 (week4 하위 절대 경로)
             name=exp['name'],
+            optimizer='SGD', # optimizer=auto(기본값)는 lr0/momentum을 자체 계산해 덮어쓴다. lr 실험이 의미를 가지려면 옵티마이저를 명시해야 lr0가 실제로 적용된다
+            exist_ok=True, # 같은 이름 디렉터리에 덮어쓴다. 미지정 시 재실행마다 exp_lr_low-2처럼 자동 증가해 아래 평가가 옛 가중치를 읽는다
             patience=10,
             plots=True,
             verbose=False,
@@ -357,10 +362,10 @@ for exp in experiments: # 실험을 하나씩 순서대로 실행
 
 
         # 평가
-        best_path = f'{project_dir}/{exp["name"]}/weights/best.pt'
-        if os.path.exists(best_path):
+        best_path = result.save_dir / 'weights' / 'best.pt' # 경로 문자열을 재조립하지 말고 train이 실제로 저장한 디렉터리를 쓴다
+        if best_path.exists():
             eval_model = YOLO(best_path) # 학습된 best 가중치 로드
-            metrics = eval_model.val(verbose=False, project=project_dir, name=f'{exp["name"]}_val') # 검증셋 평가 (project 미지정 시 루트 runs/로 샘)
+            metrics = eval_model.val(verbose=False, project=project_dir, name=f'{exp["name"]}_val', exist_ok=True) # 검증셋 평가 (project 미지정 시 루트 runs/로 샘)
 
 
             results_summary.append({ # 이 실험의 성능 지표 기록

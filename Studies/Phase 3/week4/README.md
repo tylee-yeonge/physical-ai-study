@@ -297,8 +297,8 @@ model.train(
     device=0,              # GPU 번호
 
     # -- 최적화 (모델 가중치를 갱신하는 방식) --
-    optimizer="auto",      # 옵티마이저 (SGD, Adam, AdamW, auto)
-    lr0=0.01,              # 초기 학습률 (한 번에 가중치를 얼마나 바꿀지)
+    optimizer="auto",      # 옵티마이저 (SGD, Adam, AdamW, auto). 주의: auto면 lr0/momentum을 자체 계산해 아래 값을 무시한다. lr0를 직접 지정하려면 SGD 등으로 명시할 것
+    lr0=0.01,              # 초기 학습률 (한 번에 가중치를 얼마나 바꿀지). optimizer=auto일 때는 무시됨 (위 주의 참고)
     lrf=0.01,              # 최종 학습률 비율 (마지막엔 lr0 * lrf 까지 감소)
     momentum=0.937,        # SGD momentum (이전 갱신 방향을 얼마나 유지할지)
     weight_decay=0.0005,   # 가중치 감쇠 (값이 너무 커지지 않게 억제, 과적합 방지)
