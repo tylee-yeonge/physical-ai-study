@@ -46,7 +46,7 @@ def problem4_review_timing():
     print("질문: 2026.11 분기 재평가 시 가장 중요한 판단 기준?\n")
     print("보기:")
     print("  A) Phase 4 코드 line 수")
-    print("  B) 시장 시그널 + #4 진행률 -> 본격 지원 시점 (2027.07 vs 2028.03)")
+    print("  B) 스파이크 결과 + 시장 신호 probe -> 2028.03 fallback 여부 (실지원 2027.02 개시)")
     print("  C) 블로그 조회수")
     print("  D) LinkedIn 팔로워")
 

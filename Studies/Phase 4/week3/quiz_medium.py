@@ -115,7 +115,7 @@ def problem3_write_differentiation_sentence():
 
     조건:
       1) 80~150 자
-      2) "양산" / "9년" / "AMR ROS" / "펌웨어" / "자동차 R&D 보조" 중 1개 이상
+      2) "양산" / "5년" / "AMR ROS" / "펌웨어" 중 1개 이상
       3) RT-2 또는 VLA 의 한계 / 비용을 본인 강점으로 연결
 
     TODO: my_sentence 에 본인의 한 문장을 작성.
@@ -136,7 +136,7 @@ def problem3_write_differentiation_sentence():
         "80~150자": 80 <= len(my_sentence) <= 150,
         "본인 경력 키워드 1개": any(
             kw in my_sentence
-            for kw in ["양산", "9년", "AMR", "ROS", "펌웨어", "자동차"]
+            for kw in ["양산", "5년", "AMR", "ROS", "펌웨어"]
         ),
         "RT-2/VLA 한계 연결": any(
             kw in my_sentence

@@ -65,13 +65,13 @@ Shotcut 의 Filters > Text: Simple 또는 Filters > Subtitles:
 
 ```
 0:00 -> 0:05 | (인트로) "Phase 4 산출물 #2: OpenVLA -> ROS2"
-0:05 -> 0:10 | "AMR ROS 양산 SW 엔지니어 9년"
+0:05 -> 0:10 | "AMR ROS 양산 SW 엔지니어 실무 5년"
 0:10 -> 0:15 | "OpenVLA HuggingFace inference"
 0:15 -> 0:25 | "ROS2 Humble + vla_node 패키지"
 0:25 -> 0:40 | "실시간 동작 (Rerun)"
 0:40 -> 0:50 | "RTX 4070 4-bit nf4 / mean 165ms / 6Hz"
 0:50 -> 0:55 | "양산 의미: hierarchical 구조 필수"
-0:55 -> 0:60 | "다음: Phase 7 Real-to-Sim-to-Real (2027.07)"
+0:55 -> 0:60 | "다음: Phase 7 Real-to-Sim-to-Real (2027.08~)"
 ```
 
 
@@ -106,7 +106,7 @@ Shotcut 의 Filters > Text: Simple 또는 Filters > Subtitles:
 
 작은 글씨 (아래):
   AMR ROS Production SW + Physical AI Integration
-  9-year SW Engineer
+  AMR ROS SW Engineer (since 2021.06)
 ```
 
 
@@ -120,7 +120,7 @@ Shotcut 의 Filters > Text: Simple 또는 Filters > Subtitles:
 큰 글씨 (가운데):
   다음 산출물:
   Real-to-Sim-to-Real
-  (Phase 7, 2027.07)
+  (Phase 7, 2027.08~)
 
 
 작은 글씨 (아래):

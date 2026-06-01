@@ -32,8 +32,8 @@ def p3():
     """분기 재평가 #2 의 결정 매트릭스"""
     print("\n문제 3: 분기 재평가 #2 의 4 시나리오")
     print()
-    print("  A) Phase 6 정상 + 신 VLA 모델 X -> 원안 (2027.07 본격)")
-    print("  B) Phase 6 정상 + 신 모델 등장 -> 모델 갱신 + 원안")
+    print("  A) Phase 6 정상 + 신 VLA 모델 X -> 실지원 지속 (2027.02 개시)")
+    print("  B) Phase 6 정상 + 신 모델 등장 -> 모델 갱신 + 실지원 지속")
     print("  C) Phase 6 지연 -> Phase 7 압축 또는 fallback")
     print("  D) 시장 정체 -> fallback 2028.03")
     print()

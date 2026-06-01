@@ -13,9 +13,9 @@ def p1():
     print("  A: ?\n  B: ?\n  C: ?\n  D: ?")
     print()
     print("  옵션:")
-    print("  1) 원안 (2027.07 본격 지원)")
-    print("  2) 모델 갱신 + 원안")
-    print("  3) Phase 6 시간 줄여 원안")
+    print("  1) 실지원 지속 (2027.02 개시)")
+    print("  2) 모델 갱신 + 실지원 지속")
+    print("  3) Phase 6 시간 줄여 실지원 지속")
     print("  4) fallback 2028.03")
 
 

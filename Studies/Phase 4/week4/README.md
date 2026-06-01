@@ -29,13 +29,13 @@
 ## 시작하기 전에 — OpenVLA 가 본 로드맵에 가지는 의미
 
 
-OpenVLA 는 본 로드맵 **산출물 #2 (2026.12), #4 결정타 (2027.07) 모두에서 직접 사용** 하는 모델이다:
+OpenVLA 는 본 로드맵 **산출물 #2 (2026.12), #4 강화 카드 (2027.08~) 모두에서 직접 사용** 하는 모델이다:
 
 
 | 산출물 | OpenVLA 의 역할 |
 |---|---|
 | #2 (2026.12) | OpenVLA HuggingFace inference → ROS2 토픽 minimal demo (week 8-12) |
-| #4 (2027.07) | OpenVLA fork + ROS2 노드 + 자작 6DOF 팔 통합 (Real-to-Sim-to-Real) |
+| #4 (2027.08~) | OpenVLA fork + ROS2 노드 + 자작 6DOF 팔 통합 (Real-to-Sim-to-Real) |
 
 
 즉 이번 주의 정독 깊이 = 산출물 #4 의 깊이. RT-2 (week 1-3) 보다 더 정밀하게 읽어야 한다.

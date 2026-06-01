@@ -249,7 +249,7 @@ ros2 run vla_node rerun_logger
 [화면: Title 카드]
 "Phase 4 산출물 #2"
 "OpenVLA -> ROS2 minimal demo"
-"AMR ROS 양산 SW + Physical AI 통합 - 9년 SW 엔지니어"
+"AMR ROS 양산 SW + Physical AI 통합 - AMR ROS 실무 5년 (2021.06~) SW 엔지니어"
 
 
 [narration]

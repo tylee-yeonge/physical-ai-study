@@ -8,7 +8,7 @@ def main():
     print("Week 5 Quiz - Medium (ONNX 변환)")
     print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
 
-    print("Q1. ONNX Runtime의 그래프 최적화가 PyTorch보다 빠른 이유를")
+    print("Q1. ONNX Runtime이 PyTorch보다 빠른 이유를")
     print("    3가지 이상 설명하세요.")
     print("   설명:\n")
 

@@ -60,15 +60,15 @@ def problem3_solution():
     print("=" * 60 + "\n")
 
     examples = [
-        "9년의 AMR ROS 양산 경험에서 봤을 때, RT-2 의 200ms latency 와 "
+        "AMR ROS 양산 실무 5년 경험에서 봤을 때, RT-2 의 200ms latency 와 "
         "0.78mm quantization step 은 안전 인터록과 hierarchical "
         "structure 없이는 양산 시점에 그대로 사용할 수 없다.",
 
-        "자동차 R&D 보조 와 AMR 펌웨어 경력 관점에서, VLA 의 closed-source "
+        "펌웨어 (상용차 클러치 반자동화) 와 AMR ROS 경력 관점에서, VLA 의 closed-source "
         "weight 와 큰 GPU 의존성은 단순한 기술적 결함이 아니라 양산 비용 "
         "구조의 본질적 변화를 의미한다.",
 
-        "AMR 양산 9년 동안 ROS 노드의 5ms latency 와 싸워온 입장에서, "
+        "AMR 양산 ROS 5년 동안 노드의 5ms latency 와 싸워온 입장에서, "
         "RT-2 의 200ms 는 '느린 brain + 빠른 body' hierarchical 구조 "
         "설계가 필수임을 명확히 보여준다.",
     ]
@@ -80,11 +80,11 @@ def problem3_solution():
         print()
 
     print("  [tip] 차별화 한 문장의 패턴:")
-    print("       1) 본인 경력 (9년 / AMR / 펌웨어 / 자동차)")
+    print("       1) 본인 경력 (AMR ROS 5년 / 펌웨어)")
     print("       2) 그 경력에서 보이는 RT-2 의 한계")
     print("       3) 이 한계가 양산에서 의미하는 구조적 결론")
     print()
-    print("       이 한 문장이 본인의 9년이 응축된 면접 hook.")
+    print("       이 한 문장이 본인의 경력이 응축된 면접 hook.")
     print("       정성껏 다듬을 가치가 있다.")
 
 

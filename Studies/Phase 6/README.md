@@ -1,10 +1,10 @@
 # Studies/Phase 6 — Isaac Sim + 디지털 트윈
 
 
-> **학습 기간**: 2027.02-05 (3개월, 12주)
+> **학습 기간**: 2027.05-07 (3개월, 12주)
 > **마스터 가이드**: [`Roadmap/Phase 6.md`](../../Roadmap/Phase%206.md)
 > **자료 미리 작성됨** — 진입 시 (2027.02) 다시 체크 후 학습 시작
-> **병행 트랙**: [`Studies/Hardware-Arm/`](../Hardware-Arm/) Stage 2 (2027.02-04)
+> **병행 트랙**: [`Studies/Hardware-Arm/`](../Hardware-Arm/) Stage 2 (2027.04-06)
 
 
 ---

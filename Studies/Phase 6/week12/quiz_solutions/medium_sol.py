@@ -20,8 +20,8 @@ def p2():
 def p3():
     print("\n정답: 분기 재평가 #2 매트릭스")
     print()
-    print("  Best case (A): Phase 6 정상 + 신 모델 X -> 원안 (2027.07)")
-    print("  Updated (B): 신 모델 등장 -> 모델 갱신 + 원안")
+    print("  Best case (A): Phase 6 정상 + 신 모델 X -> 실지원 지속 (2027.02 개시)")
+    print("  Updated (B): 신 모델 등장 -> 모델 갱신 + 실지원 지속")
     print("  Compressed (C): Phase 6 지연 -> Phase 7 4주 압축")
     print("  Fallback (D): 시장 정체 -> 2028.03 + Jetson 옵션")
 

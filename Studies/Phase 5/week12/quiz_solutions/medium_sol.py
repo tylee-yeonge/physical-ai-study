@@ -4,10 +4,10 @@
 def p1():
     print("\n정답: 분기 재평가 매트릭스")
     print()
-    print("  A) OpenVLA + 정상 + 좋은 시그널 -> 1) 원안")
-    print("  B) 신 모델 + 정상 -> 2) 모델 갱신 + 원안")
+    print("  A) OpenVLA + 정상 + 좋은 시그널 -> 1) 실지원 지속")
+    print("  B) 신 모델 + 정상 -> 2) 모델 갱신 + 실지원 지속")
     print("     (Phase 7 의 산출물 #4 backbone 변경)")
-    print("  C) Stage 2 지연 -> 3) Phase 6 시간 줄여 원안")
+    print("  C) Stage 2 지연 -> 3) Phase 6 시간 줄여 실지원 지속")
     print("     또는 4) fallback 시 충분 시간")
     print("  D) 시장 정체 -> 4) fallback 2028.03 + 산출물 보강")
 

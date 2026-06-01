@@ -1,7 +1,7 @@
 # Studies/Phase 5 — Foundation Model 기초 (ViT / CLIP / DINOv2 / SigLIP)
 
 
-> **학습 기간**: 2026.12-2027.02 (3개월, 12주)
+> **학습 기간**: 2027.02-04 (3개월, 12주)
 > **마스터 가이드**: [`Roadmap/Phase 5.md`](../../Roadmap/Phase%205.md)
 > **자료 미리 작성됨** — 진입 시 (2026.12) 다시 체크 후 학습 시작
 

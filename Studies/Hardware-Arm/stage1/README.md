@@ -1,7 +1,7 @@
 # Hardware-Arm Stage 1 - 가이드
 
 
-> **기간**: 2026.10-12 (3개월)
+> **기간**: 2027.01-02 (2개월, 스파이크로 디리스크된 본 빌드)
 > **목표**: Dynamixel 2-3DOF + URDF + ROS2 + Isaac Sim 임포트
 > **30-50만원**
 
@@ -13,9 +13,9 @@
 
 
 ```
-2026.10: Dynamixel + U2D2 구매 + 조립
-2026.11: URDF + ROS2 드라이버
-2026.12: pick-and-place + Sim 임포트 + 영상
+2027.01 전반: Dynamixel + U2D2 구매 (스파이크 부품 재활용) + URDF + ROS2 드라이버
+2027.01 후반: pick-and-place (programmed motion)
+2027.02: Isaac Sim 임포트 + 1분 영상
         -> 산출물 #2.5
 ```
 
@@ -40,19 +40,19 @@
 ## 단계별 진행
 
 
-### 2026.10: 부품 + 조립
+### 2027.01 전반: 부품 + 조립
 - XL330 2-3 + U2D2 구매
 - 3D 프린트 부품 (open-source fork)
 - Dynamixel Wizard 동작 확인
 
 
-### 2026.11: URDF + ROS2
+### 2027.01 후반: URDF + ROS2
 - URDF/XACRO 작성
 - RViz 검증
 - dynamixel_hardware 패키지
 
 
-### 2026.12: 동작 + Sim
+### 2027.02: 동작 + Sim
 - pick-and-place (programmed motion)
 - Isaac Sim URDF 임포트
 - 1분 영상 -> 산출물 #2.5

@@ -97,7 +97,7 @@ def problem4_solution():
     print("     별도의 low-frequency policy 와 결합되어야 양산 시점에 사용 가능' 같은")
     print("    '실무 인과 관계' 가 박사 블로그에는 거의 없다.")
     print()
-    print("  [tip] 이 한 문단이 본인의 9년 경력 (자동차 R&D 보조 + 펌웨어 + AMR ROS) 의")
+    print("  [tip] 이 한 문단이 본인의 경력 (AMR ROS 실무 5년 + 펌웨어 2.5년) 의")
     print("       유일한 차별화 메시지가 된다. 정성껏 작성.")
 
 

@@ -11,7 +11,7 @@ git push --tags
 
 # 메인 README 업데이트 (Portfolio 표에 #4 추가)
 # LinkedIn post 작성 + 발행
-# Portfolio Sprint 진입
+# 포트폴리오/이력서 갱신
 ```
 
 
@@ -20,5 +20,5 @@ git push --tags
 - [ ] 메인 README 업데이트
 - [ ] LinkedIn post 공개
 - [ ] Phase 7 retro 작성
-- [ ] Portfolio Sprint 진입 준비
+- [ ] 포트폴리오/이력서 갱신
 - [ ] 분기 재평가 #3 캘린더 (2027.11) 등록

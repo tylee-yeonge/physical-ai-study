@@ -40,7 +40,10 @@ def main():
     print("        opset_version=12,           # 12 이상 권장")
     print("        input_names=['input'],      # dynamic_axes 키와 일치시킴")
     print("        output_names=['output'],")
-    print("        dynamic_axes={'input': {0: 'batch', 2: 'height', 3: 'width'}}")
+    print("        dynamic_axes={")
+    print("            'input':  {0: 'batch', 2: 'height', 3: 'width'},")
+    print("            'output': {0: 'batch'},  # 입력 batch를 가변으로 두면 출력 batch도 가변 선언")
+    print("        }")
     print("    )")
 
     print("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")

@@ -1,11 +1,11 @@
-# Phase 3 : Detection + Depth → PC TensorRT + ROS2 노드
+# Phase 3: Detection + Depth → PC TensorRT + ROS2 노드
 
 
-> **기간**: 약 2개월 (2026.06-08, F안)
-> **목표**: Detection + Depth 의 핵심 + Foundation Model latency 사전 학습용 PC TensorRT 경험
+> **기간**: 약 2개월 (2026.06-08)
+> **목표**: Detection + Depth 의 핵심 + PC TensorRT latency 측정을 갖춘 독립 완성품 #1 (Foundation Model latency 감각의 토대이기도 함)
 > **언어**: **Python** (학습) + **C++/TensorRT** (PC 배포) + **ROS2** (노드 래퍼)
 > **하드웨어**: Ubuntu PC (RTX 4070) — 주 학습/실험/배포 장비 / Jetson Orin Nano — **Phase 7 이후 옵션 #5**
-> **주간 시간**: 약 8-12시간 (출장 주 50% 보정)
+> **주간 시간**: 약 6-8시간 (출장 주 보정)
 
 
 ---
@@ -20,13 +20,13 @@
 - 통합 시스템: Detection + Depth → 3D 위치 추정 + ROS2 노드 래퍼
 
 
-**산출물 #1**: YOLO11 + Depth Anything V2 → **PC TensorRT 추론 + ROS2 노드 래퍼 + 1분 데모 영상** (2026.08까지 `physical-ai-study` 레포에 공개. Jetson 실기 배포는 Phase 7 이후 옵션 #5)
+**산출물 #1**: YOLO11 + Depth Anything V2 → **PC TensorRT 추론 + ROS2 노드 래퍼 + latency 측정(ms) + 분석 글 + 1분 데모 영상** (2026.08까지 `physical-ai-study` 레포에 공개. #4 없이도 단독으로 면접에 들고 갈 수 있는 독립 완성품. Jetson 실기 배포는 Phase 7 이후 옵션 #5)
 
 
 > **언어 전략**: 학습은 Python, 배포는 C++/TensorRT (PC), 통합은 ROS2.
 
 
-> **포트폴리오 통합 원칙 (v3 변경)**: 별도 Repo (`robotics-perception-portfolio`) 분리 폐기. `physical-ai-study` 단일 레포에 *Studies/* (학습 노트) 와 *Portfolio/* (또는 산출물 디렉토리) 를 디렉토리 수준에서만 분리. 채용 담당자 진입점은 README → 산출물 디렉토리.
+> **포트폴리오 통합 원칙**: `physical-ai-study` 단일 레포에 *Studies/* (학습 노트) 와 *Portfolio/* (산출물 디렉토리) 를 디렉토리 수준에서 분리. 채용 담당자 진입점은 README → 산출물 디렉토리.
 
 
 ---
@@ -48,7 +48,7 @@
 - 상세: [ENVIRONMENT.md](../ENVIRONMENT.md)
 
 
-> Phase 3 (축소판) 에서는 **PC TensorRT + ROS2 노드까지만**. Jetson 실기 배포는 전체 학습 (Phase 2-7) 완료 후 옵션 (#5).
+> Phase 3 에서는 **PC TensorRT + ROS2 노드까지만**. Jetson 실기 배포는 전체 학습 (Phase 2-7) 완료 후 옵션 (#5).
 
 
 ---
@@ -64,7 +64,7 @@
 - [ ] 2순위 3개사 JD 정독 — 대기업 자율주행 SW 자회사 (CV/ML) / ADAS 양산 SW 중견기업 / Dynamixel 제조사 + 휴머노이드 양산 상장사 (모터 직접 매칭)
 - [ ] 공통 요구 스택 추출 → 학습 우선순위 매핑 표 작성
 - [ ] **Phase 3 산출물 #1 스펙 1페이지 확정** (타깃 모델 / 데이터 / 수치 목표 / 데모 형태, Jetson 제외)
-- [x] `physical-ai-study` 레포 Public 전환 완료 (별도 Portfolio repo 분리 폐기)
+- [x] `physical-ai-study` 레포 Public 전환 완료 (별도 Portfolio repo 사용 안 함)
 - [ ] **TensorRT C++ Quick Start 1회 따라하기** — Section 5.2 Week 6 (PC TensorRT 배포) 학습 곡선 단축용 사전 워밍업
   - 공식 가이드: https://docs.nvidia.com/deeplearning/tensorrt/latest/getting-started/quick-start-guide.html
   - 샘플 코드 (Semantic Segmentation, C++): https://github.com/NVIDIA/TensorRT/tree/main/quickstart/SemanticSegmentation
@@ -266,7 +266,7 @@ trtexec --onnx=yolo11n.onnx \
 
 
 #### 성능 측정 (PC, RTX 4070 기준)
-- [ ] Latency 분석 (전처리/추론/후처리) — Foundation Model latency 사전 학습
+- [ ] Latency 분석 (전처리/추론/후처리) — #1 의 측정 증거 + Foundation Model latency 감각
 - [ ] Multi-threading (카메라 읽기 병렬화)
 
 
@@ -401,7 +401,7 @@ pipe = pipeline(task="depth-estimation",
   ```
 
 
-#### ROS2 노드 래퍼 (필수, F안)
+#### ROS2 노드 래퍼 (필수)
 - [ ] Detection 결과 publish (`vision_msgs/Detection3DArray`)
 - [ ] Depth map publish (`sensor_msgs/Image`)
 - [ ] 통합 결과 publish + TF로 좌표계 변환
@@ -443,7 +443,7 @@ pipe = pipeline(task="depth-estimation",
 ---
 
 
-## Phase 3 (축소판) 완료 체크리스트
+## Phase 3 완료 체크리스트
 
 
 ### Object Detection
@@ -463,7 +463,7 @@ pipe = pipeline(task="depth-estimation",
 ### 통합 시스템 + ROS2
 - [ ] Detection + Depth 융합 구현
 - [ ] 3D 위치 추정 동작
-- [ ] **ROS2 노드 래퍼** (필수, F안) — `vision_msgs` publish + TF
+- [ ] **ROS2 노드 래퍼** (필수) — `vision_msgs` publish + TF
 - [ ] Demo 영상 제작 (1분)
 
 
@@ -538,11 +538,12 @@ pipe = pipeline(task="depth-estimation",
 
 
 Phase 3 완료 후 (2026.08):
-- **Phase 4: VLA 논문 reading + OpenVLA → ROS2 minimal demo** (2026.09-12)
+- **하드웨어 스파이크 (2026.08-09, 2-3주)** — 2-DOF Dynamixel + ROS2 파이프라인 리스크 검증 (산출물 아님)
+- **Phase 4: VLA 논문 reading + OpenVLA → ROS2 minimal demo** (2026.09-12, 메인 단독 트랙)
 - 산출물 #2 목표: RT-2 + OpenVLA 블로그 2편 + ROS2 토픽 demo (2026.12)
-- 동시기 진행: **Hardware-Arm Stage 1** (2026.10-12)
-- 동시기 진행: **정찰 지원 2-3건** (2026.11-12, 합격 기대 X, 면접관 반응 측정)
-- 2026.11 **6개월 분기 재평가 #1**
+- 병행: **시장 신호 probe** (JD 정독 + 커피챗 + LinkedIn 헤드라인, 2026.06~)
+- 2026.11 **6개월 분기 재평가 #1** (스파이크 결과 / Phase 4 진행 / probe 반응)
+- Hardware-Arm Stage 1 본 빌드는 Phase 4 종료 후 (2027.01-02) — 한 구간 1트랙 원칙
 
 
 > 기존 Phase 4 (3D Perception/KITTI/BEV) 는 `Archive/Perception-3D-legacy/` 로 이동 예정 (F안). 본 레포의 새 Phase 4 는 VLA 트랙.

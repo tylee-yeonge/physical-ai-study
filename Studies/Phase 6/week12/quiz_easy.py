@@ -15,13 +15,13 @@ def p2():
 
 
 def p3():
-    print("\n문제 3: Phase 7 의 본격 시작 시점")
-    print("  A) 2026.12\n  B) 2027.02\n  C) 2027.05\n  D) 2028.03")
+    print("\n문제 3: Phase 7 (산출물 #4 강화 카드) 시작 시점")
+    print("  A) 2027.08\n  B) 2027.02\n  C) 2027.05\n  D) 2028.03")
 
 
 def p4():
     print("\n문제 4: 분기 재평가 #2 의 핵심 결정")
-    print("  A) 새 Phase 추가\n  B) VLA 모델 갱신 + 본격 지원 시점\n  C) Sim 추가\n  D) Hardware 추가")
+    print("  A) 새 Phase 추가\n  B) VLA 모델 갱신 + 실지원 점검\n  C) Sim 추가\n  D) Hardware 추가")
 
 
 if __name__ == "__main__":

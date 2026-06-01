@@ -34,7 +34,7 @@ def problem2_solution():
 
     example = """
 RTX 4070 에서 OpenVLA 의 mean latency 가 165 ms (6 Hz) 라는 사실은,
-9년의 AMR ROS 양산 SW 경험에서 봤을 때 자동차 부품 조립 같은 정밀
+AMR ROS 양산 SW 실무 5년 경험에서 봤을 때 자동차 부품 조립 같은 정밀
 작업에 직접 사용할 수 없는 수치다. 자동차 양산 라인은 60 Hz 폐쇄 루프
 제어를 기본으로 하며, action 명령과 모터 응답 사이의 16 ms 마진
 안에서 안전 인터록이 동작해야 한다. OpenVLA 의 165 ms 는 그 마진의
@@ -48,7 +48,7 @@ hierarchical 구조 안에서만 양산 통합이 가능하다.
     print()
     print("  [tip] 좋은 단락의 구조:")
     print("    1) 사실 (165ms, 6Hz)")
-    print("    2) 본인 경력의 관점 (9년 AMR ROS)")
+    print("    2) 본인 경력의 관점 (AMR ROS 5년)")
     print("    3) 양산 비교 기준 (60Hz, 16ms 마진)")
     print("    4) 결론 (hierarchical 구조 필수)")
 

@@ -31,10 +31,10 @@
 본 주가 끝나면:
 - **산출물 #2 완료**: 블로그 2편 + ROS2 minimal demo + 1분 영상
 - **2026.12** 시점 본인이 가진 패: #1 (Detection+Depth+TRT+ROS2) + #2 (VLA) + #2.5 (자작 팔 Stage 1)
-- **2026.11-12 정찰 지원** 의 핵심 카드 준비
+- **2027.02 실지원** 의 핵심 카드 준비
 
 
-다음 Phase: **Phase 5 (Foundation Model 기초)** 진입 (2026.12-2027.02).
+다음 Phase: **Phase 5 (Foundation Model 기초)** 진입 (2027.02-04).
 
 
 ---
@@ -64,7 +64,7 @@
 # physical-ai-study
 
 
-> AMR ROS 양산 SW + Physical AI 통합 - 9년 SW 엔지니어의 학습 + 산출물 레포
+> AMR ROS 양산 SW + Physical AI 통합 - AMR ROS 실무 5년 (2021.06~) SW 엔지니어의 학습 + 산출물 레포
 
 
 ## Portfolio (산출물)
@@ -75,7 +75,7 @@
 | 1 | 2026.08 | Detection + Depth + PC TensorRT + ROS2 노드 | [01_Detection_Depth](Portfolio/01_Detection_Depth) |
 | 2 | 2026.12 | OpenVLA + ROS2 minimal demo + 블로그 2편 | [02_VLA_demo](Portfolio/02_VLA_demo) |
 | 2.5 | 2026.12 | 자작 팔 Stage 1 (2~3DOF + URDF) | [Hardware-Arm/Stage1](...) |
-| 4 | 2027.07 | (예정) Real-to-Sim-to-Real | (작성중) |
+| 4 | 2027.08~ | (예정) Real-to-Sim-to-Real (강화 카드) | (작성중) |
 
 
 (자세한 로드맵: [Roadmap/](Roadmap/))
@@ -102,7 +102,7 @@ ROS2 패키지 + 1분 영상:
 
 
 다음 산출물:
-Real-to-Sim-to-Real (Phase 7, 2027.07) - 자작 6DOF 팔 + Isaac Sim + OpenVLA
+Real-to-Sim-to-Real (Phase 7, 2027.08~) - 자작 6DOF 팔 + Isaac Sim + OpenVLA
 
 
 #VLA #OpenVLA #ROS2 #PhysicalAI #AMR
@@ -133,7 +133,7 @@ Real-to-Sim-to-Real (Phase 7, 2027.07) - 자작 6DOF 팔 + Isaac Sim + OpenVLA
 - ___
 
 
-## 시장 시그널 (2026.11~12 정찰 지원 결과)
+## 시장 시그널 (2026.06~ 시장 신호 probe 결과)
 - ___ 건 지원 / ___ 건 응답
 - 면접관 질문 패턴: ___
 - 강조한 산출물: ___
@@ -159,14 +159,14 @@ Real-to-Sim-to-Real (Phase 7, 2027.07) - 자작 6DOF 팔 + Isaac Sim + OpenVLA
 
 ```
 재평가 항목:
-- 정찰 지원 2~3 건 결과 (면접관 반응)
+- 시장 신호 probe 결과 (JD 격차 / 커피챗 / 실지원 1건 반응)
 - Phase 4 진행률 (산출물 #2 완성)
 - 자작 팔 Stage 1 완성 여부 (산출물 #2.5)
 - 시장 시그널 (1순위 회사 채용 활성도, OpenVLA 후속 모델)
 
 
 판단:
-- 시그널 좋음 + #4 80% 완성 -> 2027.07 본격 지원 앞당김
+- 시그널 좋음 + #1+#2+스파이크 확보 -> 2027.02 실지원 개시 (기본선)
 - 시그널 약함 + 시장 정체 -> 2028.03 fallback + Jetson 옵션
 - OpenVLA 가 한 세대 뒤 -> 2027.05 재평가 시 모델 갱신
 ```
@@ -195,7 +195,7 @@ Real-to-Sim-to-Real (Phase 7, 2027.07) - 자작 6DOF 팔 + Isaac Sim + OpenVLA
 
 
 **Q5. 2026.11 분기 재평가의 핵심 판단?**
-> 시장 시그널 + #4 진행률을 보고 본격 지원 시점 (2027.07 vs 2028.03 fallback) 결정.
+> 스파이크 결과 + 시장 신호 probe 반응을 보고 2028.03 fallback 진입 여부 / 모델 갱신 결정 (실지원은 2027.02 기본 개시).
 
 
 ---
@@ -214,7 +214,7 @@ Real-to-Sim-to-Real (Phase 7, 2027.07) - 자작 6DOF 팔 + Isaac Sim + OpenVLA
 7. quiz_easy / quiz_medium
 
 
-### Phase 5 진입 준비 (2026.12 말 ~ 2027.01 초)
+### Phase 5 진입 준비 (2027.01 말 ~ 2027.02 초)
 - ViT 의 patch embedding 사전 지식 점검
 - CLIP / SigLIP 의 차이 한 줄 정리
 - DINOv2 의 self-supervised 학습 사전 지식

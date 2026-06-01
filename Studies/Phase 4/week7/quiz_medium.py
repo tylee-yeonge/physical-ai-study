@@ -59,7 +59,7 @@ def problem2_write_differentiation_paragraph():
     조건:
       - "5Hz" / "165 ms" / "60Hz" 같은 정량 수치
       - "안전 인터록" / "hierarchical" / "fast safety policy" 중 1개 이상
-      - 본인 9년 경력 키워드 (AMR / 자동차 / 펌웨어) 중 1개 이상
+      - 본인 경력 키워드 (AMR ROS 5년 / 펌웨어) 중 1개 이상
 
     TODO: my_para 채우기.
     """
@@ -85,7 +85,7 @@ def problem2_write_differentiation_paragraph():
         ),
         "경력 키워드 포함": any(
             kw in my_para
-            for kw in ["AMR", "자동차", "펌웨어", "양산", "9년"]
+            for kw in ["AMR", "ROS", "펌웨어", "양산", "5년"]
         ),
     }
     print("\n자가 평가:")

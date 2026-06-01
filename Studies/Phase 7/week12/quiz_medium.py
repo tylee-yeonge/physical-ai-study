@@ -13,14 +13,14 @@ def p1():
 
 def p2():
     print("\n문제 2: LinkedIn post 의 핵심 메시지")
-    print("  '9년 AMR ROS 양산 SW + 자작 6DOF 팔 + VLA + Sim/Real 통합'")
-    print("  +'본격 이직 활동 시작'")
+    print("  'AMR ROS 실무 5년 + 자작 6DOF 팔 + VLA + Sim/Real 통합'")
+    print("  +'실지원 진행 중'")
     print("  -> 한 줄로 본인의 차별화 전달")
 
 
 def p3():
-    print("\n문제 3: 본격 지원의 표준 흐름")
-    print("  2027.08: 본격 지원 시작")
+    print("\n문제 3: 실지원 표준 흐름")
+    print("  2027.02: 실지원 시작")
     print("  2027.11: 분기 재평가 #3 (3개월 점검)")
     print("  2028.03: fallback decision point")
     print()

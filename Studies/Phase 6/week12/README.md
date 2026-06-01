@@ -26,7 +26,7 @@
 ## Phase 6 마지막 주
 
 
-Phase 7 (2027.05-07, Real-to-Sim-to-Real) 의 진입.
+Phase 7 (2027.08~, Real-to-Sim-to-Real) 의 진입.
 
 
 ```
@@ -44,7 +44,7 @@ Phase 7 입력:
 
 
 Phase 7 산출물 #4:
-- Real-to-Sim-to-Real 영상 (2027.07)
+- Real-to-Sim-to-Real 영상 (2027.08~)
 ```
 
 
@@ -58,7 +58,7 @@ Phase 7 산출물 #4:
 
 
 ```markdown
-# Sim/Real Gap Report (자작 6DOF 팔, 2027.05)
+# Sim/Real Gap Report (자작 6DOF 팔, 2027.07)
 
 
 ## 1. Latency
@@ -114,10 +114,10 @@ ee position trace
 ### 4. 분기 재평가 #2
 
 
-2027.05 시점:
+2027.07 시점:
 - VLA 모델 갱신
 - Phase 7 시점
-- 본격 지원 (2027.07 vs 2028.03)
+- 2028.03 fallback 진입 여부 (실지원은 2027.02 개시)
 
 
 ---
@@ -130,7 +130,7 @@ ee position trace
 **Q2. 가장 큰 gap?** > Image (noise variance, DR 전 후).
 **Q3. Phase 7 입력?** > Phase 6 인프라 + OpenVLA + 자작 팔.
 **Q4. 분기 재평가 #2?** > 2027.05, VLA 갱신 + Phase 7.
-**Q5. 본격 지원 시점?** > 2027.07 (원안) 또는 2028.03 (fallback).
+**Q5. 실지원 시점?** > 2027.02 개시, 2028.03 은 fallback 분기.
 
 
 ---
@@ -140,7 +140,7 @@ ee position trace
 
 
 ### 이번 주: 종합 보고서 + Rerun + retro + quiz
-### Phase 7 (2027.05-07): 산출물 #4 결정타
+### Phase 7 (2027.08~): 산출물 #4 강화 카드
 
 
 ---

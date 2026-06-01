@@ -296,12 +296,12 @@ scratch 구현은 **생략**한다. 이유:
 ## -> 다음 단계
 
 
-Phase 2 완료 후 → **[Phase 3 (축소): Detection + Depth → PC TensorRT + ROS2 노드](Phase%203.md)** (약 2개월, 2026.06-08) 로 직진.
+Phase 2 완료 후 → **[Phase 3: Detection + Depth → PC TensorRT + ROS2 노드](Phase%203.md)** (약 2개월, 2026.06-08) 로 직진.
 
 
 > 기존 SLAM 트랙(VO/BA, VIO)은 [Archive/SLAM-legacy/](../Archive/SLAM-legacy/) 로 이동되었다. SLAM 트랙은 더 이상 메인 로드맵의 일부가 아니다.
 >
-> Phase 3 는 F안 기준 *축소판* — 기존 12주 (Detection+Depth+Jetson 30+ FPS) → 8주 (PC TensorRT + ROS2 노드). Jetson 실기 배포는 Phase 7 이후 옵션.
+> Phase 3 는 8주 구성 (PC TensorRT + ROS2 노드). Jetson 실기 배포는 Phase 7 이후 옵션.
 
 
 ---

@@ -119,7 +119,7 @@ Stage 2 의 sim param matching:
 ## 다음 단계
 
 
-Phase 6 (2027.02-05) 와 병행 + Phase 7 (2027.05-07) 산출물 #4 의 hardware 기반 완성.
+Phase 6 (2027.05-07) 와 병행 + Phase 7 (2027.08~) 산출물 #4 의 hardware 기반 완성.
 
 
 Stage 2 의 모든 산출물 git tag stage2.

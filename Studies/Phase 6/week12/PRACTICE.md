@@ -21,7 +21,7 @@
 - Robot: 자작 6DOF 팔 (Dynamixel XM430)
 - Sim: Isaac Sim 4.x
 - Real: ROS2 Humble
-- 측정 일자: 2027.05 (Phase 6 종료)
+- 측정 일자: 2027.07 (Phase 6 종료)
 
 
 ## 1. Latency (week 8)
@@ -115,7 +115,7 @@ Rerun UI 에서 4 panel 동시 시각화. Phase 7 산출물 #4 영상의 핵심 
 
 
 ```markdown
-# Phase 6 회고 (2027.02 ~ 2027.05)
+# Phase 6 회고 (2027.05 ~ 2027.07)
 
 
 ## 시간 분배
@@ -144,7 +144,7 @@ Rerun UI 에서 4 panel 동시 시각화. Phase 7 산출물 #4 영상의 핵심 
 - Phase 5/6 결과
 - 자작 팔 Stage 2 완성도
 - VLA 모델 갱신 검토
-- Phase 7 시점 + 본격 지원 시점
+- Phase 7 시점 + 실지원 점검
 
 
 ## 산출물 list

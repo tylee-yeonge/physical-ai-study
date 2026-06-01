@@ -1,24 +1,24 @@
 # Phase 6: Isaac Sim + 디지털 트윈
 
 
-> **기간**: 약 3개월 (2027.02-05, F안 — v2 의 6개월에서 압축)
+> **기간**: 약 3개월 (2027.05-07, 실지원 병행 저강도)
 > **목표**: 자작 팔 (Hardware-Arm Stage 2) 의 URDF 를 Isaac Sim 에 임포트 → 디지털 트윈 + Sim/Real gap 측정 인프라 구축
 > **언어**: **Python** (Isaac Sim API) + **ROS2**
 > **하드웨어**: Ubuntu PC (RTX 4070) + 자작 팔 (Hardware-Arm Stage 2, 6DOF)
-> **주간 시간**: 약 8-12시간 (출장 주 50% 보정)
+> **주간 시간**: 약 6-8시간 (실지원 병행 저강도)
 
 
 ---
 
 
-## -> **실습 가이드**: `Studies/Phase 6/weekN/` (각 week 별 README + PRACTICE + quiz 미리 작성됨. **진입 시 (2027.02) 다시 체크**)
+## -> **실습 가이드**: `Studies/Phase 6/weekN/` (각 week 별 README + PRACTICE + quiz 미리 작성됨. **진입 시 (2027.05) 다시 체크**)
 
 
-**병행 트랙**: **Hardware-Arm Stage 2 (2027.02-04)** — 6DOF 확장 + teleop + 안전 인터록. URDF / 캘리브 / Sim 물리 파라미터가 본 Phase 와 공유됨.
+**병행 트랙**: **Hardware-Arm Stage 2 (2027.04-06)** — 6DOF 확장 + teleop + 안전 인터록. URDF / 캘리브 / Sim 물리 파라미터가 본 Phase 와 공유됨.
 
 
 **핵심 메시지**:
-- 본 Phase 는 *Sim only 산출물* 을 만들지 않는다 (#3 폐기, F안). Sim 환경 자체는 Phase 7 의 *Real-to-Sim-to-Real* 산출물 #4 의 한 축으로 통합.
+- 본 Phase 는 *Sim only 산출물* 을 만들지 않는다. Sim 환경 자체는 Phase 7 의 *Real-to-Sim-to-Real* 산출물 #4 의 한 축으로 통합.
 - "Sim 만 돌려본 결과물은 박사도 만든다" — 자작 팔과 결합되어야 차별점.
 
 
@@ -49,7 +49,7 @@
 - [ ] Isaac Sim 4.x 설치 + Workstation 라이선스 확인
 - [ ] 자작 팔 URDF 검증 (Hardware-Arm Stage 1 자료 활용)
 - [ ] **6개월 분기 재평가 #2 결과 반영** (2027.05 가 본 Phase 종료 시점이라 *진입 시점에는 미반영*. 종료 시 재평가)
-- [x] **Studies/Phase 6/ week 1-12 자료** 미리 작성됨. 진입 시 (2027.02) 본문 다시 체크.
+- [x] **Studies/Phase 6/ week 1-12 자료** 미리 작성됨. 진입 시 (2027.05) 본문 다시 체크.
 
 
 ---
@@ -145,4 +145,4 @@
 
 Phase 6 완료 후 (2027.05):
 - **6개월 분기 재평가 #2 (2027.05)** — Phase 5 결과 / Hardware-Arm Stage 2 완성도 / VLA 모델 갱신 검토 / Phase 6 진입 준비도
-- **Phase 7: Real-to-Sim-to-Real (2027.05-07)** — 결정타 산출물 #4 (OpenVLA fork + ROS2 + 자작 팔 + 안전 인터록 + latency 측정 + Sim/Real gap 영상)
+- **Phase 7: Real-to-Sim-to-Real (2027.08~)** — 강화 카드 산출물 #4 (OpenVLA fork + ROS2 + 자작 팔 + 안전 인터록 + latency 측정 + Sim/Real gap 영상)

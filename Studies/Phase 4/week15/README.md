@@ -57,11 +57,11 @@
 
 예시:
 0:05 "Phase 4 산출물 #2 - OpenVLA + ROS2"
-0:10 "9년 AMR ROS 양산 SW 엔지니어"
+0:10 "AMR ROS 양산 SW 실무 5년 엔지니어"
 0:15 "ROS2 노드 구조"
 0:20 "/camera/image_raw -> vla_node -> /vla/action"
 ...
-0:55 "다음: Phase 7 Real-to-Sim-to-Real (2027.07)"
+0:55 "다음: Phase 7 Real-to-Sim-to-Real (2027.08~)"
 ```
 
 
@@ -100,7 +100,7 @@ YouTube / LinkedIn 미리보기에 노출되는 이미지:
 **아웃트로 (3-5초)**:
 ```
 [End 카드]
-"다음 산출물: Real-to-Sim-to-Real (2027.07)"
+"다음 산출물: Real-to-Sim-to-Real (2027.08~)"
 "github.com/<you>/physical-ai-study"
 "contact: <linkedin>"
 ```

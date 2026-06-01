@@ -12,17 +12,17 @@ def p2():
 
 
 def p3():
-    print("\n정답: C) 2027.05")
-    print("  Phase 6 종료 2027.05 -> Phase 7 시작 (2027.05~07)")
-    print("  본격 지원 2027.07")
+    print("\n정답: A) 2027.08")
+    print("  Phase 6 종료 2027.07 -> Phase 7 시작 (2027.08~)")
+    print("  실지원은 2027.02 부터 진행 중")
 
 
 def p4():
-    print("\n정답: B) VLA 모델 갱신 + 본격 지원 시점")
+    print("\n정답: B) VLA 모델 갱신 + 실지원 점검")
     print("  분기 재평가 #2 핵심:")
     print("    1. OpenVLA vs π0/Helix/GR00T")
-    print("    2. Phase 7 시점 (2027.05 시작)")
-    print("    3. 본격 지원 (2027.07 vs 2028.03)")
+    print("    2. Phase 7 시점 (2027.08 시작)")
+    print("    3. 2028.03 fallback 진입 여부 (실지원은 2027.02 개시)")
 
 
 if __name__ == "__main__":

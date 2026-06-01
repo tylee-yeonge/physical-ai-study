@@ -28,7 +28,7 @@ def problem2_solution():
     print("=" * 60 + "\n")
     segments = [
         ("a", "인트로",       0,  5,  "5s - 인트로 카드"),
-        ("b", "본인 정보",    5, 10,  "5s - AMR ROS 9년"),
+        ("b", "본인 정보",    5, 10,  "5s - AMR ROS 5년"),
         ("c", "System 1",   10, 18,  "8s - ros2 node 다이어그램"),
         ("d", "System 2",   18, 25,  "7s - 자세한 흐름"),
         ("e", "실시간 동작", 25, 45, "20s - Rerun 화면, 가장 긴 segment"),

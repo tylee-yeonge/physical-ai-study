@@ -4,7 +4,7 @@
 def p1():
     print("\n문제 1: 영상의 핵심 메시지 한 줄")
     print()
-    print("  '9년 AMR ROS 양산 SW 엔지니어가 자작 6DOF 팔에 OpenVLA")
+    print("  'AMR ROS 실무 5년 엔지니어가 자작 6DOF 팔에 OpenVLA")
     print("   fine-tune 으로 Real-to-Sim-to-Real 통합 + 정량 측정.'")
 
 

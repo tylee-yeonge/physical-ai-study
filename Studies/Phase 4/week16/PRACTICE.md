@@ -98,7 +98,7 @@ ROS2 패키지 + 1분 영상:
 [GitHub link]
 
 
-다음 산출물 (Phase 7, 2027.07): Real-to-Sim-to-Real
+다음 산출물 (Phase 7, 2027.08~): Real-to-Sim-to-Real
 - 자작 6DOF 팔 (Dynamixel)
 - Isaac Sim 디지털 트윈
 - OpenVLA fork + LoRA fine-tune
@@ -155,14 +155,14 @@ LinkedIn 에 paste + image (thumbnail 추가).
 
 
 ## 6. 2026.11 분기 재평가 결과
-정찰 지원 결과:
+시장 신호 probe 결과:
 - 응답률: ___
 - 면접관 질문 패턴: ___
 - 강조 효과 큰 산출물: ___
 
 
 판단:
-- [ ] 원안 고수 (2027.07 본격 지원)
+- [ ] 2027.02 실지원 개시 (기본)
 - [ ] 시점 앞당김
 - [ ] fallback 진입 (2028.03)
 - [ ] 모델 갱신 (OpenVLA -> π0 / Helix / GR00T)
