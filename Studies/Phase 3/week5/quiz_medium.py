@@ -21,7 +21,6 @@ def main():
     import torch
 
     model = MyModel()
-    # model.train()  # 이 줄이 문제?
     dummy = torch.randn(1, 3, 640, 640)
 
     torch.onnx.export(
