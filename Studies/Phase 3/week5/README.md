@@ -232,31 +232,26 @@ SLAM/로봇 환경에서의 선택: Static Shape 권장!
 
 **ONNX Runtime**은 Microsoft가 만든 고성능 추론 엔진이다. ONNX 모델을 받아 실제로 실행한다.
 
-```
 특징:
-+-- 크로스 플랫폼 (Windows, Linux, macOS)
-+-- GPU 가속 (CUDA, TensorRT, DirectML)
-+-- CPU 최적화 (AVX, VNNI)
-+-- 그래프 최적화 (연산 융합, 상수 폴딩)
-+-- Python, C++, C#, Java API
-```
+
+- 크로스 플랫폼 (Windows, Linux, macOS)
+- GPU 가속 (CUDA, TensorRT, DirectML)
+- CPU 최적화 (AVX, VNNI)
+- 그래프 최적화 (연산 융합, 상수 폴딩)
+- Python, C++, C#, Java API
 
 추론 파이프라인은 전처리 -> 실행 -> 후처리 흐름이다. 실행 단계에서 **ExecutionProvider**로 어떤 하드웨어를 쓸지 고른다.
 
-```
-이미지 입력
-    ↓
-전처리 (resize, normalize, transpose)
-    ↓
-ONNX Runtime Session
-    +-- ExecutionProvider 선택
-    | +-- CUDAExecutionProvider (GPU)
-    | +-- TensorrtExecutionProvider (TensorRT)
-    | +-- CPUExecutionProvider (CPU)
-    ↓
-후처리 (NMS, bbox decode)
-    ↓
-결과 출력
+```mermaid
+flowchart TD
+    A["이미지 입력"] --> B["전처리<br/>resize, normalize, transpose"]
+    B --> C["ONNX Runtime Session"]
+    C --> P["ExecutionProvider 선택"]
+    P --> P1["CUDAExecutionProvider (GPU)"]
+    P --> P2["TensorrtExecutionProvider (TensorRT)"]
+    P --> P3["CPUExecutionProvider (CPU)"]
+    C --> D["후처리<br/>NMS, bbox decode"]
+    D --> E["결과 출력"]
 ```
 
 ---
