@@ -88,7 +88,9 @@ Phase 3의 1-4주가 모델을 학습하는 과정이었다면, week5부터는 �
 """
 PyTorch YOLO11 → ONNX 변환
 """
+import os
 import torch
+import torchvision.models as models
 from ultralytics import YOLO
 
 
@@ -97,15 +99,17 @@ def export_static():
     model = YOLO('yolo11n.pt') # 사전학습 nano 모델 로드
 
 
-    # ONNX 변환
-    model.export(
+    # ONNX 변환 (export는 항상 yolo11n.onnx로 저장하므로 반환 경로를 받아둔다)
+    onnx_path = model.export(
         format='onnx', # 출력 포맷
         imgsz=640, # 입력 크기 고정
         opset=12, # ONNX 연산자 집합 버전
         simplify=True, # 불필요한 연산 정리
         half=False, # FP32
     )
-    print("Static ONNX 변환 완료: yolo11n.onnx")
+    # static/dynamic이 같은 yolo11n.onnx에 저장돼 서로 덮어쓰므로 이름을 구분한다
+    os.replace(onnx_path, 'yolo11n_static.onnx') # 덮어쓰기까지 원자적으로 이동
+    print("Static ONNX 변환 완료: yolo11n_static.onnx")
 
 
 def export_dynamic():
@@ -113,21 +117,19 @@ def export_dynamic():
     model = YOLO('yolo11n.pt')
 
 
-    model.export(
+    onnx_path = model.export(
         format='onnx',
         imgsz=640,
         opset=12,
         simplify=True,
         dynamic=True, # 동적 배치 (배치 크기 가변)
     )
-    print("Dynamic ONNX 변환 완료")
+    os.replace(onnx_path, 'yolo11n_dynamic.onnx') # static과 구분되는 이름으로 저장
+    print("Dynamic ONNX 변환 완료: yolo11n_dynamic.onnx")
 
 
 def export_manual():
     """수동 ONNX 변환 (커스텀 모델용)"""
-    import torchvision.models as models
-
-
     # 예시: ResNet18 (torchvision 0.13+ 신 API: pretrained=True 대신 weights= 사용)
     model = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1) # 사전학습 ResNet18 로드
     model.eval() # 평가 모드 (변환 전 필수)
@@ -194,6 +196,7 @@ ONNX 모델 검증: 구조 확인 + 출력 비교
 """
 import onnx
 import numpy as np
+import onnxruntime as ort
 import torch
 from ultralytics import YOLO
 
@@ -235,9 +238,6 @@ def check_model(onnx_path):
 
 def compare_outputs(pt_path, onnx_path):
     """PyTorch vs ONNX 출력 비교"""
-    import onnxruntime as ort
-
-
     # 더미 입력
     dummy = np.random.randn(1, 3, 640, 640).astype(np.float32) # 가짜 입력 텐서
 
@@ -253,8 +253,8 @@ def compare_outputs(pt_path, onnx_path):
 
 
 if __name__ == "__main__":
-    check_model("yolo11n.onnx")
-    compare_outputs("yolo11n.pt", "yolo11n.onnx")
+    check_model("yolo11n_static.onnx")
+    compare_outputs("yolo11n.pt", "yolo11n_static.onnx")
 ```
 
 
@@ -445,7 +445,7 @@ def draw_detections(image, boxes, scores, class_ids):
 
 if __name__ == "__main__":
     # 검출기 초기화
-    detector = ONNXDetector("yolo11n.onnx") # ONNX 검출기 생성
+    detector = ONNXDetector("yolo11n_static.onnx") # static 모델 로드 (H/W가 640 고정 정수)
 
 
     # 이미지 추론
@@ -567,8 +567,8 @@ if __name__ == "__main__":
 
 
     pt_time = benchmark_pytorch("yolo11n.pt") # PyTorch 속도 측정
-    onnx_cpu = benchmark_onnx("yolo11n.onnx", "CPUExecutionProvider") # ONNX CPU 측정
-    onnx_gpu = benchmark_onnx("yolo11n.onnx", "CUDAExecutionProvider") # ONNX GPU 측정
+    onnx_cpu = benchmark_onnx("yolo11n_static.onnx", "CPUExecutionProvider") # ONNX CPU 측정
+    onnx_gpu = benchmark_onnx("yolo11n_static.onnx", "CUDAExecutionProvider") # ONNX GPU 측정
 
 
     print(f"\n 결과 요약:")
@@ -609,23 +609,22 @@ if __name__ == "__main__":
 """
 ONNX 모델 양자화: FP32 → FP16, INT8
 """
+import os
+
 import onnx
-from onnxruntime.quantization import quantize_dynamic, QuantType
 import numpy as np
+from onnxconverter_common import float16
+from onnxruntime.quantization import quantize_dynamic, QuantType
 
 
 def convert_fp16(input_path, output_path):
     """FP32 → FP16 변환"""
-    from onnxconverter_common import float16
-
-
     model = onnx.load(input_path)
     model_fp16 = float16.convert_float_to_float16(model) # 가중치를 FP16(반정밀도)으로 변환
     onnx.save(model_fp16, output_path)
 
 
     # 크기 비교
-    import os
     size_fp32 = os.path.getsize(input_path) / 1024 / 1024 # 바이트 -> MB
     size_fp16 = os.path.getsize(output_path) / 1024 / 1024
     print(f"FP16 변환 완료")
@@ -642,7 +641,6 @@ def quantize_int8_dynamic(input_path, output_path):
     )
 
 
-    import os
     size_orig = os.path.getsize(input_path) / 1024 / 1024 # 바이트 -> MB
     size_int8 = os.path.getsize(output_path) / 1024 / 1024
     print(f"INT8 Dynamic 양자화 완료")
@@ -657,14 +655,14 @@ if __name__ == "__main__":
 
 
     # FP16
-    convert_fp16("yolo11n.onnx", "yolo11n_fp16.onnx")
+    convert_fp16("yolo11n_static.onnx", "yolo11n_fp16.onnx")
 
 
     print()
 
 
     # INT8
-    quantize_int8_dynamic("yolo11n.onnx", "yolo11n_int8.onnx")
+    quantize_int8_dynamic("yolo11n_static.onnx", "yolo11n_int8.onnx")
 ```
 
 

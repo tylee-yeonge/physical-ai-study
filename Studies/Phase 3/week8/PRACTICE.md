@@ -96,9 +96,10 @@ HuggingFace Pipeline으로 Depth Anything 추론
 가장 간단한 방법!
 """
 import os
-from transformers import pipeline
-from PIL import Image
+import time
 import numpy as np
+from PIL import Image
+from transformers import pipeline
 
 
 def infer_with_pipeline(image_path, model_name="depth-anything/Depth-Anything-V2-Small-hf"):
@@ -145,9 +146,6 @@ def compare_models(image_path):
     print("\n" + "=" * 40)
     print("모델 크기별 비교")
     print("=" * 40)
-
-
-    import time
 
 
     models = [ # 비교할 모델 2종 (경로, 표시 이름)
@@ -971,6 +969,7 @@ import os
 import numpy as np
 import cv2
 from PIL import Image
+from transformers import pipeline
 
 
 def combine_yolo_depth(image_path, yolo_boxes, depth_map):
@@ -1062,7 +1061,6 @@ if __name__ == "__main__":
 
 
     # 깊이 추론
-    from transformers import pipeline
     image_path = "data/indoor.jpg"
 
 
