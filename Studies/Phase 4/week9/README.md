@@ -96,6 +96,9 @@ action (ee frame) -> 자신의 좌표계 (base_link) -> joint command
 ```
 
 
+> **이식 관점 (열린 질문)**: 위는 팔 기준 — `Twist` 의 linear/angular 를 end-effector delta 의 그릇으로 재활용한다. 같은 `/vla/action` 토픽이 **이동 로봇이면 `Twist` 의 본래 의미인 base 선속도/각속도**가 된다. 즉 메시지 타입은 같아도 의미·downstream 매핑이 통째로 달라진다. 이게 팔->이동 이식 시 바뀌는 지점이고, 2026.11 재평가(README 부록 D)의 기술적 단서다. 지금 demo 는 팔 기준으로 정리하고, 이동 매핑은 열어둔다.
+
+
 ### 3. cv_bridge 사용
 
 
@@ -271,6 +274,7 @@ configure() -> activate() -> running -> deactivate() -> cleanup()
 3. **header.stamp** 가 모든 latency 측정의 근간.
 4. **QoS** image=best_effort, action=reliable.
 5. **spec 1 페이지** 가 week 10 의 진입 input.
+6. (열린 질문) 같은 `Twist` action 이 **이동 플랫폼이면 base 선속도/각속도**로 의미가 바뀐다 — 팔->이동 이식 시 재매핑 지점, 2026.11 재평가(README 부록 D) 단서.
 
 
 ---

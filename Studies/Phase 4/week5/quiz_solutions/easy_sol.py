@@ -61,10 +61,27 @@ def problem4_solution():
     print("    -> 표현력 + 메모리 효율 균형")
 
 
+def problem5_solution():
+    print("\n" + "=" * 50)
+    print("문제 5 정답: B) 256 bin discretize -> Llama vocabulary 토큰")
+    print("=" * 50 + "\n")
+    print("해설:")
+    print("  action 표현 3층위:")
+    print("    - 관절각 (joint)  : embodiment 원본 (자작 팔 6 dim)")
+    print("    - EE-delta (연속) : OpenX 표준화 [dx,dy,dz,rx,ry,rz,gripper]")
+    print("    - action token    : OpenVLA 출력 형태")
+    print()
+    print("  OpenVLA 는 연속 EE-delta 를 차원별 256 bin 으로 나눠")
+    print("  Llama vocabulary 의 자주 안 쓰는 256개 토큰에 매핑해 출력한다")
+    print("  (RT-2 와 동일 vocab trick). 사용 시 de-tokenize 로 연속값 복원.")
+    print("  -> A 는 관절각 직접 회귀라 OpenVLA 방식 아님.")
+
+
 if __name__ == "__main__":
     print("=" * 50)
     problem1_solution()
     problem2_solution()
     problem3_solution()
     problem4_solution()
+    problem5_solution()
     print("=" * 50)

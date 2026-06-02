@@ -176,6 +176,9 @@ RGB --+ concat -> 결합 patch token
 ```
 
 
+> **action token = vocab trick 상세**: OpenVLA 는 연속 7-DoF action 을 차원별 **256 bin 으로 discretize** 한 뒤, Llama vocabulary 의 자주 안 쓰는 256개 토큰에 매핑해 출력한다 (RT-2 와 동일 trick, week2 참조). 즉 LM 입장에서 action 은 "특수 단어" 의 나열이고, de-tokenize 로 다시 연속값이 된다. 이 token 표현이 관절각·EE-delta 와 어떻게 다른지는 week5 §3.5 의 비교 축에서 정리한다.
+
+
 ### 6. OpenX-Embodiment 데이터 (week 5 의 핵심)
 
 

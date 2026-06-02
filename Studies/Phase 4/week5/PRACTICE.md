@@ -315,6 +315,8 @@ print("\n 실습 3 완료!")
 - 자작 팔: joint position (6 dim)
 - OpenVLA: end-effector delta pose (7 dim)
 - 변환: forward kinematics 로 EE pose 계산 -> delta 계산
+- 표현 3층위: 관절각(자작 팔 원본 6 dim) -> EE-delta(OpenX 표준 7 dim) -> action token(OpenVLA 가 256 bin 으로 이산화해 출력, README week5 §3.5)
+- 주의: 내가 수집/저장하는 단위는 EE-delta 까지. token 화는 OpenVLA 내부에서 일어나고 de-tokenize 로 다시 연속값이 되므로, 데이터셋 포맷에는 token 이 아니라 연속 action 을 담는다
 
 
 ## 5. 데이터 수집 계획 (Phase 7 의 사전 설계)

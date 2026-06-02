@@ -71,6 +71,7 @@ OpenVLA 블로그는 week 3 의 RT-2 블로그와 동일한 8-section 구조지�
 - 4-3. OpenX-Embodiment 의 22 embodiments
 - 4-4. LoRA fine-tuning 흐름
 - 4-5. 4-bit quantization 의 trade-off (~ 1-2%p 정확도 손실, 메모리 1/8)
+- 4-6. action representation 비교 (관절각 / EE-delta / action token, week5 §3.5) — "남이 안 짚는 각도"
 
 
 ### Section 5: 결과 + 실측 데이터

@@ -17,10 +17,11 @@
 | 1 | 환경 | `requirements.txt` | datasets, h5py 추가 |
 | 2 | OpenX 페이지 정독 | https://robotics-transformer-x.github.io/ | dataset list / format |
 | 3 | OpenVLA 논문 Sec 4 재정독 | OpenVLA PDF | fine-tuning details |
-| 4 | datasets 라이브러리 실습 | `PRACTICE.md` 1-2 | HuggingFace로 OpenX 일부 로드 |
-| 5 | LoRA 코드 흐름 분석 | `PRACTICE.md` 3 | OpenVLA repo 의 LoRA config |
-| 6 | 퀴즈 | quiz_easy / quiz_medium | 데이터 구조 / LoRA 설정 |
-| 7 | 노트 정리 | `PRACTICE.md` 4 | "자작 팔 데이터 호환성 분석" 노트 |
+| 4 | action representation 비교 정독 | README §3.5 (+ week4 §5) | 관절각/EE-delta/token, tokenization |
+| 5 | datasets 라이브러리 실습 | `PRACTICE.md` 1-2 | HuggingFace로 OpenX 일부 로드 |
+| 6 | LoRA 코드 흐름 분석 | `PRACTICE.md` 3 | OpenVLA repo 의 LoRA config |
+| 7 | 퀴즈 | quiz_easy / quiz_medium | 데이터 구조 / action 표현 / LoRA 설정 |
+| 8 | 노트 정리 | `PRACTICE.md` 4 | "자작 팔 데이터 호환성 분석" 노트 |
 
 
 ---
@@ -127,6 +128,25 @@ OpenVLA 표준화:
 
 
 이게 22 embodiments 를 한 모델에 학습 가능한 핵심.
+
+
+### 3.5 Action representation 비교 축 (관절각 / EE-delta / token)
+
+
+같은 "action" 이라도 표현 방식이 다르고, 이게 VLA 구조 비교의 핵심 축이다:
+
+
+| 표현 | 예시 | 쓰는 곳 |
+|---|---|---|
+| 관절각 (joint) | Franka 7-DoF joint velocity | embodiment 원본 |
+| EE-delta (연속) | `[dx, dy, dz, rx, ry, rz, gripper]` | OpenX 표준화 후 (§3) |
+| action token (이산) | 각 차원을 256 bin 으로 discretize 한 정수 토큰 | OpenVLA 가 Llama 로 출력 |
+
+
+OpenVLA 는 연속 EE-delta 를 차원별 **256 bin 으로 나눠 Llama vocabulary 의 토큰으로 치환**(자주 안 쓰는 256개 토큰을 덮어씀)해 출력한다 (아키텍처 다이어그램상 위치는 week4 §5). 즉 week2 의 "action 도 토큰" 이 여기서 구체화된다 — 연속 제어량을 언어 모델이 생성할 수 있는 이산 토큰으로 바꾼 것. 이 비교 축(관절각 -> EE-delta -> token)이 week7 OpenVLA 블로그의 "남이 안 짚는 각도" 재료가 된다.
+
+
+> **이식 관점 (열린 질문)**: 위 표는 전부 팔 기준이다. 이동 로봇이면 action 이 base 속도(선속도 + 각속도)가 되어 EE-delta 매핑이 통째로 달라진다. 이 갭은 Phase 4 demo (week9) 의 인터페이스 정리와 2026.11 재평가(부록 D)의 입력이다. 지금 결론 낼 질문이 아니라 열어두는 질문.
 
 
 ### 4. Fine-tuning 흐름 (OpenVLA GitHub repo 기준)
@@ -265,6 +285,10 @@ OpenVLA 의 평가 지표 (논문 Table):
 > 보통 30-100 step (5-15초). 1 task 당 50-100 episode 면 ~ 5000-10000 step. LoRA 학습에 충분.
 
 
+**Q6. OpenVLA 가 출력하는 action 은 관절각/EE-delta/token 중 무엇이며 어떻게 만들어지나?**
+> **action token**(이산). 연속 EE-delta `[dx,dy,dz,rx,ry,rz,gripper]` 를 차원별 256 bin 으로 discretize 한 뒤 Llama vocabulary 토큰으로 치환해 출력하고, 사용 시 de-tokenize 로 다시 연속값이 된다 (week2 RT-2 의 vocab trick 과 동일, 아키텍처 위치는 week4 §5). 관절각은 embodiment 원본, EE-delta 는 OpenX 표준화 단계.
+
+
 ---
 
 
@@ -295,6 +319,7 @@ OpenVLA 의 평가 지표 (논문 Table):
 3. **LoRA + 4-bit base** 가 RTX 4070 12GB 환경의 표준 fine-tune 구성.
 4. **학습 파라미터 ~ 1% 미만** → 새 robot 빠른 적응.
 5. **자작 팔 데이터 수집**: 50-100 demonstrations × 30-100 step = ~5K~10K step.
+6. **action 표현 3층위**: 관절각(원본) → EE-delta(OpenX 표준화) → action token(256 bin 이산, OpenVLA 출력). 이동 로봇이면 base 속도로 매핑이 달라짐(열린 질문, week9).
 
 
 ---

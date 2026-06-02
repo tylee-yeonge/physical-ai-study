@@ -53,6 +53,18 @@ def problem4_lora_target():
     print("  D) input_layer, output_layer")
 
 
+def problem5_action_representation():
+    print("\n" + "=" * 50)
+    print("문제 5: OpenVLA 가 출력하는 action 의 표현")
+    print("=" * 50 + "\n")
+    print("질문: OpenVLA 는 연속 EE-delta action 을 어떻게 출력하는가?\n")
+    print("보기:")
+    print("  A) 6개 관절각 (joint angle) 을 float 로 직접 회귀")
+    print("  B) 차원별 256 bin 으로 discretize 해 Llama vocabulary 토큰으로 출력")
+    print("  C) 이미지 segmentation mask 로 출력")
+    print("  D) 자연어 문장으로 동작을 서술")
+
+
 if __name__ == "__main__":
     print("=" * 50)
     print("  Phase 4 Week 5 Quiz - Easy")
@@ -61,6 +73,7 @@ if __name__ == "__main__":
     problem2_rlds_schema()
     problem3_self_arm_embodiment()
     problem4_lora_target()
+    problem5_action_representation()
     print("\n" + "=" * 50)
     print("정답은 quiz_solutions/easy_sol.py 참고")
     print("=" * 50)

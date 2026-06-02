@@ -92,9 +92,9 @@
 | 주차 | 내용 | 핵심 |
 |------|------|------|
 | 4 | OpenVLA 논문 1회독 + Architecture | Llama 7B + DINOv2 + SigLIP |
-| 5 | OpenX-Embodiment 데이터 + Fine-tuning 흐름 | 970K episodes |
+| 5 | OpenX-Embodiment 데이터 + Fine-tuning 흐름 + **스키마/action representation 정독** | 970K episodes / observation↔action 페어링 / 관절각·EE-delta·token 비교 |
 | 6 | OpenVLA HuggingFace 모델 카드 + 환경 셋업 | `transformers` + GPU |
-| 7 | 블로그 1편 작성 (OpenVLA) | RT-2 와 비교 + open-source 의 의미 |
+| 7 | 블로그 1편 작성 (OpenVLA) | RT-2 와 비교 + open-source 의 의미 + **action representation 비교 축** (week5 §3.5) |
 
 
 ---
@@ -109,7 +109,7 @@
 | 주차 | 내용 | 핵심 |
 |------|------|------|
 | 8 | HuggingFace inference 셋업 | 4-bit quantization (필요 시) |
-| 9 | inference 입력/출력 인터페이스 정리 | image + instruction → action |
+| 9 | inference 입력/출력 인터페이스 정리 + **제어 인터페이스 매핑** | image + instruction → action / 이동 플랫폼이면 매핑이 어떻게 달라지나 |
 | 10 | ROS2 패키지 골격 작성 | `vla_node` 노드 + `vla_action` 토픽 |
 | 11 | image subscribe → inference → action publish | 단순 동영상 입력으로 dry-run |
 | 12 | Rerun 시각화 + 1분 영상 제작 | Demo 영상 마감 |
@@ -117,9 +117,11 @@
 
 **ROS2 인터페이스 예시**:
 ```
-Input : /camera/image_raw (sensor_msgs/Image), /vla/instruction (std_msgs/String)
-Output : /vla/action (geometry_msgs/Twist 또는 custom msg)
+Input  : /camera/image_raw (sensor_msgs/Image), /vla/instruction (std_msgs/String)
+Output : /vla/action (팔: EE-delta [dx,dy,dz,rx,ry,rz] -> geometry_msgs/Twist + gripper Float64, 또는 custom msg)
 ```
+
+> 메시지 선택 상세는 `Studies/Phase 4/week9` §1. 같은 `Twist` 가 **이동 플랫폼에서는 base 선속도/각속도**로 의미가 바뀐다 — 팔->이동 이식 시 재매핑 지점이자 부록 D(2026.11) 재평가의 기술적 단서.
 
 
 ---
@@ -146,6 +148,7 @@ Output : /vla/action (geometry_msgs/Twist 또는 custom msg)
 - [ ] RT-2 아키텍처 다이어그램을 막힘없이 설명 가능
 - [ ] OpenVLA 아키텍처 다이어그램을 막힘없이 설명 가능
 - [ ] RT-2 와 OpenVLA 의 차이 (open-source / 모델 크기 / 데이터) 정리
+- [ ] action representation (관절각 / EE-delta / token) 을 모델 간 비교하고, 그 출력이 제어 인터페이스 및 다른 플랫폼(이동 로봇) 과 어떻게 연결되는지 설명 가능
 
 
 ### 블로그
@@ -171,7 +174,7 @@ Output : /vla/action (geometry_msgs/Twist 또는 custom msg)
 ## Phase 4 완료 기준
 
 
-> "RT-2 와 OpenVLA 의 아키텍처를 막힘없이 설명할 수 있고, OpenVLA HuggingFace inference 를 ROS2 토픽으로 받는 minimal demo 를 동작시킬 수 있다."
+> "RT-2 와 OpenVLA 의 아키텍처를 막힘없이 설명할 수 있고, OpenVLA HuggingFace inference 를 ROS2 토픽으로 받는 minimal demo 를 동작시킬 수 있다. 그리고 action representation 이 실제 제어 인터페이스 및 다른 플랫폼(이동 로봇) 과 어떻게 연결되는지 설명할 수 있다."
 
 
 ---
