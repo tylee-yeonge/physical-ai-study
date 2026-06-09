@@ -138,18 +138,18 @@ def explore_depth_map():
 
 
     axes[0].imshow(relative_depth, cmap='magma') # 상대 깊이맵 표시
-    axes[0].set_title('상대 깊이맵 (Relative)')
+    axes[0].set_title('Relative Depth Map')
     axes[0].colorbar = plt.colorbar(axes[0].images[0], ax=axes[0]) # 색상-깊이 대응 막대
 
 
     axes[1].imshow(metric_depth, cmap='magma') # 절대 깊이맵 표시
-    axes[1].set_title('절대 깊이맵 (Metric, m)')
+    axes[1].set_title('Metric Depth Map (m)')
 
 
     # 깊이별 컬러맵 비교
     for ax, cmap in zip([axes[2]], ['turbo']): # 세 번째 칸에 turbo 컬러맵 적용
         ax.imshow(relative_depth, cmap=cmap)
-        ax.set_title(f'컬러맵: {cmap}')
+        ax.set_title(f'Colormap: {cmap}')
 
 
     plt.tight_layout()

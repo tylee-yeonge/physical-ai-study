@@ -596,7 +596,7 @@ colors = ['red', 'blue', 'green', 'orange', 'purple', 'cyan'] # 박스별 구분
 
 
 # NMS 전
-ax1.set_title("NMS 전", fontsize=14)
+ax1.set_title("Before NMS", fontsize=14)
 ax1.set_xlim(0, 700)
 ax1.set_ylim(500, 0) # 이미지 좌표계 (위가 0)
 for i, (box, score) in enumerate(zip(boxes, scores)): # 모든 박스 그리기
@@ -610,7 +610,7 @@ for i, (box, score) in enumerate(zip(boxes, scores)): # 모든 박스 그리기
 
 
 # NMS 후
-ax2.set_title("NMS 후", fontsize=14)
+ax2.set_title("After NMS", fontsize=14)
 ax2.set_xlim(0, 700)
 ax2.set_ylim(500, 0)
 for i in keep: # 살아남은 박스만 그리기
