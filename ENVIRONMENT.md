@@ -74,6 +74,7 @@ Ubuntu PC (원격) 에서 코드 실행 -> 맥북/노트북 (로컬) 에서 view
 | 방법 | 원격 코드 | 로컬 필요 | 포트포워딩 | 언제 좋은가 |
 |---|---|---|---|---|
 | **A. RRD 파일** | `rr.save("out.rrd")` | rerun viewer | 불필요 | 결과 한 번 확인. 가장 안정 |
+| **A-2. RRD + hosted 뷰어** | `rr.save("out.rrd")` | 브라우저만 | 불필요 | 로컬 설치 없이 .rrd 확인 |
 | **B. serve_web** | `rr.serve_web(...)` | 브라우저만 | 9090 + 9876 | 빠른 반복 확인 |
 | **C. gRPC connect** | `rr.serve_grpc(...)` | rerun viewer | 9876 | 큰 데이터 / 부드러운 3D 인터랙션 |
 
@@ -89,7 +90,8 @@ conda init "$(basename "${SHELL}")"   # zsh / bash
 # rerun 전용 env
 conda create -n rerun python=3.12 -c conda-forge -y
 conda activate rerun
-conda install -c conda-forge "rerun-sdk=0.23.1" -y
+# conda-forge 채널에는 최신 버전이 없을 수 있어 pip 로 설치 (원격과 버전 일치)
+pip install "rerun-sdk==0.33.0"
 rerun --version
 ```
 
@@ -109,6 +111,22 @@ rr.save("output/result.rrd")
 
 
 VSCode 파일트리에서 RRD 우클릭 -> Download -> 로컬에서 `rerun result.rrd`.
+
+
+**방법 A-2: 로컬 설치 없이 hosted 웹 뷰어로 열기** (가장 간단):
+
+
+로컬에 `rerun-sdk` 를 안 깔고도 .rrd 를 볼 수 있다. 위와 동일하게 .rrd 를 Download 한 뒤:
+
+
+1. 브라우저로 https://rerun.io/viewer 접속
+2. .rrd 파일을 화면에 드래그앤드롭 (또는 메뉴에서 Open)
+
+
+뷰어는 WASM 으로 브라우저 안에서 전부 처리되므로 파일이 서버로 업로드되지 않는다 (로컬에서만 읽힘).
+
+
+> **버전 일치 필수**: hosted 뷰어도 .rrd 를 만든 SDK 버전과 맞아야 한다. https://rerun.io/viewer 는 최신 안정 버전을 띄우므로, 원격 `rerun-sdk` 가 최신이면 그대로 열린다. version mismatch 에러가 나면 버전을 박은 URL 을 쓴다: `https://app.rerun.io/version/<원격버전>/` (예: `https://app.rerun.io/version/0.33.0/`). 원격 버전은 `python3 -c "import rerun; print(rerun.__version__)"` 로 확인.
 
 
 **VSCode Tunnel + serve_web (방법 B)**:
