@@ -1,7 +1,7 @@
 # Week 12: Sim/Real gap 종합 보고서 + Phase 7 진입
 
 
-> **이번 주 목표**: Phase 6 의 4 gap 통합 보고서. Phase 7 산출물 #4 의 직접 입력.
+> **이번 주 목표**: Phase 6 의 4 gap 통합 보고서. Phase 7 산출물 v3 의 직접 입력.
 > **예상 시간**: 5시간
 
 
@@ -43,7 +43,7 @@ Phase 7 입력:
 - 자작 6DOF 팔 (Hardware-Arm Stage 2)
 
 
-Phase 7 산출물 #4:
+Phase 7 산출물 v3:
 - Real-to-Sim-to-Real 영상 (2027.08~)
 ```
 
@@ -117,7 +117,7 @@ ee position trace
 2027.07 시점:
 - VLA 모델 갱신
 - Phase 7 시점
-- 2028.03 fallback 진입 여부 (실지원은 2027.02 개시)
+- 2028.03 fallback 진입 여부 (실지원은 2027 개시)
 
 
 ---
@@ -130,7 +130,7 @@ ee position trace
 **Q2. 가장 큰 gap?** > Image (noise variance, DR 전 후).
 **Q3. Phase 7 입력?** > Phase 6 인프라 + OpenVLA + 자작 팔.
 **Q4. 분기 재평가 #2?** > 2027.05, VLA 갱신 + Phase 7.
-**Q5. 실지원 시점?** > 2027.02 개시, 2028.03 은 fallback 분기.
+**Q5. 실지원 시점?** > 2027 개시, 2028.03 은 fallback 분기.
 
 
 ---
@@ -140,7 +140,7 @@ ee position trace
 
 
 ### 이번 주: 종합 보고서 + Rerun + retro + quiz
-### Phase 7 (2027.08~): 산출물 #4 강화 카드
+### Phase 7 (2027.08~): 산출물 v3 강화 카드
 
 
 ---

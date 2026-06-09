@@ -1,8 +1,8 @@
-# Phase 6: Isaac Sim + 디지털 트윈
+# Phase 6: Isaac Sim 디지털 트윈 + 자작 팔 → 산출물 v2 (헤드라인)
 
 
 > **기간**: 약 3개월 (2027.05-07, 실지원 병행 저강도)
-> **목표**: 자작 팔 (Hardware-Arm Stage 2) 의 URDF 를 Isaac Sim 에 임포트 → 디지털 트윈 + Sim/Real gap 측정 인프라 구축
+> **목표**: 자작 팔 (Hardware-Arm Stage 1/2) 의 URDF 를 Isaac Sim 에 임포트 → 디지털 트윈 + **자작 팔 결합 sim-to-real gap 수치 측정 = 헤드라인 산출물 v2**
 > **언어**: **Python** (Isaac Sim API) + **ROS2**
 > **하드웨어**: Ubuntu PC (RTX 4070) + 자작 팔 (Hardware-Arm Stage 2, 6DOF)
 > **주간 시간**: 약 6-8시간 (실지원 병행 저강도)
@@ -18,8 +18,9 @@
 
 
 **핵심 메시지**:
-- 본 Phase 는 *Sim only 산출물* 을 만들지 않는다. Sim 환경 자체는 Phase 7 의 *Real-to-Sim-to-Real* 산출물 #4 의 한 축으로 통합.
-- "Sim 만 돌려본 결과물은 박사도 만든다" — 자작 팔과 결합되어야 차별점.
+- 본 Phase 는 *Sim only 산출물* 을 만들지 않는다. 자작 팔과 결합해 **sim-to-real gap 을 수치로 측정·보고 = 헤드라인 산출물 v2**. v1(sim) 성공률이 그 gap 의 분모가 된다.
+- "Sim 만 돌려본 결과물은 박사도 만든다" — 자작 팔과 결합되어야 차별점. (Sim-only 배제 원칙 유지)
+- Phase 7(v3, Real-to-Sim-to-Real)은 본 Phase 의 v2 를 6DOF + 안전 인터록 + OpenVLA fork 로 확장한 정점.
 
 
 ---
@@ -111,9 +112,10 @@
 - [ ] 카메라 부착 + Sim/Real 시각 비교
 
 
-### Sim/Real gap 측정 인프라
+### Sim/Real gap 측정 인프라 → 산출물 v2
 - [ ] latency / 반복성 / force / 시각 gap 측정 코드
 - [ ] 보고서 + 시각화 (Rerun)
+- [ ] **산출물 v2 공개** (자작 팔 + 디지털 트윈 + sim-to-real gap 수치, 헤드라인)
 
 
 ---
@@ -122,7 +124,7 @@
 ## Phase 6 완료 기준
 
 
-> "자작 팔의 URDF 를 Isaac Sim 에 임포트해 디지털 트윈을 동작시키고, Sim 과 Real 의 4가지 gap (latency / 반복성 / force / 시각) 을 정량 측정할 수 있다."
+> "자작 팔의 URDF 를 Isaac Sim 에 임포트해 디지털 트윈을 동작시키고, Sim 과 Real 의 4가지 gap (latency / 반복성 / force / 시각) 을 정량 측정해 **산출물 v2 (sim-to-real gap 보고, 헤드라인)** 로 공개할 수 있다."
 
 
 ---
@@ -145,4 +147,4 @@
 
 Phase 6 완료 후 (2027.05):
 - **6개월 분기 재평가 #2 (2027.05)** — Phase 5 결과 / Hardware-Arm Stage 2 완성도 / VLA 모델 갱신 검토 / Phase 6 진입 준비도
-- **Phase 7: Real-to-Sim-to-Real (2027.08~)** — 강화 카드 산출물 #4 (OpenVLA fork + ROS2 + 자작 팔 + 안전 인터록 + latency 측정 + Sim/Real gap 영상)
+- **Phase 7: Real-to-Sim-to-Real (2027.08~)** — 정점 산출물 v3 (OpenVLA fork + ROS2 + 자작 6DOF 팔 + 안전 인터록 + latency 측정 + Sim/Real gap 영상)

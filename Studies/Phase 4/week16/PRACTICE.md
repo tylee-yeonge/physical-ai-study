@@ -1,4 +1,4 @@
-# Week 16 실습: 산출물 #2 공개 + 회고 + Phase 5 진입 준비
+# Week 16 실습: 산출물 v1 공개 + 회고 + Phase 5 진입 준비
 
 
 > **실습 목표**: Phase 4 의 모든 산출물 공개 + 회고 + Phase 5 진입 직전 정리.
@@ -17,8 +17,8 @@ git status
 
 
 # 모든 파일 commit
-git add Portfolio/02_VLA_demo/
-git commit -m "phase4: release 산출물 #2 (OpenVLA + ROS2 demo + 1분 영상)"
+git add Portfolio/01_VLA_v1/
+git commit -m "phase4: release 산출물 v1 (OpenVLA + ROS2 demo + 1분 영상)"
 
 
 # Phase 4 완료 tag
@@ -42,17 +42,17 @@ gh repo view --json visibility
 **파일명**: `~/code/physical-ai-study/README.md`
 
 
-산출물 #2 row 를 추가:
+산출물 v1 row 를 추가:
 
 
 ```markdown
-| 2 | 2026.12 | OpenVLA + ROS2 minimal demo + 블로그 2편 | [02_VLA_demo](Portfolio/02_VLA_demo) |
+| 2 | 2026 하반기 | OpenVLA + ROS2 minimal demo + 블로그 2편 | [01_VLA_v1](Portfolio/01_VLA_v1) |
 ```
 
 
 ```bash
 git add README.md
-git commit -m "docs: add 산출물 #2 to main portfolio table"
+git commit -m "docs: add 산출물 v1 to main portfolio table"
 git push
 ```
 
@@ -67,7 +67,7 @@ git push
 
 
 ```markdown
-# Phase 4 산출물 #2 공개
+# Phase 4 산출물 v1 공개
 
 
 VLA (Vision-Language-Action) 의 정독 + 실측 + ROS2 통합 minimal demo 를 공개했습니다.
@@ -123,7 +123,7 @@ LinkedIn 에 paste + image (thumbnail 추가).
 
 
 ```markdown
-# Phase 4 회고 (2026.09 ~ 2026.12)
+# Phase 4 회고 (2026.06 ~ 2026.09)
 
 
 ## 1. 시간 분배 vs 실제
@@ -162,7 +162,7 @@ LinkedIn 에 paste + image (thumbnail 추가).
 
 
 판단:
-- [ ] 2027.02 실지원 개시 (기본)
+- [ ] 2027 실지원 개시 (기본)
 - [ ] 시점 앞당김
 - [ ] fallback 진입 (2028.03)
 - [ ] 모델 갱신 (OpenVLA -> π0 / Helix / GR00T)

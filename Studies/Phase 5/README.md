@@ -3,7 +3,7 @@
 
 > **학습 기간**: 2027.02-04 (3개월, 12주)
 > **마스터 가이드**: [`Roadmap/Phase 5.md`](../../Roadmap/Phase%205.md)
-> **자료 미리 작성됨** — 진입 시 (2026.12) 다시 체크 후 학습 시작
+> **자료 미리 작성됨** — 진입 시 (2027.02) 다시 체크 후 학습 시작
 
 
 ---
@@ -21,7 +21,7 @@ Studies/Phase 5/
 ```
 
 
-## week 자료 형식 (기존 Phase 3 패턴)
+## week 자료 형식 (Phase 3 패턴)
 
 
 - `README.md` / `PRACTICE.md` / `quiz_easy.py` / `quiz_medium.py` / `quiz_solutions/` / `requirements.txt`

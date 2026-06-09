@@ -87,7 +87,7 @@ pip install -r requirements.txt
 ### /vla/latency_ms
 - Type: std_msgs/Float64
 - Content: 한 inference 의 latency (ms)
-- 용도: monitoring / 산출물 #4 의 latency 측정
+- 용도: monitoring / 산출물 v3 의 latency 측정
 
 
 ## Diagnostic

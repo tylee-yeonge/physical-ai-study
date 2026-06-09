@@ -1,7 +1,7 @@
 # Hardware-Arm Stage 2 - 6DOF 확장
 
 
-> 2027.02
+> 2027.04
 
 
 ---
@@ -49,7 +49,7 @@ Gripper : XL330 or 단순
 ## URDF 갱신
 
 
-기존 Stage 1 URDF 에 추가:
+Stage 1 URDF 에 추가:
 
 
 ```xml

@@ -146,7 +146,7 @@ Operation CUDA total %
 4. RTX 4070 SM 부족으로 실제 ~ 5~10 ms
 
 
-## Phase 4 산출물 #2 와 연결
+## Phase 4 산출물 v1 와 연결
 - 영상에서 보여준 165 ms 의 정확한 구성
 - LM 이 최대 -> speculative decoding 등 LM 최적화 시 큰 이득
 - Vision 은 이미 작은 비중 -> 추가 최적화 효과 한계

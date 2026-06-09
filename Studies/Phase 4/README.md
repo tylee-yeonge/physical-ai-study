@@ -1,9 +1,9 @@
 # Studies/Phase 4 — VLA 논문 reading + OpenVLA → ROS2 minimal demo
 
 
-> **학습 기간**: 2026.09-12 (4개월, 16주)
+> **학습 기간**: 2026.06-09 (4개월, 16주)
 > **마스터 가이드**: [`Roadmap/Phase 4.md`](../../Roadmap/Phase%204.md)
-> **자료 미리 작성됨** — 진입 시 (2026.09) 다시 체크 후 학습 시작
+> **자료 미리 작성됨** — 진입 시 (2026.06) 다시 체크 후 학습 시작
 
 
 ---
@@ -27,13 +27,13 @@ Studies/Phase 4/
   week1/ ~ week3/ # RT-2 정독 + 블로그 1편
   week4/ ~ week7/ # OpenVLA 정독 + 블로그 1편
   week8/ ~ week12/ # OpenVLA HuggingFace → ROS2 minimal demo
-  week13/ ~ week16/ # 블로그 마무리 + 산출물 #2 패키징
+  week13/ ~ week16/ # 블로그 마무리 + 산출물 v1 패키징
   blog/ # RT-2 / OpenVLA 블로그 초고
-  ros2_pkg/ # OpenVLA → ROS2 토픽 패키지 (#2 demo)
+  ros2_pkg/ # OpenVLA → ROS2 토픽 패키지 (v1 demo)
 ```
 
 
-## week 자료 형식 (기존 Phase 3 패턴 그대로)
+## week 자료 형식 (Phase 3 패턴)
 
 
 각 week 디렉토리:

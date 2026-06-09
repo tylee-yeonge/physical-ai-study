@@ -17,4 +17,4 @@ python create_report.py > sim_real_gap_report_phase7.md
 체크리스트:
 - [ ] 4 gap 재측정
 - [ ] 보고서 작성
-- [ ] Phase 7 #4 영상에 들어갈 표 마감
+- [ ] Phase 7 v3 영상에 들어갈 표 마감

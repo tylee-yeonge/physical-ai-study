@@ -104,7 +104,7 @@ Isaac Sim
 ```
 
 
-Closed loop = Phase 7 산출물 #4 의 토대.
+Closed loop = Phase 7 산출물 v3 의 토대.
 
 
 ---

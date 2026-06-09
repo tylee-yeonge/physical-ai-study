@@ -8,7 +8,7 @@
 
 OpenVLA 7B 는 RTX 4070 12GB 로 **학습이 불가능**하다. 따라서 무거운 LoRA 파인튜닝은 Colab (A100/L4) 에서, 가벼운 추론은 로컬 4070 + ROS2 환경에서 4bit 양자화로 돌린다. 환경 구축은 두 갈래로 진행된다.
 
-**적용 산출물**: 산출물 #2 (RT-2/OpenVLA 블로그 2편 + ROS2 minimal demo).
+**적용 산출물**: 산출물 v1 (RT-2/OpenVLA 블로그 2편 + ROS2 minimal demo).
 
 **핵심 원칙 연결**:
 - 결과물 없는 학습 금지 — 학습 자체가 아니라 *블로그 + ROS2 데모* 가 목표
@@ -49,7 +49,7 @@ OpenVLA 7B 는 RTX 4070 12GB 로 **학습이 불가능**하다. 따라서 무거
 
 ## 2. 사전 점검 체크리스트
 
-Phase 4 진입 (2026.09 예정) 직전에 한 번 더 점검한다.
+Phase 4 진입 (2026.06 예정) 직전에 한 번 더 점검한다.
 
 ### 2.1 계정/구독
 - [ ] Google 계정 (Colab + Drive 동일 계정)
@@ -241,7 +241,7 @@ Colab 환경 (CUDA, PyTorch, transformers) 과 로컬 환경의 버전이 다르
 | accelerate | 0.29.x | 0.29.x | 학습 시 사용 |
 | timm | 1.0.x | 1.0.x | DINOv2 / SigLIP backbone |
 
-> 위 버전은 진입 시점 (2026.09) 에 OpenVLA 공식 리포의 `requirements.txt` 를 확인해 재조정한다. **OpenVLA upstream 이 정답**이며, 본 표는 시작점일 뿐.
+> 위 버전은 진입 시점 (2026.06) 에 OpenVLA 공식 리포의 `requirements.txt` 를 확인해 재조정한다. **OpenVLA upstream 이 정답**이며, 본 표는 시작점일 뿐.
 
 ### 7.2 공유 requirements 파일
 
@@ -320,7 +320,7 @@ rclone 설정 후엔 `rclone copy drive:phase4_openvla/lora/ ~/phase4_workspace/
 
 ---
 
-## 10. 블로그 소재로의 활용 (산출물 #2 연결)
+## 10. 블로그 소재로의 활용 (산출물 v1 연결)
 
 이 분업 자체가 좋은 콘텐츠다. 같은 처지 (consumer GPU 보유자) 가 많아 검색 트래픽이 나온다.
 

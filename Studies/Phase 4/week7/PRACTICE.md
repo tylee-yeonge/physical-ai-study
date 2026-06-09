@@ -190,7 +190,7 @@ xychart-beta
 
 따라서 OpenVLA 단독 양산 통합은 제한적. 반드시 fast safety policy
 (joint-level PD controller / impedance control) 와 함께 hierarchical
-구조 필요. 이게 본 로드맵의 Phase 7 산출물 #4 의 핵심 설계 결정.
+구조 필요. 이게 본 로드맵의 Phase 7 산출물 v3 의 핵심 설계 결정.
 ```
 
 
@@ -213,7 +213,7 @@ xychart-beta
 - OpenVLA : https://velog.io/@<id>/openvla-rtx4070-latency (week 7 발행)
 
 
-산출물 #2 의 진행:
+산출물 v1 의 진행:
 - [x] RT-2 블로그
 - [x] OpenVLA 블로그
 - [ ] OpenVLA -> ROS2 minimal demo (week 8~12)

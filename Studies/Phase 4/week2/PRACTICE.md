@@ -424,7 +424,7 @@ Robot sample 에서 output 의 처음 7~11 token 이 action 으로 해석.
 
 
 ## 7. 본 로드맵 관점
-- Phase 7 산출물 #4 에서 OpenVLA (동일한 discrete action token) 사용
+- Phase 7 산출물 v3 에서 OpenVLA (동일한 discrete action token) 사용
 - Quantization step 수치를 면접에서 'fine motion 한계' 의 정량적 근거로 인용
 ```
 

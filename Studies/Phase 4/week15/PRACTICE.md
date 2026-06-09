@@ -1,7 +1,7 @@
 # Week 15 실습: 영상 최종 마감 + 자막 + thumbnail + GIF
 
 
-> **실습 목표**: Portfolio/02_VLA_demo/ 의 모든 영상 파일 완성.
+> **실습 목표**: Portfolio/01_VLA_v1/ 의 모든 영상 파일 완성.
 > **예상 시간**: 4-6시간
 
 
@@ -64,7 +64,7 @@ Shotcut 의 Filters > Text: Simple 또는 Filters > Subtitles:
 
 
 ```
-0:00 -> 0:05 | (인트로) "Phase 4 산출물 #2: OpenVLA -> ROS2"
+0:00 -> 0:05 | (인트로) "Phase 4 산출물 v1: OpenVLA -> ROS2"
 0:05 -> 0:10 | "AMR ROS 양산 SW 엔지니어 실무 5년"
 0:10 -> 0:15 | "OpenVLA HuggingFace inference"
 0:15 -> 0:25 | "ROS2 Humble + vla_node 패키지"
@@ -101,7 +101,7 @@ Shotcut 의 Filters > Text: Simple 또는 Filters > Subtitles:
 
 
 작은 글씨 (위):
-  Phase 4 산출물 #2 / 2026.12
+  Phase 4 산출물 v1 / 2026 하반기
 
 
 작은 글씨 (아래):
@@ -135,7 +135,7 @@ Shotcut 의 Filters > Text: Simple 또는 Filters > Subtitles:
 ## 실습 4: Thumbnail 제작
 
 
-**파일명**: `Portfolio/02_VLA_demo/thumbnail.png`
+**파일명**: `Portfolio/01_VLA_v1/thumbnail.png`
 
 
 도구: GIMP / Canva / PowerPoint
@@ -229,7 +229,7 @@ ls -lh demo.gif
 - [ ] thumbnail 1280x720 png 제작
 - [ ] vla_demo.mp4 최종 export (< 30MB)
 - [ ] demo.gif preview 생성 (< 5MB)
-- [ ] 모든 파일 Portfolio/02_VLA_demo/ 에 commit
+- [ ] 모든 파일 Portfolio/01_VLA_v1/ 에 commit
 - [ ] quiz_easy / quiz_medium
 
 

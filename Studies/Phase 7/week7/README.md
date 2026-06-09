@@ -49,7 +49,7 @@ Q4. Sim vs Real latency? > Sim 이 step time 으로 약간 느림.
 1. End-to-end latency 184 ms
 2. Inference dominant (90%)
 3. Sim 약간 느림
-4. Phase 7 #4 의 정량 증거
+4. Phase 7 v3 의 정량 증거
 
 
 - [Week 6](../week6/README.md) | [Week 8](../week8/README.md)

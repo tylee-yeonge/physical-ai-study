@@ -19,4 +19,4 @@ print(f"Inference: {inference_lat:.1f} ms ({inference_lat/total_lat*100:.1f}%)")
 - [ ] 모든 단계 timestamp 기록
 - [ ] 1000 sample 측정
 - [ ] Histogram 시각화
-- [ ] 보고서 작성 (Phase 7 #4 의 input)
+- [ ] 보고서 작성 (Phase 7 v3 의 input)

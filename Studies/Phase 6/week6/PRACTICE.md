@@ -121,7 +121,7 @@ print(f"EE error: {ee_err*1000:.2f} mm")
 
 ```python
 # Real robot 카메라 image + Sim image 를 side-by-side
-# Phase 7 산출물 #4 의 한 컨텐츠
+# Phase 7 산출물 v3 의 한 컨텐츠
 ```
 
 

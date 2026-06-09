@@ -1,7 +1,7 @@
 # Hardware-Arm Stage 1 - Isaac Sim URDF 임포트
 
 
-> 2026.12
+> 2027.02
 
 
 ---
@@ -10,7 +10,7 @@
 ## Stage 1 의 Isaac Sim 임포트
 
 
-Phase 6 (2027.02~) 의 디지털 트윈의 첫 사이클.
+Phase 6 (2027.05~) 의 디지털 트윈의 첫 사이클.
 본 단계는 **단순 임포트 + Joint 동작 확인** 만.
 
 
@@ -107,7 +107,7 @@ print(arm.dof_names)
 ---
 
 
-## 산출물 #2.5 의 영상 capture
+## v2 선행 하드웨어 의 영상 capture
 
 
 ```python
@@ -134,7 +134,7 @@ imageio.mimsave('stage1_demo.mp4', frames, fps=20)
 ---
 
 
-## 다음 Stage (2027.02~)
+## 다음 Stage (2027.04~)
 
 
 Stage 2 의 6DOF 확장 시 본 가이드 그대로 + 추가:
@@ -152,5 +152,5 @@ Stage 2 의 6DOF 확장 시 본 가이드 그대로 + 추가:
 - [ ] Isaac Sim 임포트 성공
 - [ ] joint 동작 확인
 - [ ] 영상 capture
-- [ ] 산출물 #2.5 디렉토리 정리
+- [ ] v2 선행 하드웨어 디렉토리 정리
 - [ ] git tag stage1

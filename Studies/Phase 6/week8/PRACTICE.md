@@ -136,7 +136,7 @@ plt.tight_layout()
 plt.savefig("latency_compare.png")
 
 
-# Phase 7 산출물 #4 의 보고서에 인용 가능
+# Phase 7 산출물 v3 의 보고서에 인용 가능
 ```
 
 

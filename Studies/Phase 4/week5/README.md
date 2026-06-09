@@ -30,11 +30,11 @@
 ## 시작하기 전에 — 본 주의 실용적 가치
 
 
-이번 주 학습이 가장 직접적으로 **Phase 7 산출물 #4 의 fine-tuning 단계** 와 연결된다:
+이번 주 학습이 가장 직접적으로 **Phase 7 산출물 v3 의 fine-tuning 단계** 와 연결된다:
 
 
 ```
-Phase 7 산출물 #4 의 fine-tuning 단계 (2027.06):
+Phase 7 산출물 v3 의 fine-tuning 단계 (2027.06):
   1. 자작 6DOF 팔로 teleop demonstration ~100개 수집
   2. OpenX-Embodiment format 으로 변환
   3. OpenVLA + LoRA fine-tune
@@ -251,7 +251,7 @@ Total : ~ 10 GB (fit!)
 OpenVLA 의 평가 지표 (논문 Table):
 
 
-| 지표 | 의미 | 산출물 #4 에서 측정 |
+| 지표 | 의미 | 산출물 v3 에서 측정 |
 |---|---|---|
 | Success rate | 50 trial 중 성공 비율 | O 핵심 |
 | Recovery rate | 실패 후 복구 비율 | O (선택) |

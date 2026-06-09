@@ -62,7 +62,7 @@ RT-2 reading note 템플릿 (week 1) 와 동일 형식. 단 다음 항목 추가
 ## 7. RT-2 와의 비교 (본 README 7장 표)
 ## 8. Limitations 5가지
 ## 9. 본 로드맵 관점
-   - Phase 7 산출물 #4 에서 어떻게 쓸 것인가: _____
+   - Phase 7 산출물 v3 에서 어떻게 쓸 것인가: _____
 ## 10. 다음 (week 5) 시작 질문
 ```
 
@@ -222,7 +222,7 @@ print("-> 직접 비교: DINOv2 는 공간 경계가 선명, SigLIP 은 semantic
 
 
 ## 7. 본 로드맵 관점
-- Phase 7 산출물 #4 에서 LoRA fine-tuning 으로 자작 6DOF 팔 적응
+- Phase 7 산출물 v3 에서 LoRA fine-tuning 으로 자작 6DOF 팔 적응
 - 4-bit quantization 으로 RTX 4070 inference 가능
 
 

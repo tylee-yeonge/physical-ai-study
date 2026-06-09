@@ -165,7 +165,7 @@ print(f"Throughput : {1000/np.mean(results):.1f} Hz")
 ## Phase 7 LoRA Plan
 - Trainable: projector + Llama LoRA r=32 = 95M
 - 작은 demonstrations (~200) 으로 학습 가능
-- Phase 7 산출물 #4 의 핵심 기법
+- Phase 7 산출물 v3 의 핵심 기법
 
 
 ## Skills

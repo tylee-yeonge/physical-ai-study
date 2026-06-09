@@ -1,9 +1,9 @@
-# Week 16: 산출물 #2 공개 + 다음 phase 진입 준비
+# Week 16: 산출물 v1 공개 + 다음 phase 진입 준비
 
 
-> **이번 주 목표**: 산출물 #2 (Portfolio/02_VLA_demo/) 를 GitHub Public 으로 공개 + LinkedIn 공지. Phase 5 진입 직전 정리. **Phase 4 마지막 주**.
+> **이번 주 목표**: 산출물 v1 (Portfolio/01_VLA_v1/) 를 GitHub Public 으로 공개 + LinkedIn 공지. Phase 5 진입 직전 정리. **Phase 4 마지막 주**.
 > **예상 시간**: 4시간 (publishing 2h + LinkedIn / 회고 2h)
-> **핵심 질문**: "내 산출물 #2 가 GitHub 검색 / LinkedIn 에 노출되는가? 면접관이 자연스럽게 발견할 수 있는가?"
+> **핵심 질문**: "내 산출물 v1 가 GitHub 검색 / LinkedIn 에 노출되는가? 면접관이 자연스럽게 발견할 수 있는가?"
 
 
 ---
@@ -14,7 +14,7 @@
 
 | 순서 | 단계 | 파일/자료 | 설명 |
 |:----:|------|----------|------|
-| 1 | 최종 git push | `PRACTICE.md` 1 | Portfolio/02_VLA_demo/ |
+| 1 | 최종 git push | `PRACTICE.md` 1 | Portfolio/01_VLA_v1/ |
 | 2 | 메인 README 업데이트 | `PRACTICE.md` 2 | physical-ai-study/README.md |
 | 3 | LinkedIn 공지 | `PRACTICE.md` 3 | post 작성 |
 | 4 | 회고 | `PRACTICE.md` 4 | Phase 4 lessons learned |
@@ -29,9 +29,9 @@
 
 
 본 주가 끝나면:
-- **산출물 #2 완료**: 블로그 2편 + ROS2 minimal demo + 1분 영상
-- **2026.12** 시점 본인이 가진 패: #1 (Detection+Depth+TRT+ROS2) + #2 (VLA) + #2.5 (자작 팔 Stage 1)
-- **2027.02 실지원** 의 핵심 카드 준비
+- **산출물 v1 완료**: 블로그 2편 + ROS2 minimal demo + 1분 영상
+- **2026 하반기** 시점 본인이 가진 패: perception 로그 (Detection+Depth+TRT+ROS2, 비공개) + v1 (VLA) + v2 선행 (자작 팔 Stage 1)
+- **2027 실지원** 의 핵심 카드 준비
 
 
 다음 Phase: **Phase 5 (Foundation Model 기초)** 진입 (2027.02-04).
@@ -48,7 +48,7 @@
 
 ```
 - [ ] physical-ai-study repo 가 Public 인가
-- [ ] Portfolio/02_VLA_demo/ 가 README 의 main entry 에 link
+- [ ] Portfolio/01_VLA_v1/ 가 README 의 main entry 에 link
 - [ ] secret / token 파일 commit 안 됨
 - [ ] .gitignore 가 .env / credentials / __pycache__ 포함
 - [ ] LICENSE 파일 (MIT)
@@ -57,7 +57,7 @@
 ```
 
 
-### 2. 메인 README 의 산출물 #2 section
+### 2. 메인 README 의 산출물 v1 section
 
 
 ```markdown
@@ -70,12 +70,12 @@
 ## Portfolio (산출물)
 
 
-| # | 시점 | 내용 | Link |
+| 산출물 | 시점 | 내용 | Link |
 |---|---|---|---|
-| 1 | 2026.08 | Detection + Depth + PC TensorRT + ROS2 노드 | [01_Detection_Depth](Portfolio/01_Detection_Depth) |
-| 2 | 2026.12 | OpenVLA + ROS2 minimal demo + 블로그 2편 | [02_VLA_demo](Portfolio/02_VLA_demo) |
-| 2.5 | 2026.12 | 자작 팔 Stage 1 (2~3DOF + URDF) | [Hardware-Arm/Stage1](...) |
-| 4 | 2027.08~ | (예정) Real-to-Sim-to-Real (강화 카드) | (작성중) |
+| (로그) | - | Detection + Depth + PC TensorRT + ROS2 (Phase 3, 비공개) | repo 내부 |
+| v1 | 2026 하반기 | OpenVLA + ROS2 + sim 단일 task 루프 + 블로그 | [01_VLA_v1](Portfolio/01_VLA_v1) |
+| v2 선행 | 2027 | 자작 팔 Stage 1 (2~3DOF + URDF) | [Hardware-Arm/Stage1](...) |
+| v3 | 2027 후반~ | (예정) Real-to-Sim-to-Real (정점) | (작성중) |
 
 
 (자세한 로드맵: [Roadmap/](Roadmap/))
@@ -86,7 +86,7 @@
 
 
 ```
-Phase 4 산출물 #2 공개:
+Phase 4 산출물 v1 공개:
 OpenVLA -> ROS2 Minimal Demo
 
 
@@ -113,7 +113,7 @@ Real-to-Sim-to-Real (Phase 7, 2027.08~) - 자작 6DOF 팔 + Isaac Sim + OpenVLA
 
 
 ```markdown
-# Phase 4 회고 (2026.09 ~ 2026.12)
+# Phase 4 회고 (2026.06 ~ 2026.09)
 
 
 ## 잘 한 것
@@ -160,13 +160,13 @@ Real-to-Sim-to-Real (Phase 7, 2027.08~) - 자작 6DOF 팔 + Isaac Sim + OpenVLA
 ```
 재평가 항목:
 - 시장 신호 probe 결과 (JD 격차 / 커피챗 / 실지원 1건 반응)
-- Phase 4 진행률 (산출물 #2 완성)
-- 자작 팔 Stage 1 완성 여부 (산출물 #2.5)
+- Phase 4 진행률 (산출물 v1 완성)
+- 자작 팔 Stage 1 완성 여부 (산출물 v2 선행)
 - 시장 시그널 (1순위 회사 채용 활성도, OpenVLA 후속 모델)
 
 
 판단:
-- 시그널 좋음 + #1+#2+스파이크 확보 -> 2027.02 실지원 개시 (기본선)
+- 시그널 좋음 + v1+스파이크 확보 -> 2027 실지원 개시 (기본선)
 - 시그널 약함 + 시장 정체 -> 2028.03 fallback + Jetson 옵션
 - OpenVLA 가 한 세대 뒤 -> 2027.05 재평가 시 모델 갱신
 ```
@@ -178,11 +178,11 @@ Real-to-Sim-to-Real (Phase 7, 2027.08~) - 자작 6DOF 팔 + Isaac Sim + OpenVLA
 ## 자체 점검
 
 
-**Q1. Phase 4 의 산출물 #2 의 3 요소는?**
+**Q1. Phase 4 의 산출물 v1 의 3 요소는?**
 > 블로그 2편 (RT-2 + OpenVLA) + OpenVLA → ROS2 minimal demo + 1분 영상.
 
 
-**Q2. 산출물 #2 의 발행 후 즉시 해야 할 것은?**
+**Q2. 산출물 v1 의 발행 후 즉시 해야 할 것은?**
 > LinkedIn 공지 + 본 레포 메인 README 의 Portfolio 표 업데이트.
 
 
@@ -195,7 +195,7 @@ Real-to-Sim-to-Real (Phase 7, 2027.08~) - 자작 6DOF 팔 + Isaac Sim + OpenVLA
 
 
 **Q5. 2026.11 분기 재평가의 핵심 판단?**
-> 스파이크 결과 + 시장 신호 probe 반응을 보고 2028.03 fallback 진입 여부 / 모델 갱신 결정 (실지원은 2027.02 기본 개시).
+> 스파이크 결과 + 시장 신호 probe 반응을 보고 2028.03 fallback 진입 여부 / 모델 갱신 결정 (실지원은 2027 기본 개시).
 
 
 ---
@@ -205,7 +205,7 @@ Real-to-Sim-to-Real (Phase 7, 2027.08~) - 자작 6DOF 팔 + Isaac Sim + OpenVLA
 
 
 ### 이번 주 실습 과제
-1. Portfolio/02_VLA_demo/ 최종 git push
+1. Portfolio/01_VLA_v1/ 최종 git push
 2. 메인 README 업데이트 (Portfolio 표)
 3. LinkedIn post 공개
 4. Phase 4 회고 작성 (`~/phase4_notes/retro.md`)
@@ -227,7 +227,7 @@ Real-to-Sim-to-Real (Phase 7, 2027.08~) - 자작 6DOF 팔 + Isaac Sim + OpenVLA
 ## 이번 주 핵심 요약
 
 
-1. **산출물 #2 공개** = Phase 4 의 종착점.
+1. **산출물 v1 공개** = Phase 4 의 종착점.
 2. **LinkedIn 공지** 로 시장 노출.
 3. **메인 README 업데이트** Portfolio 표 채움.
 4. **회고** 다음 phase 에 적용할 구체 action.

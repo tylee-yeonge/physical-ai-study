@@ -147,7 +147,7 @@ imageio.mimsave('arm_motion.mp4', imgs, fps=20)
 ```
 
 
-이게 Phase 7 산출물 #4 영상의 Sim 부분.
+이게 Phase 7 산출물 v3 영상의 Sim 부분.
 
 
 ---

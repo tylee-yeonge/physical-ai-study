@@ -128,7 +128,7 @@ python practice_first_inference.py
 ---
 
 
-## 실습 2: Latency 측정 (산출물 #4 의 기초 데이터)
+## 실습 2: Latency 측정 (산출물 v3 의 기초 데이터)
 
 
 **파일명**: `practice_latency_measure.py`
@@ -137,7 +137,7 @@ python practice_first_inference.py
 ```python
 """
 실습 2: 100 회 inference 의 latency 통계
-이게 산출물 #4 (Real-to-Sim-to-Real) 의 'VLA latency 측정' 의 baseline.
+이게 산출물 v3 (Real-to-Sim-to-Real) 의 'VLA latency 측정' 의 baseline.
 """
 import time
 import torch
@@ -222,10 +222,10 @@ print()
 print(f"Throughput : {1000 / arr.mean():.2f} Hz")
 
 
-# -- 2-5. 결과 저장 (산출물 #4 의 baseline) --
+# -- 2-5. 결과 저장 (산출물 v3 의 baseline) --
 np.save("openvla_latency_4070_int4.npy", arr)
 print("\n 결과 저장: openvla_latency_4070_int4.npy")
-print("-> Phase 7 의 산출물 #4 에서 비교 baseline 으로 사용")
+print("-> Phase 7 의 산출물 v3 에서 비교 baseline 으로 사용")
 
 
 print("\n 실습 2 완료!")
@@ -244,7 +244,7 @@ python practice_latency_measure.py
 - Throughput: 5-7 Hz
 
 
-> 이 latency 데이터를 Phase 7 의 산출물 #4 영상에서 직접 인용. "RTX 4070 + 4-bit OpenVLA = 6Hz, 5Hz robot control 가능".
+> 이 latency 데이터를 Phase 7 의 산출물 v3 영상에서 직접 인용. "RTX 4070 + 4-bit OpenVLA = 6Hz, 5Hz robot control 가능".
 
 
 ---
@@ -299,7 +299,7 @@ python practice_latency_measure.py
 - [ ] `practice_latency_measure.py` 실행 + 통계 확보
 - [ ] `errors_log.md` 작성
 - [ ] quiz_easy / quiz_medium 풀기
-- [ ] `openvla_latency_4070_int4.npy` git commit (산출물 #4 의 입력 데이터)
+- [ ] `openvla_latency_4070_int4.npy` git commit (산출물 v3 의 입력 데이터)
 
 
 ---

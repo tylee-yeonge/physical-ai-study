@@ -1,7 +1,7 @@
 # Week 12: Rerun 시각화 + 1분 데모 영상 마감
 
 
-> **이번 주 목표**: Rerun.io 로 inference 시각화 (image / instruction / action / latency) + 1분 영상 제작. Phase 4 의 산출물 #2 의 마지막 1/3 (ROS2 minimal demo + 1분 영상) 완성.
+> **이번 주 목표**: Rerun.io 로 inference 시각화 (image / instruction / action / latency) + 1분 영상 제작. Phase 4 의 산출물 v1 의 마지막 1/3 (ROS2 minimal demo + 1분 영상) 완성.
 > **예상 시간**: 10시간 (Rerun 통합 4h + 영상 녹화 3h + 편집 + 자막 3h)
 > **핵심 질문**: "면접관이 1분 영상만 봐도 'OpenVLA inference + ROS2 통합' 의 핵심 흐름을 이해할 수 있는가?"
 
@@ -28,11 +28,11 @@
 ## 시작하기 전에 — Phase 4 의 결말
 
 
-이번 주가 끝나면 **산출물 #2 완성**:
+이번 주가 끝나면 **산출물 v1 완성**:
 - 블로그 2 편 (RT-2 + OpenVLA, week 3 + week 7)
 - OpenVLA -> ROS2 토픽 minimal demo (week 8-11)
 - **1분 데모 영상** (이번 주)
-- 발행: `physical-ai-study` 레포의 `Portfolio/02_VLA_demo/`
+- 발행: `physical-ai-study` 레포의 `Portfolio/01_VLA_v1/`
 
 
 ---
@@ -132,7 +132,7 @@ class RerunLogger(Node):
 
 ```
 0:00 ~ 0:10 Intro
-  - "Phase 4 산출물 #2: OpenVLA + ROS2 minimal demo"
+  - "Phase 4 산출물 v1: OpenVLA + ROS2 minimal demo"
   - 본인 정보 / 로드맵 한 줄
 
 
@@ -154,7 +154,7 @@ class RerunLogger(Node):
 
 
 0:55 ~ 1:00 Next
-  - Phase 7 산출물 #4 의 예고편
+  - Phase 7 산출물 v3 의 예고편
 ```
 
 
@@ -199,8 +199,8 @@ class RerunLogger(Node):
 physical-ai-study/
   README.md # 전체 진입점
   Portfolio/
-    01_Detection_Depth/ # 산출물 #1 (Phase 3)
-    02_VLA_demo/ # 산출물 #2 (Phase 4) <- 본 주의 산출물
+    # (perception 은 비공개 로그, Portfolio 미포함)
+    01_VLA_v1/ # 산출물 v1 (Phase 4) <- 본 주의 산출물
       README.md
       vla_demo.mp4
       blog_links.md
@@ -234,7 +234,7 @@ physical-ai-study/
 
 
 **Q5. 영상 마무리 (0:55 ~ 1:00) 에 무엇을 넣나?**
-> Phase 7 산출물 #4 의 예고편. "다음은 자작 6DOF 팔과 통합" 같은 한 줄. 면접관에게 다음 산출물의 기대 만들기.
+> Phase 7 산출물 v3 의 예고편. "다음은 자작 6DOF 팔과 통합" 같은 한 줄. 면접관에게 다음 산출물의 기대 만들기.
 
 
 ---
@@ -249,13 +249,13 @@ physical-ai-study/
 3. 1분 영상 시나리오 작성
 4. OBS / Kazam 으로 녹화
 5. 편집 + 자막
-6. `Portfolio/02_VLA_demo/` 에 packaging
+6. `Portfolio/01_VLA_v1/` 에 packaging
 7. quiz_easy / quiz_medium
 
 
 ### 다음 주 (week 13) 준비
 - 블로그 2편 다시 읽고 부족한 부분 메모
-- Portfolio 의 다른 산출물 (#1, #2.5) 정리 상태 점검
+- Portfolio 의 다른 산출물 (v2 선행 등) 정리 상태 점검
 
 
 ---
@@ -265,10 +265,10 @@ physical-ai-study/
 
 
 1. **Rerun.io 로 multi-modal 시각화** — image / action / latency 한 화면.
-2. **1분 영상 = Phase 4 산출물 #2 의 결정타** — 면접관의 가장 짧은 진입점.
+2. **1분 영상 = Phase 4 산출물 v1 의 결정타** — 면접관의 가장 짧은 진입점.
 3. **한국어 자막** + 핵심 수치 강조.
 4. **GitHub Portfolio 직접 호스팅** (< 50 MB).
-5. **Next 한 줄** 로 Phase 7 산출물 #4 예고편.
+5. **Next 한 줄** 로 Phase 7 산출물 v3 예고편.
 
 
 ---

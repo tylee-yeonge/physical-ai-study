@@ -56,7 +56,7 @@
 4. Image DR 4x 향상
 
 
-Phase 7 의 산출물 #4 영상에 인용 가능한 정량 증거.
+Phase 7 의 산출물 v3 영상에 인용 가능한 정량 증거.
 ```
 
 
@@ -102,7 +102,7 @@ for i, t in enumerate(timestamps):
 ```
 
 
-Rerun UI 에서 4 panel 동시 시각화. Phase 7 산출물 #4 영상의 핵심 컨텐츠.
+Rerun UI 에서 4 panel 동시 시각화. Phase 7 산출물 v3 영상의 핵심 컨텐츠.
 
 
 ---

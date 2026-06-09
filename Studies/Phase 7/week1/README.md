@@ -23,7 +23,7 @@
 ---
 
 
-## Phase 7 = 결정타 산출물 #4
+## Phase 7 = 정점 산출물 v3
 
 
 ```
@@ -34,7 +34,7 @@
 - Hardware-Arm Stage 2: 자작 6DOF 팔
 
 
-산출물 #4 (2027.08~):
+산출물 v3 (2027.08~):
 - Real-to-Sim-to-Real 영상 1~3분
 - ROS2 패키지
 - latency / Sim/Real gap 보고서

@@ -16,7 +16,7 @@
 2027.01 전반: Dynamixel + U2D2 구매 (스파이크 부품 재활용) + URDF + ROS2 드라이버
 2027.01 후반: pick-and-place (programmed motion)
 2027.02: Isaac Sim 임포트 + 1분 영상
-        -> 산출물 #2.5
+        -> v2 선행 하드웨어
 ```
 
 
@@ -55,7 +55,7 @@
 ### 2027.02: 동작 + Sim
 - pick-and-place (programmed motion)
 - Isaac Sim URDF 임포트
-- 1분 영상 -> 산출물 #2.5
+- 1분 영상 -> v2 선행 하드웨어
 
 
 ---

@@ -1,9 +1,9 @@
-# Studies/Phase 7 — Real-to-Sim-to-Real (결정타 산출물 #4)
+# Studies/Phase 7 — Real-to-Sim-to-Real (정점 산출물 v3)
 
 
 > **학습 기간**: 2027.08~ (3개월, 12주)
 > **마스터 가이드**: [`Roadmap/Phase 7.md`](../../Roadmap/Phase%207.md)
-> **자료 미리 작성됨** — 진입 시 (2027.05) 다시 체크 후 학습 시작
+> **자료 미리 작성됨** — 진입 시 (2027.08) 다시 체크 후 학습 시작
 
 
 ---
@@ -24,7 +24,7 @@ Studies/Phase 7/
 ```
 
 
-## week 자료 형식 (기존 Phase 3 패턴)
+## week 자료 형식 (Phase 3 패턴)
 
 
 - `README.md` / `PRACTICE.md` / `quiz_easy.py` / `quiz_medium.py` / `quiz_solutions/` / `requirements.txt`
@@ -35,9 +35,9 @@ Studies/Phase 7/
 
 | 의존 | 출처 |
 |---|---|
-| OpenVLA → ROS2 minimal demo | Phase 4 산출물 #2 |
+| OpenVLA → ROS2 minimal demo | Phase 4 산출물 v1 |
 | Isaac Sim 디지털 트윈 + Sim/Real gap 측정 인프라 | Phase 6 |
 | 자작 6DOF 팔 + 안전 인터록 기초 | [`Studies/Hardware-Arm/`](../Hardware-Arm/) Stage 2 |
 
 
-> 본 Phase 가 *Real-to-Sim-to-Real* 산출물 #4 (결정타) 의 마지막 통합 단계.
+> 본 Phase 가 *Real-to-Sim-to-Real* 산출물 v3 (결정타) 의 마지막 통합 단계.

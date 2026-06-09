@@ -113,7 +113,7 @@ for episode in range(10):
 
 ## 결론
 Domain Randomization 으로 Sim image 를 Real 에 가깝게.
-Phase 7 산출물 #4 에서 Sim/Real 의 robust action 검증 가능.
+Phase 7 산출물 v3 에서 Sim/Real 의 robust action 검증 가능.
 ```
 
 

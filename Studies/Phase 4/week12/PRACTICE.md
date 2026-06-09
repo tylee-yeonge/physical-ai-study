@@ -1,7 +1,7 @@
 # Week 12 실습: Rerun + rerun_logger + 1분 영상 + 패키징
 
 
-> **실습 목표**: Rerun 시각화 + 1분 영상 + Portfolio/02_VLA_demo/ 완성.
+> **실습 목표**: Rerun 시각화 + 1분 영상 + Portfolio/01_VLA_v1/ 완성.
 > **예상 시간**: 8-10시간
 
 
@@ -247,7 +247,7 @@ ros2 run vla_node rerun_logger
 
 
 [화면: Title 카드]
-"Phase 4 산출물 #2"
+"Phase 4 산출물 v1"
 "OpenVLA -> ROS2 minimal demo"
 "AMR ROS 양산 SW + Physical AI 통합 - AMR ROS 실무 5년 (2021.06~) SW 엔지니어"
 
@@ -314,7 +314,7 @@ RTX 4070 4-bit nf4 에서 mean latency 165ms, 6Hz."
 
 
 [narration]
-"감사합니다. Phase 7 의 결정타 산출물 #4 에서 다시 뵙겠습니다."
+"감사합니다. Phase 7 의 정점 산출물 v3 에서 다시 뵙겠습니다."
 ```
 
 
@@ -349,13 +349,13 @@ shotcut my_recording.mkv
 ## 실습 5: Portfolio 패키징
 
 
-**디렉토리**: `physical-ai-study/Portfolio/02_VLA_demo/`
+**디렉토리**: `physical-ai-study/Portfolio/01_VLA_v1/`
 
 
 ```bash
 cd ~/code/physical-ai-study
-mkdir -p Portfolio/02_VLA_demo
-cd Portfolio/02_VLA_demo
+mkdir -p Portfolio/01_VLA_v1
+cd Portfolio/01_VLA_v1
 
 
 # 영상
@@ -364,7 +364,7 @@ cp /path/to/vla_demo.mp4 .
 
 # README
 cat > README.md << EOF
-# 산출물 #2: OpenVLA -> ROS2 minimal demo
+# 산출물 v1: OpenVLA -> ROS2 minimal demo
 
 
 ## 영상
@@ -399,8 +399,8 @@ EOF
 
 
 # git
-git add Portfolio/02_VLA_demo
-git commit -m "phase4: vla_demo (산출물 #2)"
+git add Portfolio/01_VLA_v1
+git commit -m "phase4: vla_demo (산출물 v1)"
 git push
 ```
 
@@ -415,7 +415,7 @@ git push
 - [ ] rerun_logger ROS 노드 작성 + 빌드
 - [ ] 영상 시나리오 작성 (`video_script.md`)
 - [ ] 1분 녹화 + 편집 + 자막
-- [ ] `Portfolio/02_VLA_demo/` 디렉토리 생성
+- [ ] `Portfolio/01_VLA_v1/` 디렉토리 생성
 - [ ] README + mp4 + 데이터 commit
 - [ ] git push
 - [ ] LinkedIn / Twitter 공유 (선택)

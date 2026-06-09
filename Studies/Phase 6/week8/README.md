@@ -1,7 +1,7 @@
 # Week 8: Latency 측정 인프라 (Sim, Real, gap)
 
 
-> **이번 주 목표**: Sim 과 Real 의 latency 를 표준화된 방법으로 측정. Phase 7 산출물 #4 의 핵심 측정.
+> **이번 주 목표**: Sim 과 Real 의 latency 를 표준화된 방법으로 측정. Phase 7 산출물 v3 의 핵심 측정.
 > **예상 시간**: 8시간
 
 
@@ -123,10 +123,10 @@ plt.savefig("latency_hist.png")
 ```
 
 
-### 7. Phase 7 산출물 #4 의 핵심
+### 7. Phase 7 산출물 v3 의 핵심
 
 
-본 주의 인프라가 Phase 7 산출물 #4 의 결정타.
+본 주의 인프라가 Phase 7 산출물 v3 의 결정타.
 "Real-to-Sim-to-Real" 의 latency gap 을 정량적으로 측정.
 
 

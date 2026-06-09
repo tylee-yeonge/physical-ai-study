@@ -56,7 +56,7 @@
 
 
 예시:
-0:05 "Phase 4 산출물 #2 - OpenVLA + ROS2"
+0:05 "Phase 4 산출물 v1 - OpenVLA + ROS2"
 0:10 "AMR ROS 양산 SW 실무 5년 엔지니어"
 0:15 "ROS2 노드 구조"
 0:20 "/camera/image_raw -> vla_node -> /vla/action"
@@ -92,7 +92,7 @@ YouTube / LinkedIn 미리보기에 노출되는 이미지:
 ```
 [Title 카드]
 큰 글씨: "OpenVLA -> ROS2 Minimal Demo"
-작은 글씨: "Phase 4 산출물 #2"
+작은 글씨: "Phase 4 산출물 v1"
 하단: "AMR ROS 양산 SW + Physical AI 통합"
 ```
 
@@ -158,7 +158,7 @@ ffmpeg -i vla_demo.mp4 -ss 00:00:25 -t 8 \
 
 
 ```
-Portfolio/02_VLA_demo/
+Portfolio/01_VLA_v1/
   README.md # week 14
   vla_demo.mp4 # 본 주 (60s, < 30MB)
   demo.gif # 본 주 (5s preview, < 5MB)
@@ -209,12 +209,12 @@ Portfolio/02_VLA_demo/
 3. thumbnail 제작
 4. GIF preview 생성
 5. Final export
-6. 모든 파일을 Portfolio/02_VLA_demo/ 에 정리
+6. 모든 파일을 Portfolio/01_VLA_v1/ 에 정리
 7. quiz_easy / quiz_medium
 
 
 ### 다음 주 (week 16) 준비
-- 산출물 #2 공개 (git push + LinkedIn 공지)
+- 산출물 v1 공개 (git push + LinkedIn 공지)
 
 
 ---
@@ -236,4 +236,4 @@ Portfolio/02_VLA_demo/
 - 이전: [Week 14 - README + 환경 가이드](../week14/README.md)
 
 
-다음: [Week 16 - 산출물 #2 공개](../week16/README.md)
+다음: [Week 16 - 산출물 v1 공개](../week16/README.md)

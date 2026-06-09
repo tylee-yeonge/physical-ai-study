@@ -1,7 +1,7 @@
 # Week 14: ROS2 demo README + 환경 세팅 가이드
 
 
-> **이번 주 목표**: `Portfolio/02_VLA_demo/README.md` 를 면접관이 따라할 수 있는 수준으로 다듬는다. 다른 사람도 환경 셋업 + 재현 가능.
+> **이번 주 목표**: `Portfolio/01_VLA_v1/README.md` 를 면접관이 따라할 수 있는 수준으로 다듬는다. 다른 사람도 환경 셋업 + 재현 가능.
 > **예상 시간**: 6시간 (README 작성 4h + 검증 2h)
 > **핵심 질문**: "내 README 만 따라가서 다른 사람이 30분 안에 inference 동작까지 갈 수 있는가?"
 
@@ -93,7 +93,7 @@ ros2 pkg list | grep vla_node
 
 ```bash
 git clone https://github.com/<you>/physical-ai-study
-cd physical-ai-study/Portfolio/02_VLA_demo
+cd physical-ai-study/Portfolio/01_VLA_v1
 docker-compose up # 또는 ./quickstart.sh
 ```
 

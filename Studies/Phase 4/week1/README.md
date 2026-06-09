@@ -36,16 +36,16 @@ Phase 4는 **VLA (Vision-Language-Action) 의 논문 이해 + ROS2 통합 첫 �
 
 - **week 1-3**: RT-2 정독 + 블로그 1편 (이번 주는 1주)
 - **week 4-7**: OpenVLA 정독 + 블로그 1편
-- **week 8-12**: OpenVLA HuggingFace inference → ROS2 토픽 minimal demo (산출물 #2)
-- **week 13-16**: 블로그 2편 마무리 + 산출물 #2 패키징
+- **week 8-12**: OpenVLA HuggingFace inference → ROS2 토픽 minimal demo (산출물 v1)
+- **week 13-16**: 블로그 2편 마무리 + 산출물 v1 패키징
 
 
-본 phase의 최종 산출물 #2 (2026.12 공개):
+본 phase의 최종 산출물 v1 (2026 하반기 공개):
 - RT-2 + OpenVLA 블로그 2편
 - OpenVLA inference → ROS2 토픽 `vla_action` publish 하는 minimal demo + 1분 영상
 
 
-> Phase 4 의 ROS2 demo 는 Phase 7 의 **Real-to-Sim-to-Real (산출물 #4 결정타)** 의 토대다. 여기서 익힌 inference 파이프라인이 Phase 7 에서 자작 6DOF 팔 + Isaac Sim 과 결합된다.
+> Phase 4 의 ROS2 demo 는 Phase 7 의 **Real-to-Sim-to-Real (산출물 v3 결정타)** 의 토대다. 여기서 익힌 inference 파이프라인이 Phase 7 에서 자작 6DOF 팔 + Isaac Sim 과 결합된다.
 
 
 ### 왜 RT-2 부터 시작하는가
@@ -364,7 +364,7 @@ RT-2 의 가장 인상적인 결과는 robot data 에 명시적으로 없는 **�
 
 
 **Q4. RT-2 의 한계 중 양산 SW 엔지니어에게 가장 치명적인 것은?**
-> Inference latency (~200ms+). 5Hz 정도라 실시간 30Hz 제어 어려움. Phase 7 의 산출물 #4 에서 이 latency 를 측정해 "양산 시점 비용" 으로 증거화하는 것이 본 로드맵의 핵심 차별화 포인트.
+> Inference latency (~200ms+). 5Hz 정도라 실시간 30Hz 제어 어려움. Phase 7 의 산출물 v3 에서 이 latency 를 측정해 "양산 시점 비용" 으로 증거화하는 것이 본 로드맵의 핵심 차별화 포인트.
 
 
 **Q5. Co-fine-tuning 의 비율 (Web : Robot) 이 8:2 인 이유는?**

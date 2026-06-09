@@ -20,7 +20,7 @@
 
 
 ```
-Portfolio/04_R2S2R/
+Portfolio/03_VLA_v3/
   README.md
   r2s2r_demo.mp4
   demo.gif
@@ -65,7 +65,7 @@ Portfolio/04_R2S2R/
 
 ```bash
 git clone ...
-cd Portfolio/04_R2S2R
+cd Portfolio/03_VLA_v3
 ./scripts/setup.sh
 ./scripts/run_demo.sh
 ```

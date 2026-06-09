@@ -53,7 +53,7 @@ Terminal 4: Sim 의 카메라가 동시에 vla_node 의 input?
 Q1. 동시 실행 흐름? > Real camera -> vla_node -> Sim mirror + Real.
 Q2. 영상 구성? > Real | Sim | metrics.
 Q3. 차이 분석? > Joint / ee 시계열, Phase 6 의 4 gap.
-Q4. 보고서 입력? > Phase 7 #4 의 영상의 한 segment.
+Q4. 보고서 입력? > Phase 7 v3 의 영상의 한 segment.
 
 
 ## 요약
@@ -61,7 +61,7 @@ Q4. 보고서 입력? > Phase 7 #4 의 영상의 한 segment.
 2. Side-by-side 영상
 3. 차이 시계열 분석
 4. Phase 6 의 4 gap 인용
-5. 산출물 #4 의 핵심 컨텐츠
+5. 산출물 v3 의 핵심 컨텐츠
 
 
 - [Week 7](../week7/README.md) | [Week 9](../week9/README.md)

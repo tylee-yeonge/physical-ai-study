@@ -31,7 +31,7 @@ Phase 7 의 새로움:
 - Real 의 작업 완료율
 
 
-### 산출물 #4 의 정량 표 (template)
+### 산출물 v3 의 정량 표 (template)
 
 
 ```markdown
@@ -45,13 +45,13 @@ Phase 7 의 새로움:
 ```
 
 
-이 표가 Phase 7 산출물 #4 의 핵심.
+이 표가 Phase 7 산출물 v3 의 핵심.
 
 
 ## 자체 점검
 Q1. 4 gap 의 source? > Phase 6 week 8-11.
 Q2. Phase 7 의 새로움? > Closed loop success rate.
-Q3. 보고서 활용? > 산출물 #4 의 영상에 인용.
+Q3. 보고서 활용? > 산출물 v3 의 영상에 인용.
 Q4. Sim/Real 차이? > Latency / 반복성 / force / image.
 Q5. 양산 차별화 증거? > 정량 수치 모두 (latency / 안전 / 비용).
 
@@ -59,7 +59,7 @@ Q5. 양산 차별화 증거? > 정량 수치 모두 (latency / 안전 / 비용).
 ## 요약
 1. 4 gap 재측정 (LoRA 후)
 2. 정량 표 통합
-3. 산출물 #4 의 핵심 보고서
+3. 산출물 v3 의 핵심 보고서
 4. "VLA latency / 안전 메커니즘 / 양산 비용" 증거 종합
 5. 다음: 영상 마감
 

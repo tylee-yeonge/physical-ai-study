@@ -32,7 +32,7 @@ Phase 6 = Phase 7 의 사전 준비:
 
 ```
 Phase 6: 자작 팔 URDF -> Isaac Sim 디지털 트윈 + Sim/Real gap 측정
-Phase 7: OpenVLA + ROS2 + 자작 팔 + 디지털 트윈 = Real-to-Sim-to-Real (산출물 #4)
+Phase 7: OpenVLA + ROS2 + 자작 팔 + 디지털 트윈 = Real-to-Sim-to-Real (산출물 v3)
 ```
 
 

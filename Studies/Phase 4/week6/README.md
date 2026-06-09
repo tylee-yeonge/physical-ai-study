@@ -18,7 +18,7 @@
 | 2 | HuggingFace 모델 카드 정독 | https://huggingface.co/openvla/openvla-7b | usage / VRAM / license |
 | 3 | 4-bit quantization 셋업 | `PRACTICE.md` 1 | bitsandbytes nf4 |
 | 4 | 첫 inference 실행 | `PRACTICE.md` 2 | mock image + instruction |
-| 5 | latency 측정 | `PRACTICE.md` 3 | 첫 latency 데이터 (이게 산출물 #4 의 기초) |
+| 5 | latency 측정 | `PRACTICE.md` 3 | 첫 latency 데이터 (이게 산출물 v3 의 기초) |
 | 6 | 퀴즈 | quiz_easy / quiz_medium | quantization / inference 흐름 |
 
 
@@ -125,7 +125,7 @@ model = AutoModelForVision2Seq.from_pretrained(
 ### 4. Latency 측정의 중요성
 
 
-본 로드맵의 **산출물 #4 결정타** 의 핵심 측정 지표가 latency 다. 이번 주에 첫 데이터를 확보:
+본 로드맵의 **산출물 v3 결정타** 의 핵심 측정 지표가 latency 다. 이번 주에 첫 데이터를 확보:
 
 
 ```
@@ -280,7 +280,7 @@ action = vla.predict_action(**inputs, unnormalize_key="bridge_orig", do_sample=F
 1. **4-bit quantization (bitsandbytes nf4) 필수** RTX 4070 12GB 환경.
 2. **`predict_action()` + `unnormalize_key`**: OpenVLA 의 custom inference API.
 3. **Latency ~ 100-200ms**: LM decoder 가 대부분.
-4. **첫 데이터 확보**: 산출물 #4 의 latency 측정의 baseline.
+4. **첫 데이터 확보**: 산출물 v3 의 latency 측정의 baseline.
 5. **다음 주부터 블로그 + ROS2 demo**: 본격적 통합 시작.
 
 

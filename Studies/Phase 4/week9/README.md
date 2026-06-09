@@ -66,7 +66,7 @@ Output topics:
 - 또는 `geometry_msgs/PoseStamped` 로 absolute pose 출력
 
 
-Phase 7 의 산출물 #4 에서 custom msg 로 전환 권장:
+Phase 7 의 산출물 v3 에서 custom msg 로 전환 권장:
 
 
 ```
@@ -146,7 +146,7 @@ def image_callback(self, msg):
 ```
 
 
-### 5. 입출력 spec 1 페이지 (산출물 #2 의 일부)
+### 5. 입출력 spec 1 페이지 (산출물 v1 의 일부)
 
 
 ```

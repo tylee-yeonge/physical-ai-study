@@ -112,7 +112,7 @@ wget -O ~/phase4_notes/papers/rt2.pdf "https://arxiv.org/pdf/2307.15818.pdf"
 
 
 ## 9. 본 로드맵 관점에서의 시사점
-- 산출물 #4 (Real-to-Sim-to-Real) 에 어떤 영향: ______________
+- 산출물 v3 (Real-to-Sim-to-Real) 에 어떤 영향: ______________
 - 양산 SW 엔지니어 면접에서 강조할 포인트: _____________________
 
 
@@ -358,7 +358,7 @@ python practice_action_tokenization.py
 4. **Co-fine-tuning**: web : robot 비율 / 이유
 5. **Emergent Capability 4 사례**: 한 줄씩
 6. **Limitations 5 가지**: 한 줄씩 (latency / closed / etc.)
-7. **본 로드맵 관점**: 산출물 #4 와의 연결 / 면접 포인트
+7. **본 로드맵 관점**: 산출물 v3 와의 연결 / 면접 포인트
 8. **다음 주 (week 2) 시작 질문**: 적어도 1 개
 
 

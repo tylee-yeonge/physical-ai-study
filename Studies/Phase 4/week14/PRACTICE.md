@@ -1,7 +1,7 @@
 # Week 14 실습: README 작성 + 환경 세팅 가이드 + 검증
 
 
-> **실습 목표**: `Portfolio/02_VLA_demo/README.md` 완성 + clean 환경에서 재현 검증.
+> **실습 목표**: `Portfolio/01_VLA_v1/README.md` 완성 + clean 환경에서 재현 검증.
 > **예상 시간**: 5시간
 
 
@@ -11,14 +11,14 @@
 ## 실습 1: README 작성 (전체 골격)
 
 
-**파일명**: `Portfolio/02_VLA_demo/README.md`
+**파일명**: `Portfolio/01_VLA_v1/README.md`
 
 
 ```markdown
 # OpenVLA -> ROS2 Minimal Demo
 
 
-> **Phase 4 산출물 #2** of [physical-ai-study](https://github.com/...)
+> **Phase 4 산출물 v1** of [physical-ai-study](https://github.com/...)
 > Vision-Language-Action 모델을 ROS2 환경에 통합한 minimal demo.
 
 
@@ -53,7 +53,7 @@ flowchart LR
 
 \`\`\`bash
 git clone https://github.com/<you>/physical-ai-study
-cd physical-ai-study/Portfolio/02_VLA_demo
+cd physical-ai-study/Portfolio/01_VLA_v1
 
 
 # 환경 세팅 (~ 10분)
@@ -182,7 +182,7 @@ Raw data: [latency_data.csv](latency_data.csv)
   author = {Your Name},
   title = {Phase 4 Vla Demo - OpenVLA + ROS2},
   year = {2026},
-  url = {https://github.com/<you>/physical-ai-study/tree/main/Portfolio/02_VLA_demo},
+  url = {https://github.com/<you>/physical-ai-study/tree/main/Portfolio/01_VLA_v1},
 }
 \`\`\`
 ```
@@ -194,7 +194,7 @@ Raw data: [latency_data.csv](latency_data.csv)
 ## 실습 2: setup.sh 스크립트
 
 
-**파일명**: `Portfolio/02_VLA_demo/scripts/setup.sh`
+**파일명**: `Portfolio/01_VLA_v1/scripts/setup.sh`
 
 
 ```bash

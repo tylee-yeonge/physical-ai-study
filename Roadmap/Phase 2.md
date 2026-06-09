@@ -1,46 +1,11 @@
 # Phase 2: Perception을 위한 기하학 기초
 
 
-> **기간**: 4주 (기존 8주 → 4주 압축, Optical Flow 제거)
+> **기간**: 4주
 > **목표**: 카메라 행렬·왜곡·Multi-view 기하를 사용해 **2D 관측과 3D 세계를 연결**한다. 3D Object Detection / Depth Estimation / BEV의 기하학적 기초.
 > **주간 시간**: Week 3 6-9시간, Week 4 5-7시간 (하이브리드 적용)
 > **언어**: C++ (OpenCV)
 > **하드웨어**: Ubuntu PC (RTX 4070) + ELP Stereo Camera
-
-
----
-
-
-## 재구조화 회고 (2026-04-10)
-
-
-이 Phase 는 원래 **컴퓨터 비전 기초 (8주)** 였고, 완료 기준이 *"VINS-Fusion 의 feature_tracker 노드가 뭘 하는지 이해"* 였다.
-이직 타겟이 **Perception Engineer** 로 확정되면서 SLAM 트랙(VO/BA, VIO)이 [Archive/SLAM-legacy/](../Archive/SLAM-legacy/) 로 이동했고, Phase 2 도 SLAM 프레이밍을 제거하고 **Perception 중심 4주 구조** 로 재작성됐다.
-
-
-기존 8주의 학습 결과(Week 1, 2 카메라 모델/캘리브레이션)는 보존되었고, 새 구조의 Week 1, 2 는 **README 만 Perception 맥락으로 리프레이밍** 한다. Week 3, 4 는 **새 코드** 로 작성된다.
-
-
-기존 원본은 [Archive/SLAM-legacy/Roadmap/Phase 2.md](../Archive/SLAM-legacy/Roadmap/Phase%202.md) 에서 확인할 수 있다.
-
-
-### 2026-04-20: 하이브리드 전환 회고
-
-
-Phase 2 Week 3 진행 중 아래를 재점검했다:
-- scratch C++ 구현이 Week 3 후반부터 학습 효용 대비 시간 소모가 크게 느껴짐
-- 출장지에서 원격 작업이 잦아 실제 학습 환경이 "Ubuntu PC 원격 + 데이터셋" 중심으로 자연스럽게 재편됨
-- Jetson Orin Nano 실습은 당장 시간 확보가 어려워 **보류**
-
-
-결정:
-- Week 3: scratch 구현은 마무리 짓되, **KITTI 데이터 검증**을 추가해 실데이터 감각을 선제 확보
-- Week 4: **scratch 구현 생략**, OpenCV API 호출 + KITTI/nuScenes 데이터셋 실습으로 전환
-- Phase 3 이후도 **Ubuntu PC 중심 + 원격 접속**을 전제로 재프레이밍
-- 장비 표기를 **ELP Stereo Camera** 로 통일
-
-
-기존 Jetson 관련 가정은 하드웨어 실습 시간 확보 시점까지 "보류" 주석으로 남긴다.
 
 
 ---
@@ -70,10 +35,10 @@ Phase 2 Week 3 진행 중 아래를 재점검했다:
 
 | Week | 주제 | 학습 상태 | 코드 상태 |
 |------|------|----------|----------|
-| **1** | 카메라 모델 (핀홀, K, 내부/외부 파라미터) | 학습 완료 | 기존 유지, README 리프레이밍 |
-| **2** | 렌즈 왜곡 + 캘리브레이션 | 학습 완료 | 기존 유지, README 리프레이밍 |
-| **3** | Multi-view 기하 + Stereo Rectification | 재정리 | 신규 작성 + KITTI 검증 + (선택) ELP |
-| **4** | 삼각측량 + PnP (Perception 3D 맥락) | 대기 → 하이브리드 | 이론 + OpenCV API + KITTI/nuScenes |
+| **1** | 카메라 모델 (핀홀, K, 내부/외부 파라미터) | 학습 완료 | 완료 |
+| **2** | 렌즈 왜곡 + 캘리브레이션 | 학습 완료 | 완료 |
+| **3** | Multi-view 기하 + Stereo Rectification | 학습 완료 | 작성 + KITTI 검증 + (선택) ELP |
+| **4** | 삼각측량 + PnP (Perception 3D 맥락) | 학습 완료 | 이론 + OpenCV API + KITTI/nuScenes |
 
 
 > 학습 상태는 "학습자(나)의 진행도" 이고, 코드 상태는 "이 디렉토리의 실습 코드 상태"이다.
@@ -102,7 +67,6 @@ graph LR
 
 
 > **C++ 실습**: [Studies/Phase 2/week1/](../Studies/Phase%202/week1/)
-> **README 변경**: SLAM 프레이밍 제거 → Perception 맥락으로 리프레이밍
 
 
 #### 기본 개념 (학습 완료)
@@ -150,13 +114,13 @@ graph LR
 ---
 
 
-## Section 2.2: Multi-view 기하 (Week 3, 4) — Perception 맥락 신규
+## Section 2.2: Multi-view 기하 (Week 3, 4)
 
 
 ### Week 3: Multi-view 기하 + Stereo Rectification
 
 
-> **C++ 실습 (신규)**: [Studies/Phase 2/week3/](../Studies/Phase%202/week3/)
+> **C++ 실습**: [Studies/Phase 2/week3/](../Studies/Phase%202/week3/)
 > **실습 시간**: 6-8시간
 
 
@@ -181,7 +145,7 @@ graph LR
 - **Visual relocalization (Phase 4 NeRF)**: 두 뷰의 상대 자세 추정은 NeRF/Gaussian Splatting 의 카메라 포즈 입력
 
 
-#### 실습 코드 (신규 작성)
+#### 실습 코드
 - `basic.cpp` — 데모 파이프라인: 샘플 stereo → E/F 계산 → Rectification → Disparity → Depth map → 결과 저장
 - `my_basic.cpp` — 사용자 구현 뼈대 (Step 1-6)
 - `quiz_easy.cpp` / `quiz_medium.cpp` — 개념 + 구현 퀴즈
@@ -203,7 +167,7 @@ graph LR
 
 
 ### Week 4: 삼각측량 + PnP (Perception 3D 맥락)
-> **C++ 실습 (신규)**: [Studies/Phase 2/week4/](../Studies/Phase%202/week4/)
+> **C++ 실습**: [Studies/Phase 2/week4/](../Studies/Phase%202/week4/)
 > **실습 시간**: 6-8시간
 
 
@@ -299,9 +263,9 @@ scratch 구현은 **생략**한다. 이유:
 Phase 2 완료 후 → **[Phase 3: Detection + Depth → PC TensorRT + ROS2 노드](Phase%203.md)** (약 2개월, 2026.06-08) 로 직진.
 
 
-> 기존 SLAM 트랙(VO/BA, VIO)은 [Archive/SLAM-legacy/](../Archive/SLAM-legacy/) 로 이동되었다. SLAM 트랙은 더 이상 메인 로드맵의 일부가 아니다.
+> SLAM 트랙(VO/BA, VIO)은 [Archive/SLAM-legacy/](../Archive/SLAM-legacy/) 에 있음. 메인 로드맵에는 포함되지 않는다.
 >
-> Phase 3 는 8주 구성 (PC TensorRT + ROS2 노드). Jetson 실기 배포는 Phase 7 이후 옵션.
+> Phase 3 는 8주 구성 (PC TensorRT + ROS2 노드). Jetson 실기 배포는 v3 이후 옵션.
 
 
 ---
@@ -323,7 +287,7 @@ Phase 2 완료 후 → **[Phase 3: Detection + Depth → PC TensorRT + ROS2 노�
 - FCOS3D / SMOKE 논문 — Monocular 3D detection 의 기하학적 후처리
 
 
-### 새 Phase 2 가 다루지 않는 것 (Archive 참조)
+### Phase 2 가 다루지 않는 것 (Archive 참조)
 - ORB / SIFT / AKAZE 등 특징점 디스크립터 deep dive → [Archive/SLAM-legacy/Studies/Phase 2/week3/](../Archive/SLAM-legacy/Studies/Phase%202/week3/)
 - Optical Flow / KLT 트래킹 → [Archive/SLAM-legacy/Studies/Phase 2/week8/](../Archive/SLAM-legacy/Studies/Phase%202/week8/)
 - VO/BA/VIO 시스템 통합 → [Archive/SLAM-legacy/Studies/Phase 3/](../Archive/SLAM-legacy/Studies/Phase%203/), [Phase 4/](../Archive/SLAM-legacy/Studies/Phase%204/)

@@ -29,16 +29,16 @@
 ## 시작하기 전에 — OpenVLA 가 본 로드맵에 가지는 의미
 
 
-OpenVLA 는 본 로드맵 **산출물 #2 (2026.12), #4 강화 카드 (2027.08~) 모두에서 직접 사용** 하는 모델이다:
+OpenVLA 는 본 로드맵 **산출물 v1 (2026 하반기), v3 강화 카드 (2027.08~) 모두에서 직접 사용** 하는 모델이다:
 
 
 | 산출물 | OpenVLA 의 역할 |
 |---|---|
-| #2 (2026.12) | OpenVLA HuggingFace inference → ROS2 토픽 minimal demo (week 8-12) |
-| #4 (2027.08~) | OpenVLA fork + ROS2 노드 + 자작 6DOF 팔 통합 (Real-to-Sim-to-Real) |
+| v1 (2026 하반기) | OpenVLA HuggingFace inference → ROS2 토픽 minimal demo (week 8-12) |
+| v3 (2027.08~) | OpenVLA fork + ROS2 노드 + 자작 6DOF 팔 통합 (Real-to-Sim-to-Real) |
 
 
-즉 이번 주의 정독 깊이 = 산출물 #4 의 깊이. RT-2 (week 1-3) 보다 더 정밀하게 읽어야 한다.
+즉 이번 주의 정독 깊이 = 산출물 v3 의 깊이. RT-2 (week 1-3) 보다 더 정밀하게 읽어야 한다.
 
 
 > 2026.11 분기 재평가에서 OpenVLA 가 한 세대 뒤 (π0 / Helix / GR00T 등 등장) 라면 모델 갱신 가능. 단, 본 마스터는 OpenVLA 표준 가정.
@@ -232,7 +232,7 @@ OpenX-Embodiment 는 Google + DeepMind + 21 개 institution 협력의 **로봇 t
 4. **LoRA fine-tuning 지원**: 새 robot 에 빠르게 적응
 
 
-LoRA fine-tuning 은 본 로드맵 Phase 7 의 산출물 #4 에서 자작 6DOF 팔에 OpenVLA 를 적응시킬 때 핵심 기법.
+LoRA fine-tuning 은 본 로드맵 Phase 7 의 산출물 v3 에서 자작 6DOF 팔에 OpenVLA 를 적응시킬 때 핵심 기법.
 
 
 ### 9. 한계 (OpenVLA 의 정직한 결점)
@@ -300,7 +300,7 @@ LoRA fine-tuning 은 본 로드맵 Phase 7 의 산출물 #4 에서 자작 6DOF �
 
 
 **Q4. OpenX-Embodiment 의 970K 가 가지는 의미는?**
-> RT-1 dataset 의 130K 의 약 7배. 더 중요한 건 22 embodiments 다양성으로 새 robot 으로의 generalization (LoRA fine-tuning) 가능성 확대. Phase 7 의 산출물 #4 에서 자작 6DOF 팔에 LoRA 로 적응 시 핵심 근거.
+> RT-1 dataset 의 130K 의 약 7배. 더 중요한 건 22 embodiments 다양성으로 새 robot 으로의 generalization (LoRA fine-tuning) 가능성 확대. Phase 7 의 산출물 v3 에서 자작 6DOF 팔에 LoRA 로 적응 시 핵심 근거.
 
 
 **Q5. RTX 4070 12GB 에서 OpenVLA 를 inference 하려면?**
@@ -337,7 +337,7 @@ LoRA fine-tuning 은 본 로드맵 Phase 7 의 산출물 #4 에서 자작 6DOF �
 1. **OpenVLA 는 RT-2 의 open-source 재현 + 개선**: 모델 크기 + 데이터 + 개방성 모두 변경.
 2. **Hybrid vision encoder**: DINOv2 (spatial) + SigLIP (semantic).
 3. **OpenX-Embodiment 970K episodes**: 22 embodiments, generalization 강화.
-4. **LoRA 지원**: 새 robot 빠르게 적응 (산출물 #4 의 핵심 기법).
+4. **LoRA 지원**: 새 robot 빠르게 적응 (산출물 v3 의 핵심 기법).
 5. **양산 SW 엔지니어 관점**: 4-bit quantization 으로 RTX 4070 에 inference 가능 → Phase 7 직접 사용 가능.
 
 

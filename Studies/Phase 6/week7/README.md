@@ -75,7 +75,7 @@ cv2.imwrite("comparison.png", side)
 ```
 
 
-Phase 7 산출물 #4 의 핵심 컨텐츠.
+Phase 7 산출물 v3 의 핵심 컨텐츠.
 
 
 ---
@@ -87,7 +87,7 @@ Phase 7 산출물 #4 의 핵심 컨텐츠.
 **Q1. 카메라 위치?** > External (ELP Stereo).
 **Q2. focal_length?** > Real 과 같이 ~ 15 mm.
 **Q3. 시각 gap 4?** > Lighting / Color / Geometry / Noise.
-**Q4. Side-by-side 의 가치?** > Phase 7 산출물 #4 컨텐츠.
+**Q4. Side-by-side 의 가치?** > Phase 7 산출물 v3 컨텐츠.
 **Q5. 측정 시기?** > week 11.
 
 

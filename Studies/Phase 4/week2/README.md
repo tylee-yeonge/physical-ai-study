@@ -236,7 +236,7 @@ inference 시 흐름:
 | Flow matching | diffusion 보다 빠름 | 비교적 새로움 | Helix, π0 |
 
 
-> 본 로드맵의 Phase 7 산출물 #4 에서 OpenVLA (discrete token) 를 사용. Phase 4 의 분기 재평가 (2026.11) 에서 π0 / Helix 등으로 갱신될 수 있음.
+> 본 로드맵의 Phase 7 산출물 v3 에서 OpenVLA (discrete token) 를 사용. Phase 4 의 분기 재평가 (2026.11) 에서 π0 / Helix 등으로 갱신될 수 있음.
 
 
 ---
@@ -303,7 +303,7 @@ Robot sample 에서 output text 의 처음 7~11 token 이 action 으로 해석�
 
 
 **Q4. Inference 시 quantization 오차의 영향은?**
-> dx step ~ 0.78mm 으로 cm 단위 manipulation 에는 충분. 단 sub-mm 정밀 조립 / 미세 force control 은 불가. 본 로드맵 Phase 7 의 산출물 #4 에서 이 quantization 오차를 직접 측정해 "양산 시점 비용" 의 증거로 사용 가능.
+> dx step ~ 0.78mm 으로 cm 단위 manipulation 에는 충분. 단 sub-mm 정밀 조립 / 미세 force control 은 불가. 본 로드맵 Phase 7 의 산출물 v3 에서 이 quantization 오차를 직접 측정해 "양산 시점 비용" 의 증거로 사용 가능.
 
 
 **Q5. RT-2 의 action representation 이 Diffusion Policy 대비 가지는 차이는?**

@@ -13,7 +13,7 @@
 
 
 ```
-2027.02: XM430 추가 + 6DOF + URDF 갱신
+2027.04: XM430 추가 + 6DOF + URDF 갱신
 2027.03: Teleop + 데이터 수집 + 카메라-팔 캘리브
 2027.04: 안전 인터록 (C++) + Sim 물리 파라미터 매칭
         -> Phase 6 / 7 의 하드웨어 기반
@@ -41,7 +41,7 @@
 
 
 ```
-Stage 2 (2027.02~04) Phase 6 (2027.02~05) 와 병행:
+Stage 2 (2027.04~06) Phase 6 (2027.05~07) 와 병행:
 - Stage 2 URDF 갱신 -> Phase 6 의 Isaac Sim 임포트
 - Stage 2 안전 인터록 -> Phase 7 의 안전 노드
 - Stage 2 teleop 데이터 -> Phase 7 의 LoRA fine-tune
