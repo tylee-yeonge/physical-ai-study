@@ -53,7 +53,7 @@ Phase 4 진입 (2026.06 예정) 직전에 한 번 더 점검한다.
 
 ### 2.1 계정/구독
 - [ ] Google 계정 (Colab + Drive 동일 계정)
-- [ ] Colab Pro 구독 결정 — A100/L4 사용에 필요 (월 단위 권장; Phase 4 16주간 활성)
+- [ ] (선택) Colab Pro 구독 — v2 LoRA 파인튜닝 트랙 진입 시에만 필요 (A100/L4). v1 필수 트랙은 무료 T4 + 로컬 4070 으로 충분하므로 Pro 불필요
 - [ ] Google Drive 잔여 용량 — LoRA 가중치 + 체크포인트 약 10-30GB 예상
 - [ ] HuggingFace 계정 + Access Token (OpenVLA 가중치 다운로드)
 
@@ -340,11 +340,12 @@ velog 작성 + LinkedIn 공유까지가 한 사이클.
 본 SETUP 의 진행 상태 + Phase 4 전체에서 컴퓨트 전략이 정상 가동되는지 추적용. (Roadmap Phase 4 의 완료 체크리스트와 별개; 환경 관점 단일 보드.)
 
 ### 11.1 진입 전 (week 1 시작 전)
-- [ ] Colab Pro 구독 + 컴퓨트 유닛 확보
-- [ ] Colab / 로컬 라이브러리 버전 매칭 (`requirements_colab.txt` + `requirements_local.txt` 공유)
 - [ ] §2 사전 점검 체크리스트 전부 통과
+- [ ] 로컬 추론 라이브러리 버전 확인 (`requirements_local.txt`)
 
 ### 11.2 학습 측 (병행 트랙, 선택)
+- [ ] Colab Pro 구독 + 컴퓨트 유닛 확보 (이 트랙 진입 시에만)
+- [ ] Colab / 로컬 라이브러리 버전 매칭 (`requirements_colab.txt` + `requirements_local.txt`; §7)
 - [ ] Colab 에서 베이스 OpenVLA 로드 검증 (추론 한 번 굴려보기)
 - [ ] LoRA 파인튜닝 스크립트 작성 + 체크포인트 저장 설정
 - [ ] 학습 완료 → LoRA 가중치 Drive 저장
