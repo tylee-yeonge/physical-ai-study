@@ -461,13 +461,13 @@ def visualize_side_by_side(image_path, depth_map, save_path="outputs/depth_compa
     # 원본 이미지
     image = Image.open(image_path)
     axes[0].imshow(image)
-    axes[0].set_title('원본 이미지', fontsize=14)
+    axes[0].set_title('Original Image', fontsize=14)
     axes[0].axis('off')
 
 
     # 깊이맵
     im = axes[1].imshow(depth_map, cmap='magma')
-    axes[1].set_title('깊이맵 (Depth Anything)', fontsize=14)
+    axes[1].set_title('Depth Map (Depth Anything)', fontsize=14)
     axes[1].axis('off')
     plt.colorbar(im, ax=axes[1], fraction=0.046, pad=0.04) # 색상-깊이 대응 막대
 
@@ -489,11 +489,11 @@ def visualize_colormaps(depth_map, save_path="outputs/depth_colormaps.png"):
 
     for ax, cmap_name in zip(axes, colormaps): # 컬러맵별로 같은 깊이맵 표시
         ax.imshow(depth_map, cmap=cmap_name)
-        ax.set_title(f'컬러맵: {cmap_name}', fontsize=12)
+        ax.set_title(f'Colormap: {cmap_name}', fontsize=12)
         ax.axis('off')
 
 
-    plt.suptitle('깊이맵 컬러맵 비교', fontsize=16)
+    plt.suptitle('Depth Colormap Comparison', fontsize=16)
     plt.tight_layout()
     plt.savefig(save_path, dpi=150, bbox_inches='tight')
     print(f"저장: {save_path}")
@@ -507,17 +507,17 @@ def visualize_depth_histogram(depth_map, save_path="outputs/depth_histogram.png"
 
     # 깊이맵
     axes[0].imshow(depth_map, cmap='magma')
-    axes[0].set_title('깊이맵')
+    axes[0].set_title('Depth Map')
     axes[0].axis('off')
 
 
     # 히스토그램
     axes[1].hist(depth_map.flatten(), bins=100, color='steelblue', alpha=0.7) # 모든 픽셀의 깊이값 분포
-    axes[1].set_xlabel('깊이 값')
-    axes[1].set_ylabel('픽셀 수')
-    axes[1].set_title('깊이값 분포')
+    axes[1].set_xlabel('Depth Value')
+    axes[1].set_ylabel('Pixel Count')
+    axes[1].set_title('Depth Value Distribution')
     axes[1].axvline(depth_map.mean(), color='red', linestyle='--', # 평균값 위치에 세로선
-                     label=f'평균: {depth_map.mean():.2f}')
+                     label=f'Mean: {depth_map.mean():.2f}')
     axes[1].legend()
 
 
@@ -551,7 +551,7 @@ def create_overlay(image_path, depth_map, alpha=0.5, save_path="outputs/depth_ov
     # 저장
     plt.figure(figsize=(10, 6))
     plt.imshow(overlay)
-    plt.title(f'깊이 오버레이 (alpha={alpha})')
+    plt.title(f'Depth Overlay (alpha={alpha})')
     plt.axis('off')
     plt.savefig(save_path, dpi=150, bbox_inches='tight')
     print(f"저장: {save_path}")
@@ -859,29 +859,29 @@ def analyze_depth_regions(depth_map, image_path):
 
     image = Image.open(image_path)
     axes[0, 0].imshow(image)
-    axes[0, 0].set_title('원본 이미지')
+    axes[0, 0].set_title('Original Image')
 
 
     axes[0, 1].imshow(depth_map, cmap='magma')
-    axes[0, 1].set_title('깊이맵')
+    axes[0, 1].set_title('Depth Map')
     axes[0, 1].axhline(h//3, color='cyan', linewidth=1, linestyle='--') # 상/중 경계선
     axes[0, 1].axhline(2*h//3, color='cyan', linewidth=1, linestyle='--') # 중/하 경계선
 
 
     # 영역별 히스토그램
-    axes[1, 0].hist(top.flatten(), bins=50, alpha=0.5, label='상단', color='skyblue')
-    axes[1, 0].hist(mid.flatten(), bins=50, alpha=0.5, label='중단', color='orange')
-    axes[1, 0].hist(bot.flatten(), bins=50, alpha=0.5, label='하단', color='green')
+    axes[1, 0].hist(top.flatten(), bins=50, alpha=0.5, label='Top', color='skyblue')
+    axes[1, 0].hist(mid.flatten(), bins=50, alpha=0.5, label='Middle', color='orange')
+    axes[1, 0].hist(bot.flatten(), bins=50, alpha=0.5, label='Bottom', color='green')
     axes[1, 0].legend()
-    axes[1, 0].set_title('영역별 깊이 분포')
+    axes[1, 0].set_title('Depth Distribution by Region')
 
 
     # 가로 프로파일 (중앙 라인)
     center_line = depth_map[h//2, :] # 이미지 중앙 가로줄의 깊이값
     axes[1, 1].plot(center_line)
-    axes[1, 1].set_title('중앙 수평선 깊이 프로파일')
-    axes[1, 1].set_xlabel('X 좌표')
-    axes[1, 1].set_ylabel('깊이 값')
+    axes[1, 1].set_title('Center Horizontal Depth Profile')
+    axes[1, 1].set_xlabel('X Coordinate')
+    axes[1, 1].set_ylabel('Depth Value')
 
 
     for ax in axes.flatten():
@@ -970,6 +970,7 @@ import numpy as np
 import cv2
 from PIL import Image
 from transformers import pipeline
+from ultralytics import YOLO
 
 
 def combine_yolo_depth(image_path, yolo_boxes, depth_map):
@@ -1048,29 +1049,33 @@ def combine_yolo_depth(image_path, yolo_boxes, depth_map):
 
 
 if __name__ == "__main__":
-    # 가상의 YOLO 검출 결과 (실제 사용 시 YOLO 모델로 대체)
-    yolo_boxes = [ # 각 항목: [x1, y1, x2, y2, 클래스명, confidence]
-        [100, 50, 300, 400, "person", 0.92],
-        [400, 200, 550, 350, "chair", 0.85],
-        [50, 300, 200, 450, "dog", 0.78],
-    ]
-
-
-    print("(가상의 YOLO 검출 결과로 테스트)")
-    print("실제 사용 시 ultralytics YOLO 모델로 대체하세요.")
-
-
-    # 깊이 추론
     image_path = "data/indoor.jpg"
 
 
+    # 1. 실제 YOLO 검출: yolo11n 사전학습 모델로 객체 박스 추출
+    yolo_model = YOLO("yolo11n.pt") # nano 모델 (없으면 자동 다운로드)
+    detections = yolo_model(image_path)[0] # 단일 이미지이므로 첫 결과만 사용
+
+
+    # 2. combine_yolo_depth가 기대하는 [x1, y1, x2, y2, 클래스명, conf] 형식으로 변환
+    yolo_boxes = []
+    for box in detections.boxes: # 검출된 박스마다 순회
+        x1, y1, x2, y2 = box.xyxy[0].tolist() # 픽셀 좌표 (좌상단, 우하단)
+        cls_name = yolo_model.names[int(box.cls[0])] # 클래스 인덱스 -> 이름
+        conf = float(box.conf[0]) # 검출 신뢰도
+        yolo_boxes.append([x1, y1, x2, y2, cls_name, conf])
+
+    print(f"YOLO 검출: {len(yolo_boxes)}개 객체")
+
+
+    # 3. Depth Anything으로 깊이맵 추론
     depth_pipe = pipeline("depth-estimation",
                           model="depth-anything/Depth-Anything-V2-Small-hf")
     result = depth_pipe(image_path)
     depth_map = np.array(result["depth"]).astype(np.float32) # 깊이맵을 numpy float32로
 
 
-    # 결합
+    # 4. 박스별 깊이 분석 + 시각화
     combine_yolo_depth(image_path, yolo_boxes, depth_map) # 박스별 깊이 분석
 ```
 
