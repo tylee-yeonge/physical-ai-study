@@ -19,6 +19,7 @@
 
 **핵심 메시지**:
 - 본 Phase 는 *Sim only 산출물* 을 만들지 않는다. 자작 팔과 결합해 **sim-to-real gap 을 수치로 측정·보고 = 헤드라인 산출물 v2**. v1(sim) 성공률이 그 gap 의 분모가 된다.
+- **adaptation(LoRA)은 본 Phase 가 아니라 v1.5(Phase 4.5)에서 다룬다** — 이전 README 표에 있던 "LoRA 파인튜닝"은 Phase 4.5 로 전진 배치됐고, 본 Phase 는 **둘째 층(adaptation)이 아니라 셋째 층(sim-to-real gap) 에 집중**한다. (README ↔ 본문 정합)
 - "Sim 만 돌려본 결과물은 박사도 만든다" — 자작 팔과 결합되어야 차별점. (Sim-only 배제 원칙 유지)
 - Phase 7(v3, Real-to-Sim-to-Real)은 본 Phase 의 v2 를 6DOF + 안전 인터록 + OpenVLA fork 로 확장한 정점.
 
