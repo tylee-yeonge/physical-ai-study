@@ -171,39 +171,15 @@ VLM vocabulary 의 마지막 256 개 token ID:
 ### 5. RT-2 의 Architecture Diagram (논문 Figure 1)
 
 
-```
-+----------------------+ +--------------------+
-| Vision Encoder | ----> | Image Tokens |
-| (ViT-22B in PaLI-X) | | (about 64-256) |
-+----------------------+ +--------------------+
-                                          |
-                                          v
-+----------------------+ +--------------------+
-| Text "Pick the can" | -----> | Text Tokens |
-+----------------------+ +--------------------+
-                                          |
-                                          v
-                                +--------------------+
-                                | Concatenated Tokens|
-                                +--------------------+
-                                          |
-                                          v
-                                +--------------------+
-                                | Transformer Decoder|
-                                | (PaLM / PaLI core) |
-                                +--------------------+
-                                          |
-                                          v
-                                +--------------------+
-                                | Output Tokens |
-                                | "1 128 91 241 ..." | <- 7-DoF action
-                                +--------------------+
-                                          |
-                                          v (de-tokenize)
-                                +--------------------+
-                                | Action [dx,dy,dz, |
-                                | rx,ry,rz,grip] |
-                                +--------------------+
+```mermaid
+flowchart TD
+    VE["Vision Encoder<br/>ViT-22B in PaLI-X"] --> IT["Image Tokens<br/>약 64-256개"]
+    TX["Text 명령<br/>Pick the can"] --> TT["Text Tokens"]
+    IT --> CC["Concatenated Tokens<br/>image + text 한 sequence"]
+    TT --> CC
+    CC --> DEC["Transformer Decoder<br/>PaLM / PaLI core"]
+    DEC --> OT["Output Tokens<br/>1 128 91 241 ...<br/>7-DoF action"]
+    OT -->|"de-tokenize"| ACT["Action<br/>dx dy dz<br/>rx ry rz<br/>grip"]
 ```
 
 
