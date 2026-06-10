@@ -9,6 +9,26 @@
 ---
 
 
+## Foundation Model 직무의 3개 층과 본 로드맵의 좌표
+
+
+Physical AI 에서 Foundation Model(FM)을 다루는 일은 세 층으로 나뉜다. 본 로드맵은 이 좌표 위에서 셋째 층을 핵심 강점으로 두고, 둘째 층(경량 adaptation)을 방어선으로 묶는다.
+
+
+- **첫째 층 — FM 제작**: 아키텍처 설계, 사전학습, 새로운 학습 패러다임 연구. 대규모 연구 자원과 연구 트랙이 필요한 영역으로, 본 로드맵의 범위 밖에 둔다.
+- **둘째 층 — Adaptation**: 사전학습된 FM 을 특정 로봇/태스크/환경에 맞추는 일. 도메인 데이터 수집, LoRA/co-fine-tuning 으로 모델을 그 작업에 길들인다. 본 로드맵은 **v1.5 (Phase 4.5)** 에서 이 층을 경량 범위로 편입한다.
+- **셋째 층 — Deployment/Integration**: FM 을 실제 로봇에서 동작시키는 일. 양자화/증류로 추론을 최적화하고, latency 를 관리하고, ROS2 노드로 감싸 실시간 제어 루프에 통합하고, sim-to-real 격차를 측정하고, 안전 인터록을 걸고, 하드웨어 인터페이스에 맞춘다. **본 로드맵의 핵심 강점** — AMR ROS 양산 실무 5년 + 임베디드 실시간 제어 background 가 직접 맞물린다.
+
+
+셋째 층이 필요한 이유는 FM 이 강력해질수록 분명해진다. 예로 RT-2(2023)는 55B 모델이 1-3Hz 로 동작해 고주파 제어에 부적합하고, 실시간 추론이 병목이며, 양자화/증류가 과제라고 스스로 한계를 밝혔다. 즉 FM 은 그대로 올린다고 로봇에서 돌지 않는다. **"안 돌아가는 FM 을 돌게 만드는" 엔지니어링**이 셋째 층의 실체이며, 본 로드맵의 차별화 하중이 실리는 지점이다.
+
+
+본 로드맵의 좌표: 셋째 층을 핵심 강점으로 두고, 둘째 층(경량 adaptation)을 방어선으로 묶는다. 첫째 층은 추구하지 않는다.
+
+
+---
+
+
 ## Repo 운영 방식
 
 
@@ -34,6 +54,7 @@ gantt
     Phase 2 (기하 기초 마무리) :a1, 2026-05, 1M
     Phase 3 (Detection+Depth, 비공개 리허설) :a2, 2026-06, 1M
     Phase 4 (VLA v1: zero-shot 추론 + ROS2) :a3, 2026-06, 4M
+    Phase 4.5 (VLA v1.5: LoRA adaptation) :a35, 2026-11, 2M
     section 자작 팔
     HW 스파이크 (2-DOF 리스크 검증) :crit, h0, 2026-10, 3w
     Stage 1 (2~3DOF, v2 선행) :h1, 2027-01, 2M
@@ -44,6 +65,7 @@ gantt
     Phase 7 (Real-to-Sim-to-Real, v3) :a6, 2027-08, 3M
     section 산출물 + 이직
     v1 공개 (sim VLA 루프) :milestone, d1, 2026-10, 0d
+    v1.5 공개 (LoRA adaptation) :milestone, d15, 2026-12, 0d
     정찰 지원 (v1+스파이크) :crit, sig, 2026-11, 2M
     본격 실지원 :b2, 2027-01, 12M
     이직 실현 (레인지) :milestone, d2, 2027-12, 0d
@@ -63,6 +85,7 @@ gantt
 
 
 > Phase 4(VLA)는 2026.06 진입. 후속 일정의 구체 월은 분기 재평가에서 확정한다.
+> Phase 4.5(v1.5, LoRA adaptation)를 둘째 층 증거로 편입하면서 후속 Phase 5-7 이 약 1-2개월 순연될 수 있다 (주 6-8시간 예산 + v1.5 약 6-8주). 단 v1.5 는 v1 자산 재사용으로 한계비용이 낮고, LoRA 가 Phase 6 에서 v1.5 로 전진 배치돼 Phase 6 이 가벼워지므로 일부 상쇄된다. 순 영향은 2026.11 재평가에서 실측 일정으로 재확정.
 
 
 | 시기 | Stage | 내용 | 목표 |
@@ -71,6 +94,7 @@ gantt
 | 2026.03-05 | Stage 1 | Phase 2: Perception 기하 기초 (마무리 중) | 카메라 모델 + Multi-view |
 | 2026.06 초 | Stage 1 | Phase 3 week8 통합 노드 마무리 (**비공개 리허설**, 공개 산출물 아님) | VLA wrapper 리허설 |
 | 2026.06-09 | Stage 1 | **Phase 4 (메인 단독): VLA v1 — pretrained OpenVLA zero-shot 추론 + ROS2 wrapper + sim 단일 task 루프 + 블로그** | **산출물 v1 (2026 하반기 공개)** |
+| 2026.11-12 | Stage 1 | **Phase 4.5: VLA v1.5 — OpenVLA LoRA adaptation + before/after 정량 분석** (sim 데이터, v1 자산 재사용, v1 우선 공개 후 착수) | **산출물 v1.5 (둘째 층 adaptation 증거)** |
 | 2026.06-08 (병행) | Stage 1 | **시장 신호 probe**: 타겟사 JD 5-10개 정독 + 현직자 커피챗 1-2건 + LinkedIn 헤드라인 교체 | 시장 실측 → 우선순위 보정 |
 | 2026.10 | Stage 1 | **하드웨어 스파이크 (2-3주)**: 2-DOF Dynamixel + ROS2 + URDF 파이프라인이 도는지만 검증 | 리스크 조기 검증 (분기 재평가 #1 입력) |
 | 2026.11-12 | Career | **정찰 지원** (2-3개사, 합격 기대 X, 반응 측정) + **분기 재평가 #1** | 시장 반응 측정 |
@@ -172,7 +196,7 @@ gantt
 ### Phase 4: VLA v1 — OpenVLA zero-shot 추론 + ROS2 minimal demo (약 4개월, 2026.06-09)
 > **목표**: VLA 의 아키텍처 다이어그램을 막힘없이 읽을 수 있는 수준 + pretrained OpenVLA zero-shot inference 를 ROS2 토픽으로 받는 sim 단일 task 루프
 > **선정 논문 (2편)**: RT-2, OpenVLA — 필요 시 분기 재평가에서 π0 / Helix / GR00T 로 갱신
-> **범위 (v1)**: pretrained zero-shot (LoRA 파인튜닝은 v2), sim embodiment (자작 팔은 v2), 단일 task N회 성공률
+> **범위 (v1)**: pretrained zero-shot (LoRA adaptation 은 v1.5/Phase 4.5), sim embodiment (자작 팔은 v2), 단일 task N회 성공률
 
 
 | 주차 | 내용 | 핵심 |
@@ -216,7 +240,7 @@ gantt
 |------|------|------|
 | 1-3 | Isaac Sim 환경 셋업 | Conda + Workstation |
 | 4-7 | URDF 임포트 + 디지털 트윈 | Sim Joint State ↔ Real Joint State 매칭 |
-| 8-12 | Sim/Real gap 측정 인프라 + LoRA 파인튜닝 | latency / 반복성 / force / 시각, v1 성공률을 gap 분모로 |
+| 8-12 | Sim/Real gap 측정 인프라 (LoRA 는 v1.5/Phase 4.5 로 이관) | latency / 반복성 / force / 시각, v1 성공률을 gap 분모로 |
 
 
 **산출물 v2 강화 카드 (헤드라인)**: 자작 팔에 FM 을 올렸을 때의 sim-to-real gap 을 수치로 측정·보고. "팔이 움직인다" 가 아니라 격차를 측정한 것이 핵심 신호. v1(sim) 성공률이 그 분모.
@@ -322,7 +346,7 @@ gantt
 > 이후 v2 (sim-to-real gap) / v3 (Real-to-Sim-to-Real) 가 완성되면 포트폴리오에 **강화 카드로 추가** 하고 이력서/영상 갱신.
 
 
-**차별화 메시지**: *"이기종 플랫폼(이동+조작)에 Foundation Model 을 실시간 배포·통합하는 엔지니어"* — 매니퓰레이션 데이터 moat 경쟁을 피하면서(통합/배포로 승부) AMR 이동 해자가 프리미엄을 받는 cross-embodiment 좌표.
+**차별화 메시지**: *"이기종 플랫폼(이동+조작)에 Foundation Model 을 실시간 배포·통합하고, 경량 adaptation 까지 다루는 엔지니어"* — 매니퓰레이션 데이터 moat 에 **단독 베팅하지는 않되**, 경량 adaptation(둘째 층)을 셋째 층(통합/배포)과 묶어 보유한다. AMR 이동 해자가 프리미엄을 받는 cross-embodiment 좌표이며, 데이터 moat 전면 베팅도 단순 회피도 아닌 중간 좌표다.
 
 
 ---
@@ -416,6 +440,9 @@ Phase 3 (2026.06 초): Detection+Depth+PC TRT+ROS2 (비공개 리허설, VLA wra
 Phase 4 끝 (2026 하반기): 산출물 v1 (OpenVLA zero-shot 추론 + ROS2 + sim 단일 task 루프 + 블로그)
       |
       v
+Phase 4.5 (2026 하반기, v1 직후): 산출물 v1.5 (OpenVLA LoRA adaptation + before/after 정량 분석, 둘째 층 증거)
+      |
+      v
 HW 스파이크 (2026.10): 2-DOF 리스크 검증 (산출물 아님)
       |
       v
@@ -443,6 +470,7 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 ### 최종 포지셔닝
 > "이기종 플랫폼(이동+조작)에 Foundation Model 을 실제 로봇 (자작 팔 포함) 에 배포해본 **Brain ↔ Body 통합 SW 엔지니어**
 > — AMR 양산 ROS 실무 5년 (2021.06~, 로봇/실기체 경력) + 임베디드 실시간 제어 background + 자작 팔 + Real-to-Sim-to-Real 사이클"
+> — 좌표: **둘째 층(경량 adaptation) + 셋째 층(deployment/integration) 묶음**. 첫째 층(FM 제작)은 추구하지 않는다.
 
 
 > **레이어 상향 서사** (면접 1줄): *액추에이터 실시간 제어 (임베디드: 상용차 클러치 반자동화 장치) → ROS 미들웨어 (AMR 양산 5년) → Foundation Model 통합 (학습 중)*.
@@ -482,7 +510,8 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 - [ ] **GitHub + velog + LinkedIn 산출물 v1 공개** (2026 하반기)
 
 
-#### 2026.10-12 (스파이크 + 정찰 지원)
+#### 2026.10-12 (스파이크 + 정찰 지원 + v1.5)
+- [ ] **Phase 4.5 완료 → 산출물 v1.5 공개** (OpenVLA LoRA adaptation + before/after 정량 분석, 둘째 층 증거. v1 우선 공개 후 착수)
 - [ ] 2-DOF Dynamixel + U2D2 + ROS2 토픽 각도 명령 1회 성공 (파이프라인 검증만)
 - [ ] 스파이크 결과로 Stage 1/2 일정·BOM 재산정 (터지면 즉시)
 - [ ] **정찰 지원 2-3개사** (합격 기대 X, 반응 측정)
@@ -550,6 +579,7 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 | Stage 1 Phase 2 | 기하 기초 | ~2026.05 | `Studies/Phase 2/` |
 | Stage 1 Phase 3 | Detection+Depth (비공개 리허설) | ~2026.06 | `Studies/Phase 3/` |
 | Stage 1 Phase 4 | VLA v1 (OpenVLA zero-shot + ROS2) | 2026.06-09 | `Studies/Phase 4/` |
+| Stage 1 Phase 4.5 | VLA v1.5 (OpenVLA LoRA adaptation, 둘째 층) | 2026.11-12 | `Studies/Phase 4.5/` |
 | Stage 1 Phase 5 | Foundation Model 기초 (실지원 병행) | 2027.02-04 | `Studies/Phase 5/` |
 | Stage 1 Phase 6 | Isaac Sim + 디지털 트윈 (산출물 v2) | 2027.05-07 | `Studies/Phase 6/` |
 | Stage 1 Phase 7 | Real-to-Sim-to-Real (산출물 v3) | 2027.08~ | `Studies/Phase 7/` |
@@ -567,7 +597,8 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 | 산출물 | 시점 | 내용 | 우선순위 |
 |---|---|---|---|
 | **v1** | 2026 하반기 | pretrained OpenVLA zero-shot 추론 → ROS2 wrapper → sim 단일 task 루프 (N회 성공률 기록) + RT-2/OpenVLA 블로그 + 1분 영상. sim 기준선 | **1 (첫 공개 산출물, 정찰 지원 카드)** |
-| **v2 강화 카드 (헤드라인)** | 2027 | 자작 팔 결합 + LoRA + **sim-to-real gap 수치 측정·보고** (= Phase 6 디지털 트윈 + 자작 팔 Stage 1). v1 성공률이 gap 의 분모 | **1 (본인만 만드는 결정타)** |
+| **v1.5 (둘째 층 증거)** | 2026 하반기 | OpenVLA LoRA adaptation (sim 데이터) + zero-shot 대비 **before/after 성공률 정량 분석** (N회, 분산 포함) + 블로그 1편 (= Phase 4.5). 성공률 상승이 아닌 **설계-실행-분석** 이 기준 | **2 (둘째 층 adaptation 가점 카드)** |
+| **v2 강화 카드 (헤드라인)** | 2027 | 자작 팔 결합 + **sim-to-real gap 수치 측정·보고** (= Phase 6 디지털 트윈 + 자작 팔 Stage 1). v1 성공률이 gap 의 분모. LoRA 는 v1.5 로 이관 | **1 (본인만 만드는 결정타)** |
 | **v3** | 2027 후반~ | 6DOF 확장 + Real-to-Sim-to-Real (= Phase 7): OpenVLA fork + ROS2 노드 래핑 + 안전 인터록 + latency 측정 + Sim/Real gap 영상 | 1 (차별화 정점) |
 | (내부 로그) | 2026 상반기 | Phase 3 perception (YOLO11 + Depth Anything V2 + PC TensorRT + ROS2) — 공개 어필 안 함, VLA wrapper 리허설 | 비공개 |
 | Jetson 옵션 | v3 이후 | Jetson 실기 배포 — v1 또는 v3 의 Jetson 포팅판 | (옵션) |
@@ -603,7 +634,7 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 
 | 시점 | 재평가 항목 |
 |---|---|
-| **2026.11** | 하드웨어 스파이크 결과 (파이프라인 검증·일정 재산정) / 산출물 v1 반응 + 정찰 지원 결과 / 시장 신호 probe 반응 (JD 격차·커피챗) / **콘텐츠 반응** (조회·인바운드·댓글·star) / OpenVLA 후속 모델 등장 여부 / **cross-embodiment 좌표 점검** (매니퓰레이션 첫 증명 + 이동 해자 연결이 유효한지, heterogeneous fleet/mobile manipulation 타깃 적합성. 자작 팔을 첫 embodiment 증명으로 유지하되 이동 검증을 일부 끌어들일지를 스파이크 결과·시간 예산과 함께 판단) |
+| **2026.11** | 하드웨어 스파이크 결과 (파이프라인 검증·일정 재산정) / 산출물 v1 반응 + 정찰 지원 결과 / 시장 신호 probe 반응 (JD 격차·커피챗) / **콘텐츠 반응** (조회·인바운드·댓글·star) / OpenVLA 후속 모델 등장 여부 / **둘째 층(adaptation) 증거 점검** (v1.5 sim adaptation 이 AI 트랙 JD 에서 둘째 층 증거로 읽히는지 + sim 증거의 설득력 한계 + real 확장 경로) / **cross-embodiment 좌표 점검** (매니퓰레이션 첫 증명 + 이동 해자 연결이 유효한지, heterogeneous fleet/mobile manipulation 타깃 적합성. 자작 팔을 첫 embodiment 증명으로 유지하되 이동 검증을 일부 끌어들일지를 스파이크 결과·시간 예산과 함께 판단) |
 | **2027.05** | 실지원 면접 결과 누적 / Phase 5 종료 시점 / 자작 팔 Stage 2 완성도 + v2 진행률 / VLA 모델 선정 재검토 (OpenVLA 유지 or π0/Helix/GR00T 등으로 갱신) / **콘텐츠 반응** 추이 |
 | **2027.11** | 실지원 후 누적 면접 결과 / 시장 매칭 시그널 / **콘텐츠 반응** / **2028.03 fallback 진입 여부 판단** (착지점 정의: 부록 E) / Jetson 옵션 진입 여부 |
 
@@ -635,7 +666,10 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 - 도메인 이탈이 아니라 같은 로봇/자율주행 도메인 안에서의 횡이동 → 경력직 전환 리스크가 낮게 읽힌다.
 
 
-**무엇이 살아남나**: Phase 3 perception (Detection + Depth + PC TRT + ROS2 노드) 이 이 시나리오의 핵심 증거 — fallback 시 비공개 로그를 velog 1편으로 승격 공개. 자작 팔 / VLA 산출물 (v1, v2, v3) 은 "추가 가점"으로 기능.
+**무엇이 살아남나**: Phase 3 perception (Detection + Depth + PC TRT + ROS2 노드) 이 이 시나리오의 핵심 증거 — fallback 시 비공개 로그를 velog 1편으로 승격 공개. 자작 팔 / VLA 산출물 (v1, v1.5, v2, v3) 은 "추가 가점"으로 기능.
+
+
+> **둘째 층(adaptation) 편입과 fallback 의 관계**: v1.5(LoRA adaptation)는 가점 카드이지 fallback 의 전제 조건이 아니다. 본 fallback 은 "VLA fine-tune 역량이 없어도 지원 가능"을 전제로 하며, 둘째 층 편입은 이 안전망을 약화시키지 않는다 — fallback 시에도 핵심 증거는 여전히 Phase 3 perception 로그다.
 
 
 **진입 판단**: 부록 D 시그널 매핑의 *"probe 반응 약함 + 시장 정체 → 2028.03 fallback"* 와 연결. 2027.11 재평가에서 1순위(VLA) 시장이 정체면 이쪽으로 분기.
