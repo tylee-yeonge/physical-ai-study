@@ -3,7 +3,7 @@
 
 > **기간**: 약 4개월 (2026.06-09)
 > **목표**: VLA 아키텍처 다이어그램을 막힘없이 읽는 수준 + pretrained OpenVLA zero-shot inference 를 ROS2 토픽으로 받아 **sim 단일 task 루프를 닫는다**(N회 성공률 기록)
-> **범위 (v1)**: pretrained zero-shot (**LoRA 파인튜닝은 v2**), **sim embodiment** (자작 팔은 v2), 단일 task, 단일 embodiment
+> **범위 (v1)**: pretrained zero-shot (**LoRA adaptation 은 v1.5/Phase 4.5**), **sim embodiment** (자작 팔은 v2), 단일 task, 단일 embodiment
 > **언어**: **Python** + **ROS2 (rclpy)**
 > **하드웨어**: Ubuntu PC (RTX 4070) — HuggingFace inference / ROS2 노드 / 시각화
 > **주간 시간**: 약 6-8시간 (출장 주 보정)
@@ -30,7 +30,7 @@
 > **선정 논문 (2편)**: RT-2, OpenVLA — 2026.11 분기 재평가에서 π0 / Helix / GR00T 등으로 갱신 가능. "현 세대 FM 배포"가 어필 포인트이므로 v1 착수 시 세대 점검 1회.
 
 
-> **v2/v3 의 예고편**: 본 Phase 의 ROS2 wrapper + sim 루프가 v2(자작 팔 + sim-to-real gap)·v3(Real-to-Sim-to-Real)의 토대. 여기서 익힌 inference 파이프라인 + ROS2 통합이 자작 팔과 결합됨.
+> **후속 산출물 예고**: v1.5(Phase 4.5) = adaptation(LoRA) / v2(Phase 6) = deployment(sim-to-real gap) / v3(Phase 7) = Real-to-Sim-to-Real 정점. 본 Phase 의 ROS2 wrapper + sim 루프 + 성공률 baseline 은 v1.5 의 eval harness 로 그대로 재사용되고, 이후 자작 팔과 결합된다.
 
 
 ---
@@ -45,12 +45,12 @@
 | HuggingFace inference 셋업 (4-bit 양자화) | Ubuntu PC (원격) | O |
 | ROS2 패키지 작성 + sim 단일 task 루프 | Ubuntu PC (원격) | O |
 | 블로그 작성 | 디바이스 무관 | O |
-| (v2) LoRA 파인튜닝 | **Colab A100/L4 (클라우드) — v2 범위** | O |
+| (v1.5) LoRA 파인튜닝 | **Colab A100/L4 (클라우드) — Phase 4.5 범위** | O |
 
 
-- **VRAM 비대칭 (컴퓨트 리스크, 미검증)**: OpenVLA 7B 의 BF16 가중치는 약 14-15GB → RTX 4070 12GB 로 **풀 정밀도 추론 불가**. 4-bit 양자화 시 약 6GB 로 축소되어 12GB 안에 안착. LoRA 파인튜닝은 24GB+ 필요 → 4070 으로 사실상 불가(v2 에서 Colab).
+- **VRAM 비대칭 (컴퓨트 리스크, 미검증)**: OpenVLA 7B 의 BF16 가중치는 약 14-15GB → RTX 4070 12GB 로 **풀 정밀도 추론 불가**. 4-bit 양자화 시 약 6GB 로 축소되어 12GB 안에 안착. LoRA 파인튜닝은 24GB+ 필요 → 4070 으로 사실상 불가(v1.5/Phase 4.5 에서 Colab).
 - **v1 착수 시 1회 측정 필요**: 4-bit OpenVLA 7B 가 RTX 4070 12GB 에 OOM 없이 올라가는지 + 추론 latency 가 제어 주기에 맞는지. 안 맞으면 범위 축소(관측 → action 예측 → 시각화, 제어 루프 주장 보류)로 분기.
-- **분업 원칙**: 무거운 학습(v2 LoRA)은 Colab, 가벼운 추론(v1)은 로컬 4070 + ROS2.
+- **분업 원칙**: 무거운 학습(v1.5 LoRA)은 Colab, 가벼운 추론(v1)은 로컬 4070 + ROS2. 이 컴퓨트 표는 v1 과 v1.5 가 **공유**한다 (v1.5 의 단일 진실 공급원은 [`Studies/Phase 4/SETUP.md`](../Studies/Phase%204/SETUP.md)).
 - 상세:
   - [Studies/Phase 4/SETUP.md](../Studies/Phase%204/SETUP.md) — Phase 4 진입 전 환경 구축 단일 진실 공급원
   - [ENVIRONMENT.md](../ENVIRONMENT.md) — 프로젝트 공용 환경
@@ -211,6 +211,7 @@ Output : /vla/action (팔: EE-delta [dx,dy,dz,rx,ry,rz] -> geometry_msgs/Twist +
 
 
 Phase 4 완료 후 (2026 하반기):
+- **Phase 4.5 (VLA v1.5)** — OpenVLA LoRA adaptation + before/after 정량 분석 (둘째 층 증거). v1 우선 공개 후 착수, v1 자산 재사용 ([Phase 4.5.md](Phase%204.5.md))
 - **하드웨어 스파이크** (2026.10, 2-3주) — 2-DOF Dynamixel + ROS2 파이프라인 리스크 검증 (조달은 v1 과 병렬로 이미 착수)
 - **정찰 지원** (2026.11-12, 2-3개사, 합격 기대 X, 반응 측정)
 - **6개월 분기 재평가 #1 (2026.11)** — 스파이크 결과 / v1 반응 / VLA 모델 갱신 검토 / 시장 신호 probe 반응 / cross-embodiment 좌표 점검

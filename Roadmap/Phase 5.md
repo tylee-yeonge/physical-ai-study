@@ -2,7 +2,7 @@
 
 
 > **기간**: 약 3개월 (2027.02-04, 실지원 병행 저강도)
-> **목표**: ViT / CLIP / DINOv2 / SigLIP 의 *동작 원리 수준* — 아키텍처 다이어그램 + 학습 방식 + 입출력 인터페이스 설명 가능. **직접 학습 / fine-tune 은 하지 않음**.
+> **목표**: ViT / CLIP / DINOv2 / SigLIP 의 *동작 원리 수준* — 아키텍처 다이어그램 + 학습 방식 + 입출력 인터페이스 설명 가능. **직접 학습 / fine-tune 은 하지 않음** (본 Phase 한정 원칙 — adaptation/LoRA fine-tune 은 [Phase 4.5](Phase%204.5.md)(v1.5)에서 수행한다. 로드맵 전체가 "fine-tune 안 함"이 아님).
 > **언어**: **Python** (HuggingFace transformers)
 > **하드웨어**: Ubuntu PC (RTX 4070)
 > **주간 시간**: 약 6-8시간 (출장 주 보정)
@@ -19,7 +19,7 @@
 
 > **목적**: Phase 4 의 OpenVLA 가 *어떤 vision encoder + LLM 토대* 위에 서 있는지 이해. Phase 6, 7 의 인코더 선택 및 latency 분석의 사전 지식.
 >
-> "동작 원리 수준" 의 의미: 아키텍처 다이어그램 + 학습 방식 + 입력/출력 인터페이스를 설명할 수 있는 수준. 직접 학습 / fine-tune 은 *하지 않음*.
+> "동작 원리 수준" 의 의미: 아키텍처 다이어그램 + 학습 방식 + 입력/출력 인터페이스를 설명할 수 있는 수준. 직접 학습 / fine-tune 은 *본 Phase 에서* 하지 않음 (adaptation/LoRA 는 [Phase 4.5](Phase%204.5.md)).
 
 
 ---
