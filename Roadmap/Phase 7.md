@@ -66,9 +66,12 @@
 ## Section 9.1: OpenVLA fork + ROS2 통합 (3주)
 
 
+> **둘째 층 파이프라인 재사용**: 본 절의 fine-tuning 은 처음부터 만드는 게 아니라, **v1.5(Phase 4.5)에서 sim 데이터로 확립한 LoRA adaptation 파이프라인 + eval harness 를 자작 팔 teleop(real) 데이터로 확장**하는 것이다. 즉 v1.5 의 sim adaptation 증거를 real 도메인으로 끌어올려 sim 증거의 설득력 한계(Phase 4.5 §0.3)를 보완한다. v3 는 셋째 층 정점을 유지하되, 둘째 층 파이프라인을 재사용한다.
+
+
 | 주차 | 내용 | 핵심 |
 |------|------|------|
-| 1 | OpenVLA fork + 자작 팔용 fine-tuning 데이터 준비 | teleop 데이터 (Stage 2 산출) |
+| 1 | OpenVLA fork + Phase 4.5 파이프라인을 자작 팔 teleop 데이터로 확장 | sim→real 데이터 교체, 파이프라인 재사용 (Stage 2 산출) |
 | 2 | inference 노드 통합 (Phase 4 demo 확장) | image + instruction → joint action |
 | 3 | Sim 환경 (Isaac Sim) 에서 dry-run | 디지털 트윈 활용 |
 
