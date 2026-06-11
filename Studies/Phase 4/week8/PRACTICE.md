@@ -28,8 +28,8 @@ pip install -r week8/requirements.txt
 
 
 # 작업 디렉토리
-mkdir -p ~/phase4_notes/week8/vla_inference
-cd ~/phase4_notes/week8/vla_inference
+mkdir -p /workspace/phase4_workspace/vla_inference
+cd /workspace/phase4_workspace/vla_inference
 ```
 
 

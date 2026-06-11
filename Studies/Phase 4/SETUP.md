@@ -69,21 +69,21 @@ OpenVLA 7B 는 RTX 4070 12GB 로 **학습이 불가능**하다. 따라서 무거
 Phase 4 진입 (2026.06 예정) 직전에 한 번 더 점검한다.
 
 ### 2.1 계정/구독
-- [ ] Google 계정 (Colab + Drive 동일 계정)
+- [x] Google 계정 (Colab + Drive 동일 계정)
 - [ ] (선택) Colab Pro 구독 — v2 LoRA 파인튜닝 트랙 진입 시에만 필요 (A100/L4). v1 필수 트랙은 무료 T4 + 로컬 4070 으로 충분하므로 Pro 불필요
-- [ ] Google Drive 잔여 용량 — LoRA 가중치 + 체크포인트 약 10-30GB 예상
-- [ ] HuggingFace 계정 + Access Token (OpenVLA 가중치 다운로드)
+- [x] Google Drive 잔여 용량 — LoRA 가중치 + 체크포인트 약 10-30GB 예상
+- [x] HuggingFace 계정 + Access Token (OpenVLA 가중치 다운로드)
 
 ### 2.2 로컬 (Ubuntu PC + RTX 4070 12GB)
-- [ ] NVIDIA 드라이버 (`nvidia-smi`) — CUDA 12.x 지원 확인
-- [ ] 로컬 디스크 50GB 이상 여유 (베이스 14-15GB + LoRA + 양자화 캐시)
-- [ ] ROS2 Humble (또는 Jazzy) 설치 — Phase 3 에서 사용 중
-- [ ] ELP 스테레오 카메라 USB 연결 + `/dev/video*` 인식
+- [x] NVIDIA 드라이버 (`nvidia-smi`) — CUDA 12.x 지원 확인
+- [x] 로컬 디스크 50GB 이상 여유 (베이스 14-15GB + LoRA + 양자화 캐시)
+- [x] ROS2 Humble (또는 Jazzy) 설치 — Phase 3 에서 사용 중
+- [x] ELP 스테레오 카메라 USB 연결 + `/dev/video*` 인식
 
 ### 2.3 공통 도구
-- [ ] `git`, `python3.10+`, `pip`
-- [ ] Rerun viewer 0.23+ (양자화 추론 시각화; ENVIRONMENT.md §4 참고)
-- [ ] 블로그 플랫폼 결정 (Velog / Medium / 본 레포 `Studies/Phase 4/blog/`)
+- [x] `git`, `python3.10+`, `pip`
+- [x] Rerun viewer 0.23+ (양자화 추론 시각화; ENVIRONMENT.md §4 참고)
+- [x] 블로그 플랫폼 결정 (**Velog** / Medium / 본 레포 `Studies/Phase 4/blog/`)
 
 ---
 
@@ -216,7 +216,7 @@ os.environ['HF_HOME'] = f'{WORK_DIR}/.hf_cache'
 ### 6.1 디렉토리 구조
 
 ```
-~/phase4_workspace/
+/workspace/phase4_workspace/
   openvla/          # 베이스 가중치 (약 15GB)
   lora/             # Drive 에서 다운로드한 LoRA
   merged/           # 베이스 + LoRA 머지 결과
