@@ -25,7 +25,7 @@ OpenVLA 7B 는 RTX 4070 12GB 로 **학습이 불가능**하다. 따라서 무거
 | 추론 (BF16 풀 정밀도) | 16GB+ (가중치만 14-15GB) | 12GB | 양자화 필수 |
 | LoRA 파인튜닝 | 24GB+ (단일 GPU) | 12GB | 사실상 불가 |
 | 풀 파인튜닝 | 80GB+ 멀티 GPU | 12GB | 불가 |
-| 추론 (4bit 양자화) | 약 6GB대 | 12GB | 가능 |
+| 추론 (4bit 양자화) | 약 7GB (논문 실측) | 12GB | 가능 |
 
 결론: **학습은 로컬에서 못 돌린다. 추론은 양자화하면 된다.** 이 비대칭이 분업의 근거다.
 
@@ -33,7 +33,7 @@ OpenVLA 7B 는 RTX 4070 12GB 로 **학습이 불가능**하다. 따라서 무거
 
 | 항목 | 학습 (LoRA 파인튜닝) | 추론 (ROS2 데모) |
 |------|----------------------|------------------|
-| VRAM | 무겁다 (24GB+) | 가볍다 (양자화 시 약 6GB) |
+| VRAM | 무겁다 (24GB+) | 가볍다 (int4 양자화 시 약 7GB) |
 | 시간 | 일회성, 몇 시간 점유 | 상시, 실시간 루프 |
 | 환경 | 오프라인, ROS2 불필요 | ROS2 노드 통합 필수 |
 | 카메라/센서 | 불필요 | ELP 스테레오 입력 필요 |
@@ -44,6 +44,23 @@ OpenVLA 7B 는 RTX 4070 12GB 로 **학습이 불가능**하다. 따라서 무거
 - 추론의 요구 (실시간 / ROS2 / 센서) 는 **로컬이어야만** 충족된다.
 
 이 분업은 실무 표준 패턴이기도 하다: **무거운 학습은 클라우드, 가벼운 추론은 엣지.** Phase 6-7 에서 자작 팔 + Jetson 배포로 갈 때도 동일한 구조가 재사용된다.
+
+### 1.3 OpenVLA 공개 실측치와 4070 외삽 (컴퓨트 수치의 단일 진실 공급원)
+
+| 항목 | 수치 | 출처 |
+|---|---|---|
+| int4 VRAM | 7.0 GB | OpenVLA 논문 Table 2 |
+| int4 Bridge 성공률 | 71.9 ± 4.7% (bf16 71.3% 와 동등) | OpenVLA 논문 Table 2 |
+| int8 Bridge 성공률 | 58.1 ± 5.1% (유의한 하락) | OpenVLA 논문 Table 2 |
+| int8 추론 속도 | 1.2 Hz (A5000) — 속도 하락이 시스템 동역학을 바꿔 성공률 하락으로 이어짐 | OpenVLA 논문 §5.4 |
+| int4 추론 속도 | 약 3 Hz (A5000, Ampere 768 GB/s) | OpenVLA 논문 |
+| bf16 추론 속도 | 약 6 Hz (RTX 4090, 1008 GB/s, 최적화 트릭 없이) | OpenVLA 논문 |
+
+- **4070 외삽**: autoregressive 7B 추론은 메모리 대역폭 지배적. 4070(504 GB/s)은 A5000(768 GB/s)보다 낮으나, int4 처리량이 Ada Lovelace 아키텍처에서 특히 잘 나온다는 논문 보고로 일부 상쇄 — 종합 추정 **약 2-3 Hz (step당 약 330-500 ms)**. 실제 스택(bitsandbytes nf4 + HF transformers + eager attention)에서는 ±50% 어긋날 수 있으며, 확정은 진입 시 1회 실측으로만 가능하다.
+- **VRAM**: int4 7 GB + ROS2/sim 오버헤드를 더해도 12 GB 안착 — 사실상 확정.
+- **int8 경로는 실험에서 배제**: 성공률(58.1%)과 속도(1.2 Hz) 모두 열위. 코드 경로는 비교 실험 대비로만 보존한다 (week8 config 참고).
+- **제어 주기 적합성**: v1 범위(sim 단일 task, quasi-static pick-and-place)에는 2-3 Hz 로 충분 추정 — OpenVLA 원 실험 자체가 유사 속도 대역에서 blocking control 로 실로봇을 구동했다. 판정용 제어 주기 수치는 task 선정 후 확정한다.
+- 컴퓨트 수치의 본체는 이 표다. 루트 README 의 컴퓨트 인용구는 이 표의 요약만 유지한다.
 
 ---
 
@@ -92,7 +109,7 @@ flowchart LR
     subgraph Local["로컬 4070 + ROS2 - 추론"]
         direction TB
         L1[베이스 + LoRA 머지]
-        L2[4bit 양자화 약 6GB]
+        L2[4bit 양자화 약 7GB]
         L3[ROS2 lifecycle 노드 래핑]
         L4[ELP 스테레오 카메라 입력]
         L5[Rerun 시각화 + 1분 영상]
@@ -115,7 +132,7 @@ flowchart LR
 
 6. Drive 에서 LoRA 가중치 다운로드 (rclone 권장; §8)
 7. 베이스 모델에 LoRA 머지
-8. 4bit 양자화 (bitsandbytes) 로 약 6GB 로 축소 → 12GB 에 안착
+8. 4bit 양자화 (bitsandbytes) 로 약 7GB 로 축소 → 12GB 에 안착
 9. ROS2 lifecycle 노드로 래핑 (기존 ROS2 미들웨어 경험 활용)
 10. ELP 스테레오 카메라 입력 → 추론 → action 출력
 11. Rerun 으로 시각화, 1분 데모 영상 녹화
@@ -203,7 +220,7 @@ os.environ['HF_HOME'] = f'{WORK_DIR}/.hf_cache'
   openvla/          # 베이스 가중치 (약 15GB)
   lora/             # Drive 에서 다운로드한 LoRA
   merged/           # 베이스 + LoRA 머지 결과
-  quantized/        # 4bit 양자화 결과 (약 6GB)
+  quantized/        # 4bit 양자화 결과 (약 7GB)
   ros2_ws/          # ROS2 워크스페이스 (vla_node 패키지)
   notes/            # week 별 reading note
 ```

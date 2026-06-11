@@ -91,8 +91,8 @@ gantt
 | 시기 | Stage | 내용 | 목표 |
 |------|-------|------|------|
 | 2026.01-02 | Stage 1 | Phase 0-1 (완료) | 환경 세팅, 수학 핵심 |
-| 2026.03-05 | Stage 1 | Phase 2: Perception 기하 기초 (마무리 중) | 카메라 모델 + Multi-view |
-| 2026.06 초 | Stage 1 | Phase 3 week8 통합 노드 마무리 (**비공개 리허설**, 공개 산출물 아님) | VLA wrapper 리허설 |
+| 2026.03-05 | Stage 1 | Phase 2: Perception 기하 기초 (완료) | 카메라 모델 + Multi-view |
+| 2026.06 초 | Stage 1 | Phase 3 완료 (**비공개 리허설**, 공개 산출물 아님) | VLA wrapper 리허설 |
 | 2026.06-09 | Stage 1 | **Phase 4 (메인 단독): VLA v1 — pretrained OpenVLA zero-shot 추론 + ROS2 wrapper + sim 단일 task 루프 + 블로그** | **산출물 v1 (2026 하반기 공개)** |
 | 2026.11-12 | Stage 1 | **Phase 4.5: VLA v1.5 — OpenVLA LoRA adaptation + before/after 정량 분석** (sim 데이터, v1 자산 재사용, v1 우선 공개 후 착수) | **산출물 v1.5 (둘째 층 adaptation 증거)** |
 | 2026.06-08 (병행) | Stage 1 | **시장 신호 probe**: 타겟사 JD 5-10개 정독 + 현직자 커피챗 1-2건 + LinkedIn 헤드라인 교체 | 시장 실측 → 우선순위 보정 |
@@ -176,7 +176,7 @@ gantt
 
 ### Phase 3: Detection + Depth → PC TensorRT + ROS2 노드 (비공개 리허설, ~2026.06 초)
 > **메시지**: Detection + Depth + PC TensorRT/ROS2 통합은 **VLA v1 wrapper 의 난도 낮은 리허설이자 재사용 스캐폴드**다. AMR ROS 5년차 기준 commodity 라 별도 공개 어필은 하지 않는다. 학습/통합 가치는 흡수하되 공개 산출물에서는 제외.
-> **상태**: week1-7 완료, week8 통합 노드(ROS2 래퍼)만 1-2일 내 마무리 후 비공개 로그로 커밋.
+> **상태**: week1-8 완료, 비공개 로그 커밋 완료 (2026.06).
 
 
 | 주차 | 내용 | 핵심 모델 | 우선순위 |
@@ -206,6 +206,8 @@ gantt
 | 8-12 | **OpenVLA zero-shot inference → ROS2 토픽 → sim 단일 task 루프 (v1)** | Brain ↔ Body 첫 통합 |
 | 13-16 | 블로그 마무리 + 패키징 + v1 영상 + 공개 | 정찰 지원 카드 |
 
+> 진행 순서 변형: 2026.06-07 선행 투입 구간은 표적 skim → week8-12 실습 선행, week1-7 정독/블로그는 2026.08-09 후행 (역순 학습 원칙). 상세: [`Roadmap/Phase 4.md`](./Roadmap/Phase%204.md)
+
 
 **산출물 v1** (2026 하반기까지 `physical-ai-study` 레포 + velog/LinkedIn 공개):
 - RT-2 + OpenVLA 블로그 (아키텍처 / 학습 / 데이터 / inference 흐름 + action representation 비교)
@@ -213,7 +215,7 @@ gantt
 - 한계 명시: v1 의 Body 는 sim, 실암 결합은 v2 예고
 
 
-> **컴퓨트 (미검증 리스크)**: OpenVLA 7B 의 BF16 가중치는 약 14-15GB → RTX 4070 12GB 로 풀 정밀도 불가. 4-bit 양자화 시 약 6GB. VRAM 여유와 추론 latency 가 제어 주기에 맞는지 v1 착수 시 1회 측정 필요. 안 맞으면 범위 축소(관측→action 시각화) 로 분기.
+> **컴퓨트 (추정치 검증 단계)**: OpenVLA 7B 의 BF16 가중치는 약 14-15GB → RTX 4070 12GB 로 풀 정밀도 불가. int4 양자화 시 VRAM 약 7GB (논문 실측) + 성공률은 bf16 과 동등 → 12GB 안착 사실상 확정. 4070 추론 속도는 약 2-3 Hz 로 외삽되며 quasi-static 단일 task 에는 적합 추정. int8 은 성공률·속도 모두 열위로 실험에서 배제. v1 착수 시 1회 실측은 추정치 검증 성격 (수치 본체: [`Studies/Phase 4/SETUP.md`](./Studies/Phase%204/SETUP.md)). 추정이 크게 어긋나면 범위 축소(관측→action 시각화) 로 분기.
 
 
 ### Phase 5: Foundation Model 기초 (3개월, 2027.02-04, 실지원 병행 저강도)
@@ -434,7 +436,7 @@ Stage 1 에서 학습 제외로 분류한 영역 중 회사 환경에서 자연�
 시장 신호 probe (2026.06~): JD 정독 + 커피챗 + LinkedIn 헤드라인
       |
       v
-Phase 3 (2026.06 초): Detection+Depth+PC TRT+ROS2 (비공개 리허설, VLA wrapper 스캐폴드)
+Phase 3 (2026.06 초, 완료): Detection+Depth+PC TRT+ROS2 (비공개 리허설, VLA wrapper 스캐폴드)
       |
       v
 Phase 4 끝 (2026 하반기): 산출물 v1 (OpenVLA zero-shot 추론 + ROS2 + sim 단일 task 루프 + 블로그)
@@ -492,14 +494,14 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 #### 환경 / 기초
 - [x] 환경 세팅 완료
 - [x] 수학 기초 이해
-- [x] Phase 2 완료 (Perception 기하 기초, 마무리 중)
+- [x] Phase 2 완료 (Perception 기하 기초)
 
 
 #### 2026.06 (Phase 4 와 병행) — 시장 신호 probe
 - [ ] 타겟사 **실제 JD 5-10개 정독** — 1순위 (VLA 모델 직접 개발 코스닥 상장사 / 대기업 SW 자회사 VLA / 신생 휴머노이드 스타트업) + 2순위 (자율주행 SW 자회사 CV/ML / ADAS 양산 중견 / Dynamixel 제조사 / 매니퓰레이션 FM) → 요구 역량 vs 현재 격차 1페이지 매핑
 - [ ] LinkedIn 프로필 헤드라인 변경 ("AMR ROS Engineer" → "AMR ROS Production SW + Physical AI Integration")
 - [ ] (선택) ROS 포지션 1건 실지원 — 프로필이 어떻게 읽히는지 실측
-- [ ] Phase 3 week8 통합 노드 마무리 + 비공개 로그 커밋 (VLA wrapper 리허설)
+- [x] Phase 3 week8 통합 노드 마무리 + 비공개 로그 커밋 (VLA wrapper 리허설)
 
 
 #### 2026.06-09 (Phase 4 VLA v1, 메인 단독)

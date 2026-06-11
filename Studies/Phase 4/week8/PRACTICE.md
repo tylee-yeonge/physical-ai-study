@@ -33,7 +33,7 @@ cd ~/phase4_notes/week8/vla_inference
 ```
 
 
-> VRAM 점검: 4bit 양자화 후 OpenVLA 가 약 6GB 를 차지하므로 12GB 4070 에 안착해야 정상. `nvidia-smi` 로 inference 직후 사용량을 측정해 두면 week 11 에서 ROS2 오버헤드를 더했을 때의 여유 판단에 사용 가능 (SETUP.md §9.3 리스크 4).
+> VRAM 점검: 4bit 양자화 후 OpenVLA 가 약 7GB 를 차지하므로 12GB 4070 에 안착해야 정상. `nvidia-smi` 로 inference 직후 사용량을 측정해 두면 week 11 에서 ROS2 오버헤드를 더했을 때의 여유 판단에 사용 가능 (SETUP.md §9.3 리스크 4).
 
 
 ---
@@ -196,7 +196,7 @@ class VLAInference:
         inputs = self.processor(prompt, image_pil).to(self.device, dtype=torch.float16)
         with torch.no_grad():
             action = self.model.predict_action(
-                **inputs, unnormalize_key=self.unnorm_key, do_sample=False,
+                **inputs, unnorm_key=self.unnorm_key, do_sample=False,
             )
         return np.asarray(action).astype(np.float32)
 
@@ -324,6 +324,8 @@ import os
 
 
 MODEL_ID = os.environ.get('VLA_MODEL_ID', 'openvla/openvla-7b')
+# '8bit' 경로는 실험에서 사용하지 않음 — int8 은 성공률 58.1% + A5000 1.2 Hz
+# (OpenVLA Table 2/§5.4) 로 성공률·속도 모두 열위. 코드 경로는 비교 실험 대비로만 보존.
 QUANT_TYPE = os.environ.get('VLA_QUANT', '4bit')
 DEVICE = os.environ.get('VLA_DEVICE', 'cuda:0')
 UNNORM_KEY = os.environ.get('VLA_UNNORM_KEY', 'bridge_orig')
@@ -415,7 +417,8 @@ vla.close()
 - [ ] `vla_inference/` 패키지 4 파일 작성
 - [ ] `practice_stress_test.py` 실행
   - [ ] 100/100 success
-  - [ ] mean latency < 200 ms
+  - [ ] mean/p95 latency 실측·기록 + task 제어 주기 기준 충족 여부 판정
+    - 판정 수치는 task 선정(sim 정합 단계) 후 확정. 그 전까지 "2 Hz 이상(step당 500 ms 이하)" 은 placeholder
 - [ ] (선택) ELP Stereo 로 실제 이미지 테스트
 - [ ] git commit
 - [ ] quiz_easy / quiz_medium
