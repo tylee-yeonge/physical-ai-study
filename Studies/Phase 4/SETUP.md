@@ -227,9 +227,9 @@ os.environ['HF_HOME'] = f'{WORK_DIR}/.hf_cache'
 
 ### 6.2 venv 분리 원칙
 
-Phase 3 패턴 (`.venv-weekN`) 을 그대로 따른다. 각 week 디렉토리의 `pip_install.sh` 실행 시 해당 week 의 `.venv-weekN` 이 생성된다.
+Phase 3 패턴 (`.venv-weekN`) 을 그대로 따른다. 각 week 디렉토리의 `pip_install.sh` 실행 시 해당 week 디렉토리 안에 `.venv-weekN` 이 생성된다.
 
-다만 **week 8 이후 (양자화 추론)** 부터는 무거운 의존성 (torch + transformers + bitsandbytes + peft) 이 공통이므로, week 별 venv 대신 **`Studies/Phase 4/.venv-vla` 공용 venv** 를 만들어 8-12 가 공유한다 — week 별 .venv 가 각 8-10GB 씩 누적되는 것을 막기 위함. 이 정책은 week 8 진입 시 PRACTICE.md 에서 다시 안내한다.
+다만 **양자화 추론 주차 (week 6, 8-12)** 는 무거운 의존성 (torch + transformers + bitsandbytes + accelerate) 이 공통이므로, week 별 venv 대신 **`Studies/Phase 4/.venv-vla` 공용 venv** 를 만들어 공유한다 — week 별 .venv 가 각 8-10GB 씩 누적되는 것을 막기 위함. 생성 명령은 `week8/PRACTICE.md` "환경 설정" 절에 있으며 로드맵 순서 1 Step 0 (week 6 실측 직전) 에서 1회 생성한다.
 
 ### 6.3 ROS2 환경
 

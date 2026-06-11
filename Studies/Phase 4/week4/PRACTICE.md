@@ -12,9 +12,9 @@
 
 
 ```bash
-conda activate phase4
-pip install -r requirements.txt
-# 추가: transformers (이미 설치됨), Pillow
+# 내부에서 .venv-week4 생성 후 requirements.txt 설치 (transformers, Pillow 포함)
+bash pip_install.sh
+source .venv-week4/bin/activate
 ```
 
 

@@ -12,9 +12,10 @@
 
 
 ```bash
-conda activate phase4
-pip install -r requirements.txt
-# 추가: datasets, h5py, peft (LoRA 라이브러리)
+# 내부에서 .venv-week5 생성 후 requirements.txt 설치
+# (datasets, h5py, peft (LoRA 라이브러리) 포함)
+bash pip_install.sh
+source .venv-week5/bin/activate
 ```
 
 

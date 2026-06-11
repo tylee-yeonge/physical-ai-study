@@ -12,9 +12,10 @@
 
 
 ```bash
-conda activate phase4
-pip install -r requirements.txt
-# 추가: sentencepiece, transformers (tokenizer 만), torch (loss 계산용)
+# 내부에서 .venv-week2 생성 후 requirements.txt 설치
+# (sentencepiece, transformers (tokenizer 만), torch (loss 계산용) 포함)
+bash pip_install.sh
+source .venv-week2/bin/activate
 ```
 
 

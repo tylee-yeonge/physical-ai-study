@@ -11,9 +11,11 @@
 ## 환경 설정
 
 
+무거운 의존성 (torch + transformers + bitsandbytes) 을 쓰는 주차이므로 week 별 venv 대신 **공용 venv `.venv-vla`** 를 사용한다 ([`../SETUP.md`](../SETUP.md) §6.2). 생성 명령은 [`week8/PRACTICE.md`](../week8/PRACTICE.md) "환경 설정" 절에 있으며 로드맵 순서 1 Step 0 에서 1회 생성한다. 본 week 의 의존성은 week8 의 requirements.txt 에 모두 포함되므로 추가 설치는 없다.
+
+
 ```bash
-conda activate phase4
-pip install -r requirements.txt
+source "/workspace/study/physical-ai-study/Studies/Phase 4/.venv-vla/bin/activate"
 ```
 
 

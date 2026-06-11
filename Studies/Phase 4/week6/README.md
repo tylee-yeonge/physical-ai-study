@@ -37,12 +37,8 @@ python --version # 3.10+
 
 
 ```bash
-# venv 환경 (week 1 그대로)
-source .venv/bin/activate
-
-
-# bitsandbytes 설치 (4-bit quantization 핵심)
-pip install bitsandbytes>=0.43.0 accelerate>=0.30.0
+# 공용 venv .venv-vla 사용 (PRACTICE.md 환경 설정 참고; bitsandbytes, accelerate 포함)
+source "/workspace/study/physical-ai-study/Studies/Phase 4/.venv-vla/bin/activate"
 ```
 
 
