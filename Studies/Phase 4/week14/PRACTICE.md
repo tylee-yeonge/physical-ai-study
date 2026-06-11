@@ -91,9 +91,9 @@ source /opt/ros/humble/setup.bash
 ros2 --version # 검증
 
 
-# 2. Conda env
-conda create -n vla python=3.10 -y
-conda activate vla
+# 2. Python venv (Python 3.10+ — 위 Software 요구사항)
+python3 -m venv .venv
+source .venv/bin/activate
 
 
 # 3. Python deps
@@ -223,11 +223,11 @@ if ! command -v nvidia-smi &> /dev/null; then
 fi
 
 
-# 3. Conda env
-if ! conda env list | grep -q '^vla '; then
-    conda create -n vla python=3.10 -y
+# 3. Python venv
+if [ ! -d .venv ]; then
+    python3 -m venv .venv
 fi
-source activate vla
+source .venv/bin/activate
 
 
 # 4. Python deps
@@ -278,7 +278,7 @@ echo "ros2 launch vla_node demo.launch.py"
 
 
 ```bash
-# 새 Docker 또는 새 conda env 에서
+# 새 Docker 또는 새 venv 에서
 # README 의 Installation section 만 보고 따라하기
 # 막히는 step 이 있으면 그 step 의 명령 / 검증을 README 에 추가
 ```
@@ -290,7 +290,7 @@ echo "ros2 launch vla_node demo.launch.py"
 ```markdown
 - [ ] Step 1 (CUDA) 명확하게 검증 가능
 - [ ] Step 2 (ROS2) 명확
-- [ ] Step 3 (Conda) 명확
+- [ ] Step 3 (venv) 명확
 - [ ] Step 4 (pip install) 모든 의존성 명시
 - [ ] Step 5 (vla_inference pip install -e) 동작
 - [ ] Step 6 (colcon build) 동작
@@ -308,7 +308,7 @@ echo "ros2 launch vla_node demo.launch.py"
 - [ ] README.md 작성 (10 section)
 - [ ] scripts/setup.sh 작성
 - [ ] 트러블슈팅 표 10개 이상
-- [ ] (선택) Docker 또는 새 conda 검증
+- [ ] (선택) Docker 또는 새 venv 검증
 - [ ] quiz_easy / quiz_medium
 
 

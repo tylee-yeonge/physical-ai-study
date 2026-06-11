@@ -66,7 +66,7 @@
 1. Hardware 요구사항: RTX 4070+ (12GB), Ubuntu 22.04
 2. CUDA 설치: 11.8 또는 12.x
 3. ROS2 Humble 설치 (apt)
-4. Conda 환경 생성
+4. Python venv 생성
 5. Python 의존성 설치 (pip install -r requirements.txt)
 6. OpenVLA 모델 다운로드 (~ 15GB)
 7. 빌드: colcon build --packages-select vla_node
