@@ -96,11 +96,15 @@ print(f"inputs.keys(): {list(inputs.keys())}")
 
 
 # -- 1-4. 첫 inference --
+# attention_mask 는 전달하지 않는다 -- predict_action 이 빈 토큰(29871) 을 input_ids 에만
+# 덧붙여 mask 와 길이가 1 어긋나므로 (eager attention 에서 크래시), generate 가 mask 를
+# 알아서 생성하게 둔다
 print("\n[1-4] 첫 inference (warm-up)")
 with torch.no_grad():
     action = vla.predict_action(
-        **inputs,
-        unnormalize_key="bridge_orig",
+        input_ids=inputs["input_ids"],
+        pixel_values=inputs["pixel_values"],
+        unnorm_key="bridge_orig",
         do_sample=False,
     )
 print(f"Action shape: {action.shape}")
@@ -182,7 +186,11 @@ inputs = processor(prompt, image).to("cuda:0", dtype=torch.float16)
 
 for i in range(5):
     with torch.no_grad():
-        action = vla.predict_action(**inputs, unnormalize_key="bridge_orig", do_sample=False)
+        # attention_mask 제외 -- 실습 1 의 1-4 주석 참고
+        action = vla.predict_action(
+            input_ids=inputs["input_ids"], pixel_values=inputs["pixel_values"],
+            unnorm_key="bridge_orig", do_sample=False,
+        )
 print("warm-up 완료")
 
 
@@ -200,7 +208,11 @@ for i in range(100):
     torch.cuda.synchronize()
     start = time.time()
     with torch.no_grad():
-        action = vla.predict_action(**inputs, unnormalize_key="bridge_orig", do_sample=False)
+        # attention_mask 제외 -- 실습 1 의 1-4 주석 참고
+        action = vla.predict_action(
+            input_ids=inputs["input_ids"], pixel_values=inputs["pixel_values"],
+            unnorm_key="bridge_orig", do_sample=False,
+        )
     torch.cuda.synchronize()
     elapsed_ms = (time.time() - start) * 1000
     latencies.append(elapsed_ms)
@@ -328,4 +340,5 @@ python practice_latency_measure.py
 | `ImportError: bitsandbytes` | `pip install bitsandbytes>=0.43.0` |
 | `flash_attn not installed` | `attn_implementation="eager"` 옵션 추가 |
 | download 중단 | `--resume-download` 옵션 |
-| inference 가 0 action | unnormalize_key 누락 or 잘못 |
+| inference 가 0 action | unnorm_key 누락 or 잘못 |
+| `tensor a (N+1) must match tensor b (N)` | predict_action 에 attention_mask 를 넘기지 않기 (실습 1 의 1-4 주석 참고) |
