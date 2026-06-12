@@ -194,9 +194,14 @@ class VLAInference:
     def _predict_internal(self, image_pil, instruction) -> np.ndarray:
         prompt = f"In: What action should the robot take to {instruction}?\nOut:"
         inputs = self.processor(prompt, image_pil).to(self.device, dtype=torch.float16)
+        # attention_mask 는 넘기지 않는다 -- predict_action 이 빈 토큰을 input_ids 에만
+        # 덧붙여 mask 와 길이가 1 어긋나 eager attention 에서 크래시
         with torch.no_grad():
             action = self.model.predict_action(
-                **inputs, unnorm_key=self.unnorm_key, do_sample=False,
+                input_ids=inputs["input_ids"],
+                pixel_values=inputs["pixel_values"],
+                unnorm_key=self.unnorm_key,
+                do_sample=False,
             )
         return np.asarray(action).astype(np.float32)
 

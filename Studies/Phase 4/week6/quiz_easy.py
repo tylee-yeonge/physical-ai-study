@@ -27,11 +27,11 @@ def problem2_predict_action():
     print("  D) model.predict()")
 
 
-def problem3_unnormalize_key():
+def problem3_unnorm_key():
     print("\n" + "=" * 50)
-    print("문제 3: unnormalize_key 의 의미")
+    print("문제 3: unnorm_key 의 의미")
     print("=" * 50 + "\n")
-    print("질문: predict_action(..., unnormalize_key='bridge_orig') 의 의미는?\n")
+    print("질문: predict_action(..., unnorm_key='bridge_orig') 의 의미는?\n")
     print("보기:")
     print("  A) 모델 weights 의 normalization key")
     print("  B) OpenX-Embodiment 의 어떤 dataset 의 action normalization 통계로")
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     print("=" * 50)
     problem1_quantization()
     problem2_predict_action()
-    problem3_unnormalize_key()
+    problem3_unnorm_key()
     problem4_latency_component()
     print("=" * 50)
     print("정답은 quiz_solutions/easy_sol.py 참고")

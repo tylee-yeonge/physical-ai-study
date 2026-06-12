@@ -42,9 +42,14 @@ inputs = proc("In: pick up the can\nOut:", img).to('cuda:0', dtype=torch.float16
 
 
 # warm-up
+# attention_mask 는 넘기지 않는다 -- predict_action 이 빈 토큰을 input_ids 에만 덧붙여
+# mask 와 길이가 1 어긋나 eager attention 에서 크래시
 for _ in range(5):
     with torch.no_grad():
-        _ = vla.predict_action(**inputs, unnormalize_key='bridge_orig', do_sample=False)
+        _ = vla.predict_action(
+            input_ids=inputs['input_ids'], pixel_values=inputs['pixel_values'],
+            unnorm_key='bridge_orig', do_sample=False,
+        )
 
 
 # Component 별 측정 (간단 hooks 또는 prof. 사용)
@@ -58,7 +63,10 @@ for _ in range(n_iter):
     # 여기서 OpenVLA 내부에 hook 을 걸어 component 별 측정
     # 또는 torch.profiler 사용
     with torch.no_grad():
-        action = vla.predict_action(**inputs, unnormalize_key='bridge_orig', do_sample=False)
+        action = vla.predict_action(
+            input_ids=inputs['input_ids'], pixel_values=inputs['pixel_values'],
+            unnorm_key='bridge_orig', do_sample=False,
+        )
     torch.cuda.synchronize()
     breakdowns['total'].append((time.time() - t0) * 1000)
 
@@ -95,7 +103,10 @@ with profiler.profile(
     record_shapes=True,
 ) as prof:
     with torch.no_grad():
-        _ = vla.predict_action(**inputs, unnormalize_key='bridge_orig', do_sample=False)
+        _ = vla.predict_action(
+            input_ids=inputs['input_ids'], pixel_values=inputs['pixel_values'],
+            unnorm_key='bridge_orig', do_sample=False,
+        )
 
 
 # top 20 operation by CUDA time

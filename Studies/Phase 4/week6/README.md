@@ -138,17 +138,18 @@ model = AutoModelForVision2Seq.from_pretrained(
 > LM decoder 의 시간이 압도적. 이게 줄어들면 (speculative decoding 등) latency 전체가 좋아짐.
 
 
-### 5. unnormalize_key 의 의미
+### 5. unnorm_key 의 의미
 
 
-OpenVLA `predict_action()` 호출 시 `unnormalize_key` 인자가 있다:
+OpenVLA `predict_action()` 호출 시 `unnorm_key` 인자가 있다:
 
 
 ```python
-action = model.predict_action(
-    image=...,
-    instruction=...,
-    unnormalize_key="bridge_orig", # <- 이게 핵심
+action = vla.predict_action(
+    input_ids=inputs["input_ids"],
+    pixel_values=inputs["pixel_values"],
+    unnorm_key="bridge_orig", # <- 이게 핵심
+    do_sample=False,
 )
 ```
 
@@ -202,9 +203,15 @@ instruction = "pick up the can"
 prompt = f"In: What action should the robot take to {instruction}?\nOut:"
 
 
-# 추론
+# 추론 -- attention_mask 는 넘기지 않는다 (predict_action 이 빈 토큰을 input_ids 에만
+# 덧붙여 mask 와 길이가 1 어긋나 eager attention 에서 크래시)
 inputs = processor(prompt, image).to("cuda:0", dtype=torch.float16)
-action = vla.predict_action(**inputs, unnormalize_key="bridge_orig", do_sample=False)
+action = vla.predict_action(
+    input_ids=inputs["input_ids"],
+    pixel_values=inputs["pixel_values"],
+    unnorm_key="bridge_orig",
+    do_sample=False,
+)
 ```
 
 
@@ -232,7 +239,7 @@ action = vla.predict_action(**inputs, unnormalize_key="bridge_orig", do_sample=F
 > 4-bit nf4 (bitsandbytes). 7B fp16 은 14GB, int4 는 ~ 5GB.
 
 
-**Q2. `predict_action()` 의 `unnormalize_key` 의 역할은?**
+**Q2. `predict_action()` 의 `unnorm_key` 의 역할은?**
 > OpenX-Embodiment 의 어떤 dataset 의 action normalization 통계로 de-normalize 할지 지정. 자작 팔에는 "bridge_orig" (WidowX) 가 가장 가까움.
 
 
@@ -274,7 +281,7 @@ action = vla.predict_action(**inputs, unnormalize_key="bridge_orig", do_sample=F
 
 
 1. **4-bit quantization (bitsandbytes nf4) 필수** RTX 4070 12GB 환경.
-2. **`predict_action()` + `unnormalize_key`**: OpenVLA 의 custom inference API.
+2. **`predict_action()` + `unnorm_key`**: OpenVLA 의 custom inference API.
 3. **Latency ~ 100-200ms**: LM decoder 가 대부분.
 4. **첫 데이터 확보**: 산출물 v3 의 latency 측정의 baseline.
 5. **다음 주부터 블로그 + ROS2 demo**: 본격적 통합 시작.
