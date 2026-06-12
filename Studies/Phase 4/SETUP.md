@@ -55,11 +55,12 @@ OpenVLA 7B 는 RTX 4070 12GB 로 **학습이 불가능**하다. 따라서 무거
 | int8 추론 속도 | 1.2 Hz (A5000) — 속도 하락이 시스템 동역학을 바꿔 성공률 하락으로 이어짐 | OpenVLA 논문 §5.4 |
 | int4 추론 속도 | 약 3 Hz (A5000, Ampere 768 GB/s) | OpenVLA 논문 |
 | bf16 추론 속도 | 약 6 Hz (RTX 4090, 1008 GB/s, 최적화 트릭 없이) | OpenVLA 논문 |
+| int4 추론 속도 (4070 실측) | **3.33 Hz** (mean 300.3 ms / median 301.3 ms / std 3.8 ms / p95 304.8 ms, n=100) | week6 실측 (`week6/openvla_latency_4070_int4.npy`) |
 
-- **4070 외삽**: autoregressive 7B 추론은 메모리 대역폭 지배적. 4070(504 GB/s)은 A5000(768 GB/s)보다 낮으나, int4 처리량이 Ada Lovelace 아키텍처에서 특히 잘 나온다는 논문 보고로 일부 상쇄 — 종합 추정 **약 2-3 Hz (step당 약 330-500 ms)**. 실제 스택(bitsandbytes nf4 + HF transformers + eager attention)에서는 ±50% 어긋날 수 있으며, 확정은 진입 시 1회 실측으로만 가능하다.
+- **4070 실측 (2026-06, week6)**: bitsandbytes nf4 + HF transformers + eager attention 스택에서 step당 mean 300.3 ms (**3.33 Hz**). 사전 외삽(메모리 대역폭 기준 약 2-3 Hz, step당 330-500 ms — 4070 의 504 GB/s 가 A5000 의 768 GB/s 보다 낮은 점과 Ada Lovelace 의 int4 처리량 이점을 종합)의 ±50% 허용 범위 안이며, 포인트 범위보다 약 9% 빠르다. std 3.8 ms 로 분포가 매우 안정적. 단, 이 수치는 `predict_action` 호출만 측정한 것으로 이미지 전처리(processor)와 ROS2 오버헤드는 제외 — 제어 루프 전체 주기는 week11 dry-run 에서 별도 확인.
 - **VRAM**: int4 7 GB + ROS2/sim 오버헤드를 더해도 12 GB 안착 — 사실상 확정.
 - **int8 경로는 실험에서 배제**: 성공률(58.1%)과 속도(1.2 Hz) 모두 열위. 코드 경로는 비교 실험 대비로만 보존한다 (week8 config 참고).
-- **제어 주기 적합성**: v1 범위(sim 단일 task, quasi-static pick-and-place)에는 2-3 Hz 로 충분 추정 — OpenVLA 원 실험 자체가 유사 속도 대역에서 blocking control 로 실로봇을 구동했다. 판정용 제어 주기 수치는 task 선정 후 확정한다.
+- **제어 주기 적합성**: v1 범위(sim 단일 task, quasi-static pick-and-place)에는 실측 3.3 Hz 로 충분 추정 — OpenVLA 원 실험 자체가 유사 속도 대역에서 blocking control 로 실로봇을 구동했다. 판정용 제어 주기 수치는 task 선정 후 확정한다.
 - 컴퓨트 수치의 본체는 이 표다. 루트 README 의 컴퓨트 인용구는 이 표의 요약만 유지한다.
 
 ---
@@ -262,10 +263,8 @@ Colab 환경 (CUDA, PyTorch, transformers) 과 로컬 환경의 버전이 다르
 
 ### 7.2 공유 requirements 파일
 
-본 디렉토리에 두 파일을 둔다 (week 8 진입 시 작성):
-
-- `requirements_colab.txt` — 학습용 (peft, accelerate, wandb 포함)
-- `requirements_local.txt` — 추론용 (bitsandbytes, rerun-sdk 포함)
+- 로컬 추론용 버전 고정의 단일 진실 공급원은 [`week8/requirements.txt`](week8/requirements.txt) — `.venv-vla` 공용 venv 생성 시 사용한다 (§6.2). OpenVLA remote code 가 요구하는 고정 버전 (transformers 4.40.1 / tokenizers 0.19.1 / timm 0.9.16 / accelerate 1.0.1 이하) 의 근거 주석 포함. 별도 `requirements_local.txt` 는 두지 않는다.
+- `requirements_colab.txt` (학습용; peft, accelerate, wandb 포함) 는 v1.5 LoRA 트랙 진입 시 본 디렉토리에 작성한다.
 
 두 파일의 공통 라이브러리는 **버전 문자열까지 동일**해야 한다. 변경 시 양쪽 동시 업데이트.
 
@@ -356,21 +355,21 @@ velog 작성 + LinkedIn 공유까지가 한 사이클.
 
 본 SETUP 의 진행 상태 + Phase 4 전체에서 컴퓨트 전략이 정상 가동되는지 추적용. (Roadmap Phase 4 의 완료 체크리스트와 별개; 환경 관점 단일 보드.)
 
-### 11.1 진입 전 (week 1 시작 전)
-- [ ] §2 사전 점검 체크리스트 전부 통과
-- [ ] 로컬 추론 라이브러리 버전 확인 (`requirements_local.txt`)
+### 11.1 진입 전
+- [x] §2 사전 점검 체크리스트 전부 통과 — 잔여 미체크는 "(선택) Colab Pro" 뿐이며 v1 필수 트랙에 불필요
+- [x] 로컬 추론 라이브러리 버전 확인 — `week8/requirements.txt` 로 고정 (§7.2)
 
-### 11.2 학습 측 (병행 트랙, 선택)
+### 11.2 학습 측 (v1.5 / Phase 4.5 병행 트랙, 선택)
 - [ ] Colab Pro 구독 + 컴퓨트 유닛 확보 (이 트랙 진입 시에만)
-- [ ] Colab / 로컬 라이브러리 버전 매칭 (`requirements_colab.txt` + `requirements_local.txt`; §7)
+- [ ] Colab / 로컬 라이브러리 버전 매칭 (`requirements_colab.txt` + `week8/requirements.txt`; §7)
 - [ ] Colab 에서 베이스 OpenVLA 로드 검증 (추론 한 번 굴려보기)
 - [ ] LoRA 파인튜닝 스크립트 작성 + 체크포인트 저장 설정
 - [ ] 학습 완료 → LoRA 가중치 Drive 저장
 - [ ] §7.3 호환성 검증 통과
 
 ### 11.3 추론 측 (week 8-12)
-- [ ] 로컬에서 가중치 다운로드 + 머지 + 4bit 양자화
-- [ ] 4070 에서 양자화 추론 동작 확인 (VRAM 사용량 측정)
+- [x] 4070 에서 베이스 모델 4bit 양자화 추론 동작 확인 — week6 실측: OOM 없이 로드, mean 300.3 ms (3.33 Hz, n=100), VRAM 기록 (§1.3)
+- [ ] (v1.5) Drive 에서 LoRA 가중치 다운로드 + 베이스에 머지 + 4bit 재양자화
 - [ ] ROS2 노드 래핑 + ELP 카메라 연동
 - [ ] Rerun 시각화 + 1분 데모 영상
 

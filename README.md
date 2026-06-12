@@ -215,7 +215,7 @@ gantt
 - 한계 명시: v1 의 Body 는 sim, 실암 결합은 v2 예고
 
 
-> **컴퓨트 (추정치 검증 단계)**: OpenVLA 7B 의 BF16 가중치는 약 14-15GB → RTX 4070 12GB 로 풀 정밀도 불가. int4 양자화 시 VRAM 약 7GB (논문 실측) + 성공률은 bf16 과 동등 → 12GB 안착 사실상 확정. 4070 추론 속도는 약 2-3 Hz 로 외삽되며 quasi-static 단일 task 에는 적합 추정. int8 은 성공률·속도 모두 열위로 실험에서 배제. v1 착수 시 1회 실측은 추정치 검증 성격 (수치 본체: [`Studies/Phase 4/SETUP.md`](./Studies/Phase%204/SETUP.md)). 추정이 크게 어긋나면 범위 축소(관측→action 시각화) 로 분기.
+> **컴퓨트 (실측 검증 완료)**: OpenVLA 7B 의 BF16 가중치는 약 14-15GB → RTX 4070 12GB 로 풀 정밀도 불가. int4 양자화 시 VRAM 약 7GB (논문 실측) + 성공률은 bf16 과 동등 → 12GB 안착, 4070 에서 OOM 없이 로드 확인. 4070 추론 속도는 실측 mean 300.3 ms (3.33 Hz, n=100) 로 quasi-static 단일 task 에 적합 추정 — 제어 주기 판정 수치는 task 선정 후 확정. int8 은 성공률·속도 모두 열위로 실험에서 배제 (수치 본체: [`Studies/Phase 4/SETUP.md`](./Studies/Phase%204/SETUP.md) §1.3). 제어 주기 미충족 시 범위 축소(관측→action 시각화) 로 분기.
 
 
 ### Phase 5: Foundation Model 기초 (3개월, 2027.02-04, 실지원 병행 저강도)
