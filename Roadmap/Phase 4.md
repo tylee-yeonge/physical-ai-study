@@ -65,73 +65,7 @@
 
 ### 실행 체크리스트 (파일·섹션 단위)
 
-위 표의 각 순서를 실제로 열어볼 파일과 섹션 단위로 펼친 진행 보드. 위에서 아래로 순서대로 진행하고, 완료한 항목에 체크한다. 모든 경로는 `Studies/Phase 4/` 기준.
-
-#### 순서 1 — Step 0: 환경 구축 + 레포 청소 + 실측 (6월 2주차, 6h)
-
-- [x] `SETUP.md` §2 사전 점검 체크리스트 통과 (계정 / 로컬 드라이버·디스크·ROS2 / 공통 도구)
-- [x] `SETUP.md` §6 로컬 환경 세팅 — 공용 venv `.venv-vla` 생성은 `week8/PRACTICE.md` "환경 설정" 절의 명령 사용
-- [x] `SETUP.md` §1.3 실측치 표 숙지 — 이번 실측이 검증할 추정치 (int4 약 7GB / 약 2-3 Hz)
-- [x] git 커밋 신원 정리 — 작업 컨테이너에 `git config user.name` / `user.email` 을 GitHub 계정에 연결된 개인 이메일(또는 noreply)로 설정. author `root` + 사내 이메일 상태로는 contribution graph 에 연결되지 않고 개인 포트폴리오에 사내 이메일이 남는다. 기존 커밋 히스토리의 author 재작성(`git filter-repo`) 여부는 v1 공개 전 결정 — 공개·fork 이후에는 불가
-- [x] `predict_action` 호출 패턴 일괄 청소 (**순서 4 진입 전 필수**) — `grep -rn "predict_action(\*\*inputs" .` 으로 잔존 위치 확인 후 `input_ids` / `pixel_values` 만 전달하도록 통일. 근거: `predict_action` 은 빈 토큰(29871)을 input_ids 에만 덧붙이므로 processor 출력의 attention_mask 를 그대로 넘기면 eager attention 에서 off-by-one 으로 깨진다 (week6 PRACTICE 는 수정 완료, `week6/README.md`·`week8`-`week12` 자료·quiz 잔존 확인 대상)
-- [x] `week6/PRACTICE.md` 실습 1 (첫 OpenVLA 4-bit inference) — OOM 없이 로드되는지
-- [x] `week6/PRACTICE.md` 실습 2 (latency 측정 100회 + 통계 + 결과 저장) — mean/p95 와 `nvidia-smi` VRAM 기록
-- [x] 실측치를 `SETUP.md` §1.3 추정치와 비교 — 추정 범위(±50%)를 벗어나면 §1.3 을 실측 기준으로 갱신 (실측 mean 300.3 ms / 3.33 Hz, ±50% 범위 내 — §1.3 에 실측 행 추가)
-
-#### 순서 2 — 표적 skim (6월 2-3주차, 4h)
-
-skim 목적은 구현에 필요한 사실 확인이지 정독이 아니다. 항목별로 답을 노트 1페이지에 적으면 끝.
-
-- [ ] 라이선스 확인: OpenVLA HF 모델 카드 — 코드 MIT / weights 는 Llama 2 license. v1 공개물(블로그·영상·레포)에서의 사용 조건 확인
-- [ ] action 표현: `week5/README.md` §3 (Action space 표준화) + §3.5 (관절각/EE-delta/token 비교 축) — OpenVLA 출력 7-DoF 가 무엇을 의미하는지
-- [ ] unnorm_key / 입력 형식: OpenVLA HF 모델 카드의 사용 예시 코드 + `week6/README.md` "핵심 개념"의 모델 로드/추론 코드 절 — prompt 형식과 `predict_action(input_ids=..., pixel_values=..., unnorm_key=..., do_sample=False)` 호출. **주의**: processor 출력 전체를 `**inputs` 로 넘기는 패턴은 attention_mask 동봉으로 크래시한다 (순서 1 청소 항목의 근거 참조). 참고 자료에 옛 패턴이 남아 있으면 그 자리에서 수정
-- [ ] embodiment 가정: `week5/README.md` §1 (OpenX-Embodiment 구조) + §2 (대표 embodiment 특징) + 공식 repo README — 어떤 로봇/카메라 시점을 전제로 학습됐는지, sim 이 거기에 맞을 수 있는지
-- [ ] 아키텍처 최소 골격: `week4/README.md` §5 (Architecture Diagram) + "한 페이지 OpenVLA 요약"의 입출력 인터페이스 절
-
-#### 순서 3 — sim 정합 + 성공 task 정의 (6월 2-3주차, 12h)
-
-이 구간은 대응하는 week 자료가 없는 신규 작업이다 (원안에서 week11 에 묻혀 있던 선행 의사결정을 분리한 것).
-
-- [ ] 순서 2 의 embodiment 가정에 맞는 sim 후보 비교·선정 — 선정 사유를 노트로 기록
-- [ ] 성공 task 1종 + 성공률 기준 N 정의
-- [ ] task 의 제어 주기 요구 확정 → `week8/PRACTICE.md` 실습 체크리스트의 latency placeholder ("2 Hz 이상") 를 확정 수치로 교체
-- [ ] `week11/README.md` §4 (1분 dry-run 의 success criteria) 미리 읽기 — 순서 4 의 종착점 파악
-
-#### 순서 4 — week8-12 실습 압축 (6월 3주 - 7월 중순, 34h)
-
-각 week 공통 패턴: `README.md` 정독 → `PRACTICE.md` 실습 → `quiz_easy.py` / `quiz_medium.py` (출장일 저녁 등 파편 시간에 배치 가능). 진입 전제: 순서 1 의 `predict_action` 패턴 청소 완료.
-
-- [ ] `week8/README.md` + `week8/PRACTICE.md` 실습 1-4 (VLAInference class / image preprocess / exceptions·config / 100회 stress test) + quiz
-- [ ] `week9/README.md` + `week9/PRACTICE.md` 실습 1-3 (I/O spec 1페이지 / msg <-> Python 변환 / BGR->RGB 검증) + quiz
-- [ ] `week10/README.md` + `week10/PRACTICE.md` 실습 1-4 (vla_node 패키지 생성 / 골격 노드 / setup.py / 빌드+실행, 실습 5 dummy image 는 선택) + quiz
-- [ ] `week11/README.md` + `week11/PRACTICE.md` 실습 1-3 (실 inference 통합 / 빌드+실행 / 1분 dry-run + 통계) — 입력은 순서 3 에서 선정한 sim 으로 연결 (자료의 ros2 bag 재생은 대체 수단) + quiz
-- [ ] `week12/README.md` + `week12/PRACTICE.md` 실습 1-2 (Rerun 기본 / rerun_logger 노드) — 영상 제작(실습 3-5)은 순서 7 로 후행 + quiz
-
-#### 순서 5 — 성공률 측정 + 결과 정리 (7월 중순 - 말, 22h)
-
-- [ ] 정의된 task 를 N회 시도, 성공률 기록 — 측정/통계 코드는 `week11/PRACTICE.md` 실습 3 패턴 재사용
-- [ ] mean/p95 latency 실측 + task 제어 주기 충족 여부 판정 (`week8/PRACTICE.md` 실습 체크리스트의 확정 기준)
-- [ ] 결과 표 정리 — `week12/PRACTICE.md` 실습 5 의 "측정 결과" 표 형식 참고. 여기까지가 v1 기술 코어 (7월 말 목표)
-- [ ] **8월 초 체크포인트 수행** — 본 절 상단 bullet 의 입력으로 8-12월 예산·배치 확정 (순서 6-7 잠정치 갱신, v1.5 조기 진입 여부 결정)
-
-#### 순서 6 — week1-7 정독 + 블로그 2편 (8-9월)
-
-- [ ] `week1/` RT-2 1회독 + reading note (PRACTICE 실습 1-3) + quiz
-- [ ] `week2/` Co-fine-tuning + action tokenization (PRACTICE 실습 1-3) + quiz
-- [ ] 블로그 플랫폼 선정 (Velog / Medium / 본 레포의 `Studies/Phase 4/blog/`) — week3 발행 전 결정
-- [ ] `week3/` RT-2 블로그 1편 작성 + 발행 (PRACTICE 실습 1-4)
-- [ ] `week4/` OpenVLA 정독 — 순서 2 에서 안 본 부분 중심 (hybrid vision encoder, contribution, 한계) + 실습 1-3 + quiz
-- [ ] `week5/` OpenX-Embodiment + LoRA 흐름 정독 + 실습 1-4 + quiz
-- [ ] `week6/` README 개념 보충만 — 실습 1-2 는 순서 1 에서 이미 수행, 실습 3 (에러 기록) 은 미기록분 보완
-- [ ] `week7/` OpenVLA 블로그 1편 작성 + 발행 — 실측 결과 섹션에 순서 1/5 의 수치 사용 (PRACTICE 실습 1-4)
-
-#### 순서 7 — 패키징 + v1 공개 (8-9월)
-
-- [ ] `week12/PRACTICE.md` 실습 3-5 (1분 영상 시나리오 / 녹화+편집 / Portfolio 패키징) — 순서 4 에서 미룬 분량
-- [ ] `week13/` 블로그 2편 퇴고 + 다이어그램 통일 (PRACTICE 실습 1-4)
-- [ ] `week14/` ROS2 demo README + 환경 세팅 가이드 + 검증 (PRACTICE 실습 1)
-- [ ] `week15/` 영상 자막/thumbnail/최종 export (PRACTICE 실습 1-5)
-- [ ] `week16/` 산출물 v1 공개 + 회고 + Phase 4.5 진입 준비 (PRACTICE 실습 1-5)
+진행 보드는 [`Studies/Phase 4/notes.md`](../Studies/Phase%204/notes.md) 에 있다 — 순서 1-7 의 파일·섹션 단위 체크 항목과 노트 산출물을 한 파일에서 관리하며, 체크 표기도 그 파일에서만 갱신한다. 본 문서에는 계획(위 순서 표 + 진행 원칙 bullet)만 남긴다.
 
 
 ---
@@ -164,7 +98,7 @@ skim 목적은 구현에 필요한 사실 확인이지 정독이 아니다. 항�
 ## 원안 week 구조 (자료 맵)
 
 
-각 week 디렉토리(`Studies/Phase 4/weekN/`)가 담는 내용의 참조 표. **실행 순서와 체크 항목의 단일 진실 공급원은 위 "진행 순서 변형" 절이다** — 이 표는 자료가 어디에 있는지 찾을 때만 쓴다.
+각 week 디렉토리(`Studies/Phase 4/weekN/`)가 담는 내용의 참조 표. **실행 순서의 단일 진실 공급원은 위 "진행 순서 변형" 절, 진행 체크의 단일 진실 공급원은 [`Studies/Phase 4/notes.md`](../Studies/Phase%204/notes.md) 다** — 이 표는 자료가 어디에 있는지 찾을 때만 쓴다.
 
 | week | 구간 | 내용 | 핵심 |
 |---|---|---|---|
