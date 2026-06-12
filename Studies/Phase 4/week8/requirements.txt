@@ -1,8 +1,17 @@
 numpy>=1.24.0
 torch>=2.0.0
-transformers>=4.40.0
+# OpenVLA remote code (modeling_prismatic.py) 가 요구하는 고정 버전:
+# - transformers/tokenizers: 4.40.1/0.19.1 외 버전은 inference regression 경고,
+#   5.x 에서는 AutoModelForVision2Seq 제거 + GenerationMixin 분리로 동작 불가
+# - timm: 0.9.10/0.9.11/0.9.12/0.9.16 외에는 NotImplementedError 로 즉시 중단
+transformers==4.40.1
+tokenizers==0.19.1
+timm==0.9.16
+torchvision>=0.17.0
 bitsandbytes>=0.43.0
-accelerate>=0.30.0
+# accelerate 1.2.0+ 는 4-bit 모델을 .to() 로 옮기려 하는데 transformers 4.40.1 이
+# bnb 모델의 .to() 를 무조건 차단하므로 충돌 -> bnb 가드가 있는 1.0.1 이하로 고정
+accelerate==1.0.1
 Pillow>=9.5.0
 opencv-python>=4.8.0
 sentencepiece>=0.1.99
