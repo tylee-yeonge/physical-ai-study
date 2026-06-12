@@ -248,18 +248,19 @@ Colab 환경 (CUDA, PyTorch, transformers) 과 로컬 환경의 버전이 다르
 
 ### 7.1 고정 대상 매트릭스
 
-| 항목 | Colab (학습) | 로컬 (추론) | 비고 |
+| 항목 | Colab (학습, v1.5 진입 시 맞춤) | 로컬 (추론, `.venv-vla` 실설치 2026-06) | 비고 |
 |------|-------------|------------|------|
-| CUDA | 12.1 (Colab 기본) | 12.1 (로컬에 설치) | 드라이버는 더 높아도 OK |
-| Python | 3.10 | 3.10 | 동일 minor |
-| PyTorch | 2.3.x | 2.3.x | major.minor 일치 |
-| transformers | 4.40.x | 4.40.x | major.minor 일치 |
-| peft | 0.10.x | 0.10.x | LoRA adapter 포맷 호환성 |
-| bitsandbytes | 0.43.x | 0.43.x | 양자화 포맷 호환성 |
-| accelerate | 0.29.x | 0.29.x | 학습 시 사용 |
-| timm | 1.0.x | 1.0.x | DINOv2 / SigLIP backbone |
+| CUDA | 로컬과 major 일치 목표 | 13.0 (driver 580.159.03) | 드라이버는 더 높아도 OK |
+| Python | 동일 minor (3.12) | 3.12.3 | |
+| PyTorch | major.minor 일치 | 2.12.0 | |
+| transformers | 4.40.1 | 4.40.1 (고정) | OpenVLA remote code 요구 — 4.40.1 외 regression 경고, 5.x 는 동작 불가 |
+| tokenizers | 0.19.1 | 0.19.1 (고정) | transformers 4.40.1 페어 |
+| timm | 0.9.16 | 0.9.16 (고정) | 0.9.10/0.9.11/0.9.12/0.9.16 외 NotImplementedError |
+| accelerate | 1.0.1 | 1.0.1 (고정) | 1.2.0+ 는 4-bit 모델 `.to()` 충돌 |
+| bitsandbytes | 0.49.x | 0.49.2 | 양자화 포맷 호환성 |
+| peft | v1.5 진입 시 양쪽 동시 추가 | 미설치 | LoRA adapter 포맷 호환성 |
 
-> 위 버전은 진입 시점 (2026.06) 에 OpenVLA 공식 리포의 `requirements.txt` 를 확인해 재조정한다. **OpenVLA upstream 이 정답**이며, 본 표는 시작점일 뿐.
+> 고정 버전의 본체와 근거 주석은 `week8/requirements.txt` (§7.2). 로컬 열은 `.venv-vla` 실설치 기준이며, Colab 열은 v1.5 LoRA 트랙 진입 시 로컬에 맞춰 작성한다 (`requirements_colab.txt`).
 
 ### 7.2 공유 requirements 파일
 
