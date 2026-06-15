@@ -215,7 +215,58 @@ action = vla.predict_action(
 ```
 
 
-### 8. 본 로드맵의 다음 5주 흐름 (week 8-12)
+### 8. inference 코드 한 줄씩 풀어 읽기
+
+
+섹션 7 의 표준 코드를 흐름 순서로 다시 읽는다. 전체 그림은 단순하다 — **사진 1 장 + 자연어 명령**을 넣으면 **로봇 팔이 다음에 취할 동작값** 7 개(이동 dx/dy/dz + 회전 rx/ry/rz + 그리퍼)가 나온다. 단계는 셋뿐이다.
+
+
+```mermaid
+flowchart LR
+    A["모델 로드<br/>processor + vla"] --> B["입력 만들기<br/>이미지 + 명령 프롬프트"]
+    B --> C["추론<br/>predict_action 호출"]
+    C --> D["동작값 7 차원"]
+```
+
+
+**1단계 — 모델 로드.** `processor` 는 사람이 주는 입력(이미지 파일, 텍스트 문장)을 모델이 먹는 숫자 텐서로 바꾸는 통역사. `vla` 는 실제 추론을 하는 모델 본체. 로드 옵션의 의미:
+
+
+| 옵션 | 의미 |
+|---|---|
+| `quantization_config=bnb_config` | 가중치를 4-bit 로 압축해 올림. 7B 를 fp16 으로 올리면 14GB 넘는데 4-bit 면 약 1/4. `bnb_config` 는 섹션 2 에서 미리 만든 설정 |
+| `attn_implementation="eager"` | attention 을 표준 PyTorch 방식으로. `flash_attn` 이 깔려 있으면 더 빠른 구현을 쓰지만 없을 때의 안전한 fallback |
+| `low_cpu_mem_usage=True` | 로딩 중 RAM 피크를 낮춤 |
+| `trust_remote_code=True` | OpenVLA 는 표준 transformers 에 없는 자체 모델 코드를 HuggingFace 에서 같이 받아 실행. 이를 허용하는 플래그 |
+
+
+**2단계 — 입력 만들기.** OpenVLA 는 학습 때 **항상 같은 문장 틀**로 명령을 받았다. 그래서 추론도 같은 틀에 명령을 끼워야 학습 때와 같은 방식으로 반응한다. 틀을 바꾸면 성능이 떨어진다.
+
+
+```python
+prompt = f"In: What action should the robot take to {instruction}?\nOut:"
+```
+
+
+`processor(prompt, image)` 가 텍스트는 토큰 ID(`input_ids`)로, 이미지는 픽셀 텐서(`pixel_values`)로 변환하고, `.to("cuda:0")` 로 GPU 에 올린다.
+
+
+**3단계 — 추론.** `do_sample=False` 는 같은 입력에 항상 같은 출력이 나오게 한다(가장 확률 높은 동작을 그대로 선택). 로봇 제어는 무작위성이 없는 편이 안전하다. `attention_mask` 를 안 넘기는 이유는 섹션 7 의 주석대로 — `predict_action` 이 빈 동작 토큰을 `input_ids` 에만 덧붙여서 mask 와 길이가 1 어긋나고, eager attention 이 그 불일치에서 크래시 나기 때문이다.
+
+
+**`unnorm_key` 가 핵심인 이유 (정규화 되돌리기).** 섹션 5 의 key 표를 "왜" 의 사슬로 풀면:
+
+
+1. 로봇마다 물리 스케일이 다르다. 한 스텝에 1cm 움직이는 팔도, 5cm 움직이는 팔도 있다.
+2. 여러 로봇 데이터로 한 모델을 학습시키려면 이 차이를 없애야 한다. 그래서 학습 전에 각 로봇의 동작값을 **정규화**(평균 0, 일정 범위)해 통일한다.
+3. 따라서 모델이 내뱉는 raw 출력도 **정규화된 추상값**(예: -1 - +1)이다. 실제 로봇에 그대로 주면 안 된다.
+4. `unnorm_key` 는 "이 출력을 어느 로봇의 실제 단위로 되돌릴지" 고르는 스위치다. `"bridge_orig"` 를 주면 WidowX 팔(Bridge) 의 통계로 역정규화해 실제 이동량/회전량으로 환산한다.
+
+
+key 를 잘못 고르면 모델은 멀쩡히 동작값을 내는데 스케일이 틀려서 로봇이 엉뚱한 거리로 움직인다. 자작 팔은 처음엔 가까운 팔(`bridge_orig`)을 빌려 쓰다가, fine-tune 후 본인 통계 key 로 바꾸는 게 정석이다.
+
+
+### 9. 본 로드맵의 다음 5주 흐름 (week 8-12)
 
 
 이번 주의 inference 셋업이 끝나면:
