@@ -215,14 +215,38 @@ skim 목적은 구현에 필요한 사실 확인이지 정독이 아니다. 항�
 
 이 구간은 대응하는 week 자료가 없는 신규 작업이다 (원안에서 week11 에 묻혀 있던 선행 의사결정을 분리한 것).
 
-- [ ] 순서 2 의 embodiment 가정에 맞는 sim 후보 비교·선정 — 선정 사유를 아래 노트에 기록
+- [x] 순서 2 의 embodiment 가정에 맞는 sim 후보 비교·선정 — 선정 사유를 아래 노트에 기록
 - [ ] 성공 task 1종 + 성공률 기준 N 정의
 - [ ] task 의 제어 주기 요구 확정 → `week8/PRACTICE.md` 실습 체크리스트의 latency placeholder ("2 Hz 이상") 를 확정 수치로 교체
 - [ ] `week11/README.md` §4 (1분 dry-run 의 success criteria) 미리 읽기 — 순서 4 의 종착점 파악
 
 ### 노트: sim 후보 비교·선정 사유
 
-- (작성 전)
+선정: **ManiSkill** (SAPIEN 기반). 사유는 비교표 아래에 정리.
+
+이 실습의 sim 역할은 환경 제작이 아니라 "VLA 추론에 이미지를 공급하고 action 을 받아 실행하는 closed-loop 테스트 무대"다 (학습 아님, 추론 통합 + latency/성공률 측정이 목적). 따라서 평가 기준은 렌더링 품질이 아니라 (1) embodiment/action 정합, (2) 이미지 획득 난이도, (3) 기성 task 제공, (4) 4070(12GB) GPU 부담, (5) VLA 통합 노력이다.
+
+| 후보 | embodiment/action 정합 | 이미지 획득 | 기성 task | GPU 부담(4070 12GB) | 통합 노력 |
+|------|----------------------|-----------|----------|--------------------|----------|
+| ManiSkill | 팔(Franka) 위주, EEF delta 제어모드로 OpenVLA 7-DoF 출력과 매핑 가능 | obs dict 에 자동 포함 | 내장(PickCube 등) | 헤드리스 렌더 가능, 비교적 가벼움 | 가장 적음 |
+| SAPIEN | ManiSkill 과 동일 엔진이나 task 직접 구성 | 카메라 수동 추가 후 take_picture | 없음(직접) | ManiSkill 과 동급 | 중간 |
+| MuJoCo | 팔 모델 가능하나 씬/카메라 직접 구성 | XML 카메라 + Renderer 수동 | 없음(직접) | 가벼움 | 중간 |
+| PyBullet | 팔 모델 가능하나 모든 것 직접 | view/proj 행렬 직접 계산 | 없음(직접) | 가벼움 | 가장 많음 |
+| Isaac Sim | 팔 다수 제공, 렌더 품질 최고 | 카메라 + ROS2 bridge 공식 지원 | 일부 제공 | 매우 무거움, 7B 추론과 VRAM 경쟁 위험 | 무거운 셋업 |
+
+선정 사유 (ManiSkill):
+
+- **통합 노력 최소**: 카메라와 task 가 이미 세팅된 채로 나온다. `obs_mode="rgb"` 만 지정하면 관측 dict 에 카메라 이미지가 들어오므로, 순서 4 에서 "이미지 들어가고 action 나오는지"를 가장 빨리 검증할 수 있다.
+- **action 정합**: Franka 의 `pd_ee_delta_pose` 제어 모드가 OpenVLA 출력(7-DoF EEF delta + gripper)과 직접 매핑 가능하다. 별도 변환 레이어 부담이 작다. (정확한 단위/축 정합은 순서 4 통합 시 1회 검증 필요)
+- **GPU 부담**: 헤드리스 GPU 렌더로 4070 에서 OpenVLA int4 추론과 병행 여지가 있다. Isaac Sim 은 동일 GPU 에서 7B 추론과 VRAM 을 다투어 4070 환경에서 위험이 크다 — 선정 제외의 핵심 사유.
+- **task 매핑**: 기성 PickCube 등이 순서 3 의 "성공 task 1종 정의"에 그대로 매핑된다.
+- **설치**: pip 설치, Linux 친화적. Isaac Sim(Omniverse) 의 무거운 셋업과 대비된다.
+
+한계/리스크 (선정했더라도 감수하는 부분):
+
+- **도메인 갭**: OpenVLA 는 실로봇 데이터(OpenX-Embodiment)로 학습됐다. ManiSkill 렌더 이미지는 도메인이 달라 zero-shot 성공률이 낮을 수 있다 — 측정이 목적이므로 낮은 수치도 결과로 수용한다 (순서 5).
+- **embodiment 부분 불일치**: 팔 형태는 맞지만 카메라 시점/로봇 외형이 OpenVLA 학습 분포와 정확히 같지 않다. 순서 2 의 embodiment 가정과 ManiSkill 기본 카메라 시점이 어긋나면 성공률에 추가 악영향.
+- **ROS2 연계 직접 구현**: Isaac Sim 과 달리 ROS2 bridge 가 기본 제공되지 않는다. sim 이미지를 `sensor_msgs/Image` 로 publish 하는 래핑을 week9/week10 에서 직접 만들어야 한다 — 단 이 실습의 학습 목표 자체가 그 노드 구현이므로 비용이 아니라 과제에 가깝다.
 
 ### 노트: 성공 task 정의 + 성공률 기준 N
 
