@@ -105,19 +105,19 @@ OpenX-Embodiment
 
 ```python
 {
-    'steps': [
-        {
-            'observation': {
-                'image': <RGB image>, # 224x224 또는 256x256
-                'natural_language_instruction': <str>, # 'pick up the can'
-                # (선택) 'wrist_image', 'depth', 'state' 등
-            },
-            'action': <7-DoF or N-DoF>, # [dx, dy, dz, rx, ry, rz, gripper]
-            'reward': <float>,
-            'is_first': <bool>, 'is_last': <bool>, 'is_terminal': <bool>,
-        },
-        ... (한 episode 의 모든 step)
-    ]
+  'steps': [
+    {
+      'observation': {
+        'image': <RGB image>, # 224x224 또는 256x256
+        'natural_language_instruction': <str>, # 'pick up the can'
+        # (선택) 'wrist_image', 'depth', 'state' 등
+      },
+      'action': <7-DoF or N-DoF>, # [dx, dy, dz, rx, ry, rz, gripper]
+      'reward': <float>,
+      'is_first': <bool>, 'is_last': <bool>, 'is_terminal': <bool>,
+    },
+    ... (한 episode 의 모든 step)
+  ]
 }
 ```
 
@@ -127,8 +127,8 @@ OpenX-Embodiment
 
 | Embodiment | Robot type | DoF | Gripper | Episode 수 | 본 로드맵 자작 팔과의 유사도 |
 |---|---|---|---|---|---|
-| Franka Emika Panda | 7-DoF arm | 7 | Franka 2-finger | ~ 200K | 매우 높음 (가장 가까움) |
-| WidowX 250 | 6-DoF arm | 6 | WidowX gripper | ~ 80K | 높음 (6DOF) |
+| WidowX 250 | 6-DoF arm | 6 | WidowX gripper | ~ 80K | 매우 높음 (가장 가까움) |
+| Franka Emika Panda | 7-DoF arm | 7 | Franka 2-finger | ~ 200K | 중간 (7DOF, 다른 액추에이터) |
 | UR5 / UR5e | 6-DoF arm | 6 | 다양 | ~ 30K | 높음 |
 | xArm 7 | 7-DoF arm | 7 | xArm gripper | ~ 20K | 중간 |
 | Sawyer | 7-DoF arm | 7 | Rethink gripper | ~ 5K | 중간 |
@@ -141,7 +141,6 @@ OpenX-Embodiment
 
 
 OpenX-Embodiment 는 embodiment 별로 action space 가 다르다. OpenVLA 는 **표준화** 하여 학습:
-
 
 ```
 Embodiment 별 action:

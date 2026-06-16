@@ -50,8 +50,8 @@
 skim 목적은 구현에 필요한 사실 확인이지 정독이 아니다. 항목별로 답을 아래 노트 섹션에 적으면 끝.
 
 - [x] 라이선스 확인: OpenVLA HF 모델 카드 — 코드 MIT / weights 는 Llama 2 license. v1 공개물(블로그·영상·레포)에서의 사용 조건 확인 (노트 작성 완료)
-- [ ] action 표현: `week5/README.md` §3 (Action space 표준화) + §3.5 (관절각/EE-delta/token 비교 축) — OpenVLA 출력 7-DoF 가 무엇을 의미하는지
-- [ ] unnorm_key / 입력 형식: OpenVLA HF 모델 카드의 사용 예시 코드 + `week6/README.md` "핵심 개념"의 모델 로드/추론 코드 절 — prompt 형식과 `predict_action(input_ids=..., pixel_values=..., unnorm_key=..., do_sample=False)` 호출. **주의**: processor 출력 전체를 `**inputs` 로 넘기는 패턴은 attention_mask 동봉으로 크래시한다 (순서 1 청소 항목의 근거 참조). 참고 자료에 옛 패턴이 남아 있으면 그 자리에서 수정
+- [x] action 표현: `week5/README.md` §3 (Action space 표준화) + §3.5 (관절각/EE-delta/token 비교 축) — OpenVLA 출력 7-DoF 가 무엇을 의미하는지
+- [x] unnorm_key / 입력 형식: OpenVLA HF 모델 카드의 사용 예시 코드 + `week6/README.md` "핵심 개념"의 모델 로드/추론 코드 절 — prompt 형식과 `predict_action(input_ids=..., pixel_values=..., unnorm_key=..., do_sample=False)` 호출. **주의**: processor 출력 전체를 `**inputs` 로 넘기는 패턴은 attention_mask 동봉으로 크래시한다 (순서 1 청소 항목의 근거 참조). 참고 자료에 옛 패턴이 남아 있으면 그 자리에서 수정
 - [ ] embodiment 가정: `week5/README.md` §1 (OpenX-Embodiment 구조) + §2 (대표 embodiment 특징) + 공식 repo README — 어떤 로봇/카메라 시점을 전제로 학습됐는지, sim 이 거기에 맞을 수 있는지
 - [ ] 아키텍처 최소 골격: `week4/README.md` §5 (Architecture Diagram) + "한 페이지 OpenVLA 요약"의 입출력 인터페이스 절
 
@@ -127,14 +127,45 @@ skim 목적은 구현에 필요한 사실 확인이지 정독이 아니다. 항�
 > 출처: OpenVLA HF 모델 카드 사용 예시 + `week6/README.md` §5, §7
 
 파악할 항목:
-[ ] prompt 문자열 형식은? instruction 을 어디에 끼워넣나?
-[ ] `processor` 출력 중 `predict_action` 에 넘기는 인자는 무엇인가? 반대로 넘기면 안 되는 것은 무엇이고 그 이유는? (순서 1 청소 항목의 근거와 연결)
-[ ] `unnorm_key` 는 무엇을 결정하나? 값을 바꾸면 출력의 무엇이 달라지나?
-[ ] 대표 key 예시는 각각 어느 embodiment 인가? 자작 6-DoF 팔에는 어떤 key 가 1순위 후보인가? (embodiment 가정 노트와 연결)
-[ ] `do_sample` 인자의 의미는? 왜 보통 `False` 인가?
+[x] prompt 문자열 형식은? instruction 을 어디에 끼워넣나?
+[x] `processor` 출력 중 `predict_action` 에 넘기는 인자는 무엇인가? 반대로 넘기면 안 되는 것은 무엇이고 그 이유는? (순서 1 청소 항목의 근거와 연결)
+[x] `unnorm_key` 는 무엇을 결정하나? 값을 바꾸면 출력의 무엇이 달라지나?
+[x] 대표 key 예시는 각각 어느 embodiment 인가? 자작 6-DoF 팔에는 어떤 key 가 1순위 후보인가? (embodiment 가정 노트와 연결)
+[x] `do_sample` 인자의 의미는? 왜 보통 `False` 인가?
 
 정리:
-- 
+- OpenVLA는 학습할 때 쓴 프롬프트 틀이 정해져있고, 추론 때도 그 틀을 그대로 맞춰야 함
+    - 형식: "In: What action should the robot take to {명령}?\nOut:"
+        - {명령}에 내가 원하는 영어 문구를 넣으면 됨
+        - 이 형식은 OpenVLA 전용 문구이며, 다른 VLA 모델의 경우 전용 프롬프트를 사용해야 함 
+- processor 출력 내용
+    - OpenVLA의 processor는 PrismaticProcessor로, 텍스트 토크나이저(LLaMA 기반)와 이미지 프로세서(DINOv2 + SigLIP 듀얼 백본)을 묶은 통역사임
+        - 호출하면 dict 형태(BatchFeature)를 반환
+        - 핵심 키
+            - input_ids : 프롬프트 문장을 토큰 ID 수열로 변환
+            - attention_mask : 어느 토큰이 실제 입력인지(보통 전부 1)
+            - pixel_values : 전처리된 이미지 텐서 (이미지를 모델 입력 규격에 맞춘 숫자로 변환)
+- vla.predict_action
+    - 이미지 + 명령 입력 -> 7차원 동작값 출력
+    - 하는 일
+        1) input_ids, pixel_values 입력
+        2) input_ids 뒤에 빈 동작 토큰 자리 추가
+        3) 디코더가 action 토큰 7개 생성
+        4) 토큰 ID -> 정규화된 실수 (-1 ~ 1)로 변환
+        5) unnorm_key 통계로 실제 단위 환산
+        6) 7차원 동작값 출력
+    - processor 출력 값 중 vla.predict_action에 넘기면 안되는 인자
+        - attention_mask: input_ids와 같은 개수를 가지지만 vla.predict_action에서 빈 동작 토큰 자리를 추가해서 개수가 달라지게 되므로 입력하면 가리키는 데이터가 틀어지게 됨
+    - unnorm_key
+        - 위 순서 중 4)에서 정규화된 값을 원하는 로봇의 통계로 역정규화해 실제 물리로 환산하는데 사용됨
+        - key가 맞지 않으면 역정규화는 정상적으로 진행되지만 실제 물리 값은 맞지 않게됨
+        - 예) key가 "bridge_orig"면 WidowX 팔의 스케일로 환산됨
+    - do_sample
+        - LM(Language Model)에서 다음 토큰을 고를 때 확률분포에 따른 추첨을 할지 안할지 결정하는 인자
+        - 인자 값에 따른 동작
+            - True: 확률에 비례해 추첨해서 토큰을 선택, 출력이 일관적이지 않음
+            - False: 추첨 없이 확률이 최댓값인 토큰을 선택, 출력이 일관적임
+
 
 ### 노트: embodiment 가정
 
@@ -142,14 +173,28 @@ skim 목적은 구현에 필요한 사실 확인이지 정독이 아니다. 항�
 > 출처: `week5/README.md` §1, §2 + OpenVLA 공식 repo README
 
 파악할 항목:
-[ ] observation 에 무엇이 들어가나? 이미지 해상도와 필수/선택 필드는? (§1 RLDS schema)
-[ ] 학습 데이터의 로봇은 주로 어떤 형태인가? 팔 위주인가, 이동 로봇도 포함되나?
-[ ] 카메라 시점 전제는? (3인칭 고정 / 손목 카메라 / depth 유무) — 공식 repo README 에서 확인
-[ ] 자작 6-DoF 팔과 가장 가까운 embodiment 는 무엇이고 근거는? (§2 표)
-[ ] (순서 3 입력) 선정할 sim 이 위 전제(로봇 형태·카메라 시점)를 맞출 수 있나? — 여기서 결론 내지 말고, 순서 3 에서 판단할 질문만 명확히 적어둔다.
+[x] observation 에 무엇이 들어가나? 이미지 해상도와 필수/선택 필드는? (§1 RLDS schema)
+[x] 학습 데이터의 로봇은 주로 어떤 형태인가? 팔 위주인가, 이동 로봇도 포함되나?
+[x] 카메라 시점 전제는? (3인칭 고정 / 손목 카메라 / depth 유무) — 공식 repo README 에서 확인
+[x] 자작 6-DoF 팔과 가장 가까운 embodiment 는 무엇이고 근거는? (§2 표)
 
 정리:
-- 
+- OpenX-Embodiment: 60개의 dataset을 표준 schema로 통합
+    - 표준 schema: RLDS(Reinforcement Learning Dataset Schema) 형식
+        - steps: 한 작업을 구성하는 step들의 나열, step 하나는 그 순간 관측 + 그 순간 행동 + 부가 정보로 이루어짐
+            - observation: 
+                - image<RGB image>: 주로 224x224(OpenVLA), 256x256 사용 (사실상 필수)
+                - natural_language_instruction<str>: 자연어로된 명령어(ex. "pick up the can") (사실상 필수)
+                - wrist_image<RGB image>: 손목 장착 카메라 (선택)
+                - depth<float32 or uint16>: 깊이 정보 (선택)
+                - state<float32 [N]>: 로봇 자체 상태(ex. 관절각, EE 위치 등) (선택)
+            - action<N-DoF(OpenVLA=7-DoF)>: 팔의 이동 좌표 
+            - reward<float>: 이 step의 행동에 대한 평가, 대부분 - 0, 성공한 마지막 step - 1, 혹은 데이터셋에 따라 아예 의미 없음
+            - is_first<bool>: 이 step이 episode의 첫 step인지 여부
+            - is_last<bool>: 이 step이 episode의 마지막 step인지 여부
+            - is_terminal<bool>: 이 step이 작업 종료 상태인지 여부
+- 자작 6-DoF 팔과 가장 가까운 embodiment는 WidowX 250임
+    - 이유: DoF 일치, 액추에이터 계열이 비슷, episode 개수가 상대적으로 많음
 
 ### 노트: 아키텍처 최소 골격
 
