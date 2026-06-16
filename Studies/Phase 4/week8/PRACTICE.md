@@ -423,7 +423,7 @@ vla.close()
 - [ ] `practice_stress_test.py` 실행
   - [ ] 100/100 success
   - [ ] mean/p95 latency 실측·기록 + task 제어 주기 기준 충족 여부 판정
-    - 판정 수치는 task 선정(sim 정합 단계) 후 확정. 그 전까지 "2 Hz 이상(step당 500 ms 이하)" 은 placeholder
+    - 확정 기준: 전체 제어 루프 2 Hz 이상(step 500 ms 이하). task = PickCube 는 quasi-static 이라 실시간 deadline 이 없고, sim 성공률에는 제어 주기가 무관하다(sim 이 action 을 기다림) — 이 2 Hz 는 sim 게이트가 아니라 실로봇 plausibility 하한이다. 근거: predict_action 실측 300 ms(3.33 Hz) 위에 이미지 전처리 + ROS2 통신 약 200 ms headroom. 전체 루프 주기 실측은 week11 dry-run 에서 (notes.md 순서 3 "노트: 제어 주기 요구 확정" 참조)
 - [ ] (선택) ELP Stereo 로 실제 이미지 테스트
 - [ ] git commit
 - [ ] quiz_easy / quiz_medium

@@ -131,47 +131,46 @@ RGB --+ concat -> 결합 patch token
 
 
 ```
-        +-----------+
-        | RGB image |
-        +-----------+
-            / \
-           v v
+          +-----------+
+          | RGB image |
+          +-----------+
+            /       \
+           v         v
    +-----------+ +-----------+
-   | DINOv2 | | SigLIP |
+   | DINOv2    | | SigLIP    |
    | (ViT-L/14)| | (ViT-L/14)|
    +-----------+ +-----------+
-        | |
-        v v
+        |              |
+        v              v
    +-----------+ +-----------+
    | patch tok | | patch tok |
    +-----------+ +-----------+
-            \ /
-             v v
+               \ /
+               v v
         +-----------+
-        | concat | ~ 512 tokens
+        | concat    | ~ 512 tokens
         +-----------+
               |
               v
         +-----------+ +------------------+
         | projector | | text instruction |
-        | (MLP) | | "pick up the can"|
+        | (MLP)     | | "pick up the can"|
         +-----------+ +------------------+
-              | |
-              +---------+-----------+
-                        v
+                    \ /
+                    v v
               +-------------------+
-              | Llama 2 7B |
-              | (LM decoder) |
+              | Llama 2 7B        |
+              | (LM decoder)      |
               +-------------------+
                         |
                         v
               +-------------------+
-              | action tokens | (7 dim, same vocab trick as RT-2)
+              | action tokens     | (7 dim, same vocab trick as RT-2)
               +-------------------+
                         |
                         v (de-tokenize)
               +-------------------+
-              | 7-DoF action |
+              | 7-DoF action      |
               +-------------------+
 ```
 

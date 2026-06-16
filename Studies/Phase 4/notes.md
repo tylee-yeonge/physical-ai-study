@@ -202,15 +202,39 @@ skim 목적은 구현에 필요한 사실 확인이지 정독이 아니다. 항�
 > 출처: `week4/README.md` §5 + "한 페이지 OpenVLA 요약"
 
 파악할 항목:
-[ ] 입력 형식은? (이미지 해상도 + 그 외 무엇)
-[ ] 출력 형식은? (action 표현 노트의 결론과 일치하는지 교차 확인)
-[ ] RGB 입력부터 action 출력까지 거치는 블록을 순서대로 나열 (vision encoder -> ... -> LM -> ...)
-[ ] vision encoder 가 왜 둘(DINOv2 + SigLIP)인가? 각각의 역할을 한 단어로.
-[ ] 제어 주기: README 추정치는 얼마인가? 순서 1 실측치(3.33 Hz)와 비교하면? 어긋나면 어느 쪽을 기준으로 삼나?
+[x] 입력 형식은? (이미지 해상도 + 그 외 무엇)
+[x] 출력 형식은? (action 표현 노트의 결론과 일치하는지 교차 확인)
+[x] RGB 입력부터 action 출력까지 거치는 블록을 순서대로 나열 (vision encoder -> ... -> LM -> ...)
+[x] vision encoder 가 왜 둘(DINOv2 + SigLIP)인가? 각각의 역할을 한 단어로.
+[x] 제어 주기: README 추정치는 얼마인가? 순서 1 실측치(3.33 Hz)와 비교하면? 어긋나면 어느 쪽을 기준으로 삼나?
 
 정리:
 - VLA Architecture
-    - 
+    1. RGB image 처리
+        1) RGB image 입력 받음
+        2) RGB image를 두 개의 비전 인코더에 전달
+            - DINOv2(ViT-L/14): label 없이 self-supervised로 학습, 공간적/기하학적 구조 인지 -> 객체의 위치 및 경계 파악 가능
+            - SigLIP(ViT-L/14): 이미지-텍스트 대조 학습, 의미적 정보를 얻을 수 있음
+            - 두 인코더를 동시에 통과시켜 사용하는 경우 성능이 더 높아짐을 확인(in Prismatic VLM)
+        3) 이미지 -> 토큰 변환
+            - 두 인코더(DINOv2, SigLIP)가 만든 256개 패치 토큰을 같은 패치 위치에서 두 인코더의 특징 벡터를 이어 붙임 -> concat(이어붙이기)
+        4) Projection (비전 토큰 -> Llama의 임베딩 공간으로 사영)
+    2. 자연어 명령 처리
+        - 수신된 자연어 명령을 Llama의 일반 텍스트 토크나이저로 토큰화
+    3. Llama 시퀀스 진행
+        1) 전처리된 RGB image + 자연어 명령 입력 받음
+        2) action token 생성
+            - 로봇 행동의 각 연속값을 256단계로 이산화
+            - Llama에서 가장 사용 빈도가 낮은 단어 256개의 토큰에 행동 ID를 매핑하여 재활용
+            - VLM의 구조를 전혀 바꾸지 않고 행동 예측기로 사용 가능하며, 학습도 일반 언어 모델과 동일한 cross-entropy loss로 진행 가능
+        3) 7-DoF의 action 생성
+            - action token 내 매핑된 단어 토큰을 256구간 인덱스로 변환하여 변화량을 계산
+            - 손끝 위치 변화량 (3 DoF), 회전 변화량 (3 DoF), 그리퍼 open/close -> 7 DoF
+            - 출력된 값은 절대값이 아닌 변화량임
+- 제어 주기
+    - README 추정치: 5-7 Hz (100-150 ms) — RTX 4090 fp16 기준을 4070 4-bit 에 외삽한 낙관치
+    - 순서 1 실측치: 3.33 Hz (mean 300 ms, 4070+int4) — README 추정과 약 2배 어긋남
+    - 기준: 타깃 환경(4070+int4) 실측을 기준으로 삼음 (추정은 다른 GPU/정밀도 외삽값, 실측이 우선). SETUP.md §1.3 / 순서 4 노트에서 이미 실측 기준 확정
 
 ## 순서 3 — sim 정합 + 성공 task 정의 (6월 2-3주차, 12h)
 
@@ -219,7 +243,7 @@ skim 목적은 구현에 필요한 사실 확인이지 정독이 아니다. 항�
 - [x] 순서 2 의 embodiment 가정에 맞는 sim 후보 비교·선정 — 선정 사유를 아래 노트에 기록
 - [x] 성공 task 1종 + 성공률 기준 N 정의
 - [x] task 의 제어 주기 요구 확정 → `week8/PRACTICE.md` 실습 체크리스트의 latency placeholder ("2 Hz 이상") 를 확정 수치로 교체
-- [ ] `week11/README.md` §4 (1분 dry-run 의 success criteria) 미리 읽기 — 순서 4 의 종착점 파악
+- [x] `week11/README.md` §4 (1분 dry-run 의 success criteria) 미리 읽기 — 순서 4 의 종착점 파악
 
 ### 노트: sim 후보 비교·선정 사유
 
@@ -266,6 +290,32 @@ skim 목적은 구현에 필요한 사실 확인이지 정독이 아니다. 항�
 - 기록값 = 성공 횟수 / N. 임계 통과/실패가 아니라 **수치 자체가 산출물**이다 — 도메인 갭으로 낮게 나와도 결과로 수용한다 (sim 선정 노트의 한계 항목과 일치).
 - N 기준: 베이스라인 **20**, 예산 절삭 시 하한 **10** (진행 원칙의 절삭 순서 2 = "성공률 측정 N 축소"에 해당).
 - 한계(명시): N=20 에서 측정 성공률의 신뢰구간은 매우 넓다 (50% 부근에서 약 ±22%p). 이 수치는 통계적 추정이 아니라 "v1 데모가 단일 task 루프를 닫는다"를 보이는 baseline 으로만 쓴다. 정밀 성공률은 v1.5 eval harness(Phase 4.5)에서 N 을 키워 재측정한다.
+
+### 노트: 제어 주기 요구 확정
+
+- task = PickCube 는 quasi-static pick-and-place 라 하드 실시간 deadline 이 없다. 게다가 sim 은 action 이 올 때까지 대기하므로 **제어 주기는 sim 성공률에 영향을 주지 않는다**. 따라서 여기서 정하는 제어 주기 기준은 sim 성공 게이트가 아니라 "실로봇에 옮겼을 때도 말이 되는가"를 보이는 실로봇 plausibility/어필용 하한이다.
+- 확정 수치: **전체 제어 루프 2 Hz 이상(step 500 ms 이하)**. 이는 placeholder 를 그대로 둔 게 아니라, task 가 더 빡센 요구를 부과하지 않으니 하한을 결정하는 건 측정된 파이프라인이라는 판단의 결과다. predict_action 실측 300 ms(3.33 Hz, 순서 1)가 baseline 이고, 그 위에 이미지 전처리 + ROS2 publish/subscribe 오버헤드로 약 200 ms headroom 을 두면 500 ms 다.
+- 전체 루프 주기(전처리 + 통신 포함) 실측은 순서 4 의 week11 dry-run 에서 한다 — 순서 1 실측은 predict_action 단독이라 전체 주기가 아니다. 만약 전체 루프가 500 ms 를 넘겨 2 Hz 밑으로 떨어져도 sim 성공률은 영향받지 않으나, 실로봇 일반화 어필이 약해진다. 그때는 placeholder 가 아니라 실측 기반으로 기준을 재조정한다.
+- placeholder 교체 완료: `week8/PRACTICE.md` 실습 체크리스트의 "2 Hz 이상" 문구를 위 확정 기준 + 근거로 교체.
+
+### 노트: week11 §4 dry-run success criteria (순서 4 종착점)
+
+순서 4 의 종착점은 week11 실습 3 의 1분 dry-run 이다. 자료(`week11/README.md` §4)가 제시하는 판정 표:
+
+| 지표 | 자료 목표 |
+|---|---|
+| total inference 수 | 60s × 5 Hz = 300-350 frame |
+| Success rate | 100% (0 fail) |
+| Mean latency | < 200 ms |
+| p95 latency | < 300 ms |
+| GPU memory | < 10 GB |
+| 노드 안 죽음 | True |
+
+해석 (구현 때 안 헷갈리게):
+
+- 이 표는 task 성공률이 아니라 **노드 안정성 + 처리량** 기준이다 — "1분간 노드가 안 죽고 일정 주기로 추론을 계속 돈다"를 확인하는 것이지, 큐브를 집었는지(= 성공 task 정의 노트의 `success` 플래그)와는 다른 축이다. 둘을 섞지 않는다.
+- 자료의 `mean < 200 ms` / `5 Hz` / `p95 < 300 ms` 는 원 강의의 낙관치로, 순서 1 실측(predict_action mean 300.3 ms / p95 304.8 ms / 3.33 Hz)과 어긋난다. int4 + 4070 환경에서 `mean < 200 ms` 와 `5 Hz` 는 **달성 불가**다(전체 루프는 predict_action 보다 더 느림). 따라서 dry-run 판정은 자료 수치 그대로가 아니라 실측 baseline 기준(mean 약 300 ms, 처리량 약 3 Hz, 전체 루프는 그 이하)으로 재조정해 읽는다.
+- 그대로 유효한 기준: `0 fail` / `노드 안 죽음` / `GPU < 10 GB`(int4 약 7 GB 로 충족). 이 셋은 환경과 무관하게 dry-run 통과 조건으로 쓴다.
 
 ## 순서 4 — week8-12 실습 압축 (6월 3주 - 7월 중순, 34h)
 
