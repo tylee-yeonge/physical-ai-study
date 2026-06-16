@@ -209,15 +209,16 @@ skim 목적은 구현에 필요한 사실 확인이지 정독이 아니다. 항�
 [ ] 제어 주기: README 추정치는 얼마인가? 순서 1 실측치(3.33 Hz)와 비교하면? 어긋나면 어느 쪽을 기준으로 삼나?
 
 정리:
-- 
+- VLA Architecture
+    - 
 
 ## 순서 3 — sim 정합 + 성공 task 정의 (6월 2-3주차, 12h)
 
 이 구간은 대응하는 week 자료가 없는 신규 작업이다 (원안에서 week11 에 묻혀 있던 선행 의사결정을 분리한 것).
 
 - [x] 순서 2 의 embodiment 가정에 맞는 sim 후보 비교·선정 — 선정 사유를 아래 노트에 기록
-- [ ] 성공 task 1종 + 성공률 기준 N 정의
-- [ ] task 의 제어 주기 요구 확정 → `week8/PRACTICE.md` 실습 체크리스트의 latency placeholder ("2 Hz 이상") 를 확정 수치로 교체
+- [x] 성공 task 1종 + 성공률 기준 N 정의
+- [x] task 의 제어 주기 요구 확정 → `week8/PRACTICE.md` 실습 체크리스트의 latency placeholder ("2 Hz 이상") 를 확정 수치로 교체
 - [ ] `week11/README.md` §4 (1분 dry-run 의 success criteria) 미리 읽기 — 순서 4 의 종착점 파악
 
 ### 노트: sim 후보 비교·선정 사유
@@ -250,7 +251,21 @@ skim 목적은 구현에 필요한 사실 확인이지 정독이 아니다. 항�
 
 ### 노트: 성공 task 정의 + 성공률 기준 N
 
-- (작성 전)
+선정 task: **PickCube**(ManiSkill 내장, Franka Panda + `pd_ee_delta_pose` 제어). 사유는 sim 선정 노트와 동일 맥락 — (1) Roadmap 의 task 예시 "pick-and-place"에 직접 대응, (2) ManiSkill 기성 task 라 환경/카메라/성공 판정이 이미 구현돼 통합 노력이 가장 작음, (3) OpenVLA 학습 분포(테이블탑 단일 물체 집기)와 형태가 가깝다. instruction 은 OpenVLA prompt 틀에 맞춰 `"pick up the cube"` 영어 단문으로 고정.
+
+1회 시도(episode)의 성공 정의:
+
+- ManiSkill 이 step 마다 반환하는 내장 `success` 플래그를 그대로 채택한다 — 자체 임계값을 새로 만들지 않는다.
+- PickCube 의 success 는 대략 "큐브가 목표 위치 반경 내(기본 약 2.5cm)에 들어오고 로봇이 정지 상태"로 정의된다. **정확한 임계값/축은 설치된 ManiSkill 버전에서 1회 확인**(순서 4 통합 시) — 버전마다 다를 수 있어 단정하지 않는다.
+- 시도 종료 조건: `success == True`(성공) 또는 step cap 도달(미달 = 실패). step cap 은 잠정 100 step, 통합 시 episode 가 실제로 도는 것을 보고 확정한다.
+- 주의: sim 은 action 이 올 때까지 대기하므로 추론 latency(실측 3.33 Hz)가 sim 안에서는 성공/실패를 직접 깨뜨리지 않는다. latency 의 task 적합성 판정은 실시간 제어 요구를 따지는 다음 체크박스(제어 주기 확정)에서 별도로 다룬다 — week11 §4 의 dry-run success criteria 는 task 성공률이 아니라 노드 안정성(0 fail / latency 한계) 기준이므로 혼동하지 않는다.
+
+성공률 기준 N:
+
+- 매 시도마다 seed 를 바꿔 큐브 초기 pose 와 목표 위치를 무작위화한다 (동일 조건 반복은 성공률로서 의미가 없다).
+- 기록값 = 성공 횟수 / N. 임계 통과/실패가 아니라 **수치 자체가 산출물**이다 — 도메인 갭으로 낮게 나와도 결과로 수용한다 (sim 선정 노트의 한계 항목과 일치).
+- N 기준: 베이스라인 **20**, 예산 절삭 시 하한 **10** (진행 원칙의 절삭 순서 2 = "성공률 측정 N 축소"에 해당).
+- 한계(명시): N=20 에서 측정 성공률의 신뢰구간은 매우 넓다 (50% 부근에서 약 ±22%p). 이 수치는 통계적 추정이 아니라 "v1 데모가 단일 task 루프를 닫는다"를 보이는 baseline 으로만 쓴다. 정밀 성공률은 v1.5 eval harness(Phase 4.5)에서 N 을 키워 재측정한다.
 
 ## 순서 4 — week8-12 실습 압축 (6월 3주 - 7월 중순, 34h)
 
