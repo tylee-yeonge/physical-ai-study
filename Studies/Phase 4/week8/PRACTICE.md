@@ -30,10 +30,35 @@ pip install -r week8/requirements.txt
 # 작업 디렉토리
 mkdir -p /workspace/phase4_workspace/vla_inference
 cd /workspace/phase4_workspace/vla_inference
+
+# 패키지 표시용 빈 파일 (상대 import 가 동작하려면 필수)
+touch __init__.py
 ```
 
 
 > VRAM 점검: 4bit 양자화 후 OpenVLA 가 약 7GB 를 차지하므로 12GB 4070 에 안착해야 정상. `nvidia-smi` 로 inference 직후 사용량을 측정해 두면 week 11 에서 ROS2 오버헤드를 더했을 때의 여유 판단에 사용 가능 (SETUP.md §9.3 리스크 4).
+
+
+---
+
+
+## 작성 순서 (의존성 기준)
+
+
+아래 실습 1-4 의 번호는 **읽는 순서**다 — 핵심 모듈 VLAInference 를 먼저 보여주는 top-down 설명 순서. 실제로 **코드를 작성·실행하는 순서는 의존성 역순**이어야 한다. 실습 1 의 `inference.py` 가 실습 3 의 `exceptions.py` / `config.py` 를 import 하므로, 문서 순서대로 치면 import 대상이 아직 없어 `ModuleNotFoundError` 가 난다.
+
+
+| 작성 순서 | 파일 | 실습 | 의존 대상 |
+|---|---|---|---|
+| 1 | `__init__.py` (빈 파일) | 환경 설정 | 없음 |
+| 2 | `exceptions.py` | 실습 3 | 없음 |
+| 3 | `config.py` | 실습 3 | 없음 |
+| 4 | `preprocess.py` | 실습 2 | exceptions |
+| 5 | `inference.py` | 실습 1 | exceptions, config |
+| 6 | `practice_stress_test.py` | 실습 4 | inference, exceptions |
+
+
+`__init__.py` 는 패키지 표시용 빈 파일이다 (환경 설정의 작업 디렉토리 단계에서 `touch` 로 생성). 이 순서로 작성하면 매 파일을 만들 때 그 파일이 import 하는 대상이 이미 존재해 단계마다 바로 import 검증이 된다.
 
 
 ---

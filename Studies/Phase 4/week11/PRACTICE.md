@@ -28,6 +28,9 @@ pip install -e .
 ```
 
 
+> Step 0 필수 — `pip install -e .` 를 빠뜨리면 실습 1 의 `from vla_inference.inference import VLAInference` 가 `ModuleNotFoundError` 로 죽는다. week 8 에서 만든 `vla_inference/` 패키지를 공용 venv 에 설치하는 단계이며, 노드 빌드·실행(실습 2) 전에 반드시 선행한다. "(선택)" 이 아니다.
+
+
 > 통합 후 VRAM 점검 필수 — week 8 단독 측정값 (약 6GB) + ROS2 cv_bridge + image subscribe 큐 + KV 캐시가 더해진다. 12GB 4070 에서 빠듯하면 batch 1 고정 + action chunk 축소 (SETUP.md §9.3).
 
 

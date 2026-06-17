@@ -311,6 +311,9 @@ ros2 topic echo /vla/action
 ```
 
 
+> 주의: `image_callback` 은 instruction 이 설정되고 이미지가 들어와야만 action 을 발행한다 (instruction 없으면 early return). 따라서 action echo 를 보려면 instruction 발행과 **별개로 이미지 스트림이 필요**하다. 실습 5 의 image_publisher 가 "(선택)" 으로 표기돼 있지만 실습 4 의 action 검증에는 사실상 필수다 — 실습 5 를 먼저 띄우거나 `ros2 bag play` 로 카메라 토픽을 공급한 뒤 echo 를 확인한다.
+
+
 ---
 
 
