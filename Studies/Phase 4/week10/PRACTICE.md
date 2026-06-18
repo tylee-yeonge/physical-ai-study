@@ -25,9 +25,9 @@ source /opt/ros/humble/setup.bash
 sudo apt install python3-colcon-common-extensions ros-humble-cv-bridge
 
 
-# ROS2 workspace (없으면 SETUP.md §6.1 의 ~/phase4_workspace/ros2_ws/ 를 사용해도 무방)
-mkdir -p ~/ros2_ws/src
-cd ~/ros2_ws
+# ROS2 workspace (SETUP.md §6.1 의 /workspace/phase4_workspace/ros2_ws/ 사용)
+mkdir -p /workspace/phase4_workspace/ros2_ws/src
+cd /workspace/phase4_workspace/ros2_ws
 ```
 
 
@@ -38,7 +38,7 @@ cd ~/ros2_ws
 
 
 ```bash
-cd ~/ros2_ws/src
+cd /workspace/phase4_workspace/ros2_ws/src
 ros2 pkg create vla_node \
   --build-type ament_python \
   --dependencies rclpy sensor_msgs geometry_msgs std_msgs cv_bridge
@@ -72,7 +72,7 @@ vla_node/
 ## 실습 2: vla_inference_node.py 골격
 
 
-**파일명**: `~/ros2_ws/src/vla_node/vla_node/vla_inference_node.py`
+**파일명**: `/workspace/phase4_workspace/ros2_ws/src/vla_node/vla_node/vla_inference_node.py`
 
 
 ```python
@@ -227,7 +227,7 @@ if __name__ == '__main__':
 ## 실습 3: setup.py 수정
 
 
-**파일명**: `~/ros2_ws/src/vla_node/setup.py`
+**파일명**: `/workspace/phase4_workspace/ros2_ws/src/vla_node/setup.py`
 
 
 ```python
@@ -270,7 +270,7 @@ setup(
 
 ```bash
 # 빌드
-cd ~/ros2_ws
+cd /workspace/phase4_workspace/ros2_ws
 colcon build --packages-select vla_node --symlink-install
 
 
@@ -333,7 +333,7 @@ ros2 run image_publisher image_publisher_node /path/to/test.jpg --ros-args -r im
 또는 직접 publish 스크립트:
 
 
-**파일명**: `practice_image_publisher.py`
+**파일명**: `/workspace/phase4_workspace/pub_test/practice_image_publisher.py`
 
 
 ```python

@@ -18,7 +18,7 @@ week 8-11 의 공용 venv (`.venv-vla`) 를 그대로 사용. Rerun SDK 버전�
 
 ```bash
 source /opt/ros/humble/setup.bash
-source ~/ros2_ws/install/setup.bash
+source /workspace/phase4_workspace/ros2_ws/install/setup.bash
 source "/workspace/study/physical-ai-study/Studies/Phase 4/.venv-vla/bin/activate"
 
 
@@ -41,7 +41,7 @@ sudo apt install shotcut # 또는 openshot-qt
 ## 실습 1: Rerun 기본 사용
 
 
-**파일명**: `practice_rerun_basic.py`
+**파일명**: `/workspace/phase4_workspace/rerun_basic/practice_rerun_basic.py`
 
 
 ```python
@@ -117,7 +117,7 @@ python practice_rerun_basic.py
 ## 실습 2: rerun_logger ROS 노드
 
 
-**파일명**: `~/ros2_ws/src/vla_node/vla_node/rerun_logger.py`
+**파일명**: `/workspace/phase4_workspace/ros2_ws/src/vla_node/vla_node/rerun_logger.py`
 
 
 ```python
@@ -219,7 +219,7 @@ if __name__ == '__main__':
 
 **빌드 + 실행**:
 ```bash
-cd ~/ros2_ws
+cd /workspace/phase4_workspace/ros2_ws
 colcon build --packages-select vla_node --symlink-install
 source install/setup.bash
 
@@ -236,7 +236,7 @@ ros2 run vla_node rerun_logger
 ## 실습 3: 1분 영상 시나리오 + script
 
 
-**파일명**: `~/phase4_notes/week12/video_script.md`
+**파일명**: `/workspace/phase4_workspace/notes/week12/video_script.md`
 
 
 ```markdown
@@ -353,7 +353,7 @@ shotcut my_recording.mkv
 
 
 ```bash
-cd ~/code/physical-ai-study
+cd /workspace/study/physical-ai-study
 mkdir -p Portfolio/01_VLA_v1
 cd Portfolio/01_VLA_v1
 

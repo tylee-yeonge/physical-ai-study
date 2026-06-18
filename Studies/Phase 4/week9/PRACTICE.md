@@ -35,7 +35,7 @@ pip install -r requirements.txt
 ## 실습 1: I/O Spec 1 페이지 작성
 
 
-**파일명**: `~/phase4_notes/week9/vla_io_spec.md`
+**파일명**: `/workspace/phase4_workspace/notes/week9/vla_io_spec.md`
 
 
 ```markdown
@@ -121,7 +121,7 @@ pip install -r requirements.txt
 ## 실습 2: msg <-> Python 변환
 
 
-**파일명**: `practice_msg_conversion.py`
+**파일명**: `/workspace/phase4_workspace/io_check/practice_msg_conversion.py`
 
 
 ```python
@@ -243,7 +243,7 @@ print("\n 실습 2 완료!")
 ## 실습 3: BGR -> RGB 변환 검증
 
 
-**파일명**: `practice_bgr_rgb_check.py`
+**파일명**: `/workspace/phase4_workspace/io_check/practice_bgr_rgb_check.py`
 
 
 ```python

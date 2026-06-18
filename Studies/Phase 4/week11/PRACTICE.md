@@ -18,12 +18,12 @@ week 8 의 양자화 inference + week 10 의 ROS2 패키지를 한 노드 안에
 
 ```bash
 source /opt/ros/humble/setup.bash
-source ~/ros2_ws/install/setup.bash
+source /workspace/phase4_workspace/ros2_ws/install/setup.bash
 source "/workspace/study/physical-ai-study/Studies/Phase 4/.venv-vla/bin/activate"
 
 
 # vla_inference 를 pip 으로 (방법 2)
-cd ~/phase4_notes/week8/vla_inference
+cd /workspace/phase4_workspace/vla_inference
 pip install -e .
 ```
 
@@ -40,7 +40,7 @@ pip install -e .
 ## 실습 1: vla_inference_node.py 통합
 
 
-**파일명**: `~/ros2_ws/src/vla_node/vla_node/vla_inference_node.py`
+**파일명**: `/workspace/phase4_workspace/ros2_ws/src/vla_node/vla_node/vla_inference_node.py`
 
 
 week 10 의 노드를 다음과 같이 수정:
@@ -220,7 +220,7 @@ if __name__ == '__main__':
 
 
 ```bash
-cd ~/ros2_ws
+cd /workspace/phase4_workspace/ros2_ws
 colcon build --packages-select vla_node --symlink-install
 source install/setup.bash
 
@@ -266,7 +266,7 @@ ros2 bag info dry_run_*/
 ```
 
 
-**파일명**: `practice_analyze_dry_run.py`
+**파일명**: `/workspace/phase4_workspace/dryrun_analysis/practice_analyze_dry_run.py`
 
 
 ```python
@@ -335,7 +335,7 @@ print(f"p95 < 300ms: {np.percentile(arr, 95) < 300}")
 vla_node 와 별개의 **read-only 노드** 로 토픽을 구독해 Rerun 에 로깅. 메인 inference 노드 코드는 손대지 않는다.
 
 
-**파일명**: `~/ros2_ws/src/vla_node/vla_node/rerun_dryrun.py`
+**파일명**: `/workspace/phase4_workspace/ros2_ws/src/vla_node/vla_node/rerun_dryrun.py`
 
 
 ```python
