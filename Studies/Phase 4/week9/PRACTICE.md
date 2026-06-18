@@ -139,6 +139,7 @@ from PIL import Image
 # ROS2 imports
 try:
     import rclpy
+    from rclpy.clock import Clock
     from sensor_msgs.msg import Image as ImageMsg
     from geometry_msgs.msg import Twist
     from std_msgs.msg import Float64, String, Header
@@ -169,7 +170,7 @@ if HAS_ROS:
     # OpenCV -> ROS Image
     img_msg = bridge.cv2_to_imgmsg(img_bgr, encoding='bgr8')
     img_msg.header.frame_id = 'camera_link'
-    img_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
+    img_msg.header.stamp = Clock().now().to_msg()
     print(f"\n[2-1] OpenCV -> ROS Image")
     print(f"shape: {img_bgr.shape}, encoding: {img_msg.encoding}")
     print(f"frame_id: {img_msg.header.frame_id}")
@@ -215,7 +216,11 @@ def action_to_twist(action: np.ndarray):
 
 print("\n[2-4] action ndarray -> Twist + gripper")
 action = np.array([0.05, -0.03, 0.02, 0.5, -1.2, 0.0, 0.9], dtype=np.float32)
-twist, grip = action_to_twist(action), None
+result = action_to_twist(action)
+if HAS_ROS:
+    twist, grip = result  # ROS 환경: (Twist, Float64) 튜플 언패킹
+else:
+    twist, grip = result, None  # mock 환경: dict 반환이라 그대로 twist 에 보관
 print(f"action: {action}")
 print(f"twist : {twist}")
 
