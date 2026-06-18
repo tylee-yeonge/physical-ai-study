@@ -78,7 +78,7 @@ ros2 launch vla_node demo.launch.py
 - Ubuntu 22.04
 - CUDA 11.8 또는 12.x
 - Python 3.10
-- ROS2 Humble
+- ROS2
 
 
 ### Step-by-step
@@ -87,7 +87,7 @@ ros2 launch vla_node demo.launch.py
 \`\`\`bash
 # 1. CUDA + ROS2
 nvidia-smi # 검증
-source /opt/ros/humble/setup.bash
+source /opt/ros/${ROS_DISTRO}/setup.bash
 ros2 --version # 검증
 
 
@@ -161,7 +161,7 @@ Raw data: [latency_data.csv](latency_data.csv)
 | CUDA OOM | 다른 GPU process | nvidia-smi 후 kill |
 | flash_attn ImportError | flash-attn 미설치 | `attn_implementation="eager"` |
 | inference 가 0 action | unnormalize_key 잘못 | parameter 확인 |
-| colcon build fail | ROS2 source 누락 | source /opt/ros/humble/setup.bash |
+| colcon build fail | ROS2 source 누락 | source /opt/ros/${ROS_DISTRO}/setup.bash |
 | Image topic 없음 | bag 재생 안 함 | ros2 bag play |
 
 
@@ -207,13 +207,13 @@ echo "=== VLA Demo Quick Setup ==="
 
 # 1. ROS2
 if ! command -v ros2 &> /dev/null; then
-    echo "ROS2 Humble 이 설치되어 있지 않습니다."
-    echo "https://docs.ros.org/en/humble/Installation.html 참고"
+    echo "ROS2 가 설치/source 되어 있지 않습니다."
+    echo "https://docs.ros.org/en/${ROS_DISTRO}/Installation.html 참고"
     exit 1
 fi
 
 
-source /opt/ros/humble/setup.bash
+source /opt/ros/${ROS_DISTRO}/setup.bash
 
 
 # 2. CUDA

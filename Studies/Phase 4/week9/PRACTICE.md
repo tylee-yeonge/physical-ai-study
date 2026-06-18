@@ -15,12 +15,15 @@
 
 
 ```bash
-# ROS2 시스템 패키지
-sudo apt install ros-humble-cv-bridge ros-humble-image-transport
+# week 8 에서 만든 공용 venv 재사용 (활성화 순서: ros -> venv)
+# ROS2 를 먼저 source 해야 ${ROS_DISTRO} 가 설정되어 아래 apt install 에 반영된다
+source /opt/ros/${ROS_DISTRO}/setup.bash
 
 
-# week 8 에서 만든 공용 venv 재사용
-source /opt/ros/humble/setup.bash
+# ROS2 시스템 패키지 (현재 distro 에 맞춰 설치)
+sudo apt install ros-${ROS_DISTRO}-cv-bridge ros-${ROS_DISTRO}-image-transport
+
+
 source "/workspace/study/physical-ai-study/Studies/Phase 4/.venv-vla/bin/activate"
 pip install -r requirements.txt
 ```
@@ -133,7 +136,7 @@ import cv2
 from PIL import Image
 
 
-# ROS2 imports (Humble)
+# ROS2 imports
 try:
     import rclpy
     from sensor_msgs.msg import Image as ImageMsg

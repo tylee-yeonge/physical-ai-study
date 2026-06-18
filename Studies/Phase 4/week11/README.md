@@ -208,7 +208,7 @@ ros2 node info /vla_node
 
 | 증상 | 원인 | 해결 |
 |---|---|---|
-| `cv_bridge import error` | ros-humble-cv-bridge 누락 | apt install |
+| `cv_bridge import error` | ros-${ROS_DISTRO}-cv-bridge 누락 | apt install |
 | 노드 시작 시 OOM | GPU 메모리 부족 | 다른 process 종료, 4-bit 확인 |
 | inference 가 0 action | unnormalize_key 잘못 | parameter 확인 |
 | image_callback 호출 안 됨 | topic 이름 불일치 | ros2 topic list 확인 |

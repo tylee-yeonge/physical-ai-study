@@ -65,7 +65,7 @@
 ```
 1. Hardware 요구사항: RTX 4070+ (12GB), Ubuntu 22.04
 2. CUDA 설치: 11.8 또는 12.x
-3. ROS2 Humble 설치 (apt)
+3. ROS2 설치 (apt)
 4. Python venv 생성
 5. Python 의존성 설치 (pip install -r requirements.txt)
 6. OpenVLA 모델 다운로드 (~ 15GB)
@@ -114,7 +114,7 @@ docker-compose up # 또는 ./quickstart.sh
 | `flash_attn ImportError` | flash-attn 미설치 | `attn_implementation="eager"` |
 | `Image topic 안 나옴` | bag 재생 안 함 | ros2 bag play |
 | `inference 가 0 action` | unnormalize_key 잘못 | parameter 확인 |
-| `colcon build fail` | source 안 함 | source /opt/ros/humble/setup.bash |
+| `colcon build fail` | source 안 함 | source /opt/ros/${ROS_DISTRO}/setup.bash |
 ```
 
 

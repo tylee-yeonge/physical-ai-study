@@ -20,7 +20,7 @@
 ## 환경
 - Robot: 자작 6DOF 팔 (Dynamixel XM430)
 - Sim: Isaac Sim 4.x
-- Real: ROS2 Humble
+- Real: ROS2
 - 측정 일자: 2027.07 (Phase 6 종료)
 
 

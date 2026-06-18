@@ -236,7 +236,7 @@ Phase 3 패턴 (`.venv-weekN`) 을 그대로 따른다. 각 week 디렉토리의
 
 - Phase 3 의 ROS2 배포판 (Humble 또는 Jazzy) 재사용.
 - `vla_node` 패키지는 lifecycle node 로 작성 — 모델 로딩/언로딩을 명시적으로 관리 (week 10 에서 다룸).
-- ROS2 와 Python venv 의 상호작용 주의: `source /opt/ros/<distro>/setup.bash` → `source .venv-vla/bin/activate` 순.
+- ROS2 와 Python venv 의 상호작용 주의: `source /opt/ros/${ROS_DISTRO}/setup.bash` → `source .venv-vla/bin/activate` 순. (`${ROS_DISTRO}` 는 Phase 3 에서 설치한 배포판으로 자동 치환 — 셸에 설정돼 있지 않으면 `humble` / `jazzy` 등으로 직접 대체)
 
 ---
 

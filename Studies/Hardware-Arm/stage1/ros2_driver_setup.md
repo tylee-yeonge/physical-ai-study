@@ -11,7 +11,7 @@
 
 
 ```bash
-# Source 설치 (ROS2 humble)
+# Source 설치 (ROS2)
 cd ~/ros2_ws/src
 git clone https://github.com/dynamixel-community/dynamixel_hardware.git
 cd ..

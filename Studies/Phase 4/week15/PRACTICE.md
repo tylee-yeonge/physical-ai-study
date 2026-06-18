@@ -67,7 +67,7 @@ Shotcut 의 Filters > Text: Simple 또는 Filters > Subtitles:
 0:00 -> 0:05 | (인트로) "Phase 4 산출물 v1: OpenVLA -> ROS2"
 0:05 -> 0:10 | "AMR ROS 양산 SW 엔지니어 실무 5년"
 0:10 -> 0:15 | "OpenVLA HuggingFace inference"
-0:15 -> 0:25 | "ROS2 Humble + vla_node 패키지"
+0:15 -> 0:25 | "ROS2 + vla_node 패키지"
 0:25 -> 0:40 | "실시간 동작 (Rerun)"
 0:40 -> 0:50 | "RTX 4070 4-bit nf4 / mean 165ms / 6Hz"
 0:50 -> 0:55 | "양산 의미: hierarchical 구조 필수"

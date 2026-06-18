@@ -33,7 +33,7 @@
 
 ```bash
 # ROS2 의 joy 패키지
-sudo apt install ros-humble-joy
+sudo apt install ros-${ROS_DISTRO}-joy
 ros2 run joy joy_node
 # 출력: /joy topic
 ```

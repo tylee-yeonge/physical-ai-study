@@ -27,7 +27,7 @@
 
 
 #### 필수 패키지 설치
-- [ ] ROS 설치 확인 (ROS1 Noetic 또는 ROS2 Humble)
+- [ ] ROS 설치 확인 (ROS1 Noetic 또는 ROS2)
 - [ ] OpenCV 설치 확인 (4.x)
 - [ ] Eigen3 설치 확인
 - [ ] Ceres Solver 설치
@@ -45,7 +45,7 @@
 
 
 #### Option B: ROS2 + Bridge
-- [ ] ROS2 Humble 환경에서 ros1_bridge 설정
+- [ ] ROS2 환경에서 ros1_bridge 설정
 - [ ] ROS1 노드를 ROS2에서 실행
 
 

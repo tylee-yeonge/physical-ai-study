@@ -17,7 +17,7 @@ week 8 의 양자화 inference + week 10 의 ROS2 패키지를 한 노드 안에
 
 
 ```bash
-source /opt/ros/humble/setup.bash
+source /opt/ros/${ROS_DISTRO}/setup.bash
 source /workspace/phase4_workspace/ros2_ws/install/setup.bash
 source "/workspace/study/physical-ai-study/Studies/Phase 4/.venv-vla/bin/activate"
 
@@ -484,7 +484,7 @@ atexit.register(lambda: rr.save("dryrun.rrd"))
 
 
 # ROS2 video_stream_opencv 패키지 사용
-sudo apt install ros-humble-video-stream-opencv
+sudo apt install ros-${ROS_DISTRO}-video-stream-opencv
 
 
 ros2 launch video_stream_opencv camera.launch.py \

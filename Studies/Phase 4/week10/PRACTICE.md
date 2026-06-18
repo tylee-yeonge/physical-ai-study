@@ -17,12 +17,12 @@
 
 
 ```bash
-# ROS2 Humble 또는 Jazzy
-source /opt/ros/humble/setup.bash
+# ROS2 (현재 distro 에 맞춰 source)
+source /opt/ros/${ROS_DISTRO}/setup.bash
 
 
 # colcon + 의존성
-sudo apt install python3-colcon-common-extensions ros-humble-cv-bridge
+sudo apt install python3-colcon-common-extensions ros-${ROS_DISTRO}-cv-bridge
 
 
 # ROS2 workspace (SETUP.md §6.1 의 /workspace/phase4_workspace/ros2_ws/ 사용)
@@ -322,7 +322,7 @@ ros2 topic echo /vla/action
 
 ```bash
 # 패키지 설치
-sudo apt install ros-humble-image-publisher
+sudo apt install ros-${ROS_DISTRO}-image-publisher
 
 
 # 실행
@@ -416,6 +416,6 @@ if __name__ == '__main__':
 |---|---|
 | `Package 'vla_node' not found` | source install/setup.bash 다시 |
 | `No executable 'vla_inference_node'` | setup.py 의 entry_points 확인 |
-| `cv_bridge ImportError` | sudo apt install ros-humble-cv-bridge |
+| `cv_bridge ImportError` | sudo apt install ros-${ROS_DISTRO}-cv-bridge |
 | `Image topic 안 나옴` | image_publisher 또는 fake publisher 실행 |
 | `Build fail with --packages-select` | colcon build (전체) 한 번 |

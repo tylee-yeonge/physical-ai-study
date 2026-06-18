@@ -17,7 +17,7 @@ week 8-11 의 공용 venv (`.venv-vla`) 를 그대로 사용. Rerun SDK 버전�
 
 
 ```bash
-source /opt/ros/humble/setup.bash
+source /opt/ros/${ROS_DISTRO}/setup.bash
 source /workspace/phase4_workspace/ros2_ws/install/setup.bash
 source "/workspace/study/physical-ai-study/Studies/Phase 4/.venv-vla/bin/activate"
 
