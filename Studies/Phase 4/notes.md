@@ -298,7 +298,8 @@ skim 목적은 구현에 필요한 사실 확인이지 정독이 아니다. 항�
 
 - task = PickCube 는 quasi-static pick-and-place 라 하드 실시간 deadline 이 없다. 게다가 sim 은 action 이 올 때까지 대기하므로 **제어 주기는 sim 성공률에 영향을 주지 않는다**. 따라서 여기서 정하는 제어 주기 기준은 sim 성공 게이트가 아니라 "실로봇에 옮겼을 때도 말이 되는가"를 보이는 실로봇 plausibility/어필용 하한이다.
 - 확정 수치: **전체 제어 루프 2 Hz 이상(step 500 ms 이하)**. 이는 placeholder 를 그대로 둔 게 아니라, task 가 더 빡센 요구를 부과하지 않으니 하한을 결정하는 건 측정된 파이프라인이라는 판단의 결과다. predict_action 실측 300 ms(3.33 Hz, 순서 1)가 baseline 이고, 그 위에 이미지 전처리 + ROS2 publish/subscribe 오버헤드로 약 200 ms headroom 을 두면 500 ms 다.
-- 전체 루프 주기(전처리 + 통신 포함) 실측은 순서 4 의 week11 dry-run 에서 한다 — 순서 1 실측은 predict_action 단독이라 전체 주기가 아니다. 만약 전체 루프가 500 ms 를 넘겨 2 Hz 밑으로 떨어져도 sim 성공률은 영향받지 않으나, 실로봇 일반화 어필이 약해진다. 그때는 placeholder 가 아니라 실측 기반으로 기준을 재조정한다.
+- week8 실습 4 stress test(int4, 4070, N=100): `predict()` 전체(입력검증 + processor 전처리 + predict_action) mean 298.8 ms / p95 305.0 ms, 100/100 성공. 이 값이 순서 1 의 predict_action 단독(mean 300.3 / p95 304.8 ms)과 사실상 동일하다는 점이 핵심이다 — **processor 전처리 오버헤드는 무시 수준**임이 실측으로 확인됐다. 따라서 위 200 ms headroom 은 전처리가 아니라 거의 전부 카메라 캡처 + ROS2 통신 몫이며, 전체 루프가 500 ms 안에 들어오는지는 그 통신 비용에 달려 있다. 또 p95 가 mean 대비 +6 ms 에 그쳐 지연 꼬리(tail)가 거의 없다 = 실시간 제어 관점에서 안정적.
+- 전체 루프 주기(전처리 + 통신 포함) 실측은 순서 4 의 week11 dry-run 에서 한다 — 순서 1·week8 실측은 모두 카메라/ROS2 를 제외한 추론 경로 단독이라 전체 주기가 아니다. 만약 전체 루프가 500 ms 를 넘겨 2 Hz 밑으로 떨어져도 sim 성공률은 영향받지 않으나, 실로봇 일반화 어필이 약해진다. 그때는 placeholder 가 아니라 실측 기반으로 기준을 재조정한다.
 - placeholder 교체 완료: `week8/PRACTICE.md` 실습 체크리스트의 "2 Hz 이상" 문구를 위 확정 기준 + 근거로 교체.
 
 ### 노트: week11 §4 dry-run success criteria (순서 4 종착점)
@@ -324,7 +325,7 @@ skim 목적은 구현에 필요한 사실 확인이지 정독이 아니다. 항�
 
 각 week 공통 패턴: `README.md` 정독 → `PRACTICE.md` 실습 → `quiz_easy.py` / `quiz_medium.py` (출장일 저녁 등 파편 시간에 배치 가능). 진입 전제: 순서 1 의 `predict_action` 패턴 청소 완료.
 
-- [ ] `week8/README.md` + `week8/PRACTICE.md` 실습 1-4 (VLAInference class / image preprocess / exceptions·config / 100회 stress test) + quiz
+- [x] `week8/README.md` + `week8/PRACTICE.md` 실습 1-4 (VLAInference class / image preprocess / exceptions·config / 100회 stress test) + quiz
 - [ ] `week9/README.md` + `week9/PRACTICE.md` 실습 1-3 (I/O spec 1페이지 / msg <-> Python 변환 / BGR->RGB 검증) + quiz
 - [ ] `week10/README.md` + `week10/PRACTICE.md` 실습 1-4 (vla_node 패키지 생성 / 골격 노드 / setup.py / 빌드+실행, 실습 5 dummy image 는 선택) + quiz
 - [ ] `week11/README.md` + `week11/PRACTICE.md` 실습 1-3 (실 inference 통합 / 빌드+실행 / 1분 dry-run + 통계) — 입력은 순서 3 에서 선정한 sim 으로 연결 (자료의 ros2 bag 재생은 대체 수단) + quiz
