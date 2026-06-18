@@ -1,4 +1,4 @@
-numpy>=1.24.0
+numpy>=1.24.0,<2  # ROS cv_bridge(apt) 는 numpy 1.x 로 빌드됨 - 2.x 면 변환 시 segfault
 torch>=2.0.0
 transformers>=4.40.0
 bitsandbytes>=0.43.0

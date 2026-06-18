@@ -4,4 +4,4 @@
 #   sudo apt install ros-humble-cv-bridge python3-colcon-common-extensions
 # Python 의존성:
 opencv-python>=4.8.0
-numpy>=1.24.0
+numpy>=1.24.0,<2  # ROS cv_bridge(apt) 는 numpy 1.x 로 빌드됨 - 2.x 면 변환 시 segfault
