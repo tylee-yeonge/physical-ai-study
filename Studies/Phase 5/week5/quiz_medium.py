@@ -10,8 +10,8 @@ def p1():
     print()
     # TODO: 가장 좋은 prompt
     best = ""
-    expected = "B"
-    print(f"  당신의 답: {best} (기대: {expected})")
+    print(f"  당신의 답: {best}")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def p2():
@@ -27,8 +27,8 @@ def p2():
     print()
     # TODO
     answer = ""
-    expected = "C"
-    print(f"  당신의 답: {answer} (기대: {expected})")
+    print(f"  당신의 답: {answer}")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def p3():

@@ -7,16 +7,12 @@ def p1():
     sensor_w = 36.0  # mm
     focal_mm = 15.0
     # FOV (horizontal) = 2 * atan( sensor_w / (2 * focal) )
-    import math
-    fov_rad = 2 * math.atan(sensor_w / (2 * focal_mm))
-    fov_deg = math.degrees(fov_rad)
     print(f"  Sensor width: {sensor_w} mm")
     print(f"  Focal length: {focal_mm} mm")
     # TODO
     your_fov = 0.0
-    expected = fov_deg
-    print(f"  FOV: {your_fov:.1f} deg (기대 {expected:.1f})")
-    print(f"  -> 약 100 deg, wide-angle")
+    print(f"  FOV: {your_fov:.1f} deg")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def p2():
@@ -39,10 +35,8 @@ def p3():
     bytes_per_pixel = 1  # uint8
     # TODO
     bytes_total = 0
-    expected = w * h * c * bytes_per_pixel
     print(f"  당신: {bytes_total} bytes")
-    print(f"  기대: {expected} bytes (~900 KB per frame)")
-    print(f"  30 FPS -> ~ 27 MB/s data rate")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 if __name__ == "__main__":

@@ -33,14 +33,12 @@ def problem1_latency_to_throughput():
     can_5hz = None  # True / False
     can_30hz = None
 
-    expected_mean = 1000 / mean_ms
-    expected_p95 = 1000 / p95_ms
-
     print(f"  당신의 답:")
-    print(f"    (a) mean throughput : {mean_hz:.2f} Hz (기대: {expected_mean:.2f})")
-    print(f"    (b) p95  throughput : {p95_hz:.2f} Hz (기대: {expected_p95:.2f})")
-    print(f"    (c) 5Hz 가능?        : {can_5hz}  (기대: True)")
-    print(f"    (d) 30Hz 가능?       : {can_30hz} (기대: False)")
+    print(f"    (a) mean throughput : {mean_hz:.2f} Hz")
+    print(f"    (b) p95  throughput : {p95_hz:.2f} Hz")
+    print(f"    (c) 5Hz 가능?        : {can_5hz}")
+    print(f"    (d) 30Hz 가능?       : {can_30hz}")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem2_vram_check():
@@ -78,14 +76,11 @@ def problem2_vram_check():
     activation_b1 = 0.0
     max_batch = 0
 
-    expected_total = model_loaded + kv_cache + vision_act + buffer
-    expected_act = kv_cache + vision_act
-    expected_max_b = int((available - model_loaded - buffer) / expected_act)
-
     print(f"  당신의 답:")
-    print(f"    total_b1     : {total_b1:.2f} GB (기대: {expected_total:.2f})")
-    print(f"    activation_b1 : {activation_b1:.2f} GB (기대: {expected_act:.2f})")
-    print(f"    max_batch    : {max_batch}        (기대: ~{expected_max_b})")
+    print(f"    total_b1     : {total_b1:.2f} GB")
+    print(f"    activation_b1 : {activation_b1:.2f} GB")
+    print(f"    max_batch    : {max_batch}")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem3_warmup_outlier():
@@ -111,17 +106,10 @@ def problem3_warmup_outlier():
     print("=" * 60 + "\n")
 
     # TODO
-    correct_methods = ""  # 예: "A,C,D"
-
-    expected = "A,C,D"
+    correct_methods = ""  # 콤마로 구분 (예: "A,B" 형식)
 
     print(f"  당신의 답 : {correct_methods}")
-    print(f"  기대 답   : {expected}")
-
-    if sorted(correct_methods.replace(" ", "").split(",")) == sorted(expected.split(",")):
-        print("\n  [O] 정답!")
-    else:
-        print("\n  [X] 정답은 quiz_solutions/medium_sol.py")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 if __name__ == "__main__":

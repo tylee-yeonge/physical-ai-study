@@ -35,30 +35,15 @@ def problem1_label_conversion():
     print(f"    width    = ({x_max} - {x_min}) / {W} = ?")
     print(f"    height   = ({y_max} - {y_min}) / {H} = ?")
 
-    # 정답 계산
-    actual_xc = (x_min + x_max) / 2 / W
-    actual_yc = (y_min + y_max) / 2 / H
-    actual_w = (x_max - x_min) / W
-    actual_h = (y_max - y_min) / H
-
     # TODO: 직접 계산해보세요
     yolo_xc = 0.0   # 여기를 채우시오
     yolo_yc = 0.0   # 여기를 채우시오
     yolo_w = 0.0    # 여기를 채우시오
     yolo_h = 0.0    # 여기를 채우시오
 
-    print(f"\n  정답: {class_id} {actual_xc:.4f} {actual_yc:.4f} "
-          f"{actual_w:.4f} {actual_h:.4f}")
     print(f"  입력: {class_id} {yolo_xc:.4f} {yolo_yc:.4f} "
           f"{yolo_w:.4f} {yolo_h:.4f}")
-
-    if (abs(yolo_xc - actual_xc) < 0.01 and
-            abs(yolo_yc - actual_yc) < 0.01 and
-            abs(yolo_w - actual_w) < 0.01 and
-            abs(yolo_h - actual_h) < 0.01):
-        print("\n  ✅ 정답!")
-    else:
-        print("\n  ❌ 다시 계산해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem2_confusion_matrix():
@@ -107,27 +92,11 @@ def problem2_confusion_matrix():
     most_fn_class = ""       # 여기를 채우시오 ("person", "car", "bicycle")
     most_fp_class = ""       # 여기를 채우시오
 
-    # 정답
-    actual_person_recall = 70 / (70 + 5 + 3 + 22)
-    actual_most_fn = "bicycle"   # background 열: 22, 37, 51 → bicycle
-    actual_most_fp = "person"    # background 행: 8, 3, 2 → person
-
-    print(f"  정답:")
-    print(f"    person Recall = 70 / 100 = {actual_person_recall:.2f}")
-    print(f"    가장 미검출 많은 클래스: {actual_most_fn} (51개)")
-    print(f"    가장 오검출 많은 클래스: {actual_most_fp} (8개)")
-
-    print(f"\n  내 답:")
+    print(f"  내 답:")
     print(f"    person Recall = {person_recall:.2f}")
     print(f"    가장 미검출 많은 클래스: {most_fn_class}")
     print(f"    가장 오검출 많은 클래스: {most_fp_class}")
-
-    if (abs(person_recall - actual_person_recall) < 0.01 and
-            most_fn_class == actual_most_fn and
-            most_fp_class == actual_most_fp):
-        print("\n  ✅ 정답!")
-    else:
-        print("\n  ❌ 다시 분석해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem3_hyperparameter_decision():

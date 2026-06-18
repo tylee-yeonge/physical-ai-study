@@ -37,19 +37,9 @@ def problem1_recover_action_from_token():
     # 2. action = a_min + (bin + 0.5) / N_BIN * (a_max - a_min)
     continuous_action = [0.0] * 7  # 여기를 채우시오
 
-    # 검증
-    bin_idx = np.array(token_ids) - ACTION_TOKEN_START
-    expected = a_min + (bin_idx + 0.5) / N_BIN * (a_max - a_min)
-
     print(f"  token_ids : {token_ids}")
-    print(f"  bin index : {bin_idx.tolist()}")
     print(f"  당신의 답 : {[round(x, 4) for x in continuous_action]}")
-    print(f"  기대 답   : {[round(x, 4) for x in expected]}")
-
-    if all(abs(c - e) < 1e-4 for c, e in zip(continuous_action, expected)):
-        print("\n  [O] 정답!")
-    else:
-        print("\n  [X] 다시 계산해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem2_vocab_overlap():
@@ -77,15 +67,8 @@ def problem2_vocab_overlap():
     # TODO
     emerg_problem = ""  # 여기를 채우시오
 
-    expected = "C"
-
     print(f"  당신의 답 : {emerg_problem}")
-    print(f"  기대 답   : {expected}")
-
-    if emerg_problem == expected:
-        print("\n  [O] 정답!")
-    else:
-        print("\n  [X] 다시 생각해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
     print("\n  힌트: '평소에 자주 나타나는가' 가 핵심.")
     print("        web data 에서 그 token 이 일정 빈도 이상 등장하면")
@@ -114,18 +97,12 @@ def problem3_compute_combined_loss():
     # TODO: 직접 계산
     combined_loss = 0.0  # 여기를 채우시오
 
-    expected = (8 * 2.3 + 4 * 3.1 + 4 * 4.5) / (8 + 4 + 4)
     print(f"  Web sample (8): loss=2.3")
     print(f"  VQA sample (4): loss=3.1")
     print(f"  Robot (4)     : loss=4.5")
     print()
     print(f"  당신의 답 : {combined_loss:.4f}")
-    print(f"  기대 답   : {expected:.4f}")
-
-    if abs(combined_loss - expected) < 1e-4:
-        print("\n  [O] 정답!")
-    else:
-        print("\n  [X] 다시 계산해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 if __name__ == "__main__":

@@ -38,20 +38,15 @@ def problem1_vram_calculation():
         "int4": False,
     }
 
-    expected_fp32 = (n_params * 4 * overhead) / 1e9
-    expected_fp16 = (n_params * 2 * overhead) / 1e9
-    expected_int8 = (n_params * 1 * overhead) / 1e9
-    expected_int4 = (n_params * 0.5 * overhead) / 1e9
-
     print(f"  당신의 답:")
-    print(f"    fp32 : {vram_fp32:.2f} GB (기대: {expected_fp32:.2f})")
-    print(f"    fp16 : {vram_fp16:.2f} GB (기대: {expected_fp16:.2f})")
-    print(f"    int8 : {vram_int8:.2f} GB (기대: {expected_int8:.2f})")
-    print(f"    int4 : {vram_int4:.2f} GB (기대: {expected_int4:.2f})")
+    print(f"    fp32 : {vram_fp32:.2f} GB")
+    print(f"    fp16 : {vram_fp16:.2f} GB")
+    print(f"    int8 : {vram_int8:.2f} GB")
+    print(f"    int4 : {vram_int4:.2f} GB")
     print()
     print(f"  RTX 4070 (12GB) 에 fit 가능?")
     print(f"    {fits_on_4070}")
-    print(f"    기대: fp32=False, fp16=False, int8=True, int4=True")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem2_lora_params():
@@ -83,7 +78,6 @@ def problem2_lora_params():
     # TODO
     lora_params = 0  # rank * (in + out) * n_linear_layers
 
-    expected = rank * (in_size + out_size) * n_linear_layers
     total = 7e9
 
     print(f"  Linear layer 수    : {n_linear_layers}")
@@ -91,13 +85,9 @@ def problem2_lora_params():
     print(f"  LoRA rank          : {rank}")
     print()
     print(f"  당신의 답          : {lora_params:,}")
-    print(f"  기대값             : {expected:,}")
     print()
     print(f"  전체 7B 모델 대비  : {lora_params/total*100:.2f}%")
-    print(f"  기대 비율          : {expected/total*100:.2f}%")
-    print()
-    print("  -> LoRA 는 전체 파라미터의 약 1% 만 학습.")
-    print("     이게 빠른 fine-tuning 의 핵심.")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem3_compare_table():
@@ -129,30 +119,10 @@ def problem3_compare_table():
         "D2 (OpenVLA open)": "",
     }
 
-    expected = {
-        "A1 (RT-2 LM size)": "PaLI-X 5B / 55B",
-        "A2 (OpenVLA LM size)": "Llama 2 7B",
-        "B1 (RT-2 vision)": "ViT (PaLI-X 내부)",
-        "B2 (OpenVLA vision)": "DINOv2 + SigLIP hybrid",
-        "C1 (RT-2 robot data)": "RT-1 dataset (130K)",
-        "C2 (OpenVLA robot data)": "OpenX-Embodiment (970K)",
-        "D1 (RT-2 open)": "No (closed)",
-        "D2 (OpenVLA open)": "Yes (weight+code+data)",
-    }
-
-    print("  당신의 답 vs 기대:")
-    correct = 0
+    print("  당신의 답:")
     for k, v in answers.items():
-        match = v.strip().lower() == expected[k].strip().lower()
-        if match:
-            correct += 1
-        mark = "[O]" if match else "[X]"
-        print(f"  {mark} {k}")
-        print(f"      당신: '{v}'")
-        print(f"      기대: '{expected[k]}'")
-
-    print(f"\n  점수: {correct}/{len(answers)}")
-    print("  정답은 quiz_solutions/medium_sol.py 참고")
+        print(f"    {k}: '{v}'")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 if __name__ == "__main__":

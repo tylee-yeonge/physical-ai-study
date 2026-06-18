@@ -9,11 +9,10 @@ def p1():
     print()
     # TODO: 정보 손실량
     pca3_pct = 0  # PCA 3 dim 이 explain 하는 variance %
-    expected = "~30~50%"
-    print(f"  당신: {pca3_pct}% (기대 {expected})")
+    print(f"  당신: {pca3_pct}%")
     print()
-    print("  [tip] high-dim feature 의 PCA 3 dim 은 ~30~50% variance.")
-    print("       시각화에는 충분, 정확한 분석은 더 많은 dim 필요.")
+    print("  [tip] 시각화에는 PCA 3 dim 으로 충분, 정확한 분석은 더 많은 dim 필요.")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def p2():
@@ -24,10 +23,9 @@ def p2():
     # TODO
     seq_total = 0
     par_total = 0
-    expected_seq = 56
-    expected_par = 28
-    print(f"  순차: {seq_total} ms (기대 {expected_seq})")
-    print(f"  병렬: {par_total} ms (기대 {expected_par})")
+    print(f"  순차: {seq_total} ms")
+    print(f"  병렬: {par_total} ms")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def p3():
@@ -41,13 +39,13 @@ def p3():
     print()
     # TODO
     answer = ""
-    expected = "B"
-    print(f"  당신: {answer} (기대: {expected})")
+    print(f"  당신: {answer}")
     print()
     print("  [tip] OpenVLA 의 hardware budget:")
     print("    - 7B Llama (~ 14GB fp16, 4GB int4)")
     print("    - vision encoder (~ 2GB)")
     print("    - 합쳐서 4070 12GB 에 fit 해야")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 if __name__ == "__main__":

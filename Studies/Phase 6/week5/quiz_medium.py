@@ -15,8 +15,8 @@ def p1():
     print()
     # TODO
     ans = ""
-    expected = "B"
-    print(f"  당신: {ans} (기대: {expected})")
+    print(f"  당신: {ans}")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def p2():

@@ -31,22 +31,10 @@ def problem1_write_section5_table():
     print("당신의 표:")
     print(my_table)
 
-    expected = """
-| Metric | Value |
-|---|---|
-| mean latency | 165 ms |
-| p95 latency | 220 ms |
-| p99 latency | 250 ms |
-| Throughput (mean) | 6.0 Hz |
-| GPU memory | 5.3 GB |
-""".strip()
-
-    print("\n기대 표:")
-    print(expected)
-
     print("\n자가 평가:")
     print("  필요 항목: mean / p95 / p99 / throughput / GPU memory")
     print("  형태: Markdown table")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem2_write_differentiation_paragraph():

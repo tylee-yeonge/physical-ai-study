@@ -15,9 +15,9 @@ def problem1():
     thr_b = 0.0
     thr_l = 0.0
 
-    expected = (100.0, 33.3)
-    print(f"  ViT-B: {thr_b} Hz (기대 {expected[0]})")
-    print(f"  ViT-L: {thr_l} Hz (기대 {expected[1]})")
+    print(f"  ViT-B: {thr_b} Hz")
+    print(f"  ViT-L: {thr_l} Hz")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem2():
@@ -35,9 +35,8 @@ def problem2():
     # TODO
     vram_gb = 0.0
 
-    expected = (n_params * bytes_per_param / 1e9) * activation_factor
     print(f"  당신: {vram_gb:.2f} GB")
-    print(f"  기대: {expected:.2f} GB")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem3():
@@ -56,10 +55,9 @@ def problem3():
     # TODO: FLOPS 비율
     attn_flops_ratio = 0.0  # (577^2) / (197^2)
 
-    expected = (577 ** 2) / (197 ** 2)
     print(f"  Seq len  : 197 -> 577 ({577/197:.2f}x)")
-    print(f"  Attn FLOPS ratio: {attn_flops_ratio:.2f}  (기대: {expected:.2f}x)")
-    print(f"  -> attention 이 ~ 8.6x 늘어남, latency 도 비슷한 비율")
+    print(f"  Attn FLOPS ratio: {attn_flops_ratio:.2f}")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 if __name__ == "__main__":

@@ -9,14 +9,9 @@ def p1():
     print()
     # TODO
     mapping = {"revolute": "", "prismatic": "", "continuous": "", "fixed": ""}
-    expected = {
-        "revolute": "RevoluteJoint (with limit)",
-        "prismatic": "PrismaticJoint",
-        "continuous": "RevoluteJoint (no limit)",
-        "fixed": "FixedJoint",
-    }
     for k in mapping:
-        print(f"  {k:12s} -> 당신: {mapping[k]}, 기대: {expected[k]}")
+        print(f"  {k:12s} -> 당신: {mapping[k]}")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def p2():
@@ -25,9 +20,7 @@ def p2():
     print("  원인: ?")
     print("  해결: ?")
     print()
-    print("  답:")
-    print("  - 원인: fix_base=False (default)")
-    print("  - 해결: import_config.fix_base = True")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def p3():
@@ -40,9 +33,7 @@ def p3():
     print("  C) Sim 이 paused")
     print("  D) 모두 가능")
     print()
-    print("  해결:")
-    print("    arm.set_joint_position_targets(target)")
-    print("    set_joint_position 도 가능 (직접 set, drive 무관)")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 if __name__ == "__main__":

@@ -27,21 +27,10 @@ def problem1_design_action_twist():
         "action[6] (gripper)": "",
     }
 
-    expected = {
-        "action[0] (dx)": "twist.linear.x",
-        "action[1] (dy)": "twist.linear.y",
-        "action[2] (dz)": "twist.linear.z",
-        "action[3] (rx)": "twist.angular.x",
-        "action[4] (ry)": "twist.angular.y",
-        "action[5] (rz)": "twist.angular.z",
-        "action[6] (gripper)": "gripper_msg.data (std_msgs/Float64)",
-    }
-
     print("  당신의 매핑:")
     for k, v in mapping.items():
-        mark = "[O]" if v == expected[k] else "[X]"
-        print(f"    {mark} {k} -> {v}")
-        print(f"        (기대: {expected[k]})")
+        print(f"    {k} -> {v}")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem2_image_age_threshold():
@@ -69,11 +58,9 @@ def problem2_image_age_threshold():
     threshold_ms = 0
     pos_error_cm = 0.0
 
-    expected_threshold = 200  # 5 Hz = 200ms cycle. age 가 그 절반 이하 권장
-    expected_pos_error = 0.5  # 5 cm/s * 0.1s = 0.5 cm
-
-    print(f"  (a) 5 Hz 의 image age threshold : {threshold_ms} ms (기대 ~ 100~200)")
-    print(f"  (b) 5cm/s * 100ms             : {pos_error_cm} cm (기대 ~ 0.5)")
+    print(f"  (a) 5 Hz 의 image age threshold : {threshold_ms} ms")
+    print(f"  (b) 5cm/s * 100ms             : {pos_error_cm} cm")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem3_qos_table():
@@ -102,18 +89,10 @@ def problem3_qos_table():
         "latency": ("", "", 0),
     }
 
-    expected = {
-        "image_raw": ("best_effort", "keep_last", 1),
-        "action": ("reliable", "keep_last", 10),
-        "instruction": ("transient_local", "keep_last", 1),
-        "latency": ("best_effort", "keep_last", 10),
-    }
-
     print("  당신의 QoS:")
     for k, v in qos.items():
-        mark = "[O]" if v == expected[k] else "[X]"
-        print(f"    {mark} {k}: {v}")
-        print(f"          (기대: {expected[k]})")
+        print(f"    {k}: {v}")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 if __name__ == "__main__":

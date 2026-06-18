@@ -25,14 +25,8 @@ def problem1_estimate_bitrate():
     # TODO
     file_size_mb = 0.0
 
-    expected = (bitrate_mbps + audio_mbps) * duration_s / 8
-
     print(f"  당신의 답: {file_size_mb:.2f} MB")
-    print(f"  기대 답  : {expected:.2f} MB")
-    print()
-    print("  계산:")
-    print(f"    total bitrate = video + audio = {bitrate_mbps + audio_mbps:.3f} Mbps")
-    print(f"    file size = {bitrate_mbps + audio_mbps:.3f} Mbps * {duration_s}s / 8 = {expected:.2f} MB")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem2_subtitle_segments():
@@ -69,25 +63,11 @@ def problem2_subtitle_segments():
         ("h", "다음", 0, 0),
     ]
 
-    expected = [
-        ("a", "인트로", 0, 5),
-        ("b", "본인", 5, 10),
-        ("c", "System 1", 10, 18),
-        ("d", "System 2", 18, 25),
-        ("e", "실시간", 25, 45),
-        ("f", "Latency", 45, 52),
-        ("g", "양산 의미", 52, 56),
-        ("h", "다음", 56, 60),
-    ]
-
     print("  당신의 segment 들:")
     for code, name, s, e in segments:
         dur = e - s
         print(f"    {code}) {name:<10} {s:>3}s -> {e:>3}s ({dur}s)")
-    print("\n  기대 답:")
-    for code, name, s, e in expected:
-        dur = e - s
-        print(f"    {code}) {name:<10} {s:>3}s -> {e:>3}s ({dur}s)")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem3_thumbnail_design():
@@ -115,18 +95,8 @@ def problem3_thumbnail_design():
     # TODO (우선순위 순)
     top3 = ["", "", ""]
 
-    expected = ["A", "B", "E"]  # OpenVLA, ROS2, latency
-
     print(f"  당신의 답 : {top3}")
-    print(f"  기대 답  : {expected}")
-    print()
-    print("  이유:")
-    print("    A) OpenVLA  - 가장 중요한 모델명")
-    print("    B) ROS2     - 본인의 차별화 (양산 SW)")
-    print("    E) 165ms/6Hz - '직접 측정' 의 증거")
-    print()
-    print("  G) Vision-Language-Action 은 길어서 thumbnail 에 안 들어감.")
-    print("  F) AMR 은 본인 정보 (작은 폰트로 별도).")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 if __name__ == "__main__":

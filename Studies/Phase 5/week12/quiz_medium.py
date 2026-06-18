@@ -28,8 +28,8 @@ def p2():
     print("  영상 재편집           : 2 hr")
     # TODO
     total = 0
-    expected = 7
-    print(f"  Total: {total} hr (기대 {expected})")
+    print(f"  Total: {total} hr")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def p3():
@@ -38,10 +38,7 @@ def p3():
     print()
     print("  당신: ___________________________________________")
     print()
-    print("  예시 답:")
-    print("    'OpenVLA 의 vision backbone (DINOv2 + SigLIP + projector) 의")
-    print("     모든 component 의 학습 방식 / latency / VRAM / 학습 가능 여부 를")
-    print("     설명 가능 -> Phase 6/7 의 토대.'")
+    print("  정답/예시 답안은 quiz_solutions/medium_sol.py 참고")
 
 
 if __name__ == "__main__":

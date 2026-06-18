@@ -14,8 +14,8 @@ def p1():
     print("  D) Dropout 사용")
     # TODO
     answer = ""
-    expected = "B"
-    print(f"  당신: {answer}, 기대: {expected}")
+    print(f"  당신: {answer}")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def p2():
@@ -29,11 +29,8 @@ def p2():
     # TODO
     n_patches = 0
     spatial_grid = 0
-    expected_n = grid * grid
-    expected_g = grid
-
     print(f"  당신: n_patches={n_patches}, grid={spatial_grid}x{spatial_grid}")
-    print(f"  기대: n_patches={expected_n}, grid={expected_g}x{expected_g}")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def p3():

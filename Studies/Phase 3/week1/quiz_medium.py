@@ -22,19 +22,8 @@ def problem1_gradient_computation():
     print("문제 1: Gradient 직접 계산 및 검증")
     print("━" * 36 + "\n")
 
-    x = torch.tensor(2.0, requires_grad=True)
-    y = torch.tensor(3.0, requires_grad=True)
-
-    # f(x, y) = x^2 * y + y^3
-    f = x ** 2 * y + y ** 3
-    f.backward()
-
     print(f"  f(x, y) = x^2 * y + y^3")
     print(f"  (x, y) = (2.0, 3.0)")
-    print(f"  f = {f.item()}")
-    print(f"\n  PyTorch가 계산한 gradient:")
-    print(f"    df/dx = {x.grad.item()}")
-    print(f"    df/dy = {y.grad.item()}")
 
     # TODO: 수학적으로 직접 계산해보세요
     # df/dx = 2xy = ?
@@ -45,11 +34,7 @@ def problem1_gradient_computation():
     print(f"\n  직접 계산한 gradient:")
     print(f"    df/dx = {expected_dx}")
     print(f"    df/dy = {expected_dy}")
-
-    if expected_dx == x.grad.item() and expected_dy == y.grad.item():
-        print("\n  ✅ 정답!")
-    else:
-        print("\n  ❌ 다시 계산해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem2_custom_model():
@@ -66,20 +51,6 @@ def problem2_custom_model():
     print("문제 2: 모델 파라미터 수 계산")
     print("━" * 36 + "\n")
 
-    model = nn.Sequential(
-        nn.Conv2d(3, 16, kernel_size=3, padding=1),   # Conv1
-        nn.ReLU(),
-        nn.MaxPool2d(2),                                # 32x32 → 16x16
-        nn.Conv2d(16, 32, kernel_size=3, padding=1),   # Conv2
-        nn.ReLU(),
-        nn.MaxPool2d(2),                                # 16x16 → 8x8
-        nn.Flatten(),
-        nn.Linear(32 * 8 * 8, 10),                     # FC
-    )
-
-    # PyTorch로 실제 파라미터 수 계산
-    actual_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-
     print("  모델 구조:")
     print("    Conv2d(3→16, 3x3)  + ReLU + MaxPool2d")
     print("    Conv2d(16→32, 3x3) + ReLU + MaxPool2d")
@@ -93,13 +64,8 @@ def problem2_custom_model():
     # TODO: 직접 계산해보세요
     total_params_expected = 0  # 여기를 채우시오
 
-    print(f"\n  실제 파라미터 수: {actual_params}")
-    print(f"  계산한 파라미터 수: {total_params_expected}")
-
-    if total_params_expected == actual_params:
-        print("\n  ✅ 정답!")
-    else:
-        print("\n  ❌ 다시 계산해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
+    print(f"\n  계산한 파라미터 수: {total_params_expected}")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem3_learning_rate_effect():

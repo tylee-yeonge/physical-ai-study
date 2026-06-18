@@ -12,8 +12,8 @@ def p1():
     print("  D) 안 됨")
     # TODO
     ans = ""
-    expected = "A"
-    print(f"  당신: {ans} (기대 {expected})")
+    print(f"  당신: {ans}")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def p2():
@@ -25,10 +25,10 @@ def p2():
     print("    /tf          : 10 transforms * 30   = 5 KB/s")
     # TODO
     total = 0.0
-    expected = 27 + 0.001 + 0.005  # ~ 27 MB/s
-    print(f"  Total ~ {total} MB/s (기대 ~{expected})")
+    print(f"  Total ~ {total} MB/s")
     print()
     print("  -> image 가 압도적 (99%+)")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def p3():

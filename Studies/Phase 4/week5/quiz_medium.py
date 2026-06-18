@@ -33,20 +33,11 @@ def problem1_step_count_estimation():
     total_steps = 0
     train_time_hours = 0.0
 
-    expected_episodes = n_tasks * demos_per_task
-    expected_steps = expected_episodes * steps_per_episode
-    expected_time = expected_steps * sec_per_step / 3600
-
     print(f"  당신의 답:")
-    print(f"    (a) total_episodes : {total_episodes}  (기대: {expected_episodes})")
-    print(f"    (b) total_steps    : {total_steps}    (기대: {expected_steps})")
-    print(f"    (c) train_time_hr  : {train_time_hours:.2f} (기대: {expected_time:.2f})")
-
-    if total_episodes == expected_episodes and total_steps == expected_steps:
-        if abs(train_time_hours - expected_time) < 0.1:
-            print("\n  [O] 정답!")
-            return
-    print("\n  [X] 다시 계산해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
+    print(f"    (a) total_episodes : {total_episodes}")
+    print(f"    (b) total_steps    : {total_steps}")
+    print(f"    (c) train_time_hr  : {train_time_hours:.2f}")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem2_lora_memory_budget():
@@ -80,22 +71,17 @@ def problem2_lora_memory_budget():
     total = base_int4 + lora_fp16 + activation + gradient + optimizer + buffer
     fits = total < 12.0
 
-    expected_base = 7e9 * 0.5 * 1.2 / 1e9
-    expected_lora = 70e6 * 2 / 1e9
-    expected_opt = 3 * gradient
-    expected_total = expected_base + expected_lora + activation + gradient + expected_opt + buffer
-
     print(f"  당신의 추정 (GB):")
-    print(f"    base (int4)  : {base_int4:.2f}  (기대 ~ {expected_base:.2f})")
-    print(f"    LoRA (fp16)  : {lora_fp16:.2f}  (기대 ~ {expected_lora:.2f})")
+    print(f"    base (int4)  : {base_int4:.2f}")
+    print(f"    LoRA (fp16)  : {lora_fp16:.2f}")
     print(f"    activation   : {activation:.2f}")
     print(f"    gradient     : {gradient:.2f}")
-    print(f"    optimizer    : {optimizer:.2f}  (기대 ~ {expected_opt:.2f})")
+    print(f"    optimizer    : {optimizer:.2f}")
     print(f"    buffer       : {buffer:.2f}")
     print(f"    ---")
-    print(f"    total        : {total:.2f}  (기대 ~ {expected_total:.2f})")
-    print()
-    print(f"  RTX 4070 12GB fit?  {fits}  (기대: True)")
+    print(f"    total        : {total:.2f}")
+    print(f"\n  RTX 4070 12GB fit?  {fits}")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem3_finetune_strategy():
@@ -127,17 +113,9 @@ def problem3_finetune_strategy():
     answer = ""
     reasoning = ""
 
-    expected = "B"
-
     print(f"  당신의 답 : {answer}")
     print(f"  당신의 이유: {reasoning}")
-    print()
-    print(f"  기대 답  : {expected}")
-
-    if answer == expected:
-        print("\n  [O] 정답!")
-    else:
-        print("\n  [X] 다시 생각해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 if __name__ == "__main__":

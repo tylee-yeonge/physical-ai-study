@@ -24,24 +24,8 @@ def problem1_class_responsibilities():
     # TODO
     answers = ""
 
-    # A: 모델 로드 - O
-    # B: image preprocess - X (preprocess.py 가 담당, 별도 모듈)
-    # C: predict_action - O
-    # D: NaN 검출 - O
-    # E: ROS2 topic - X (ROS2 노드의 책임)
-    # F: Stress test - X (테스트 스크립트의 책임)
-    expected = sorted(["A", "C", "D"])
-
     print(f"  당신의 답 : {sorted(answers.replace(' ', '').split(',')) if answers else '(empty)'}")
-    print(f"  기대 답   : {expected}")
-    print()
-    print("  자가 평가:")
-    print("    A 모델 로드      : O (VLAInference 의 일)")
-    print("    B image preprocess: X (preprocess.py 가 따로)")
-    print("    C predict_action : O")
-    print("    D NaN 검출       : O (output validation)")
-    print("    E ROS2 topic 발행: X (ROS2 노드)")
-    print("    F Stress test    : X (test script)")
+    print("  정답/해설은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem2_exception_mapping():
@@ -49,15 +33,18 @@ def problem2_exception_mapping():
     문제 2: Exception 클래스 매핑
 
     아래 시나리오 - exception 매핑:
-      Scenario                              | Exception
-      --------------------------------------|--------------------
-      1) model file 손상                     | A) VLAModelError
-      2) image 가 numpy array 가 아님       | B) VLAInputError
-      3) inference 결과에 NaN               | C) VLAOutputError
-      4) CUDA OOM                            | D) VLAOOMError
-      5) 알 수 없는 에러                     | E) VLAInferenceError (base)
+    시나리오:
+      1) model file 손상
+      2) image 가 numpy array 가 아님
+      3) inference 결과에 NaN
+      4) CUDA OOM
+      5) 알 수 없는 에러
 
-    TODO: mapping 딕셔너리를 채우시오.
+    Exception 클래스 후보 (순서 무관):
+      VLAOutputError, VLAOOMError, VLAModelError,
+      VLAInferenceError (base), VLAInputError
+
+    TODO: mapping 딕셔너리에 각 번호에 맞는 Exception 클래스명을 채우시오.
     """
     print("\n" + "=" * 60)
     print("문제 2: Exception 클래스 매핑")
@@ -65,26 +52,17 @@ def problem2_exception_mapping():
 
     # TODO
     mapping = {
-        1: "",  # model file 손상
-        2: "",  # image type error
-        3: "",  # NaN 결과
-        4: "",  # OOM
-        5: "",  # base
+        1: "",  # 시나리오 1
+        2: "",  # 시나리오 2
+        3: "",  # 시나리오 3
+        4: "",  # 시나리오 4
+        5: "",  # 시나리오 5
     }
 
-    expected = {
-        1: "VLAModelError",
-        2: "VLAInputError",
-        3: "VLAOutputError",
-        4: "VLAOOMError",
-        5: "VLAInferenceError",
-    }
-
-    print(f"  당신의 답:")
+    print("  당신의 답:")
     for k, v in mapping.items():
-        match = v == expected[k]
-        mark = "[O]" if match else "[X]"
-        print(f"    {mark} {k}: {v}  (기대: {expected[k]})")
+        print(f"    {k}: {v}")
+    print("  정답/해설은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem3_pipeline_order():
@@ -98,26 +76,17 @@ def problem3_pipeline_order():
       D) output validation (NaN / shape)
       E) processor 로 tensor 변환
 
-    TODO: 순서를 채우시오 (예: "B,A,E,C,D")
+    TODO: 순서를 채우시오 (콤마로 구분, 예: "A,B,C,D,E" 형식)
     """
     print("\n" + "=" * 60)
     print("문제 3: predict() 의 단계 순서")
     print("=" * 60 + "\n")
 
     # TODO
-    order = ""  # 예: "B,A,E,C,D"
-
-    expected = "B,A,E,C,D"
+    order = ""  # 콤마로 구분된 순서 (예: "A,B,C,D,E" 형식)
 
     print(f"  당신의 답 : {order}")
-    print(f"  기대 답   : {expected}")
-    print()
-    print("  정답 흐름:")
-    print("    1. B (input validation)        - 잘못된 입력은 일찍 catch")
-    print("    2. A (prompt 생성)              - instruction + 'In: ...' template")
-    print("    3. E (processor tensor 변환)    - HuggingFace processor")
-    print("    4. C (model.predict_action)     - 실제 inference")
-    print("    5. D (output validation)        - NaN / shape 검증")
+    print("  정답/해설은 quiz_solutions/medium_sol.py 참고")
 
 
 if __name__ == "__main__":

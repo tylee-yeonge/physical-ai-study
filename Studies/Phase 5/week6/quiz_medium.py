@@ -9,9 +9,8 @@ def p1():
     print("  + ROS topic publish ~ 1ms")
     # TODO
     total = 0
-    expected = 36
-    print(f"  당신: {total} ms (기대 {expected} ms)")
-    print(f"  -> Throughput: {1000/expected:.1f} Hz")
+    print(f"  당신: {total} ms")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def p2():
@@ -22,9 +21,9 @@ def p2():
     overhead = 1.0
     # TODO
     total = 0.0
-    expected = openvla + clip + overhead
-    print(f"  당신: {total:.2f} GB (기대 {expected:.2f})")
+    print(f"  당신: {total:.2f} GB")
     print(f"  RTX 4070 12GB 에 fit?: {total < 12.0}")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def p3():

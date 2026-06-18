@@ -77,17 +77,10 @@ def problem2_quarterly_decision():
     # TODO
     decisions = {"A": 0, "B": 0, "C": 0, "D": 0}
 
-    expected = {
-        "A": 2,  # probe 반응 좋음 + 신모델 X -> #4 가속
-        "B": 4,  # probe 반응 좋음 + 신모델 등장 -> 모델 갱신 + 실지원
-        "C": 3,  # probe 반응 약함 + 신모델 X -> fallback
-        "D": 5,  # probe 반응 약함 + 신모델 등장 -> 모델 갱신 + fallback
-    }
-
     print("  당신의 결정:")
     for k, v in decisions.items():
-        mark = "[O]" if v == expected[k] else "[X]"
-        print(f"    {mark} {k}: {v}  (기대: {expected[k]})")
+        print(f"    {k}: {v}")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem3_phase5_prep():
@@ -113,18 +106,8 @@ def problem3_phase5_prep():
     # TODO
     reusable = ""
 
-    expected = "A,B,C,D"  # E, F 는 Phase 5 에서 직접 안 씀
-
     print(f"  당신의 답 : {reusable}")
-    print(f"  기대 답   : {expected}")
-    print()
-    print("  분석:")
-    print("    A) Transformer 기본 - Phase 5 ViT 의 직접 토대")
-    print("    B) HuggingFace transformers - Phase 5 그대로 사용")
-    print("    C) DINOv2 / SigLIP - Phase 5 의 핵심 모델")
-    print("    D) 4-bit quantization - Phase 5 의 큰 모델에도 적용")
-    print("    E) ROS2 노드 - Phase 5 는 동작 원리 수준, ROS2 안 씀")
-    print("    F) ros2 bag - Phase 5 안 씀")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 if __name__ == "__main__":

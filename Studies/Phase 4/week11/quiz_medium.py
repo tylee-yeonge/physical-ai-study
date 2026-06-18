@@ -31,19 +31,11 @@ def problem1_compute_throughput():
     actual_hz = 0.0  # TODO
     expected_hz = 0.0  # TODO
 
-    expected_actual = n / duration_s
-    expected_expected = 1000 / mean_ms
-
     print(f"  당신의 답:")
-    print(f"    (a) actual_hz   : {actual_hz:.2f} (기대: {expected_actual:.2f})")
-    print(f"    (b) expected_hz : {expected_hz:.2f} (기대: {expected_expected:.2f})")
+    print(f"    (a) actual_hz   : {actual_hz:.2f}")
+    print(f"    (b) expected_hz : {expected_hz:.2f}")
     print(f"    (c) 차이의 원인 : ?")
-    print()
-    print("  (c) 의 가능한 원인 (정답은 medium_sol.py):")
-    print("    - image 가 30Hz 로 들어오지만 inference 가 5~6Hz 라 image skip")
-    print("    - image_age_threshold 로 일부 skip")
-    print("    - instruction 없을 때 skip")
-    print("    - GPU 다른 일이 있어 잠시 느려짐")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem2_design_status_msg():
@@ -71,15 +63,10 @@ def problem2_design_status_msg():
         "oom": "",
         "model_fail": "",
     }
-    expected = {
-        "loading": "loading",
-        "ready": "ready",
-        "oom": "error: oom",
-        "model_fail": "error: model_load_failed",
-    }
+    print("  당신의 답:")
     for k, v in statuses.items():
-        mark = "[O]" if v == expected[k] else "[X]"
-        print(f"  {mark} {k}: '{v}'  (기대 예시: '{expected[k]}')")
+        print(f"    {k}: '{v}'")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem3_failure_handling_table():
@@ -110,16 +97,10 @@ def problem3_failure_handling_table():
     # TODO
     mapping = {"A": 0, "B": 0, "C": 0, "D": 0, "E": 0}
 
-    expected = {
-        "A": 1,  # cv_bridge 변환 실패 -> skip + log
-        "B": 1,  # image age 초과 -> skip
-        "C": 3,  # OOM -> empty_cache + log
-        "D": 2,  # NaN -> zero action + warning
-        "E": 1,  # input error -> skip + log
-    }
+    print("  당신의 답:")
     for k, v in mapping.items():
-        mark = "[O]" if v == expected[k] else "[X]"
-        print(f"  {mark} {k}: {v} (기대: {expected[k]})")
+        print(f"    {k}: {v}")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 if __name__ == "__main__":

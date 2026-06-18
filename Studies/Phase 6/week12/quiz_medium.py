@@ -12,8 +12,8 @@ def p1():
     print("  가장 큰 gap?")
     # TODO
     ans = ""
-    expected = "Image"
-    print(f"  당신: {ans} (기대: {expected})")
+    print(f"  당신: {ans}")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def p2():
@@ -24,8 +24,7 @@ def p2():
     print("    Image gap 크다 -> Phase 7 의 첫 작업: Domain Randomization 강화")
     print("    Force gap 크다 -> Phase 7 의 첫 작업: Friction tuning")
     print()
-    print("  본 phase 의 dominant: Image (noise)")
-    print("  -> Phase 7 week 1~2 의 DR 정교화 우선")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def p3():

@@ -30,26 +30,10 @@ def problem1_quantization_step():
     step_rx = 0.0  # rx 의 step (단위: rad)
     step_grip = 0.0  # gripper 의 step
 
-    # 검증용
-    expected_dx = (0.10 - (-0.10)) / N_BIN
-    expected_rx = (np.pi - (-np.pi)) / N_BIN
-    expected_grip = 1.0 / N_BIN
-
     print(f"  계산한 step_dx   : {step_dx:.6f} m = {step_dx*1000:.4f} mm")
     print(f"  계산한 step_rx   : {step_rx:.6f} rad = {np.degrees(step_rx):.4f} deg")
     print(f"  계산한 step_grip : {step_grip:.6f}")
-    print(f"\n  기대 step_dx   : {expected_dx:.6f} m = {expected_dx*1000:.4f} mm")
-    print(f"  기대 step_rx   : {expected_rx:.6f} rad = {np.degrees(expected_rx):.4f} deg")
-    print(f"  기대 step_grip : {expected_grip:.6f}")
-
-    if (
-        abs(step_dx - expected_dx) < 1e-9
-        and abs(step_rx - expected_rx) < 1e-9
-        and abs(step_grip - expected_grip) < 1e-9
-    ):
-        print("\n  [O] 정답!")
-    else:
-        print("\n  [X] 다시 계산해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem2_output_token_length():
@@ -82,9 +66,9 @@ def problem2_output_token_length():
 
     print(f"  Action tokens per frame   : {action_tokens}")
     print(f"  Special tokens per frame  : {special_tokens}")
-    print(f"  Tokens per frame          : {tokens_per_frame} (기대: {action_tokens + special_tokens})")
+    print(f"  Tokens per frame          : {tokens_per_frame}")
     print(f"  Frames per second         : {fps}")
-    print(f"  Tokens per second         : {tokens_per_second} (기대: {(action_tokens + special_tokens) * fps})")
+    print(f"  Tokens per second         : {tokens_per_second}")
 
     print("\n  질문: 일반 LLM 이 RTX 4070 에서 약 100 token/s 라고 할 때,")
     print(f"        RT-2 의 {tokens_per_second} token/s 는 가능한 수치인가?")
@@ -111,16 +95,10 @@ def problem3_emergent_capability_classification():
     print("=" * 60 + "\n")
 
     # TODO: emergent capability 인 사례를 모두 채우시오
-    emergent_cases = []  # 예: ["A", "C"]
+    emergent_cases = []  # 해당 사례를 리스트로 (예: ["B", "E"] 형식)
 
-    expected = sorted(["A", "C", "D"])
     print(f"  당신의 답: {sorted(emergent_cases)}")
-    print(f"  기대 답  : {expected}")
-
-    if sorted(emergent_cases) == expected:
-        print("\n  [O] 정답!")
-    else:
-        print("\n  [X] 다시 생각해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
     print("\n  힌트: emergent capability 는 'web knowledge transfer' 가 필요한 사례.")
     print("        학습 데이터에 정확히 같은 형태가 있으면 emergent 가 아니다.")

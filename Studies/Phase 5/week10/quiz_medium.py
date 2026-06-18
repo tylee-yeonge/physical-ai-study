@@ -17,8 +17,8 @@ def p1():
     print("  C) 차이 없음")
     # TODO
     ans = ""
-    expected = "B"
-    print(f"  당신: {ans} (기대: {expected})")
+    print(f"  당신: {ans}")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def p2():
@@ -30,10 +30,9 @@ def p2():
     print()
     # TODO: 정확도 차이
     diff = 0.0
-    expected = 0.5
-    print(f"  당신: {diff}% (기대 ~ {expected})")
+    print(f"  당신: {diff}%")
     print()
-    print("  [tip] 정확도 차이는 작지만 (~0.5%p):")
+    print("  [tip] 정확도 차이는 작지만:")
     print("    - SigLIP 의 학습 효율이 훨씬 좋음")
     print("    - 같은 compute 로 더 큰 모델 가능")
     print("    - OpenVLA 가 SigLIP 선택 이유")
@@ -47,8 +46,8 @@ def p3():
     print()
     # TODO: latency 추정
     lat = 0
-    expected = 40
-    print(f"  RTX 4070 fp16 latency 추정: {lat} ms (기대 ~ {expected})")
+    print(f"  RTX 4070 fp16 latency 추정: {lat} ms")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 if __name__ == "__main__":

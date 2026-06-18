@@ -24,15 +24,12 @@ def problem1_video_section_priority():
     # TODO
     section_secs = {"A": 0, "B": 0, "C": 0, "D": 0, "E": 0}
 
-    expected = {"A": 10, "B": 15, "C": 20, "D": 10, "E": 5}
-    total_expected = sum(expected.values())
-
     print("  당신의 답:")
     your_total = sum(section_secs.values())
     for k, v in section_secs.items():
-        mark = "[O]" if abs(v - expected[k]) <= 3 else "[X]"
-        print(f"  {mark} {k}: {v}s  (기대: {expected[k]}s)")
-    print(f"  Total: {your_total}s (기대: {total_expected}s)")
+        print(f"  {k}: {v}s")
+    print(f"  Total: {your_total}s")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem2_rerun_log_design():
@@ -55,18 +52,10 @@ def problem2_rerun_log_design():
     # TODO
     paths = {"A": "", "B": "", "C": "", "D": "", "E": ""}
 
-    expected = {
-        "A": "camera/image",
-        "B": "vla/action/linear_{x,y,z}",
-        "C": "vla/action/angular_{x,y,z}",
-        "D": "vla/gripper",
-        "E": "vla/latency_ms",
-    }
-
     print("  당신의 답:")
     for k, v in paths.items():
         print(f"  {k}: '{v}'")
-        print(f"      (기대: '{expected[k]}')")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
     print()
     print("  [tip] entity path 의 원칙:")
     print("    - 슬래시로 계층 분리")
@@ -97,15 +86,13 @@ def problem3_packaging_files():
     print("=" * 60 + "\n")
 
     # TODO
-    included = ""  # 예: "A,B,C"
-
-    expected = "A,B,C,D,E,F,G"  # H 는 보안상 절대 포함하면 안 됨!
+    included = ""  # 포함할 항목 코드를 콤마로 구분
 
     print(f"  당신의 답 : {included}")
-    print(f"  기대 답   : {expected}")
     print()
-    print("  주의: H (huggingface_credentials.txt) 는 절대 포함하면 안 됨!")
+    print("  힌트: credential / token 류 파일은 절대 패키징에 포함하지 말 것.")
     print("        token 은 환경 변수 또는 .env (gitignore) 로 관리.")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 if __name__ == "__main__":

@@ -11,14 +11,9 @@ def p1():
     # TODO: total
     total_sim_only = 0.0
     total_with_vla = 0.0
-    expected_sim = sim
-    expected_with_vla = sim + openvla + ros2_bridge
-
-    print(f"  Sim only         : {total_sim_only:.1f} GB (기대 {expected_sim})")
-    print(f"  + OpenVLA + Bridge: {total_with_vla:.1f} GB (기대 {expected_with_vla})")
-    print(f"  RTX 4070 12GB fit:")
-    print(f"    Sim only: True")
-    print(f"    + OpenVLA: ~ 9.8 GB (fit, 여유 적음)")
+    print(f"  Sim only         : {total_sim_only:.1f} GB")
+    print(f"  + OpenVLA + Bridge: {total_with_vla:.1f} GB")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def p2():
@@ -30,8 +25,8 @@ def p2():
     print("  D) Manual build")
     # TODO
     ans = ""
-    expected = "B"
-    print(f"  당신: {ans} (기대: {expected})")
+    print(f"  당신: {ans}")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def p3():

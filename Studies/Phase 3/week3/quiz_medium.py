@@ -34,28 +34,11 @@ def problem1_iou_calculation():
     print("    합집합 = A + B - 교집합 = ?")
     print("    IoU = 교집합 / 합집합 = ?")
 
-    # 프로그래밍으로 계산
-    inter_x1 = max(box_a[0], box_b[0])
-    inter_y1 = max(box_a[1], box_b[1])
-    inter_x2 = min(box_a[2], box_b[2])
-    inter_y2 = min(box_a[3], box_b[3])
-    inter_area = max(0, inter_x2 - inter_x1) * max(0, inter_y2 - inter_y1)
-
-    area_a = (box_a[2] - box_a[0]) * (box_a[3] - box_a[1])
-    area_b = (box_b[2] - box_b[0]) * (box_b[3] - box_b[1])
-    union_area = area_a + area_b - inter_area
-    actual_iou = inter_area / union_area
-
     # TODO: 직접 계산해보세요
     iou_expected = 0.0  # 여기를 채우시오
 
-    print(f"\n  프로그래밍 결과: IoU = {actual_iou:.4f}")
-    print(f"  직접 계산한 값:  IoU = {iou_expected:.4f}")
-
-    if abs(iou_expected - actual_iou) < 0.01:
-        print("\n  ✅ 정답!")
-    else:
-        print("\n  ❌ 다시 계산해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
+    print(f"\n  직접 계산한 값:  IoU = {iou_expected:.4f}")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem2_nms_trace():
@@ -90,40 +73,11 @@ def problem2_nms_trace():
     print("    3단계: 선택된 BBox와 IoU > 0.5인 BBox 제거")
     print("    4단계: 반복")
 
-    # 실제 NMS 수행
-    def nms(boxes, scores, threshold):
-        order = scores.argsort()[::-1]
-        keep = []
-        while order.size > 0:
-            i = order[0]
-            keep.append(i)
-            if order.size == 1:
-                break
-            x1 = np.maximum(boxes[i, 0], boxes[order[1:], 0])
-            y1 = np.maximum(boxes[i, 1], boxes[order[1:], 1])
-            x2 = np.minimum(boxes[i, 2], boxes[order[1:], 2])
-            y2 = np.minimum(boxes[i, 3], boxes[order[1:], 3])
-            inter = np.maximum(0, x2 - x1) * np.maximum(0, y2 - y1)
-            area_i = (boxes[i, 2] - boxes[i, 0]) * (boxes[i, 3] - boxes[i, 1])
-            area_j = (boxes[order[1:], 2] - boxes[order[1:], 0]) * \
-                     (boxes[order[1:], 3] - boxes[order[1:], 1])
-            iou = inter / (area_i + area_j - inter + 1e-7)
-            remaining = np.where(iou < threshold)[0]
-            order = order[remaining + 1]
-        return keep
-
-    actual_result = nms(boxes, scores, 0.5)
-
     # TODO: NMS 결과를 예측하세요
-    nms_result = []  # 여기를 채우시오 (예: [1, 2, 4])
+    nms_result = []  # 여기를 채우시오 (남는 BBox 인덱스 리스트)
 
-    print(f"\n  실제 NMS 결과: {actual_result}")
-    print(f"  예측한 결과:   {nms_result}")
-
-    if nms_result == actual_result:
-        print("\n  ✅ 정답!")
-    else:
-        print("\n  ❌ 다시 추적해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
+    print(f"\n  예측한 결과:   {nms_result}")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem3_precision_recall():
@@ -148,10 +102,10 @@ def problem3_precision_recall():
     print("    GT2: [400, 100, 500, 250]")
     print()
     print("  검출 결과 (confidence 순):")
-    print("    Det0: [55, 48, 148, 148],  conf=0.95, IoU(GT0)=0.85 → TP")
-    print("    Det1: [195, 195, 345, 345],conf=0.88, IoU(GT1)=0.82 → TP")
-    print("    Det2: [300, 300, 400, 400],conf=0.75, IoU(모든GT)<0.5 → FP")
-    print("    Det3: [405, 105, 495, 245],conf=0.60, IoU(GT2)=0.78 → TP")
+    print("    Det0: [55, 48, 148, 148],  conf=0.95, IoU(GT0)=0.85 → ?")
+    print("    Det1: [195, 195, 345, 345],conf=0.88, IoU(GT1)=0.82 → ?")
+    print("    Det2: [300, 300, 400, 400],conf=0.75, IoU(모든GT)<0.5 → ?")
+    print("    Det3: [405, 105, 495, 245],conf=0.60, IoU(GT2)=0.78 → ?")
     print("    Det4: [60, 55, 145, 145],  conf=0.50, IoU(GT0)=0.75 → ?")
     print()
     print("  주의: Det4는 GT0과 높은 IoU를 가지지만,")
@@ -165,26 +119,10 @@ def problem3_precision_recall():
     final_precision = 0.0  # 여기를 채우시오
     final_recall = 0.0     # 여기를 채우시오
 
-    # 정답
-    actual_tp = 3
-    actual_fp = 2
-    actual_precision = actual_tp / (actual_tp + actual_fp)
-    actual_recall = actual_tp / 3
-
-    print(f"\n  실제 결과:")
-    print(f"    TP={actual_tp}, FP={actual_fp}")
-    print(f"    Precision={actual_precision:.4f}")
-    print(f"    Recall={actual_recall:.4f}")
-
     print(f"\n  내 계산:")
     print(f"    Precision={final_precision:.4f}")
     print(f"    Recall={final_recall:.4f}")
-
-    if (abs(final_precision - actual_precision) < 0.01 and
-            abs(final_recall - actual_recall) < 0.01):
-        print("\n  ✅ 정답!")
-    else:
-        print("\n  ❌ 다시 계산해보세요. 정답은 quiz_solutions/medium_sol.py 참고")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 if __name__ == "__main__":

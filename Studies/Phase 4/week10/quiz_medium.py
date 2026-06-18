@@ -32,16 +32,10 @@ def problem1_directory_structure():
         "D (ROS marker dir)": "",
         "E (실제 코드 dir)": "",
     }
-    expected = {
-        "A (package metadata)": "package.xml",
-        "B (build entry point)": "setup.py",
-        "C (build config)": "setup.cfg",
-        "D (ROS marker dir)": "resource",
-        "E (실제 코드 dir)": "vla_node",
-    }
+    print("  당신의 답:")
     for k, v in answers.items():
-        mark = "[O]" if v == expected[k] else "[X]"
-        print(f"  {mark} {k}: '{v}'  (기대: {expected[k]})")
+        print(f"    {k}: '{v}'")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem2_lifecycle_skeleton():
@@ -55,7 +49,7 @@ def problem2_lifecycle_skeleton():
       D) inference (predict)
       E) instruction 비어있으면 skip
 
-    TODO: 순서를 채우시오 (예: "E,B,C,D,A")
+    TODO: 순서를 채우시오 (콤마로 구분, 예: "A,B,C,D,E" 형식)
     """
     print("\n" + "=" * 60)
     print("문제 2: image_callback 의 단계 순서")
@@ -64,17 +58,8 @@ def problem2_lifecycle_skeleton():
     # TODO
     order = ""
 
-    expected = "E,B,C,D,A"
-
     print(f"  당신의 답 : {order}")
-    print(f"  기대 답   : {expected}")
-    print()
-    print("  정답 흐름:")
-    print("    1. E (instruction 비어있으면 skip)  - fail fast")
-    print("    2. B (image age check)              - 너무 오래된 image 무시")
-    print("    3. C (preprocess BGR -> RGB)        - 색공간 변환")
-    print("    4. D (inference predict)            - VLAInference.predict()")
-    print("    5. A (action publish)               - 결과 발행")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem3_qos_match():
@@ -100,16 +85,10 @@ def problem3_qos_match():
         "instruction": ("", 0),
         "action": ("", 0),
     }
-    expected = {
-        "image_raw": ("BEST_EFFORT", 1),
-        "instruction": ("RELIABLE (transient_local)", 1),
-        "action": ("RELIABLE", 10),
-    }
     print("  당신의 QoS:")
     for k, v in qos.items():
-        mark = "[O]" if v == expected[k] else "[X]"
-        print(f"  {mark} {k}: {v}")
-        print(f"      (기대: {expected[k]})")
+        print(f"    {k}: {v}")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 if __name__ == "__main__":

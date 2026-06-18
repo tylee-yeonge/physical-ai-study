@@ -25,12 +25,11 @@ def p2():
     print("  large batch (4096+): negative 많음 -> 강한 학습")
     print()
     # TODO
-    n_neg_32 = 0  # 32 - 1
-    n_neg_4096 = 0  # 4095
-    expected_32 = 31
-    expected_4096 = 4095
-    print(f"  배치 32 의 negative: {n_neg_32} (기대 {expected_32})")
-    print(f"  배치 4096 의 negative: {n_neg_4096} (기대 {expected_4096})")
+    n_neg_32 = 0  # batch - 1
+    n_neg_4096 = 0  # batch - 1
+    print(f"  배치 32 의 negative: {n_neg_32}")
+    print(f"  배치 4096 의 negative: {n_neg_4096}")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def p3():

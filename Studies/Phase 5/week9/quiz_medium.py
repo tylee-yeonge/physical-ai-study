@@ -10,9 +10,9 @@ def p1():
 
     # TODO: vision 비중
     vis_pct = 0.0
-    expected = vis_tokens / total * 100
     print(f"  Vision: {vis_tokens}, Text: {text_tokens}, Total: {total}")
-    print(f"  당신: {vis_pct:.1f}% (기대 {expected:.1f}%)")
+    print(f"  당신: {vis_pct:.1f}%")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def p2():
@@ -22,11 +22,8 @@ def p2():
     llama_lora_r32 = 65e6  # ~ 65M
     # TODO
     total = 0.0
-    expected = projector + llama_lora_r32
-    base = 7e9
-    pct = expected / base * 100
-    print(f"  당신: {total/1e6:.1f}M (기대 {expected/1e6:.1f}M)")
-    print(f"  Base model 7B 대비: {pct:.2f}%")
+    print(f"  당신: {total/1e6:.1f}M")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def p3():
@@ -38,9 +35,8 @@ def p3():
     print("  Reserve for response       : 20")
     # TODO
     total = 0
-    expected = 452 + 10 + 20 + 20  # 502
-    print(f"  당신: {total} (기대 {expected})")
-    print(f"  Llama 2 의 max context 4096 에 비해 작음 (12%)")
+    print(f"  당신: {total}")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 if __name__ == "__main__":

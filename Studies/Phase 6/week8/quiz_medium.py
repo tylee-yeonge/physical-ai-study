@@ -9,9 +9,8 @@ def p1():
     real_act = 10  # Dynamixel
     # TODO
     total = 0
-    expected = inf + sim + real_act  # 210
     print(f"  Inference + Sim + Real = {total} ms")
-    print(f"  기대: {expected} ms")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def p2():
@@ -21,9 +20,9 @@ def p2():
     gap_ms = 30
     # TODO
     error = 0.0
-    expected = speed * gap_ms / 1000  # 3 mm
-    print(f"  Error = speed * gap = {expected*1000:.1f} mm (기대 ~3)")
+    print(f"  Error = {error*1000:.1f} mm")
     print(f"  자작 팔 cm 단위 manipulation 에 영향")
+    print("  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def p3():

@@ -49,9 +49,8 @@ def problem2_seo_title():
 
     answer = ""  # TODO
 
-    expected = "C"
     print(f"  당신의 답: {answer}")
-    print(f"  기대 답  : {expected}")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 def problem3_metric_consistency():
@@ -77,13 +76,10 @@ def problem3_metric_consistency():
     # TODO
     preferred = ""
 
-    expected_options = ["a", "b"]  # a 또는 b 둘 다 OK, 한 글 안에서 일관성이 중요
     print(f"  당신의 권장 표기: {preferred}")
-    print(f"  기대 (둘 중 하나, 일관성): {expected_options}")
     print()
-    print("  [tip] 'a (165 ms)' 가 SI 표기 표준 (단위와 수치 사이 공백).")
-    print("       'b (165ms)' 도 일반적으로 통용.")
-    print("       어느 쪽을 쓰든 글 안에서 일관되게.")
+    print("  [tip] 핵심은 어느 표기를 고르든 글 전체에서 일관되게 쓰는 것.")
+    print("\n  정답은 quiz_solutions/medium_sol.py 참고")
 
 
 if __name__ == "__main__":
