@@ -222,17 +222,7 @@ print(f"twist : {twist}")
 
 
 
-# -- 2-3. timestamp 측정 --
 if HAS_ROS:
-    print("\n[2-5] Timestamp 측정 시뮬레이션")
-    import time
-    t_image_msg = rclpy.clock.Clock().now()
-    time.sleep(0.15) # 150ms inference 시뮬레이션
-    t_action_msg = rclpy.clock.Clock().now()
-    latency_ms = (t_action_msg - t_image_msg).nanoseconds / 1e6
-    print(f"image stamp -> action stamp = {latency_ms:.1f} ms (inference latency)")
-
-
     rclpy.shutdown()
 
 

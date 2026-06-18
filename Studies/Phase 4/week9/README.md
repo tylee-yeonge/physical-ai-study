@@ -254,8 +254,7 @@ configure() -> activate() -> running -> deactivate() -> cleanup()
 1. spec 1 페이지 작성 (`vla_io_spec.md`)
 2. `practice_msg_conversion.py` - msg <-> Python 변환 코드
 3. cv_bridge 사용법 익히기
-4. timestamp 측정 시뮬레이션
-5. quiz_easy / quiz_medium
+4. quiz_easy / quiz_medium
 
 
 ### 다음 주 (week 10) 준비
