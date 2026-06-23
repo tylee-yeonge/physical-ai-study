@@ -327,16 +327,30 @@ skim 목적은 구현에 필요한 사실 확인이지 정독이 아니다. 항�
 
 - [x] `week8/README.md` + `week8/PRACTICE.md` 실습 1-4 (VLAInference class / image preprocess / exceptions·config / 100회 stress test) + quiz
 - [x] `week9/README.md` + `week9/PRACTICE.md` 실습 1-3 (I/O spec 1페이지 / msg <-> Python 변환 / BGR->RGB 검증) + quiz
-- [ ] `week10/README.md` + `week10/PRACTICE.md` 실습 1-4 (vla_node 패키지 생성 / 골격 노드 / setup.py / 빌드+실행, 실습 5 dummy image 는 선택) + quiz
+- [x] `week10/README.md` + `week10/PRACTICE.md` 실습 1-4 (vla_node 패키지 생성 / 골격 노드 / setup.py / 빌드+실행, 실습 5 dummy image 는 선택) + quiz
 - [ ] `week11/README.md` + `week11/PRACTICE.md` 실습 1-3 (실 inference 통합 / 빌드+실행 / 1분 dry-run + 통계) — 입력은 순서 3 에서 선정한 sim 으로 연결 (자료의 ros2 bag 재생은 대체 수단) + quiz
 - [ ] `week12/README.md` + `week12/PRACTICE.md` 실습 1-2 (Rerun 기본 / rerun_logger 노드) — 영상 제작(실습 3-5)은 순서 7 로 후행 + quiz
 
 ## 순서 5 — 성공률 측정 + 결과 정리 (6월 5주차 목표 6/30(5h 추세 시 7월 첫 주 일부), 22h)
 
-- [ ] 정의된 task 를 N회 시도, 성공률 기록 — 측정/통계 코드는 `week11/PRACTICE.md` 실습 3 패턴 재사용
+- [ ] 정의된 task 를 N회 시도, 성공률 기록 — 측정 루프는 신규 작성, 통계 출력부만 `week11/PRACTICE.md` 실습 3 재사용
+  - [ ] 설치된 ManiSkill 에서 PickCube `success` 플래그의 임계값/축 1회 확인 (위 "성공 task 정의" 노트 = 반경 약 2.5cm + 정지, 버전마다 다를 수 있음)
+  - [ ] step cap 확정 — 잠정 100 step, 실제 episode 가 도는 것을 보고 결정
+  - [ ] N episode 측정 루프 작성: 매 시도 seed 변경 → `env.reset` → vla action 으로 step → `success==True` 또는 step cap 까지 반복
+  - [ ] 통계/출력 골격은 실습 3 의 `np.array` -> mean/p95 부분 재사용, 성공 카운트 로직은 신규 (실습 3 은 latency 분석이라 성공률 코드는 없음)
+  - [ ] 기록값 = 성공 횟수 / N 산출 (N=20 베이스라인, 예산 절삭 시 하한 10). 임계 통과가 아니라 수치 자체가 산출물
 - [ ] mean/p95 latency 실측 + task 제어 주기 충족 여부 판정 (`week8/PRACTICE.md` 실습 체크리스트의 확정 기준)
+  - [ ] 순서 4 week11 dry-run 이 산출한 mean/p95/throughput 수치 가져오기 (순서 5 에서 새로 재지 않음)
+  - [ ] 전체 제어 루프 2 Hz 이상(step 500 ms 이하) 충족 여부 판정 (위 "제어 주기 요구 확정" 노트)
+  - [ ] dry-run 환경 무관 통과 조건 확인: `0 fail` / 노드 안 죽음 / GPU < 10 GB
+  - [ ] 500 ms 초과로 2 Hz 밑이면 placeholder 가 아니라 실측 기반으로 기준 재조정 + 사유 메모
 - [ ] 결과 표 정리 — `week12/PRACTICE.md` 실습 5 의 "측정 결과" 표 형식 참고. 여기까지가 v1 기술 코어 (6/30 목표)
+  - [ ] week12 표 형식(Mean / p95 / Throughput / GPU Memory)에 성공률 행 추가해 작성
+  - [ ] 한계 명시: N=20 신뢰구간이 넓음(50% 부근 약 ±22%p), baseline 용도로만 사용 — 정밀치는 Phase 4.5 eval harness 에서 재측정
 - [ ] **8월 초 체크포인트 수행** — "진행 원칙"의 입력으로 8-12월 예산·배치 확정 (순서 6-7 잠정치 갱신, v1.5 조기 진입 여부 결정)
+  - [ ] 6-7월 실제 진척 속도(시간/일 추세) vs 계획 대조
+  - [ ] 8-12월 가용 예산 재산정 → 순서 6-7 잠정치 갱신
+  - [ ] v1.5(Phase 4.5) 조기 진입 여부 결정
 
 ## 순서 6 — week1-7 정독 + 블로그 2편 (8-9월)
 
