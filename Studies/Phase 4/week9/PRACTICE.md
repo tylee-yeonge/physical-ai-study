@@ -291,12 +291,12 @@ print("\n 실습 3 완료!")
 ## 실습 체크리스트
 
 
-- [ ] `vla_io_spec.md` 산출 (1 페이지)
-- [ ] `practice_msg_conversion.py` 실행
-  - [ ] OpenCV <-> ROS Image round-trip 성공
-  - [ ] action -> Twist + gripper 변환
-- [ ] `practice_bgr_rgb_check.py` 실행, 시각화 확인
-- [ ] quiz_easy / quiz_medium 풀기
+- [x] `vla_io_spec.md` 산출 (1 페이지)
+- [x] `practice_msg_conversion.py` 실행
+  - [x] OpenCV <-> ROS Image round-trip 성공
+  - [x] action -> Twist + gripper 변환
+- [x] `practice_bgr_rgb_check.py` 실행, 시각화 확인
+- [x] quiz_easy / quiz_medium 풀기
 
 
 ---
