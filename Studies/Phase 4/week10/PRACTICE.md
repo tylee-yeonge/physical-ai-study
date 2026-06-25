@@ -508,7 +508,7 @@ ros2 topic list | grep camera
 - [x] ros2 topic list 에서 /vla/* 보임
 - [x] ros2 topic echo /vla/action 가 0.0 0.0 ... publish 확인
 - [x] git commit (ROS2 workspace 의 vla_node 만)
-- [ ] quiz_easy / quiz_medium
+- [x] quiz_easy / quiz_medium
 
 
 ---
