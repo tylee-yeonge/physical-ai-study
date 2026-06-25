@@ -49,26 +49,13 @@
 ### 1. VLAInference 를 ROS2 패키지에서 import
 
 
-방법 1: ROS2 workspace 안에 vla_inference 를 별도 ament_python 패키지로:
+week 8 의 `vla_inference` 패키지를 ROS2 노드에서 그대로 import 하려면, 그 패키지를 ROS2 workspace 안으로 가져와 노드 실행 환경 (공용 venv) 에 설치해야 한다.
 
 
-```bash
-cd ~/ros2_ws/src
-# week 8 의 vla_inference 디렉토리를 여기로 복사 / git submodule
-cp -r ~/phase4_notes/week8/vla_inference .
-# ros2 ament_python 패키지로 wrap
-```
+`/workspace/phase4_workspace/vla_inference` (week 8 결과물) 을 ROS2 workspace 의 `src/vla_inference` 로 복사한 뒤, 그 위치에서 공용 venv 에 pip editable 설치 (`pip install -e`) 한다. 이렇게 하면 import 경로 (`from vla_inference...`) 가 그대로 유지되고 week 8 라이브러리와 ROS 노드의 분리도 보존된다.
 
 
-방법 2: vla_inference 를 system Python 으로 pip install:
-
-
-```bash
-pip install -e ~/phase4_notes/week8/vla_inference
-```
-
-
-본 phase 권장: 방법 2 (단순, ROS2 workspace 와 분리).
+구체적인 복사·설치 절차는 [`PRACTICE.md`](PRACTICE.md) 의 "환경 설정" (Step 0) 에서 수행한다.
 
 
 ### 2. 노드 코드 통합 (week 10 -> week 11)
