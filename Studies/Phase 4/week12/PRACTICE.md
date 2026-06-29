@@ -58,26 +58,32 @@ print("실습 1: Rerun 기본")
 print("=" * 60)
 
 
-# 초기화 (UI 자동 spawn)
-rr.init("phase4_week12_basic", spawn=True)
+# 초기화 (헤드리스 환경이라 GUI viewer 를 spawn 하지 않는다)
+rr.init("phase4_week12_basic")
+
+
+# 현재 위치에 현재 시각(YYYYMMDD_HHMMSS) 이름으로 .rrd 파일 싱크 설정.
+# 이후의 log 는 모두 이 파일로 스트리밍된다.
+filename = time.strftime("%Y%m%d_%H%M%S") + ".rrd"
+rr.save(filename)
 
 
 # 100 step 의 가짜 stream
 for t in range(100):
-    rr.set_time_sequence("step", t)
+    rr.set_time("step", sequence=t)
 
 
     # 1. Image
     img = (np.random.rand(224, 224, 3) * 255).astype(np.uint8)
-    rr.log("camera/image", rr.Image(img))
+    rr.log("camera/image_raw", rr.Image(img))
 
 
     # 2. Scalar (latency)
-    rr.log("vla/latency_ms", rr.Scalar(150 + np.random.randn() * 20))
+    rr.log("vla/latency_ms", rr.Scalars(150 + np.random.randn() * 20))
 
 
     # 3. Scalar (gripper)
-    rr.log("vla/gripper", rr.Scalar(np.sin(t * 0.1) * 0.5 + 0.5))
+    rr.log("vla/gripper", rr.Scalars(np.sin(t * 0.1) * 0.5 + 0.5))
 
 
     # 4. Text (instruction)
@@ -96,8 +102,8 @@ for t in range(100):
     time.sleep(0.05) # 20 Hz
 
 
-print("\n Rerun UI 에서 시각화 확인.")
-print("Recording 저장: rr.save('/path/to/file.rrd')")
+print(f"\nsaved: {filename}")
+print("로컬(맥북 등)에서 'rerun <파일명>.rrd' 로 열어 확인.")
 print("\n 실습 1 완료!")
 ```
 
@@ -108,7 +114,7 @@ python practice_rerun_basic.py
 ```
 
 
-브라우저에서 http://localhost:9876 자동 열림.
+실행하면 현재 위치에 `<시각>.rrd` 파일이 생성된다. 헤드리스 서버라 GUI 가 안 뜨므로, 이 파일을 로컬(맥북 등)로 내려받아 `rerun <시각>.rrd` 로 연다.
 
 
 ---
@@ -126,6 +132,7 @@ ROS topics -> Rerun 시각화
 """
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import qos_profile_sensor_data
 import rerun as rr
 from cv_bridge import CvBridge
 
@@ -142,12 +149,16 @@ class RerunLogger(Node):
         super().__init__('rerun_logger')
 
 
-        rr.init('vla_demo', spawn=True)
+        # 헤드리스: GUI spawn 대신 gRPC 서버로 띄워 로컬 viewer 가 connect
+        rr.init('vla_demo', spawn=False)
+        rr.serve_grpc(grpc_port=9876)
         self.bridge = CvBridge()
 
 
+        # 카메라 publisher 가 BEST_EFFORT(sensor data) 라 구독도 같은 QoS 로 맞춘다.
+        # 기본 QoS(RELIABLE) 로 구독하면 불호환이라 이미지가 수신되지 않는다.
         self.image_sub = self.create_subscription(
-            Image, '/camera/image_raw', self.on_image, 1)
+            Image, '/camera/image_raw', self.on_image, qos_profile_sensor_data)
         self.action_sub = self.create_subscription(
             Twist, '/vla/action', self.on_action, 10)
         self.gripper_sub = self.create_subscription(
@@ -170,20 +181,20 @@ class RerunLogger(Node):
 
 
     def on_action(self, msg):
-        rr.log("vla/action/linear_x", rr.Scalar(msg.linear.x))
-        rr.log("vla/action/linear_y", rr.Scalar(msg.linear.y))
-        rr.log("vla/action/linear_z", rr.Scalar(msg.linear.z))
-        rr.log("vla/action/angular_x", rr.Scalar(msg.angular.x))
-        rr.log("vla/action/angular_y", rr.Scalar(msg.angular.y))
-        rr.log("vla/action/angular_z", rr.Scalar(msg.angular.z))
+        rr.log("vla/action/linear_x", rr.Scalars(msg.linear.x))
+        rr.log("vla/action/linear_y", rr.Scalars(msg.linear.y))
+        rr.log("vla/action/linear_z", rr.Scalars(msg.linear.z))
+        rr.log("vla/action/angular_x", rr.Scalars(msg.angular.x))
+        rr.log("vla/action/angular_y", rr.Scalars(msg.angular.y))
+        rr.log("vla/action/angular_z", rr.Scalars(msg.angular.z))
 
 
     def on_gripper(self, msg):
-        rr.log("vla/gripper", rr.Scalar(msg.data))
+        rr.log("vla/gripper", rr.Scalars(msg.data))
 
 
     def on_latency(self, msg):
-        rr.log("vla/latency_ms", rr.Scalar(msg.data))
+        rr.log("vla/latency_ms", rr.Scalars(msg.data))
 
 
     def on_instruction(self, msg):
@@ -227,6 +238,12 @@ source install/setup.bash
 # 두 노드 동시 실행
 ros2 run vla_node vla_inference_node &
 ros2 run vla_node rerun_logger
+```
+
+
+**로컬(맥북)에서 viewer 연결** (VSCode Tunnel PORTS 에서 9876 forward 필요):
+```bash
+rerun --connect rerun+http://localhost:9876/proxy
 ```
 
 
@@ -411,15 +428,15 @@ git push
 ## 실습 체크리스트
 
 
-- [ ] Rerun 기본 사용 (`practice_rerun_basic.py`)
-- [ ] rerun_logger ROS 노드 작성 + 빌드
-- [ ] 영상 시나리오 작성 (`video_script.md`)
-- [ ] 1분 녹화 + 편집 + 자막
-- [ ] `Portfolio/01_VLA_v1/` 디렉토리 생성
-- [ ] README + mp4 + 데이터 commit
-- [ ] git push
-- [ ] LinkedIn / Twitter 공유 (선택)
-- [ ] quiz_easy / quiz_medium
+- [x] Rerun 기본 사용 (`practice_rerun_basic.py`)
+- [x] rerun_logger ROS 노드 작성 + 빌드
+- [-] 영상 시나리오 작성 (`video_script.md`)
+- [-] 1분 녹화 + 편집 + 자막
+- [-] `Portfolio/01_VLA_v1/` 디렉토리 생성
+- [-] README + mp4 + 데이터 commit
+- [-] git push
+- [-] LinkedIn / Twitter 공유 (선택)
+- [x] quiz_easy / quiz_medium
 
 
 ---
