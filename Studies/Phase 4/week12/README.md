@@ -1,9 +1,12 @@
 # Week 12: Rerun 시각화 + 1분 데모 영상 마감
 
 
-> **이번 주 목표**: Rerun.io 로 inference 시각화 (image / instruction / action / latency) + 1분 영상 제작. Phase 4 의 산출물 v1 의 마지막 1/3 (ROS2 minimal demo + 1분 영상) 완성.
-> **예상 시간**: 10시간 (Rerun 통합 4h + 영상 녹화 3h + 편집 + 자막 3h)
-> **핵심 질문**: "면접관이 1분 영상만 봐도 'OpenVLA inference + ROS2 통합' 의 핵심 흐름을 이해할 수 있는가?"
+> **[v1 범위 조정 — 2026-06]** 이 주차의 **1분 영상 제작(실습 3-5)은 v1 에서 제외하고 v2(Phase 6)로 이관**했다. v1 에서는 **Rerun 시각화(실습 1-2)만 레포 결과 기록용으로 선택 수행**한다 (스크린샷 또는 짧은 gif 1장이면 충분). 아래 영상 시나리오·자막·패키징 내용은 v2 공개 단계에서 사용할 참조 자료로 보존한다. 결정 배경: `Roadmap/Phase 4.md` "산출물 v1" 절.
+
+
+> **이번 주 목표 (v1)**: Rerun.io 로 inference 시각화 (image / instruction / action / latency) — 레포 결과 기록용 스크린샷/gif. (원안의 1분 영상 제작은 v2 로 이관.)
+> **예상 시간 (v1)**: 약 4시간 (Rerun 통합만; 영상 녹화·편집·자막은 v2)
+> **핵심 질문 (v1)**: "Rerun 한 화면에서 image / action / latency 가 시간 동기화되어 보이는가?" (영상 어필 질문은 v2 로 이관)
 
 
 ---
@@ -28,11 +31,12 @@
 ## 시작하기 전에 — Phase 4 의 결말
 
 
-이번 주가 끝나면 **산출물 v1 완성**:
-- 블로그 2 편 (RT-2 + OpenVLA, week 3 + week 7)
-- OpenVLA -> ROS2 토픽 minimal demo (week 8-11)
-- **1분 데모 영상** (이번 주)
-- 발행: `physical-ai-study` 레포의 `Portfolio/01_VLA_v1/`
+v1 의 종착점은 **순서 5(성공률 측정 + 레포 결과 기록)** 다. 이 주차에서 v1 범위는 Rerun 시각화(레포 기록용)까지다:
+- OpenVLA -> ROS2 토픽 minimal demo + sim 단일 task 루프 (week 8-11)
+- Rerun 시각화 스크린샷/gif (이번 주, 레포 기록용 선택)
+- 레포 기록: README + 성공률 표 + latency 수치
+
+v2(Phase 6)로 이관된 것: 블로그 2편(RT-2 + OpenVLA) + 1분 데모 영상 + 패키징 + velog/LinkedIn 외부 공개.
 
 
 ---

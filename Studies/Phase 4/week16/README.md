@@ -1,6 +1,9 @@
 # Week 16: 산출물 v1 공개 + 다음 phase 진입 준비
 
 
+> **[v1 범위 조정 — 2026-06]** 이 주차(v1 외부 공개 + LinkedIn 공지)는 **v1 에서 제외하고 v2(Phase 6)로 이관**했다. v1 은 레포에 결과 기록만 남기고 외부 공개(velog/LinkedIn)는 하지 않는다 — 첫 외부 공개는 실제 팔이 결합되는 v2 에서 수행한다. 아래 공개 체크리스트·LinkedIn 패턴·회고 틀은 v2 공개 시 참조용으로 보존한다. (Phase 4 회고 자체는 순서 5 의 8월 초 체크포인트에서 가볍게 수행 가능.) 결정 배경: `Roadmap/Phase 4.md` "산출물 v1" 절.
+
+
 > **이번 주 목표**: 산출물 v1 (Portfolio/01_VLA_v1/) 를 GitHub Public 으로 공개 + LinkedIn 공지. Phase 5 진입 직전 정리. **Phase 4 마지막 주**.
 > **예상 시간**: 4시간 (publishing 2h + LinkedIn / 회고 2h)
 > **핵심 질문**: "내 산출물 v1 가 GitHub 검색 / LinkedIn 에 노출되는가? 면접관이 자연스럽게 발견할 수 있는가?"

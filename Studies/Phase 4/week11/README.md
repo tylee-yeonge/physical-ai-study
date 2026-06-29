@@ -37,7 +37,7 @@
 4. **latency 측정 데이터** 가 ROS topic 으로 publish
 
 
-다음 주 (week 12) 에 Rerun 시각화 + 1분 영상 제작.
+다음 주 (week 12) 에 Rerun 시각화 (레포 결과 기록용 선택). 1분 영상 제작은 v1 에서 제외하고 v2(Phase 6)로 이관했다.
 
 
 ---
@@ -279,8 +279,8 @@ ros2 topic echo /vla/latency_ms > latency.log
 
 
 ### 다음 주 (week 12) 준비
-- Rerun.io 설치 (https://rerun.io)
-- 화면 녹화 도구 (OBS / Kazam) 준비
+- Rerun.io 설치 (https://rerun.io) — 레포 결과 기록용 시각화(선택)
+- (1분 영상 녹화 도구 OBS / Kazam 준비는 v2 로 이관)
 
 
 ---
@@ -293,7 +293,7 @@ ros2 topic echo /vla/latency_ms > latency.log
 2. **image age check + preprocess + error handling** 의 표준 패턴.
 3. **1분 dry-run** 에서 0 fail, < 200ms mean latency.
 4. **ros2 bag** 으로 재현 가능한 테스트.
-5. **다음 주 영상 제작** 의 사전 준비.
+5. **다음 주 Rerun 시각화** (레포 기록용) 의 사전 준비. 1분 영상은 v2 로 이관.
 
 
 ---
