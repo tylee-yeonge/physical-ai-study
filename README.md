@@ -65,7 +65,7 @@ gantt
     Phase 7 (Real-to-Sim-to-Real, v3) :a6, 2027-08, 3M
     section 산출물 + 이직
     육아휴직 (~2027.03 복직) :active, leave, 2026-06, 9M
-    v1 레포 기록 (sim VLA 루프, 외부 공개는 v2) :milestone, d1, 2026-10, 0d
+    v1 레포 기록 (ROS2 dry-run, 외부 공개는 v2) :milestone, d1, 2026-10, 0d
     v1.5 공개 (LoRA adaptation) :milestone, d15, 2026-12, 0d
     복직 + 본격 실지원 개시 :milestone, d3, 2027-03, 0d
     본격 실지원 (복직 직후) :b2, 2027-03, 9M
@@ -94,8 +94,8 @@ gantt
 | 2026.01-02 | Stage 1 | Phase 0-1 (완료) | 환경 세팅, 수학 핵심 |
 | 2026.03-05 | Stage 1 | Phase 2: Perception 기하 기초 (완료) | 카메라 모델 + Multi-view |
 | 2026.06 초 | Stage 1 | Phase 3 완료 (**비공개 리허설**, 공개 산출물 아님) | VLA wrapper 리허설 |
-| 2026.06-09 | Stage 1 | **Phase 4 (메인 단독): VLA v1 — pretrained OpenVLA zero-shot 추론 + ROS2 wrapper + sim 단일 task 루프 + 정독** | **산출물 v1 (2026 하반기 레포 기록, 외부 공개는 v2)** |
-| 2026.11-12 | Stage 1 | **Phase 4.5: VLA v1.5 — OpenVLA LoRA adaptation + before/after 정량 분석** (sim 데이터, v1 자산 재사용) | **산출물 v1.5 (둘째 층 adaptation 증거)** |
+| 2026.06-09 | Stage 1 | **Phase 4 (메인 단독): VLA v1 — pretrained OpenVLA zero-shot 추론 + ROS2 wrapper + 카메라/bag dry-run 측정 + 정독** | **산출물 v1 (2026 하반기 레포 기록, 외부 공개는 v2)** |
+| 2026.11-12 | Stage 1 | **Phase 4.5: VLA v1.5 — sim 구축 + OpenVLA LoRA adaptation + before/after 정량 분석** (sim 데이터, v1 추론 노드 재사용) | **산출물 v1.5 (둘째 층 adaptation 증거)** |
 | 2026.06-08 (병행) | Stage 1 | **시장 신호 probe**: 타겟사 JD 5-10개 정독 + 현직자 커피챗 1-2건 + LinkedIn 헤드라인 교체 | 시장 실측 → 우선순위 보정 |
 | 2026.10 | Stage 1 | **하드웨어 스파이크 (2-3주)**: 2-DOF Dynamixel + ROS2 + URDF 파이프라인이 도는지만 검증 | 리스크 조기 검증 (분기 재평가 #1 입력) |
 | 2026.06-2027.03 | Career | **육아휴직** — 구직 지원(정찰 포함) 안 함, 학습·산출물 집중. 시장 신호 probe 만 저강도 유지 | 학습 집중 기간 |
@@ -196,23 +196,23 @@ gantt
 
 
 ### Phase 4: VLA v1 — OpenVLA zero-shot 추론 + ROS2 minimal demo (약 4개월, 2026.06-09)
-> **목표**: VLA 의 아키텍처 다이어그램을 막힘없이 읽을 수 있는 수준 + pretrained OpenVLA zero-shot inference 를 ROS2 토픽으로 받는 sim 단일 task 루프
+> **목표**: VLA 의 아키텍처 다이어그램을 막힘없이 읽을 수 있는 수준 + pretrained OpenVLA zero-shot inference 를 ROS2 토픽으로 받는 추론 루프 (카메라/bag dry-run 으로 latency/throughput 측정)
 > **선정 논문 (2편)**: RT-2, OpenVLA — 필요 시 분기 재평가에서 π0 / Helix / GR00T 로 갱신
-> **범위 (v1)**: pretrained zero-shot (LoRA adaptation 은 v1.5/Phase 4.5), sim embodiment (자작 팔은 v2), 단일 task N회 성공률
+> **범위 (v1)**: pretrained zero-shot (LoRA adaptation 은 v1.5/Phase 4.5), 카메라/bag dry-run (sim embodiment 결합 + task 성공률은 v1.5/Phase 4.5, 자작 팔은 v2), 단일 embodiment
 
 
 | 주차 | 내용 | 핵심 |
 |------|------|------|
 | 1-2,4-6 | RT-2 / OpenVLA 정독 (블로그 작성 week3·7 은 v2 이관) | Vision-Language → Action |
-| 8-12 | **OpenVLA zero-shot inference → ROS2 토픽 → sim 단일 task 루프 (v1)** | Brain ↔ Body 첫 통합 |
+| 8-12 | **OpenVLA zero-shot inference → ROS2 토픽 → 카메라/bag 추론 루프 dry-run (v1)** | Brain ↔ Body 첫 통합 |
 | 13-16 | 블로그 마무리 + 패키징 + 1분 영상 + 외부 공개 → **v2 이관** | (v1 제외) |
 
 > 진행 순서 변형: 2026.06-07 선행 투입 구간은 표적 skim → week8-12 실습 선행, week1-7 정독은 2026.08-09 후행 (역순 학습 원칙). 블로그 작성·1분 영상·패키징·외부 공개는 v2 로 이관. 상세: [`Roadmap/Phase 4.md`](./Roadmap/Phase%204.md)
 
 
 **산출물 v1** (2026 하반기까지 `physical-ai-study` 레포에 **결과 기록만**, 외부 공개는 v2 로 이관):
-- ROS2 패키지: OpenVLA zero-shot inference → `vla_action` 토픽 → sim 단일 task 루프 (N회 성공률 기록)
-- 레포 기록: README + 성공률 표 + latency 수치 (+ 선택 Rerun 시각화 스크린샷/gif)
+- ROS2 패키지: OpenVLA zero-shot inference → `vla_action` 토픽, 카메라/bag 입력으로 1분 dry-run (sim task 성공률은 v1.5/Phase 4.5)
+- 레포 기록: README + latency/throughput 표 (+ 선택 Rerun 시각화 스크린샷/gif)
 - RT-2/OpenVLA 정독 — 아키텍처 이해 (블로그 작성은 v2)
 - 1분 영상·블로그 작성·velog/LinkedIn 외부 공개는 v2(Phase 6)로 이관 — v1(sim zero-shot)은 공개 산출물로 약해 공개 푸시는 실제 팔이 결합되는 v2 로 통합
 - 한계 명시: v1 의 Body 는 sim, 실암 결합은 v2 예고
@@ -245,10 +245,10 @@ gantt
 |------|------|------|
 | 1-3 | Isaac Sim 환경 셋업 | Conda + Workstation |
 | 4-7 | URDF 임포트 + 디지털 트윈 | Sim Joint State ↔ Real Joint State 매칭 |
-| 8-12 | Sim/Real gap 측정 인프라 (LoRA 는 v1.5/Phase 4.5 로 이관) | latency / 반복성 / force / 시각, v1 성공률을 gap 분모로 |
+| 8-12 | Sim/Real gap 측정 인프라 (LoRA 는 v1.5/Phase 4.5 로 이관) | latency / 반복성 / force / 시각, v1.5 sim 성공률을 gap 분모로 |
 
 
-**산출물 v2 강화 카드 (헤드라인)**: 자작 팔에 FM 을 올렸을 때의 sim-to-real gap 을 수치로 측정·보고. "팔이 움직인다" 가 아니라 격차를 측정한 것이 핵심 신호. v1(sim) 성공률이 그 분모.
+**산출물 v2 강화 카드 (헤드라인)**: 자작 팔에 FM 을 올렸을 때의 sim-to-real gap 을 수치로 측정·보고. "팔이 움직인다" 가 아니라 격차를 측정한 것이 핵심 신호. v1.5(sim) 성공률이 그 분모.
 
 
 ### Phase 7: Real-to-Sim-to-Real → 산출물 v3 (3개월, 2027.08~) — 차별화 정점

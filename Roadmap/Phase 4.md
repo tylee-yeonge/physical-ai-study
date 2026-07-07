@@ -1,9 +1,9 @@
-# Phase 4: VLA v1 — OpenVLA zero-shot 추론 + ROS2 → sim 단일 task 루프
+# Phase 4: VLA v1 — OpenVLA zero-shot 추론 + ROS2 추론 루프 (카메라/bag dry-run)
 
 
 > **기간**: 약 4개월 (2026.06-09)
-> **목표**: VLA 아키텍처 다이어그램을 막힘없이 읽는 수준 + pretrained OpenVLA zero-shot inference 를 ROS2 토픽으로 받아 **sim 단일 task 루프를 닫는다**(N회 성공률 기록)
-> **범위 (v1)**: pretrained zero-shot (**LoRA adaptation 은 v1.5/Phase 4.5**), **sim embodiment** (자작 팔은 v2), 단일 task, 단일 embodiment
+> **목표**: VLA 아키텍처 다이어그램을 막힘없이 읽는 수준 + pretrained OpenVLA zero-shot inference 를 ROS2 토픽으로 받아 **추론 루프를 닫고**(카메라/bag 입력 → action 토픽) **1분 dry-run 으로 latency/throughput/안정성을 측정**한다. sim 단일 task 성공률은 Phase 4.5(v1.5)로 이관
+> **범위 (v1)**: pretrained zero-shot (**LoRA adaptation 은 v1.5/Phase 4.5**), 카메라/bag 입력 dry-run (**sim embodiment 결합 + task 성공률은 v1.5/Phase 4.5**, 자작 팔은 v2), 단일 embodiment
 > **언어**: **Python** + **ROS2 (rclpy)**
 > **하드웨어**: Ubuntu PC (RTX 4070) — HuggingFace inference / ROS2 노드 / 시각화
 > **주간 시간**: 2026.06-07 은 아래 "진행 순서 변형" 절의 예산(계획선 78h)을 따른다. 8월 이후는 8월 초 체크포인트에서 확정 (잠정 주 6-8시간)
@@ -16,23 +16,23 @@
 
 
 **핵심 산출물 (v1)**:
-- OpenVLA zero-shot inference → ROS2 토픽 → **sim 단일 task 루프 (N회 시도 성공률 기록)** + 레포 결과 기록 (README + 성공률 표 + latency 수치)
+- OpenVLA zero-shot inference → ROS2 토픽 → **추론 루프 (카메라/bag 입력 → action 토픽, 1분 dry-run 측정)** + 레포 결과 기록 (README + latency/throughput 표). sim 단일 task 성공률은 Phase 4.5 로 이관
 - RT-2/OpenVLA 정독 — 아키텍처를 막힘없이 설명하는 수준 (블로그 작성은 v2 로 이관)
 
 
 **산출물 v1** (2026 하반기까지 `physical-ai-study` 레포에 **결과 기록만**, 외부 공개는 v2 로 이관):
-- ROS2 패키지: OpenVLA zero-shot inference → `vla_action` 토픽 → sim 단일 task 루프 + (선택) Rerun 시각화 스크린샷/짧은 gif
-- 레포 기록: README + 성공률 표 + latency 수치. velog/LinkedIn 외부 공개와 1분 영상·블로그 작성은 v2(Phase 6)로 이관
-- **성공 기준**: "추론 루프가 닫힌다"(action 텐서 출력)는 불충분. "정의된 task 1종(예: pick-and-place)에서 N회 시도 성공률 기록"이 어필 기준.
-- 한계 명시: v1 의 Body 는 sim, 실암 결합은 v2 예고
+- ROS2 패키지: OpenVLA zero-shot inference → `vla_action` 토픽, 카메라/bag 입력으로 1분 dry-run + (선택) Rerun 시각화 스크린샷/짧은 gif
+- 레포 기록: README + latency/throughput 표. velog/LinkedIn 외부 공개와 1분 영상·블로그 작성은 v2(Phase 6)로 이관
+- **성공 기준 (v1)**: 추론 루프가 닫히고(카메라/bag 이미지 입력 → action 토픽 연속 발행) 1분 dry-run 에서 mean/p95 latency·throughput·`0 fail`·GPU<10GB 를 측정·기록. sim 단일 task 성공률(N회)은 sim embodiment 결합이 필요하므로 Phase 4.5(v1.5)로 이관 — v1 에서는 task 성공 여부를 판정하지 않는다.
+- 한계 명시: v1 은 sim 없이 카메라/bag dry-run 까지. sim task 성공률은 v1.5, 실팔 결합은 v2 예고
 
-> **v1 범위 축소 결정 (2026-06)**: v1(sim zero-shot)은 공개 산출물로 약해, 다듬은 영상·블로그·패키징·LinkedIn 공개에 50-70h 를 투입하는 것은 오배치다. 공개 푸시는 실제 팔이 결합되는 v2 가 훨씬 강하므로 **블로그 작성·1분 영상·패키징·외부 공개를 모두 v2 로 이관**한다. v1 은 sim 기술 코어(추론 루프 + 성공률) + 정독(이해)까지를 레포에 기록하는 것으로 정의한다. RT-2/OpenVLA 정독은 v2 블로그의 배경으로 재사용된다.
+> **v1 범위 축소 결정 (2026-06)**: (1) 공개 측면 — v1 은 공개 산출물로 약해, 다듬은 영상·블로그·패키징·LinkedIn 공개에 50-70h 를 투입하는 것은 오배치다. 공개 푸시는 실제 팔이 결합되는 v2 가 훨씬 강하므로 **블로그 작성·1분 영상·패키징·외부 공개를 모두 v2 로 이관**한다. (2) sim 측면 — sim(ManiSkill) 은 v1 에서 한 번도 구축되지 않았고, sim zero-shot 성공률은 도메인 갭으로 0% 근처 + N=20 신뢰구간이 ±22%p 라 통계적 의미가 약하다. sim 구축·정합·성공률 측정은 sim 을 본격 쓰는 Phase 4.5(eval harness)로 이관하고, **v1 은 sim 없이 추론 루프 dry-run(latency/throughput) + 정독(이해)까지를 레포에 기록**하는 것으로 정의한다. ManiSkill 선정·PickCube 정의·제어 주기 분석(notes.md 순서 3)은 4.5 에서 재사용한다. RT-2/OpenVLA 정독은 v2 블로그의 배경으로 재사용된다.
 
 
 > **선정 논문 (2편)**: RT-2, OpenVLA — 2026.11 분기 재평가에서 π0 / Helix / GR00T 등으로 갱신 가능. "현 세대 FM 배포"가 어필 포인트이므로 v1 착수 시 세대 점검 1회.
 
 
-> **후속 산출물 예고**: v1.5(Phase 4.5) = adaptation(LoRA) / v2(Phase 6) = deployment(sim-to-real gap) / v3(Phase 7) = Real-to-Sim-to-Real 정점. 본 Phase 의 ROS2 wrapper + sim 루프 + 성공률 baseline 은 v1.5 의 eval harness 로 그대로 재사용되고, 이후 자작 팔과 결합된다.
+> **후속 산출물 예고**: v1.5(Phase 4.5) = adaptation(LoRA) + sim 결합·성공률 측정 / v2(Phase 6) = deployment(sim-to-real gap) / v3(Phase 7) = Real-to-Sim-to-Real 정점. 본 Phase 의 ROS2 wrapper(추론 노드 + `vla_action` 토픽)는 v1.5 의 eval harness 로 그대로 재사용되고, sim 환경 구축과 zero-shot 성공률 baseline 측정은 v1.5 에서 처음 수행된다. 이후 자작 팔과 결합된다.
 
 
 ---
@@ -51,18 +51,18 @@
 | 1 | `SETUP.md` (week 아님) | Step 0: 환경 구축 + 레포 청소 + 4-bit 로드 + latency/VRAM 실측 (실측 코드는 `week6` 실습 1-2 선행 수행) | 6월 2주차 | 6h |
 | 2 | `week4`-`week5` 일부만 | 표적 skim: action 표현 / unnorm_key / 입력 형식 / embodiment 가정 (+ OpenVLA 모델 카드, 공식 repo README). 정독 아님 — 정독은 순서 6 | 6월 2-3주차 | 4h |
 | 3 | `week11` 일부 선행 | sim 환경 선정 + embodiment 정합 + 성공 task 1종 정의 (→ latency 판정 수치 확정) | 6월 2-3주차 | 12h |
-| 4 | `week8` → `week9` → `week10` → `week11` → `week12` | 실습 압축: VLAInference → ROS2 노드 → sim 단일 task 루프 | 6/17 - 6/26(목표) | 34h |
-| 5 | `week11`-`week12` 마무리 | 성공률 N회 측정 + 결과 정리 | 6/29 - 6/30(목표), 5h 추세 시 7월 첫 주 일부 | 22h |
+| 4 | `week8` → `week9` → `week10` → `week11` → `week12` | 실습 압축: VLAInference → ROS2 노드 → 카메라/bag 1분 dry-run | 6/17 - 6/26(목표) | 34h |
+| 5 | `week11`-`week12` 마무리 | dry-run 결과 정리 (latency/throughput 표) + 8월 체크포인트 | 6/30(목표) | 4h |
 | 6 | `week1`,`week2`,`week4`,`week5`,`week6` (정독만) | RT-2/OpenVLA 정독 — 아키텍처 이해 (블로그 작성 `week3`/`week7` 은 v2 로 이관) | 8-9월 | 20-30h 잠정 — 8월 초 체크포인트에서 갱신 |
 | (이관) | `week3`,`week7`,`week12`(실습 3-5),`week13`-`week16` | 블로그 작성 + 패키징 + 1분 영상 + 외부 공개 → **v2(Phase 6)로 이관** | (v2) | (v1 제외) |
 
-- 순서 1-5 (6-7월) 합계 **78h** = 계획선 정합. 최대 가용(96h)과의 차이 약 18h 는 버퍼로, 막히는 구간(실습/측정)에 흡수한다.
-- 2026-06-17 갱신: 순서 1-3 완료(6+4+12 = 22h 소진). 잔여 순서 4-5 = 56h 를 6월 잔여(50-80h, 평일 10일)에 배치. 6월 내 완주가 기준선이며, 5h 추세로 미달 시 절삭 규칙(notes.md) 발동 + 최대 약 6h 만 7월 첫 주 이월.
+- 순서 1-5 (6-7월) 합계 약 **60h** = 계획선 (순서 5 가 성공률 측정 제외로 22h→4h 로 축소). 최대 가용(96h)과의 차이는 버퍼로, 막히는 구간(실습·통합·dry-run 디버깅)에 흡수한다.
+- 2026-06-17 갱신: 순서 1-3 완료(6+4+12 = 22h 소진). 잔여 순서 4-5 = 38h 를 6월 잔여(50-80h, 평일 10일)에 배치. 6월 내 완주가 기준선이며, 5h 추세로 미달 시 절삭 규칙(notes.md) 발동.
 
 
-- **계획선 미달 시 절삭 순서**: (1) 버퍼 소진 → (2) 성공률 측정 N 축소 → (3) 측정 항목 축소 (latency 분포는 유지, 부가 지표 절삭). v1 산출물 정의(루트 README 부록 B)를 건드리는 절삭은 별도 의사결정 — 발동 시 부록 B 갱신 + 2026.11 분기 재평가 #1 안건 등재가 전제다.
-- **작업-시간 매칭**: 연속 블록(통합·디버깅·dry-run)은 6월 종일 가용일에 우선 배치한다. 순서 5 측정 반복·quiz 는 짧은 블록에서도 가능하므로 7월 단시간 가용일의 흡수처로 둔다.
-- **8월 초 체크포인트**: v1 기술 코어(순서 5) 확보 직후 8-12월 예산·배치를 확정한다. 입력: 7월 실가용 실적(사후 집계), v1 진행 결과. 1순위 검토 안건: Phase 4.5(v1.5) 의 9-10월 조기 진입 — 2026.11 분기 재평가를 가설이 아닌 실물(v1.5 결과) 위에서 수행하기 위함. 순서 6 정독의 "20-30h" 는 이 체크포인트 전까지의 잠정치다.
+- **계획선 미달 시 절삭 순서**: (1) 버퍼 소진 → (2) dry-run 부가 지표 축소 (latency 분포는 유지, 그 외 절삭). (성공률 측정 N 축소는 sim 을 v1 에서 빼면서 더 이상 v1 절삭 대상이 아니다 — Phase 4.5 사안.) v1 산출물 정의(루트 README 부록 B)를 건드리는 절삭은 별도 의사결정 — 발동 시 부록 B 갱신 + 2026.11 분기 재평가 #1 안건 등재가 전제다.
+- **작업-시간 매칭**: 연속 블록(통합·디버깅·dry-run)은 6월 종일 가용일에 우선 배치한다. 순서 5 결과 정리·quiz 는 짧은 블록에서도 가능하므로 7월 단시간 가용일의 흡수처로 둔다.
+- **8월 초 체크포인트**: v1 기술 코어(순서 4) 확보 직후 8-12월 예산·배치를 확정한다. 입력: 7월 실가용 실적(사후 집계), v1 진행 결과. 1순위 검토 안건: Phase 4.5(v1.5) 의 9-10월 조기 진입 — 2026.11 분기 재평가를 가설이 아닌 실물(v1.5 결과) 위에서 수행하기 위함. 순서 6 정독의 "20-30h" 는 이 체크포인트 전까지의 잠정치다.
 - **RT-2 정독 후행**: RT-2 는 비공개 모델로 순수 개념용이므로 정독 전량을 8-9월로 이동한다. 6월의 표적 skim 은 구현에 필수인 부분집합(action 표현 / unnorm_key / 입력 형식 / embodiment 가정)만 다룬다. (RT-2 블로그 작성은 v2 로 이관 — 정독만 v1 범위.)
 
 ### 실행 체크리스트 (파일·섹션 단위)
@@ -80,7 +80,7 @@
 |---|---|---|
 | RT-2 / OpenVLA 논문 정독 | 디바이스 무관 | O |
 | HuggingFace inference 셋업 (4-bit 양자화) | Ubuntu PC (원격) | O |
-| ROS2 패키지 작성 + sim 단일 task 루프 | Ubuntu PC (원격) | O |
+| ROS2 패키지 작성 + 카메라/bag dry-run | Ubuntu PC (원격) | O |
 | 블로그 작성 | 디바이스 무관 | O |
 | (v1.5) LoRA 파인튜닝 | **Colab A100/L4 (클라우드) — Phase 4.5 범위** | O |
 
@@ -151,16 +151,16 @@ Output : /vla/action (팔: EE-delta [dx,dy,dz,rx,ry,rz] -> geometry_msgs/Twist +
 - 블로그 작성/공개는 v1 범위 아님. 위 "논문 reading" 의 정독(아키텍처 설명 가능)까지가 v1.
 
 
-### v1 sim 단일 task 루프
+### v1 ROS2 추론 루프 (카메라/bag dry-run)
 - [ ] 컴퓨트 점검 (4-bit OpenVLA 7B 가 RTX 4070 12GB 에서 OOM 없이 동작 + latency 제어 주기 이내)
-- [ ] OpenVLA zero-shot inference 동작 (sim embodiment 정합)
+- [ ] OpenVLA zero-shot inference 동작
 - [ ] `vla_node` ROS2 패키지 빌드 + 실행 (Phase 3 week8 스캐폴드 재사용)
-- [ ] 정의된 단일 task 에서 **N회 시도 성공률 기록** (단순 action 출력으로는 불충분)
+- [ ] **카메라/bag 입력으로 1분 dry-run**: action 토픽 연속 발행 + mean/p95 latency·throughput·`0 fail`·GPU<10GB 측정·기록 (sim task 성공률은 Phase 4.5 로 이관)
 - [ ] (선택) Rerun 시각화 스크린샷/짧은 gif 1장 — 레포 결과 기록용 (1분 영상 제작은 v2)
 
 
 ### 산출물 v1 레포 기록 (외부 공개는 v2 로 이관)
-- [ ] `physical-ai-study` 레포에 결과 기록: README + 성공률 표 + latency 수치
+- [ ] `physical-ai-study` 레포에 결과 기록: README + latency/throughput 표
 - 1분 영상·블로그 작성·velog/LinkedIn 외부 공개는 v2(Phase 6)에서 수행
 
 
@@ -170,7 +170,7 @@ Output : /vla/action (팔: EE-delta [dx,dy,dz,rx,ry,rz] -> geometry_msgs/Twist +
 ## Phase 4 완료 기준
 
 
-> "RT-2 와 OpenVLA 의 아키텍처를 막힘없이 설명할 수 있고, pretrained OpenVLA zero-shot inference 를 ROS2 토픽으로 받아 sim 단일 task 루프를 닫아 N회 성공률을 기록한다. 그리고 action representation 이 실제 제어 인터페이스 및 다른 플랫폼(이동 로봇) 과 어떻게 연결되는지 설명할 수 있다. 단순 action 출력은 통과가 아니다."
+> "RT-2 와 OpenVLA 의 아키텍처를 막힘없이 설명할 수 있고, pretrained OpenVLA zero-shot inference 를 ROS2 토픽으로 받아 추론 루프를 닫고(카메라/bag 입력 → action 토픽) 1분 dry-run 으로 latency/throughput/안정성을 측정·기록한다. 그리고 action representation 이 실제 제어 인터페이스 및 다른 플랫폼(이동 로봇) 과 어떻게 연결되는지 설명할 수 있다. 단순 1회 action 출력은 통과가 아니다 — 루프가 닫히고 dry-run 측정이 기록돼야 한다. (sim 단일 task 성공률은 Phase 4.5 범위.)"
 
 
 ---

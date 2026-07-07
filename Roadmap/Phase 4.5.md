@@ -1,8 +1,8 @@
 # Phase 4.5: VLA v1.5 — OpenVLA LoRA adaptation (before/after 정량 분석)
 
 
-> **기간**: 약 6-8주 (2026 하반기, v1 공개 직후 — v1 지연 최소화 원칙상 v1 우선)
-> **목표**: v1 의 zero-shot 베이스라인 위에서 OpenVLA 를 LoRA 로 **adaptation** 하고, 동일 sim task 의 성공률을 **before(zero-shot)/after(fine-tuned)** 로 비교·정량 분석한다.
+> **기간**: 약 7-10주 (2026 하반기, v1 레포 기록 직후 — v1 지연 최소화 원칙상 v1 우선). v1 에서 sim 을 제외하면서 **sim 환경 구축 + zero-shot baseline 측정이 본 Phase 로 이관**돼 원안(6-8주)보다 약 1-2주 늘었다.
+> **목표**: sim task 의 zero-shot 성공률 베이스라인을 **본 Phase 에서 측정**하고, 그 위에서 OpenVLA 를 LoRA 로 **adaptation** 한 뒤 동일 sim task 의 성공률을 **before(zero-shot)/after(fine-tuned)** 로 비교·정량 분석한다.
 > **범위 (v1.5)**: 경량 LoRA adaptation, **sim 생성 데이터** (자작 팔 데이터 대기 안 함), 단일 task, 동일 embodiment. real 데이터 확장은 Phase 7.
 > **언어**: **Python** (HuggingFace transformers + peft) + **ROS2 (rclpy)** (eval 루프 재사용)
 > **하드웨어**: 학습은 **Colab A100/L4** (24GB+ 필요), 추론·eval 은 **로컬 RTX 4070 + 4-bit 양자화**
@@ -27,7 +27,7 @@
 ## 왜 별도 Phase 인가 (3-Layer 좌표)
 
 
-- v1(Phase 4)은 **셋째 층** — 현 세대 FM 을 그대로 배포해 단일 task 루프를 닫는다(zero-shot).
+- v1(Phase 4)은 **셋째 층** — 현 세대 FM 을 그대로 배포해 추론 루프를 닫는다(zero-shot, 카메라/bag dry-run). sim task 성공률 측정은 본 Phase 로 이관됐다.
 - v1.5(본 Phase)는 **둘째 층** — FM 을 특정 태스크/환경에 맞추는 adaptation 의 증거. zero-shot 과 **대비**되어야 둘째 층 역량이 드러나므로 v1 과 섞지 않고 독립 산출물로 둔다.
 - LoRA 를 Phase 6(v2)에서 본 Phase 로 **전진 배치** 했다. Phase 6 은 sim-to-real gap(셋째 층)에 집중하고, 둘째 층 증거의 타이밍을 실지원(2027) 전으로 앞당긴다.
 
@@ -59,7 +59,7 @@
 |---|---|---|
 | OpenX-Embodiment | 사용 안 함 | OpenVLA 가 OpenX 970K 로 **사전학습됨** -> 이미 본 데이터 재학습은 adaptation 증거로 부적합 |
 | 자작 팔 teleop 데이터 | 대기 안 함 | 2027 이후라 둘째 층 증거가 실지원 타이밍보다 늦음 (real 확장은 Phase 7) |
-| **sim 생성 데이터** | **채택** | OpenVLA **미학습 분포**로 구성 가능 + 타이밍 확보. v1 의 sim 환경/embodiment 재사용 |
+| **sim 생성 데이터** | **채택** | OpenVLA **미학습 분포**로 구성 가능 + 타이밍 확보. v1 순서 3 의 sim 선정(ManiSkill)/embodiment 분석 재사용 (sim 환경 구축은 본 Phase 에서) |
 
 
 > 진입 시 점검: 생성한 sim 데이터가 OpenVLA 사전학습 분포와 **겹치지 않는지** 확인해야 adaptation 의 의미가 산다.
@@ -75,7 +75,7 @@
 |---|---|---|
 | LoRA 파인튜닝 | **Colab A100/L4** | OpenVLA 7B LoRA 는 24GB+ 필요 -> RTX 4070(12GB) 불가 |
 | 머지 + 4-bit 양자화 | 로컬 4070 | 약 6GB 로 축소 -> 12GB 안착 |
-| eval 추론 루프 | 로컬 4070 + ROS2 | Phase 4 의 `vla_node` / sim 루프 재사용 |
+| eval 추론 루프 | 로컬 4070 + ROS2 | Phase 4 의 `vla_node`(추론 노드) 재사용. sim 단일 task 루프는 본 Phase 에서 신규 구축 |
 
 
 - **가용성/비용이 변수**: A100 이 항상 잡히지 않음. L4 + gradient accumulation 으로 우회 가능(시간 증가).
@@ -93,8 +93,8 @@
 - [ ] fine-tuned 모델 4-bit 추론이 RTX 4070 12GB 에 OOM 없이 올라가는지 확인
 - [ ] sim 데이터 생성 방식 확정 (어느 sim, 어떤 task, 수집 규모) + OpenVLA 미학습 분포인지 점검
 - [ ] eval N 및 통계 처리(분산/신뢰구간) 기준 1차 결정
-- [ ] v1(Phase 4) 의 sim 환경 / 성공 task / 성공률 표가 baseline 으로 재사용 가능한지 확인
-- [ ] **before/after 측정 성립 구간 확인**: v1 task 의 zero-shot 성공률이 포화(개선 폭 안 보임)도 0% 근처(비교 무의미)도 아닌 **중간 구간**인지 점검. 벗어나면 Section 1 에서 task 난이도를 조정
+- [ ] **sim 환경 구축 + zero-shot 성공률 baseline 측정** (v1 순서 3 의 ManiSkill 선정/PickCube 정의 재사용, sim 자체는 v1 에 없으므로 본 Phase 에서 신규 구축)
+- [ ] **before/after 측정 성립 구간 확인**: sim task 의 zero-shot 성공률(본 Phase 측정)이 포화(개선 폭 안 보임)도 0% 근처(비교 무의미)도 아닌 **중간 구간**인지 점검. 벗어나면 Section 1 에서 task 난이도를 조정
 
 
 ---
@@ -105,7 +105,7 @@
 
 | 주차 | 내용 | 핵심 |
 |------|------|------|
-| 1 | sim task 정의 (**before/after 신호가 나올 난이도대 선정**) + 데이터 수집 (관측↔action 페어) + 미학습 분포 점검 | v1 환경 재사용, 규모는 LoRA 가 돌 최소선. task 는 zero-shot 이 어중간하게 되는 구간으로 |
+| 1 | sim task 정의 (**before/after 신호가 나올 난이도대 선정**) + 데이터 수집 (관측↔action 페어) + 미학습 분포 점검 | sim 환경은 Section 0 에서 구축(v1 순서3 ManiSkill 분석 재사용). 규모는 LoRA 가 돌 최소선. task 는 zero-shot 이 어중간하게 되는 구간으로 |
 | 2 | OpenVLA 학습 포맷으로 변환 (RLDS / 모델 카드 스키마 확인) | 데이터 포맷팅이 adaptation 의 절반 |
 
 
@@ -136,7 +136,7 @@
 | 6 | before/after 정량 분석 + 블로그 1편 + v1.5 공개 | negative 결과도 성립하는 논지 |
 
 
-> eval 은 v1 의 sim 단일 task 루프를 그대로 쓰되 모델만 zero-shot / fine-tuned 로 바꿔 N회 반복한다. 변인은 모델 하나로 고정.
+> eval 은 본 Phase 에서 구축한 sim 단일 task 루프를 쓰되 모델만 zero-shot / fine-tuned 로 바꿔 N회 반복한다. 변인은 모델 하나로 고정.
 
 
 ---
