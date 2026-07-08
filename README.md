@@ -6,6 +6,20 @@
 > **전제**: 2025.08 출생 딸과 함께하는 직장인 아빠, AMR ROS Application 개발자
 
 
+## 실측 결과 (Evidence)
+
+> 이 리포의 가장 강한 증거를 먼저 둔다. 상세 데이터·방법론·판단 근거: [`Measurements/openvla-rtx4070-int4/`](./Measurements/openvla-rtx4070-int4/)
+
+| 항목 | 결과 | 조건 |
+|---|---|---|
+| OpenVLA 7B int4 로드 | RTX 4070 12GB 에 OOM 없이 안착 (약 7GB) | bitsandbytes nf4 + transformers 4.40.1 |
+| 추론 latency | mean 300.3 ms / p95 304.8 ms / std 3.8 ms (n=100) | `predict_action` 단독, 전처리·ROS2 제외 |
+| throughput | 3.33 Hz | quasi-static 단일 task 적합 추정 |
+| int8 경로 | 배제 — 성공률 58.1% (int4 71.9%), 1.2 Hz | OpenVLA 논문 Table 2·§5.4 근거 + 실측 판단 |
+
+측정: 2026-06, 재측정 (방법론 보강 + p50/p99/VRAM peak) 2026-08 예정. Rerun 시각화 gif 는 확보 시 이 절에 추가 (4070 반납 전).
+
+
 ---
 
 

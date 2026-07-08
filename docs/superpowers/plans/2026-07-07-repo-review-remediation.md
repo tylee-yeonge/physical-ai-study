@@ -163,7 +163,7 @@ git commit -m "docs: adopt evidence retention policy with Measurements and Portf
 **Files:**
 - Modify: `README.md` (제목 blockquote 직후, 첫 `---` 앞에 섹션 삽입)
 
-- [ ] **Step 1: "실측 결과" 섹션 삽입**
+- [x] **Step 1: "실측 결과" 섹션 삽입**
 
 README.md:8 (전제 blockquote) 뒤에 다음 섹션을 삽입한다:
 
@@ -182,11 +182,11 @@ README.md:8 (전제 blockquote) 뒤에 다음 섹션을 삽입한다:
 측정: 2026-06, 재측정 (방법론 보강 + p50/p99/VRAM peak) 2026-08 예정. Rerun 시각화 gif 는 확보 시 이 절에 추가 (4070 반납 전).
 ```
 
-- [ ] **Step 2: 검증 — 렌더링 확인**
+- [x] **Step 2: 검증 — 렌더링 확인**
 
 VS Code 미리보기로 표·링크 렌더링 확인, `Measurements/` 상대 링크 클릭 가능 확인.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add README.md
