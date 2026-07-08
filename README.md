@@ -1,7 +1,7 @@
 # Physical AI 학습 로드맵
 
 
-> **목표**: AMR ROS 양산 SW + Physical AI 통합 → **cross-embodiment VLA/Foundation Model 통합 엔지니어**
+> **목표**: AMR ROS 양산 SW + Physical AI 통합 → **Robot Learning Deployment / Physical AI Systems Engineer**
 > **기간**: Stage 1 (이직 전) + Stage 2 (이직 후) + Stage 2+ (장기 확장)
 > **전제**: 2025.08 출생 딸과 함께하는 직장인 아빠, AMR ROS Application 개발자
 
@@ -280,7 +280,7 @@ gantt
 **산출물 v3** (2027.08~): Real-to-Sim-to-Real — 자작 6DOF 팔 + Isaac Sim 디지털 트윈 + OpenVLA fork + ROS2 노드 + 안전 인터록 + latency 측정 + Sim/Real gap 영상
 
 
-> *"Sim only 산출물은 박사도 만든다. Sim + 자작 실 팔이면 본인만 만든다."*
+> *"Sim-only 산출물은 차별점이 되지 않는다 — 자작 실 팔과 결합되어야 본인 강점 (실배포·통합) 이 실린다."*
 
 
 ---
@@ -290,7 +290,7 @@ gantt
 > **왜 자작 팔인가**: *"Brain ↔ Body 통합 SW 엔지니어"* 의 가장 완전한 증거. 본인 약점 (VLA 신입급) 을 본인 강점 (AMR ROS 실무 5년, 2021.06~ + 펌웨어 2.5년 하드웨어 이해) 으로 직접 깨는 카드. 자작 팔은 cross-embodiment 의 첫 embodiment 증명이다.
 > **가장 중요한 증거일수록 가장 먼저 리스크를 깬다** — 첫 하드웨어는 계획의 2-3배 걸린다. 그래서 본 빌드 전에 짧은 스파이크로 먼저 굴린다. 조달·조립은 v1(sim) 과 병렬로 지금 착수해 v2 가 하드웨어 리드타임에 게이트되지 않게 한다.
 >
-> 박사·연구생이 못 만드는 결과물 3가지:
+> 실행 품질로 증명하는 3가지 — latency 측정, e-stop, BOM 이해는 로보틱스 랩에서도 일상적으로 다룬다 (항목 자체가 희소한 것이 아니다). 차별점은 양산 ROS 5년 경험자가 이것들을 제품 수준 감각 (측정 방법론, 안전 설계 관행, 원가 구조) 으로 수행한다는 **실행 품질**이다:
 > - **latency**: 추론 → 모터 명령까지 ms 단위 측정
 > - **안전 메커니즘**: e-stop, 토크 한계, 충돌 감지 직접 구현
 > - **양산 비용 이해**: DIY 팔 BOM 표 — "이 가격대에 이 성능까지"
@@ -473,7 +473,7 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 병행 학습 (2027~): Phase 5~7 + Stage 2 → 산출물 v2 (sim-to-real gap, 헤드라인) → v3 (Real-to-Sim-to-Real, 정점)
       |
       v
-이직 실현 (2027말-2028): cross-embodiment VLA/FM 통합 엔지니어
+이직 실현 (2027말-2028): Robot Learning Deployment / Physical AI Systems Engineer
       |
       v
 장기: Embodied AI / Physical AI 시니어
@@ -483,7 +483,7 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 
 
 ### 최종 포지셔닝
-> "이기종 플랫폼(이동+조작)에 Foundation Model 을 실제 로봇 (자작 팔 포함) 에 배포해본 **Brain ↔ Body 통합 SW 엔지니어**
+> "이기종 플랫폼(이동+조작)에 Foundation Model 을 실제 로봇 (자작 팔 포함) 에 배포해본 **Robot Learning Deployment / Physical AI Systems Engineer**
 > — AMR 양산 ROS 실무 5년 (2021.06~, 로봇/실기체 경력) + 임베디드 실시간 제어 background + 자작 팔 + Real-to-Sim-to-Real 사이클"
 > — 좌표: **둘째 층(경량 adaptation) + 셋째 층(deployment/integration) 묶음**. 첫째 층(FM 제작)은 추구하지 않는다.
 
@@ -492,7 +492,7 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 > 주의: 로봇 경력은 **AMR ROS 5년만** 해당 (총 경력 약 10년). 자동차부품연구원 연구보조 2.5년은 로봇 경력에서 제외하고 강점 근거로 쓰지 않는다. 펌웨어 2.5년은 상용차 수동변속기 클러치 반자동화 장치 (액추에이터 실시간 제어) = Body/구동계 레이어 background 다. 차별점의 하중은 거의 전부 **자작 팔 + 실배포** 에 실린다.
 
 
-> **cross-embodiment 서사** (헤드라인 좌표): *"팔 중심 공개 VLA 의 perception+action 구조를 분석해, 내 5년 도메인인 이동 로봇 플랫폼과 잇는다 (mobile manipulation / heterogeneous fleet)."* — 매니퓰레이션을 첫 embodiment 증명으로 삼되 단독 베팅하지 않고, AMR 이동 해자를 연결한다. 하드웨어 베팅 자체(팔 중심 vs 이동 확대)는 2026.11 재평가 입력(부록 D)으로 둔다.
+> **cross-embodiment 서사** (지향 좌표 — 복수 embodiment 실경험 확보 전에는 표제로 쓰지 않음, 2026.11 재평가 입력): *"팔 중심 공개 VLA 의 perception+action 구조를 분석해, 내 5년 도메인인 이동 로봇 플랫폼과 잇는다 (mobile manipulation / heterogeneous fleet)."* — 매니퓰레이션을 첫 embodiment 증명으로 삼되 단독 베팅하지 않고, AMR 이동 해자를 연결한다. 하드웨어 베팅 자체(팔 중심 vs 이동 확대)는 2026.11 재평가 입력(부록 D)으로 둔다.
 
 
 ---
@@ -693,4 +693,4 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 
 
 > **경로**: 기하학 기초 → **VLA 논문** → **자작 팔** → **Foundation Model** → **Isaac Sim 디지털 트윈** → **Real-to-Sim-to-Real (v3 정점)** → **이직**
-> AMR 실무 경험 + 펌웨어 이해 + 자작 팔을 살려 **cross-embodiment VLA/Foundation Model 통합 엔지니어**로 성장합니다.
+> AMR 실무 경험 + 펌웨어 이해 + 자작 팔을 살려 **Robot Learning Deployment / Physical AI Systems Engineer**로 성장합니다.

@@ -200,18 +200,20 @@ git commit -m "docs: promote 4070 measurement results to readme top"
 **Files:**
 - Modify: `README.md`, `Roadmap/Hardware-Arm.md`, `Roadmap/Phase 6.md`, `Roadmap/Phase 7.md`
 
-- [ ] **Step 1: 표제 교체 (4곳)**
+- [x] **Step 1: 표제 교체 (4곳)**
 
 - README.md:4 — `**cross-embodiment VLA/Foundation Model 통합 엔지니어**` → `**Robot Learning Deployment / Physical AI Systems Engineer**`
 - README.md:462 (커리어 경로 종점) — `cross-embodiment VLA/FM 통합 엔지니어` → `Robot Learning Deployment / Physical AI Systems Engineer`
 - README.md:471-474 (최종 포지셔닝 blockquote) — 첫 줄을 "이기종 플랫폼(이동+조작)에 Foundation Model 을 실제 로봇 (자작 팔 포함) 에 배포해본 **Robot Learning Deployment / Physical AI Systems Engineer**" 로 교체. 좌표 줄 (둘째 층 + 셋째 층 묶음) 은 유지
 - README.md:682 (말미) — 동일 교체
 
-- [ ] **Step 2: cross-embodiment 서사 지위 하향**
+- [x] **Step 2: cross-embodiment 서사 지위 하향**
 
 README.md:481 blockquote 의 라벨 `**cross-embodiment 서사** (헤드라인 좌표)` → `**cross-embodiment 서사** (지향 좌표 — 복수 embodiment 실경험 확보 전에는 표제로 쓰지 않음, 2026.11 재평가 입력)`. 본문 서사 (분석·연결 계획) 는 유지 — 주장이 아닌 계획 서술이므로.
 
-- [ ] **Step 3: "박사가 못 만드는 3가지" 서사 교체 (2곳)**
+- [x] **Step 3: "박사가 못 만드는 3가지" 서사 교체 (2곳)**
+
+진행 상황 (2026-07-09): README 는 원문이 blockquote 목록이라 heading 대신 blockquote 도입문 형태로 동일 취지 반영, Hardware-Arm.md 는 계획 문안대로 heading + 도입문. 최종 포지셔닝 첫 줄의 기존 표제는 "Brain-Body 통합 SW 엔지니어" 였음 — 계획 문안대로 교체.
 
 README.md:279-282 와 Roadmap/Hardware-Arm.md:27-30 의 제목·도입을 교체한다. 항목 3개 (latency 측정 / 안전 메커니즘 / BOM 비용 이해) 는 유지하되 희소성 주장을 제거:
 
@@ -222,11 +224,11 @@ latency 측정, e-stop, BOM 이해는 로보틱스 랩에서도 일상적으로 
 차별점은 양산 ROS 5년 경험자가 이것들을 제품 수준 감각 (측정 방법론, 안전 설계 관행, 원가 구조) 으로 수행한다는 **실행 품질**이다.
 ```
 
-- [ ] **Step 4: "박사도 만든다" 문구 완화 (3곳)**
+- [x] **Step 4: "박사도 만든다" 문구 완화 (3곳)**
 
 README.md:269, Roadmap/Phase 7.md:28, Roadmap/Phase 6.md:23 — `"Sim only 산출물은 박사도 만든다. Sim + 자작 실 팔이면 본인만 만든다."` → `"Sim-only 산출물은 차별점이 되지 않는다 — 자작 실 팔과 결합되어야 본인 강점 (실배포·통합) 이 실린다."` (Phase 6.md 는 문장 구조에 맞게 동일 취지로.)
 
-- [ ] **Step 5: 검증**
+- [x] **Step 5: 검증**
 
 ```bash
 grep -rn "cross-embodiment VLA" README.md Roadmap/          # 기대: 0건 (표제 용법)
@@ -235,7 +237,7 @@ grep -rn "박사" README.md Roadmap/                            # 기대: 0건
 
 리마인더 (리포 밖): 이력서·LinkedIn 초안의 표제도 동일 문구로 통일 — 2026.09 헤드라인 교체 시 적용.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add README.md Roadmap/
