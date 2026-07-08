@@ -63,11 +63,13 @@
 
 **Interfaces:** 이후 모든 Task 가 인용하는 근거 문서의 리포 내 고정 경로.
 
-- [ ] **Step 1: 보고서 저장**
+- [x] **Step 1: 보고서 저장**
 
 검토 보고서 v1.4 원문 (대화 첨부본) 을 위 경로에 그대로 저장한다. `.private/` 은 gitignore 대상이므로 커밋되지 않는다 — 전략·probe 일정 등 외부 노출 부적합 내용을 담고 있어 의도적 비커밋.
 
-- [ ] **Step 2: 검증 — 파일 존재 + 참조 성립**
+진행 상황 (2026-07-09): 저장 완료.
+
+- [x] **Step 2: 검증 — 파일 존재 + 참조 성립**
 
 ```bash
 test -f ".private/reviews/physical-ai-study-repo-review-v1.4.md" && echo OK
@@ -90,7 +92,7 @@ git check-ignore ".private/reviews/physical-ai-study-repo-review-v1.4.md" && ech
 
 **Interfaces:** `Measurements/openvla-rtx4070-int4/` — Task 1-3 (README 승격 링크), Task 2-2 (재측정 산출물 착지점) 가 의존.
 
-- [ ] **Step 1: `Measurements/README.md` 작성**
+- [x] **Step 1: `Measurements/README.md` 작성**
 
 보고서 §5 를 리포 언어로 옮긴다. 포함 항목:
 
@@ -102,7 +104,9 @@ git check-ignore ".private/reviews/physical-ai-study-repo-review-v1.4.md" && ech
 6. 워크플로우 (실습 1건 종료 시): 증거 커밋 → evidence-index 1줄 추가 → Studies 원복 → notes.md 회고. **증거 보존이 원복보다 먼저**
 7. 소급 적용: Phase 4 실측만 이관 (본 디렉터리), Phase 0-2 단순 실습은 소급 보존 안 함
 
-- [ ] **Step 2: 실험 디렉터리 생성 + `.npy`·스크립트 이관**
+- [x] **Step 2: 실험 디렉터리 생성 + `.npy`·스크립트 이관**
+
+진행 상황 (2026-07-09): `practice.ipynb` 내용 확인 결과 latency 측정 코드 (warm-up 5회 + n=100 + synchronize + 통계 산출) 로 판정 — `scripts/` 로 `git mv` 완료. 외부 참조 없음 확인.
 
 ```bash
 mkdir -p "Measurements/openvla-rtx4070-int4/raw" "Measurements/openvla-rtx4070-int4/scripts"
@@ -110,30 +114,34 @@ git mv "Studies/Phase 4/week6/openvla_latency_4070_int4.npy" "Measurements/openv
 # practice.ipynb 는 내용 확인 후: 측정 코드면 git mv(미추적이면 mv), 학습 정답 코드면 보존 정책 §5.2 에 따라 원복 대상으로 분류만 하고 이동하지 않음
 ```
 
-- [ ] **Step 3: `environment.md` 작성 (기지 사실만)**
+- [x] **Step 3: `environment.md` 작성 (기지 사실만)**
+
+진행 상황 (2026-07-09): 측정 기록 commit `1652c81` 확인·기입.
 
 `Studies/Phase 4/SETUP.md` §7.1 실설치 열에서 옮긴다: Ubuntu PC, RTX 4070 12GB, driver 580.159.03, CUDA 13.0, Python 3.12.3, PyTorch 2.12.0, transformers 4.40.1, tokenizers 0.19.1, timm 0.9.16, accelerate 1.0.1, bitsandbytes 0.49.2, eager attention, 측정일 2026-06 (week6). 측정 시점 commit 은 `git log --oneline -- "Studies/Phase 4/week6"` 로 확인해 기입.
 
-- [ ] **Step 4: `methodology.md` 골격 작성**
+- [x] **Step 4: `methodology.md` 골격 작성**
 
 기지 사실 (n=100, `predict_action` 단독 측정 — 이미지 전처리·ROS2 제외, bitsandbytes nf4, do_sample=False) 을 기입하고, 미기록 항목은 체크박스로 남긴다 (본인이 Task 2-2 재측정에서 채움): warm-up 횟수, batch size, 입력 해상도, CPU/GPU 동기화 방식, preprocessing 포함 여부, p50/p99, VRAM peak, 재실행 명령어.
 
-- [ ] **Step 5: `findings.md` 골격 작성**
+진행 상황 (2026-07-09): 측정 노트북 실행 기록에서 계획이 미기록으로 가정했던 항목 다수가 확인됨 — warm-up 5회, batch 1, 224x224 랜덤 RGB (매 반복 새 이미지), synchronize 앞뒤 수행, 전처리 제외, p50 301.3 / p99 305.6 / min 290.4 / max 308.2 ms, `memory_allocated` 4.38 GB → 기지 사실로 기입. 잔여 미기록: nvidia-smi 기준 VRAM peak, 구간별 분해, 실카메라 입력 조건, 재실행 스크립트 정리, summary.csv.
+
+- [x] **Step 5: `findings.md` 골격 작성**
 
 기존 판단 기록을 출처 표기와 함께 발췌 이관 (SETUP.md §1.3, notes.md 순서 1·3 노트): int8 배제 사유 (성공률 58.1% vs int4 71.9%, 1.2 Hz), 3.33 Hz 의 제어 주기 해석 (quasi-static 적합 추정, 전체 루프 2 Hz 하한 근거), 외삽 대비 ±50% 검증. 본인 재작성 영역 (Block 1-4 결과: int4 메모리 산수, int8 열위 메커니즘, 300 ms 구간 분해, 3.33 Hz 조건부 판정) 은 소제목 + 체크박스로 비워 둔다.
 
-- [ ] **Step 6: `Portfolio/evidence-index.md` 작성**
+- [x] **Step 6: `Portfolio/evidence-index.md` 작성**
 
 | 증거 | 날짜 | 위치 | 입증 역량 |
 |---|---|---|---|
 | OpenVLA 7B int4 latency 실측 (RTX 4070) | 2026-06 (재측정 2026-08 예정) | `Measurements/openvla-rtx4070-int4/` | 양자화 배포 실측·컴퓨트 의사결정 (셋째 층) |
 | Phase 3 perception 통합 노드 (supporting) | 2026-06 | `Studies/Phase 3/` week8 | TensorRT + ROS2 통합 (VLA wrapper 스캐폴드) |
 
-- [ ] **Step 7: 참조 갱신**
+- [x] **Step 7: 참조 갱신**
 
 `Studies/Phase 4/SETUP.md` §1.3 표의 출처 셀과 `Studies/Phase 4/notes.md` 순서 1 노트의 결과 파일 경로를 새 경로 (`Measurements/openvla-rtx4070-int4/raw/openvla_latency_4070_int4.npy`) 로 교체.
 
-- [ ] **Step 8: 검증**
+- [x] **Step 8: 검증**
 
 ```bash
 grep -rn "week6/openvla_latency" --include="*.md" . | grep -v .private   # 기대: 0건
@@ -141,7 +149,7 @@ test -f "Measurements/openvla-rtx4070-int4/raw/openvla_latency_4070_int4.npy" &&
 git status --short   # 이동이 rename 으로 잡히는지 확인
 ```
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add Measurements Portfolio "Studies/Phase 4/SETUP.md" "Studies/Phase 4/notes.md" "Studies/Phase 4/week6"

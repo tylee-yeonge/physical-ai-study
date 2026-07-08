@@ -45,7 +45,7 @@
 
 - int4 OpenVLA 7B 가 RTX 4070 12GB 에 OOM 없이 로드.
 - latency 실측 (n=100): mean 300.3 ms / median 301.3 ms / std 3.8 ms / p95 304.8 ms → **3.33 Hz**. 외삽 추정(약 2-3 Hz)의 ±50% 범위 내. 단, `predict_action` 호출만 측정 — 이미지 전처리/ROS2 오버헤드 제외 (제어 루프 전체 주기는 순서 4 의 week11 dry-run 에서 확인).
-- 결과 파일: `week6/openvla_latency_4070_int4.npy` (Phase 7 산출물 v3 의 비교 baseline).
+- 결과 파일: `Measurements/openvla-rtx4070-int4/raw/openvla_latency_4070_int4.npy` (Phase 7 산출물 v3 의 비교 baseline — 측정 노트북은 같은 실험 디렉토리 `scripts/`).
 - 수치 본체: `SETUP.md` §1.3.
 
 ## 순서 2 — 표적 skim (6월 2-3주차, 4h)

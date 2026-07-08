@@ -55,7 +55,7 @@ OpenVLA 7B 는 RTX 4070 12GB 로 **학습이 불가능**하다. 따라서 무거
 | int8 추론 속도 | 1.2 Hz (A5000) — 속도 하락이 시스템 동역학을 바꿔 성공률 하락으로 이어짐 | OpenVLA 논문 §5.4 |
 | int4 추론 속도 | 약 3 Hz (A5000, Ampere 768 GB/s) | OpenVLA 논문 |
 | bf16 추론 속도 | 약 6 Hz (RTX 4090, 1008 GB/s, 최적화 트릭 없이) | OpenVLA 논문 |
-| int4 추론 속도 (4070 실측) | **3.33 Hz** (mean 300.3 ms / median 301.3 ms / std 3.8 ms / p95 304.8 ms, n=100) | week6 실측 (`week6/openvla_latency_4070_int4.npy`) |
+| int4 추론 속도 (4070 실측) | **3.33 Hz** (mean 300.3 ms / median 301.3 ms / std 3.8 ms / p95 304.8 ms, n=100) | week6 실측 — 원본·방법론은 [`Measurements/openvla-rtx4070-int4/`](../../Measurements/openvla-rtx4070-int4/) |
 
 - **4070 실측 (2026-06, week6)**: bitsandbytes nf4 + HF transformers + eager attention 스택에서 step당 mean 300.3 ms (**3.33 Hz**). 사전 외삽(메모리 대역폭 기준 약 2-3 Hz, step당 330-500 ms — 4070 의 504 GB/s 가 A5000 의 768 GB/s 보다 낮은 점과 Ada Lovelace 의 int4 처리량 이점을 종합)의 ±50% 허용 범위 안이며, 포인트 범위보다 약 9% 빠르다. std 3.8 ms 로 분포가 매우 안정적. 단, 이 수치는 `predict_action` 호출만 측정한 것으로 이미지 전처리(processor)와 ROS2 오버헤드는 제외 — 제어 루프 전체 주기는 week11 dry-run 에서 별도 확인.
 - **VRAM**: int4 7 GB + ROS2/sim 오버헤드를 더해도 12 GB 안착 — 사실상 확정.
