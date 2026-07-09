@@ -57,7 +57,7 @@ Physical AI 에서 Foundation Model(FM)을 다루는 일은 세 층으로 나뉜
 ## 전체 로드맵
 
 
-> 주당 6-8시간 예산 기준. 본격 실지원(2027.03 복직 직후) 전까지는 한 구간에 메인 학습 1트랙만 둔다. 이후는 실지원과 병행하는 저강도 학습으로 진행한다. **2026.06-2027.03 은 육아휴직 기간** — 이 기간에는 구직 지원(정찰 포함)을 하지 않고 학습·산출물에 집중하며, 시장 신호 probe(LinkedIn 헤드라인·JD 정독·커피챗)만 저강도로 유지한다. 본격 실지원은 복직(2027.03) 직후 개시하고, v2/v3 는 그 위에 얹는 강화 카드다.
+> 주당 6-8시간 예산 기준. 본격 실지원(2027.03 복직 직후) 전까지는 한 구간에 메인 학습 1트랙만 둔다. 이후는 실지원과 병행하는 저강도 학습으로 진행한다. **2026.09-2027.02 는 육아휴직 기간** (2026-07-01 신청, 승인 대기. 2026.06-08 은 재직 + GPU (4070) 반납 전 구간 — 평일 저녁 약 2h 가용 전제) — 휴직 기간에는 구직 지원(정찰 포함)을 하지 않고 학습·산출물에 집중하며, 시장 신호 probe 는 가시성 기준으로 분해해 저강도 유지한다 (JD 정독 2026.07-08 / LinkedIn 헤드라인·커피챗 2026.09~). 본격 실지원은 복직(2027.03) 직후 개시하고, v2/v3 는 그 위에 얹는 강화 카드다.
 
 
 ```mermaid
@@ -78,7 +78,7 @@ gantt
     Phase 6 (Isaac Sim 디지털 트윈, v2) :a5, 2027-05, 3M
     Phase 7 (Real-to-Sim-to-Real, v3) :a6, 2027-08, 3M
     section 산출물 + 이직
-    육아휴직 (~2027.03 복직) :active, leave, 2026-06, 9M
+    육아휴직 (~2027.03 복직) :active, leave, 2026-09, 6M
     v1 레포 기록 (ROS2 dry-run, 외부 공개는 v2) :milestone, d1, 2026-10, 0d
     v1.5 공개 (LoRA adaptation) :milestone, d15, 2026-12, 0d
     복직 + 본격 실지원 개시 :milestone, d3, 2027-03, 0d
@@ -110,9 +110,10 @@ gantt
 | 2026.06 초 | Stage 1 | Phase 3 완료 (**비공개 리허설**, 공개 산출물 아님) | VLA wrapper 리허설 |
 | 2026.06-09 | Stage 1 | **Phase 4 (메인 단독): VLA v1 — pretrained OpenVLA zero-shot 추론 + ROS2 wrapper + 카메라/bag dry-run 측정 + 정독** | **산출물 v1 (2026 하반기 레포 기록, 외부 공개는 v2)** |
 | 2026.11-12 | Stage 1 | **Phase 4.5: VLA v1.5 — sim 구축 + OpenVLA LoRA adaptation + before/after 정량 분석** (sim 데이터, v1 추론 노드 재사용) | **산출물 v1.5 (둘째 층 adaptation 증거)** |
-| 2026.06-08 (병행) | Stage 1 | **시장 신호 probe**: 타겟사 JD 5-10개 정독 + 현직자 커피챗 1-2건 + LinkedIn 헤드라인 교체 | 시장 실측 → 우선순위 보정 |
+| 2026.07-08 (병행) | Stage 1 | **시장 신호 probe 1단 (저가시성)**: 타겟사 JD 5-10개 정독 + 격차 매핑, 학습 리포 공개 증거 정비 | 시장 실측 → 우선순위 보정 |
+| 2026.09- (병행) | Stage 1 | **시장 신호 probe 2단 (고가시성)**: LinkedIn 헤드라인 교체 + 현직자 커피챗 1-2건 (휴직 개시·승인 확정 후) | 시장 실측 → 우선순위 보정 |
 | 2026.10 | Stage 1 | **하드웨어 스파이크 (2-3주)**: 2-DOF Dynamixel + ROS2 + URDF 파이프라인이 도는지만 검증 | 리스크 조기 검증 (분기 재평가 #1 입력) |
-| 2026.06-2027.03 | Career | **육아휴직** — 구직 지원(정찰 포함) 안 함, 학습·산출물 집중. 시장 신호 probe 만 저강도 유지 | 학습 집중 기간 |
+| 2026.09-2027.02 | Career | **육아휴직** (2026-07-01 신청, 승인 대기) — 구직 지원(정찰 포함) 안 함, 학습·산출물 집중. 2026.06-08 은 재직 + GPU 반납 전 구간 | 학습 집중 기간 |
 | 2026.11 | Career | **분기 재평가 #1** (정찰 지원 없이 수행 — 입력: 스파이크 결과 / v1 결과 / 시장 신호 probe 반응 / 모델 갱신) | 중간 점검 |
 | 2027.01-02 | Stage 1 | **Hardware-Arm Stage 1 (2-3DOF 본 빌드, 스파이크로 디리스크)** + URDF + Sim 디지털 트윈 (v2 선행) | v2 하드웨어 기반 |
 | **2027.03~ (복직)** | **Career** | **본격 실지원 개시** (복직 직후, 트리거: v1 + 스파이크 확보 = "면접장에 들어갈 만큼") | 합격 |
@@ -326,15 +327,15 @@ gantt
 | **합계** | | **약 150-225만** |
 
 
-### 시장 신호 probe (육아휴직 중 저강도) → (복직) → 본격 실지원
-> **시장 신호는 학습 초기부터 싸게 받는다**: 12개월 투입을 기다리지 않고 JD·커피챗·LinkedIn 으로 *지금* 받는다.
-> **육아휴직 (2026.06-2027.03) 중에는 구직 지원(정찰 포함)을 하지 않는다.** 지원이 아닌 정보 수집·프로필 정비(시장 신호 probe)만 저강도로 유지한다. 본격 실지원은 복직(2027.03) 직후 개시한다.
+### 시장 신호 probe (가시성 기준 분해, 재직·휴직 중 저강도) → (복직) → 본격 실지원
+> **시장 신호는 학습 초기부터 싸게 받는다**: 12개월 투입을 기다리지 않고 JD·커피챗·LinkedIn 으로 받는다. 단, 가시성이 높은 항목은 육아휴직 승인 확정 전에 움직이지 않는다 — 승인 계류 중 헤드라인 교체는 고용주에게 이직 확정 신호를 보내 승인 프로세스에 불필요한 마찰 변수를 만든다.
+> **육아휴직 (2026.09-2027.02) 중에는 구직 지원(정찰 포함)을 하지 않는다.** 지원이 아닌 정보 수집·프로필 정비(시장 신호 probe)만 저강도로 유지한다. 본격 실지원은 복직(2027.03) 직후 개시한다.
 
 
-**육아휴직 중 저강도 유지 (2026.06-2027.03, Phase 4 와 병행)**:
-- 타겟사 **실제 JD 5-10개 정독** → 요구 역량 vs 현재 격차 1페이지 매핑
-- 현직자 **1-2명 커피챗/메시지** (정보성, 합격 목적 아님)
-- **LinkedIn 헤드라인 교체** ("AMR ROS Engineer" → "AMR ROS Production SW + Physical AI Integration")
+**probe 일정 (가시성 기준 3분해, Phase 4 와 병행)**:
+- **2026.07-08 (재직 중, 저가시성)**: 타겟사 **실제 JD 5-10개 정독** → 요구 역량 vs 현재 격차 1페이지 매핑 + **학습 리포 공개 증거 정비** (실측 표·supporting 산출물 — 학습 리포 공개는 재직자도 흔히 하므로 이직 신호로 읽히지 않는다)
+- **2026.09 (휴직 개시·승인 확정 후, 고가시성)**: **LinkedIn 헤드라인 교체** ("AMR ROS Engineer" → "AMR ROS Production SW + Physical AI Integration") — 2026.11 재평가 전 약 2개월의 신호 수집 기간 확보
+- **2026.09 이후 (저강도)**: 현직자 **1-2명 커피챗/메시지** (정보성, 합격 목적 아님)
 - 구직 지원(정찰 포함)은 하지 않는다 — 복직 후로 미룬다.
 
 
@@ -446,13 +447,13 @@ Stage 1 에서 학습 제외로 분류한 영역 중 회사 환경에서 자연�
 현재: AMR ROS Application 개발자 (양산 AMR, ROS 2021.06~ 5년차)
       |
       v
-시장 신호 probe (2026.06~, 육아휴직 중 저강도): JD 정독 + 커피챗 + LinkedIn 헤드라인 (구직 지원 X)
+시장 신호 probe (1단 2026.07-08: JD 정독·리포 증거 / 2단 2026.09~: LinkedIn 헤드라인·커피챗, 구직 지원 X)
       |
       v
 Phase 3 (2026.06 초, 완료): Detection+Depth+PC TRT+ROS2 (비공개 리허설, VLA wrapper 스캐폴드)
       |
       v
-Phase 4 끝 (2026 하반기): 산출물 v1 (OpenVLA zero-shot 추론 + ROS2 + sim 단일 task 루프 + 정독, 레포 기록만)
+Phase 4 끝 (2026 하반기): 산출물 v1 (OpenVLA zero-shot 추론 + ROS2 + 카메라/bag dry-run + 정독, 레포 기록만)
       |
       v
 Phase 4.5 (2026 하반기, v1 직후): 산출물 v1.5 (OpenVLA LoRA adaptation + before/after 정량 분석, 둘째 층 증거)
@@ -510,9 +511,9 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 - [x] Phase 2 완료 (Perception 기하 기초)
 
 
-#### 2026.06 (Phase 4 와 병행) — 시장 신호 probe
-- [ ] 타겟사 **실제 JD 5-10개 정독** — 1순위 (VLA 모델 직접 개발 코스닥 상장사 / 대기업 SW 자회사 VLA / 신생 휴머노이드 스타트업) + 2순위 (자율주행 SW 자회사 CV/ML / ADAS 양산 중견 / Dynamixel 제조사 / 매니퓰레이션 FM) → 요구 역량 vs 현재 격차 1페이지 매핑
-- [ ] LinkedIn 프로필 헤드라인 변경 ("AMR ROS Engineer" → "AMR ROS Production SW + Physical AI Integration")
+#### 2026.07-09 (Phase 4 와 병행) — 시장 신호 probe (가시성 분해)
+- [ ] (2026.07-08) 타겟사 **실제 JD 5-10개 정독** — 1순위 (VLA 모델 직접 개발 코스닥 상장사 / 대기업 SW 자회사 VLA / 신생 휴머노이드 스타트업) + 2순위 (자율주행 SW 자회사 CV/ML / ADAS 양산 중견 / Dynamixel 제조사 / 매니퓰레이션 FM) → 요구 역량 vs 현재 격차 1페이지 매핑
+- [ ] (2026.09, 휴직 개시·승인 확정 후) LinkedIn 프로필 헤드라인 변경 ("AMR ROS Engineer" → "AMR ROS Production SW + Physical AI Integration")
 - 육아휴직 중에는 구직 지원(ROS 포지션 실지원 포함)을 하지 않는다 — 복직(2027.03) 후로 미룸
 - [x] Phase 3 week8 통합 노드 마무리 + 비공개 로그 커밋 (VLA wrapper 리허설)
 
@@ -521,8 +522,8 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 - [ ] OpenVLA 지원 embodiment/action space 확인 + sim 환경 정합
 - [ ] 컴퓨트 사전 점검 (OpenVLA 7B 4-bit 가 RTX 4070 12GB 에 올라가는지 + latency 1회 측정)
 - [ ] 성공 task 1종 + 성공률 기준 N 정의
-- [ ] Phase 4 완료 (RT-2 + OpenVLA 정독 + OpenVLA zero-shot inference → ROS2 → sim 단일 task 루프)
-- [ ] **레포에 산출물 v1 결과 기록** (README + 성공률 표 + latency 수치) — 블로그 작성·1분 영상·velog/LinkedIn 외부 공개는 v2 로 이관
+- [ ] Phase 4 완료 (RT-2 + OpenVLA 정독 + OpenVLA zero-shot inference → ROS2 → 카메라/bag dry-run)
+- [ ] **레포에 산출물 v1 결과 기록** (README + latency/throughput 표) — 블로그 작성·1분 영상·velog/LinkedIn 외부 공개는 v2 로 이관
 
 
 #### 2026.10-12 (스파이크 + v1.5, 육아휴직 중 — 구직 지원 없음)
@@ -610,7 +611,7 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 
 | 산출물 | 시점 | 내용 | 우선순위 |
 |---|---|---|---|
-| **v1** | 2026 하반기 | pretrained OpenVLA zero-shot 추론 → ROS2 wrapper → sim 단일 task 루프 (N회 성공률 기록) + RT-2/OpenVLA 정독. sim 기준선, **레포 결과 기록만** (블로그 작성·1분 영상·외부 공개는 v2 로 이관) | **2 (기술 코어, v2 의 eval harness 기반)** |
+| **v1** | 2026 하반기 | pretrained OpenVLA zero-shot 추론 → ROS2 wrapper → 카메라/bag dry-run (latency/throughput 측정, sim task 성공률은 v1.5) + RT-2/OpenVLA 정독. **레포 결과 기록만** (블로그 작성·1분 영상·외부 공개는 v2 로 이관) | **2 (기술 코어, v2 의 eval harness 기반)** |
 | **v1.5 (둘째 층 증거)** | 2026 하반기 | OpenVLA LoRA adaptation (sim 데이터) + zero-shot 대비 **before/after 성공률 정량 분석** (N회, 분산 포함) + 블로그 1편 (= Phase 4.5). 성공률 상승이 아닌 **설계-실행-분석** 이 기준 | **2 (둘째 층 adaptation 가점 카드)** |
 | **v2 강화 카드 (헤드라인)** | 2027 | 자작 팔 결합 + **sim-to-real gap 수치 측정·보고** (= Phase 6 디지털 트윈 + 자작 팔 Stage 1). v1 성공률이 gap 의 분모. LoRA 는 v1.5 로 이관. **v1 에서 이관된 RT-2/OpenVLA 블로그 + 1분 영상 + velog/LinkedIn 외부 공개를 여기서 첫 공개** | **1 (본인만 만드는 결정타, 첫 외부 공개)** |
 | **v3** | 2027 후반~ | 6DOF 확장 + Real-to-Sim-to-Real (= Phase 7): OpenVLA fork + ROS2 노드 래핑 + 안전 인터록 + latency 측정 + Sim/Real gap 영상 | 1 (차별화 정점) |

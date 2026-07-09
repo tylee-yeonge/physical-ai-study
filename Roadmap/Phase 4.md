@@ -199,6 +199,6 @@ Output : /vla/action (팔: EE-delta [dx,dy,dz,rx,ry,rz] -> geometry_msgs/Twist +
 Phase 4 완료 후 (2026 하반기):
 - **Phase 4.5 (VLA v1.5)** — OpenVLA LoRA adaptation + before/after 정량 분석 (둘째 층 증거). v1 기술 코어(레포 기록) 확보 후 착수가 원안이나, 8월 초 체크포인트에서 9-10월 조기 진입 여부 결정 ([Phase 4.5.md](Phase%204.5.md))
 - **하드웨어 스파이크** (2026.10, 2-3주) — 2-DOF Dynamixel + ROS2 파이프라인 리스크 검증 (조달은 v1 과 병렬로 이미 착수)
-- **6개월 분기 재평가 #1 (2026.11)** — 스파이크 결과 / v1 결과(레포) / VLA 모델 갱신 검토 / 시장 신호 probe 반응 / cross-embodiment 좌표 점검. **육아휴직(2026.06-2027.03) 중이라 정찰 지원은 하지 않으며, 본격 실지원은 복직(2027.03) 직후 개시한다.**
+- **6개월 분기 재평가 #1 (2026.11)** — 스파이크 결과 / v1 결과(레포) / VLA 모델 갱신 검토 / 시장 신호 probe 반응 / cross-embodiment 좌표 점검. **육아휴직(2026.09-2027.02) 중이라 정찰 지원은 하지 않으며, 본격 실지원은 복직(2027.03) 직후 개시한다.**
 - **Hardware-Arm Stage 1 본 빌드** (2027.01-02) → v2 선행 하드웨어
 - **Phase 6 (Isaac Sim 디지털 트윈) + 자작 팔 결합 → 산출물 v2** (헤드라인, sim-to-real gap)

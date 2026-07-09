@@ -302,7 +302,7 @@ git commit -m "docs: replace colab with runpod as cloud compute across setup and
 **Files:**
 - Modify: `README.md`, `Roadmap/Phase 4.md`, `Roadmap/Phase 3.md`
 
-- [ ] **Step 1: 육아휴직 기간 교체 (2026.06-2027.03 → 2026.09-2027.02)**
+- [x] **Step 1: 육아휴직 기간 교체 (2026.06-2027.03 → 2026.09-2027.02)**
 
 - README.md:46 — "**2026.06-2027.03 은 육아휴직 기간**" → "**2026.09-2027.02 는 육아휴직 기간** (2026-07-01 신청, 승인 대기. 2026.06-08 은 재직 + GPU 반납 전 구간 — 평일 저녁 약 2h 가용 전제)"
 - README.md:67 (gantt) — `:active, leave, 2026-06, 9M` → `:active, leave, 2026-09, 6M`
@@ -312,7 +312,7 @@ git commit -m "docs: replace colab with runpod as cloud compute across setup and
 - Roadmap/Phase 4.md:202 — "육아휴직(2026.06-2027.03)" → "(2026.09-2027.02)"
 - Roadmap/Phase 3.md:154 — 동일 교체
 
-- [ ] **Step 2: probe 일정 분해 (2026.06 일괄 → 가시성 기준 3분해)**
+- [x] **Step 2: probe 일정 분해 (2026.06 일괄 → 가시성 기준 3분해)**
 
 - README.md:99 (표 행) — "2026.06-08 (병행) | 시장 신호 probe: JD 정독 + 커피챗 + LinkedIn 헤드라인" → 2행 분해: "2026.07-08 | probe 1단 (저가시성): 타겟사 JD 5-10개 정독 + 격차 매핑, 학습 리포 공개 증거 정비" / "2026.09- | probe 2단 (고가시성): LinkedIn 헤드라인 교체 + 커피챗 1-2건 (휴직 개시·승인 확정 후)"
 - README.md:320-324 (probe 절 목록) — 항목별 시점 재배치: JD 정독 (2026.07-08), 헤드라인 교체 (2026.09 — "육아휴직 승인 계류 중 교체는 고용주에 이직 신호 → 승인 확정 후" 근거 병기), 커피챗 (2026.09 이후)
@@ -320,18 +320,20 @@ git commit -m "docs: replace colab with runpod as cloud compute across setup and
 - README.md:499-504 (마일스톤 "#### 2026.06 (Phase 4 와 병행)" 절) — 헤더를 "#### 2026.07-09 — 시장 신호 probe (가시성 분해)" 로 교체, LinkedIn 항목에 "(2026.09, 휴직 개시 후)" 명기
 - Roadmap/Phase 3.md:153 — "2026.06~" → 분해 표기
 
-- [ ] **Step 3: v1 범위 표기 잔재 정정**
+- [x] **Step 3: v1 범위 표기 잔재 정정**
+
+진행 상황 (2026-07-09): 계획 대상 (README 커리어 경로·마일스톤·부록 B v1 행) 외에 Roadmap/Phase 3.md:151 의 "sim 단일 task 루프" 잔재도 발견해 함께 정정. Roadmap/Phase 4.5.md 의 동일 문구 2곳은 4.5 범위 서술이라 정상 — 유지.
 
 README.md:441, 510 의 "sim 단일 task 루프" → "카메라/bag dry-run (sim task 성공률은 v1.5)" — Phase 4.md·부록 B 의 확정 표기와 정합. README.md:511 의 "성공률 표" → "latency/throughput 표".
 
-- [ ] **Step 4: 검증**
+- [x] **Step 4: 검증**
 
 ```bash
 grep -rn "2026.06-2027.03" README.md Roadmap/     # 기대: 0건
 grep -rn "sim 단일 task 루프" README.md            # 기대: 0건
 ```
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add README.md Roadmap/
