@@ -441,21 +441,23 @@ git commit -m "docs: frontload phase 4.5 section 0 to august for gpu return dead
 **Files:**
 - Modify: `Roadmap/Phase 3.md`, `README.md` (Phase 3 절·커리어 경로·부록 B·부록 E)
 
-- [ ] **Step 1: `Roadmap/Phase 3.md` 지위 전환**
+- [x] **Step 1: `Roadmap/Phase 3.md` 지위 전환**
 
 - 제목 "(비공개 리허설)" → "(supporting system work — 보조 엔지니어링 증거)"
 - 상태 줄 재작성: "**supporting 증거로 공개** — 대표작 아님. YOLO+Depth 조합은 AMR ROS 5년차 기준 commodity 이므로 헤드라인에 올리지 않고, TensorRT/양자화 배포 + ROS2 통합의 보조 증거로만 공개한다. v1 공개 전까지 README 계층에서 하위 배치 (헤드라인 오독 방지)"
 - "공개하지 않는 이유" 절 → "supporting 으로 공개하는 이유와 조건" 으로 재작성. 조건 2개 명기: (1) supporting 라벨 + 하위 배치, (2) 빌드 스크립트 기준 재현 확인 (TensorRT 엔진은 GPU 아키텍처 종속 → 마지막 기회는 4070 반납 전 2026.08 — Task 2-4)
 - fallback 예외 (부록 E 승격 공개) 는 유지
 
-- [ ] **Step 2: README 정합**
+- [x] **Step 2: README 정합**
+
+진행 상황 (2026-07-09): 계획 대상 외 추가 발견분도 함께 전환 — README gantt 행, 부록 A 표 행, Roadmap/Phase 3.md 내부 체크리스트·week8 산출 서술 ("비공개 로그 커밋" 2곳). "RT-2 는 비공개 모델" (Roadmap/Phase 4.md) 은 다른 용법이라 유지.
 
 - README.md:96, 179-181, 195 — "비공개 리허설 / 비공개 로그" → "supporting 공개 (보조 엔지니어링 증거)" 로 교체, "velog/LinkedIn 공개 어필 안 함" 취지는 유지
 - README.md:438 (커리어 경로) — 동일 교체
 - README.md:603 (부록 B "(내부 로그)" 행) — "(supporting)" 으로 교체, 내용 셀에 "supporting system work 로 리포 내 공개, 어필 헤드라인 아님" 명기
 - README.md:664, 669 (부록 E) — "비공개 로그" → "supporting 로그" 로 문구 정합 (fallback 시 velog 승격 서술 유지)
 
-- [ ] **Step 3: 검증**
+- [x] **Step 3: 검증**
 
 ```bash
 grep -rn "비공개 리허설\|비공개 로그" README.md Roadmap/    # 기대: 0건
@@ -463,7 +465,7 @@ grep -rn "비공개 리허설\|비공개 로그" README.md Roadmap/    # 기대:
 
 리마인더 (리포 밖): 이력서·LinkedIn 에서도 Phase 3 를 동일 지위 (supporting) 로 통일.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add README.md "Roadmap/Phase 3.md"

@@ -66,7 +66,7 @@ gantt
     dateFormat YYYY-MM
     section 메인 학습 (한 구간 1트랙)
     Phase 2 (기하 기초 마무리) :a1, 2026-05, 1M
-    Phase 3 (Detection+Depth, 비공개 리허설) :a2, 2026-06, 1M
+    Phase 3 (Detection+Depth, supporting 공개) :a2, 2026-06, 1M
     Phase 4 (VLA v1: zero-shot 추론 + ROS2) :a3, 2026-06, 4M
     Phase 4.5 Section 0 (sim+Docker+RunPod) :a35a, 2026-08, 1M
     Phase 4.5 Sections 1-3 (LoRA+eval) :a35b, 2026-09, 3M
@@ -108,7 +108,7 @@ gantt
 |------|-------|------|------|
 | 2026.01-02 | Stage 1 | Phase 0-1 (완료) | 환경 세팅, 수학 핵심 |
 | 2026.03-05 | Stage 1 | Phase 2: Perception 기하 기초 (완료) | 카메라 모델 + Multi-view |
-| 2026.06 초 | Stage 1 | Phase 3 완료 (**비공개 리허설**, 공개 산출물 아님) | VLA wrapper 리허설 |
+| 2026.06 초 | Stage 1 | Phase 3 완료 (**supporting 공개** — 보조 엔지니어링 증거, 대표작 아님) | VLA wrapper 리허설 |
 | 2026.06-09 | Stage 1 | **Phase 4 (메인 단독): VLA v1 — pretrained OpenVLA zero-shot 추론 + ROS2 wrapper + 카메라/bag dry-run 측정 + 정독** | **산출물 v1 (2026 하반기 레포 기록, 외부 공개는 v2)** |
 | 2026.08 (Section 0) + 2026.09-11 (Sections 1-3) | Stage 1 | **Phase 4.5: VLA v1.5 — Section 0 (sim 구축·Docker·RunPod 이관, GPU 반납 전 전진) + OpenVLA LoRA adaptation + before/after 정량 분석** (sim 데이터, v1 추론 노드 재사용) | **산출물 v1.5 (둘째 층 adaptation 증거)** |
 | 2026.07-08 (병행) | Stage 1 | **시장 신호 probe 1단 (저가시성)**: 타겟사 JD 5-10개 정독 + 격차 매핑, 학습 리포 공개 증거 정비 | 시장 실측 → 우선순위 보정 |
@@ -192,9 +192,9 @@ gantt
 | 2 | Perception 기하 기초 (카메라 모델, Multi-view) | 4주 |
 
 
-### Phase 3: Detection + Depth → PC TensorRT + ROS2 노드 (비공개 리허설, ~2026.06 초)
-> **메시지**: Detection + Depth + PC TensorRT/ROS2 통합은 **VLA v1 wrapper 의 난도 낮은 리허설이자 재사용 스캐폴드**다. AMR ROS 5년차 기준 commodity 라 별도 공개 어필은 하지 않는다. 학습/통합 가치는 흡수하되 공개 산출물에서는 제외.
-> **상태**: week1-8 완료, 비공개 로그 커밋 완료 (2026.06).
+### Phase 3: Detection + Depth → PC TensorRT + ROS2 노드 (supporting system work, ~2026.06 초)
+> **메시지**: Detection + Depth + PC TensorRT/ROS2 통합은 **VLA v1 wrapper 의 난도 낮은 리허설이자 재사용 스캐폴드**다. AMR ROS 5년차 기준 commodity 라 헤드라인 어필은 하지 않되, **보조 엔지니어링 증거 (supporting system work) 로 리포 내 공개**한다 — 공개 조건·재현 확인은 [`Roadmap/Phase 3.md`](./Roadmap/Phase%203.md) 참고.
+> **상태**: week1-8 완료, supporting 로그 커밋 완료 (2026.06). 빌드 스크립트 기준 재현 확인은 4070 반납 전 (2026.08) 수행.
 
 
 | 주차 | 내용 | 핵심 모델 | 우선순위 |
@@ -208,7 +208,7 @@ gantt
 > **Jetson 실기 배포는 v3 이후 옵션** — 전체 학습 (Phase 2-7) 완료 후 시간 여유 보고 결정
 
 
-**Phase 3 산출**: YOLO11 + Depth Anything V2 → PC TensorRT 추론 + ROS2 노드 래퍼 + latency 측정 → **repo 내 비공개 경량 로그** (velog/LinkedIn 공개 안 함). TensorRT/양자화 배포 + ROS2 통합 경험은 VLA v1 에 흡수.
+**Phase 3 산출**: YOLO11 + Depth Anything V2 → PC TensorRT 추론 + ROS2 노드 래퍼 + latency 측정 → **repo 내 supporting 로그로 공개** (velog/LinkedIn 어필 안 함, 대표작 아님). TensorRT/양자화 배포 + ROS2 통합 경험은 VLA v1 에 흡수.
 
 
 ### Phase 4: VLA v1 — OpenVLA zero-shot 추론 + ROS2 minimal demo (약 4개월, 2026.06-09)
@@ -452,7 +452,7 @@ Stage 1 에서 학습 제외로 분류한 영역 중 회사 환경에서 자연�
 시장 신호 probe (1단 2026.07-08: JD 정독·리포 증거 / 2단 2026.09~: LinkedIn 헤드라인·커피챗, 구직 지원 X)
       |
       v
-Phase 3 (2026.06 초, 완료): Detection+Depth+PC TRT+ROS2 (비공개 리허설, VLA wrapper 스캐폴드)
+Phase 3 (2026.06 초, 완료): Detection+Depth+PC TRT+ROS2 (supporting 공개, VLA wrapper 스캐폴드)
       |
       v
 Phase 4 끝 (2026 하반기): 산출물 v1 (OpenVLA zero-shot 추론 + ROS2 + 카메라/bag dry-run + 정독, 레포 기록만)
@@ -517,7 +517,7 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 - [ ] (2026.07-08) 타겟사 **실제 JD 5-10개 정독** — 1순위 (VLA 모델 직접 개발 코스닥 상장사 / 대기업 SW 자회사 VLA / 신생 휴머노이드 스타트업) + 2순위 (자율주행 SW 자회사 CV/ML / ADAS 양산 중견 / Dynamixel 제조사 / 매니퓰레이션 FM) → 요구 역량 vs 현재 격차 1페이지 매핑
 - [ ] (2026.09, 휴직 개시·승인 확정 후) LinkedIn 프로필 헤드라인 변경 ("AMR ROS Engineer" → "AMR ROS Production SW + Physical AI Integration")
 - 육아휴직 중에는 구직 지원(ROS 포지션 실지원 포함)을 하지 않는다 — 복직(2027.03) 후로 미룸
-- [x] Phase 3 week8 통합 노드 마무리 + 비공개 로그 커밋 (VLA wrapper 리허설)
+- [x] Phase 3 week8 통합 노드 마무리 + supporting 로그 커밋 (VLA wrapper 리허설)
 
 
 #### 2026.06-09 (Phase 4 VLA v1, 메인 단독)
@@ -595,7 +595,7 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 |---|---|---|---|
 | Stage 1 Phase 0-1 | 학습 사전 (환경 + 수학) | 완료 | `Studies/Phase 0`, `Studies/Phase 1` |
 | Stage 1 Phase 2 | 기하 기초 | ~2026.05 | `Studies/Phase 2/` |
-| Stage 1 Phase 3 | Detection+Depth (비공개 리허설) | ~2026.06 | `Studies/Phase 3/` |
+| Stage 1 Phase 3 | Detection+Depth (supporting 공개) | ~2026.06 | `Studies/Phase 3/` |
 | Stage 1 Phase 4 | VLA v1 (OpenVLA zero-shot + ROS2) | 2026.06-09 | `Studies/Phase 4/` |
 | Stage 1 Phase 4.5 | VLA v1.5 (OpenVLA LoRA adaptation, 둘째 층) | 2026.08-11 | `Studies/Phase 4.5/` |
 | Stage 1 Phase 5 | Foundation Model 기초 (실지원 병행) | 2027.02-04 | `Studies/Phase 5/` |
@@ -610,7 +610,7 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 ## 부록 B: 산출물 정의
 
 
-> 산출물은 VLA 트랙 단계명 **v1/v2/v3** 로 구분한다. v1 은 레포 기록만 하고 외부 공개는 v2 로 이관했다 — 외부 공개 어필의 첫 산출물은 실제 팔이 결합되는 v2 다. perception 은 비공개 내부 로그다.
+> 산출물은 VLA 트랙 단계명 **v1/v2/v3** 로 구분한다. v1 은 레포 기록만 하고 외부 공개는 v2 로 이관했다 — 외부 공개 어필의 첫 산출물은 실제 팔이 결합되는 v2 다. perception 은 supporting 증거 (리포 내 공개, 어필 헤드라인 아님) 다.
 
 | 산출물 | 시점 | 내용 | 우선순위 |
 |---|---|---|---|
@@ -618,7 +618,7 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 | **v1.5 (둘째 층 증거)** | 2026 하반기 (Section 0 은 2026.08 전진 — GPU 반납 대비) | OpenVLA LoRA adaptation (sim 데이터) + zero-shot 대비 **before/after 성공률 정량 분석** (N회, 분산 포함) + 블로그 1편 (= Phase 4.5). 성공률 상승이 아닌 **설계-실행-분석** 이 기준 | **2 (둘째 층 adaptation 가점 카드)** |
 | **v2 강화 카드 (헤드라인)** | 2027 | 자작 팔 결합 + **sim-to-real gap 수치 측정·보고** (= Phase 6 디지털 트윈 + 자작 팔 Stage 1). v1 성공률이 gap 의 분모. LoRA 는 v1.5 로 이관. **v1 에서 이관된 RT-2/OpenVLA 블로그 + 1분 영상 + velog/LinkedIn 외부 공개를 여기서 첫 공개** | **1 (본인만 만드는 결정타, 첫 외부 공개)** |
 | **v3** | 2027 후반~ | 6DOF 확장 + Real-to-Sim-to-Real (= Phase 7): OpenVLA fork + ROS2 노드 래핑 + 안전 인터록 + latency 측정 + Sim/Real gap 영상 | 1 (차별화 정점) |
-| (내부 로그) | 2026 상반기 | Phase 3 perception (YOLO11 + Depth Anything V2 + PC TensorRT + ROS2) — 공개 어필 안 함, VLA wrapper 리허설 | 비공개 |
+| (supporting) | 2026 상반기 | Phase 3 perception (YOLO11 + Depth Anything V2 + PC TensorRT + ROS2) — supporting system work 로 리포 내 공개, 어필 헤드라인 아님. VLA wrapper 리허설 | supporting |
 | Jetson 옵션 | v3 이후 | Jetson 실기 배포 — v1 또는 v3 의 Jetson 포팅판 | (옵션) |
 
 
@@ -679,12 +679,12 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 
 
 **왜 이 자리인가**:
-- 기존 강점 (AMR ROS 실무 5년, 2021.06~) + Stage 1 에서 쌓은 CV (Detection + Depth + PC TensorRT + ROS2 노드, Phase 3 비공개 로그) 를 **그대로** 재사용. VLA fine-tune 역량이 없어도 지원 가능.
+- 기존 강점 (AMR ROS 실무 5년, 2021.06~) + Stage 1 에서 쌓은 CV (Detection + Depth + PC TensorRT + ROS2 노드, Phase 3 supporting 로그) 를 **그대로** 재사용. VLA fine-tune 역량이 없어도 지원 가능.
 - VLA / Foundation Model 통합보다 진입장벽이 낮고, 합격 확률은 더 높다.
 - 도메인 이탈이 아니라 같은 로봇/자율주행 도메인 안에서의 횡이동 → 경력직 전환 리스크가 낮게 읽힌다.
 
 
-**무엇이 살아남나**: Phase 3 perception (Detection + Depth + PC TRT + ROS2 노드) 이 이 시나리오의 핵심 증거 — fallback 시 비공개 로그를 velog 1편으로 승격 공개. 자작 팔 / VLA 산출물 (v1, v1.5, v2, v3) 은 "추가 가점"으로 기능.
+**무엇이 살아남나**: Phase 3 perception (Detection + Depth + PC TRT + ROS2 노드) 이 이 시나리오의 핵심 증거 — fallback 시 supporting 로그를 velog 1편으로 승격 공개. 자작 팔 / VLA 산출물 (v1, v1.5, v2, v3) 은 "추가 가점"으로 기능.
 
 
 > **둘째 층(adaptation) 편입과 fallback 의 관계**: v1.5(LoRA adaptation)는 가점 카드이지 fallback 의 전제 조건이 아니다. 본 fallback 은 "VLA fine-tune 역량이 없어도 지원 가능"을 전제로 하며, 둘째 층 편입은 이 안전망을 약화시키지 않는다 — fallback 시에도 핵심 증거는 여전히 Phase 3 perception 로그다.
