@@ -347,7 +347,7 @@ git commit -m "docs: sync parental leave window, probe schedule, and v1 scope wo
 **Files:**
 - Modify: `README.md` (Hardware-Arm 절 + BOM 표), `Roadmap/Hardware-Arm.md`
 
-- [ ] **Step 1: BOM·구성 교체**
+- [x] **Step 1: BOM·구성 교체**
 
 - README.md:304-312 BOM 표와 Roadmap/Hardware-Arm.md:41-55 BOM 절을 교체:
 
@@ -365,18 +365,20 @@ git commit -m "docs: sync parental leave window, probe schedule, and v1 scope wo
 - Roadmap/Hardware-Arm.md:8 (헤더 예산) — "약 150-225만" → "약 46.7만원 (Koch v1.1, 2026.12 발주)"
 - 기존 "대안 (AR4 ...)" 문단은 의사결정 기록으로 유지하되 "커스텀 XL330+XM430 안 (150-225만원) 은 Koch v1.1 확정으로 비채택" 1줄 추가
 
-- [ ] **Step 2: 미결 사항 명시**
+- [x] **Step 2: 미결 사항 명시**
 
 Roadmap/Hardware-Arm.md 의 스파이크·Stage 1/2 절 앞에 주석 추가: "Koch v1.1 확정에 따른 스파이크 (2-DOF 커스텀) 와 Stage 1/2 구성 (XM430 6DOF 확장) 의 재설계는 2026.11 분기 재평가 안건 — 본 문서의 해당 절은 재설계 전 원안이다." (§0.1 세 번째 항목의 문서화.)
 
-- [ ] **Step 3: 검증**
+- [x] **Step 3: 검증**
+
+진행 상황 (2026-07-09): "150-225만" 잔존 4건은 전부 확정 표·비채택 기록 내 대비 서술 — 낡은 계획 용법 0건. Hardware-Arm.md 헤더의 하드웨어·예산 줄도 Koch v1.1 로 갱신 (BOM 표와의 모순 방지).
 
 ```bash
 grep -rn "150-225만" README.md Roadmap/    # 기대: 비채택 기록 1곳만
 grep -rn "Koch" README.md Roadmap/         # 기대: BOM 절·확정 표에 존재
 ```
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add README.md Roadmap/Hardware-Arm.md
