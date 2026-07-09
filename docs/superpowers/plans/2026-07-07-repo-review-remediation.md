@@ -479,7 +479,7 @@ git commit -m "docs: publish phase 3 as supporting system work"
 **Files:**
 - Modify: `Roadmap/Phase 4.md` (핵심 산출물·성공 기준·체크리스트), `README.md` (부록 B·마일스톤), `Roadmap/Hardware-Arm.md` (Stage 1 체크리스트), `Roadmap/Phase 6.md` (진입 전 준비 절 신설)
 
-- [ ] **Step 1: v1 정의에 3항목 추가 (`Roadmap/Phase 4.md`)**
+- [x] **Step 1: v1 정의에 3항목 추가 (`Roadmap/Phase 4.md`)**
 
 "핵심 산출물 (v1)" 과 "산출물 v1" 절에 추가:
 
@@ -491,7 +491,7 @@ git commit -m "docs: publish phase 3 as supporting system work"
 
 완료 체크리스트에 대응 항목 3개 추가. README.md:599 (부록 B v1 행) 내용 셀에 "adapter 추상화 + action schema validation + 벤치마크 재현성 포함" 추가.
 
-- [ ] **Step 2: 부록 B 에 v2.5 행 신설 (`README.md`)**
+- [x] **Step 2: 부록 B 에 v2.5 행 신설 (`README.md`)**
 
 v2 행 앞에 삽입:
 
@@ -499,12 +499,14 @@ v2 행 앞에 삽입:
 | **v2.5 (데이터 파이프라인 증거)** | 2027 상반기 (Koch 도착 후) | Koch 리더-팔로워 teleop 으로 자작 데이터셋 수집 (100-500 episodes 는 실측 후 재산정) → **LeRobot 포맷 + HF Hub 공개** + LeRobot ACT 1회 학습·결과 기록. Diffusion Policy 는 학습하지 않고 라잇 정리 (ACT-Diffusion-VLA 계보, 면접 방어용) | 2 (데이터 레짐·정책 계보 증거) |
 ```
 
-- [ ] **Step 3: 실행 지점 연결**
+- [x] **Step 3: 실행 지점 연결**
 
 - Roadmap/Hardware-Arm.md Stage 1 완료 체크리스트에 추가: `- [ ] LeRobot ACT 1회 학습 + 결과 기록 (Koch teleop 소량 데이터, v2.5 선행 실험)`
 - README.md:521-524 (2027.01-02 마일스톤 절) 에 추가: `- [ ] ACT-Diffusion-VLA 정책 계보 라잇 정리 노트 (면접 방어용, 학습 아님)`
 
-- [ ] **Step 4: Isaac Lab 튜토리얼 편입 (`Roadmap/Phase 6.md`)**
+- [x] **Step 4: Isaac Lab 튜토리얼 편입 (`Roadmap/Phase 6.md`)**
+
+진행 상황 (2026-07-09): Phase 6.md 에는 이미 "Section 8.0: 시작 전" 절이 진입 전 준비 역할을 하고 있어, 별도 절 신설 대신 그 절의 첫 항목으로 편입 (외과적 변경). 부수 정정: v2 의 gap 분모 표기 "v1 성공률" → "v1.5(sim) 성공률" (README 부록 B v2 행, Phase 6.md 핵심 메시지 — 성공률 측정이 v1.5 로 이관된 결정과 정합). README 마일스톤에 v2.5 착수 항목도 추가.
 
 주차 표 앞에 "진입 전 준비" 절 신설:
 
@@ -514,7 +516,7 @@ v2 행 앞에 삽입:
 - [ ] **Isaac Lab 튜토리얼 1개 최소 수행** — NVIDIA 무료 Physical AI 코스 (SO-101 sim-to-real, GR00T post-training 포함) 활용. RunPod 에서 실행 가능. 시점: Phase 4.5 Sections 1-3 여유 시 (2026.09-11) 또는 본 Phase 직전. 목적: NVIDIA 표준 경로 (Isaac Lab 정책 학습) 에 대한 최소 발화 가능 경험 확보 — "sim-to-real 을 다룬다" 주장의 정책 학습 측 방어
 ```
 
-- [ ] **Step 5: 검증**
+- [x] **Step 5: 검증**
 
 ```bash
 grep -n "RobotPolicy" "Roadmap/Phase 4.md" README.md   # 기대: 각 1건 이상
@@ -522,7 +524,7 @@ grep -n "v2.5" README.md                                # 기대: 부록 B 행 �
 grep -n "Isaac Lab" "Roadmap/Phase 6.md"                # 기대: 1건 이상
 ```
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add "Roadmap/Phase 4.md" "Roadmap/Phase 6.md" Roadmap/Hardware-Arm.md README.md

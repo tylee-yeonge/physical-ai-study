@@ -105,6 +105,7 @@ latency 측정, e-stop, BOM 이해는 로보틱스 랩에서도 일상적으로 
 - [ ] pick-and-place 단순 동작 시연
 - [ ] Isaac Sim URDF 임포트 + Sim Joint State 매칭 (첫 사이클)
 - [ ] 1분 영상 + v2 선행 하드웨어 디렉토리 정리
+- [ ] LeRobot ACT 1회 학습 + 결과 기록 (Koch teleop 소량 데이터, v2.5 선행 실험)
 
 
 ---

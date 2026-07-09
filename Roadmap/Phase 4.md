@@ -18,12 +18,16 @@
 **핵심 산출물 (v1)**:
 - OpenVLA zero-shot inference → ROS2 토픽 → **추론 루프 (카메라/bag 입력 → action 토픽, 1분 dry-run 측정)** + 레포 결과 기록 (README + latency/throughput 표). sim 단일 task 성공률은 Phase 4.5 로 이관
 - RT-2/OpenVLA 정독 — 아키텍처를 막힘없이 설명하는 수준 (블로그 작성은 v2 로 이관)
+- v1 엔지니어링 범위 (2026-07 확장): `RobotPolicy` adapter 추상화 + action schema validation + 벤치마크 재현성 — 상세는 아래 산출물 v1
 
 
 **산출물 v1** (2026 하반기까지 `physical-ai-study` 레포에 **결과 기록만**, 외부 공개는 v2 로 이관):
 - ROS2 패키지: OpenVLA zero-shot inference → `vla_action` 토픽, 카메라/bag 입력으로 1분 dry-run + (선택) Rerun 시각화 스크린샷/짧은 gif
 - 레포 기록: README + latency/throughput 표. velog/LinkedIn 외부 공개와 1분 영상·블로그 작성은 v2(Phase 6)로 이관
 - **성공 기준 (v1)**: 추론 루프가 닫히고(카메라/bag 이미지 입력 → action 토픽 연속 발행) 1분 dry-run 에서 mean/p95 latency·throughput·`0 fail`·GPU<10GB 를 측정·기록. sim 단일 task 성공률(N회)은 sim embodiment 결합이 필요하므로 Phase 4.5(v1.5)로 이관 — v1 에서는 task 성공 여부를 판정하지 않는다.
+- **adapter 추상화**: 추론 노드가 모델 구현에 직접 결합되지 않도록 `RobotPolicy` 인터페이스로 분리 (모델 교체 대비 — 2026.11 재평가의 모델 갱신 시나리오 대응)
+- **action schema validation**: 출력 7-DoF 의 범위·NaN·급변 검증 레이어 (안전 실행 스택 전체가 아니라 스키마 검증까지 — watchdog/fallback/collision 은 검증 대상 실팔이 생기는 v2 로 이관)
+- **벤치마크 재현성**: latency 측정을 스크립트 + 고정 조건 문서 (`Measurements/` 연동) 로 재현 가능하게
 - 한계 명시: v1 은 sim 없이 카메라/bag dry-run 까지. sim task 성공률은 v1.5, 실팔 결합은 v2 예고
 
 > **v1 범위 축소 결정 (2026-06)**: (1) 공개 측면 — v1 은 공개 산출물로 약해, 다듬은 영상·블로그·패키징·LinkedIn 공개에 50-70h 를 투입하는 것은 오배치다. 공개 푸시는 실제 팔이 결합되는 v2 가 훨씬 강하므로 **블로그 작성·1분 영상·패키징·외부 공개를 모두 v2 로 이관**한다. (2) sim 측면 — sim(ManiSkill) 은 v1 에서 한 번도 구축되지 않았고, sim zero-shot 성공률은 도메인 갭으로 0% 근처 + N=20 신뢰구간이 ±22%p 라 통계적 의미가 약하다. sim 구축·정합·성공률 측정은 sim 을 본격 쓰는 Phase 4.5(eval harness)로 이관하고, **v1 은 sim 없이 추론 루프 dry-run(latency/throughput) + 정독(이해)까지를 레포에 기록**하는 것으로 정의한다. ManiSkill 선정·PickCube 정의·제어 주기 분석(notes.md 순서 3)은 4.5 에서 재사용한다. RT-2/OpenVLA 정독은 v2 블로그의 배경으로 재사용된다.
@@ -157,6 +161,9 @@ Output : /vla/action (팔: EE-delta [dx,dy,dz,rx,ry,rz] -> geometry_msgs/Twist +
 - [ ] `vla_node` ROS2 패키지 빌드 + 실행 (Phase 3 week8 스캐폴드 재사용)
 - [ ] **카메라/bag 입력으로 1분 dry-run**: action 토픽 연속 발행 + mean/p95 latency·throughput·`0 fail`·GPU<10GB 측정·기록 (sim task 성공률은 Phase 4.5 로 이관)
 - [ ] (선택) Rerun 시각화 스크린샷/짧은 gif 1장 — 레포 결과 기록용 (1분 영상 제작은 v2)
+- [ ] `RobotPolicy` adapter 인터페이스 분리 (추론 노드가 모델 구현에 직접 결합되지 않게)
+- [ ] action schema validation 레이어 (7-DoF 범위·NaN·급변 검증)
+- [ ] 벤치마크 재현 스크립트 + 고정 조건 문서 (`Measurements/openvla-rtx4070-int4/` 연동)
 
 
 ### 산출물 v1 레포 기록 (외부 공개는 v2 로 이관)

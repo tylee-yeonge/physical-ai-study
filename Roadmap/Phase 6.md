@@ -18,7 +18,7 @@
 
 
 **핵심 메시지**:
-- 본 Phase 는 *Sim only 산출물* 을 만들지 않는다. 자작 팔과 결합해 **sim-to-real gap 을 수치로 측정·보고 = 헤드라인 산출물 v2**. v1(sim) 성공률이 그 gap 의 분모가 된다.
+- 본 Phase 는 *Sim only 산출물* 을 만들지 않는다. 자작 팔과 결합해 **sim-to-real gap 을 수치로 측정·보고 = 헤드라인 산출물 v2**. v1.5(sim) 성공률이 그 gap 의 분모가 된다.
 - **adaptation(LoRA)은 본 Phase 가 아니라 v1.5(Phase 4.5)에서 다룬다** — 이전 README 표에 있던 "LoRA 파인튜닝"은 Phase 4.5 로 전진 배치됐고, 본 Phase 는 **둘째 층(adaptation)이 아니라 셋째 층(sim-to-real gap) 에 집중**한다. (README ↔ 본문 정합)
 - Sim 만 돌려본 결과물은 차별점이 되지 않는다 — 자작 팔과 결합되어야 본인 강점 (실배포·통합) 이 실린다. (Sim-only 배제 원칙 유지)
 - Phase 7(v3, Real-to-Sim-to-Real)은 본 Phase 의 v2 를 6DOF + 안전 인터록 + OpenVLA fork 로 확장한 정점.
@@ -48,6 +48,7 @@
 ## Section 8.0: 시작 전 (Phase 5 종료 후)
 
 
+- [ ] **Isaac Lab 튜토리얼 1개 최소 수행 (선행 가능)** — NVIDIA 무료 Physical AI 코스 (SO-101 sim-to-real, GR00T post-training 포함) 활용, RunPod 에서 실행 가능. 시점: Phase 4.5 Sections 1-3 여유 시 (2026.09-11) 또는 본 Phase 직전. 목적: NVIDIA 표준 경로 (Isaac Lab 정책 학습) 에 대한 최소 발화 가능 경험 확보 — "sim-to-real 을 다룬다" 주장의 정책 학습 측 방어
 - [ ] Isaac Sim 4.x 설치 + Workstation 라이선스 확인
 - [ ] 자작 팔 URDF 검증 (Hardware-Arm Stage 1 자료 활용)
 - [ ] **6개월 분기 재평가 #2 결과 반영** (2027.05 가 본 Phase 종료 시점이라 *진입 시점에는 미반영*. 종료 시 재평가)
