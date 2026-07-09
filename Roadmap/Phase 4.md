@@ -82,12 +82,12 @@
 | HuggingFace inference 셋업 (4-bit 양자화) | Ubuntu PC (원격) | O |
 | ROS2 패키지 작성 + 카메라/bag dry-run | Ubuntu PC (원격) | O |
 | 블로그 작성 | 디바이스 무관 | O |
-| (v1.5) LoRA 파인튜닝 | **Colab A100/L4 (클라우드) — Phase 4.5 범위** | O |
+| (v1.5) LoRA 파인튜닝 | **RunPod RTX 4090 (클라우드) — Phase 4.5 범위** | O |
 
 
-- **VRAM 비대칭 (컴퓨트 리스크, 실측 검증 완료)**: OpenVLA 7B 의 BF16 가중치는 약 14-15GB → RTX 4070 12GB 로 **풀 정밀도 추론 불가**. int4 양자화 시 약 7GB (논문 실측) 로 12GB 안에 안착 — 순서 1 실측에서 OOM 없이 로드 확인. LoRA 파인튜닝은 24GB+ 필요 → 4070 으로 사실상 불가(v1.5/Phase 4.5 에서 Colab).
+- **VRAM 비대칭 (컴퓨트 리스크, 실측 검증 완료)**: OpenVLA 7B 의 BF16 가중치는 약 14-15GB → RTX 4070 12GB 로 **풀 정밀도 추론 불가**. int4 양자화 시 약 7GB (논문 실측) 로 12GB 안에 안착 — 순서 1 실측에서 OOM 없이 로드 확인. LoRA 파인튜닝은 24GB+ 필요 → 4070 으로 사실상 불가(v1.5/Phase 4.5 에서 RunPod).
 - **v1 착수 시 1회 실측 (완료, 2026-06 순서 1)**: int4 OpenVLA 7B 가 RTX 4070 12GB 에 OOM 없이 로드되고, 추론 latency 실측 mean 300.3 ms (**3.33 Hz**, n=100) — 외삽 추정(약 2-3 Hz)의 ±50% 범위 내. 제어 주기 충족 여부 판정은 순서 3 의 task 선정 후 확정하며, 미충족 시 범위 축소(관측 → action 예측 → 시각화, 제어 루프 주장 보류)로 분기. 수치 본체: [`Studies/Phase 4/SETUP.md`](../Studies/Phase%204/SETUP.md) §1.3.
-- **분업 원칙**: 무거운 학습(v1.5 LoRA)은 Colab, 가벼운 추론(v1)은 로컬 4070 + ROS2. 이 컴퓨트 표는 v1 과 v1.5 가 **공유**한다 (v1.5 의 단일 진실 공급원은 [`Studies/Phase 4/SETUP.md`](../Studies/Phase%204/SETUP.md)).
+- **분업 원칙**: 무거운 학습(v1.5 LoRA)은 RunPod, 가벼운 추론(v1)은 로컬 4070 + ROS2. 이 컴퓨트 표는 v1 과 v1.5 가 **공유**한다 (v1.5 의 단일 진실 공급원은 [`Studies/Phase 4/SETUP.md`](../Studies/Phase%204/SETUP.md)).
 - **원격 워크플로우**: 사무실에서의 GPU 의존 작업은 자택 4070 에 Tailscale/VS Code tunnel 로 원격 수행. 경로는 순서 1 실측에서 겸사 검증.
 - 상세:
   - [Studies/Phase 4/SETUP.md](../Studies/Phase%204/SETUP.md) — Phase 4 진입 전 환경 구축 단일 진실 공급원

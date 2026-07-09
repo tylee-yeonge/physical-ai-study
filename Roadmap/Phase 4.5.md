@@ -5,7 +5,7 @@
 > **목표**: sim task 의 zero-shot 성공률 베이스라인을 **본 Phase 에서 측정**하고, 그 위에서 OpenVLA 를 LoRA 로 **adaptation** 한 뒤 동일 sim task 의 성공률을 **before(zero-shot)/after(fine-tuned)** 로 비교·정량 분석한다.
 > **범위 (v1.5)**: 경량 LoRA adaptation, **sim 생성 데이터** (자작 팔 데이터 대기 안 함), 단일 task, 동일 embodiment. real 데이터 확장은 Phase 7.
 > **언어**: **Python** (HuggingFace transformers + peft) + **ROS2 (rclpy)** (eval 루프 재사용)
-> **하드웨어**: 학습은 **Colab A100/L4** (24GB+ 필요), 추론·eval 은 **로컬 RTX 4070 + 4-bit 양자화**
+> **하드웨어**: 학습은 **RunPod RTX 4090** (Community Cloud, 24GB), 추론·eval 은 **로컬 RTX 4070 + 4-bit 양자화**
 > **주간 시간**: 약 6-8시간 (출장 주 보정)
 
 
@@ -16,7 +16,7 @@
 
 
 **핵심 산출물 (v1.5)**:
-- LoRA 파이프라인 (sim 데이터 포맷팅 -> Colab 학습 -> 체크포인트 -> 로컬 머지/양자화)
+- LoRA 파이프라인 (sim 데이터 포맷팅 -> RunPod 학습 -> 체크포인트 -> 로컬 머지/양자화)
 - eval harness: zero-shot vs fine-tuned 를 **동일 조건 N회** 로 비교 (N 과 분산까지 보고)
 - 블로그 1편: adaptation **설계-실행-분석** 서사 (성공률 상승 여부와 무관하게 성립)
 
@@ -73,12 +73,12 @@
 
 | 작업 | 환경 | 비고 |
 |---|---|---|
-| LoRA 파인튜닝 | **Colab A100/L4** | OpenVLA 7B LoRA 는 24GB+ 필요 -> RTX 4070(12GB) 불가 |
+| LoRA 파인튜닝 | **RunPod RTX 4090 (24GB)** | OpenVLA 7B LoRA 는 24GB+ 필요 -> RTX 4070(12GB) 불가 |
 | 머지 + 4-bit 양자화 | 로컬 4070 | 약 6GB 로 축소 -> 12GB 안착 |
 | eval 추론 루프 | 로컬 4070 + ROS2 | Phase 4 의 `vla_node`(추론 노드) 재사용. sim 단일 task 루프는 본 Phase 에서 신규 구축 |
 
 
-- **가용성/비용이 변수**: A100 이 항상 잡히지 않음. L4 + gradient accumulation 으로 우회 가능(시간 증가).
+- **가용성/비용이 변수**: Community Cloud 인스턴스는 회수될 수 있고 유휴 과금이 있다 -> network volume 체크포인트 필수, 작업 종료 시 pod 중지 (SETUP.md §5).
 - **Step 0 실측 실패 시 분기**: LoRA 대상을 action head 인근 어댑터로 축소, sim 소량 데이터, before/after 를 단일 변형으로 한정, 주장 톤을 "경량 adaptation 실험"으로 (롤백 옵션 B).
 - 컴퓨트 전략의 단일 진실 공급원은 [`Studies/Phase 4/SETUP.md`](../Studies/Phase%204/SETUP.md) 의 분업 원칙과 공유 — v1.5 는 그 "LoRA 파인튜닝 트랙"을 본 산출물로 승격한 것이다.
 
@@ -89,7 +89,7 @@
 ## Section 0: 시작 전 (Step 0 실측)
 
 
-- [ ] OpenVLA 7B LoRA 1회 사이클이 Colab A100/L4 에서 가능한지 실측 (시간/비용/체크포인트)
+- [ ] OpenVLA 7B LoRA 1회 사이클이 RunPod RTX 4090 에서 가능한지 실측 (시간/비용/체크포인트)
 - [ ] fine-tuned 모델 4-bit 추론이 RTX 4070 12GB 에 OOM 없이 올라가는지 확인
 - [ ] sim 데이터 생성 방식 확정 (어느 sim, 어떤 task, 수집 규모) + OpenVLA 미학습 분포인지 점검
 - [ ] eval N 및 통계 처리(분산/신뢰구간) 기준 1차 결정
@@ -120,8 +120,8 @@
 
 | 주차 | 내용 | 핵심 |
 |------|------|------|
-| 3 | Colab LoRA 파인튜닝 + 체크포인트 주기 저장 | 세션 끊김 대비 (SETUP.md §5.3) |
-| 4 | LoRA 가중치 -> Drive -> 로컬 머지 + 4-bit 양자화 + 호환성 검증 | 버전 매칭(SETUP.md §7) |
+| 3 | RunPod LoRA 파인튜닝 + 체크포인트 주기 저장 | 중단 대비 (SETUP.md §5.3) |
+| 4 | LoRA 가중치 -> 로컬 rsync -> 머지 + 4-bit 양자화 + 호환성 검증 | 버전 매칭(SETUP.md §7) |
 
 
 ---
@@ -147,7 +147,7 @@
 
 ### adaptation 파이프라인
 - [ ] sim 생성 데이터가 OpenVLA 미학습 분포임을 확인
-- [ ] LoRA 파인튜닝 1 사이클 완료 (Colab) + 체크포인트
+- [ ] LoRA 파인튜닝 1 사이클 완료 (RunPod) + 체크포인트
 - [ ] 로컬 머지 + 4-bit 양자화 + 호환성 검증 통과
 
 

@@ -14,7 +14,7 @@
 
 Phase 4.5 의 모든 week 를 시작하기 *전에* [`SETUP.md`](SETUP.md) 를 1회 수행한다.
 
-**왜 별도 단계가 필요한가**: v1.5 는 **학습(Colab A100/L4) + 추론/eval(로컬 4070 4-bit)** 분업을 전제로 한다. 이 분업·버전 매칭의 단일 진실 공급원은 [`Studies/Phase 4/SETUP.md`](../Phase%204/SETUP.md) 이며, 본 Phase 의 SETUP 은 그 위에 **adaptation 전용 추가분**(sim 데이터 생성, LoRA 학습 스크립트, eval harness)만 얹는다.
+**왜 별도 단계가 필요한가**: v1.5 는 **학습(RunPod RTX 4090) + 추론/eval(로컬 4070 4-bit)** 분업을 전제로 한다. 이 분업·버전 매칭의 단일 진실 공급원은 [`Studies/Phase 4/SETUP.md`](../Phase%204/SETUP.md) 이며, 본 Phase 의 SETUP 은 그 위에 **adaptation 전용 추가분**(sim 데이터 생성, LoRA 학습 스크립트, eval harness)만 얹는다.
 
 
 ---
@@ -35,7 +35,7 @@ v1(zero-shot) 베이스라인 위에서 OpenVLA 를 sim 데이터로 LoRA adapta
 ```
 Studies/Phase 4.5/
   week1/ ~ week2/  # sim 데이터 생성 + OpenVLA 포맷 변환
-  week3/ ~ week4/  # Colab LoRA 학습 + 로컬 머지/양자화
+  week3/ ~ week4/  # RunPod LoRA 학습 + 로컬 머지/양자화
   week5/ ~ week6/  # eval harness (N회) + before/after 분석 + 블로그/공개
   lora/            # LoRA 어댑터 (gitignore — *.pt/*.safetensors)
   eval/            # eval harness + 결과 표/그래프 (outputs/ gitignore)

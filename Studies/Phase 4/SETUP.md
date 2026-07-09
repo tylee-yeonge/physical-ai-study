@@ -6,7 +6,7 @@
 
 ## 0. 한 줄 요약
 
-OpenVLA 7B 는 RTX 4070 12GB 로 **학습이 불가능**하다. 따라서 무거운 LoRA 파인튜닝은 Colab (A100/L4) 에서, 가벼운 추론은 로컬 4070 + ROS2 환경에서 4bit 양자화로 돌린다. 환경 구축은 두 갈래로 진행된다.
+OpenVLA 7B 는 RTX 4070 12GB 로 **학습이 불가능**하다. 따라서 무거운 LoRA 파인튜닝·sim 대규모 작업은 **RunPod** (Community Cloud RTX 4090 24GB) 에서, 가벼운 추론은 로컬 4070 + ROS2 환경에서 4bit 양자화로 돌린다. 환경 구축은 두 갈래로 진행된다. **Colab 은 SSH 불가·세션 휘발로 배제한다 (2026-07 결정).** 4070 반납 (2026.08) 후에는 추론·eval 도 Docker 이미지로 RunPod 에 이관한다 (Phase 4.5 Section 0).
 
 **적용 산출물**: 산출물 v1 (RT-2/OpenVLA 블로그 2편 + ROS2 minimal demo).
 
@@ -38,9 +38,9 @@ OpenVLA 7B 는 RTX 4070 12GB 로 **학습이 불가능**하다. 따라서 무거
 | 환경 | 오프라인, ROS2 불필요 | ROS2 노드 통합 필수 |
 | 카메라/센서 | 불필요 | ELP 스테레오 입력 필요 |
 | 세션 끊김 | 체크포인트로 복구 가능 | 끊기면 데모 자체가 안 됨 |
-| 적합 환경 | **Colab (클라우드 GPU)** | **로컬 4070 + ROS2** |
+| 적합 환경 | **RunPod (클라우드 GPU)** | **로컬 4070 + ROS2** |
 
-- Colab 의 단점 (세션 끊김 / ROS2 미지원 / 카메라 미연결) 이 **학습에는 거의 다 무력화**된다.
+- 클라우드 GPU 의 단점 (인스턴스 중단 / ROS2 미지원 / 카메라 미연결) 이 **학습에는 거의 다 무력화**된다.
 - 추론의 요구 (실시간 / ROS2 / 센서) 는 **로컬이어야만** 충족된다.
 
 이 분업은 실무 표준 패턴이기도 하다: **무거운 학습은 클라우드, 가벼운 추론은 엣지.** Phase 6-7 에서 자작 팔 + Jetson 배포로 갈 때도 동일한 구조가 재사용된다.
@@ -70,9 +70,7 @@ OpenVLA 7B 는 RTX 4070 12GB 로 **학습이 불가능**하다. 따라서 무거
 Phase 4 진입 (2026.06 예정) 직전에 한 번 더 점검한다.
 
 ### 2.1 계정/구독
-- [x] Google 계정 (Colab + Drive 동일 계정)
-- [ ] (선택) Colab Pro 구독 — v2 LoRA 파인튜닝 트랙 진입 시에만 필요 (A100/L4). v1 필수 트랙은 무료 T4 + 로컬 4070 으로 충분하므로 Pro 불필요
-- [x] Google Drive 잔여 용량 — LoRA 가중치 + 체크포인트 약 10-30GB 예상
+- [ ] (선택) RunPod 계정 + 크레딧 충전 — v1.5 LoRA 파인튜닝 트랙 진입 시에만 필요 (Community Cloud RTX 4090). v1 필수 트랙은 로컬 4070 으로 충분
 - [x] HuggingFace 계정 + Access Token (OpenVLA 가중치 다운로드)
 
 ### 2.2 로컬 (Ubuntu PC + RTX 4070 12GB)
@@ -94,16 +92,16 @@ Phase 4 진입 (2026.06 예정) 직전에 한 번 더 점검한다.
 
 ```mermaid
 flowchart LR
-    subgraph Colab["Colab (A100 / L4) - 학습"]
+    subgraph RunPod["RunPod (RTX 4090) - 학습"]
         direction TB
         C1[베이스 OpenVLA 7B 로드 BF16]
         C2[LoRA 어댑터 파인튜닝]
-        C3[체크포인트 주기 저장]
+        C3[체크포인트 network volume 저장]
         C4[최종 LoRA 가중치 추출]
         C1 --> C2 --> C3 --> C4
     end
 
-    subgraph Drive["Google Drive (가중치 전송)"]
+    subgraph Volume["network volume (가중치 보존)"]
         D1[LoRA weights<br/>수백 MB - 수 GB]
     end
 
@@ -117,21 +115,21 @@ flowchart LR
         L1 --> L2 --> L3 --> L4 --> L5
     end
 
-    C4 -->|업로드| D1
-    D1 -->|다운로드| L1
+    C4 -->|저장| D1
+    D1 -->|rsync 다운로드| L1
 ```
 
-### 3.2 Colab 측 (학습)
+### 3.2 RunPod 측 (학습)
 
-1. conda/pip 환경 세팅 — **버전 고정** (§7 참고)
+1. SSH 접속 + Docker 이미지 기동, pip 환경 세팅 — **버전 고정** (§7 참고)
 2. 베이스 OpenVLA 7B 로드 (BF16)
-3. LoRA 어댑터로 파인튜닝 (DDP 불필요, 단일 A100 이면 충분)
-4. 학습 중 체크포인트 주기적 저장 (세션 끊김 대비, §5.3)
-5. 최종 LoRA 가중치를 Google Drive 에 저장
+3. LoRA 어댑터로 파인튜닝 (DDP 불필요, 단일 RTX 4090 24GB 로 충분)
+4. 학습 중 체크포인트 주기적 저장 (인스턴스 회수 대비, §5.3)
+5. 최종 LoRA 가중치를 network volume 에 저장
 
 ### 3.3 로컬 측 (추론)
 
-6. Drive 에서 LoRA 가중치 다운로드 (rclone 권장; §8)
+6. RunPod volume 에서 LoRA 가중치 다운로드 (rsync; §8)
 7. 베이스 모델에 LoRA 머지
 8. 4bit 양자화 (bitsandbytes) 로 약 7GB 로 축소 → 12GB 에 안착
 9. ROS2 lifecycle 노드로 래핑 (기존 ROS2 미들웨어 경험 활용)
@@ -144,11 +142,11 @@ flowchart LR
 
 각 week 에서 어떤 환경이 필요한지 미리 파악해 두면 출장 일정 등을 잡을 때 도움이 된다.
 
-| Week | 작업 | Colab 필요 | 로컬 GPU 필요 | ROS2 필요 |
+| Week | 작업 | 클라우드 GPU 필요 | 로컬 GPU 필요 | ROS2 필요 |
 |------|------|-----------|--------------|-----------|
 | 1-3  | RT-2 정독 + 블로그 1 | X | X | X |
 | 4-5  | OpenVLA 정독 | X | X | X |
-| 6    | OpenVLA HuggingFace 모델 카드 + 환경 셋업 | 조건부 (T4 무료) | 선택 | X |
+| 6    | OpenVLA HuggingFace 모델 카드 + 환경 셋업 | X | 선택 | X |
 | 7    | OpenVLA 블로그 1 | X | X | X |
 | 8    | HuggingFace inference + 양자화 | X | O | X |
 | 9    | I/O spec + cv_bridge | X | O | O |
@@ -156,59 +154,39 @@ flowchart LR
 | 11   | ROS2 dry-run (subscribe → inference → publish) | X | O | O |
 | 12   | Rerun 시각화 + 1분 영상 | X | O | O |
 | 13-16| 블로그 마무리 + 패키징 | X | O (영상 보강 시) | O |
-| 병행 (선택) | LoRA 파인튜닝 | **O (A100 권장)** | X | X |
+| 병행 (선택) | LoRA 파인튜닝 | **O (RTX 4090)** | X | X |
 
 > LoRA 파인튜닝은 본 Phase 의 *필수* 트랙이 아니다. 시간/예산 제약 시 베이스 OpenVLA + 양자화 추론만으로도 minimal demo 산출 가능. Week 6-7 사이에 병행으로 시도하는 것을 권장.
 
 ---
 
-## 5. Colab 측 환경 세팅
+## 5. RunPod 측 환경 세팅 (학습, v1.5 트랙)
 
 ### 5.1 GPU 선택 가이드
 
 | GPU | VRAM | 티어 | Phase 4 용도 |
 |-----|------|------|-------------|
-| T4  | 15GB | 무료 | 추론 검증 (7B 는 양자화 필요), 가벼운 실험 (week 6) |
-| L4  | 22.5GB | Pro | 추론 여유 + LoRA 양자화 학습 가능 |
-| A100 | 40/80GB | Pro / Pay-as-you-go | LoRA 파인튜닝 권장 사양 충족 |
+| RTX 4090 (Community Cloud) | 24GB | 기본 선택 | LoRA 파인튜닝 요건 (24GB+) 충족 |
+| A40 / A100 | 48 / 40-80GB | 필요 시 | 4090 가용성 부족 또는 더 큰 batch 필요 시 |
 
-- 컴퓨트 유닛 1개 약 0.1 달러. A100 은 유닛 소모가 빠름.
-- 유료 플랜에서도 GPU 할당은 가용성에 따라 변동 — A100 이 항상 잡히지는 않음.
-- 무료 티어: 최대 12시간 세션 + idle 타임아웃 → **체크포인트 저장 필수**.
+- 요금은 셋업 시점에 확인한다 — 시세가 변하므로 수치를 문서에 고정하지 않는다.
+- Community Cloud 는 저렴한 대신 인스턴스가 회수될 수 있다 → **체크포인트 저장 필수** (§5.3).
+- 유휴 시간에도 pod 가 켜져 있으면 과금된다 → 작업 종료 시 pod 중지 습관화.
 
-권장 진행: 추론 검증은 **무료 T4 → 부족하면 Pro L4 → LoRA 파인튜닝은 A100** 으로 단계적으로 올린다.
+### 5.2 표준 셋업 절차
 
-### 5.2 Colab 노트북 표준 셋업 셀
+1. RunPod 계정 + SSH public key 등록
+2. pod 생성 — CUDA·PyTorch 버전이 §7 매트릭스와 일치하는 Docker 이미지 선택 (또는 직접 빌드)
+3. network volume 을 pod 에 마운트 (가중치·체크포인트 저장 경로)
+4. 코드/데이터 rsync 업로드 → `pip install -r requirements_runpod.txt` (버전 고정; §7 참고)
+5. HuggingFace 캐시를 volume 경로로 지정 (`HF_HOME`) — pod 재생성 시 재다운로드 회피
 
-학습 노트북 최상단에 두는 표준 셀:
-
-```python
-# 1) GPU 확인
-!nvidia-smi
-
-# 2) Drive 마운트 (체크포인트 + LoRA 저장 경로)
-from google.colab import drive
-drive.mount('/content/drive')
-
-# 3) 작업 디렉토리
-import os
-WORK_DIR = '/content/drive/MyDrive/phase4_openvla'
-os.makedirs(WORK_DIR, exist_ok=True)
-os.chdir(WORK_DIR)
-
-# 4) 의존성 설치 (버전 고정; §7 참고)
-!pip install -r requirements_colab.txt
-
-# 5) HuggingFace 캐시를 Drive 로 (선택; 세션 끊겨도 재다운로드 회피)
-os.environ['HF_HOME'] = f'{WORK_DIR}/.hf_cache'
-```
-
-### 5.3 세션 끊김 대비
+### 5.3 중단 대비 (인스턴스 회수·재시작)
 
 - 체크포인트 주기: **N step 마다 1회** (학습 스크립트의 `save_steps` 인자 명시)
-- 저장 위치: Drive (`/content/drive/MyDrive/phase4_openvla/checkpoints/`)
+- 저장 위치: network volume (pod 중지·회수 후에도 잔존)
 - 저장 항목: LoRA adapter + optimizer state + step count
-- 재시작 시: 최신 step adapter 로드 + optimizer state 복원
+- 재시작 시: 새 pod 에 volume 마운트 → 최신 step adapter 로드 + optimizer state 복원
 
 ---
 
@@ -219,7 +197,7 @@ os.environ['HF_HOME'] = f'{WORK_DIR}/.hf_cache'
 ```
 /workspace/phase4_workspace/
   openvla/          # 베이스 가중치 (약 15GB)
-  lora/             # Drive 에서 다운로드한 LoRA
+  lora/             # RunPod volume 에서 다운로드한 LoRA
   merged/           # 베이스 + LoRA 머지 결과
   quantized/        # 4bit 양자화 결과 (약 7GB)
   ros2_ws/          # ROS2 워크스페이스 (vla_node 패키지)
@@ -242,13 +220,13 @@ Phase 3 패턴 (`.venv-weekN`) 을 그대로 따른다. 각 week 디렉토리의
 
 ## 7. 버전 매칭 (리스크 1: 가장 흔한 함정)
 
-Colab 환경 (CUDA, PyTorch, transformers) 과 로컬 환경의 버전이 다르면, 학습된 가중치를 로컬에서 **로딩 못 하는** 사태가 발생한다. 학습 시작 *전에* 양쪽 핵심 라이브러리 버전을 맞춰둔다.
+RunPod 환경 (CUDA, PyTorch, transformers) 과 로컬 환경의 버전이 다르면, 학습된 가중치를 로컬에서 **로딩 못 하는** 사태가 발생한다. 학습 시작 *전에* 양쪽 핵심 라이브러리 버전을 맞춰둔다.
 
 > 이 작업이 흔히 말하는 "환경 세팅 2주" 의 실체 중 하나. 미리 맞추면 며칠 아낀다.
 
 ### 7.1 고정 대상 매트릭스
 
-| 항목 | Colab (학습, v1.5 진입 시 맞춤) | 로컬 (추론, `.venv-vla` 실설치 2026-06) | 비고 |
+| 항목 | RunPod (학습, v1.5 진입 시 맞춤) | 로컬 (추론, `.venv-vla` 실설치 2026-06) | 비고 |
 |------|-------------|------------|------|
 | CUDA | 로컬과 major 일치 목표 | 13.0 (driver 580.159.03) | 드라이버는 더 높아도 OK |
 | Python | 동일 minor (3.12) | 3.12.3 | |
@@ -260,18 +238,18 @@ Colab 환경 (CUDA, PyTorch, transformers) 과 로컬 환경의 버전이 다르
 | bitsandbytes | 0.49.x | 0.49.2 | 양자화 포맷 호환성 |
 | peft | v1.5 진입 시 양쪽 동시 추가 | 미설치 | LoRA adapter 포맷 호환성 |
 
-> 고정 버전의 본체와 근거 주석은 `week8/requirements.txt` (§7.2). 로컬 열은 `.venv-vla` 실설치 기준이며, Colab 열은 v1.5 LoRA 트랙 진입 시 로컬에 맞춰 작성한다 (`requirements_colab.txt`).
+> 고정 버전의 본체와 근거 주석은 `week8/requirements.txt` (§7.2). 로컬 열은 `.venv-vla` 실설치 기준이며, RunPod 열은 v1.5 LoRA 트랙 진입 시 로컬에 맞춰 작성한다 (`requirements_runpod.txt`).
 
 ### 7.2 공유 requirements 파일
 
 - 로컬 추론용 버전 고정의 단일 진실 공급원은 [`week8/requirements.txt`](week8/requirements.txt) — `.venv-vla` 공용 venv 생성 시 사용한다 (§6.2). OpenVLA remote code 가 요구하는 고정 버전 (transformers 4.40.1 / tokenizers 0.19.1 / timm 0.9.16 / accelerate 1.0.1 이하) 의 근거 주석 포함. 별도 `requirements_local.txt` 는 두지 않는다.
-- `requirements_colab.txt` (학습용; peft, accelerate, wandb 포함) 는 v1.5 LoRA 트랙 진입 시 본 디렉토리에 작성한다.
+- `requirements_runpod.txt` (학습용; peft, accelerate, wandb 포함) 는 v1.5 LoRA 트랙 진입 시 본 디렉토리에 작성한다.
 
 두 파일의 공통 라이브러리는 **버전 문자열까지 동일**해야 한다. 변경 시 양쪽 동시 업데이트.
 
 ### 7.3 호환성 검증 절차
 
-LoRA 가중치를 Drive 에 올린 *직후*, 로컬에서 다음을 1회 실행:
+LoRA 가중치를 volume 에 저장한 *직후*, 로컬로 받아 다음을 1회 실행:
 
 ```python
 from peft import PeftModel
@@ -288,29 +266,27 @@ print("LoRA load OK")
 
 ## 8. 가중치 / 데이터 전송 워크플로우
 
-### 8.1 Colab → Drive → 로컬 흐름
+### 8.1 RunPod volume ↔ 로컬 흐름
 
 ```mermaid
 sequenceDiagram
-    participant C as Colab
-    participant D as Google Drive
+    participant R as RunPod pod
+    participant V as network volume
     participant L as 로컬 4070
 
-    C->>C: LoRA fine-tune (수 시간)
-    C->>D: checkpoint-XXXX/ 업로드 (자동, N step 마다)
-    C->>D: 최종 adapter_model.safetensors 업로드
-    L->>D: rclone 또는 gdown 으로 다운로드
+    R->>R: LoRA fine-tune (수 시간)
+    R->>V: checkpoint-XXXX/ 저장 (자동, N step 마다)
+    R->>V: 최종 adapter_model.safetensors 저장
+    L->>R: rsync 로 다운로드 (SSH 경유)
     L->>L: 베이스 + LoRA 머지
     L->>L: 4bit 양자화
     L->>L: ROS2 노드에서 추론
 ```
 
-### 8.2 다운로드 도구
+### 8.2 전송 도구
 
-- **rclone**: Drive 와 로컬 디스크 동기화. 큰 파일에 안정적. 처음 1회만 설정.
-- **gdown**: 단일 파일/폴더 빠른 다운로드. 간편하지만 큰 파일에서 가끔 실패.
-
-rclone 설정 후엔 `rclone copy drive:phase4_openvla/lora/ ~/phase4_workspace/lora/` 한 줄로 동기화.
+- **rsync** (기본): `rsync -avzP -e "ssh -p <pod-port>" root@<pod-host>:/workspace/lora/ ~/phase4_workspace/lora/` — 중단 시 이어받기 가능, 큰 파일에 안정적.
+- **scp** (대안): 단일 파일 빠른 복사. 이어받기 없음.
 
 ---
 
@@ -323,10 +299,10 @@ rclone 설정 후엔 `rclone copy drive:phase4_openvla/lora/ ~/phase4_workspace/
 - Phase 4 목표는 **"돌아가는 걸 보여주는 minimal demo"** — 품질 저하 허용 범위.
 - "성능이 좋다" 가 목표가 아님. 양자화 전후 비교 자체를 블로그 소재로 활용 (§10 참고).
 
-### 9.2 리스크 3: Colab 세션 불안정
+### 9.2 리스크 3: RunPod 가용성·비용
 
-- 학습: 체크포인트 저장으로 복구 → 영향 적음.
-- 가용성 변동으로 A100 못 잡히면 L4 + gradient accumulation 으로 우회 (시간만 더 걸림).
+- Community Cloud 인스턴스는 회수될 수 있다 → network volume 체크포인트 (§5.3) 로 복구, 영향 적음.
+- 유휴 과금 주의 — 작업 종료 시 pod 중지. 요금·가용성은 셋업 시점에 재확인.
 
 ### 9.3 리스크 4: 4070 에서 추론도 빠듯할 가능성
 
@@ -341,12 +317,12 @@ rclone 설정 후엔 `rclone copy drive:phase4_openvla/lora/ ~/phase4_workspace/
 
 이 분업 자체가 좋은 콘텐츠다. 같은 처지 (consumer GPU 보유자) 가 많아 검색 트래픽이 나온다.
 
-- **글감 1**: "Consumer GPU 로 VLA 배포하기 — 학습은 Colab, 추론은 로컬 양자화"
+- **글감 1**: "Consumer GPU 로 VLA 배포하기 — 학습은 클라우드, 추론은 로컬 양자화"
   - 권장 작성 시점: week 7 (OpenVLA 블로그) 의 부가 코너 또는 week 13-14 (블로그 마무리)
 - **글감 2**: "OpenVLA 4bit 양자화 추론 + ROS2 노드 통합 후기" (양자화 전후 성능/메모리 비교 표 포함)
   - 권장 작성 시점: week 12 (영상 마감) 직후 또는 week 13-14
 
-검색 태그 예: `OpenVLA`, `VLA fine-tuning Colab`, `4bit quantization ROS2`, `RTX 4070 LLM`.
+검색 태그 예: `OpenVLA`, `VLA fine-tuning RunPod`, `4bit quantization ROS2`, `RTX 4070 LLM`.
 
 velog 작성 + LinkedIn 공유까지가 한 사이클.
 
@@ -357,20 +333,20 @@ velog 작성 + LinkedIn 공유까지가 한 사이클.
 본 SETUP 의 진행 상태 + Phase 4 전체에서 컴퓨트 전략이 정상 가동되는지 추적용. (Roadmap Phase 4 의 완료 체크리스트와 별개; 환경 관점 단일 보드.)
 
 ### 11.1 진입 전
-- [x] §2 사전 점검 체크리스트 전부 통과 — 잔여 미체크는 "(선택) Colab Pro" 뿐이며 v1 필수 트랙에 불필요
+- [x] §2 사전 점검 체크리스트 전부 통과 — 잔여 미체크는 "(선택) RunPod 계정" 뿐이며 v1 필수 트랙에 불필요
 - [x] 로컬 추론 라이브러리 버전 확인 — `week8/requirements.txt` 로 고정 (§7.2)
 
 ### 11.2 학습 측 (v1.5 / Phase 4.5 병행 트랙, 선택)
-- [ ] Colab Pro 구독 + 컴퓨트 유닛 확보 (이 트랙 진입 시에만)
-- [ ] Colab / 로컬 라이브러리 버전 매칭 (`requirements_colab.txt` + `week8/requirements.txt`; §7)
-- [ ] Colab 에서 베이스 OpenVLA 로드 검증 (추론 한 번 굴려보기)
+- [ ] RunPod 계정 + 크레딧 확보 (이 트랙 진입 시에만)
+- [ ] RunPod / 로컬 라이브러리 버전 매칭 (`requirements_runpod.txt` + `week8/requirements.txt`; §7)
+- [ ] RunPod 에서 베이스 OpenVLA 로드 검증 (추론 한 번 굴려보기)
 - [ ] LoRA 파인튜닝 스크립트 작성 + 체크포인트 저장 설정
-- [ ] 학습 완료 → LoRA 가중치 Drive 저장
+- [ ] 학습 완료 → LoRA 가중치 network volume 저장
 - [ ] §7.3 호환성 검증 통과
 
 ### 11.3 추론 측 (week 8-12)
 - [x] 4070 에서 베이스 모델 4bit 양자화 추론 동작 확인 — week6 실측: OOM 없이 로드, mean 300.3 ms (3.33 Hz, n=100), VRAM 기록 (§1.3)
-- [ ] (v1.5) Drive 에서 LoRA 가중치 다운로드 + 베이스에 머지 + 4bit 재양자화
+- [ ] (v1.5) volume 에서 LoRA 가중치 다운로드 + 베이스에 머지 + 4bit 재양자화
 - [ ] ROS2 노드 래핑 + ELP 카메라 연동
 - [ ] Rerun 시각화 + 1분 데모 영상
 

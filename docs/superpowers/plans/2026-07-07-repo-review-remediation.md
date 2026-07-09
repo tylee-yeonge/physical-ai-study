@@ -253,7 +253,7 @@ git commit -m "docs: reposition headline to robot learning deployment engineer"
 
 **Interfaces:** SETUP.md 가 컴퓨트 전략의 단일 진실 공급원 — Roadmap/Phase 4.5.md (Task 1-8) 는 이 결과를 인용만 한다.
 
-- [ ] **Step 1: `Studies/Phase 4/SETUP.md` 전환**
+- [x] **Step 1: `Studies/Phase 4/SETUP.md` 전환**
 
 섹션별 지시 (수치 본체 §1.3 은 불변):
 
@@ -270,7 +270,7 @@ git commit -m "docs: reposition headline to robot learning deployment engineer"
 | §9.2 리스크 | "Colab 세션 불안정" → "RunPod 가용성·비용" (Community Cloud 는 인스턴스 회수 가능성 있음 → 체크포인트 필수, 유휴 과금 주의) |
 | §11.2 체크리스트 | Colab 문구 3곳 → RunPod 로 교체 |
 
-- [ ] **Step 2: 인용 문서 동기화**
+- [x] **Step 2: 인용 문서 동기화**
 
 - `Studies/Phase 4/README.md:16` — "학습은 Colab A100/L4" → "학습은 RunPod (RTX 4090)" 문장 교체
 - `Roadmap/Phase 4.md:85` — "(v1.5) LoRA 파인튜닝 | Colab A100/L4 (클라우드)" → "RunPod RTX 4090 (클라우드)"
@@ -278,7 +278,9 @@ git commit -m "docs: reposition headline to robot learning deployment engineer"
 - `Studies/Phase 4.5/SETUP.md` — §0 한 줄 요약·§1 공유 목록의 Colab 5곳 → RunPod (구조 재작성은 Phase 4.5 진입 시 — 문자열 수준만)
 - `Studies/Phase 4.5/README.md:17` — 동일 교체
 
-- [ ] **Step 3: 검증**
+- [x] **Step 3: 검증**
+
+진행 상황 (2026-07-09): 잔존 1건은 `Studies/Phase 4/SETUP.md` §0 의 배제 사유 기록 ("Colab 은 SSH 불가·세션 휘발로 배제") — 낡은 계획 참조가 아니라 의사결정 근거이므로 의도적 잔존. 그 외 0건. Roadmap/Phase 4.5.md 의 컴퓨트 문자열 교체 (계획상 Task 1-8 몫) 도 검증 정합을 위해 본 Task 에서 함께 수행함. `Studies/Phase 4/notes.md` 의 과거 노트 내 Colab 2건은 의미 보존 선에서 "클라우드 GPU" 로 일반화.
 
 ```bash
 grep -rn "Colab" README.md Roadmap/ "Studies/Phase 4/SETUP.md" "Studies/Phase 4/README.md" \
@@ -286,7 +288,7 @@ grep -rn "Colab" README.md Roadmap/ "Studies/Phase 4/SETUP.md" "Studies/Phase 4/
 # 기대: 0건 (week 자료 내 잔존은 범위 밖 — §0.1 참조)
 ```
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add "Studies/Phase 4" "Studies/Phase 4.5" Roadmap/ README.md
