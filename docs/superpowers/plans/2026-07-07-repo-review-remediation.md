@@ -392,14 +392,16 @@ git commit -m "docs: adopt koch v1.1 leader-follower arm and update bom"
 **Files:**
 - Modify: `Roadmap/Phase 4.5.md`, `README.md` (gantt·타임라인·마일스톤·부록 A·B), `Studies/Phase 4/notes.md` (갱신 노트 1줄), `Studies/Phase 4.5/README.md`, `Roadmap/Phase 4.md` (다음 단계 절)
 
-- [ ] **Step 1: `Roadmap/Phase 4.5.md` 갱신**
+- [x] **Step 1: `Roadmap/Phase 4.5.md` 갱신**
+
+진행 상황 (2026-07-09): 하드웨어 줄의 Colab→RunPod 교체는 Task 1-5 에서 선행 완료. Section 0 확장 시 "ManiSkill/SAPIEN sim 환경 구축" 은 기존 체크 항목이 이미 커버해 중복 추가하지 않고, Docker 컨테이너화 + RunPod 이관 검증 2개만 신설. Section 1-3 은 표가 아니라 절 제목에 시기 병기 (2026.09 / 2026.09-10 / 2026.10-11).
 
 - 헤더 기간 — "약 7-10주 (2026 하반기, v1 레포 기록 직후)" → "**Section 0: 2026.08 (전진 배치)** / Sections 1-3: 2026.09-11". 전진 사유 병기: "GPU (4070) 반납 (2026.08) 전에 sim 환경을 구축·컨테이너화해 로컬 GPU 없이 재현 가능한 상태로 만들어야 한다"
 - 하드웨어 줄 — Colab A100/L4 → RunPod RTX 4090 (6곳: 8, 19, 76, 81, 92, 123, 150행. Task 1-5 와 동일 문구)
 - Section 0 체크리스트 확장 — 기존 항목 유지 + 추가: `- [ ] ManiSkill/SAPIEN sim 환경 구축 (v1 순서 3 선정 재사용)` / `- [ ] sim + eval 환경 Docker 컨테이너화` / `- [ ] RunPod 에서 컨테이너 기동 + zero-shot 1회 추론 재현 확인 (로컬 GPU 비의존 검증)` — 각각 2026.08 데드라인 명기
 - Sections 1-3 표의 시기 열을 2026.09-11 로 갱신
 
-- [ ] **Step 2: README 타임라인 동기화**
+- [x] **Step 2: README 타임라인 동기화**
 
 - README.md:57 (gantt) — `Phase 4.5 (VLA v1.5: LoRA adaptation) :a35, 2026-11, 2M` → 2행: `Phase 4.5 Section 0 (sim+Docker+RunPod) :a35a, 2026-08, 1M` / `Phase 4.5 Sections 1-3 (LoRA+eval) :a35b, 2026-09, 3M`
 - README.md:69 — v1.5 공개 마일스톤 `2026-12` → `2026-11` (Sections 1-3 종료 직후)
@@ -409,7 +411,7 @@ git commit -m "docs: adopt koch v1.1 leader-follower arm and update bom"
 - README.md:600 (부록 B v1.5 행) — 시점 "2026 하반기" 유지, 내용에 Section 0 전진 주석
 - Roadmap/Phase 4.md:200 (다음 단계) — "8월 초 체크포인트에서 9-10월 조기 진입 여부 결정" → "Section 0 은 2026.08 전진 확정 (GPU 반납 대비), Sections 1-3 은 2026.09-11"
 
-- [ ] **Step 3: `Studies/Phase 4/notes.md` 갱신 노트**
+- [x] **Step 3: `Studies/Phase 4/notes.md` 갱신 노트**
 
 "8월 체크포인트 조기 수행" 노트 아래 1줄 추가 (기존 노트는 의사결정 로그로 보존):
 
@@ -417,7 +419,7 @@ git commit -m "docs: adopt koch v1.1 leader-follower arm and update bom"
 - **2026-07-07 갱신**: Section 0 선행을 9-10월 → **2026.08 로 재전진**. 사유: RTX 4070 반납 (2026.08) 전에 sim 구축·Docker 화·RunPod 이관 검증이 끝나야 로컬 GPU 없이 Sections 1-3 진행 가능 (검토 보고서 v1.4 §2.3). Sections 1-3 은 2026.09-11.
 ```
 
-- [ ] **Step 4: 검증**
+- [x] **Step 4: 검증**
 
 gantt 렌더링 확인 (VS Code 미리보기) + 기간 표기 일관성:
 
@@ -425,7 +427,7 @@ gantt 렌더링 확인 (VS Code 미리보기) + 기간 표기 일관성:
 grep -rn "2026.11-12" README.md Roadmap/    # 기대: Phase 4.5 용법 0건
 ```
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add Roadmap/ README.md "Studies/Phase 4/notes.md" "Studies/Phase 4.5/README.md"

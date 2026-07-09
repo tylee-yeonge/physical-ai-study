@@ -1,7 +1,7 @@
 # Phase 4.5: VLA v1.5 — OpenVLA LoRA adaptation (before/after 정량 분석)
 
 
-> **기간**: 약 7-10주 (2026 하반기, v1 레포 기록 직후 — v1 지연 최소화 원칙상 v1 우선). v1 에서 sim 을 제외하면서 **sim 환경 구축 + zero-shot baseline 측정이 본 Phase 로 이관**돼 원안(6-8주)보다 약 1-2주 늘었다.
+> **기간**: **Section 0 은 2026.08 (전진 배치)** / Sections 1-3 은 2026.09-11 (약 7-10주). 전진 사유: GPU (4070) 반납 (2026.08) 전에 sim 환경을 구축·컨테이너화해 로컬 GPU 없이 재현 가능한 상태로 만들어야 한다. v1 에서 sim 을 제외하면서 **sim 환경 구축 + zero-shot baseline 측정이 본 Phase 로 이관**돼 원안(6-8주)보다 약 1-2주 늘었다.
 > **목표**: sim task 의 zero-shot 성공률 베이스라인을 **본 Phase 에서 측정**하고, 그 위에서 OpenVLA 를 LoRA 로 **adaptation** 한 뒤 동일 sim task 의 성공률을 **before(zero-shot)/after(fine-tuned)** 로 비교·정량 분석한다.
 > **범위 (v1.5)**: 경량 LoRA adaptation, **sim 생성 데이터** (자작 팔 데이터 대기 안 함), 단일 task, 동일 embodiment. real 데이터 확장은 Phase 7.
 > **언어**: **Python** (HuggingFace transformers + peft) + **ROS2 (rclpy)** (eval 루프 재사용)
@@ -86,7 +86,7 @@
 ---
 
 
-## Section 0: 시작 전 (Step 0 실측)
+## Section 0: 시작 전 (Step 0 실측 + sim 구축·이관 — 2026.08, GPU 반납 전)
 
 
 - [ ] OpenVLA 7B LoRA 1회 사이클이 RunPod RTX 4090 에서 가능한지 실측 (시간/비용/체크포인트)
@@ -95,12 +95,14 @@
 - [ ] eval N 및 통계 처리(분산/신뢰구간) 기준 1차 결정
 - [ ] **sim 환경 구축 + zero-shot 성공률 baseline 측정** (v1 순서 3 의 ManiSkill 선정/PickCube 정의 재사용, sim 자체는 v1 에 없으므로 본 Phase 에서 신규 구축)
 - [ ] **before/after 측정 성립 구간 확인**: sim task 의 zero-shot 성공률(본 Phase 측정)이 포화(개선 폭 안 보임)도 0% 근처(비교 무의미)도 아닌 **중간 구간**인지 점검. 벗어나면 Section 1 에서 task 난이도를 조정
+- [ ] **sim + eval 환경 Docker 컨테이너화** (2026.08 — 4070 반납 후 재현 대비)
+- [ ] **RunPod 에서 컨테이너 기동 + zero-shot 1회 추론 재현 확인** (2026.08 — 로컬 GPU 비의존 검증)
 
 
 ---
 
 
-## Section 1: sim 데이터 생성 + 포맷팅 (1-2주)
+## Section 1: sim 데이터 생성 + 포맷팅 (1-2주, 2026.09)
 
 
 | 주차 | 내용 | 핵심 |
@@ -115,7 +117,7 @@
 ---
 
 
-## Section 2: LoRA 학습 + 로컬 이식 (2-3주)
+## Section 2: LoRA 학습 + 로컬 이식 (2-3주, 2026.09-10)
 
 
 | 주차 | 내용 | 핵심 |
@@ -127,7 +129,7 @@
 ---
 
 
-## Section 3: eval harness + before/after 분석 (2-3주)
+## Section 3: eval harness + before/after 분석 (2-3주, 2026.10-11)
 
 
 | 주차 | 내용 | 핵심 |

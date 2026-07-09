@@ -68,7 +68,8 @@ gantt
     Phase 2 (기하 기초 마무리) :a1, 2026-05, 1M
     Phase 3 (Detection+Depth, 비공개 리허설) :a2, 2026-06, 1M
     Phase 4 (VLA v1: zero-shot 추론 + ROS2) :a3, 2026-06, 4M
-    Phase 4.5 (VLA v1.5: LoRA adaptation) :a35, 2026-11, 2M
+    Phase 4.5 Section 0 (sim+Docker+RunPod) :a35a, 2026-08, 1M
+    Phase 4.5 Sections 1-3 (LoRA+eval) :a35b, 2026-09, 3M
     section 자작 팔
     HW 스파이크 (2-DOF 리스크 검증) :crit, h0, 2026-10, 3w
     Stage 1 (2~3DOF, v2 선행) :h1, 2027-01, 2M
@@ -80,7 +81,7 @@ gantt
     section 산출물 + 이직
     육아휴직 (~2027.03 복직) :active, leave, 2026-09, 6M
     v1 레포 기록 (ROS2 dry-run, 외부 공개는 v2) :milestone, d1, 2026-10, 0d
-    v1.5 공개 (LoRA adaptation) :milestone, d15, 2026-12, 0d
+    v1.5 공개 (LoRA adaptation) :milestone, d15, 2026-11, 0d
     복직 + 본격 실지원 개시 :milestone, d3, 2027-03, 0d
     본격 실지원 (복직 직후) :b2, 2027-03, 9M
     이직 실현 (레인지) :milestone, d2, 2027-12, 0d
@@ -109,7 +110,7 @@ gantt
 | 2026.03-05 | Stage 1 | Phase 2: Perception 기하 기초 (완료) | 카메라 모델 + Multi-view |
 | 2026.06 초 | Stage 1 | Phase 3 완료 (**비공개 리허설**, 공개 산출물 아님) | VLA wrapper 리허설 |
 | 2026.06-09 | Stage 1 | **Phase 4 (메인 단독): VLA v1 — pretrained OpenVLA zero-shot 추론 + ROS2 wrapper + 카메라/bag dry-run 측정 + 정독** | **산출물 v1 (2026 하반기 레포 기록, 외부 공개는 v2)** |
-| 2026.11-12 | Stage 1 | **Phase 4.5: VLA v1.5 — sim 구축 + OpenVLA LoRA adaptation + before/after 정량 분석** (sim 데이터, v1 추론 노드 재사용) | **산출물 v1.5 (둘째 층 adaptation 증거)** |
+| 2026.08 (Section 0) + 2026.09-11 (Sections 1-3) | Stage 1 | **Phase 4.5: VLA v1.5 — Section 0 (sim 구축·Docker·RunPod 이관, GPU 반납 전 전진) + OpenVLA LoRA adaptation + before/after 정량 분석** (sim 데이터, v1 추론 노드 재사용) | **산출물 v1.5 (둘째 층 adaptation 증거)** |
 | 2026.07-08 (병행) | Stage 1 | **시장 신호 probe 1단 (저가시성)**: 타겟사 JD 5-10개 정독 + 격차 매핑, 학습 리포 공개 증거 정비 | 시장 실측 → 우선순위 보정 |
 | 2026.09- (병행) | Stage 1 | **시장 신호 probe 2단 (고가시성)**: LinkedIn 헤드라인 교체 + 현직자 커피챗 1-2건 (휴직 개시·승인 확정 후) | 시장 실측 → 우선순위 보정 |
 | 2026.10 | Stage 1 | **하드웨어 스파이크 (2-3주)**: 2-DOF Dynamixel + ROS2 + URDF 파이프라인이 도는지만 검증 | 리스크 조기 검증 (분기 재평가 #1 입력) |
@@ -527,8 +528,9 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 - [ ] **레포에 산출물 v1 결과 기록** (README + latency/throughput 표) — 블로그 작성·1분 영상·velog/LinkedIn 외부 공개는 v2 로 이관
 
 
-#### 2026.10-12 (스파이크 + v1.5, 육아휴직 중 — 구직 지원 없음)
-- [ ] **Phase 4.5 완료 → 산출물 v1.5 공개** (OpenVLA LoRA adaptation + before/after 정량 분석, 둘째 층 증거. v1 기술 코어 확보 후 착수)
+#### 2026.08-12 (Phase 4.5 + 스파이크 — 구직 지원 없음)
+- [ ] (2026.08, GPU 반납 전) **Phase 4.5 Section 0**: ManiSkill sim 구축 + zero-shot baseline + Docker 컨테이너화 + RunPod 이관 검증
+- [ ] (2026.09-11) **Phase 4.5 Sections 1-3 완료 → 산출물 v1.5 공개** (OpenVLA LoRA adaptation + before/after 정량 분석, 둘째 층 증거)
 - [ ] 2-DOF Dynamixel + U2D2 + ROS2 토픽 각도 명령 1회 성공 (파이프라인 검증만)
 - [ ] 스파이크 결과로 Stage 1/2 일정·BOM 재산정 (터지면 즉시)
 - [ ] **6개월 분기 재평가 #1 (2026.11)** — 정찰 지원 없이 수행. 입력: 스파이크 결과 / v1 결과(레포) / 시장 신호 (probe 반응, 1순위 채용 활성도, OpenVLA 후속 모델 등장 여부)
@@ -595,7 +597,7 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 | Stage 1 Phase 2 | 기하 기초 | ~2026.05 | `Studies/Phase 2/` |
 | Stage 1 Phase 3 | Detection+Depth (비공개 리허설) | ~2026.06 | `Studies/Phase 3/` |
 | Stage 1 Phase 4 | VLA v1 (OpenVLA zero-shot + ROS2) | 2026.06-09 | `Studies/Phase 4/` |
-| Stage 1 Phase 4.5 | VLA v1.5 (OpenVLA LoRA adaptation, 둘째 층) | 2026.11-12 | `Studies/Phase 4.5/` |
+| Stage 1 Phase 4.5 | VLA v1.5 (OpenVLA LoRA adaptation, 둘째 층) | 2026.08-11 | `Studies/Phase 4.5/` |
 | Stage 1 Phase 5 | Foundation Model 기초 (실지원 병행) | 2027.02-04 | `Studies/Phase 5/` |
 | Stage 1 Phase 6 | Isaac Sim + 디지털 트윈 (산출물 v2) | 2027.05-07 | `Studies/Phase 6/` |
 | Stage 1 Phase 7 | Real-to-Sim-to-Real (산출물 v3) | 2027.08~ | `Studies/Phase 7/` |
@@ -613,7 +615,7 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 | 산출물 | 시점 | 내용 | 우선순위 |
 |---|---|---|---|
 | **v1** | 2026 하반기 | pretrained OpenVLA zero-shot 추론 → ROS2 wrapper → 카메라/bag dry-run (latency/throughput 측정, sim task 성공률은 v1.5) + RT-2/OpenVLA 정독. **레포 결과 기록만** (블로그 작성·1분 영상·외부 공개는 v2 로 이관) | **2 (기술 코어, v2 의 eval harness 기반)** |
-| **v1.5 (둘째 층 증거)** | 2026 하반기 | OpenVLA LoRA adaptation (sim 데이터) + zero-shot 대비 **before/after 성공률 정량 분석** (N회, 분산 포함) + 블로그 1편 (= Phase 4.5). 성공률 상승이 아닌 **설계-실행-분석** 이 기준 | **2 (둘째 층 adaptation 가점 카드)** |
+| **v1.5 (둘째 층 증거)** | 2026 하반기 (Section 0 은 2026.08 전진 — GPU 반납 대비) | OpenVLA LoRA adaptation (sim 데이터) + zero-shot 대비 **before/after 성공률 정량 분석** (N회, 분산 포함) + 블로그 1편 (= Phase 4.5). 성공률 상승이 아닌 **설계-실행-분석** 이 기준 | **2 (둘째 층 adaptation 가점 카드)** |
 | **v2 강화 카드 (헤드라인)** | 2027 | 자작 팔 결합 + **sim-to-real gap 수치 측정·보고** (= Phase 6 디지털 트윈 + 자작 팔 Stage 1). v1 성공률이 gap 의 분모. LoRA 는 v1.5 로 이관. **v1 에서 이관된 RT-2/OpenVLA 블로그 + 1분 영상 + velog/LinkedIn 외부 공개를 여기서 첫 공개** | **1 (본인만 만드는 결정타, 첫 외부 공개)** |
 | **v3** | 2027 후반~ | 6DOF 확장 + Real-to-Sim-to-Real (= Phase 7): OpenVLA fork + ROS2 노드 래핑 + 안전 인터록 + latency 측정 + Sim/Real gap 영상 | 1 (차별화 정점) |
 | (내부 로그) | 2026 상반기 | Phase 3 perception (YOLO11 + Depth Anything V2 + PC TensorRT + ROS2) — 공개 어필 안 함, VLA wrapper 리허설 | 비공개 |
