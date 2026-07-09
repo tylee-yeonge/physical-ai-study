@@ -619,7 +619,7 @@ git commit -m "docs: add phase 3 reproduction check and rerun visualization"
 
 ## Verification (after all tasks)
 
-- [ ] 잔존 문자열 0 확인 (week 자료 제외 범위):
+- [x] 잔존 문자열 0 확인 (week 자료 제외 범위): — 통과 (2026-07-09). 예외 1건: SETUP.md §0 의 Colab 배제 사유 기록 (의도적 잔존, Task 1-5 로그 참조)
 
 ```bash
 grep -rn "Colab" README.md Roadmap/ "Studies/Phase 4/SETUP.md" "Studies/Phase 4/README.md" "Studies/Phase 4.5/SETUP.md" "Studies/Phase 4.5/README.md"
@@ -628,11 +628,11 @@ grep -rn "cross-embodiment VLA" README.md Roadmap/
 grep -rn "week6/openvla_latency" --include="*.md" .
 ```
 
-- [ ] 링크 무결성: README 실측 결과 절 → `Measurements/`, SETUP.md §1.3 → raw 경로, Roadmap 상호 링크가 미리보기에서 열림
-- [ ] gantt 2곳 (타임라인, 육아휴직·Phase 4.5 행) Mermaid 렌더링 정상
-- [ ] `Portfolio/evidence-index.md` 의 각 행이 실존 경로를 가리킴
+- [x] 링크 무결성: README 실측 결과 절 → `Measurements/`, SETUP.md §1.3 → raw 경로, Roadmap 상호 링크 — 상대 경로 계산 확인 (2026-07-09). 미리보기 육안 확인은 본인 1회 권장
+- [x] gantt 2곳 (타임라인, 육아휴직·Phase 4.5 행) Mermaid 문법 확인 (2026-07-09) — 렌더링 육안 확인은 본인 1회 권장
+- [x] `Portfolio/evidence-index.md` 의 각 행이 실존 경로를 가리킴 — 확인 (2026-07-09)
 - [ ] Phase 2 데드라인 준수 확인: Task 2-2·2-4 가 4070 반납 (2026.08) 전 완료 — 미완 시 2026.11 재평가 #1 에 사유와 함께 등재
-- [ ] 검토 보고서의 이행 점검 항목 (보고서 §4): 권고 1-4 이행 여부·10문항 통과 여부·probe 2026.09 개시 여부를 2026.11 분기 재평가 #1 안건으로 등재 (README 부록 D 2026.11 행에 이미 반영됐는지 확인)
+- [x] 검토 보고서의 이행 점검 항목 (보고서 §4): 권고 1-4 이행 여부·10문항 통과 여부·probe 2026.09 개시 여부를 2026.11 분기 재평가 #1 안건으로 등재 — README 부록 D 2026.11 행에 추가 완료 (2026-07-09)
 
 ## Self-Review
 

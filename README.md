@@ -655,7 +655,7 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 
 | 시점 | 재평가 항목 |
 |---|---|
-| **2026.11** | 하드웨어 스파이크 결과 (파이프라인 검증·일정 재산정) / 산출물 v1 결과(레포 기록) / 시장 신호 probe 반응 (JD 격차·커피챗, **육아휴직 중이라 정찰 지원 입력은 없음**) / **콘텐츠 반응** (조회·인바운드·댓글·star) / OpenVLA 후속 모델 등장 여부 / **둘째 층(adaptation) 증거 점검** (v1.5 sim adaptation 이 AI 트랙 JD 에서 둘째 층 증거로 읽히는지 + sim 증거의 설득력 한계 + real 확장 경로) / **cross-embodiment 좌표 점검** (매니퓰레이션 첫 증명 + 이동 해자 연결이 유효한지, heterogeneous fleet/mobile manipulation 타깃 적합성. 자작 팔을 첫 embodiment 증명으로 유지하되 이동 검증을 일부 끌어들일지를 스파이크 결과·시간 예산과 함께 판단) |
+| **2026.11** | 하드웨어 스파이크 결과 (파이프라인 검증·일정 재산정) / 산출물 v1 결과(레포 기록) / 시장 신호 probe 반응 (JD 격차·커피챗, **육아휴직 중이라 정찰 지원 입력은 없음**) / **콘텐츠 반응** (조회·인바운드·댓글·star) / OpenVLA 후속 모델 등장 여부 / **둘째 층(adaptation) 증거 점검** (v1.5 sim adaptation 이 AI 트랙 JD 에서 둘째 층 증거로 읽히는지 + sim 증거의 설득력 한계 + real 확장 경로) / **cross-embodiment 좌표 점검** (매니퓰레이션 첫 증명 + 이동 해자 연결이 유효한지, heterogeneous fleet/mobile manipulation 타깃 적합성. 자작 팔을 첫 embodiment 증명으로 유지하되 이동 검증을 일부 끌어들일지를 스파이크 결과·시간 예산과 함께 판단) / **검토 보고서 v1.4 이행 점검** (재측정·이해 검증 10문항 통과 여부, Phase 3 재현 확인·Rerun 시각 자료 확보 여부, probe 2단이 2026.09 에 실제 개시됐는지 — plan: `docs/superpowers/plans/2026-07-07-repo-review-remediation.md`) |
 | **2027.05** | 실지원 면접 결과 누적 / Phase 5 종료 시점 / 자작 팔 Stage 2 완성도 + v2 진행률 / VLA 모델 선정 재검토 (OpenVLA 유지 or π0/Helix/GR00T 등으로 갱신) / **콘텐츠 반응** 추이 |
 | **2027.11** | 실지원 후 누적 면접 결과 / 시장 매칭 시그널 / **콘텐츠 반응** / **2028.03 fallback 진입 여부 판단** (착지점 정의: 부록 E) / Jetson 옵션 진입 여부 |
 
