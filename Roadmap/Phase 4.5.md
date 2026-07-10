@@ -1,7 +1,7 @@
 # Phase 4.5: VLA v1.5 — OpenVLA LoRA adaptation (before/after 정량 분석)
 
 
-> **기간**: **Section 0 은 2026.08 (전진 배치)** / Sections 1-3 은 2026.09-11 (약 7-10주). 전진 사유: GPU (4070) 반납 (2026.08) 전에 sim 환경을 구축·컨테이너화해 로컬 GPU 없이 재현 가능한 상태로 만들어야 한다. v1 에서 sim 을 제외하면서 **sim 환경 구축 + zero-shot baseline 측정이 본 Phase 로 이관**돼 원안(6-8주)보다 약 1-2주 늘었다.
+> **기간**: **Section 0 은 2026.08 (전진 배치)** / Sections 1-3 은 2026.09-11 (약 7-10주). 전진 사유: GPU (4070) 반납 가능성 (2026.08 말 예정, 미확정) 에 대비해 sim 환경을 구축·컨테이너화해 로컬 GPU 없이 재현 가능한 상태로 만들어 둔다. v1 에서 sim 을 제외하면서 **sim 환경 구축 + zero-shot baseline 측정이 본 Phase 로 이관**돼 원안(6-8주)보다 약 1-2주 늘었다.
 > **목표**: sim task 의 zero-shot 성공률 베이스라인을 **본 Phase 에서 측정**하고, 그 위에서 OpenVLA 를 LoRA 로 **adaptation** 한 뒤 동일 sim task 의 성공률을 **before(zero-shot)/after(fine-tuned)** 로 비교·정량 분석한다.
 > **범위 (v1.5)**: 경량 LoRA adaptation, **sim 생성 데이터** (자작 팔 데이터 대기 안 함), 단일 task, 동일 embodiment. real 데이터 확장은 Phase 7.
 > **언어**: **Python** (HuggingFace transformers + peft) + **ROS2 (rclpy)** (eval 루프 재사용)
