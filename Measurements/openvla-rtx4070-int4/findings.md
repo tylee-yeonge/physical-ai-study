@@ -40,7 +40,49 @@ processor 출력 전체를 `**inputs` 로 넘기는 참고 자료 패턴은 off-
 
 ### 4.1 Block 1 — int4 메모리 산수 (2026.07)
 
-- [ ] 7B x 2byte = 14GB 손계산 → int4 예측치 → `memory_allocated` (실측 4.38 GB) / `nvidia-smi` 대조 → 차이 원인 (allocator 예약, activation, CUDA context) 설명
+> 골격: 실측값 하나 (`memory_allocated` 4.38 GB) 를 첫 원리 (파라미터 수 x dtype 크기) 에서 출발한 예측으로 끝까지 설명한다. 실측 수치의 원본은 methodology.md §4 (2026-07 메모리 상세 실측), 측정 코드는 `scripts/memory_breakdown.py`. 이 절에는 예측 논리와 오차 해석만 본인 문장으로 쓴다.
+
+- [x] **Step 1 — fp16 손계산 (로드 불가의 정량 근거)**
+
+  총 파라미터 수를 모델에서 직접 센다 — OpenVLA 는 Llama-2 7B 백본 + vision encoder (SigLIP + DINOv2) + projector 구조라 정확히 7.0B 가 아니다. 실제 파라미터 수 x 2 byte 로 fp16 요구량을 계산하고, 4070 12GB 에 로드 불가 → int4 채택의 정량 근거로 결론 짓는다.
+
+  -> 7B x 2byte(fp16) = 14GB => 4070 12GB에 로드할 수 없음
+
+- [ ] **Step 2 — int4 예측치 (나이브 → 정제)**
+
+  나이브 계산 (전체 x 0.5 byte) 값을 먼저 적고, 그 값이 실측 4.38 GB 보다 작을 수밖에 없는 이유 두 가지를 반영해 정제 예측을 만든다:
+  - bitsandbytes 는 `nn.Linear` 만 양자화한다 — embedding·`lm_head`·LayerNorm 은 fp16 잔존. vision encoder 포함 여부는 Step 3 실측에서 확인
+  - NF4 는 블록 (기본 64 파라미터) 마다 absmax scale 을 저장한다 — double quant 포함 오버헤드 추정
+
+  -> 7B x 0.5byte(int4) = 3.5GB, 
+
+- [ ] **Step 3 — `memory_allocated` (4.38 GB) 대조**
+
+  스크립트의 dtype 별 합산 표 (methodology §4) 가 4.38 GB 와 일치하는지 확인하고, Step 2 정제 예측과의 오차를 설명한다. 부수 확인: vision encoder 가 양자화됐는지가 이 표에서 드러난다.
+
+  (본인 작성)
+
+- [ ] **Step 4 — `nvidia-smi` 대조 (차이 원인 3분해)**
+
+  nvidia-smi 프로세스 사용량과 `memory_allocated` 의 차이를 3개 delta 로 분리하고, 각 delta 가 왜 생기는지 본인 문장으로 설명한다:
+
+  | 원인 | 대응 delta | 수치 출처 |
+  |---|---|---|
+  | CUDA context | smi(A, 텐서 1개만) 또는 smi(B) - `memory_reserved`(B) | methodology §4 시점 A·B |
+  | allocator 예약 | `memory_reserved`(B) - `memory_allocated`(B) | methodology §4 시점 B |
+  | activation·KV cache | `max_memory_allocated`(C) - `memory_allocated`(B) | methodology §4 시점 C |
+
+  (본인 작성)
+
+사다리 표 — 각 칸이 채워지면 Block 1 완료:
+
+| 단계 | 예측 | 실측 | 오차 해석 |
+|---|---|---|---|
+| fp16 손계산 | | — (로드 불가) | |
+| int4 나이브 | | — | |
+| int4 정제 예측 | | 4.38 GB (`memory_allocated`) | |
+| nvidia-smi (로드 직후) | | | |
+| nvidia-smi (추론 후) | | | |
 
 ### 4.2 Block 2 — int8 열위 메커니즘 (2026.07)
 
