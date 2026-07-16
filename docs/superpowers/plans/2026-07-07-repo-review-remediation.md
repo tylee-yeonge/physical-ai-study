@@ -16,8 +16,9 @@
 
 ### 지금 (7월)
 
-- [ ] 1. **Block 1 — int4 메모리 산수** (2-3h, GPU 사용). 손계산 14GB → int4 예측 → 실측 대조 → 차이 원인. 결과는 [findings.md §4.1](../../../Measurements/openvla-rtx4070-int4/findings.md) 에 본인 문장으로 (Task 2-1)
-  - 진행 (2026-07-10): 작성 골격 (findings §4.1 Step 1-4 + 사다리 표), 측정 스크립트 (`scripts/memory_breakdown.py`), 수치 기입처 (methodology §4) 준비됨. methodology §3 의 VRAM peak 항목은 §4 로 앞당김 — 남은 것은 4070 에서 스크립트 실행 + 본인 문장 작성
+- [x] 1. **Block 1 — int4 메모리 산수** (2-3h, GPU 사용). 손계산 14GB → int4 예측 → 실측 대조 → 차이 원인. 결과는 [findings.md §4.1](../../../Measurements/openvla-rtx4070-int4/findings.md) 에 본인 문장으로 (Task 2-1)
+  - 진행 (2026-07-10): 측정 완료 — `memory_breakdown.py` 실행, 수치는 methodology §4 에 기입 (context 0.19 / 로드 후 4.74 / 추론 후 5.05 GB, dtype 분해 포함). 부수 발견: 실측 5.05 GB 는 SETUP.md §1.3 의 "약 7GB (논문 실측)" 과 불일치 — 간극 해석은 Step 4, 문구 갱신은 Task 2-2 수치 갱신에서 처리
+  - 완료 (2026-07-16): findings §4.1 Step 1-4 + 사다리 표 작성 완료 (QLoRA §3 두 문단 정독 포함). 정제 예측 4.284 GB vs 실측 4.38 GB (잔차 2단 분해: 버퍼 + 미확인 장부 잔차), nvidia-smi 재구성 잔차 로드 시 0 / 추론 후 0.02 GB (allocator 밖 할당 추정). 잔여 이관: "약 7GB (논문 실측)" 과의 간극 해석은 findings §4.1 Step 5 에서 완료 (2026-07-16, 논문 Table 2 + openvla 코드 기본값 확인 — DQ 미사용 +0.34 / 측정 오버헤드 차 +1.05 / 미확인 0.56 GB) — SETUP.md 문구 병기 갱신만 Task 2-2 에 잔존
 - [ ] 2. **Block 2 — int8 열위 메커니즘** (3-4h). LLM.int8() vs NF4 논문 해당 절만 → findings.md §4.2 → 커밋 (Task 2-1)
 - [ ] 3. **JD 5-10개 정독 + 격차 매핑 1페이지** — 짧은 블록에 병행
 - [ ] 4. **Phase 4.5 Section 0 전반: ManiSkill sim 구축 + zero-shot baseline** — 가장 무겁고 불확실하므로 7월 후반부터 조기 착수. 상세: [Roadmap/Phase 4.5.md](../../../Roadmap/Phase%204.5.md) Section 0
@@ -597,7 +598,7 @@ git commit -m "docs: expand v1 scope and add v2.5 dataset deliverable with act b
 **Files:**
 - Modify: `Measurements/openvla-rtx4070-int4/findings.md` (본인 작성 영역)
 
-- [ ] **Step 1: Block 1 — 메모리 산수 (2-3h)**
+- [x] **Step 1: Block 1 — 메모리 산수 (2-3h)**
 
 7B x 2byte = 14GB 손계산 → int4 예측치 산출 → `torch.cuda.memory_allocated` / `nvidia-smi` 실측 대조 → 차이 원인 (allocator 예약, activation, CUDA context) 을 본인 문장으로 findings.md 에 기록.
 **통과 기준**: "왜 int4 가 약 7GB 인가" 를 숫자로 답변 가능.
