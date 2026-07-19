@@ -294,6 +294,32 @@ git commit -m "docs: record week11 dry-run full-loop measurements"
 
 ---
 
+### Task 8: 레포 비공개 유지 + 산출물 repo 분리 반영 (spec §3.8 — 2026-07-20 사용자 결정)
+
+**Files:**
+- Modify: `README.md` (Repo 운영 방식, probe 1단 2곳, 커리어 경로, 부록 B 인트로)
+- Modify: `Studies/Phase 4/notes.md` (진행 원칙 git filter-repo 항목, 정식 체크포인트 안건 (4))
+
+- [ ] **Step 1: README "Repo 운영 방식"에 공개 전략 명시** — "산출물 (v1, v2, v3) 은 별도 디렉토리에 완성본 보존 방침" 항목을 "이 레포는 비공개 유지 (2026-07-20 결정)" + "산출물은 별도 공개 산출물 repo 로 관리 (구조·이관 범위는 신설 시 결정, 늦어도 v1.5 공개 전)" 2개 항목으로 교체
+- [ ] **Step 2: probe 1단의 "학습 리포 공개 증거 정비" 교체** — 타임라인 표·probe 절·커리어 경로 3곳을 "공개 증거 정비 (별도 산출물 repo 신설)" 계열 문구로 교체
+- [ ] **Step 3: 부록 B 인트로에 발행처 명시** — "외부 공개 산출물·블로그 동반 코드는 별도 공개 산출물 repo 에서 발행한다 (이 레포는 비공개 유지)" 추가
+- [ ] **Step 4: notes.md git filter-repo 항목 방향 갱신** — 이 레포 author 재작성은 비공개 유지로 사실상 불요 예상, 산출물 repo 를 처음부터 올바른 신원으로 생성하는 것으로 대체 (8월 초 체크포인트에서 최종 확정). 정식 체크포인트 안건 (4)도 동일 방향으로 갱신
+- [ ] **Step 5: 검증**
+
+```
+grep -c "비공개 유지" README.md                          # 기대: 3 이상 (운영 방식 + probe + 부록 B)
+grep -c "학습 리포 공개 증거 정비" README.md              # 기대: 0
+```
+
+- [ ] **Step 6: Commit**
+
+```
+git add README.md "Studies/Phase 4/notes.md"
+git commit -m "docs: keep study repo private and manage public artifacts in separate repo"
+```
+
+---
+
 ## Verification (after all tasks)
 
 - [ ] 회사 실명 grep 0건 — spec §6 V1: `grep -rn "로보티즈\|씨메스\|RLWRLD\|컨피그\|피트인\|두산\|레인보우" --include="*.md" . | grep -v Archive/` 결과 없음
