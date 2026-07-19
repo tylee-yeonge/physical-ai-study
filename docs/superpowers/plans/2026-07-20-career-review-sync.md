@@ -45,7 +45,7 @@
 **Files:**
 - Modify: `README.md` (부록 D 표의 2026.11 행)
 
-- [ ] **Step 1: 안건 2건을 행 말미에 추가**
+- [x] **Step 1: 안건 2건을 행 말미에 추가**
 
 부록 D 2026.11 행에서 다음 문자열을 찾는다:
 
@@ -59,14 +59,14 @@ plan: `docs/superpowers/plans/2026-07-07-repo-review-remediation.md`)
  / **동역학 라잇 트랙 편입 여부** (타겟 제조사 AI 트랙 JD 의 강체 동역학·수치 최적화 요구 대응. 갭은 매니퓰레이터 기구학(FK/IK)·강체 동역학 — 수치 최적화 기초는 Phase 1 week7-8 자산 재활용. 범위 상한: 순기구학·역기구학·자코비안·기초 동역학, must 만으로 면접 방어 수준. 편입 시 주 4-5시간 필요 — 총 예산(주 6-8시간) 안에서 대체 대상(무엇을 빼거나 늦출지)을 함께 결정. spec: `docs/superpowers/specs/2026-07-20-career-review-sync-design.md`) / **본격 실지원 개시 시점 재확인** (사후지급금 폐지(2025.01 — 법령 원문 재확인 필요)로 휴직 중 지원의 경제 페널티 소멸, 채용 프로세스 1-3개월 감안 시 2027.01 지원 = 복직(2027.03) 접속 가능. 판단 입력: 타겟 공고 개폐 / v1·v1.5 완성도 / 스파이크 결과 / 고용주 관계·평판 리스크. 즉흥 변경 금지 — 본 재평가에서만 판단)
 ```
 
-- [ ] **Step 2: 검증 — spec §6 V3**
+- [x] **Step 2: 검증 — spec §6 V3**
 
 ```
 grep -c "동역학 라잇 트랙 편입 여부\|본격 실지원 개시 시점 재확인" README.md   # 기대: 부록 D 행에서 각 1회
 grep "동역학 라잇 트랙" README.md | grep -c "Phase 1\|대체 대상"                # 기대: 1 (두 조건 모두 문안에 포함)
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```
 git add README.md
@@ -80,7 +80,7 @@ git commit -m "docs: add dynamics track and application timing agenda to 2026.11
 **Files:**
 - Modify: `README.md` (probe 절 bullet 2곳 + 마일스톤 JD 정독 항목)
 
-- [ ] **Step 1: 마일스톤 JD 정독 항목 교체**
+- [x] **Step 1: 마일스톤 JD 정독 항목 교체**
 
 다음 항목을:
 
@@ -94,7 +94,7 @@ git commit -m "docs: add dynamics track and application timing agenda to 2026.11
 - [ ] (2026.07-08) 타겟사 **실제 JD 5-10개 정독** — 1순위 (Dynamixel 제조사 본사 휴머노이드 시스템 SW 라인 — 2026-07 사거리 재평가로 승격 / VLA 모델 직접 개발 코스닥 상장사 / 대기업 SW 자회사 VLA / 신생 휴머노이드 스타트업 / 매니퓰레이션 FM — 정조준 정합으로 2순위에서 이동 / 양팔 데이터 인프라 스타트업 — 검토 후보, v2.5 정합) + 2순위 (자율주행 SW 자회사 CV/ML / ADAS 양산 중견) → 요구 역량 vs 현재 격차 1페이지 매핑 (제조사 본사 2개 공고(시스템 SW·모방학습) 자격요건 vs v1/v1.5/v2.5 일대일 매핑 우선). 동일 그룹 AMR 물적분할 자회사는 수평이동이라 제외
 ```
 
-- [ ] **Step 2: probe 1단 bullet 에 우선 배치·제외 원칙·인재풀 부기**
+- [x] **Step 2: probe 1단 bullet 에 우선 배치·제외 원칙·인재풀 부기**
 
 probe 절의 "- **2026.07-08 (재직 중, 저가시성)**:" bullet 말미("이직 신호로 읽히지 않는다)" 뒤)에 다음 문장을 추가한다:
 
@@ -102,7 +102,7 @@ probe 절의 "- **2026.07-08 (재직 중, 저가시성)**:" bullet 말미("이�
  JD 목록에는 Dynamixel 제조사 본사 2개 공고(시스템 SW·모방학습)를 우선 배치하고, 동일 그룹의 AMR 물적분할 자회사는 수평이동이라 제외한다. 인재풀 등록·공고 알림 설정도 저가시성이라 이 단계에서 수행.
 ```
 
-- [ ] **Step 3: 커피챗 bullet 에 우선순위 부기**
+- [x] **Step 3: 커피챗 bullet 에 우선순위 부기**
 
 ```
 - **2026.09 이후 (저강도)**: 현직자 **1-2명 커피챗/메시지** (정보성, 합격 목적 아님)
@@ -114,14 +114,16 @@ probe 절의 "- **2026.07-08 (재직 중, 저가시성)**:" bullet 말미("이�
 - **2026.09 이후 (저강도)**: 현직자 **1-2명 커피챗/메시지** (정보성, 합격 목적 아님. Dynamixel 제조사 재직자 우선 — 질문 예: 면접 평가 축, 시스템 SW 트랙과 AI 트랙의 조직 관계)
 ```
 
-- [ ] **Step 4: 검증 — spec §6 V5**
+- [x] **Step 4: 검증 — spec §6 V5**
 
 ```
 grep "2순위 (자율주행" README.md | grep -c "Dynamixel"   # 기대: 0 (2순위에서 제거됨)
 grep -c "AMR 물적분할 자회사" README.md                  # 기대: 2 (마일스톤 + probe 절)
 ```
 
-- [ ] **Step 5: Commit**
+진행 상황 (2026-07-20): 실행 완료. 첫 grep 은 줄 단위 매칭이라 같은 줄의 1순위 쪽 문구("2순위에서 이동")에 오탐 1건 — 셀 단위로 2순위 괄호(자율주행 SW 자회사 CV/ML / ADAS 양산 중견)에 제조사·매니퓰레이션 FM 부재를 확인하고 통과 처리.
+
+- [x] **Step 5: Commit**
 
 ```
 git add README.md
@@ -136,7 +138,7 @@ git commit -m "docs: apply target range reassessment to probe lists"
 - Modify: `Roadmap/Hardware-Arm.md` (가이드 안내 행, 보너스 절, 재설계 대기 노트)
 - Modify: `Roadmap/Phase 4.md` (진행 원칙의 8월 초 체크포인트 bullet)
 
-- [ ] **Step 1: 가이드 안내 행의 잔재 표기 정정**
+- [x] **Step 1: 가이드 안내 행의 잔재 표기 정정**
 
 ```
 > Stage 1 가이드 + Stage 2 가이드 미리 작성됨. **진입 시 (스파이크: 2026.08, Stage 1: 2027.01, Stage 2: 2027.04) 다시 체크**.
@@ -148,7 +150,7 @@ git commit -m "docs: apply target range reassessment to probe lists"
 > Stage 1 가이드 + Stage 2 가이드 미리 작성됨. **진입 시 (스파이크: 실행 시기 8월 초 체크포인트에서 확정 — 원안 2026.10, Stage 1: 2027.01, Stage 2: 2027.04) 다시 체크**.
 ```
 
-- [ ] **Step 2: 보너스 절의 순위 표기 교체**
+- [x] **Step 2: 보너스 절의 순위 표기 교체**
 
 ```
 - **Dynamixel 제조사이자 휴머노이드 양산 상장사 (2순위 C)** 지원 시 직접 매칭 (모터 제조사 = 회사 자체).
@@ -160,7 +162,7 @@ git commit -m "docs: apply target range reassessment to probe lists"
 - **Dynamixel 제조사이자 휴머노이드 양산 상장사 (2026-07 사거리 재평가로 1순위 승격 — 시스템 SW 라인 정조준)** 지원 시 직접 매칭 (모터 제조사 = 회사 자체).
 ```
 
-- [ ] **Step 3: 재설계 대기 노트 분리 (스파이크는 8월 체크포인트, Stage 1/2 는 2026.11 유지)**
+- [x] **Step 3: 재설계 대기 노트 분리 (스파이크는 8월 체크포인트, Stage 1/2 는 2026.11 유지)**
 
 ```
 > **재설계 대기 (2026-07)**: Koch v1.1 확정에 따라 아래 스파이크 (2-DOF 커스텀) 와 Stage 1/2 구성 (XL330 본 빌드, XM430 6DOF 확장) 의 재설계는 2026.11 분기 재평가 안건이다 — 이하 해당 절은 재설계 전 원안이다.
@@ -172,7 +174,7 @@ git commit -m "docs: apply target range reassessment to probe lists"
 > **재설계 대기 (2026-07)**: Koch v1.1 확정에 따라 이하 해당 절은 재설계 전 원안이다. 스파이크의 실행 시기(9월 절충안 vs 원안 10월)와 부품 구성(2-DOF 커스텀 vs Koch v1.1 BOM 정합)은 **8월 초 체크포인트**(`Studies/Phase 4/notes.md` 진행 보드)에서 확정하며, 확정 전 부품 발주는 보류한다. Stage 1/2 구성 (XL330 본 빌드, XM430 6DOF 확장) 의 재설계는 2026.11 분기 재평가 안건으로 유지한다.
 ```
 
-- [ ] **Step 4: Phase 4.md 체크포인트 bullet 현행화 (기결 사안 반영 + 안건 위임)**
+- [x] **Step 4: Phase 4.md 체크포인트 bullet 현행화 (기결 사안 반영 + 안건 위임)**
 
 ```
 - **8월 초 체크포인트**: v1 기술 코어(순서 4) 확보 직후 8-12월 예산·배치를 확정한다. 입력: 7월 실가용 실적(사후 집계), v1 진행 결과. 1순위 검토 안건: Phase 4.5(v1.5) 의 9-10월 조기 진입 — 2026.11 분기 재평가를 가설이 아닌 실물(v1.5 결과) 위에서 수행하기 위함. 순서 6 정독의 "20-30h" 는 이 체크포인트 전까지의 잠정치다.
@@ -184,7 +186,7 @@ git commit -m "docs: apply target range reassessment to probe lists"
 - **8월 초 체크포인트**: v1 기술 코어(순서 4) 확보 직후 8-12월 예산·배치를 확정한다. 입력: 7월 실가용 실적(사후 집계), v1 진행 결과. 조기 수행분(notes.md 2026-06-29 노트 + 2026-07-07 갱신)에서 Phase 4.5 전면 조기 진입 보류와 Section 0 의 2026.08 전진이 기결됐고, 정식 체크포인트의 안건 목록은 notes.md 진행 보드를 따른다. 순서 6 정독의 "20-30h" 는 이 체크포인트 전까지의 잠정치다.
 ```
 
-- [ ] **Step 5: 검증**
+- [x] **Step 5: 검증**
 
 ```
 grep -c "스파이크: 2026.08" Roadmap/Hardware-Arm.md      # 기대: 0 (잔재 제거)
@@ -192,7 +194,7 @@ grep -c "2순위 C" Roadmap/Hardware-Arm.md                 # 기대: 0
 grep -c "9-10월 조기 진입" "Roadmap/Phase 4.md"           # 기대: 0 (기결 문구 제거)
 ```
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```
 git add Roadmap/Hardware-Arm.md "Roadmap/Phase 4.md"
@@ -206,11 +208,11 @@ git commit -m "docs: move spike timing decision to august checkpoint"
 **Files:**
 - Modify: `Studies/Phase 4/notes.md` (진행 표 2행 + 조기 체크포인트 노트)
 
-- [ ] **Step 1: 진행 표 상태 열 갱신**
+- [x] **Step 1: 진행 표 상태 열 갱신**
 
 순서 5 행의 `| 4h | 대기 |` 를 `| 4h | 완료 |` 로, 순서 6 행의 `| 20-30h 잠정 (8월 초 체크포인트에서 갱신) | 대기 |` 를 `| 20-30h 잠정 (8월 초 체크포인트에서 갱신) | 진행 중 |` 으로 교체한다 (순서 6 은 week1 정독 완료로 착수 상태).
 
-- [ ] **Step 2: 정식 체크포인트 안건 bullet 추가**
+- [x] **Step 2: 정식 체크포인트 안건 bullet 추가**
 
 "8월 체크포인트 조기 수행" 노트의 마지막 bullet("- **2026-07-07 갱신**: ... Sections 1-3 은 2026.09-11.") 바로 아래에 추가한다:
 
@@ -218,7 +220,7 @@ git commit -m "docs: move spike timing decision to august checkpoint"
 - **정식 8월 초 체크포인트 안건 (2026-07-20 등재, 입력: 7월 실가용 실적)**: (1) 조기 결론 재확인 (Section 0 2026.08 / Sections 1-3 2026.09-11), (2) 하드웨어 스파이크 실행 시기 결정 — 9월 절충안 vs 원안 10월 (8월은 GPU 종속 작업 과밀로 제외) + 부품 구성(2-DOF 커스텀 vs Koch v1.1 BOM 정합) 선결정, 확정 전 부품 발주 보류, (3) 순서 6 정독 잠정치 갱신, (4) git filter-repo 실행 여부 확정 (진행 원칙의 기존 항목).
 ```
 
-- [ ] **Step 3: 진행 원칙의 기결 문구 현행화 (Phase 4.md 와 동일 사유)**
+- [x] **Step 3: 진행 원칙의 기결 문구 현행화 (Phase 4.md 와 동일 사유)**
 
 진행 원칙의 8월 초 체크포인트 bullet 에서:
 
@@ -232,7 +234,7 @@ git commit -m "docs: move spike timing decision to august checkpoint"
 조기 수행분(아래 노트)에서 Phase 4.5 전면 조기 진입 보류·Section 0 의 2026.08 전진이 기결 — 정식 안건 목록은 아래 "정식 8월 초 체크포인트 안건" bullet 을 따른다. 순서 6 정독 잠정치(20-30h)도 여기서 갱신한다.
 ```
 
-- [ ] **Step 4: 검증 — spec §6 V4**
+- [x] **Step 4: 검증 — spec §6 V4**
 
 ```
 grep -c "| 대기 |" "Studies/Phase 4/notes.md"             # 기대: 0
@@ -240,7 +242,7 @@ grep -c "정식 8월 초 체크포인트 안건" "Studies/Phase 4/notes.md"   # 
 grep -c "1순위 검토 안건" "Studies/Phase 4/notes.md"       # 기대: 0 (기결 문구 제거)
 ```
 
-- [ ] **Step 4: Commit**
+- [x] **Step 5: Commit**
 
 ```
 git add "Studies/Phase 4/notes.md"
@@ -287,10 +289,10 @@ git commit -m "docs: record week11 dry-run full-loop measurements"
 **Files:**
 - Modify: `.private/notes.md` (1-3순위 표, 제외/폐기 표, 매핑 표, 정찰 지원 후보 절, 출처 헤더)
 
-- [ ] **Step 1: 사거리 재평가 반영** — 로보티즈를 2순위 표에서 1순위 표로 이동(본사 시스템 SW 정조준 / 모방학습·AI 트랙 상향 병기), 컨피그를 3순위(모니터링)에 추가, 로보티즈AI(AMR 물적분할 자회사)를 제외 표에 추가, 리얼월드 행에 상향 재분류 부기, 두산·레인보우 행에 2026-07 재평가(중장기 2028-)와 기존 제약의 긴장 부기
-- [ ] **Step 2: 매핑 표 갱신** — "양팔 데이터 인프라 스타트업" = 컨피그 행 추가
-- [ ] **Step 3: 정찰 지원 후보 절을 원칙과 정합화** — 휴직 중 지원 금지(정찰 포함, 2026-07 확정)를 명시하고, 목록은 2026.11 안건(실지원 개시 시점 재확인)에서 조기 지원이 결정될 경우의 조건부 후보로만 보존
-- [ ] **Step 4: 검증** — `git check-ignore .private/notes.md` 통과(커밋 대상 아님 확인), 문서 내 로보티즈가 2순위 표에 잔존하지 않음
+- [x] **Step 1: 사거리 재평가 반영** — Dynamixel 제조사를 2순위 표에서 1순위 표로 이동(본사 시스템 SW 정조준 / 모방학습·AI 트랙 상향 병기), 양팔 데이터 인프라 스타트업을 3순위(모니터링)에 추가, 동 제조사의 AMR 물적분할 자회사를 제외 표에 추가, 로보틱스 FM 스타트업 행에 상향 재분류 부기, 중장기(2028-) 재배치 대상 2사 행에 기존 제약과의 긴장 부기 (실명은 해당 파일에만 존재)
+- [x] **Step 2: 매핑 표 갱신** — "양팔 데이터 인프라 스타트업"·"로보틱스 FM 스타트업" 매핑 행 추가
+- [x] **Step 3: 정찰 지원 후보 절을 원칙과 정합화** — 휴직 중 지원 금지(정찰 포함, 2026-07 확정)를 명시하고, 목록은 2026.11 안건(실지원 개시 시점 재확인)에서 조기 지원이 결정될 경우의 조건부 후보로만 보존
+- [x] **Step 4: 검증** — `git check-ignore .private/notes.md` 통과(커밋 대상 아님 확인), 제조사가 2순위 표에 잔존하지 않음
 
 ---
 
@@ -300,18 +302,18 @@ git commit -m "docs: record week11 dry-run full-loop measurements"
 - Modify: `README.md` (Repo 운영 방식, probe 1단 2곳, 커리어 경로, 부록 B 인트로)
 - Modify: `Studies/Phase 4/notes.md` (진행 원칙 git filter-repo 항목, 정식 체크포인트 안건 (4))
 
-- [ ] **Step 1: README "Repo 운영 방식"에 공개 전략 명시** — "산출물 (v1, v2, v3) 은 별도 디렉토리에 완성본 보존 방침" 항목을 "이 레포는 비공개 유지 (2026-07-20 결정)" + "산출물은 별도 공개 산출물 repo 로 관리 (구조·이관 범위는 신설 시 결정, 늦어도 v1.5 공개 전)" 2개 항목으로 교체
-- [ ] **Step 2: probe 1단의 "학습 리포 공개 증거 정비" 교체** — 타임라인 표·probe 절·커리어 경로 3곳을 "공개 증거 정비 (별도 산출물 repo 신설)" 계열 문구로 교체
-- [ ] **Step 3: 부록 B 인트로에 발행처 명시** — "외부 공개 산출물·블로그 동반 코드는 별도 공개 산출물 repo 에서 발행한다 (이 레포는 비공개 유지)" 추가
-- [ ] **Step 4: notes.md git filter-repo 항목 방향 갱신** — 이 레포 author 재작성은 비공개 유지로 사실상 불요 예상, 산출물 repo 를 처음부터 올바른 신원으로 생성하는 것으로 대체 (8월 초 체크포인트에서 최종 확정). 정식 체크포인트 안건 (4)도 동일 방향으로 갱신
-- [ ] **Step 5: 검증**
+- [x] **Step 1: README "Repo 운영 방식"에 공개 전략 명시** — "산출물 (v1, v2, v3) 은 별도 디렉토리에 완성본 보존 방침" 항목을 "이 레포는 비공개 유지 (2026-07-20 결정)" + "산출물은 별도 공개 산출물 repo 로 관리 (구조·이관 범위는 신설 시 결정, 늦어도 v1.5 공개 전)" 2개 항목으로 교체
+- [x] **Step 2: probe 1단의 "학습 리포 공개 증거 정비" 교체** — 타임라인 표·probe 절·커리어 경로 3곳을 "공개 증거 정비 (별도 산출물 repo 신설)" 계열 문구로 교체
+- [x] **Step 3: 부록 B 인트로에 발행처 명시** — "외부 공개 산출물·블로그 동반 코드는 별도 공개 산출물 repo 에서 발행한다 (이 레포는 비공개 유지)" 추가
+- [x] **Step 4: notes.md git filter-repo 항목 방향 갱신** — 이 레포 author 재작성은 비공개 유지로 사실상 불요 예상, 산출물 repo 를 처음부터 올바른 신원으로 생성하는 것으로 대체 (8월 초 체크포인트에서 최종 확정). 정식 체크포인트 안건 (4)도 동일 방향으로 갱신
+- [x] **Step 5: 검증**
 
 ```
 grep -c "비공개 유지" README.md                          # 기대: 3 이상 (운영 방식 + probe + 부록 B)
 grep -c "학습 리포 공개 증거 정비" README.md              # 기대: 0
 ```
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```
 git add README.md "Studies/Phase 4/notes.md"
@@ -322,9 +324,12 @@ git commit -m "docs: keep study repo private and manage public artifacts in sepa
 
 ## Verification (after all tasks)
 
-- [ ] 회사 실명 grep 0건 — spec §6 V1: `grep -rn "로보티즈\|씨메스\|RLWRLD\|컨피그\|피트인\|두산\|레인보우" --include="*.md" . | grep -v Archive/` 결과 없음
-- [ ] 검토 원본 부재 — spec §6 V2: `ls 2026-07-20-career-repo-review.md` 실패 (2026-07-20 삭제 완료)
-- [ ] 부록 D 안건·probe 목록·보드 상태의 상호 참조 일관성 — Task 1-4 의 개별 검증 재확인
+- [x] 회사 실명 grep 0건 — spec §6 V1: `.private/notes.md` 매핑 표의 실명 전체를 패턴으로 tracked 문서(Archive·.private 제외)를 grep 해 0건 확인 (실명 패턴을 이 plan 에 직접 적지 않는다 — Global Constraints)
+
+진행 상황 (2026-07-20): 수행 완료 — 2건 발견·조치. (1) `Studies/Phase 4/week12/README.md` 의 1순위 회사 실명 1줄 익명화, (2) 본 plan 의 Task 7 문안·Verification grep 패턴에 실명이 포함돼 있던 것을 익명 표현으로 교체. 두 건 모두 이전 커밋 이력에는 잔존 — 레포 비공개 유지 결정(spec §8.5) 전제로 수용하고, 공개 전환을 재검토하게 되면 이력 정리(filter-repo)가 선행 조건이다.
+
+- [x] 검토 원본 부재 — spec §6 V2: `ls 2026-07-20-career-repo-review.md` 실패 (2026-07-20 삭제 완료)
+- [x] 부록 D 안건·probe 목록·보드 상태의 상호 참조 일관성 — Task 1-4 의 개별 검증 재확인
 
 ## Self-Review
 
