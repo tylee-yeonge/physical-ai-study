@@ -12,7 +12,7 @@
 ## 실행 보드 — 지금 할 일 (순차, 2026.07-09)
 
 > 위에서 아래로 순서대로 진행한다. **일상 체크는 이 절에서만 한다** — 아래 Phase 1·2 의 체크박스는 기록·통과 기준의 원본이며, Phase 2 는 대응 항목 완료 시점에 한 번에 닫는다.
-> 전제: 4070 (우분투 PC) 반납은 2026.08 말 예정·미확정 (결정 #5) → GPU 작업은 8월 내 완료가 보수선 (반납 취소돼도 잃는 것 없음). 가용: 평일 저녁 약 2h (주 8-10h).
+> 전제: 4070 (우분투 PC) 은 반납하지 않기로 확정 (2026-07-20, 결정 #5). 단 휴직 개시 (2026.09) 후에는 PC 장애 시 현장 방문 전까지 복구 불가 → GPU 작업은 8월 내 완료 권장 유지 (물리 접근이 일상적인 마지막 달). 가용: 평일 저녁 약 2h (주 8-10h).
 
 ### 지금 (7월)
 
@@ -27,15 +27,15 @@
 
 - [ ] 5. **v1 확장 구현: `RobotPolicy` adapter + action schema validation + 벤치마크 재현 스크립트** — #6 Docker 화 전에 코드 변경 완료. 상세: [Roadmap/Phase 4.md](../../../Roadmap/Phase%204.md) v1 체크리스트
 - [ ] 6. **Section 0 후반: Docker 컨테이너화 → RunPod 기동·재현 확인 + LoRA 1사이클 실측 + fine-tuned 4-bit 의 4070 안착 확인** (마지막 항목만 4070 필요)
-- [ ] 7. **8월 체크포인트**: 반납 여부 확정 + git author (filter-repo) 실행 여부 결정 + 정독 잠정치 갱신. 상세: [notes.md](../../../Studies/Phase%204/notes.md) 진행 원칙
+- [ ] 7. **8월 체크포인트**: 4070 보유 지속·원격 운용 전환 기록 + git author (filter-repo) 실행 여부 결정 + 정독 잠정치 갱신. 상세: [notes.md](../../../Studies/Phase%204/notes.md) 진행 원칙
 - [ ] 8. **재측정 + Block 3·4** (6-9h, GPU 필수). 예측 → 측정 → 오차 설명. [methodology.md](../../../Measurements/openvla-rtx4070-int4/methodology.md) 미기록 5항목 채움 + SETUP §1.3·README Evidence 표 갱신 → 커밋 (Task 2-2)
 - [ ] 9. **자가 검증 10문항** — 문서 참조 없이 전부 답변 (문항: 검토 보고서 §2.6). 막히면 해당 Block 재수행 (Task 2-3)
 
-### 8월 중 (반납 전 마감)
+### 8월 중 (휴직 전 마감 — 물리 접근이 일상적인 마지막 달)
 
 - [ ] 10. **Phase 3 재현 확인** (GPU 필수) — TensorRT 엔진 재빌드 + week8 통합 노드 1회 구동, 결과 기록 (Task 2-4)
 - [ ] 11. **Rerun 스크린샷/gif 1장** → README Evidence 절 삽입 + `Measurements/.../plots/` 보존 → 커밋 (Task 2-4)
-- [ ] 12. GPU 필요 잔여분 (#1, #6, #8, #10-11) 0건 확인 → **(반납하는 경우) 4070 반납**
+- [ ] 12. GPU 필요 잔여분 (#1, #6, #8, #10-11) 0건 확인 + **4070 원격 운용 전환 점검** — BIOS 전원 복구 자동 부팅 (Restore on AC Power Loss), 원격 접속 경로 이중화 (SSH + 오버레이 VPN 등), 커널 패닉 자동 리부트 (`kernel.panic` sysctl), (선택) 원격 전원 리셋 수단. 재부팅으로 안 풀리는 하드웨어 장애는 커버 불가 — 그 계층의 보험은 #6 의 RunPod 재현
 
 ### 남는 시간에 (이월 가능 — GPU 작업과 충돌하면 무조건 뒤로)
 
@@ -46,7 +46,7 @@
 - [ ] 14. LinkedIn 헤드라인 교체 (휴직 승인 확정 확인 후) + 현직자 커피챗 개시
 - [ ] 15. Phase 4.5 Sections 1-3 착수 (2026.09-11)
 
-> 반납 취소가 확정되면: #6 의 4-bit 확인과 #8·#10-11 의 마감 압박만 풀린다 (증거 품질 사안이라 8월 완료 권장은 유지). Docker·RunPod (#6) 은 LoRA 24GB+ 요건 때문에 반납 여부와 무관하게 필요.
+> 반납 취소 확정 (2026-07-20) 반영: #6 의 4-bit 확인과 #8·#10-11 은 절대 마감이 아니라 권장 마감이 됐다. 단 휴직 중 PC 장애 시 현장 방문 전까지 복구 불가라 8월 완료 권장은 유지한다. Docker·RunPod (#6) 은 LoRA 24GB+ 요건에 더해 로컬 PC 단일 장애점 제거 역할로 계속 필요.
 
 ### 문서 지도 (뭘 어디서 보나)
 
@@ -77,12 +77,12 @@
 | 1 | 산출물 보존 정책 | **"정답은 지우고 증거는 남긴다"** — quiz 정답·완성 실습 코드는 원복, 실측·판단 기록은 `Measurements/` 에 보존. 워크플로우는 증거 보존이 원복보다 먼저 | 보고서 §5.1-5.6 |
 | 2 | 구조 신설 범위 | `Measurements/` + `Portfolio/` 만 지금 신설. `Studies/` 전면 재배치·README 결과 중심 전면 개편은 v1 기록 시점 (2026 하반기) 과 결합 | 보고서 권고 5 |
 | 3 | 학습 컴퓨트 | Colab **배제** (SSH 불가·세션 휘발), **RunPod Community Cloud RTX 4090 (24GB)** 확정 | 보고서 §2.3 |
-| 4 | 육아휴직 | **2026.09-2027.02** (2026-07-01 신청, 승인 대기. 복직 2027.03 동일). 2026.06-08 은 휴직이 아니라 **재직 + GPU (4070) 반납 전 구간** | 보고서 §2.3 |
-| 5 | GPU 반납 | RTX 4070 (우분투 PC) 은 **2026.08 말 반납 예정, 미확정** — 반납하지 않을 가능성 있음 (2026-07-09 갱신). 일정은 반납 전제의 보수선 유지: 재측정·TensorRT 재현 확인·Rerun 시각화의 8월 내 데드라인으로 취급 | 보고서 §2.3, 권고 2-4 + 2026-07-09 구두 갱신 |
+| 4 | 육아휴직 | **2026.09-2027.02** (2026-07-01 신청, 승인 대기. 복직 2027.03 동일). 2026.06-08 은 휴직이 아니라 **재직 구간** (4070 물리 접근이 일상적인 구간 — 결정 #5) | 보고서 §2.3 |
+| 5 | GPU 반납 | RTX 4070 (우분투 PC) 은 **반납하지 않기로 확정 (2026-07-20 갱신)**. 단 휴직 개시 (2026.09) 후 PC 장애 시 현장 방문 전까지 복구 불가한 단일 장애점 → 재측정·TensorRT 재현 확인·Rerun 시각화의 8월 내 마감은 권장으로 유지하고, 8월 중 원격 운용 전환 점검을 수행 (실행 보드 #12) | 보고서 §2.3, 권고 2-4 + 2026-07-20 구두 갱신 |
 | 6 | 자작 팔 | 커스텀 XL330+XM430 (BOM 150-225만원) → **Koch v1.1 리더-팔로워, 약 46.7만원, 2026.12 발주** (리드타임 약 40일) | 보고서 §2.3 |
 | 7 | Phase 4.5 | **Section 0 (ManiSkill/SAPIEN sim 구축 → Docker → RunPod 이관) 을 2026.08 로 전진 배치**, Sections 1-3 은 2026.09-11 | 보고서 §2.3 |
 | 8 | probe 일정 | 2026.06 일괄 가정 폐기 → 가시성 기준 분해: **리포 공개 증거·JD 정독 2026.07-08 / LinkedIn 헤드라인·커피챗 2026.09** (휴직 개시·승인 확정 후) | 보고서 §2.2 |
-| 9 | Phase 3 지위 | 비공개 리허설 → **supporting system work 로 공개**. 조건 2개: supporting 라벨 + README 계층 하위 배치 / 반납 전 빌드 스크립트 기준 재현 확인 | 보고서 §2.3 |
+| 9 | Phase 3 지위 | 비공개 리허설 → **supporting system work 로 공개**. 조건 2개: supporting 라벨 + README 계층 하위 배치 / 8월 내 (휴직 전) 빌드 스크립트 기준 재현 확인 | 보고서 §2.3 |
 | 10 | v1 정의 | adapter 추상화 (`RobotPolicy` 인터페이스) + action schema validation + 벤치마크 재현성 을 v1 범위에 추가. 안전 실행 스택 (watchdog, fallback, collision) 은 v2 로 명시 이관 | 보고서 권고 6 |
 | 11 | 산출물 확장 | 부록 B 에 **v2.5 (Koch 자작 데이터셋, LeRobot 포맷, HF Hub 공개)** 신설. Koch 도착 후 LeRobot ACT 1회 실행. Diffusion Policy 는 라잇 정리 수준 (면접 방어용). Isaac Lab 튜토리얼 1개 (RunPod, NVIDIA 무료 코스) | 보고서 권고 8, 9 |
 | 12 | 포지셔닝 | "cross-embodiment VLA/FM 통합 엔지니어" → **"Robot Learning Deployment / Physical AI Systems Engineer"** (복수 embodiment 실경험 전 방어 불가한 표제 배제). "박사가 못 만드는 3가지" 서사 → **실행 품질 근거** 서사로 교체 | 보고서 §2.5, 권고 7 |
@@ -588,7 +588,7 @@ git commit -m "docs: expand v1 scope and add v2.5 dataset deliverable with act b
 
 ---
 
-## Phase 2: 본인 실행 항목 (2026.07-08 — 4070 반납 가능성 대비 8월 내 마감)
+## Phase 2: 본인 실행 항목 (2026.07-08 — 휴직 중 PC 장애 리스크 대비 8월 내 마감)
 
 > 이 Phase 는 문서 편집이 아니라 본인이 수행하는 측정·학습 작업이다. 본 plan 은 통과 기준과 착지 위치만 고정한다. 산출물이 생기는 즉시 `Measurements/` 에 커밋 (보존 정책: 증거 보존이 원복보다 먼저).
 > **일상 실행·체크는 본 문서 상단의 §실행 보드가 단일 보드다 (2026-07-09 지정)** — 이 절은 통과 기준의 원본으로만 유지하고, 아래 체크박스는 각 Task 완료 시점에 한 번에 닫는다.
@@ -617,7 +617,7 @@ git add Measurements/
 git commit -m "docs: add memory and quantization analysis to openvla findings"
 ```
 
-### Task 2-2: 재측정 + Block 3-4 (2026.08, GPU 반납 전 — 약 6-9시간)
+### Task 2-2: 재측정 + Block 3-4 (2026.08, 휴직 전 — 약 6-9시간)
 
 **Files:**
 - Modify: `Measurements/openvla-rtx4070-int4/methodology.md`, `findings.md`, `summary.csv`, `raw/`, `scripts/`
@@ -651,14 +651,14 @@ git commit -m "docs: complete openvla benchmark methodology with remeasured stat
 보고서 §2.6 의 10문항: int4 근거 / int8 열위 이유 / 정확도 확인 방법 / 병목 구간 / synchronize / warm-up / p95 / action 토큰 구조 / task 경계 / Jetson 이식 예측. 막히는 문항의 해당 Block 재수행.
 **통과 기준**: 10문항 전부 문서 참조 없이 답변. (결과는 이 Step 아래 진행 로그로만 기록 — 커밋 없음.)
 
-### Task 2-4: Phase 3 재현 확인 + Rerun 시각 자료 (2026.08, GPU 반납 전)
+### Task 2-4: Phase 3 재현 확인 + Rerun 시각 자료 (2026.08, 휴직 전)
 
 **Files:**
 - Modify: `README.md` (실측 결과 절 gif 삽입), `Portfolio/evidence-index.md`
 
 - [ ] **Step 1: Phase 3 빌드 스크립트 기준 재현 확인**
 
-TensorRT 엔진 재빌드 + week8 통합 노드 1회 구동 (엔진은 GPU 아키텍처 종속 — 4070 반납 후에는 불가). 결과 (성공 여부, 소요, 걸림돌) 를 Roadmap/Phase 3.md 상태 줄 또는 `Measurements/` 에 기록 — supporting 공개 조건 2 충족.
+TensorRT 엔진 재빌드 + week8 통합 노드 1회 구동 (엔진은 GPU 아키텍처 종속 — 휴직 중 PC 장애 시 현장 방문 전까지 재빌드 불가). 결과 (성공 여부, 소요, 걸림돌) 를 Roadmap/Phase 3.md 상태 줄 또는 `Measurements/` 에 기록 — supporting 공개 조건 2 충족.
 
 - [ ] **Step 2: Rerun 시각 자료 1건 확보**
 
@@ -687,7 +687,7 @@ grep -rn "week6/openvla_latency" --include="*.md" .
 - [x] 링크 무결성: README 실측 결과 절 → `Measurements/`, SETUP.md §1.3 → raw 경로, Roadmap 상호 링크 — 상대 경로 계산 확인 (2026-07-09). 미리보기 육안 확인은 본인 1회 권장
 - [x] gantt 2곳 (타임라인, 육아휴직·Phase 4.5 행) Mermaid 문법 확인 (2026-07-09) — 렌더링 육안 확인은 본인 1회 권장
 - [x] `Portfolio/evidence-index.md` 의 각 행이 실존 경로를 가리킴 — 확인 (2026-07-09)
-- [ ] Phase 2 데드라인 준수 확인: Task 2-2·2-4 가 4070 반납 (2026.08) 전 완료 — 미완 시 2026.11 재평가 #1 에 사유와 함께 등재
+- [ ] Phase 2 데드라인 준수 확인: Task 2-2·2-4 가 2026.08 내 (휴직 개시 전) 완료 — 미완 시 2026.11 재평가 #1 에 사유와 함께 등재
 - [x] 검토 보고서의 이행 점검 항목 (보고서 §4): 권고 1-4 이행 여부·10문항 통과 여부·probe 2026.09 개시 여부를 2026.11 분기 재평가 #1 안건으로 등재 — README 부록 D 2026.11 행에 추가 완료 (2026-07-09)
 
 ## Self-Review

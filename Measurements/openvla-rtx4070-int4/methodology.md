@@ -31,7 +31,7 @@
 | throughput | 3.33 Hz |
 | `torch.cuda.memory_allocated` (로드 직후) | 4.38 GB — nvidia-smi 관점 VRAM 과의 차이 분석은 findings.md Block 1 | 
 
-## 3. 미기록 항목 — 재측정 (2026.08 내, 4070 반납 예정·미확정 대비) 에서 채운다
+## 3. 미기록 항목 — 재측정 (2026.08 내, 휴직 중 GPU 접근성 리스크 대비) 에서 채운다
 
 - [x] VRAM peak (`nvidia-smi` 기준) — §4 메모리 상세 실측 (2026-07-10) 으로 앞당겨 수행 완료. 차이 원인 해석은 findings.md §4.1
 - [ ] 구간별 분해 (전처리 / vision encoder / action 토큰 autoregressive 생성 / un-normalization) — findings.md Block 3
@@ -41,7 +41,7 @@
 
 ## 4. 메모리 상세 실측 (2026-07, findings.md §4.1 Block 1 용)
 
-> §3 의 VRAM peak 항목을 GPU 반납 리스크 대비로 앞당겨 수행한다. 이 절은 수치의 원본만 담고, 차이 원인 해석은 findings.md §4.1 에 쓴다.
+> §3 의 VRAM peak 항목을 GPU 접근성 리스크 대비로 앞당겨 수행한다. 이 절은 수치의 원본만 담고, 차이 원인 해석은 findings.md §4.1 에 쓴다.
 > 실행: `python scripts/memory_breakdown.py` — 로드 조건은 §1·environment.md 와 동일 (nf4, double quant, compute dtype fp16, eager)
 
 측정 절차 — baseline (시점 0: CUDA 초기화 전 디바이스 전체 사용량) 을 먼저 기록하고 3개 시점에서 읽는다. nvidia-smi 값은 프로세스 행 매칭이 아니라 **baseline 대비 디바이스 증가분**이다 — Docker 컨테이너에서는 nvidia-smi 가 보여주는 PID 가 호스트 네임스페이스 값이라 `os.getpid()` 매칭이 구조적으로 불가능하기 때문 (전제: 측정 중 다른 프로세스의 GPU 사용량 일정):

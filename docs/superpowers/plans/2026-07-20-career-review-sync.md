@@ -260,7 +260,7 @@ git commit -m "docs: update phase 4 board states and formal checkpoint agenda"
 
 week11 dry-run(카메라/bag 1분)의 전체 루프 수치(mean/p95/throughput/GPU)가 어디에 정리됐는지 확인한다. 2026-07-20 검증에서 레포 내 기록을 찾지 못했다 — README Evidence 는 `predict_action` 단독 수치뿐이고 `Measurements/.../methodology.md` 는 전체 루프를 "별도 측정" 미래형으로 기술. 후보: 로컬 미커밋 로그, week11/week12 실습 중 생성 파일.
 
-- [ ] **Step 2: 미기록 시 확보·기록 (8월 내 — 4070 반납 전)**
+- [ ] **Step 2: 미기록 시 확보·기록 (8월 내 — 휴직 전 물리 접근 구간)**
 
 기존 로그가 없으면 dry-run 1회 재실행으로 수치를 확보하고, README Evidence 표에 전체 루프 행을 추가하거나 `Measurements/openvla-rtx4070-int4/findings.md` 에 기록한다 (2026-08 재측정과 병합 가능).
 

@@ -6,7 +6,7 @@
 
 ## 0. 한 줄 요약
 
-OpenVLA 7B 는 RTX 4070 12GB 로 **학습이 불가능**하다. 따라서 무거운 LoRA 파인튜닝·sim 대규모 작업은 **RunPod** (Community Cloud RTX 4090 24GB) 에서, 가벼운 추론은 로컬 4070 + ROS2 환경에서 4bit 양자화로 돌린다. 환경 구축은 두 갈래로 진행된다. **Colab 은 SSH 불가·세션 휘발로 배제한다 (2026-07 결정).** 4070 반납 가능성 (2026.08 말 예정, 미확정) 에 대비해 추론·eval 도 Docker 이미지로 RunPod 에서 재현 가능하게 만들어 둔다 (Phase 4.5 Section 0).
+OpenVLA 7B 는 RTX 4070 12GB 로 **학습이 불가능**하다. 따라서 무거운 LoRA 파인튜닝·sim 대규모 작업은 **RunPod** (Community Cloud RTX 4090 24GB) 에서, 가벼운 추론은 로컬 4070 + ROS2 환경에서 4bit 양자화로 돌린다. 환경 구축은 두 갈래로 진행된다. **Colab 은 SSH 불가·세션 휘발로 배제한다 (2026-07 결정).** 4070 은 반납하지 않기로 확정 (2026-07-20) 됐으나, 휴직 (2026.09-) 중 PC 장애 시 현장 방문 전까지 복구 불가한 단일 장애점이므로 추론·eval 도 Docker 이미지로 RunPod 에서 재현 가능하게 만들어 둔다 (Phase 4.5 Section 0).
 
 **적용 산출물**: 산출물 v1 (RT-2/OpenVLA 블로그 2편 + ROS2 minimal demo).
 
