@@ -145,12 +145,12 @@ processor 출력 전체를 `**inputs` 로 넘기는 참고 자료 패턴은 off-
 
   정제 공식의 상수를 출처에서 먼저 읽었던 Block 1 과 같은 이유 — 두 경로의 구조는 유도가 아니라 설계 사실이다. 각 항목을 "읽을 범위 → 답할 질문 → 결과가 쓰이는 곳" 순서로 진행한다. 항목의 "답할 질문" 에 본인 문장으로 답할 수 있으면 그 항목은 끝난 것이고, 답 자체는 Step 3-5 의 해당 칸에 적는다.
 
-  - [ ] **(a) LLM.int8() 논문 (arXiv 2208.07339) §2** — absmax·zeropoint 양자화 배경 (약 15-20분)
+  - [x] **(a) LLM.int8() 논문 (arXiv 2208.07339) §2** — absmax·zeropoint 양자화 배경 (약 15-20분)
     - 읽을 범위: §2 (Background) 의 absmax quantization·zeropoint quantization 공식 두 개
     - 답할 질문: Block 1 에서 weight 블록 (64개) 마다 저장하던 absmax 와 같은 연산이 여기서는 activation 에 적용된다 — 그러면 이 양자화는 로드 시 1회가 아니라 언제마다 일어나는가? 그리고 outlier 값 하나가 absmax 를 키우면 같은 벡터의 나머지 값들은 왜 해상도를 잃는가 (§3 에서 outlier 분리가 필요해지는 이유)?
     - 결과가 쓰이는 곳: Step 3 표 "activation 전처리" 행 — "weight 양자화는 정적 (로드 시 1회), activation 양자화는 forward 마다의 런타임 비용" 구분이 이 행의 핵심
 
-  - [ ] **(b) 같은 논문 §3** — vector-wise quantization + mixed-precision decomposition (약 30-40분)
+  - [x] **(b) 같은 논문 §3** — vector-wise quantization + mixed-precision decomposition (약 30-40분)
     - 읽을 범위: §3 전체와 분해 절차 그림. 수식은 outlier 열을 분리해 fp16 matmul + int8 matmul 2회를 수행하고 합산하는 식 하나만 따라가면 된다
     - 답할 질문: forward 1회에 어떤 순서로 무엇이 실행되는가 — threshold 초과 열 검사, 초과 열의 fp16 matmul, 나머지의 int8 matmul, int8 결과의 dequant 후 합산. 이 중 int4 (NF4) 경로에는 없는 단계가 무엇인지 목록으로 만든다
     - threshold 기본값 확인 (venv 에서 1줄):
