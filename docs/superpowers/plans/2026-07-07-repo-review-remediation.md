@@ -78,7 +78,7 @@
 
 ---
 
-**Goal:** 검토 보고서가 확정한 의사결정 (RunPod 전환, Koch v1.1, 육아휴직 2026.09-2027.02, Phase 4.5 Section 0 전진, probe 분해 일정, Phase 3 supporting 공개, 포지셔닝 하향, v1 정의 업그레이드, v2.5 신설) 을 리포 문서에 동기화하고, `Measurements/` + `Portfolio/` 구조를 신설해 "정답은 지우고 증거는 남긴다" 정책을 가동한다. 완료되면 리포가 계획의 single source of truth 로 복원되고, 4070 실측 증거가 외부인이 접근 가능한 위치에 놓인다.
+**Goal:** 검토 보고서가 확정한 의사결정 (RunPod 전환, 자작 팔 — Koch v1.1 확정 후 2026-07-28 **SO-101 로 갱신** (결정 #6), 육아휴직 2026.09-2027.02, Phase 4.5 Section 0 전진, probe 분해 일정, Phase 3 supporting 공개, 포지셔닝 하향, v1 정의 업그레이드, v2.5 신설) 을 리포 문서에 동기화하고, `Measurements/` + `Portfolio/` 구조를 신설해 "정답은 지우고 증거는 남긴다" 정책을 가동한다. 완료되면 리포가 계획의 single source of truth 로 복원되고, 4070 실측 증거가 외부인이 접근 가능한 위치에 놓인다.
 
 **Architecture:** 리포를 `Studies/` (정답 없는 반복 학습) / `Measurements/` (실측 증거 보존) / `Portfolio/` (evidence index) 로 역할 분리한다 (보고서 §5.5). 전면 재편은 하지 않고 신설 + 이관 + 문서 갱신만 수행한다 (보고서 권고 5 의 단계적 적용).
 
@@ -415,6 +415,8 @@ git commit -m "docs: sync parental leave window, probe schedule, and v1 scope wo
 
 ### Task 1-7: 자작 팔 — Koch v1.1 확정 반영 (권고 3, 결정 #6)
 
+> **대체됨 (2026-07-28)**: 자작 팔이 **SO-101 (SO-ARM101)** 로 재확정돼 이하 Step 의 Koch 문안은 **당시 적용 내용의 기록**이다. 현행 확정은 결정 #6 과 [Hardware-Arm.md](../../../Roadmap/Hardware-Arm.md) 하드웨어 확정 절이며, Koch 비채택 사유는 같은 문서 비채택 기록에 있다. 이 Task 의 문안을 현행으로 읽지 않는다.
+
 **Files:**
 - Modify: `README.md` (Hardware-Arm 절 + BOM 표), `Roadmap/Hardware-Arm.md`
 
@@ -572,7 +574,7 @@ v2 행 앞에 삽입:
 
 - [x] **Step 3: 실행 지점 연결**
 
-- Roadmap/Hardware-Arm.md Stage 1 완료 체크리스트에 추가: `- [ ] LeRobot ACT 1회 학습 + 결과 기록 (Koch teleop 소량 데이터, v2.5 선행 실험)`
+- Roadmap/Hardware-Arm.md Stage 1 완료 체크리스트에 추가 (2026-07-28: Koch → SO-101 로 문안 갱신됨): `- [ ] LeRobot ACT 1회 학습 + 결과 기록 (Koch teleop 소량 데이터, v2.5 선행 실험)`
 - README.md:521-524 (2027.01-02 마일스톤 절) 에 추가: `- [ ] ACT-Diffusion-VLA 정책 계보 라잇 정리 노트 (면접 방어용, 학습 아님)`
 
 - [x] **Step 4: Isaac Lab 튜토리얼 편입 (`Roadmap/Phase 6.md`)**

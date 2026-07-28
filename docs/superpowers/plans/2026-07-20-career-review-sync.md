@@ -134,6 +134,8 @@ git commit -m "docs: apply target range reassessment to probe lists"
 
 ### Task 3: Hardware-Arm.md + Phase 4.md — 스파이크 결정 이관과 문구 현행화 (spec §3.3, §3.4)
 
+> **대체됨 (2026-07-28)**: 자작 팔이 SO-101 로 재확정돼 이하 Step 의 Koch 문안은 당시 적용 내용의 기록이다. 스파이크도 완제품 키트에 맞춰 "조립 전 선검증" 으로 재정의됐다 — 현행은 [Hardware-Arm.md](../../../Roadmap/Hardware-Arm.md) 스파이크 절.
+
 **Files:**
 - Modify: `Roadmap/Hardware-Arm.md` (가이드 안내 행, 보너스 절, 재설계 대기 노트)
 - Modify: `Roadmap/Phase 4.md` (진행 원칙의 8월 초 체크포인트 bullet)

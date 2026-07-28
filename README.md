@@ -142,7 +142,7 @@ gantt
 | **Phase 5** | **Foundation Model 기초** | **Python** | HuggingFace transformers |
 | **Phase 6** | **Isaac Sim + 디지털 트윈** | **Python** (Isaac Sim API) + **ROS2** | URDF 임포트 + Sim/Real 매칭 |
 | **Phase 7** | **Real-to-Sim-to-Real** | **Python** + **C++** (안전 인터록) + **ROS2** | OpenVLA + 자작 팔 통합 |
-| **Hardware-Arm** | **자작 팔 트랙** | **ROS2** + **URDF/XACRO** | `dynamixel_hardware` + URDF |
+| **Hardware-Arm** | **자작 팔 트랙** | **ROS2** + **URDF/XACRO** | `feetech_ros2_driver` + URDF |
 
 
 ### 핵심 원칙
@@ -300,20 +300,22 @@ gantt
 
 
 #### 스파이크 (2026.10, 2-3주, 산출물 아님 = 리스크 검증)
-- **범위**: 2-DOF, 안 예뻐도 됨. Dynamixel 1-2개 + U2D2 + ROS2 토픽으로 각도 명령 한 번 보내기.
-- **목표**: "Dynamixel + ROS2 + URDF 파이프라인이 내 환경에서 도는가" 만 확인. pick-and-place 아님.
-- **출력**: 예상보다 오래 걸리면 Stage 1/2 일정·BOM 을 **2026 년 안에** 재산정. 결과는 분기 재평가 #1 (2026.11) 입력.
+- **범위**: 키트 전체 조립 전에 모터 1-2개만 버스에 물려 전기·소프트웨어 경로만 확인. 안 예뻐도 됨.
+- **목표**: "Feetech 버스 + `feetech_ros2_driver` + ros2_control 이 내 환경에서 도는가" 만 확인. pick-and-place 아님.
+- **출력**: 예상보다 오래 걸리면 Stage 1 의 ROS2 통합 경로·일정을 **2026 년 안에** 재산정. 결과는 분기 재평가 #1 (2026.11) 입력.
+- 완제품 키트라 부품 선구매형 스파이크가 성립하지 않아 **조립 전 선검증**으로 재정의했다 (2026-07-28).
 
 
-#### Stage 1 (2027.01-02, 2개월, 약 30-50만원) — 스파이크로 디리스크된 본 빌드 (v2 선행)
-- **하드웨어**: Dynamixel XL330 2-3DOF + U2D2 + 그리퍼 (3D 프린트)
-- **목표**: pick-and-place 단순 동작 + URDF + ROS2 드라이버 (`dynamixel_hardware`) + Isaac Sim 디지털 트윈 첫 사이클
+#### Stage 1 (2027.01-02, 2개월, 약 1-3만원) — 스파이크로 디리스크된 본 빌드 (v2 선행)
+- **하드웨어**: SO-101 리더 + 팔로워 6DOF 키트 (3D 프린팅 부품·전원·케이블 포함) + 손목 카메라 1대
+- **목표**: pick-and-place 단순 동작 + URDF + ROS2 드라이버 (`feetech_ros2_driver`) + Isaac Sim 디지털 트윈 첫 사이클
 - **역할**: v2(헤드라인, sim-to-real gap)가 소비하는 선행 하드웨어. 동작 영상 + URDF + Sim 임포트 영상은 v2 의 입력 자료.
-- **이유**: 스파이크에서 파이프라인을 이미 검증했으므로 본 빌드는 동작 완성도에 집중.
+- **이유**: 스파이크에서 드라이버 경로를 이미 검증했으므로 본 빌드는 조립과 동작 완성도에 집중.
+- **비용**: 팔 키트 약 55만원은 2026.09-10 에 선집행되므로 이 구간의 추가 지출은 손목 카메라뿐이다.
 
 
-#### Stage 2 (2027.04-06, 3개월, 약 100-150만원 추가) — 실지원과 병행 (v3 선행)
-- **하드웨어**: 6DOF 확장 (Dynamixel XM430 추가) + teleop 입력 장치
+#### Stage 2 (2027.04-06, 3개월) — 실지원과 병행 (v3 선행)
+- **하드웨어**: 확장 수단 미정 — SO-101 이 이미 6DOF 라 원안 (XM430 6DOF 확장, 약 100-150만원) 은 무효. 상위 팔 도입 / 소프트웨어 스택 심화 / 양팔 확장 중 선택을 2026.11 재평가 안건으로 이관
 - **목표**: teleop 데이터 수집 + 카메라 ↔ 팔 base 캘리브 + 안전 인터록 + Sim 물리 파라미터 매칭
 - **출력**: Phase 6 (Isaac Sim) 의 자연스러운 토대. Phase 7 산출물 v3 의 하드웨어 기반.
 
@@ -532,8 +534,8 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 #### 2026.08-12 (Phase 4.5 + 스파이크 — 구직 지원 없음)
 - [ ] (2026.08, 휴직 전 마감) **Phase 4.5 Section 0**: ManiSkill sim 구축 + zero-shot baseline + Docker 컨테이너화 + RunPod 이관 검증
 - [ ] (2026.09-11) **Phase 4.5 Sections 1-3 완료 → 산출물 v1.5 공개** (OpenVLA LoRA adaptation + before/after 정량 분석, 둘째 층 증거)
-- [ ] 2-DOF Dynamixel + U2D2 + ROS2 토픽 각도 명령 1회 성공 (파이프라인 검증만)
-- [ ] 스파이크 결과로 Stage 1/2 일정·BOM 재산정 (터지면 즉시)
+- [ ] SO-101 모터 1-2개 + `feetech_ros2_driver` + ros2_control 로 각도 명령 1회 성공 (조립 전 선검증)
+- [ ] 스파이크 결과로 Stage 1 ROS2 통합 경로·일정 재산정 (터지면 즉시)
 - [ ] **6개월 분기 재평가 #1 (2026.11)** — 정찰 지원 없이 수행. 입력: 스파이크 결과 / v1 결과(레포) / 시장 신호 (probe 반응, 1순위 채용 활성도, OpenVLA 후속 모델 등장 여부)
 
 
