@@ -143,7 +143,16 @@ latency 측정, e-stop, BOM 이해는 로보틱스 랩에서도 일상적으로 
 
 ### 실행 머신
 
-팔·카메라를 USB 로 물리는 기계와 무거운 연산을 돌리는 기계가 같아야 편하다. 전제는 **Ubuntu PC (RTX 4070) 의 자택 이전**이다 (조율 중, 2026-07-28). 원격 접속으로는 USB 장치를 붙일 수 없으므로, 이전이 무산되면 팔 옆에 둘 기계 (보유 노트북) 를 따로 세우고 학습·Sim 만 원격으로 보내는 분리 구성이 된다.
+팔·카메라를 USB 로 물리는 기계와 무거운 연산을 돌리는 기계가 같아야 편하다. 전제는 **Ubuntu PC (RTX 4070) 의 자택 이전**이다 (조율 중, 2026-07-28). 원격 접속으로는 USB 장치를 붙일 수 없으므로, 이전이 무산되면 팔 옆 기계를 따로 세우고 학습·Sim 만 원격으로 보내는 분리 구성이 된다.
+
+**이전 무산 시 팔 옆 기계는 보유 중인 Jetson Orin Nano 다** (맥북이 아니다):
+
+| 기계 | 판정 |
+|---|---|
+| **Jetson Orin Nano** | **적합.** JetPack 6 = Ubuntu 22.04 이라 ROS 2 Humble 을 apt 로 설치하며 Phase 3 절차를 그대로 재사용한다. SO-101 + LeRobot 구동 사례가 공개돼 있고 NVIDIA 공식 SO-101 코스의 기준 구성이기도 하다. 네이티브 리눅스라 `feetech_ros2_driver` 빌드에 문제가 없다. 한계 — ACT 학습·Isaac Sim 불가, 저장 매체가 SD 카드면 에피소드 영상 쓰기가 병목 (NVMe 권장) |
+| MacBook Pro 14 (M4 Pro) | **ROS2 작업 불가.** LeRobot 자체는 macOS Apple Silicon 공식 지원이라 teleop·record 는 되지만, ROS 2 는 macOS 바이너리 패키지가 없고 Docker Desktop for Mac 은 USB 패스스루를 지원하지 않아 팔을 컨테이너에 붙일 수 없다. LeRobot 전용 백업 경로로만 유효 |
+
+부수 효과: Jetson 구성은 v3 (Jetson 실기 배포, README 부록 C) 의 예행이 된다 — 개발 기계와 배포 타깃이 같아진다.
 
 **Isaac Sim 사양 리스크** — Isaac Sim 5.1 최소 사양은 RTX 4080 / VRAM 16GB / RAM 32GB 인데 본 PC 는 12GB / 31GB 로 VRAM 이 미달이고 RAM 이 턱걸이다. 다만 공식 문서가 지원 불가로 규정한 것은 RT 코어가 없는 GPU (A100·H100) 이고, 16GB 미만은 "프레임당 16MP 초과 복잡 씬에서 어려움" 서술이다. 용도별 전망:
 
@@ -157,13 +166,18 @@ latency 측정, e-stop, BOM 이해는 로보틱스 랩에서도 일상적으로 
 
 - Isaac Sim 의 WebRTC 라이브스트리밍은 **UDP 47998** (미디어) + TCP 49100 (시그널링) 을 쓰고, 두 포트는 클라이언트에 하드코딩돼 있어 5.x 에서 변경할 수 없다. TCP 전용 스트리밍은 지원하지 않는다. 컨테이너 구동 시 `--network=host` 도 요구된다
 - **RunPod 은 UDP 를 지원하지 않는다** (공식 문서: "Pods do not support UDP connections"). 노출 수단은 HTTP 프록시와 public IP + 직접 TCP 뿐이고, 관리형 컨테이너라 `--network=host` 지정도 불가하다
+- **Tailscale 로 우회할 수도 없다.** 커널 모드는 `/dev/net/tun` 이 필요한데 RunPod 이 이를 노출하지 않아 `mknod: /dev/net/tun: Operation not permitted` 로 실패한다 (runc v1.2 부터 기본 device cgroup 에서 제외됨. RunPod 측 요청 이슈 `runpod/runpodctl#272` 는 Open 상태이며, 그 이슈가 막힌 용례로 "저지연 WebRTC 스트리밍" 을 그대로 적고 있다). 유저스페이스 모드 (`--tun=userspace-networking`) 는 실행되지만 gVisor netstack 이 TCP/UDP 를 종료하고 127.0.0.1 로 재전송해 **WebRTC ICE 의 source IP 검증이 실패**한다
 
 | 워크로드 | RunPod |
 |---|---|
 | Isaac Lab RL 학습, Python API 로 씬 구성·USD 저장 (headless) | 가능 — 스트리밍 불필요 |
 | **URDF 임포트·Joint State 시각 확인, 씬 편집 (GUI)** | **불가** |
 
-**따라서 Stage 1 의 Isaac Sim 항목은 로컬 전용이고, PC 자택 이전이 편의가 아니라 선행 조건이 된다.** 원격 4070 에 X11/VNC 로 붙는 구성은 GPU 렌더를 원격 데스크톱으로 넘기는 것이라 성능·안정성 모두 권장되지 않는다. 로컬 사양이 GUI 워크로드를 감당하지 못하는 것으로 드러나면 대안은 RunPod 이 아니라 UDP 를 열 수 있는 제공자 (Vast.ai, GCP Omniverse Developer Workstation) 이며, 세팅 비용이 크므로 실제로 막히기 전에는 검토하지 않는다.
+**따라서 Isaac Sim GUI 를 돌릴 수 있는 곳은 본인 4070 PC 뿐이다.** PC 자택 이전이 성사되면 문제가 없고, 무산되면 **Tailscale 경유 원격 GUI 가 유일한 경로**가 된다 — 4070 PC 는 일반 리눅스 머신이라 커널 모드 Tailscale 이 정상 동작하고, tailnet 안에서는 UDP 47998 이 통하므로 Isaac Sim WebRTC 스트리밍을 그대로 쓸 수 있다 (`--/app/livestream/publicEndpointAddress` 를 tailscale IP 로 지정). RunPod 이 막힌 것은 제공자의 네트워크 정책 때문이지 Isaac Sim 이 원격을 못 해서가 아니다.
+
+이 경로의 변수는 회사 네트워크의 Tailscale 허용 여부, 가정 회선 업로드 대역폭, 왕복 지연이며 **PC 가 손에 닿는 2026.08 에 검증해 둔다** (실행 보드 #12). 검증에 실패하고 이전도 무산되면 Stage 1 의 Isaac Sim 항목만 Phase 6 (2027.05-) 로 이월한다 — 나머지 6개 체크 항목은 팔 옆 노트북으로 수행 가능하다.
+
+로컬 사양이 GUI 워크로드를 감당하지 못하는 것으로 드러나는 경우의 대안은 RunPod 이 아니라 UDP 를 열 수 있는 제공자 (Vast.ai, GCP Omniverse Developer Workstation) 이며, 세팅 비용이 크므로 실제로 막히기 전에는 검토하지 않는다.
 
 
 ### 단계

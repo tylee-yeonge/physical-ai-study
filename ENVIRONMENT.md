@@ -15,9 +15,10 @@
   - **하드웨어 변경 불가** (RAM·GPU 증설 포함). 로컬 사양이 모자라는 작업은 증설이 아니라 **RunPod 이관**으로 대응한다
   - 단 **GUI 스트리밍이 필요한 작업은 RunPod 로 옮길 수 없다** — RunPod 은 UDP 미지원이고 Isaac Sim WebRTC 는 UDP 47998 이 필수다 (2026-07-28 확인, 상세는 [Hardware-Arm.md](Roadmap/Hardware-Arm.md) Stage 1 실행 머신 절). headless 스크립트 워크로드만 이관 가능
   - 자택 이전 조율 중 (2026-07-28) — 성사되면 휴직 중 물리 접근 제약이 해소된다. Isaac Sim GUI 작업이 로컬 전용이라 Stage 1 (2027.01-02) 의 선행 조건이기도 하다 (remediation plan 결정 #5)
-- **ELP Stereo Camera** — Ubuntu PC 에 USB 연결된 주변기기, 실카메라 입력용
+- **MacBook Pro 14 (M4 Pro)** — 원격 접속·문서 작업. LeRobot 은 macOS Apple Silicon 을 공식 지원해 teleop·record 백업 경로로 쓸 수 있으나, **ROS2 는 불가** (macOS 바이너리 패키지 없음 + Docker Desktop for Mac 의 USB 패스스루 미지원)
+- **Jetson Orin Nano** — JetPack 6 = Ubuntu 22.04 → **ROS 2 Humble 을 apt 로 설치** (Phase 3 배포판과 동일 절차). SO-101 + LeRobot 구동 사례가 공개돼 있고 NVIDIA 공식 SO-101 코스의 기준 구성이다. **4070 PC 자택 이전이 무산될 경우 Stage 1 의 팔 옆 기계 역할** — 상세는 [Hardware-Arm.md](Roadmap/Hardware-Arm.md) Stage 1 실행 머신 절. 학습·Isaac Sim 은 불가하며, 에피소드 영상 저장 때문에 저장 매체 확인 필요 (SD 카드면 쓰기 병목, NVMe 권장)
+- **ELP Stereo Camera** — USB 연결 주변기기, 실카메라 입력용
 - (예정) **손목 카메라** — 소형 UVC USB 웹캠 1대. SO-101 팔로워 그리퍼용, Stage 1 (2027.01-02) 시점 구매
-- (보류) **Jetson Orin Nano** — v3 이후 옵션. 학습·Isaac Sim 이 불가하고 데이터 수집은 PC 로 충분해 현 로드맵에서 도입 이유 없음
 
 
 ---

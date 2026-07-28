@@ -36,6 +36,7 @@
 - [ ] 10. **Phase 3 재현 확인** (GPU 필수) — TensorRT 엔진 재빌드 + week8 통합 노드 1회 구동, 결과 기록 (Task 2-4)
 - [ ] 11. **Rerun 스크린샷/gif 1장** → README Evidence 절 삽입 + `Measurements/.../plots/` 보존 → 커밋 (Task 2-4)
 - [ ] 12. GPU 필요 잔여분 (#1, #6, #8, #10-11) 0건 확인 + **4070 원격 운용 전환 점검** — BIOS 전원 복구 자동 부팅 (Restore on AC Power Loss), 원격 접속 경로 이중화 (SSH + 오버레이 VPN 등), 커널 패닉 자동 리부트 (`kernel.panic` sysctl), (선택) 원격 전원 리셋 수단. 재부팅으로 안 풀리는 하드웨어 장애는 커버 불가 — 그 계층의 보험은 #6 의 RunPod 재현
+  - [ ] **Tailscale 경유 Isaac Sim 원격 GUI 경로 검증** (약 30분) — `--/app/livestream/publicEndpointAddress` 를 tailscale IP 로 지정해 WebRTC 스트리밍이 붙는지 확인. RunPod 은 이 우회가 구조적으로 불가하므로 (`/dev/net/tun` 미노출 + 유저스페이스 모드의 ICE 실패), PC 자택 이전이 무산될 경우 Isaac Sim 을 돌릴 유일한 경로다. **PC 가 손에 닿는 8월에 해야 한다** — 이전 성사 여부보다 이 검증이 먼저다. 상세: [Hardware-Arm.md](../../../Roadmap/Hardware-Arm.md) Stage 1 실행 머신 절
 
 ### 남는 시간에 (이월 가능 — GPU 작업과 충돌하면 무조건 뒤로)
 
