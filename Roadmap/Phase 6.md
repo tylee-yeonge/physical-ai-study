@@ -37,7 +37,8 @@
 | Sim/Real gap 측정 인프라 | Ubuntu PC + 자작 팔 | △ |
 
 
-- Isaac Sim 사양: NVIDIA RTX (Ampere 이상) 필요. RTX 4070 OK.
+- Isaac Sim 사양: NVIDIA RTX (RT 코어 필요 — A100·H100 계열은 미지원). **RTX 4070 12GB 는 5.1 요구사양 (RTX 4080 / VRAM 16GB / RAM 32GB) 미달**이나 지원 불가 범주는 아니며, 단일 팔 수준 씬은 실행 가능 전망 — 확정은 Hardware-Arm Stage 1 실측. 상세와 대응은 [Hardware-Arm.md](Hardware-Arm.md) "Stage 1 실행 머신" 절
+- **GUI 작업은 로컬 전용**: Isaac Sim WebRTC 라이브스트리밍이 UDP 47998 을 요구하는데 RunPod 은 UDP 미지원이라 이관이 불가하다. 위 표의 "Ubuntu PC (원격)" 은 셋업·headless 스크립트 한정이고, 씬 편집·시각 확인은 PC 앞에서 해야 한다. Isaac Lab 튜토리얼처럼 headless 학습으로 끝나는 작업만 RunPod 로 보낼 수 있다
 - 데이터: 자작 팔 teleop 데이터 (Hardware-Arm Stage 2 산출물)
 - 상세: [ENVIRONMENT.md](../ENVIRONMENT.md)
 

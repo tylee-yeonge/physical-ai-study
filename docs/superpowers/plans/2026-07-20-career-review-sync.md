@@ -280,7 +280,7 @@ git commit -m "docs: record week11 dry-run full-loop measurements"
 ### Task 6: 레포 밖 본인 실행 항목 (커밋 없음)
 
 - [ ] Dynamixel 제조사 인재풀 등록 + 공고 알림 설정 (저가시성 — probe 1단 성격, 재직 중 가능)
-- [ ] 스파이크 부품 발주 보류 확인 — 8월 초 체크포인트에서 부품 구성 확정 전에는 XL330·U2D2 등 커스텀 부품을 구매하지 않는다 (Koch v1.1 BOM 과의 정합 미결)
+- [ ] SO-101 키트 구매 전 판매자 확인 4항목 처리 (2026-07-28 결정) — 리더암 기어비 구성 (C046 x6 인지 공식 혼합인지), 팔로워 "1/315" 표기 오타 여부, Max 484,000원과 A-Ba 550,000원의 구성 차이, 3D 프린팅 부품의 손목 카메라 마운트 포함 여부. 상세는 [Hardware-Arm.md](../../../Roadmap/Hardware-Arm.md) 주문 전 확인 항목 표. 구매 시점은 8월 초 체크포인트가 정하는 스파이크 시기 (2026.09-10) 에 연동
 - [ ] vla-lab 첫 산출물 발행 (2026-07-23 결정) — `Measurements/openvla-rtx4070-int4` 를 자립적 write-up 으로 변환해 vla-lab 에 발행. 시점: findings §4 Block 3 (300 ms 구간 분해) 완료 후, 2026.08 말-09. 조건: 스터디 스캐폴딩 (체크박스·검토 보고서 참조·학습 배분) 제거, methodology 측정 조건 + scripts 동반으로 재현 가능하게, 공개용 git 신원으로만 커밋. 원본 (이 레포) 이 single source of truth, vla-lab 은 발행 시점 스냅샷
 
 ---

@@ -11,9 +11,13 @@
 ## 1. 장비 개요
 
 
-- **Ubuntu PC (RTX 4070, 12GB VRAM)** — 메인 학습/실험 장비
+- **Ubuntu PC** — 메인 학습/실험 장비. RTX 4070 12GB VRAM / RAM 31GB / 28 코어 / 드라이버 580.173.02
+  - **하드웨어 변경 불가** (RAM·GPU 증설 포함). 로컬 사양이 모자라는 작업은 증설이 아니라 **RunPod 이관**으로 대응한다
+  - 단 **GUI 스트리밍이 필요한 작업은 RunPod 로 옮길 수 없다** — RunPod 은 UDP 미지원이고 Isaac Sim WebRTC 는 UDP 47998 이 필수다 (2026-07-28 확인, 상세는 [Hardware-Arm.md](Roadmap/Hardware-Arm.md) Stage 1 실행 머신 절). headless 스크립트 워크로드만 이관 가능
+  - 자택 이전 조율 중 (2026-07-28) — 성사되면 휴직 중 물리 접근 제약이 해소된다. Isaac Sim GUI 작업이 로컬 전용이라 Stage 1 (2027.01-02) 의 선행 조건이기도 하다 (remediation plan 결정 #5)
 - **ELP Stereo Camera** — Ubuntu PC 에 USB 연결된 주변기기, 실카메라 입력용
-- (보류) **Jetson Orin Nano** — 하드웨어 실습 시간 확보 시점에 재도입
+- (예정) **손목 카메라** — 소형 UVC USB 웹캠 1대. SO-101 팔로워 그리퍼용, Stage 1 (2027.01-02) 시점 구매
+- (보류) **Jetson Orin Nano** — v3 이후 옵션. 학습·Isaac Sim 이 불가하고 데이터 수집은 PC 로 충분해 현 로드맵에서 도입 이유 없음
 
 
 ---
