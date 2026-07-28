@@ -70,7 +70,8 @@ Phase 4.5 Section 0 (실행 보드 #4) 은 "7월 후반 조기 착수" 로 배�
 | 6 | Section 0 전반 — sim 구축 + zero-shot baseline | 불요 (RunPod 가능) | 20-30h 추정 |
 | 6 | Section 0 후반 — Docker 화 + RunPod 재현 + LoRA 1사이클 실측 | 불요 | 8-12h 추정 |
 | 6 | fine-tuned 4-bit 의 4070 안착 확인 | **필요** | 1-2h |
-| 8 | 재측정 + Block 3·4 | **필요** | 6-9h |
+| 8 | 재측정 + **Block 3** (구간 분해 + methodology §3 잔여 + 수치 갱신) | **필요** | 4-6h |
+| 8-1 | **Block 4** (3.33 Hz 조건부 판정) — 새 측정 없음 | 불요 | 2-3h |
 | 9 | 자가 검증 10문항 | 불요 | 1-2h 추정 |
 | 10 | Phase 3 재현 확인 (TensorRT 재빌드 + week8 노드) | **필요** | 3-4h 추정 |
 | 11 | Rerun 스크린샷/gif 1장 | **필요** | 1-2h 추정 |
@@ -90,19 +91,21 @@ Phase 4.5 Section 0 (실행 보드 #4) 은 "7월 후반 조기 착수" 로 배�
 
 **2층 (8월 2-3주, 물리 접근이 필요한 실측)**
 
-- #8 재측정 + Block 3·4 → methodology §3 미기록 항목 + SETUP §1.3 · README Evidence 수치 갱신
+- **#8 재측정 + Block 3** → 구간 분해 + methodology §3 잔여 4항목 + SETUP §1.3 · README Evidence 수치 갱신. **이 층에서 가장 큰 덩어리이자 vla-lab 첫 발행의 트리거**다
 - #10 Phase 3 재현 확인 (TensorRT 엔진은 GPU 아키텍처 종속 — 재빌드는 여기서만 가능)
 - #11 Rerun 시각 자료
-- #9 자가 검증 10문항 (막히는 문항의 Block 재수행이 GPU 를 부를 수 있으므로 이 구간에 둔다)
 
 **3층 (8월 4주 이후 — 9월 이월 허용)**
 
+- **#8-1 Block 4** + **#9 자가 검증 10문항** (한 묶음). Block 4 는 새 측정이 없어 GPU 가 필요 없고, #9 는 Block 4 산출물("task 경계" 문항)에 의존하므로 순서가 고정이다. 8월 4주에 붙이면 막히는 문항이 나왔을 때 GPU 로 돌아갈 수 있고, 9월로 밀면 **측정 기반 문항이 막혔을 때 재측정이 불가**해진다 — 자택 이전이 성사되면 이 손실은 사라진다
 - Section 0 의 sim 구축 + zero-shot baseline (RunPod 로 가능 → 휴직 중에도 안전). 실제 마감은 8월 말이 아니라 Section 1 착수 (9월 중순) 전
 - Section 0 의 sim + eval Docker 화 + RunPod 재현 (sim 구축에 의존 — 1층으로 당길 수 없다)
 - #5 v1 확장 구현 (코드 작업 — GPU 무관)
-- vla-lab 첫 산출물 발행
+- vla-lab 첫 산출물 발행 (Block 3 완료가 트리거이므로 2층 직후 착수 가능)
 
-즉 8월에 반드시 끝내야 하는 것은 1층 + 2층 (추정 16-25h) 이고, 이건 예산 안에 들어간다. 3층을 8월에 우겨넣으려는 시도가 계획을 깨뜨린다.
+즉 8월에 반드시 끝내야 하는 것은 1층 + 2층 (추정 13-20h) 이고, 이건 예산 안에 들어간다. 3층을 8월에 우겨넣으려는 시도가 계획을 깨뜨린다.
+
+**Block 3·4 시점 요약** (findings.md 와 실행 보드의 정합 결과): Block 3 은 GPU 필수라 **8월 2-3주 고정**, Block 4 는 새 측정이 없어 **8월 4주 권장 / 9월 이월 허용**이다. 둘을 한 항목으로 묶어 두면 GPU 불요 작업이 8월 부하로 잡혀 정작 물리 접근이 필요한 #10·#11 을 밀어낸다.
 
 ### 3.3 9월 (휴직 개시 — 확정)
 
@@ -154,8 +157,8 @@ gantt
     axisFormat %m월
     section 학습
     Block 2 마감 :b2, 2026-07-28, 4d
-    재측정 + Block 3-4 :b34, 2026-08-10, 12d
-    자가 검증 10문항 :quiz, 2026-08-22, 5d
+    재측정 + Block 3 (GPU 필수) :crit, b3, 2026-08-10, 10d
+    Block 4 + 자가 검증 10문항 :b4q, 2026-08-22, 9d
     Phase 4.5 Section 0 :s0, 2026-08-01, 45d
     Section 1 (sim 데이터) :s1, 2026-09-15, 14d
     Section 2 (LoRA 학습) :s2, 2026-09-29, 21d
@@ -217,7 +220,7 @@ gantt
 | 층 | 내용 |
 |---|---|
 | 1. 8월에 소진 | GPU 물리 접근 항목 (#8·#10·#11) 을 8월에 끝내면 이 층은 이전 여부와 무관해진다. 원래 계획이 이미 세워 둔 방어선이며, #12 원격 운용 전환이 그 위에 얹힌다 |
-| 2. 팔 옆 기계 = **보유 Jetson Orin Nano** | JetPack 6 = Ubuntu 22.04 → ROS 2 Humble apt 설치, SO-101 + LeRobot 구동 사례 공개. 조립·드라이버·URDF/RViz·teleop 데이터 수집을 여기서 수행한다. 추가 구매 없음. 확인할 것 — 저장 매체 (SD 카드면 영상 쓰기 병목, NVMe 권장) 와 USB 포트 수. **맥북 M4 Pro 는 대안이 아니다** — LeRobot 은 되지만 ROS2 바이너리가 없고 Docker Desktop for Mac 이 USB 패스스루를 지원하지 않는다 |
+| 2. 팔 옆 기계 = **보유 Jetson Orin Nano** | **256GB SSD + Ubuntu 22.04 설치 완료** 상태 → ROS 2 Humble apt 설치 가능, 영상 저장 용량도 충분. SO-101 + LeRobot 구동 사례 공개. 조립·드라이버·URDF/RViz·teleop 데이터 수집을 여기서 수행하며 **추가 구매 없음**. 확인할 것 — CUDA 스택 동반 여부, 카메라 2대 동시 30fps (Hardware-Arm.md 확인 표). **맥북 M4 Pro 는 대안이 아니다** — LeRobot 은 되지만 ROS2 바이너리가 없고 Docker Desktop for Mac 이 USB 패스스루를 지원하지 않는다 |
 | 3. Isaac Sim = Tailscale 경유 원격 GUI | 4070 PC 는 커널 모드 Tailscale 이 정상 동작하므로 tailnet 안에서 UDP 47998 이 통한다 → WebRTC 스트리밍 가능. **RunPod 은 이 우회가 불가하다** (`/dev/net/tun` 미노출, 유저스페이스 모드는 gVisor netstack 이 127.0.0.1 로 재전송해 WebRTC ICE source IP 검증 실패). 상세는 Hardware-Arm.md 실행 머신 절 |
 
 3층까지 실패하면 **Stage 1 의 "Isaac Sim URDF 임포트 + Joint State 매칭" 1개 항목만 Phase 6 (2027.05-07) 로 이월**한다. 복직이 2027.03 이라 Phase 6 와 자연스럽게 붙고, 손실은 v2 선행 하드웨어 산출물의 Sim 임포트 영상이 2027.02 마감을 넘기는 정도다.

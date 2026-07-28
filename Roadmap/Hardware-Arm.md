@@ -149,10 +149,20 @@ latency 측정, e-stop, BOM 이해는 로보틱스 랩에서도 일상적으로 
 
 | 기계 | 판정 |
 |---|---|
-| **Jetson Orin Nano** | **적합.** JetPack 6 = Ubuntu 22.04 이라 ROS 2 Humble 을 apt 로 설치하며 Phase 3 절차를 그대로 재사용한다. SO-101 + LeRobot 구동 사례가 공개돼 있고 NVIDIA 공식 SO-101 코스의 기준 구성이기도 하다. 네이티브 리눅스라 `feetech_ros2_driver` 빌드에 문제가 없다. 한계 — ACT 학습·Isaac Sim 불가, 저장 매체가 SD 카드면 에피소드 영상 쓰기가 병목 (NVMe 권장) |
+| **Jetson Orin Nano (8GB)** | **적합.** **256GB SSD + Ubuntu 22.04 설치 완료** 상태라 ROS 2 Humble 을 apt 로 깔고 Phase 3 절차를 그대로 재사용한다 (LeRobot 이 요구하는 Python 3.10 도 기본). SO-101 + LeRobot 구동 사례가 공개돼 있고 NVIDIA 공식 SO-101 코스의 기준 구성이기도 하다. 네이티브 리눅스라 `feetech_ros2_driver` 빌드에 문제가 없다. 저장 용량도 에피소드 영상에 충분하다. 한계 — Isaac Sim 불가, ACT 학습은 소규모 데이터셋 사례가 있으나 정석은 4070/RunPod |
 | MacBook Pro 14 (M4 Pro) | **ROS2 작업 불가.** LeRobot 자체는 macOS Apple Silicon 공식 지원이라 teleop·record 는 되지만, ROS 2 는 macOS 바이너리 패키지가 없고 Docker Desktop for Mac 은 USB 패스스루를 지원하지 않아 팔을 컨테이너에 붙일 수 없다. LeRobot 전용 백업 경로로만 유효 |
 
 부수 효과: Jetson 구성은 v3 (Jetson 실기 배포, README 부록 C) 의 예행이 된다 — 개발 기계와 배포 타깃이 같아진다.
+
+**Jetson 경로에서 확인할 것** (공개 구동 사례에서 실제로 걸린 지점들):
+
+| 항목 | 내용 |
+|---|---|
+| CUDA 스택 | Ubuntu 22.04 만 올린 상태면 CUDA·cuDNN 이 없어 PyTorch GPU 가 안 붙는다. `cat /etc/nv_tegra_release` / `dpkg -l nvidia-jetpack` 으로 JetPack·L4T 확인 |
+| PyTorch 설치 | 스크립트 설치는 실패 보고. **NVIDIA 공식 deb** 사용, `cusparselt` 선행 설치, `numpy==1.26.0` 고정. conda(aarch64) + Python 3.10 |
+| torchcodec | **aarch64 미지원** → LeRobot 이 pyav 로 자동 폴백 (ffmpeg 별도 설치 불요). 단 pyav 는 LeRobotDataset 선호 코덱 libsvtav1 을 같은 방식으로 다루지 못해, 필요 시 ffmpeg 를 libsvtav1 포함해 소스 빌드 |
+| **카메라 2대 동시 30fps** | 공개 사례에서 실패해 한 대를 10fps 로 낮춤 (대역폭). 완화 시도 — MJPEG 강제 (YUYV 무압축이 주범), USB 허브 경유 금지·본체 직결, 서로 다른 USB 컨트롤러에 분산. **ACT 입력 품질에 직결되므로 팔 도착 전에 카메라만으로 먼저 확인한다** |
+| 권한 | `/dev/ttyACM*` 접근 오류 → udev 규칙으로 정착. 캘리브레이션 실패 시 캐시 삭제 후 재시도 |
 
 **Isaac Sim 사양 리스크** — Isaac Sim 5.1 최소 사양은 RTX 4080 / VRAM 16GB / RAM 32GB 인데 본 PC 는 12GB / 31GB 로 VRAM 이 미달이고 RAM 이 턱걸이다. 다만 공식 문서가 지원 불가로 규정한 것은 RT 코어가 없는 GPU (A100·H100) 이고, 16GB 미만은 "프레임당 16MP 초과 복잡 씬에서 어려움" 서술이다. 용도별 전망:
 

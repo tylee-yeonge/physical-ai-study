@@ -12,7 +12,8 @@
 ## 실행 보드 — 지금 할 일 (순차, 2026.07-09)
 
 > 위에서 아래로 순서대로 진행한다. **일상 체크는 이 절에서만 한다** — 아래 Phase 1·2 의 체크박스는 기록·통과 기준의 원본이며, Phase 2 는 대응 항목 완료 시점에 한 번에 닫는다.
-> 전제: 4070 (우분투 PC) 은 반납하지 않기로 확정 (2026-07-20, 결정 #5). 단 휴직 개시 (2026.09) 후에는 PC 장애 시 현장 방문 전까지 복구 불가 → GPU 작업은 8월 내 완료 권장 유지 (물리 접근이 일상적인 마지막 달). 가용: 평일 저녁 약 2h (주 8-10h).
+> 전제: 4070 (우분투 PC) 은 반납하지 않기로 확정 (2026-07-20, 결정 #5). 휴직 개시 (2026.09) 후에는 PC 장애 시 현장 방문 전까지 복구 불가 → GPU 작업은 8월 내 완료 권장 (물리 접근이 일상적인 마지막 달). **자택 이전 조율 중 (2026-07-28)** — 성사되면 이 마감이 해소되나, 확정 전까지는 8월 마감을 전제로 배치한다. 가용: 평일 저녁 약 2h (주 8-10h).
+> 월별 총부하·트랙 충돌 개관은 [2026 하반기 실행 가이드](2026-07-28-year-end-execution-guide.md) 참조 (체크는 이 절에서만).
 
 ### 지금 (7월)
 
@@ -20,23 +21,33 @@
   - 진행 (2026-07-10): 측정 완료 — `memory_breakdown.py` 실행, 수치는 methodology §4 에 기입 (context 0.19 / 로드 후 4.74 / 추론 후 5.05 GB, dtype 분해 포함). 부수 발견: 실측 5.05 GB 는 SETUP.md §1.3 의 "약 7GB (논문 실측)" 과 불일치 — 간극 해석은 Step 4, 문구 갱신은 Task 2-2 수치 갱신에서 처리
   - 완료 (2026-07-16): findings §4.1 Step 1-4 + 사다리 표 작성 완료 (QLoRA §3 두 문단 정독 포함). 정제 예측 4.284 GB vs 실측 4.38 GB (잔차 2단 분해: 버퍼 + 미확인 장부 잔차), nvidia-smi 재구성 잔차 로드 시 0 / 추론 후 0.02 GB (allocator 밖 할당 추정). 잔여 이관: "약 7GB (논문 실측)" 과의 간극 해석은 findings §4.1 Step 5 에서 완료 (2026-07-16, 논문 Table 2 + openvla 코드 기본값 확인 — DQ 미사용 +0.34 / 측정 오버헤드 차 +1.05 / 미확인 0.56 GB) — SETUP.md 문구 병기 갱신만 Task 2-2 에 잔존
 - [ ] 2. **Block 2 — int8 열위 메커니즘** (3-4h). LLM.int8() vs NF4 논문 해당 절만 → findings.md §4.2 → 커밋 (Task 2-1)
+  - 진행 (2026-07-28, 커밋 `b2131ee`): findings §4.2 **Step 1-4 완료** — 직관 가정 체크, 선행 정독 (LLM.int8 §2·§3·§4 / QLoRA §3 재독 / bitsandbytes 0.49.2 소스 대조), Step 3 경로 대조표, Step 4 성공률 58.1% 인과 경로. 통과 기준 두 개 중 앞쪽 (메커니즘 답변) 충족
+  - 잔여: findings §4.2 **Step 5** ("fp16 대비 int4 속도" 방향 예측 → Table 2 대조 → 오차 설명 3줄) + **완료 판정 표 4행**, 약 1-1.5h. 이 둘이 채워지면 본 항목과 Task 2-1 Step 2·3 을 함께 닫는다
 - [ ] 3. **JD 5-10개 정독 + 격차 매핑 1페이지** — 짧은 블록에 병행
-- [ ] 4. **Phase 4.5 Section 0 전반: ManiSkill sim 구축 + zero-shot baseline** — 가장 무겁고 불확실하므로 7월 후반부터 조기 착수. 상세: [Roadmap/Phase 4.5.md](../../../Roadmap/Phase%204.5.md) Section 0
 
 ### 8월 초
 
+- [ ] 4. **Phase 4.5 Section 0 전반: ManiSkill sim 구축 + zero-shot baseline** — 상세: [Roadmap/Phase 4.5.md](../../../Roadmap/Phase%204.5.md) Section 0
+  - 이월 (2026-07-28): 원래 "7월 후반 조기 착수" 배치였으나 미착수 → 8월로 이월 확정. 추정 20-30h 라 7월 잔여 3-4일로는 착수만 하고 끊긴다. **실제 마감은 8월 말이 아니라 Section 1 착수 (9월 중순) 전 zero-shot baseline 확보** — 8월 2주차 착수로도 성립
 - [ ] 5. **v1 확장 구현: `RobotPolicy` adapter + action schema validation + 벤치마크 재현 스크립트** — #6 Docker 화 전에 코드 변경 완료. 상세: [Roadmap/Phase 4.md](../../../Roadmap/Phase%204.md) v1 체크리스트
 - [ ] 6. **Section 0 후반: Docker 컨테이너화 → RunPod 기동·재현 확인 + LoRA 1사이클 실측 + fine-tuned 4-bit 의 4070 안착 확인** (마지막 항목만 4070 필요)
-- [ ] 7. **8월 체크포인트**: 4070 보유 지속·원격 운용 전환 기록 + git author (filter-repo) 실행 여부 결정 + 정독 잠정치 갱신. 상세: [notes.md](../../../Studies/Phase%204/notes.md) 진행 원칙
-- [ ] 8. **재측정 + Block 3·4** (6-9h, GPU 필수). 예측 → 측정 → 오차 설명. [methodology.md](../../../Measurements/openvla-rtx4070-int4/methodology.md) 미기록 5항목 채움 + SETUP §1.3·README Evidence 표 갱신 → 커밋 (Task 2-2)
+- [ ] 7. **8월 체크포인트**: 4070 보유 지속·원격 운용 전환 기록 + **자택 이전 여부·시점 확정** + git author (filter-repo) 실행 여부 결정 + 정독 잠정치 갱신. 상세: [notes.md](../../../Studies/Phase%204/notes.md) 진행 원칙
+- [ ] 8. **재측정 + Block 3** (4-6h, **GPU 필수**). 예측 → 측정 → 오차 설명. 구간 분해 (전처리 / vision encoder / prefill / decode 7토큰 / un-norm) + [methodology.md](../../../Measurements/openvla-rtx4070-int4/methodology.md) §3 미기록 4항목 (구간 분해·실카메라 입력·notebook→`.py`·`summary.csv`) + SETUP §1.3·README Evidence 표 갱신 → 커밋 (Task 2-2 Step 1·3·4)
+  - 배치 근거: GPU 물리 접근이 필요한 항목 중 가장 큰 덩어리다. **vla-lab 첫 발행의 트리거**이기도 해서 (career-sync Task 6) 8월 2-3주에 두고, 그 뒤 발행이 9월에 걸리도록 한다
+- [ ] 8-1. **Block 4 — 3.33 Hz 조건부 판정** (2-3h, **GPU 불요**). 제어 계층 표 + task 유형별 판정 + action chunking. 입력은 Block 3 의 구간 분해 결과와 공개 문헌뿐 (findings §4.4 골격: "새 측정 없음") → 커밋 (Task 2-2 Step 2)
+  - **#8 에서 분리한 이유**: GPU 가 필요 없으므로 8월 마감의 대상이 아니다. 8월 4주에 붙이는 것이 자연스럽지만, 과밀 시 #9 와 함께 9월로 이월해도 안전하다
 - [ ] 9. **자가 검증 10문항** — 문서 참조 없이 전부 답변 (문항: 검토 보고서 §2.6). 막히면 해당 Block 재수행 (Task 2-3)
+  - 선후: **#8-1 다음**이다. 10문항 중 "병목 구간"·"Jetson 이식 예측" 은 Block 3, "task 경계" 는 Block 4 산출물이라 그 전에 치면 답이 없다
+  - 8월에 두는 이유는 막혔을 때 GPU 로 돌아갈 수 있기 때문이다. #8-1 과 함께 9월로 밀면 **측정 기반 문항이 막혔을 때 재측정이 불가**해진다 — 자택 이전이 성사되면 이 리스크는 소멸
 
 ### 8월 중 (휴직 전 마감 — 물리 접근이 일상적인 마지막 달)
 
 - [ ] 10. **Phase 3 재현 확인** (GPU 필수) — TensorRT 엔진 재빌드 + week8 통합 노드 1회 구동, 결과 기록 (Task 2-4)
 - [ ] 11. **Rerun 스크린샷/gif 1장** → README Evidence 절 삽입 + `Measurements/.../plots/` 보존 → 커밋 (Task 2-4)
-- [ ] 12. GPU 필요 잔여분 (#1, #6, #8, #10-11) 0건 확인 + **4070 원격 운용 전환 점검** — BIOS 전원 복구 자동 부팅 (Restore on AC Power Loss), 원격 접속 경로 이중화 (SSH + 오버레이 VPN 등), 커널 패닉 자동 리부트 (`kernel.panic` sysctl), (선택) 원격 전원 리셋 수단. 재부팅으로 안 풀리는 하드웨어 장애는 커버 불가 — 그 계층의 보험은 #6 의 RunPod 재현
+- [ ] 12. GPU 필요 잔여분 (#6 의 4-bit 확인, #8, #10-11) 0건 확인 + **4070 원격 운용 전환 점검** — BIOS 전원 복구 자동 부팅 (Restore on AC Power Loss), 원격 접속 경로 이중화 (SSH + 오버레이 VPN 등), 커널 패닉 자동 리부트 (`kernel.panic` sysctl), (선택) 원격 전원 리셋 수단. 재부팅으로 안 풀리는 하드웨어 장애는 커버 불가 — 그 계층의 보험은 #6 의 RunPod 재현
   - [ ] **Tailscale 경유 Isaac Sim 원격 GUI 경로 검증** (약 30분) — `--/app/livestream/publicEndpointAddress` 를 tailscale IP 로 지정해 WebRTC 스트리밍이 붙는지 확인. RunPod 은 이 우회가 구조적으로 불가하므로 (`/dev/net/tun` 미노출 + 유저스페이스 모드의 ICE 실패), PC 자택 이전이 무산될 경우 Isaac Sim 을 돌릴 유일한 경로다. **PC 가 손에 닿는 8월에 해야 한다** — 이전 성사 여부보다 이 검증이 먼저다. 상세: [Hardware-Arm.md](../../../Roadmap/Hardware-Arm.md) Stage 1 실행 머신 절
+  - [ ] **Jetson Orin Nano CUDA 스택 확인** (약 30분) — 256GB SSD + Ubuntu 22.04 는 설치 완료 상태이므로 재플래시는 불요 전망. 확인할 것은 **CUDA·cuDNN 동반 여부**뿐이다 (`cat /etc/nv_tegra_release`, `dpkg -l nvidia-jetpack`) — 없으면 PyTorch GPU 가 안 붙고, JetPack 재설치에는 **x86 Ubuntu 호스트 (= 이 PC) 가 필요**하다. 맥북은 SDK Manager 호스트가 될 수 없으므로 이 확인만은 8월에 해 둔다
+  - 위 두 항목은 **자택 이전이 확정되면 드롭 가능**하다 (합 약 1h). 8월 말까지 결론이 안 나면 그냥 수행한다 — 보험료가 싸다
 
 ### 남는 시간에 (이월 가능 — GPU 작업과 충돌하면 무조건 뒤로)
 
@@ -48,6 +59,7 @@
 - [ ] 15. Phase 4.5 Sections 1-3 착수 (2026.09-11)
 
 > 반납 취소 확정 (2026-07-20) 반영: #6 의 4-bit 확인과 #8·#10-11 은 절대 마감이 아니라 권장 마감이 됐다. 단 휴직 중 PC 장애 시 현장 방문 전까지 복구 불가라 8월 완료 권장은 유지한다. Docker·RunPod (#6) 은 LoRA 24GB+ 요건에 더해 로컬 PC 단일 장애점 제거 역할로 계속 필요.
+> GPU 필요 여부로 다시 가른 결과 (2026-07-28): **8월에 반드시 끝낼 것은 #8·#10·#11 + #6 의 4-bit 확인 + #12** 다. #8-1 (Block 4)·#9·#5·#13 과 Section 0 의 sim 구축은 GPU 물리 접근이 필요 없어 9월 이월이 안전하다. RunPod 은 Isaac Sim GUI 를 대체하지 못하므로 (#12 하위 항목 참조) Sim 계열은 이 판정에서 예외다.
 
 ### 문서 지도 (뭘 어디서 보나)
 
@@ -607,8 +619,13 @@ git commit -m "docs: expand v1 scope and add v2.5 dataset deliverable with act b
 
 - [ ] **Step 2: Block 2 — 양자화 원리 (3-4h)**
 
+> 본 Step 은 findings.md §4.2 **Block 2 전체**에 대응한다 (findings 안의 Step 1-5 를 모두 포함). 두 문서의 "Step" 은 층위가 다르므로 혼동하지 않는다 — plan 의 Step 2 = Block 2 하나, findings 의 Step 2 = 그 안의 선행 정독 하나.
+
 LLM.int8() 의 outlier 채널 fp16 분해 오버헤드 vs NF4 의 fused kernel — QLoRA·LLM.int8() 논문 해당 절만 정독, findings.md 의 "int8 열위 메커니즘" 영역 작성.
 **통과 기준**: int8 이 int4 보다 느리고 부정확한 메커니즘 답변 + "fp16 대비 int4 속도" 방향 예측.
+
+진행 상황 (2026-07-28, 커밋 `b2131ee`): findings §4.2 **Step 1-4 완료**. 통과 기준 두 개 중 **앞쪽 (메커니즘 답변) 충족** — Step 3 경로 대조표 (가중치 트래픽 2배 + activation absmax·threshold 스캔·outlier 분해·출력 dequant 의 매 forward 반복) 과 Step 4 인과 경로 (퍼플렉시티 무손실 vs closed-loop 성공률은 다른 지표라는 구분 + 1.2 Hz 가 궤적 보정 간격을 늘려 실패로 이어지는 경로) 로 답변 가능.
+잔여 — 뒤쪽 기준이 findings §4.2 **Step 5** 이고 아직 비어 있다 (예측 / 논문 수치 대조 / 오차 설명 3줄). **완료 판정 표 4행**도 미작성. 약 1-1.5h.
 
 - [ ] **Step 3: 검증 + Commit**
 
@@ -625,15 +642,21 @@ git commit -m "docs: add memory and quantization analysis to openvla findings"
 - Modify: `Measurements/openvla-rtx4070-int4/methodology.md`, `findings.md`, `summary.csv`, `raw/`, `scripts/`
 - Modify (수치 갱신): `Studies/Phase 4/SETUP.md` §1.3, `README.md` 실측 결과 절
 
-- [ ] **Step 1: Block 3 — 300ms 해부 (4-6h)**
+> **시점 배치 (2026-07-28 정리)**: 두 Step 의 GPU 필요 여부가 다르므로 실행 보드에서 분리했다 — Step 1 은 #8 (8월 2-3주, GPU 필수), Step 2 는 #8-1 (GPU 불요, 9월 이월 가능). Step 3-4 는 Step 1 과 같은 세션에서 처리한다 (수치 갱신 대상이 Block 3 산출물이므로). 월별 배치 개관은 [실행 가이드](2026-07-28-year-end-execution-guide.md) §3.2 참조.
+
+- [ ] **Step 1: Block 3 — 300ms 해부 (4-6h, GPU 필수)**
 
 추론 경로 (전처리 → vision encoder → action 토큰 7개 autoregressive 생성 → un-normalization) 구간별 프로파일링. `torch.cuda.synchronize` 필요성, warm-up 근거, n=100 분산 검증을 이 과정에서 함께 확인. **예측 → 측정 → 오차 설명** 순서로 수행 — 재측정 스크립트를 `scripts/` 에 저장, raw 갱신, methodology.md 의 미기록 항목 (warm-up, batch, 해상도, 동기화, p50/p99, VRAM peak, 재실행 명령어) 전부 채움.
 **통과 기준**: 구간 분해표 작성 + "해상도 절반이면 어디가 얼마나" 예측-측정-오차 설명.
 
-- [ ] **Step 2: Block 4 — 3.33Hz 의 의미 (2-3h)**
+methodology §3 잔여 4항목이 이 Step 에서 함께 닫힌다 (VRAM peak 는 2026-07-10 에 선행 완료): 구간별 분해 / 실카메라 입력 조건 / notebook → 단일 `.py` / `summary.csv`. 부수 산출: 이 Step 완료가 **vla-lab 첫 발행의 트리거**다 (career-sync Task 6).
+
+- [ ] **Step 2: Block 4 — 3.33Hz 의 의미 (2-3h, GPU 불요)**
 
 제어 계층 (전동기 수백Hz-1kHz vs 정책 수Hz) 과 연결, 정적 task 가능 / 동적 추적 불가의 경계, action chunking 이 간극을 메우는 방식 정리.
 **통과 기준**: "3.33Hz 면 충분한가" 에 task 유형별 조건부 답변.
+
+입력은 Step 1 의 구간 분해 결과 + §2 의 전체 루프 하한 (2 Hz) + 공개 문헌 (ACT 논문, OpenVLA §5.4) 뿐이고 **새 측정이 없다** (findings §4.4 골격). 따라서 8월 마감 대상이 아니며, 과밀 시 Task 2-3 과 함께 9월로 이월한다.
 
 - [ ] **Step 3: 문서 수치 갱신**
 
