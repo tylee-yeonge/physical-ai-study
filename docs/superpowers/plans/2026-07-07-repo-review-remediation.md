@@ -20,9 +20,10 @@
 - [x] 1. **Block 1 — int4 메모리 산수** (2-3h, GPU 사용). 손계산 14GB → int4 예측 → 실측 대조 → 차이 원인. 결과는 [findings.md §4.1](../../../Measurements/openvla-rtx4070-int4/findings.md) 에 본인 문장으로 (Task 2-1)
   - 진행 (2026-07-10): 측정 완료 — `memory_breakdown.py` 실행, 수치는 methodology §4 에 기입 (context 0.19 / 로드 후 4.74 / 추론 후 5.05 GB, dtype 분해 포함). 부수 발견: 실측 5.05 GB 는 SETUP.md §1.3 의 "약 7GB (논문 실측)" 과 불일치 — 간극 해석은 Step 4, 문구 갱신은 Task 2-2 수치 갱신에서 처리
   - 완료 (2026-07-16): findings §4.1 Step 1-4 + 사다리 표 작성 완료 (QLoRA §3 두 문단 정독 포함). 정제 예측 4.284 GB vs 실측 4.38 GB (잔차 2단 분해: 버퍼 + 미확인 장부 잔차), nvidia-smi 재구성 잔차 로드 시 0 / 추론 후 0.02 GB (allocator 밖 할당 추정). 잔여 이관: "약 7GB (논문 실측)" 과의 간극 해석은 findings §4.1 Step 5 에서 완료 (2026-07-16, 논문 Table 2 + openvla 코드 기본값 확인 — DQ 미사용 +0.34 / 측정 오버헤드 차 +1.05 / 미확인 0.56 GB) — SETUP.md 문구 병기 갱신만 Task 2-2 에 잔존
-- [ ] 2. **Block 2 — int8 열위 메커니즘** (3-4h). LLM.int8() vs NF4 논문 해당 절만 → findings.md §4.2 → 커밋 (Task 2-1)
-  - 진행 (2026-07-28, 커밋 `b2131ee`): findings §4.2 **Step 1-4 완료** — 직관 가정 체크, 선행 정독 (LLM.int8 §2·§3·§4 / QLoRA §3 재독 / bitsandbytes 0.49.2 소스 대조), Step 3 경로 대조표, Step 4 성공률 58.1% 인과 경로. 통과 기준 두 개 중 앞쪽 (메커니즘 답변) 충족
-  - 잔여: findings §4.2 **Step 5** ("fp16 대비 int4 속도" 방향 예측 → Table 2 대조 → 오차 설명 3줄) + **완료 판정 표 4행**, 약 1-1.5h. 이 둘이 채워지면 본 항목과 Task 2-1 Step 2·3 을 함께 닫는다
+- [x] 2. **Block 2 — int8 열위 메커니즘** (3-4h). LLM.int8() vs NF4 논문 해당 절만 → findings.md §4.2 → 커밋 (Task 2-1)
+  - 진행 (2026-07-28, 커밋 `b2131ee`): findings §4.2 **Step 1-4 완료** — 직관 가정 체크, 선행 정독 (LLM.int8 §2·§3·§4 / QLoRA §3 재독 / bitsandbytes 0.49.2 소스 대조), Step 3 경로 대조표, Step 4 성공률 58.1% 인과 경로
+  - 완료 (2026-07-28): Step 5 + 완료 판정 표 4행 작성 → §4.2 5개 Step 전부 닫힘. **단 Step 5·판정 표는 `(by claude)` 작성이다** (본인 요청, findings 내 표기됨) — 산출물은 완성됐으나 "답변 가능" 이라는 통과 기준의 판정은 **#9 자가 검증 10문항으로 이관**한다
+  - 부수 산출 2건: (1) **A5000 의 bf16 Hz 가 논문에 없음**을 확인 → int4/bf16 비율은 미확인 종결, Figure 5 캡션의 정성 진술로 대체. (2) **소재 정정** — 속도 수치는 OpenVLA §5.4 본문이고 Table 2 는 성공률·메모리만 담는다. int4 3 Hz 를 §1 에 병기하고 §1 미해소 항목을 해소 표시로 갱신
 - [ ] 3. **JD 5-10개 정독 + 격차 매핑 1페이지** — 짧은 블록에 병행
 
 ### 8월 초
@@ -34,6 +35,7 @@
 - [ ] 7. **8월 체크포인트**: 4070 보유 지속·원격 운용 전환 기록 + **자택 이전 여부·시점 확정** + git author (filter-repo) 실행 여부 결정 + 정독 잠정치 갱신. 상세: [notes.md](../../../Studies/Phase%204/notes.md) 진행 원칙
 - [ ] 8. **재측정 + Block 3** (4-6h, **GPU 필수**). 예측 → 측정 → 오차 설명. 구간 분해 (전처리 / vision encoder / prefill / decode 7토큰 / un-norm) + [methodology.md](../../../Measurements/openvla-rtx4070-int4/methodology.md) §3 미기록 4항목 (구간 분해·실카메라 입력·notebook→`.py`·`summary.csv`) + SETUP §1.3·README Evidence 표 갱신 → 커밋 (Task 2-2 Step 1·3·4)
   - 배치 근거: GPU 물리 접근이 필요한 항목 중 가장 큰 덩어리다. **vla-lab 첫 발행의 트리거**이기도 해서 (career-sync Task 6) 8월 2-3주에 두고, 그 뒤 발행이 9월에 걸리도록 한다
+  - Block 2 에서 인수한 과제: Step 5 가 "roofline 상한 약 4배 vs 실제 근사 동등" 의 간극 배분을 여기로 넘겼다. **decode 실측 (토큰당 ms) 을 대역폭 하한과 대조**해 (a) 가 어디까지 유효했는지 판정하고, vision encoder·prefill·decode 의 ms 비중으로 간극을 배분한다 (findings §4.2 Step 5 오차 설명 → §4.3 Step 3)
 - [ ] 8-1. **Block 4 — 3.33 Hz 조건부 판정** (2-3h, **GPU 불요**). 제어 계층 표 + task 유형별 판정 + action chunking. 입력은 Block 3 의 구간 분해 결과와 공개 문헌뿐 (findings §4.4 골격: "새 측정 없음") → 커밋 (Task 2-2 Step 2)
   - **#8 에서 분리한 이유**: GPU 가 필요 없으므로 8월 마감의 대상이 아니다. 8월 4주에 붙이는 것이 자연스럽지만, 과밀 시 #9 와 함께 9월로 이월해도 안전하다
 - [ ] 9. **자가 검증 10문항** — 문서 참조 없이 전부 답변 (문항: 검토 보고서 §2.6). 막히면 해당 Block 재수행 (Task 2-3)
@@ -617,7 +619,7 @@ git commit -m "docs: expand v1 scope and add v2.5 dataset deliverable with act b
 7B x 2byte = 14GB 손계산 → int4 예측치 산출 → `torch.cuda.memory_allocated` / `nvidia-smi` 실측 대조 → 차이 원인 (allocator 예약, activation, CUDA context) 을 본인 문장으로 findings.md 에 기록.
 **통과 기준**: "왜 int4 가 약 7GB 인가" 를 숫자로 답변 가능.
 
-- [ ] **Step 2: Block 2 — 양자화 원리 (3-4h)**
+- [x] **Step 2: Block 2 — 양자화 원리 (3-4h)**
 
 > 본 Step 은 findings.md §4.2 **Block 2 전체**에 대응한다 (findings 안의 Step 1-5 를 모두 포함). 두 문서의 "Step" 은 층위가 다르므로 혼동하지 않는다 — plan 의 Step 2 = Block 2 하나, findings 의 Step 2 = 그 안의 선행 정독 하나.
 
@@ -625,11 +627,20 @@ LLM.int8() 의 outlier 채널 fp16 분해 오버헤드 vs NF4 의 fused kernel �
 **통과 기준**: int8 이 int4 보다 느리고 부정확한 메커니즘 답변 + "fp16 대비 int4 속도" 방향 예측.
 
 진행 상황 (2026-07-28, 커밋 `b2131ee`): findings §4.2 **Step 1-4 완료**. 통과 기준 두 개 중 **앞쪽 (메커니즘 답변) 충족** — Step 3 경로 대조표 (가중치 트래픽 2배 + activation absmax·threshold 스캔·outlier 분해·출력 dequant 의 매 forward 반복) 과 Step 4 인과 경로 (퍼플렉시티 무손실 vs closed-loop 성공률은 다른 지표라는 구분 + 1.2 Hz 가 궤적 보정 간격을 늘려 실패로 이어지는 경로) 로 답변 가능.
-잔여 — 뒤쪽 기준이 findings §4.2 **Step 5** 이고 아직 비어 있다 (예측 / 논문 수치 대조 / 오차 설명 3줄). **완료 판정 표 4행**도 미작성. 약 1-1.5h.
 
-- [ ] **Step 3: 검증 + Commit**
+완료 (2026-07-28): Step 5 + 완료 판정 표 작성으로 §4.2 5개 Step 전부 닫힘. 뒤쪽 기준 ("fp16 대비 int4 속도" 방향 예측) 의 답은 **근사 동등** — (a) 트래픽 1/4 의 이득이 decode 7토큰에만 온전히 적용되고 vision encoder·prefill 은 compute 비중이 커서, (b) 전 구간에 붙는 dequant 비용 (특히 prefill 의 fp16 텐서 왕복) 이 이를 상쇄한다.
+
+**통과 판정 유보**: Step 5 와 완료 판정 표는 본인 요청에 따라 `(by claude)` 로 작성됐고 findings 안에 그렇게 표기돼 있다. 산출물은 완성이지만 통과 기준의 "답변" 여부는 Task 2-3 (자가 검증 10문항) 에서 판정한다 — 해당 문항에서 막히면 이 Step 으로 되돌아온다.
+
+부수 산출 2건:
+- **A5000 의 bf16 Hz 가 논문에 없다** → int4/bf16 비율은 미확인 종결 (Block 1 Step 5 와 같은 방식). Figure 5 캡션 ("bf16·int4 모두 높은 throughput") 의 정성 진술로 대체하고, §3.5 의 4090 bf16 약 6 Hz 를 A5000 으로 외삽한 값은 본인 외삽임을 명시
+- **소재 정정** — 속도 수치는 §5.4 **본문**이고 Table 2 는 성공률·메모리만 담는다. Table 2 캡션의 "4-bit 가 bfloat16 의 성능을 맞춘다" 에서 성능은 성공률이다. int4 3 Hz 를 §1 에 병기하고 §1 미해소 항목을 해소 표시로 갱신 (Global Constraints 의 §1.3 불변 제약과 무관 — findings 내부 서술이다)
+
+- [x] **Step 3: 검증 + Commit**
 
 findings.md 의 Block 1-2 체크박스 닫힘 확인.
+
+검증 (2026-07-28): Block 1 (Step 1-5 + QLoRA 정독 하위) / Block 2 (Step 1-5 + 가정 2건 + 정독 (a)-(e)) 전부 `[x]`, **§4.1-§4.2 범위 미닫힘 0건**. Task 2-1 완료 — 잔여 통과 판정만 Task 2-3 으로 이관 (Step 2 로그 참조).
 
 ```bash
 git add Measurements/
@@ -675,6 +686,8 @@ git commit -m "docs: complete openvla benchmark methodology with remeasured stat
 
 보고서 §2.6 의 10문항: int4 근거 / int8 열위 이유 / 정확도 확인 방법 / 병목 구간 / synchronize / warm-up / p95 / action 토큰 구조 / task 경계 / Jetson 이식 예측. 막히는 문항의 해당 Block 재수행.
 **통과 기준**: 10문항 전부 문서 참조 없이 답변. (결과는 이 Step 아래 진행 로그로만 기록 — 커밋 없음.)
+
+**이관 사항 (2026-07-28)**: Block 2 의 통과 판정이 이 Step 으로 넘어왔다 — findings §4.2 Step 5 와 완료 판정 표가 `(by claude)` 작성이라 Task 2-1 Step 2 의 "답변 가능" 이 본인 도출로 검증되지 않았다. 관련 문항은 **"int8 열위 이유"** 와 **"Jetson 이식 예측"** (후자는 Block 2 Step 5 의 memory-bound 논리 + Block 3 의 대역폭 외삽이 재료) 이다. 이 두 문항에서 막히면 §4.2 를 본인 문장으로 다시 쓴다.
 
 ### Task 2-4: Phase 3 재현 확인 + Rerun 시각 자료 (2026.08, 휴직 전)
 
