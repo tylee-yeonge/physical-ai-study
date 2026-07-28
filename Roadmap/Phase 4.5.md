@@ -46,7 +46,7 @@
 - before/after 를 동일 조건 **N회** 로 측정하고, **N 과 분산(표준편차 또는 신뢰구간)** 을 함께 보고한다.
 - 차이가 노이즈 범위 안이면, **그 사실과 원인 분석(데이터 규모/분포/학습 설정)** 자체를 산출물로 삼는다.
 - 즉 negative 결과여도 "왜 안 올랐는가"의 분석이 둘째 층 역량의 증거가 되도록 블로그 논지를 구성한다.
-- **before/after 가 신호를 만들려면 task 난이도가 적절해야 한다**: zero-shot 이 이미 잘 되는 task 는 adaptation 개선 폭이 안 보이고, 거의 0% 인 task 는 비교 자체가 무의미하다. task 는 **zero-shot 이 어중간하게 되는 중간 구간**으로 선정해야 before/after 가 의미 있는 신호를 만든다 (Section 0 / Section 1 에서 점검). 이 점검을 건너뛰면 데이터·학습을 다 돌리고도 "차이가 안 보이는" 결과가 구조적으로 나올 수 있다 — 이는 negative 분석(위)으로 받칠 수는 있으나, task 설계 단계에서 먼저 피하는 것이 우선이다.
+- **before/after 가 신호를 만들려면 측정 지표가 바닥에 붙지 않아야 한다**: OpenVLA 의 sim zero-shot 성공률은 환경에 따라 편차가 크다 — real2sim 정합을 맞춘 Google Robot 계열에서는 중간대가 보고되지만 (visual matching 기준 pick coke can 16.3% / move near 46.2%), WidowX+Bridge 계열에서는 0% 근처다 (SimplerEnv, CoRL 2024). 즉 신호 유무를 결정하는 손잡이는 **task 난이도가 아니라 (1) 환경의 embodiment·카메라 규약 정합, (2) 지표의 해상도**다. 난이도를 낮춰 "중간 구간"을 만들려는 조정은 성립하지 않는다. 대응 두 가지: 최종 성공률과 함께 **단계별 부분 도달률**(reached / grasped / lifted / placed)을 측정해 before 쪽이 0 으로 잘리지 않게 하고, 0% 를 받았을 때 도메인 갭과 통합 버그를 구분할 수 있도록 하네스 검증을 먼저 통과시킨다 (Section 0). before/after 가 무의미해지는 조건은 before 가 0% 인 것이 아니라 **after 도 0%** 인 것이며, 그 경우는 위 negative 분석으로 받친다.
 
 
 ---
@@ -89,12 +89,17 @@
 ## Section 0: 시작 전 (Step 0 실측 + sim 구축·이관 — 2026.08, 휴직 전 물리 접근 구간)
 
 
+> 순서 제약: **하네스 검증이 zero-shot baseline 측정보다 앞이다.** 검증 없이 측정하면 성공률 0% 를 받았을 때 도메인 갭과 통합 버그를 구분할 수 없어 수치가 해석 불가가 된다. 나머지 항목은 순서 자유.
+
+
 - [ ] OpenVLA 7B LoRA 1회 사이클이 RunPod RTX 4090 에서 가능한지 실측 (시간/비용/체크포인트)
 - [ ] fine-tuned 모델 4-bit 추론이 RTX 4070 12GB 에 OOM 없이 올라가는지 확인
-- [ ] sim 데이터 생성 방식 확정 (어느 sim, 어떤 task, 수집 규모) + OpenVLA 미학습 분포인지 점검
+- [ ] sim 데이터 생성 방식 확정 (어느 sim, 어떤 task, 수집 규모) + OpenVLA 미학습 분포인지 점검. **정합 요건과 미학습 요건은 상충하므로 함께 판단한다** — embodiment·카메라 규약은 정합시켜야 zero-shot 이 바닥을 벗어나고, task·물체·씬은 신규여야 adaptation 의 의미가 산다
 - [ ] eval N 및 통계 처리(분산/신뢰구간) 기준 1차 결정
-- [ ] **sim 환경 구축 + zero-shot 성공률 baseline 측정** (v1 순서 3 의 ManiSkill 선정/PickCube 정의 재사용, sim 자체는 v1 에 없으므로 본 Phase 에서 신규 구축)
-- [ ] **before/after 측정 성립 구간 확인**: sim task 의 zero-shot 성공률(본 Phase 측정)이 포화(개선 폭 안 보임)도 0% 근처(비교 무의미)도 아닌 **중간 구간**인지 점검. 벗어나면 Section 1 에서 task 난이도를 조정
+- [ ] **sim 환경 구축** (v1 순서 3 의 ManiSkill 선정/PickCube 정의 재사용, sim 자체는 v1 에 없으므로 본 Phase 에서 신규 구축)
+- [ ] **하네스 검증** (zero-shot baseline 측정의 선행 조건) — 성공률과 독립적으로 루프·action 변환이 정상임을 입증한다. 수단 최소 1건: (a) ManiSkill 내장 motion planning / scripted solution 을 동일 루프에 투입해 성공률 상한 확인, (b) SimplerEnv 계열 bridge 평가 환경에서 공개된 OpenVLA zero-shot 수치와 자체 결과 대조
+- [ ] **zero-shot 성공률 baseline 측정** (하네스 검증 통과 후)
+- [ ] **before/after 신호 성립 점검**: 최종 성공률이 0% 로 나와도 **부분 도달률**(reached / grasped / lifted / placed)에 0 이 아닌 단계가 남는지 확인. 전 단계가 0 이면 조정 대상은 task 난이도가 아니라 **환경의 embodiment·카메라 규약 정합**이다 (성공 기준 절 참조)
 - [ ] **sim + eval 환경 Docker 컨테이너화** (2026.08 — 휴직 중 PC 장애·원격 불가 시 재현 대비)
 - [ ] **RunPod 에서 컨테이너 기동 + zero-shot 1회 추론 재현 확인** (2026.08 — 로컬 GPU 비의존 검증)
 
@@ -107,11 +112,11 @@
 
 | 주차 | 내용 | 핵심 |
 |------|------|------|
-| 1 | sim task 정의 (**before/after 신호가 나올 난이도대 선정**) + 데이터 수집 (관측↔action 페어) + 미학습 분포 점검 | sim 환경은 Section 0 에서 구축(v1 순서3 ManiSkill 분석 재사용). 규모는 LoRA 가 돌 최소선. task 는 zero-shot 이 어중간하게 되는 구간으로 |
+| 1 | sim task 정의 (**부분 도달률이 0 이 아닌 환경·지표 조합 확정**) + 데이터 수집 (관측↔action 페어) + 미학습 분포 점검 | sim 환경은 Section 0 에서 구축(v1 순서3 ManiSkill 분석 재사용). 규모는 LoRA 가 돌 최소선. 신호는 난이도가 아니라 환경 정합·지표 해상도에서 나온다 |
 | 2 | OpenVLA 학습 포맷으로 변환 (RLDS / 모델 카드 스키마 확인) | 데이터 포맷팅이 adaptation 의 절반 |
 
 
-> task 난이도 선정 보충: 후보 task 를 1-2개 zero-shot 으로 빠르게 돌려 성공률대를 먼저 본다. 포화(예: 90%+)면 더 어려운 변형으로, 바닥(예: 10% 미만)이면 더 쉬운 변형으로 조정해 before/after 가 움직일 여지를 확보한 뒤 본 데이터를 수집한다.
+> 보충: 후보 task 를 1-2개 zero-shot 으로 빠르게 돌려 최종 성공률과 부분 도달률을 함께 본다. 최종 성공률 0% 는 정상 범위이므로 그것만으로 task 를 바꾸지 않는다. 판정은 부분 도달률로 한다 — 전 단계가 0 이면 task 를 쉽게 만드는 대신 환경 정합(embodiment·카메라 규약)을 먼저 손본 뒤 본 데이터를 수집한다.
 
 
 ---
@@ -154,7 +159,7 @@
 
 
 ### eval / 분석
-- [ ] task 가 before/after 측정 성립 구간이었는지 확인 (zero-shot 이 포화도 0% 근처도 아님)
+- [ ] before/after 신호가 성립하는 지표를 썼는지 확인 (최종 성공률 + 부분 도달률 병기, 부분 도달률이 전 단계 0 이 아님)
 - [ ] zero-shot vs fine-tuned 를 동일 조건 N회 측정 (N 명시)
 - [ ] 성공률 차이를 분산(표준편차/신뢰구간)과 함께 보고
 - [ ] 차이가 노이즈면 원인 분석을 산출물로 작성 (negative 대응)
@@ -182,6 +187,7 @@
 
 - OpenVLA (Stanford, 2024): https://openvla.github.io/
 - OpenVLA fine-tuning / LoRA: HuggingFace `peft` (https://huggingface.co/docs/peft)
+- SimplerEnv (CoRL 2024) — real2sim 평가 벤치마크. 하네스 검증용 대조 수치와 환경 정합 근거의 출처: https://github.com/simpler-env/SimplerEnv
 - 컴퓨트 분업 / 버전 매칭: [`Studies/Phase 4/SETUP.md`](../Studies/Phase%204/SETUP.md)
 - [ENVIRONMENT.md](../ENVIRONMENT.md) — 프로젝트 공용 환경
 
