@@ -3,7 +3,7 @@
 
 > **학습 기간**: Section 0 은 2026.08 (전진 배치 — 로컬 GPU 단일 장애점 대비), Sections 1-3 은 2026.09-11 — 상세: [`Roadmap/Phase 4.5.md`](../../Roadmap/Phase%204.5.md)
 > **마스터 가이드**: [`Roadmap/Phase 4.5.md`](../../Roadmap/Phase%204.5.md)
-> **자료 미리 작성됨** — 진입 시 다시 체크 후 학습 시작
+> **자료 상태**: week0 작성 완료 / week1-6 은 README 만 (아래 "week 자료 형식" 참조). 진입 시 다시 체크 후 학습 시작
 
 
 ---
@@ -34,6 +34,7 @@ v1(zero-shot) 베이스라인 위에서 OpenVLA 를 sim 데이터로 LoRA adapta
 
 ```
 Studies/Phase 4.5/
+  week0/           # sim 신규 구축 + 하네스 검증 + zero-shot baseline (Section 0 전반)
   week1/ ~ week2/  # sim 데이터 생성 + OpenVLA 포맷 변환
   week3/ ~ week4/  # RunPod LoRA 학습 + 로컬 머지/양자화
   week5/ ~ week6/  # eval harness (N회) + before/after 분석 + 블로그/공개
@@ -41,6 +42,9 @@ Studies/Phase 4.5/
   eval/            # eval harness + 결과 표/그래프 (outputs/ gitignore)
   blog/            # adaptation 설계-실행-분석 블로그 초고
 ```
+
+
+week0 은 Roadmap Section 0 전반에 대응한다. **sim 은 v1 에서 물려받지 않고 여기서 새로 구축한다** — v1 이 남긴 것은 sim 선정 판단과 task 정의 문서뿐이고 실행 가능한 환경은 없다. Section 0 후반 (Docker 컨테이너화 + RunPod 이관 + LoRA 1사이클 실측) 은 week3 의 선행 조건이므로 week3 자료에서 다룬다.
 
 
 ## week 자료 형식 (Phase 3-4 패턴)
@@ -52,7 +56,7 @@ Studies/Phase 4.5/
 - `quiz_easy.py` / `quiz_medium.py` — 개념 / 코드 퀴즈 (진입 시 작성)
 
 
-> 본 디렉토리는 **스캐폴드** 상태다. 각 week 의 PRACTICE/quiz 는 v1 완료 후 본 Phase 진입 시점에 작성·갱신한다 (다른 Phase 의 "미리 작성됨"보다 가벼운 상태 — v1.5 는 v1 자산 재사용 비중이 커서 진입 시 실측에 맞춰 채우는 편이 낫다).
+> week0 은 README + PRACTICE + quiz 가 작성돼 있다. week1-6 은 README 만 있는 스캐폴드 상태이며, PRACTICE/quiz 는 week0 의 산출물 (환경 구축 기록, action 변환 계약 표, 부분 도달률 정의) 을 입력으로 각 week 진입 시점에 작성한다 — 먼저 쓰면 실측에 맞춰 다시 쓰게 된다.
 
 
 ---
