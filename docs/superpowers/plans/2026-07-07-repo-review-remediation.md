@@ -78,7 +78,7 @@
 
 ---
 
-**Goal:** 검토 보고서가 확정한 의사결정 (RunPod 전환, 자작 팔 — Koch v1.1 확정 후 2026-07-28 **SO-101 로 갱신** (결정 #6), 육아휴직 2026.09-2027.02, Phase 4.5 Section 0 전진, probe 분해 일정, Phase 3 supporting 공개, 포지셔닝 하향, v1 정의 업그레이드, v2.5 신설) 을 리포 문서에 동기화하고, `Measurements/` + `Portfolio/` 구조를 신설해 "정답은 지우고 증거는 남긴다" 정책을 가동한다. 완료되면 리포가 계획의 single source of truth 로 복원되고, 4070 실측 증거가 외부인이 접근 가능한 위치에 놓인다.
+**Goal:** 검토 보고서가 확정한 의사결정 (RunPod 전환, 자작 팔 SO-101 (결정 #6), 육아휴직 2026.09-2027.02, Phase 4.5 Section 0 전진, probe 분해 일정, Phase 3 supporting 공개, 포지셔닝 하향, v1 정의 업그레이드, v2.5 신설) 을 리포 문서에 동기화하고, `Measurements/` + `Portfolio/` 구조를 신설해 "정답은 지우고 증거는 남긴다" 정책을 가동한다. 완료되면 리포가 계획의 single source of truth 로 복원되고, 4070 실측 증거가 외부인이 접근 가능한 위치에 놓인다.
 
 **Architecture:** 리포를 `Studies/` (정답 없는 반복 학습) / `Measurements/` (실측 증거 보존) / `Portfolio/` (evidence index) 로 역할 분리한다 (보고서 §5.5). 전면 재편은 하지 않고 신설 + 이관 + 문서 갱신만 수행한다 (보고서 권고 5 의 단계적 적용).
 
@@ -95,7 +95,7 @@
 | 3 | 학습 컴퓨트 | Colab **배제** (SSH 불가·세션 휘발), **RunPod Community Cloud RTX 4090 (24GB)** 확정 | 보고서 §2.3 |
 | 4 | 육아휴직 | **2026.09-2027.02** (2026-07-01 신청, **2026-07-28 승인 확정**. 복직 2027.03 동일). 2026.06-08 은 휴직이 아니라 **재직 구간** (4070 물리 접근이 일상적인 구간 — 결정 #5) | 보고서 §2.3 + 2026-07-28 승인 |
 | 5 | GPU 반납 | RTX 4070 (우분투 PC) 은 **반납하지 않기로 확정 (2026-07-20 갱신)**. 단 휴직 개시 (2026.09) 후 PC 장애 시 현장 방문 전까지 복구 불가한 단일 장애점 → 재측정·TensorRT 재현 확인·Rerun 시각화의 8월 내 마감은 권장으로 유지하고, 8월 중 원격 운용 전환 점검을 수행 (실행 보드 #12). **2026-07-28: 자택 이전 조율 개시** — 성사 시 물리 접근 제약과 8월 마감 근거가 함께 소멸한다 (8월 초 체크포인트 안건). 하드웨어 증설 (RAM·GPU) 은 불가하므로 로컬 사양 부족은 RunPod 이관으로만 대응 | 보고서 §2.3, 권고 2-4 + 2026-07-20·07-28 구두 갱신 |
-| 6 | 자작 팔 | 커스텀 XL330+XM430 (BOM 150-225만원) → Koch v1.1 (2026-07 확정) → **SO-101 / SO-ARM101 리더-팔로워, 약 56-58만원, 2026.09-10 구매** (국내 조달, 리드타임 3일). 근거: LeRobot/HF 생태계 표준 = 경험의 이식성. Koch 비채택 사유는 Hardware-Arm.md 비채택 기록 | 보고서 §2.3 + 2026-07-28 재결정 |
+| 6 | 자작 팔 | **SO-101 / SO-ARM101 리더-팔로워, 약 56-58만원, 2026.09-10 구매** (국내 조달, 리드타임 3일). 근거: LeRobot/HF 생태계 표준 = 경험의 이식성. 커스텀 XL330+XM430 안과 Koch v1.1 은 비채택 (사유: Hardware-Arm.md 비채택 기록) | 보고서 §2.3 + 2026-07-28 결정 |
 | 7 | Phase 4.5 | **Section 0 (ManiSkill/SAPIEN sim 구축 → Docker → RunPod 이관) 을 2026.08 로 전진 배치**, Sections 1-3 은 2026.09-11 | 보고서 §2.3 |
 | 8 | probe 일정 | 2026.06 일괄 가정 폐기 → 가시성 기준 분해: **리포 공개 증거·JD 정독 2026.07-08 / LinkedIn 헤드라인·커피챗 2026.09** (휴직 개시·승인 확정 후) | 보고서 §2.2 |
 | 9 | Phase 3 지위 | 비공개 리허설 → **supporting system work 로 공개**. 조건 2개: supporting 라벨 + README 계층 하위 배치 / 8월 내 (휴직 전) 빌드 스크립트 기준 재현 확인 | 보고서 §2.3 |
@@ -430,19 +430,11 @@ Hardware-Arm.md 의 스파이크 절과 Stage 2 절 앞에 미확정 범위를 �
 
 - [x] **Step 3: 검증**
 
-진행 상황 (2026-07-09): "150-225만" 잔존 4건은 전부 확정 표·비채택 기록 내 대비 서술 — 낡은 계획 용법 0건. Hardware-Arm.md 헤더의 하드웨어·예산 줄도 Koch v1.1 로 갱신 (BOM 표와의 모순 방지).
-
-```bash
-grep -rn "150-225만" README.md Roadmap/    # 기대: 비채택 기록 1곳만
-grep -rn "Koch" README.md Roadmap/         # 기대: BOM 절·확정 표에 존재
-```
+확정 표와 헤더 예산이 Hardware-Arm.md·README 에서 일치하고, 커스텀 XL330+XM430 안과 Koch v1.1 이 비채택 기록에만 남아 있는지 확인한다 (낡은 계획 용법으로 남으면 안 된다).
 
 - [x] **Step 4: Commit**
 
-```bash
-git add README.md Roadmap/Hardware-Arm.md
-git commit -m "docs: adopt koch v1.1 leader-follower arm and update bom"
-```
+`README.md` 와 `Roadmap/Hardware-Arm.md` 를 함께 커밋한다.
 
 ---
 
@@ -548,15 +540,11 @@ git commit -m "docs: publish phase 3 as supporting system work"
 
 - [x] **Step 2: 부록 B 에 v2.5 행 신설 (`README.md`)**
 
-v2 행 앞에 삽입:
-
-```markdown
-| **v2.5 (데이터 파이프라인 증거)** | 2027 상반기 (Koch 도착 후) | Koch 리더-팔로워 teleop 으로 자작 데이터셋 수집 (100-500 episodes 는 실측 후 재산정) → **LeRobot 포맷 + HF Hub 공개** + LeRobot ACT 1회 학습·결과 기록. Diffusion Policy 는 학습하지 않고 라잇 정리 (ACT-Diffusion-VLA 계보, 면접 방어용) | 2 (데이터 레짐·정책 계보 증거) |
-```
+v2 행 앞에 v2.5 (데이터 파이프라인 증거) 행을 넣는다 — 자작 팔 teleop 으로 데이터셋 수집 → LeRobot 포맷 + HF Hub 공개 + ACT 1회 학습, Diffusion Policy 는 라잇 정리 수준. 행 문안의 정본은 README 부록 B 이며 이 문서에 복제하지 않는다.
 
 - [x] **Step 3: 실행 지점 연결**
 
-- Roadmap/Hardware-Arm.md Stage 1 완료 체크리스트에 추가 (2026-07-28: Koch → SO-101 로 문안 갱신됨): `- [ ] LeRobot ACT 1회 학습 + 결과 기록 (Koch teleop 소량 데이터, v2.5 선행 실험)`
+- Roadmap/Hardware-Arm.md Stage 1 완료 체크리스트에 LeRobot ACT 1회 학습 항목 추가 (teleop 소량 데이터, v2.5 선행 실험)
 - README.md:521-524 (2027.01-02 마일스톤 절) 에 추가: `- [ ] ACT-Diffusion-VLA 정책 계보 라잇 정리 노트 (면접 방어용, 학습 아님)`
 
 - [x] **Step 4: Isaac Lab 튜토리얼 편입 (`Roadmap/Phase 6.md`)**
@@ -720,7 +708,7 @@ grep -rn "week6/openvla_latency" --include="*.md" .
 |---|---|
 | 1 (실측 즉시 승격) | 1-3 (+ gif 는 2-4) |
 | 2 (재측정 + 이해 검증 통합) | 1-2 (구조), 2-1, 2-2, 2-3 (수행) |
-| 3 (문서-의사결정 동기화) | 1-5 (컴퓨트), 1-6 (휴직·probe), 1-7 (Koch), 1-8 (Phase 4.5) |
+| 3 (문서-의사결정 동기화) | 1-5 (컴퓨트), 1-6 (휴직·probe), 1-7 (자작 팔), 1-8 (Phase 4.5) |
 | 4 (Phase 3 supporting 공개) | 1-9 (+ 재현 확인은 2-4) |
 | 5 (구조 재편 — Measurements 선행분) | 1-2. 전면 재편은 §0.1 로 명시 이월 |
 | 6 (v1 정의 업그레이드) | 1-10 Step 1 |
