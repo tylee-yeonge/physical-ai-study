@@ -13,8 +13,8 @@
 
 - **Ubuntu PC** — 메인 학습/실험 장비. RTX 4070 12GB VRAM / RAM 31GB / 28 코어 / 드라이버 580.173.02
   - **하드웨어 변경 불가** (RAM·GPU 증설 포함). 로컬 사양이 모자라는 작업은 증설이 아니라 **RunPod 이관**으로 대응한다
-  - 단 **GUI 스트리밍이 필요한 작업은 RunPod 로 옮길 수 없다** — RunPod 은 UDP 미지원이고 Isaac Sim WebRTC 는 UDP 47998 이 필수다 (2026-07-28 확인, 상세는 [Hardware-Arm.md](Roadmap/Hardware-Arm.md) Stage 1 실행 머신 절). headless 스크립트 워크로드만 이관 가능
-  - 자택 이전 조율 중 (2026-07-28) — 성사되면 휴직 중 물리 접근 제약이 해소된다. Isaac Sim GUI 작업이 로컬 전용이라 Stage 1 (2027.01-02) 의 선행 조건이기도 하다 (remediation plan 결정 #5)
+  - 단 **GUI 스트리밍이 필요한 작업은 RunPod 로 옮길 수 없다** — RunPod 은 UDP 미지원이고 Isaac Sim WebRTC 는 UDP 47998 이 필수다 (상세는 [Hardware-Arm.md](Roadmap/Hardware-Arm.md) Stage 1 실행 머신 절). headless 스크립트 워크로드만 이관 가능
+  - 자택 이전 조율 중 — 성사되면 휴직 중 물리 접근 제약이 해소된다. Isaac Sim GUI 작업이 로컬 전용이라 Stage 1 (2027.01-02) 의 선행 조건이기도 하다 (remediation plan 결정 #5)
 - **MacBook Pro 14 (M4 Pro)** — 원격 접속·문서 작업. LeRobot 은 macOS Apple Silicon 을 공식 지원해 teleop·record 백업 경로로 쓸 수 있으나, **ROS2 는 불가** (macOS 바이너리 패키지 없음 + Docker Desktop for Mac 의 USB 패스스루 미지원)
 - **Jetson Orin Nano (8GB)** — **256GB SSD + Ubuntu 22.04 설치 완료**. Ubuntu 22.04 이므로 **ROS 2 Humble 을 apt 로 설치**할 수 있고 (Phase 3 배포판과 동일 절차) LeRobot 이 요구하는 Python 3.10 도 기본이다. SO-101 + LeRobot 구동 사례가 공개돼 있고 NVIDIA 공식 SO-101 코스의 기준 구성이기도 하다. **4070 PC 자택 이전이 무산될 경우 Stage 1 의 팔 옆 기계 역할** — 상세는 [Hardware-Arm.md](Roadmap/Hardware-Arm.md) Stage 1 실행 머신 절
   - 한계: ACT 학습은 소규모 데이터셋에서 보고된 사례가 있으나 정석은 4070/RunPod. **Isaac Sim 은 불가** (x86 전용), OpenVLA 7B 도 비현실적
@@ -31,7 +31,7 @@
 
 - 기본: **Ubuntu PC 중심** (ELP 는 USB 주변기기)
 - 출장지: 원격 접속으로 동일 PC 사용. PC 에 ELP 가 연결되어 있으면 실카메라 데이터도 원격으로 처리 가능
-- Jetson 작업은 현재 비활성 — Phase 3 후반 TensorRT 배포 파트에서 하드웨어 확보 시 재평가
+- Jetson 은 두 역할 — PC 자택 이전 무산 시 SO-101 팔 옆 기계, 그리고 v3 실기 배포 타깃. Phase 3 TensorRT 배포는 v3 이후 옵션
 
 
 ---
@@ -195,7 +195,7 @@ PORTS 패널에서 `9090` (web), `9876` (gRPC) 두 포트 모두 forward. 9090 �
 | Phase 2 Week 3 (선택) | Ubuntu PC + ELP | 조건부 O (PC-ELP 연결 유지 시) |
 | Phase 2 Week 4 | Ubuntu PC (원격) | O |
 | Phase 3 학습 | Ubuntu PC (원격) | O |
-| Phase 3 Jetson 배포 | (보류) | 하드웨어 확보 시 |
+| Phase 3 Jetson 배포 | Jetson Orin Nano | v3 이후 옵션 |
 | Phase 4 | Ubuntu PC (원격) | O |
 
 
