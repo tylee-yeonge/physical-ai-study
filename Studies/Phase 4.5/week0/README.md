@@ -315,7 +315,7 @@ N 은 20 을 쓴다 (예산 절삭 시 하한 10). 한계도 같이 기록한다
 1. sim 환경 신규 구축 (Vulkan / venv / ManiSkill / 에셋 / 내장 데모 완주) — `outputs/env_build.md`
 2. `practice_env_check.py` — 관측 구조 확인 + 헤드리스 렌더 1장 저장
 3. `practice_sim_loop.py` — random action episode + action 공간·success 정의 확정
-4. action 변환 계약 표 작성 (출처 포함) — `outputs/action_contract.md`
+4. action 변환 계약 표 작성 (출처 포함) — `action_contract.md`
 5. `practice_upper_bound.py` — 상한 대조로 루프 검증
 6. `practice_zeroshot_baseline.py` — N=20 baseline + 부분 도달률 + seed 목록
 7. quiz_easy / quiz_medium 풀기

@@ -120,6 +120,9 @@ python practice_env_check.py            # 이렇게 실행하면 outputs/ 경로
 `outputs/` 는 실행 결과물 전용 폴더이고 gitignore 대상이다. 즉 거기 넣은 파일은 커밋되지 않으므로, **코드는 `outputs/` 안에 두지 않는다.**
 
 
+예외가 하나 있다. 실습 4 의 계약 표는 `outputs/` 밖인 `week0/action_contract.md` 에 둔다. 이 문서는 이번 주에 한 번 쓰고 버리는 실행 결과가 아니라 week1 이후가 계속 기준으로 삼는 문서이므로, gitignore 를 피해 레포에 커밋되어 남아야 한다.
+
+
 ---
 
 
@@ -563,10 +566,10 @@ print("\n실습 3 완료")
 
 **무엇을 하나**: OpenVLA 가 내놓는 7개 숫자와 ManiSkill 이 받는 7개 숫자 사이의 **번역 규칙**을 표로 확정하고, 그 표대로 변환 함수를 쓴다.
 **왜 하나**: 개수가 같다는 것은 아무것도 보장하지 않는다. 단위가 다르거나 부호가 반대면 팔이 엉뚱하게 움직이고, 그러면 실습 6 의 0% 는 모델 탓이 아니라 내 번역 버그 탓이 된다.
-**끝나면 손에 남는 것**: `outputs/action_contract.md` — 각 행에 출처가 붙은 계약 표 + 변환 함수.
+**끝나면 손에 남는 것**: `action_contract.md` — 각 행에 출처가 붙은 계약 표 + 변환 함수.
 
 
-**산출물**: `outputs/action_contract.md`
+**산출물**: `week0/action_contract.md` (`outputs/` 가 아니다 — §0.5)
 
 
 ### 왜 "개수가 같아도 안 맞는가"
@@ -646,7 +649,7 @@ for name, value in vla.norm_stats[KEY]["action"].items():
 | `mask` | 차원별 True/False 배열. **False 인 차원은 역정규화를 건너뛴다** |
 
 
-읽어야 할 것: 어떤 통계량으로 되돌리는가 / 되돌린 값의 크기 대역이 어느 정도인가 (그것이 미터인지 판단하는 근거) / **차원별 적용 여부 마스크가 있는가**, 있다면 어느 차원이 제외되는가. 답과 근거는 `outputs/action_contract.md` 에 서술한다.
+읽어야 할 것: 어떤 통계량으로 되돌리는가 / 되돌린 값의 크기 대역이 어느 정도인가 (그것이 미터인지 판단하는 근거) / **차원별 적용 여부 마스크가 있는가**, 있다면 어느 차원이 제외되는가. 답과 근거는 `action_contract.md` 에 서술한다.
 
 
 ### 4-2. 계약 표
@@ -664,7 +667,7 @@ for name, value in vla.norm_stats[KEY]["action"].items():
 | 5 | gripper 부호 규약 | mask=False -> 역정규화 우회, raw 값 통과. 범위 `[0, 1]`, **0 = 닫힘 / 1 = 열림** | 범위 `[-1, 1]`, **-1 = 닫힘 / +1 = 열림** (관절 목표 -0.01 - 0.04 m) | `g = 2 * raw - 1`. raw 가 이산값이므로 0.5 임계 이진화도 가능 | `mask` / `q01` / `q99` = `[..., False]` / `0.0` / `1.0`, `panda.py:179-180`, 실측 |
 
 
-각 행의 상세 근거 (통계 표 읽은 과정, 단위 판정 논리, ManiSkill 컨트롤러 실측값, `unnorm_key` 선택 비교) 는 `outputs/action_contract.md` 에 있다. 그 문서가 정본이고 위 표는 요약이다.
+각 행의 상세 근거 (통계 표 읽은 과정, 단위 판정 논리, ManiSkill 컨트롤러 실측값, `unnorm_key` 선택 비교) 는 `action_contract.md` 에 있다. 그 문서가 정본이고 위 표는 요약이다.
 
 
 > 이 변환 코드는 실행 보드 `#5` 의 `RobotPolicy` adapter + action schema validation 의 첫 sim 구현체다. 별도로 쓰지 말고 그 인터페이스 위에 얹는다 — 안 그러면 같은 코드를 두 번 쓴다.
@@ -1185,7 +1188,7 @@ mkdir -p "/workspace/study/physical-ai-study/Measurements/openvla-maniskill-zero
 |---|---|
 | `outputs/zeroshot_baseline.json` | `raw/` |
 | `outputs/env_build.md`, `outputs/env_decision.md` | `environment.md` |
-| `outputs/action_contract.md`, `outputs/sim_facts.md` | `methodology.md` |
+| `action_contract.md`, `outputs/sim_facts.md` | `methodology.md` |
 | `outputs/harness_check.md` | `findings.md` 의 검증 절 |
 | `practice_*.py` 중 측정 스크립트 | `scripts/` |
 | 성공률·부분 도달률 해석 | `findings.md` 본문 (본인 문장으로) |

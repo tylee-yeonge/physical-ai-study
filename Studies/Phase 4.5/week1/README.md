@@ -94,16 +94,18 @@ sim 환경은 week0 에서 구축한 것을 그대로 쓴다. 새로 만들지 �
 ```bash
 cd "/workspace/study/physical-ai-study/Studies/Phase 4.5"
 source .venv-sim/bin/activate                       # week0 에서 만든 sim venv
-ls week0/outputs/                                   # 아래 4개가 있어야 이번 주가 성립한다
+ls week0/action_contract.md week0/outputs/          # 아래 4개가 있어야 이번 주가 성립한다
 ```
 
 
-| week0 산출물 | 이번 주에서의 용도 |
-|---|---|
-| `env_build.md` | 같은 환경에서 수집한다는 근거 (버전이 바뀌면 데이터가 섞인다) |
-| `sim_facts.md` | 환경 id, action 공간, step cap, 상태 접근 경로 |
-| `action_contract.md` | **역방향 변환의 기준** (§2) |
-| `zeroshot_baseline.json` | 사용한 eval seed 목록 (§4) + 미학습 분포 논증의 입력 (§5) |
+| week0 산출물 | 위치 | 이번 주에서의 용도 |
+|---|---|---|
+| `env_build.md` | `week0/outputs/` | 같은 환경에서 수집한다는 근거 (버전이 바뀌면 데이터가 섞인다) |
+| `sim_facts.md` | `week0/outputs/` | 환경 id, action 공간, step cap, 상태 접근 경로 |
+| `action_contract.md` | `week0/` | **역방향 변환의 기준** (§2) |
+| `zeroshot_baseline.json` | `week0/outputs/` | 사용한 eval seed 목록 (§4) + 미학습 분포 논증의 입력 (§5) |
+
+계약 표만 `outputs/` 밖에 있는 이유는 그것이 실행 결과가 아니라 이후 주차가 계속 참조하는 기준 문서여서 레포에 커밋되어야 하기 때문이다 (`outputs/` 는 gitignore 대상).
 
 
 없는 항목이 있으면 week1 을 시작하지 않는다 — 특히 `action_contract.md` 가 비어 있으면 이번 주 작업이 전부 추측이 된다. 계약 표가 없는 상태에서 라벨을 만들면, 단위·부호가 맞는지 확인할 기준 자체가 없기 때문이다.
