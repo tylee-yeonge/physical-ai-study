@@ -1,0 +1,8 @@
+# week0 의 sim venv (.venv-sim) 를 그대로 쓰고, 이번 주에 추가로 필요한 것만 적는다.
+# 환경을 새로 만들면 week0 데이터와 이번 주 데이터가 서로 다른 환경 산출물이 된다.
+#
+#   source ../.venv-sim/bin/activate
+#   pip install -r requirements.txt
+#
+# 실습 5 (사전학습 데이터셋 목록 확인) 만 OpenVLA 공용 venv (.venv-vla) 에서 실행한다.
+matplotlib>=3.7.0
