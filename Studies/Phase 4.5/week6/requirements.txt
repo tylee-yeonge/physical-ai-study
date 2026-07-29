@@ -1,0 +1,11 @@
+# 분석 전용. GPU 불요 -- week0 의 .venv-sim 이나 numpy/scipy 가 있는 아무 venv 에서 돌린다.
+#
+#   source ../.venv-sim/bin/activate
+#   pip install -r requirements.txt
+#
+# scipy 를 쓰는 이유: 경계(0/N)에서 폭이 0 이 되지 않는 이항 비율 구간과
+# 불일치 쌍의 부호검정을 직접 구현하지 않고 표준 구현으로 계산하기 위함이다.
+# 어떤 방법을 쓸지는 week5 outputs/stat_method.md 에서 이미 확정했다.
+numpy>=1.24.0
+scipy>=1.11.0
+matplotlib>=3.7.0

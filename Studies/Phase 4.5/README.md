@@ -3,7 +3,7 @@
 
 > **학습 기간**: Section 0 은 2026.08 (전진 배치 — 로컬 GPU 단일 장애점 대비), Sections 1-3 은 2026.09-11 — 상세: [`Roadmap/Phase 4.5.md`](../../Roadmap/Phase%204.5.md)
 > **마스터 가이드**: [`Roadmap/Phase 4.5.md`](../../Roadmap/Phase%204.5.md)
-> **자료 상태**: week0-5 작성 완료 / week6 은 README 만 (아래 "week 자료 형식" 참조). 진입 시 다시 체크 후 학습 시작
+> **자료 상태**: week0-6 전체 작성 완료 (README + PRACTICE + quiz). 진입 시 다시 체크 후 학습 시작
 
 
 ---
@@ -56,7 +56,7 @@ week0 은 Roadmap Section 0 전반에 대응한다. **sim 은 v1 에서 물려�
 - `quiz_easy.py` / `quiz_medium.py` — 개념 / 코드 퀴즈 (진입 시 작성)
 
 
-> week0-5 는 README + PRACTICE + quiz 가 작성돼 있다. week6 은 README 만 있는 스캐폴드 상태이며, PRACTICE/quiz 는 앞 week 의 산출물 (환경 구축 기록, action 변환 계약 표, 데이터셋 스키마) 을 입력으로 각 week 진입 시점에 작성한다 — 먼저 쓰면 실측에 맞춰 다시 쓰게 된다.
+> week0-6 전체가 작성돼 있다. 각 week 은 앞 week 의 산출물 (환경 구축 기록, action 변환 계약 표, 데이터셋 스키마, eval 원시 결과) 을 입력으로 받으므로 순서를 건너뛸 수 없다. 진입 시 실측과 어긋난 부분은 그 자리에서 갱신한다.
 
 
 ---
