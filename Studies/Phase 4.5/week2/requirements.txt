@@ -1,0 +1,16 @@
+# RLDS 변환·등록·로드 검증용 venv (.venv-rlds).
+# sim venv (.venv-sim) 와 섞지 않는다 -- 변환 도구는 TensorFlow 계열이고 sim 은 아니다.
+#
+# 버전을 고정하지 않는 이유: tensorflow 계열은 CUDA·python 버전에 따라 설치 가능한 조합이
+# 갈린다. 설치 후 `pip freeze > outputs/pip_freeze_rlds.txt` 로 실제 해석된 버전을 남기고
+# outputs/env_rlds.md 에 옮긴다. 그 기록이 Section 0 후반 Docker 이미지의 학습 측 명세다.
+tensorflow
+tensorflow-datasets
+numpy>=1.24.0
+Pillow>=9.5.0
+
+# 아래 두 개는 pip 로 이 파일에서 받지 않는다 (리포 지침을 따라야 한다):
+#  - openvla 본체와 그 의존성: ~/openvla 를 클론한 뒤 리포 README 의 설치 절차를 따른다
+#    (editable 설치. 데이터로더가 요구하는 부가 패키지가 함께 들어온다)
+#  - rlds_dataset_builder: ~/rlds_dataset_builder 클론 후 그 리포의 환경 지침을 따른다
+# 두 리포의 설치 명령과 겪은 문제를 outputs/env_rlds.md 에 기록한다.
