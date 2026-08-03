@@ -461,6 +461,9 @@ gymnasium 규약에서 `env.step(action)` 은 항상 5개를 튜플로 돌려준
 둘 중 **작은 쪽이 먼저 걸린다.** 50 step 에서 환경이 `truncated=True` 를 올리고 루프가 `break` 되므로 항상 50 이다. 환경 쪽 제한을 바꾸려면 생성 시 `gym.make(..., max_episode_steps=N)` 으로 명시해야 한다 (실습 4-3 에서 이 값을 확정한다).
 
 
+내 상한을 환경 상한보다 **크게** 잡은 것은 의도적이다. 100 이라는 숫자 자체에 뜻이 있는 게 아니라 "환경 상한보다 크다"는 성질에 뜻이 있다 — 그래야 출력의 `steps` 가 어느 층 때문에 멈춘 것인지 가려진다. 50 으로 잡으면 내 `for` 문이 다 돌아서 끝난 것과 환경이 끊은 것이 똑같이 `steps=50` 으로 보여 두 원인을 구분할 수 없고, 30 으로 잡으면 환경 상한이 50 이라는 사실이 출력에 아예 나타나지 않는다. 100 으로 두면 출력이 50 이라는 것이 곧 "환경이 50 에서 끊었다"의 증거가 되고, 이것이 `sim_facts.md` 의 step cap 행에 적는 근거다. 부수 효과로 환경이 `truncated` 를 올리지 않는 설정이었을 때 루프가 무한히 도는 것도 막는다.
+
+
 ```python
 """
 실습 3: random action 으로 episode 를 돌리고 success 정의·action 공간을 확정
@@ -555,7 +558,19 @@ print("\n실습 3 완료")
 | 카메라 키 경로 / 해상도 | 정책 입력: `obs["sensor_data"]["base_camera"]["rgb"]`. 기본 128x128 이고 이번 주는 `sensor_configs` 로 224x224 고정. 사람용 렌더: `env.render()` = `(1, 512, 512, 3)` | 실습 2 의 2-3 출력, `pick_cube.py` `_default_sensor_configs` |
 
 
-> random action 은 성공하지 않는 것이 정상이다. 20/20 실패가 나와야 하며, 성공이 나오면 success 판정이 너무 느슨하므로 3-3 의 정의를 다시 읽는다.
+> random action 으로 조작이 성공하는 일은 없다. 그렇다고 **20/20 실패를 기대하지는 않는다** — `seed 0-19` 에는 조작 없이 성공으로 잡히는 배치가 섞여 있다. PickCube 는 목표 지점을 매 episode 무작위로 뽑으므로, 목표가 큐브 초기 위치에서 `goal_thresh` 안에 떨어지는 episode 가 나온다. 그 episode 는 팔을 움직이기 전부터 `is_obj_placed` 가 True 이고 팔이 정지 상태라 `is_robot_static` 도 True 이므로, 첫 step 에서 곧바로 `success` 가 된다. 출력의 `steps` 가 1 이면 이 경우다.
+
+
+> 그래서 성공이 나왔을 때 원인은 두 갈래다. 가르는 방법은 `env.step` 을 한 번도 부르기 전에 판정을 읽어 보는 것이다.
+
+
+| 성공의 원인 | 확인 방법 | 대응 |
+|---|---|---|
+| 목표가 큐브 초기 위치 안에 떨어졌다 | `reset` 직후 `env.unwrapped.evaluate()` 의 `is_obj_placed` 가 이미 True (또는 cube-goal 거리가 `goal_thresh` 보다 작다) | 정상. 어느 seed 가 그런지 세어 두고 실습 5-3 에서 무행동 하한으로 확정한다 |
+| success 판정이 느슨하다 | `reset` 직후에는 False 인데 random action 몇 step 만에 True 로 바뀐다 | 3-3 의 정의를 다시 읽는다 |
+
+
+> 이 "공짜 성공" 을 모르고 넘어가면 실습 6 에서 정책의 성과와 초기 배치 운을 구분할 수 없다.
 
 
 ---
@@ -1017,7 +1032,7 @@ OpenVLA 의 sim zero-shot 성적은 정합 처리가 없는 환경에서 0% 근�
 | `placed` | task 의 성공 판정을 통과했다 (= 최종 성공률) |
 
 
-최종이 0/20 이어도 `reached` 가 12/20 이면 신호가 살아 있다는 뜻이고, adaptation 이 그 앞 단계를 밀어 올리면 before/after 가 움직인다. **임계값은 본인이 정해 기록한다** — 정하는 순간 baseline 정의의 일부가 되므로 이후 측정에서 같은 값을 써야 한다.
+최종이 0/20 이어도 `reached` 가 12/20 이면 신호가 살아 있다는 뜻이고, adaptation 이 그 앞 단계를 밀어 올리면 before/after 가 움직인다. **판정 임계값은 baseline 정의의 일부다** — 아래 코드의 값을 바꾸려면 근거를 기록하고 이후 측정에서도 같은 값을 써야 한다.
 
 
 ```python
@@ -1038,8 +1053,49 @@ MAX_EPISODE_STEPS = 200                        # <- 실습 4-3: env step 예산 
 ACTION_REPEAT = 4                              # <- 실습 4-3: 5 Hz 정책을 20 Hz sim 에 맞춘다
 POLICY_STEPS = MAX_EPISODE_STEPS // ACTION_REPEAT   # 정책 결정 횟수 = 50
 SEEDS = list(range(20))                        # <- 실습 5 와 같은 목록 (변인 고정)
+NOOP_SEEDS = [8]                               # <- 실습 5-3 무행동 하한. 이 seed 의 성공은 조작 성공이 아니다
 UNNORM_KEY = "bridge_orig"                     # <- 실습 4 에서 근거와 함께 확정한 key
 INSTRUCTION = "pick up the cube"               # 영어 단문 고정 (OpenVLA prompt 틀)
+POS_LIMIT = 0.1                                # pd_ee_delta_pose 의 위치 한계 (m). action 1.0 = 0.1 m
+ROT_SCALE = -0.1                               # 회전 스케일 (rad). 부호가 반전돼 있다 (계약 표 4번)
+REACH_DIST = 0.05                              # reached 임계값 (m). 근거는 아래 판정식 주석
+LIFT_Z = 0.04                                  # lifted 임계값 (m). 근거는 아래 판정식 주석
+
+
+def to_maniskill_action(raw_action):
+    """OpenVLA 역정규화 출력(7,) 을 ManiSkill pd_ee_delta_pose action(7,) 으로 변환한다.
+
+    변환 규칙의 근거는 `action_contract.md` 의 계약 표에 있다. OpenVLA 는 물리량(m, rad)을
+    돌려주고 ManiSkill 은 전 차원 [-1, 1] 정규화값을 받으므로, 이 함수를 거치지 않으면
+    위치 명령이 의도의 1/10 로 줄고 회전이 반대로 돈다.
+
+    Args:
+        raw_action: `vla.predict_action()` 출력 numpy 배열 (7,).
+            [dx,dy,dz](m), [drx,dry,drz](rad), gripper[0,1]
+
+    Returns:
+        ManiSkill action (7,) float32. 전 차원 [-1, 1] 정규화값
+    """
+    pos = raw_action[:3] / POS_LIMIT           # 미터 -> 정규화 (±0.1 m 가 ±1)
+    rot = raw_action[3:6] / ROT_SCALE          # 라디안 -> 정규화, rot_lower 곱셈 때문에 부호 반전
+    rot_norm = np.linalg.norm(rot)             # 회전은 축별이 아니라 3벡터 노름으로 제한된다
+    if rot_norm > 1.0:                         # 노름이 1 을 넘으면 방향을 유지한 채 축소
+        rot = rot / rot_norm
+    grip = 2.0 * raw_action[6] - 1.0           # [0,1](0=닫힘) -> [-1,1](-1=닫힘)
+    action = np.concatenate([np.clip(pos, -1, 1), rot, [np.clip(grip, -1, 1)]])
+    return action.astype(np.float32)           # env.step 이 받는 dtype 으로 맞춘다
+
+
+def to_vec(pose_field):
+    """배치 텐서로 오는 좌표를 (3,) numpy 벡터로 바꾼다.
+
+    Args:
+        pose_field: `pose.p` 같은 (1, 3) 형태의 GPU 텐서
+
+    Returns:
+        (3,) float numpy 배열
+    """
+    return np.asarray(pose_field.cpu())[0]     # GPU -> CPU -> numpy, 배치 차원 제거
 
 
 print("=" * 60)
@@ -1075,17 +1131,19 @@ env = gym.make(
     sensor_configs=dict(width=224, height=224),   # 모델 입력 크기와 일치 -> 리사이즈 열화 없음
     max_episode_steps=MAX_EPISODE_STEPS,       # 실습 5 와 같은 env step 예산
 )
+base = env.unwrapped                           # 큐브·TCP 좌표는 wrapper 를 벗겨야 보인다
 
 
 # -- 6-3. episode 루프 --
 records = []                                   # episode 별 결과를 모은다
+grip_raw = []                                  # raw_action[6] 전량. 계약 표 5번의 [0,1] 가정 검증용
 for seed in SEEDS:
     obs, info = env.reset(seed=seed)           # 고정 seed 로 초기 배치 재현
     stages = {"reached": False, "grasped": False, "lifted": False, "placed": False}
     done = False                               # 이 episode 를 끝낼지 여부
     for policy_step in range(POLICY_STEPS):    # 정책 결정 50회
         # (a) 관측에서 카메라 이미지 추출 — 키 경로는 실습 2 의 2-3 출력대로
-        frame = obs["sensor_data"]["base_camera"]["rgb"]      # <- 실제 경로로 교체
+        frame = obs["sensor_data"]["base_camera"]["rgb"]
         frame = np.asarray(frame.cpu() if hasattr(frame, "cpu") else frame)   # GPU 텐서면 내린다
         if frame.ndim == 4:                    # (1, H, W, 3) 이면 첫 장만
             frame = frame[0]
@@ -1100,19 +1158,26 @@ for seed in SEEDS:
                 unnorm_key=UNNORM_KEY,         # 실습 4 에서 확정
                 do_sample=False,               # 결정적 출력 (제어에서는 무작위성 배제)
             )
+        grip_raw.append(float(raw_action[6]))  # gripper 차원 원값을 남긴다 (계약 표 5번 검증)
 
         # (c) 변환 — 실습 4 의 action_contract.md 에 쓴 변환 함수를 그대로 쓴다
-        action = raw_action                    # <- to_maniskill_action(raw_action) 으로 교체
+        action = to_maniskill_action(raw_action)
 
         # (d) 실행 — 같은 action 을 ACTION_REPEAT 번 넣어 실효 주기를 5 Hz 로 맞춘다
         for _ in range(ACTION_REPEAT):
             obs, reward, terminated, truncated, info = env.step(action)
 
-            # (e) 부분 도달률 갱신 — 판정식은 실습 3 의 3-4 접근 경로로 본인이 확정
-            # stages["reached"] |= <그리퍼 끝이 큐브에 충분히 접근했는가>
-            # stages["grasped"] |= <큐브를 물었는가>
-            # stages["lifted"]  |= <큐브가 바닥에서 떴는가>
-            stages["placed"] |= bool(info.get("success", False))
+            # (e) 부분 도달률 갱신 — 판정 경로는 실습 3 의 3-4 출력에서 확정한 것
+            tcp = to_vec(base.agent.tcp.pose.p)               # 그리퍼 끝 현재 위치
+            cube = to_vec(base.cube.pose.p)                   # 큐브 현재 위치
+            # reached: 실습 5 scripted 정책의 접근 고도(5 cm) 와 같은 값 -> 상한 대조와 같은 척도
+            stages["reached"] |= bool(np.linalg.norm(tcp - cube) < REACH_DIST)
+            # grasped: 환경이 이미 계산해 info 로 실어 보낸다 -> 판정식을 새로 만들지 않는다
+            stages["grasped"] |= bool(info["is_grasped"].item())
+            # lifted: 큐브가 모서리로 기울어 서 있을 때 중심 높이가 최대 0.02*sqrt(3)=0.0346 m 이므로,
+            #         그보다 위인 0.04 m 를 기준으로 잡으면 "기울어짐"을 "들림"으로 오판하지 않는다
+            stages["lifted"] |= bool(cube[2] > LIFT_Z)
+            stages["placed"] |= bool(info["success"].item())
 
             if stages["placed"] or terminated or truncated:   # 성공 또는 환경이 끝냄
                 done = True
@@ -1132,32 +1197,50 @@ print("\n[6-4] 요약")
 for stage in ["reached", "grasped", "lifted", "placed"]:
     hit = sum(record[stage] for record in records)          # 해당 단계 도달 episode 수
     print(f"   {stage}: {hit}/{len(SEEDS)}")
+# 무행동 하한 seed 의 성공은 조작 능력의 증거가 아니므로 걷어낸 값을 함께 적는다 (실습 5-3)
+earned = sum(record["placed"] for record in records if record["seed"] not in NOOP_SEEDS)
+print(f"   placed 중 조작으로 얻은 것: {earned}/{len(SEEDS)} (하한 seed {NOOP_SEEDS} 제외)")
+
+
+# gripper 원값 분포 — 계약 표 5번이 가정한 [0,1] 이산값인지 확인한다
+print("\n[6-4] raw_action[6] (gripper) 분포")
+print(f"   최소 {min(grip_raw):.3f} / 최대 {max(grip_raw):.3f} / 평균 {sum(grip_raw) / len(grip_raw):.3f}")
+print(f"   0.1 미만 {sum(g < 0.1 for g in grip_raw)} / 0.9 초과 {sum(g > 0.9 for g in grip_raw)}"
+      f" / 그 사이 {sum(0.1 <= g <= 0.9 for g in grip_raw)} (전체 {len(grip_raw)})")
+
+
 with open("outputs/zeroshot_baseline.json", "w") as f:
     json.dump({"env_id": ENV_ID, "max_episode_steps": MAX_EPISODE_STEPS,
                "action_repeat": ACTION_REPEAT, "unnorm_key": UNNORM_KEY,
-               "seeds": SEEDS, "records": records}, f, indent=2)
+               "reach_dist": REACH_DIST, "lift_z": LIFT_Z, "noop_seeds": NOOP_SEEDS,
+               "seeds": SEEDS, "records": records, "gripper_raw": grip_raw}, f, indent=2)
 print("저장 완료: outputs/zeroshot_baseline.json")
 ```
 
 
-### 빈칸 3개를 채우기 위해 스스로 답할 것
+### 이 코드의 판단을 스스로 방어할 것
 
 
-코드에 남긴 `<...>` 세 자리가 이번 주의 이해 검증이다. 답을 여기 적어 두지 않는다.
+위 스크립트는 (c) 변환과 (e) 부분 도달률을 값까지 확정한 상태다. 그대로 실행하면 돌아가지만, **왜 그 값인지 답할 수 없으면 나온 숫자를 방어할 수 없다.** 답은 코드 주석과 `action_contract.md`, 실습 3 의 3-3 / 3-4 출력에 있다.
 
 
-**(c) 변환**: `action_contract.md` 에 쓴 변환 함수를 이 파일에서 쓸 수 있게 만든다. 확인할 것 — `predict_action` 이 numpy 배열을 돌려주는가 torch 텐서를 돌려주는가, 그리고 `env.step` 이 요구하는 dtype 과 shape 은 무엇인가.
+**(c) 변환** — `to_maniskill_action`
 
 
-**(e) 부분 도달률**: 세 단계의 판정식을 정한다. 각각에 대해 답할 것 —
+- `predict_action` 이 돌려주는 것은 numpy 배열인가 torch 텐서인가. `env.step` 이 요구하는 dtype 과 어디가 다른가
+- 이 함수를 빼고 `raw_action` 을 그대로 `env.step` 에 넣으면 팔은 어떻게 움직이는가 — 위치 배수, 회전 부호, gripper 범위 세 개를 각각 답한다
+- 위치는 `0.1` 로 나누는데 회전은 왜 `-0.1` 로 나누는가
 
 
-- `reached`: 그리퍼 끝 위치와 큐브 위치를 어느 경로로 읽는가. "충분히 가깝다"의 임계값을 얼마로 잡고, 그 근거는 무엇인가 (큐브 크기? 성공 판정이 쓰는 임계값?)
-- `grasped`: 직접 계산할 필요가 있는가, `info` 에 이미 실려 오는 값이 있는가 (실습 3 의 3-4 출력을 다시 본다)
-- `lifted`: "떴다"의 기준 높이를 무엇에 대해 재는가 (바닥 z? 초기 z? 큐브 반높이?)
+**(e) 부분 도달률**
 
 
-임계값을 정하면 `outputs/` 기록에 그 값과 근거를 남긴다. 이후 fine-tuned 측정이 같은 값을 써야 before/after 가 비교 가능하다.
+- `reached` 의 `0.05` m: 왜 큐브 반높이(0.02)나 `goal_thresh`(0.025)가 아니라 이 값인가
+- `grasped`: 판정식을 새로 만들지 않고 `info["is_grasped"]` 를 쓰는 근거는 무엇인가
+- `lifted` 의 `0.04` m: 주석의 `0.0346` 은 어디서 나온 숫자인가. 기준을 `0.03` m 로 낮추면 무엇이 "들림" 으로 오판되는가
+
+
+이 값들을 `outputs/` 기록에 근거와 함께 남긴다. 이후 fine-tuned 측정이 같은 값을 써야 before/after 가 비교 가능하다.
 
 
 **확인 포인트**
@@ -1166,7 +1249,7 @@ print("저장 완료: outputs/zeroshot_baseline.json")
 - `placed` 가 0/20 인 것은 정상 범위다 (README §7). 판정 대상은 그 앞 단계다
 - **실습 5-3 의 무행동 하한 seed 에서 나온 `placed` 는 성공으로 세지 않는다.** 그 seed 는 팔을 움직이지 않아도 성공하므로, 조작 능력의 증거가 아니다. 성공률을 보고할 때 하한을 함께 적는다 (예: "placed 1/20, 그중 1개는 무행동 하한 seed")
 - `reached` 까지 0/20 이면 신호가 없다 -> task 를 쉽게 만들지 말고 **환경 정합** (embodiment·카메라 규약) 을 먼저 손본다
-- `raw_action[6]` (gripper 차원) 값을 매 step 로그로 남겨 실제 분포를 본다. 계약 표 5번의 `[0, 1]` 가정이 맞는지 확인하는 유일한 수단이고, `-1` 근처 값이 나오면 5번 행의 변환 규칙을 고쳐야 한다
+- 6-4 가 찍는 `raw_action[6]` (gripper 차원) 분포를 확인한다. 값이 0 근처와 1 근처로 갈리면 계약 표 5번의 `[0, 1]` 가정이 맞고, `-1` 근처가 나오면 5번 행의 변환 규칙을 고쳐야 한다
 
 
 ---
