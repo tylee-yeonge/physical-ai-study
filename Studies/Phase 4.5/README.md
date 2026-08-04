@@ -1,7 +1,7 @@
 # Studies/Phase 4.5 — VLA v1.5: OpenVLA LoRA adaptation (before/after)
 
 
-> **학습 기간**: Section 0 은 2026.08 (전진 배치 — 로컬 GPU 단일 장애점 대비), Sections 1-3 은 2026.09-11 — 상세: [`Roadmap/Phase 4.5.md`](../../Roadmap/Phase%204.5.md)
+> **학습 기간**: Section 0 은 2026.08 (전진 배치 — Sections 1-3 의 선행 조건), Sections 1-3 은 2026.09-11 — 상세: [`Roadmap/Phase 4.5.md`](../../Roadmap/Phase%204.5.md)
 > **마스터 가이드**: [`Roadmap/Phase 4.5.md`](../../Roadmap/Phase%204.5.md)
 > **자료 상태**: week0-6 전체 작성 완료 (README + PRACTICE + quiz). 진입 시 다시 체크 후 학습 시작
 

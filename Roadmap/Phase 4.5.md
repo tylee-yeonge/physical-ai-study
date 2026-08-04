@@ -1,7 +1,7 @@
 # Phase 4.5: VLA v1.5 — OpenVLA LoRA adaptation (before/after 정량 분석)
 
 
-> **기간**: **Section 0 은 2026.08 (전진 배치)** / Sections 1-3 은 2026.09-11 (약 7-10주). 전진 사유: 4070 은 반납하지 않기로 확정 (2026-07-20) 됐으나 휴직 (2026.09-) 중 PC 장애 시 현장 방문 전까지 복구 불가한 단일 장애점이라, sim 환경을 구축·컨테이너화해 로컬 GPU 없이 재현 가능한 상태로 만들어 둔다. v1 에서 sim 을 제외하면서 **sim 환경 구축 + zero-shot baseline 측정이 본 Phase 로 이관**돼 원안(6-8주)보다 약 1-2주 늘었다.
+> **기간**: **Section 0 은 2026.08 (전진 배치)** / Sections 1-3 은 2026.09-11 (약 7-10주). 전진 사유: sim 환경과 zero-shot baseline 이 Sections 1-3 의 선행 조건이고, LoRA 학습을 RunPod 에서 돌리기 위한 컨테이너화를 여기서 끝내 둔다 (LoRA 는 24GB+ 를 요구해 로컬 4070 으로는 불가). v1 에서 sim 을 제외하면서 **sim 환경 구축 + zero-shot baseline 측정이 본 Phase 로 이관**돼 원안(6-8주)보다 약 1-2주 늘었다.
 > **목표**: sim task 의 zero-shot 성공률 베이스라인을 **본 Phase 에서 측정**하고, 그 위에서 OpenVLA 를 LoRA 로 **adaptation** 한 뒤 동일 sim task 의 성공률을 **before(zero-shot)/after(fine-tuned)** 로 비교·정량 분석한다.
 > **범위 (v1.5)**: 경량 LoRA adaptation, **sim 생성 데이터** (자작 팔 데이터 대기 안 함), 단일 task, 동일 embodiment. real 데이터 확장은 Phase 7.
 > **언어**: **Python** (HuggingFace transformers + peft) + **ROS2 (rclpy)** (eval 루프 재사용)
@@ -86,21 +86,21 @@
 ---
 
 
-## Section 0: 시작 전 (Step 0 실측 + sim 구축·이관 — 2026.08, 휴직 전 물리 접근 구간)
+## Section 0: 시작 전 (Step 0 실측 + sim 구축·이관 — 2026.08)
 
 
 > 순서 제약: **하네스 검증이 zero-shot baseline 측정보다 앞이다.** 검증 없이 측정하면 성공률 0% 를 받았을 때 도메인 갭과 통합 버그를 구분할 수 없어 수치가 해석 불가가 된다. 나머지 항목은 순서 자유.
 
 
-- [ ] OpenVLA 7B LoRA 1회 사이클이 RunPod RTX 4090 에서 가능한지 실측 (시간/비용/체크포인트)
-- [ ] fine-tuned 모델 4-bit 추론이 RTX 4070 12GB 에 OOM 없이 올라가는지 확인
+- [ ] OpenVLA 7B LoRA 1회 사이클이 RunPod RTX 4090 에서 가능한지 실측 (시간/비용/체크포인트) — 학습 데이터 (Section 1 산출) 가 입력이라 학습 자료 기준 week3 에서 닫힌다. 마감은 week3 (LoRA 본 학습) 진입 전
+- [ ] fine-tuned 모델 4-bit 추론이 RTX 4070 12GB 에 OOM 없이 올라가는지 확인 — LoRA 1사이클의 머지 체크포인트가 필요해 학습 자료 기준 week4 에서 닫힌다
 - [ ] sim 데이터 생성 방식 확정 (어느 sim, 어떤 task, 수집 규모) + OpenVLA 미학습 분포인지 점검. **정합 요건과 미학습 요건은 상충하므로 함께 판단한다** — embodiment·카메라 규약은 정합시켜야 zero-shot 이 바닥을 벗어나고, task·물체·씬은 신규여야 adaptation 의 의미가 산다
 - [ ] eval N 및 통계 처리(분산/신뢰구간) 기준 1차 결정
 - [ ] **sim 환경 구축** (v1 순서 3 의 ManiSkill 선정/PickCube 정의 재사용, sim 자체는 v1 에 없으므로 본 Phase 에서 신규 구축)
 - [ ] **하네스 검증** (zero-shot baseline 측정의 선행 조건) — 성공률과 독립적으로 루프·action 변환이 정상임을 입증한다. 수단 최소 1건: (a) ManiSkill 내장 motion planning / scripted solution 을 동일 루프에 투입해 성공률 상한 확인, (b) SimplerEnv 계열 bridge 평가 환경에서 공개된 OpenVLA zero-shot 수치와 자체 결과 대조
 - [ ] **zero-shot 성공률 baseline 측정** (하네스 검증 통과 후)
 - [ ] **before/after 신호 성립 점검**: 최종 성공률이 0% 로 나와도 **부분 도달률**(reached / grasped / lifted / placed)에 0 이 아닌 단계가 남는지 확인. 전 단계가 0 이면 조정 대상은 task 난이도가 아니라 **환경의 embodiment·카메라 규약 정합**이다 (성공 기준 절 참조)
-- [ ] **sim + eval 환경 Docker 컨테이너화** (2026.08 — 휴직 중 PC 장애·원격 불가 시 재현 대비)
+- [ ] **학습 측 환경 Docker 컨테이너화** (2026.08 — LoRA 학습을 RunPod 에서 돌리기 위한 준비. eval·sim 은 로컬 유지 — remediation plan 결정 #5)
 - [ ] **RunPod 에서 컨테이너 기동 + zero-shot 1회 추론 재현 확인** (2026.08 — 로컬 GPU 비의존 검증)
 
 

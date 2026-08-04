@@ -29,7 +29,7 @@
 
 - 스파이크 실행 시기·부품 구성·동역학 편입·실지원 시점의 결정 — 각 결정 기구에서만 판단한다 (spec §0.3).
 - 시장 조사 사실의 재검증 — 사후지급금 폐지는 2026.11 판단 전 법령 원문 재확인이 안건 문안에 포함된다.
-- dry-run 수치 자체의 확보 — Task 5 는 기록 위치 확인이 1차이고, 재측정은 미기록일 때만 8월 내 수행.
+- dry-run 수치 자체의 확보 — Task 5 는 기록 위치 확인이 1차이고, 재측정은 미기록일 때만 수행한다 (시점 제약 없음).
 
 ## Global Constraints
 
@@ -240,7 +240,7 @@ git commit -m "docs: update phase 4 board states and formal checkpoint agenda"
 
 week11 dry-run(카메라/bag 1분)의 전체 루프 수치(mean/p95/throughput/GPU)가 어디에 정리됐는지 확인한다. 2026-07-20 검증에서 레포 내 기록을 찾지 못했다 — README Evidence 는 `predict_action` 단독 수치뿐이고 `Measurements/.../methodology.md` 는 전체 루프를 "별도 측정" 미래형으로 기술. 후보: 로컬 미커밋 로그, week11/week12 실습 중 생성 파일.
 
-- [ ] **Step 2: 미기록 시 확보·기록 (8월 내 — 휴직 전 물리 접근 구간)**
+- [ ] **Step 2: 미기록 시 확보·기록** (4070 물리 접근은 자택 이전 확정으로 유지되므로 시점 제약 없음)
 
 기존 로그가 없으면 dry-run 1회 재실행으로 수치를 확보하고, README Evidence 표에 전체 루프 행을 추가하거나 `Measurements/openvla-rtx4070-int4/findings.md` 에 기록한다 (2026-08 재측정과 병합 가능).
 

@@ -49,7 +49,8 @@
 ## Section 8.0: 시작 전 (Phase 5 종료 후)
 
 
-- [ ] **Isaac Lab 튜토리얼 1개 최소 수행 (선행 가능)** — NVIDIA 무료 Physical AI 코스 (SO-101 sim-to-real, GR00T post-training 포함) 활용, RunPod 에서 실행 가능. 시점: Phase 4.5 Sections 1-3 여유 시 (2026.09-11) 또는 본 Phase 직전. 목적: NVIDIA 표준 경로 (Isaac Lab 정책 학습) 에 대한 최소 발화 가능 경험 확보 — "sim-to-real 을 다룬다" 주장의 정책 학습 측 방어
+- [ ] **NVIDIA SO-101 sim-to-real 코스 — Phase A (선행 가능, 2026.08)** — 이론 4개 모듈 + 워크숍 코드 읽기 + RunPod headless 로 GR00T post-training·sim 평가 1회. 약 1만-2.5만원, 팔 불요. 목적: NVIDIA 표준 경로에 대한 최소 발화 가능 경험 확보 — "sim-to-real 을 다룬다" 주장의 정책 학습 측 방어. 요건·비용·경로는 [`docs/research/isaac-sim-so101-course.md`](../docs/research/isaac-sim-so101-course.md) §4.1
+- [ ] **같은 코스 — Phase B** (캘리브레이션·teleop 수집·Real 평가·액추에이션 갭). **실물 팔이 필요하므로 Hardware-Arm Stage 1 (2027.01-02) 과 겹쳐 진행**한다. 코스의 4개 옵션 전부 실물 팔을 요구하므로 팔 없이 완주할 경로는 없다 (research §1.1)
 - [ ] Isaac Sim 4.x 설치 + Workstation 라이선스 확인
 - [ ] 자작 팔 URDF 검증 (Hardware-Arm Stage 1 자료 활용)
 - [ ] **6개월 분기 재평가 #2 결과 반영** (2027.05 가 본 Phase 종료 시점이라 *진입 시점에는 미반영*. 종료 시 재평가)

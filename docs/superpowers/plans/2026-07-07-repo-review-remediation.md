@@ -12,7 +12,7 @@
 ## 실행 보드 — 지금 할 일 (순차, 2026.07-09)
 
 > 위에서 아래로 순서대로 진행한다. **일상 체크는 이 절에서만 한다** — 아래 Phase 1·2 의 체크박스는 기록·통과 기준의 원본이며, Phase 2 는 대응 항목 완료 시점에 한 번에 닫는다.
-> 전제: 4070 (우분투 PC) 은 반납하지 않기로 확정 (2026-07-20, 결정 #5). 휴직 개시 (2026.09) 후에는 PC 장애 시 현장 방문 전까지 복구 불가 → GPU 작업은 8월 내 완료 권장 (물리 접근이 일상적인 마지막 달). **자택 이전 조율 중 (2026-07-28)** — 성사되면 이 마감이 해소되나, 확정 전까지는 8월 마감을 전제로 배치한다. 가용: 평일 저녁 약 2h (주 8-10h).
+> 전제: 4070 (우분투 PC) 은 반납하지 않기로 확정 (2026-07-20, 결정 #5) 됐고 **2026.09 자택 이전이 확정**됐다 — 휴직 기간에도 물리 접근이 유지되므로 **GPU 작업의 8월 마감은 없다.** 배치 기준은 물리 접근이 아니라 가용 시간과 선후 의존이다. 가용: 재직 구간(-2026.08) 평일 저녁 약 2h (주 8-10h).
 > 월별 총부하·트랙 충돌 개관은 [2026 하반기 실행 가이드](2026-07-28-year-end-execution-guide.md) 참조 (체크는 이 절에서만).
 
 ### 지금 (7월)
@@ -29,27 +29,30 @@
 ### 8월 초
 
 - [ ] 4. **Phase 4.5 Section 0 전반: ManiSkill sim 구축 + zero-shot baseline** — 상세: [Roadmap/Phase 4.5.md](../../../Roadmap/Phase%204.5.md) Section 0
-  - 미착수. 추정 20-30h 라 짧은 잔여 기간에 착수하면 끊긴다. **실제 마감은 8월 말이 아니라 Section 1 착수 (9월 중순) 전 zero-shot baseline 확보** — 8월 2주차 착수로도 성립
-- [ ] 5. **v1 확장 구현: `RobotPolicy` adapter + action schema validation + 벤치마크 재현 스크립트** — #6 Docker 화 전에 코드 변경 완료. 상세: [Roadmap/Phase 4.md](../../../Roadmap/Phase%204.md) v1 체크리스트
-- [ ] 6. **Section 0 후반: Docker 컨테이너화 → RunPod 기동·재현 확인 + LoRA 1사이클 실측 + fine-tuned 4-bit 의 4070 안착 확인** (마지막 항목만 4070 필요)
-- [ ] 7. **8월 체크포인트**: 4070 보유 지속·원격 운용 전환 기록 + **자택 이전 여부·시점 확정** + git author (filter-repo) 실행 여부 결정 + 정독 잠정치 갱신. 상세: [notes.md](../../../Studies/Phase%204/notes.md) 진행 원칙
+  - 미착수. 추정 20-30h — 주 8-10h 기준 2-3주 연속 블록이 필요하다. **실제 마감은 8월 말이 아니라 Section 1 착수 (9월 중순) 전 zero-shot baseline 확보**인데, 8월 2주차 착수 기준 가용이 약 24-30h 로 여유가 0 이고, 9월 초는 휴직 적응기라 가용이 줄 수 있다 (실행 가이드 §2) — **즉시 착수가 안전하다**
+- [ ] 5. **v1 확장 구현: `RobotPolicy` adapter + action schema validation + 벤치마크 재현 스크립트** (8-12h 추정) — #6 Docker 화 전에 코드 변경 완료. 상세: [Roadmap/Phase 4.md](../../../Roadmap/Phase%204.md) v1 체크리스트
+- [ ] 6. **Section 0 후반: Docker 컨테이너화 → RunPod 기동·재현 확인 + LoRA 1사이클 실측 + fine-tuned 4-bit 의 4070 안착 확인** (8-12h + 4-bit 안착 1-2h 추정. 마지막 항목만 4070 필요)
+  - 컨테이너화 범위는 **학습 측만**이다 (eval 은 로컬 유지 — 결정 #5). 8월에 닫을 수 있는 것은 Docker 이미지 + RunPod 기동 재현까지다. LoRA 1사이클 실측은 학습 데이터 (Section 1 산출) 가 입력이라 학습 자료 기준 week3 에서, 4-bit 안착은 그 머지 체크포인트가 필요해 week4 에서 닫힌다 — 이 두 항목의 마감은 달력 (8월) 이 아니라 **week3 (LoRA 본 학습) 진입 전**이다
+- [ ] 7. **8월 체크포인트**: git author (filter-repo) 실행 여부 결정 + 정독 잠정치 갱신 + 하드웨어 스파이크 시기 확정. 상세: [notes.md](../../../Studies/Phase%204/notes.md) 진행 원칙 (자택 이전 안건은 2026.09 이전 확정으로 닫힘)
+- [ ] 7-1. **NVIDIA SO-101 sim-to-real 코스 Phase A** (10-16h, GPU 로컬 불요 — RunPod headless). 이론 4개 모듈 + 워크숍 코드 읽기 + GR00T post-training·sim 평가 1회. 비용 약 1만-2.5만원. 상세: [`docs/research/isaac-sim-so101-course.md`](../../research/isaac-sim-so101-course.md) §4.1
+  - 선행 의존이 없어 언제 해도 되지만 **8월 부하와 경쟁한다** (#4 Section 0 20-30h, #8 4-6h 와 같은 달). 과밀하면 9월 이후로 이월해도 손실이 없다 — 팔·물리 접근이 모두 불요다
+  - 목적은 코스 완주가 아니라 **발화 가능 수준 확보**다. 완주는 실물 팔이 필요해 Phase B (Stage 1, 2027.01-02) 로 간다
 - [ ] 8. **재측정 + Block 3** (4-6h, **GPU 필수**). 예측 → 측정 → 오차 설명. 구간 분해 (전처리 / vision encoder / prefill / decode 7토큰 / un-norm) + [methodology.md](../../../Measurements/openvla-rtx4070-int4/methodology.md) §3 미기록 4항목 (구간 분해·실카메라 입력·notebook→`.py`·`summary.csv`) + SETUP §1.3·README Evidence 표 갱신 → 커밋 (Task 2-2 Step 1·3·4)
   - 배치 근거: GPU 물리 접근이 필요한 항목 중 가장 큰 덩어리다. **vla-lab 첫 발행의 트리거**이기도 해서 (career-sync Task 6) 8월 2-3주에 두고, 그 뒤 발행이 9월에 걸리도록 한다
   - Block 2 에서 인수한 과제: Step 5 가 "roofline 상한 약 4배 vs 실제 근사 동등" 의 간극 배분을 여기로 넘겼다. **decode 실측 (토큰당 ms) 을 대역폭 하한과 대조**해 (a) 가 어디까지 유효했는지 판정하고, vision encoder·prefill·decode 의 ms 비중으로 간극을 배분한다 (findings §4.2 Step 5 오차 설명 → §4.3 Step 3)
 - [ ] 8-1. **Block 4 — 3.33 Hz 조건부 판정** (2-3h, **GPU 불요**). 제어 계층 표 + task 유형별 판정 + action chunking. 입력은 Block 3 의 구간 분해 결과와 공개 문헌뿐 (findings §4.4 골격: "새 측정 없음") → 커밋 (Task 2-2 Step 2)
-  - GPU 가 필요 없으므로 8월 마감의 대상이 아니다. 8월 4주에 붙이는 것이 자연스럽지만, 과밀 시 #9 와 함께 9월로 이월해도 안전하다
+  - GPU 가 필요 없다. 8월 4주에 붙이는 것이 자연스럽지만, 과밀 시 #9 와 함께 9월로 이월해도 안전하다
 - [ ] 9. **자가 검증 10문항** — 문서 참조 없이 전부 답변 (문항: 검토 보고서 §2.6). 막히면 해당 Block 재수행 (Task 2-3)
   - 선후: **#8-1 다음**이다. 10문항 중 "병목 구간"·"Jetson 이식 예측" 은 Block 3, "task 경계" 는 Block 4 산출물이라 그 전에 치면 답이 없다
-  - 8월에 두는 이유는 막혔을 때 GPU 로 돌아갈 수 있기 때문이다. #8-1 과 함께 9월로 밀면 **측정 기반 문항이 막혔을 때 재측정이 불가**해진다 — 자택 이전이 성사되면 이 리스크는 소멸
+  - 9월로 밀려도 안전하다. 자택 이전 확정으로 휴직 중에도 재측정이 가능하므로, "측정 기반 문항이 막혔을 때 GPU 로 돌아갈 수 없다" 는 리스크가 없다
 
-### 8월 중 (휴직 전 마감 — 물리 접근이 일상적인 마지막 달)
+### 8월 중
 
 - [ ] 10. **Phase 3 재현 확인** (GPU 필수) — TensorRT 엔진 재빌드 + week8 통합 노드 1회 구동, 결과 기록 (Task 2-4)
 - [ ] 11. **Rerun 스크린샷/gif 1장** → README Evidence 절 삽입 + `Measurements/.../plots/` 보존 → 커밋 (Task 2-4)
 - [ ] 12. GPU 필요 잔여분 (#6 의 4-bit 확인, #8, #10-11) 0건 확인 + **4070 원격 운용 전환 점검** — BIOS 전원 복구 자동 부팅 (Restore on AC Power Loss), 원격 접속 경로 이중화 (SSH + 오버레이 VPN 등), 커널 패닉 자동 리부트 (`kernel.panic` sysctl), (선택) 원격 전원 리셋 수단. 재부팅으로 안 풀리는 하드웨어 장애는 커버 불가 — 그 계층의 보험은 #6 의 RunPod 재현
-  - [ ] **Tailscale 경유 Isaac Sim 원격 GUI 경로 검증** (약 30분) — `--/app/livestream/publicEndpointAddress` 를 tailscale IP 로 지정해 WebRTC 스트리밍이 붙는지 확인. RunPod 은 이 우회가 구조적으로 불가하므로 (`/dev/net/tun` 미노출 + 유저스페이스 모드의 ICE 실패), PC 자택 이전이 무산될 경우 Isaac Sim 을 돌릴 유일한 경로다. **PC 가 손에 닿는 8월에 해야 한다** — 이전 성사 여부보다 이 검증이 먼저다. 상세: [Hardware-Arm.md](../../../Roadmap/Hardware-Arm.md) Stage 1 실행 머신 절
-  - [ ] **Jetson Orin Nano CUDA 스택 확인** (약 30분) — 256GB SSD + Ubuntu 22.04 는 설치 완료 상태이므로 재플래시는 불요 전망. 확인할 것은 **CUDA·cuDNN 동반 여부**뿐이다 (`cat /etc/nv_tegra_release`, `dpkg -l nvidia-jetpack`) — 없으면 PyTorch GPU 가 안 붙고, JetPack 재설치에는 **x86 Ubuntu 호스트 (= 이 PC) 가 필요**하다. 맥북은 SDK Manager 호스트가 될 수 없으므로 이 확인만은 8월에 해 둔다
-  - 위 두 항목은 **자택 이전이 확정되면 드롭 가능**하다 (합 약 1h). 8월 말까지 결론이 안 나면 그냥 수행한다 — 보험료가 싸다
+  - Tailscale 경유 Isaac Sim 원격 GUI 검증은 **드롭한다** — PC 가 자택에 있으므로 GUI 는 로컬에서 띄운다. 출장지 원격 사용이 실제로 필요해질 때 수행한다 (약 30분, 절차는 [Hardware-Arm.md](../../../Roadmap/Hardware-Arm.md) Stage 1 실행 머신 절)
+  - [ ] **Jetson Orin Nano CUDA 스택 확인** (약 30분) — 256GB SSD + Ubuntu 22.04 는 설치 완료 상태이므로 재플래시는 불요 전망. 확인할 것은 **CUDA·cuDNN 동반 여부**뿐이다 (`cat /etc/nv_tegra_release`, `dpkg -l nvidia-jetpack`) — 없으면 PyTorch GPU 가 안 붙고, JetPack 재설치에는 **x86 Ubuntu 호스트 (= 이 PC) 가 필요**하다. 맥북은 SDK Manager 호스트가 될 수 없다. PC 가 자택에 있으므로 시점 제약은 없고, Jetson 이 v3 배포 타깃으로 실제 필요해질 때 수행한다
 
 ### 남는 시간에 (이월 가능 — GPU 작업과 충돌하면 무조건 뒤로)
 
@@ -60,8 +63,8 @@
 - [ ] 14. LinkedIn 헤드라인 교체 (승인 확정 2026-07-28 — 선행 조건 해소, 9월 1주 집행) + 현직자 커피챗 개시
 - [ ] 15. Phase 4.5 Sections 1-3 착수 (2026.09-11)
 
-> **8월 마감 판정**: 반드시 끝낼 것은 **#8·#10·#11 + #6 의 4-bit 확인 + #12** — GPU 물리 접근이 필요한 항목이다. #8-1 (Block 4)·#9·#5·#13 과 Section 0 의 sim 구축은 물리 접근이 불요해 9월 이월이 안전하다. 마감의 성격은 절대가 아니라 권장이다 (4070 은 반납하지 않으므로) — 단 휴직 중 PC 장애 시 현장 방문 전까지 복구 불가라 권장은 유지한다.
-> 예외: RunPod 은 Isaac Sim GUI 를 대체하지 못하므로 (#12 하위 항목) Sim 계열은 위 판정 밖이다. Docker·RunPod (#6) 은 LoRA 24GB+ 요건과 로컬 PC 단일 장애점 제거 역할로 필요하다.
+> **8월 배치 판정**: 자택 이전 확정으로 GPU 물리 접근 마감이 없어졌으므로, 8월에 둘 항목은 **선후 의존과 가용 시간**으로만 정한다. 재직 구간(-2026.08)이 주 8-10h 로 가장 빡빡하므로 시간이 많이 드는 항목(#8, Section 0)을 앞에 두고, 나머지는 9월 이월을 허용한다.
+> Docker·RunPod (#6) 이 필요한 이유는 **LoRA 가 24GB+ 를 요구해 로컬 4070 으로 학습이 불가능하기 때문**이다 (장애 대비가 아니다). RunPod 은 Isaac Sim GUI 를 대체하지 못하므로 (UDP 미지원) Sim GUI 계열은 로컬 전용이다.
 
 ### 문서 지도 (뭘 어디서 보나)
 
@@ -93,12 +96,12 @@
 | 1 | 산출물 보존 정책 | **"정답은 지우고 증거는 남긴다"** — quiz 정답·완성 실습 코드는 원복, 실측·판단 기록은 `Measurements/` 에 보존. 워크플로우는 증거 보존이 원복보다 먼저 | 보고서 §5.1-5.6 |
 | 2 | 구조 신설 범위 | `Measurements/` + `Portfolio/` 만 지금 신설. `Studies/` 전면 재배치·README 결과 중심 전면 개편은 v1 기록 시점 (2026 하반기) 과 결합 | 보고서 권고 5 |
 | 3 | 학습 컴퓨트 | Colab **배제** (SSH 불가·세션 휘발), **RunPod Community Cloud RTX 4090 (24GB)** 확정 | 보고서 §2.3 |
-| 4 | 육아휴직 | **2026.09-2027.02** (2026-07-01 신청, **2026-07-28 승인 확정**. 복직 2027.03 동일). 2026.06-08 은 휴직이 아니라 **재직 구간** (4070 물리 접근이 일상적인 구간 — 결정 #5) | 보고서 §2.3 + 2026-07-28 승인 |
-| 5 | GPU 반납 | RTX 4070 (우분투 PC) 은 **반납하지 않기로 확정 (2026-07-20 갱신)**. 단 휴직 개시 (2026.09) 후 PC 장애 시 현장 방문 전까지 복구 불가한 단일 장애점 → 재측정·TensorRT 재현 확인·Rerun 시각화의 8월 내 마감은 권장으로 유지하고, 8월 중 원격 운용 전환 점검을 수행 (실행 보드 #12). **2026-07-28: 자택 이전 조율 개시** — 성사 시 물리 접근 제약과 8월 마감 근거가 함께 소멸한다 (8월 초 체크포인트 안건). 하드웨어 증설 (RAM·GPU) 은 불가하므로 로컬 사양 부족은 RunPod 이관으로만 대응 | 보고서 §2.3, 권고 2-4 + 2026-07-20·07-28 구두 갱신 |
+| 4 | 육아휴직 | **2026.09-2027.02** (2026-07-01 신청, **2026-07-28 승인 확정**. 복직 2027.03 동일). 2026.06-08 은 휴직이 아니라 **재직 구간** (주 8-10h 로 가용 시간이 가장 빡빡한 구간) | 보고서 §2.3 + 2026-07-28 승인 |
+| 5 | GPU 반납·배치 | RTX 4070 (우분투 PC) 은 **반납하지 않기로 확정 (2026-07-20)** 이고 **2026.09 자택 이전 확정**이다 → 휴직 기간에도 물리 접근이 유지되므로 GPU 종속 작업에 시점 마감이 없고, SO-101 팔 옆 기계도 이 PC 다. 하드웨어 증설 (RAM·GPU) 은 불가하므로 로컬 사양 부족은 RunPod 이관으로 대응하되, **GUI 스트리밍 워크로드는 이관 불가** (RunPod UDP 미지원) | 보고서 §2.3, 권고 2-4 + 2026-07-20·09 이전 확정 |
 | 6 | 자작 팔 | **SO-101 / SO-ARM101 리더-팔로워, 약 56-58만원, 2026.09-10 구매** (국내 조달, 리드타임 3일). 근거: LeRobot/HF 생태계 표준 = 경험의 이식성. 커스텀 XL330+XM430 안과 Koch v1.1 은 비채택 (사유: Hardware-Arm.md 비채택 기록) | 보고서 §2.3 + 2026-07-28 결정 |
 | 7 | Phase 4.5 | **Section 0 (ManiSkill/SAPIEN sim 구축 → Docker → RunPod 이관) 을 2026.08 로 전진 배치**, Sections 1-3 은 2026.09-11 | 보고서 §2.3 |
 | 8 | probe 일정 | 2026.06 일괄 가정 폐기 → 가시성 기준 분해: **리포 공개 증거·JD 정독 2026.07-08 / LinkedIn 헤드라인·커피챗 2026.09** (휴직 개시·승인 확정 후) | 보고서 §2.2 |
-| 9 | Phase 3 지위 | 비공개 리허설 → **supporting system work 로 공개**. 조건 2개: supporting 라벨 + README 계층 하위 배치 / 8월 내 (휴직 전) 빌드 스크립트 기준 재현 확인 | 보고서 §2.3 |
+| 9 | Phase 3 지위 | 비공개 리허설 → **supporting system work 로 공개**. 조건 2개: supporting 라벨 + README 계층 하위 배치 / 빌드 스크립트 기준 재현 확인 (4070 에서 재빌드 — PC 자택 이전 확정으로 시점 제약 없음) | 보고서 §2.3 |
 | 10 | v1 정의 | adapter 추상화 (`RobotPolicy` 인터페이스) + action schema validation + 벤치마크 재현성 을 v1 범위에 추가. 안전 실행 스택 (watchdog, fallback, collision) 은 v2 로 명시 이관 | 보고서 권고 6 |
 | 11 | 산출물 확장 | 부록 B 에 **v2.5 (자작 데이터셋, LeRobot 포맷, HF Hub 공개)** 신설. SO-101 조립 후 LeRobot ACT 1회 실행. Diffusion Policy 는 라잇 정리 수준 (면접 방어용). Isaac Lab 튜토리얼 1개 (RunPod, NVIDIA 무료 코스) | 보고서 권고 8, 9 |
 | 12 | 포지셔닝 | "cross-embodiment VLA/FM 통합 엔지니어" → **"Robot Learning Deployment / Physical AI Systems Engineer"** (복수 embodiment 실경험 전 방어 불가한 표제 배제). "박사가 못 만드는 3가지" 서사 → **실행 품질 근거** 서사로 교체 | 보고서 §2.5, 권고 7 |
@@ -556,7 +559,7 @@ v2 행 앞에 v2.5 (데이터 파이프라인 증거) 행을 넣는다 — 자�
 ```markdown
 ## 진입 전 준비 (선행 가능)
 
-- [ ] **Isaac Lab 튜토리얼 1개 최소 수행** — NVIDIA 무료 Physical AI 코스 (SO-101 sim-to-real, GR00T post-training 포함) 활용. RunPod 에서 실행 가능. 시점: Phase 4.5 Sections 1-3 여유 시 (2026.09-11) 또는 본 Phase 직전. 목적: NVIDIA 표준 경로 (Isaac Lab 정책 학습) 에 대한 최소 발화 가능 경험 확보 — "sim-to-real 을 다룬다" 주장의 정책 학습 측 방어
+- [ ] **NVIDIA SO-101 sim-to-real 코스 Phase A** — 이론 모듈 + 워크숍 코드 읽기 + RunPod headless 로 GR00T post-training·sim 평가 1회 (약 1만-2.5만원, 팔 불요, 2026.08 가능). GUI 가 필요한 teleop·씬 편집과 실물 평가는 Phase B (Stage 1, 2027.01-02) 로 분리한다 — 코스 4개 옵션 전부 실물 팔을 요구한다. 근거·경로: [`docs/research/isaac-sim-so101-course.md`](../../research/isaac-sim-so101-course.md)
 ```
 
 - [x] **Step 5: 검증**
@@ -619,7 +622,7 @@ git add Measurements/
 git commit -m "docs: add memory and quantization analysis to openvla findings"
 ```
 
-### Task 2-2: 재측정 + Block 3-4 (2026.08, 휴직 전 — 약 6-9시간)
+### Task 2-2: 재측정 + Block 3-4 (2026.08 — 약 6-9시간)
 
 **Files:**
 - Modify: `Measurements/openvla-rtx4070-int4/methodology.md`, `findings.md`, `summary.csv`, `raw/`, `scripts/`
@@ -639,7 +642,7 @@ methodology §3 잔여 4항목이 이 Step 에서 함께 닫힌다 (VRAM peak �
 제어 계층 (전동기 수백Hz-1kHz vs 정책 수Hz) 과 연결, 정적 task 가능 / 동적 추적 불가의 경계, action chunking 이 간극을 메우는 방식 정리.
 **통과 기준**: "3.33Hz 면 충분한가" 에 task 유형별 조건부 답변.
 
-입력은 Step 1 의 구간 분해 결과 + §2 의 전체 루프 하한 (2 Hz) + 공개 문헌 (ACT 논문, OpenVLA §5.4) 뿐이고 **새 측정이 없다** (findings §4.4 골격). 따라서 8월 마감 대상이 아니며, 과밀 시 Task 2-3 과 함께 9월로 이월한다.
+입력은 Step 1 의 구간 분해 결과 + §2 의 전체 루프 하한 (2 Hz) + 공개 문헌 (ACT 논문, OpenVLA §5.4) 뿐이고 **새 측정이 없다** (findings §4.4 골격). 따라서 GPU 가 필요 없으며, 과밀 시 Task 2-3 과 함께 9월로 이월한다.
 
 - [ ] **Step 3: 문서 수치 갱신**
 
@@ -661,14 +664,14 @@ git commit -m "docs: complete openvla benchmark methodology with remeasured stat
 
 **이관 사항 (2026-07-28)**: Block 2 의 통과 판정이 이 Step 으로 넘어왔다 — findings §4.2 Step 5 와 완료 판정 표가 `(by claude)` 작성이라 Task 2-1 Step 2 의 "답변 가능" 이 본인 도출로 검증되지 않았다. 관련 문항은 **"int8 열위 이유"** 와 **"Jetson 이식 예측"** (후자는 Block 2 Step 5 의 memory-bound 논리 + Block 3 의 대역폭 외삽이 재료) 이다. 이 두 문항에서 막히면 §4.2 를 본인 문장으로 다시 쓴다.
 
-### Task 2-4: Phase 3 재현 확인 + Rerun 시각 자료 (2026.08, 휴직 전)
+### Task 2-4: Phase 3 재현 확인 + Rerun 시각 자료 (2026.08)
 
 **Files:**
 - Modify: `README.md` (실측 결과 절 gif 삽입), `Portfolio/evidence-index.md`
 
 - [ ] **Step 1: Phase 3 빌드 스크립트 기준 재현 확인**
 
-TensorRT 엔진 재빌드 + week8 통합 노드 1회 구동 (엔진은 GPU 아키텍처 종속 — 휴직 중 PC 장애 시 현장 방문 전까지 재빌드 불가). 결과 (성공 여부, 소요, 걸림돌) 를 Roadmap/Phase 3.md 상태 줄 또는 `Measurements/` 에 기록 — supporting 공개 조건 2 충족.
+TensorRT 엔진 재빌드 + week8 통합 노드 1회 구동 (엔진은 GPU 아키텍처 종속이라 4070 에서만 재빌드된다). 결과 (성공 여부, 소요, 걸림돌) 를 Roadmap/Phase 3.md 상태 줄 또는 `Measurements/` 에 기록 — supporting 공개 조건 2 충족.
 
 - [ ] **Step 2: Rerun 시각 자료 1건 확보**
 

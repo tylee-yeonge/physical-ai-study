@@ -13,10 +13,11 @@
 
 - **Ubuntu PC** — 메인 학습/실험 장비. RTX 4070 12GB VRAM / RAM 31GB / 28 코어 / 드라이버 580.173.02
   - **하드웨어 변경 불가** (RAM·GPU 증설 포함). 로컬 사양이 모자라는 작업은 증설이 아니라 **RunPod 이관**으로 대응한다
+  - **Isaac Sim 최소 사양 미달** — 5.x 최소가 VRAM 16GB / RAM 32GB 인데 이 PC 는 12GB / 31GB 다. 증설안(5070 Ti + RAM 64GB, 139-208만원)을 검토했으나 **보류**했다 — 사유와 재판정 조건은 [`docs/research/isaac-sim-so101-course.md`](docs/research/isaac-sim-so101-course.md) §5
   - 단 **GUI 스트리밍이 필요한 작업은 RunPod 로 옮길 수 없다** — RunPod 은 UDP 미지원이고 Isaac Sim WebRTC 는 UDP 47998 이 필수다 (상세는 [Hardware-Arm.md](Roadmap/Hardware-Arm.md) Stage 1 실행 머신 절). headless 스크립트 워크로드만 이관 가능
-  - 자택 이전 조율 중 — 성사되면 휴직 중 물리 접근 제약이 해소된다. Isaac Sim GUI 작업이 로컬 전용이라 Stage 1 (2027.01-02) 의 선행 조건이기도 하다 (remediation plan 결정 #5)
+  - **2026.09 자택 이전 확정** — 휴직 기간 (2026.09-2027.02) 내내 물리 접근이 유지된다. Isaac Sim GUI 와 USB 장치 작업이 로컬 전용이므로 Stage 1 (2027.01-02) 의 전제가 충족된다 (remediation plan 결정 #5)
 - **MacBook Pro 14 (M4 Pro)** — 원격 접속·문서 작업. LeRobot 은 macOS Apple Silicon 을 공식 지원해 teleop·record 백업 경로로 쓸 수 있으나, **ROS2 는 불가** (macOS 바이너리 패키지 없음 + Docker Desktop for Mac 의 USB 패스스루 미지원)
-- **Jetson Orin Nano (8GB)** — **256GB SSD + Ubuntu 22.04 설치 완료**. Ubuntu 22.04 이므로 **ROS 2 Humble 을 apt 로 설치**할 수 있고 (Phase 3 배포판과 동일 절차) LeRobot 이 요구하는 Python 3.10 도 기본이다. SO-101 + LeRobot 구동 사례가 공개돼 있고 NVIDIA 공식 SO-101 코스의 기준 구성이기도 하다. **4070 PC 자택 이전이 무산될 경우 Stage 1 의 팔 옆 기계 역할** — 상세는 [Hardware-Arm.md](Roadmap/Hardware-Arm.md) Stage 1 실행 머신 절
+- **Jetson Orin Nano (8GB)** — **256GB SSD + Ubuntu 22.04 설치 완료**. Ubuntu 22.04 이므로 **ROS 2 Humble 을 apt 로 설치**할 수 있고 (Phase 3 배포판과 동일 절차) LeRobot 이 요구하는 Python 3.10 도 기본이다. SO-101 + LeRobot 구동 사례가 공개돼 있고 NVIDIA 공식 SO-101 코스의 기준 구성이기도 하다. **Stage 1 의 팔 옆 기계는 4070 PC 이므로, Jetson 은 v3 실기 배포 타깃과 백업 경로로 남는다** — 상세는 [Hardware-Arm.md](Roadmap/Hardware-Arm.md) Stage 1 실행 머신 절
   - 한계: ACT 학습은 소규모 데이터셋에서 보고된 사례가 있으나 정석은 4070/RunPod. **Isaac Sim 은 불가** (x86 전용), OpenVLA 7B 도 비현실적
   - 확인 필요: JetPack / L4T 버전과 **CUDA·cuDNN 동반 설치 여부** (Ubuntu 22.04 만 올린 경우 CUDA 스택이 없으면 PyTorch GPU 가 안 붙는다) — `cat /etc/nv_tegra_release`, `dpkg -l nvidia-jetpack`
 - **ELP Stereo Camera** — USB 연결 주변기기, 실카메라 입력용
@@ -31,7 +32,7 @@
 
 - 기본: **Ubuntu PC 중심** (ELP 는 USB 주변기기)
 - 출장지: 원격 접속으로 동일 PC 사용. PC 에 ELP 가 연결되어 있으면 실카메라 데이터도 원격으로 처리 가능
-- Jetson 은 두 역할 — PC 자택 이전 무산 시 SO-101 팔 옆 기계, 그리고 v3 실기 배포 타깃. Phase 3 TensorRT 배포는 v3 이후 옵션
+- SO-101 팔 옆 기계는 **Ubuntu PC** 다 (2026.09 자택 이전 확정). Jetson 은 v3 실기 배포 타깃이자 백업 경로 — Phase 3 TensorRT 배포는 v3 이후 옵션
 
 
 ---

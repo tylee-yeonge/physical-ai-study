@@ -204,7 +204,7 @@ Output : /vla/action (팔: EE-delta [dx,dy,dz,rx,ry,rz] -> geometry_msgs/Twist +
 
 
 Phase 4 완료 후 (2026 하반기):
-- **Phase 4.5 (VLA v1.5)** — OpenVLA LoRA adaptation + before/after 정량 분석 (둘째 층 증거). Section 0 (sim 구축·Docker·RunPod 이관) 은 2026.08 전진 확정 (로컬 GPU 단일 장애점 대비), Sections 1-3 은 2026.09-11 ([Phase 4.5.md](Phase%204.5.md))
+- **Phase 4.5 (VLA v1.5)** — OpenVLA LoRA adaptation + before/after 정량 분석 (둘째 층 증거). Section 0 (sim 구축·Docker·RunPod 이관) 은 2026.08 전진 확정 (Sections 1-3 의 선행 조건 + RunPod 학습 준비), Sections 1-3 은 2026.09-11 ([Phase 4.5.md](Phase%204.5.md))
 - **하드웨어 스파이크** (2026.10, 2-3주) — 2-DOF Dynamixel + ROS2 파이프라인 리스크 검증 (조달은 v1 과 병렬로 이미 착수)
 - **6개월 분기 재평가 #1 (2026.11)** — 스파이크 결과 / v1 결과(레포) / VLA 모델 갱신 검토 / 시장 신호 probe 반응 / cross-embodiment 좌표 점검. **육아휴직(2026.09-2027.02) 중이라 정찰 지원은 하지 않으며, 본격 실지원은 복직(2027.03) 직후 개시한다.**
 - **Hardware-Arm Stage 1 본 빌드** (2027.01-02) → v2 선행 하드웨어

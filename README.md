@@ -17,7 +17,7 @@
 | throughput | 3.33 Hz | quasi-static 단일 task 적합 추정 |
 | int8 경로 | 배제 — 성공률 58.1% (int4 71.9%), 1.2 Hz | OpenVLA 논문 Table 2·§5.4 근거 + 실측 판단 |
 
-측정: 2026-06, 재측정 (방법론 보강 + p50/p99/VRAM peak) 2026-08 예정. Rerun 시각화 gif 는 확보 시 이 절에 추가 (2026.08 내 — 4070 은 반납하지 않으나 휴직 중 PC 장애 시 현장 방문 필요).
+측정: 2026-06, 재측정 (방법론 보강 + p50/p99/VRAM peak) 2026-08 예정. Rerun 시각화 gif 는 확보 시 이 절에 추가.
 
 
 ---
@@ -58,7 +58,7 @@ Physical AI 에서 Foundation Model(FM)을 다루는 일은 세 층으로 나뉜
 ## 전체 로드맵
 
 
-> 주당 6-8시간 예산 기준. 본격 실지원(2027.03 복직 직후) 전까지는 한 구간에 메인 학습 1트랙만 둔다. 이후는 실지원과 병행하는 저강도 학습으로 진행한다. **2026.09-2027.02 는 육아휴직 기간** (2026-07-01 신청, 2026-07-28 승인 확정. 2026.06-08 은 재직 구간 — 평일 저녁 약 2h 가용 전제. 4070 은 반납하지 않기로 확정(2026-07-20)됐으나 휴직 중 PC 장애 시 현장 방문이 필요해 GPU 종속 작업은 8월 내 완료로 배치) — 휴직 기간에는 구직 지원(정찰 포함)을 하지 않고 학습·산출물에 집중하며, 시장 신호 probe 는 가시성 기준으로 분해해 저강도 유지한다 (JD 정독 2026.07-08 / LinkedIn 헤드라인·커피챗 2026.09~). 본격 실지원은 복직(2027.03) 직후 개시하고, v2/v3 는 그 위에 얹는 강화 카드다.
+> 주당 6-8시간 예산 기준. 본격 실지원(2027.03 복직 직후) 전까지는 한 구간에 메인 학습 1트랙만 둔다. 이후는 실지원과 병행하는 저강도 학습으로 진행한다. **2026.09-2027.02 는 육아휴직 기간** (2026-07-01 신청, 2026-07-28 승인 확정. 2026.06-08 은 재직 구간 — 평일 저녁 약 2h 가용 전제. 4070 은 반납하지 않기로 확정(2026-07-20)됐고 **2026.09 자택 이전 확정**으로 휴직 중에도 물리 접근이 유지된다) — 휴직 기간에는 구직 지원(정찰 포함)을 하지 않고 학습·산출물에 집중하며, 시장 신호 probe 는 가시성 기준으로 분해해 저강도 유지한다 (JD 정독 2026.07-08 / LinkedIn 헤드라인·커피챗 2026.09~). 본격 실지원은 복직(2027.03) 직후 개시하고, v2/v3 는 그 위에 얹는 강화 카드다.
 
 
 ```mermaid
@@ -111,11 +111,11 @@ gantt
 | 2026.03-05 | Stage 1 | Phase 2: Perception 기하 기초 (완료) | 카메라 모델 + Multi-view |
 | 2026.06 초 | Stage 1 | Phase 3 완료 (**supporting 공개** — 보조 엔지니어링 증거, 대표작 아님) | VLA wrapper 리허설 |
 | 2026.06-09 | Stage 1 | **Phase 4 (메인 단독): VLA v1 — pretrained OpenVLA zero-shot 추론 + ROS2 wrapper + 카메라/bag dry-run 측정 + 정독** | **산출물 v1 (2026 하반기 레포 기록, 외부 공개는 v2)** |
-| 2026.08 (Section 0) + 2026.09-11 (Sections 1-3) | Stage 1 | **Phase 4.5: VLA v1.5 — Section 0 (sim 구축·Docker·RunPod 이관, 로컬 GPU 단일 장애점 대비 전진) + OpenVLA LoRA adaptation + before/after 정량 분석** (sim 데이터, v1 추론 노드 재사용) | **산출물 v1.5 (둘째 층 adaptation 증거)** |
+| 2026.08 (Section 0) + 2026.09-11 (Sections 1-3) | Stage 1 | **Phase 4.5: VLA v1.5 — Section 0 (sim 구축·Docker·RunPod 이관, Sections 1-3 선행) + OpenVLA LoRA adaptation + before/after 정량 분석** (sim 데이터, v1 추론 노드 재사용) | **산출물 v1.5 (둘째 층 adaptation 증거)** |
 | 2026.07-08 (병행) | Stage 1 | **시장 신호 probe 1단 (저가시성)**: 타겟사 JD 5-10개 정독 + 격차 매핑, 공개 증거 정비 (별도 산출물 repo 신설) | 시장 실측 → 우선순위 보정 |
 | 2026.09- (병행) | Stage 1 | **시장 신호 probe 2단 (고가시성)**: LinkedIn 헤드라인 교체 + 현직자 커피챗 1-2건 (휴직 개시 후 — 승인 확정 2026-07-28) | 시장 실측 → 우선순위 보정 |
 | 2026.10 | Stage 1 | **하드웨어 스파이크 (2-3주)**: 2-DOF Dynamixel + ROS2 + URDF 파이프라인이 도는지만 검증 | 리스크 조기 검증 (분기 재평가 #1 입력) |
-| 2026.09-2027.02 | Career | **육아휴직** (2026-07-01 신청, 2026-07-28 승인 확정) — 구직 지원(정찰 포함) 안 함, 학습·산출물 집중. 2026.06-08 은 재직 구간 (4070 은 보유 지속 — 휴직 중 장애 시 현장 방문 필요라 GPU 작업은 8월 내 마감) | 학습 집중 기간 |
+| 2026.09-2027.02 | Career | **육아휴직** (2026-07-01 신청, 2026-07-28 승인 확정) — 구직 지원(정찰 포함) 안 함, 학습·산출물 집중. 2026.06-08 은 재직 구간 (4070 은 보유 지속 + 2026.09 자택 이전 확정 — 휴직 중에도 물리 접근 유지) | 학습 집중 기간 |
 | 2026.11 | Career | **분기 재평가 #1** (정찰 지원 없이 수행 — 입력: 스파이크 결과 / v1 결과 / 시장 신호 probe 반응 / 모델 갱신) | 중간 점검 |
 | 2027.01-02 | Stage 1 | **Hardware-Arm Stage 1 (2-3DOF 본 빌드, 스파이크로 디리스크)** + URDF + Sim 디지털 트윈 (v2 선행) | v2 하드웨어 기반 |
 | **2027.03~ (복직)** | **Career** | **본격 실지원 개시** (복직 직후, 트리거: v1 + 스파이크 확보 = "면접장에 들어갈 만큼") | 합격 |
@@ -195,7 +195,7 @@ gantt
 
 ### Phase 3: Detection + Depth → PC TensorRT + ROS2 노드 (supporting system work, ~2026.06 초)
 > **메시지**: Detection + Depth + PC TensorRT/ROS2 통합은 **VLA v1 wrapper 의 난도 낮은 리허설이자 재사용 스캐폴드**다. AMR ROS 5년차 기준 commodity 라 헤드라인 어필은 하지 않되, **보조 엔지니어링 증거 (supporting system work) 로 리포 내 공개**한다 — 공개 조건·재현 확인은 [`Roadmap/Phase 3.md`](./Roadmap/Phase%203.md) 참고.
-> **상태**: week1-8 완료, supporting 로그 커밋 완료 (2026.06). 빌드 스크립트 기준 재현 확인은 2026.08 내 수행 (4070 은 보유 지속이나 휴직 중 장애 시 현장 방문 필요 대비).
+> **상태**: week1-8 완료, supporting 로그 커밋 완료 (2026.06). 빌드 스크립트 기준 재현 확인은 4070 에서 직접 수행 (PC 는 2026.09 자택 이전 확정으로 시점 제약 없음).
 
 
 | 주차 | 내용 | 핵심 모델 | 우선순위 |
@@ -531,7 +531,7 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 
 
 #### 2026.08-12 (Phase 4.5 + 스파이크 — 구직 지원 없음)
-- [ ] (2026.08, 휴직 전 마감) **Phase 4.5 Section 0**: ManiSkill sim 구축 + zero-shot baseline + Docker 컨테이너화 + RunPod 이관 검증
+- [ ] (2026.08) **Phase 4.5 Section 0**: ManiSkill sim 구축 + zero-shot baseline + Docker 컨테이너화 + RunPod 이관 검증
 - [ ] (2026.09-11) **Phase 4.5 Sections 1-3 완료 → 산출물 v1.5 공개** (OpenVLA LoRA adaptation + before/after 정량 분석, 둘째 층 증거)
 - [ ] SO-101 모터 1-2개 + `feetech_ros2_driver` + ros2_control 로 각도 명령 1회 성공 (조립 전 선검증)
 - [ ] 스파이크 결과로 Stage 1 ROS2 통합 경로·일정 재산정 (터지면 즉시)
@@ -619,7 +619,7 @@ Hardware-Arm Stage 1 (2027.01-02): v2 선행 하드웨어 (자작 팔 본 빌드
 | 산출물 | 시점 | 내용 | 우선순위 |
 |---|---|---|---|
 | **v1** | 2026 하반기 | pretrained OpenVLA zero-shot 추론 → ROS2 wrapper → 카메라/bag dry-run (latency/throughput 측정, sim task 성공률은 v1.5) + RT-2/OpenVLA 정독 + adapter 추상화 (`RobotPolicy`) + action schema validation + 벤치마크 재현성 (안전 실행 스택은 v2). **레포 결과 기록만** (블로그 작성·1분 영상·외부 공개는 v2 로 이관) | **2 (기술 코어, v2 의 eval harness 기반)** |
-| **v1.5 (둘째 층 증거)** | 2026 하반기 (Section 0 은 2026.08 전진 — 로컬 GPU 단일 장애점 대비) | OpenVLA LoRA adaptation (sim 데이터) + zero-shot 대비 **before/after 성공률 정량 분석** (N회, 분산 포함) + 블로그 1편 (= Phase 4.5). 성공률 상승이 아닌 **설계-실행-분석** 이 기준 | **2 (둘째 층 adaptation 가점 카드)** |
+| **v1.5 (둘째 층 증거)** | 2026 하반기 (Section 0 은 2026.08 전진 — Sections 1-3 선행) | OpenVLA LoRA adaptation (sim 데이터) + zero-shot 대비 **before/after 성공률 정량 분석** (N회, 분산 포함) + 블로그 1편 (= Phase 4.5). 성공률 상승이 아닌 **설계-실행-분석** 이 기준 | **2 (둘째 층 adaptation 가점 카드)** |
 | **v2.5 (데이터 파이프라인 증거)** | 2027 상반기 (Stage 1 조립 후) | SO-101 리더-팔로워 teleop 으로 자작 데이터셋 수집 (100-500 episodes 는 실측 수집 속도 기준 재산정) → **LeRobot 포맷 + HF Hub 공개** + LeRobot ACT 1회 학습·결과 기록. Diffusion Policy 는 학습하지 않고 라잇 정리 (ACT-Diffusion-VLA 계보, 면접 방어용) | 2 (데이터 레짐·정책 계보 증거) |
 | **v2 강화 카드 (헤드라인)** | 2027 | 자작 팔 결합 + **sim-to-real gap 수치 측정·보고** (= Phase 6 디지털 트윈 + 자작 팔 Stage 1). v1.5(sim) 성공률이 gap 의 분모. LoRA 는 v1.5 로 이관. **v1 에서 이관된 RT-2/OpenVLA 블로그 + 1분 영상 + velog/LinkedIn 외부 공개를 여기서 첫 공개** | **1 (본인만 만드는 결정타, 첫 외부 공개)** |
 | **v3** | 2027 후반~ | 6DOF 확장 + Real-to-Sim-to-Real (= Phase 7): OpenVLA fork + ROS2 노드 래핑 + 안전 인터록 + latency 측정 + Sim/Real gap 영상 | 1 (차별화 정점) |
