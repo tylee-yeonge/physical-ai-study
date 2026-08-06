@@ -392,8 +392,13 @@ for name, value in action_stats.items():
 """
 실습 4: 학습 환경과 추론 환경의 조합을 대조하고 결정성을 확인
 """
-import torch
+import accelerate
+import bitsandbytes
 import numpy as np
+import timm
+import tokenizers
+import torch
+import transformers
 
 
 print("=" * 60)
@@ -402,7 +407,6 @@ print("=" * 60)
 
 
 # -- 4-1. 현재 추론 환경 버전 출력 (Phase 4 SETUP §7 매트릭스와 대조) --
-import transformers, tokenizers, timm, accelerate, bitsandbytes
 print("\n[4-1] 추론 환경")
 for module in [torch, transformers, tokenizers, timm, accelerate, bitsandbytes]:
     print(f"   {module.__name__}: {module.__version__}")
@@ -480,7 +484,9 @@ from PIL import Image
 
 # week0 실습 6 에서 고정한 값 -- 그대로 쓴다
 ENV_ID = "PickCube-v1"                             # <- week0 확정값
-STEP_CAP = 100                                     # <- week0 확정값
+MAX_EPISODE_STEPS = 200                            # <- week0 실습 4-3 확정값 (env step 예산)
+ACTION_REPEAT = 4                                  # <- week0 실습 4-3 확정값 (실효 5 Hz)
+POLICY_STEPS = MAX_EPISODE_STEPS // ACTION_REPEAT  # 정책 결정 횟수 = 50
 SMOKE_SEED = 500                                   # eval seed(week0 목록)와 겹치지 않는 값
 INSTRUCTION = "pick up the cube"                   # 같은 문구
 
@@ -496,13 +502,23 @@ print("=" * 60)
 
 
 # 모델 로드는 실습 2 와 동일 (같은 세션이면 재사용)
-env = gym.make(ENV_ID, obs_mode="rgb", control_mode="pd_ee_delta_pose")
+# 환경 생성 인자도 week0 실습 6 과 동일해야 한다 -- 하나라도 다르면 그것이 변인이다
+env = gym.make(
+    ENV_ID,
+    obs_mode="rgb",
+    control_mode="pd_ee_delta_pose",
+    render_mode="rgb_array",
+    sensor_configs=dict(width=224, height=224),    # week0 과 동일 (관측 카메라 native 224)
+    max_episode_steps=MAX_EPISODE_STEPS,
+)
 obs, info = env.reset(seed=SMOKE_SEED)
 prompt = f"In: What action should the robot take to {INSTRUCTION}?\nOut:"
 
 
-for step in range(STEP_CAP):
-    frame = np.asarray(obs["sensor_data"]["base_camera"]["rgb"])   # <- week0 확정 경로
+done = False
+for policy_step in range(POLICY_STEPS):
+    # 카메라 텐서는 cuda 에 있으므로 host 로 복사한 뒤 numpy 로 변환한다 (week0 확정 경로)
+    frame = obs["sensor_data"]["base_camera"]["rgb"].cpu().numpy()
     if frame.ndim == 4:
         frame = frame[0]
     image = Image.fromarray(frame.astype(np.uint8)).resize((224, 224))
@@ -516,13 +532,17 @@ for step in range(STEP_CAP):
         )
     # 변환은 week0 계약 표의 정변환을 그대로 쓴다 (한 곳에 둔 코드를 부른다)
     action = raw_action                            # <- week0 정변환 적용으로 교체
-    obs, reward, terminated, truncated, info = env.step(action)
-    if terminated or truncated or info.get("success", False):
+    for _ in range(ACTION_REPEAT):                 # 같은 action 을 4 step (week0 과 동일한 실효 주기)
+        obs, reward, terminated, truncated, info = env.step(action)
+        if terminated or truncated or bool(info["success"].item()):
+            done = True
+            break
+    if done:
         break
 
 
 env.close()
-print(f"\n루프 완주: {step + 1} 스텝. 예외 없음")
+print(f"\n루프 완주: 정책 결정 {policy_step + 1}회. 예외 없음")
 print("성공/실패는 판정하지 않는다 -- week5 의 N회 측정에서 다룬다")
 ```
 

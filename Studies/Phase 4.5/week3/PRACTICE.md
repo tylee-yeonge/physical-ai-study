@@ -256,6 +256,7 @@ grep -n "batch_size\|grad_accumulation_steps\|max_steps\|save_steps\|lora_rank\|
 # 3-2. VRAM 을 백그라운드로 기록 (피크를 놓치지 않기 위해)
 nvidia-smi --query-gpu=memory.used --format=csv -l 5 > /workspace/probe_vram.csv &
 SMI_PID=$!
+trap 'kill $SMI_PID 2>/dev/null' EXIT           # 학습이 실패로 중단돼도 기록 프로세스를 정리
 
 
 # 3-3. probe 실행 -- 스텝 수를 아주 작게 둔다
@@ -284,6 +285,7 @@ sort -t, -k1 -n /workspace/probe_vram.csv | tail -1   # 피크 값 확인
 - 3-1 을 먼저 하는 이유: 인자 이름이 버전마다 다르다. 이름을 확인하지 않고 실행하면 "인식되지 않은 인자" 로 죽거나, 더 나쁘게는 **조용히 기본값이 쓰인다.** `max_steps` 가 무시되면 20만 스텝짜리 학습이 시작된다.
 - `nvidia-smi ... -l 5 &`: 5초마다 GPU 메모리 사용량을 파일에 적는다. 끝의 `&` 는 백그라운드 실행이다. 학습이 끝난 뒤에 `nvidia-smi` 를 한 번 찍으면 **피크는 이미 지나가 있으므로** 계속 기록해야 한다.
 - `SMI_PID=$!`: 방금 백그라운드로 띄운 프로세스의 번호를 저장한다. 나중에 `kill $SMI_PID` 로 그 기록만 정확히 끝낸다.
+- `trap '...' EXIT`: 스크립트가 어느 지점에서 끝나든(오류 포함) 지정한 명령을 실행한다. `set -e` 로 학습이 중간에 죽어도 백그라운드 `nvidia-smi` 가 고아로 남지 않게 한다.
 - `time`: 뒤따르는 명령의 소요 시간을 재서 마지막에 출력한다. 이 값에서 모델 로딩 시간을 분리해야 스텝당 시간이 나온다 (로딩은 수 분 걸리고 스텝 수에 비례하지 않는다).
 - `--run_root_dir /workspace/volume/runs`: 결과가 **volume 에 떨어지도록** 지정한다. pod 기본 디스크에 저장하면 회수 시 사라진다 (README §5).
 - `sort -t, -k1 -n ... | tail -1`: csv 를 숫자로 정렬해 마지막 줄, 즉 최댓값을 본다.

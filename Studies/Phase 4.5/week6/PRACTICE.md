@@ -112,6 +112,7 @@ cat ../week5/outputs/stat_method.md         # 적용할 방법을 먼저 다시 
 실습 1-2: week5 원시 결과를 집계하고 구간·짝지은 비교를 계산
 """
 import json
+import matplotlib.pyplot as plt                  # 실습 3 의 그림 저장용
 import numpy as np
 from scipy import stats                          # 이항 구간·검정용
 
@@ -263,9 +264,6 @@ for records, name in [(zero_records, "zero"), (ft_records, "ft")]:
 
 ```python
 # -- 3-1. 단계별 성공 수 막대 (짧게, inline) --
-import matplotlib.pyplot as plt
-
-
 x = np.arange(len(STAGES))                       # 단계 위치
 zero_values = [summary[s]["zero"][0] for s in STAGES]
 ft_values = [summary[s]["ft"][0] for s in STAGES]

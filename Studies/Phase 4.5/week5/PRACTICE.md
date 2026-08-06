@@ -114,7 +114,7 @@ sim 패키지가 이 venv 에 없으면 week0 실습 1-6 의 판단(합칠지 �
 
 | 블록 | 하는 일 | 바뀌면 안 되는가 |
 |---|---|---|
-| 고정 상수 | 환경 id, step cap, instruction, 카메라 키, 이미지 크기, N | **절대 고정** |
+| 고정 상수 | 환경 id, step 예산, action repeat, instruction, 카메라 키, 이미지 크기, N | **절대 고정** |
 | 인자 | 모델 경로, `unnorm_key`, 출력 경로 | 이 셋만 바뀐다 |
 | 모델 적재 | week4 와 동일한 4-bit 설정 | 고정 |
 | seed 목록 | week0 산출물에서 읽고 규칙으로 확장 | 두 측정에서 동일 |
@@ -145,10 +145,12 @@ from transformers import AutoModelForVision2Seq, AutoProcessor, BitsAndBytesConf
 
 # ===== 고정 상수: 두 측정에서 절대 바뀌지 않는다 (week0/week4 확정값) =====
 ENV_ID = "PickCube-v1"                             # week0 sim_facts.md
-STEP_CAP = 100                                     # week0 sim_facts.md
+MAX_EPISODE_STEPS = 200                            # week0 실습 4-3 확정값 (env step 예산)
+ACTION_REPEAT = 4                                  # week0 실습 4-3 확정값 (실효 5 Hz)
+POLICY_STEPS = MAX_EPISODE_STEPS // ACTION_REPEAT  # 정책 결정 횟수 = 50
 INSTRUCTION = "pick up the cube"                   # week0-1 동일 문구
 CAMERA_KEY = ("sensor_data", "base_camera", "rgb")  # week0 확정 경로
-IMAGE_SIZE = 224                                   # OpenVLA 입력 크기
+IMAGE_SIZE = 224                                   # OpenVLA 입력 크기 (관측 카메라도 224 native)
 N_EPISODES = 100                                   # 실습 2 에서 확정한 값
 
 
@@ -183,6 +185,7 @@ prompt = f"In: What action should the robot take to {INSTRUCTION}?\nOut:"
 with open("../week0/outputs/zeroshot_baseline.json") as f:
     base_seeds = json.load(f)["seeds"]             # week0 이 쓴 목록
 # N 을 늘렸으므로 목록을 확장한다. 규칙을 코드로 고정해 두 측정이 같은 목록을 쓰게 한다.
+# 주의: week1 개발에 쓴 seed (DUMP_SEED=100 등) 는 확장 목록에 넣지 않는다 -- 미리 들여다본 문제다
 eval_seeds = list(range(N_EPISODES))               # <- 실습 2 에서 정한 확장 규칙으로 교체
 assert set(base_seeds) <= set(eval_seeds), "week0 목록이 새 목록에 포함되어야 한다"
 # 학습 seed 와의 겹침 검사 (week1 collect_meta.json 의 train_seeds)
@@ -195,11 +198,20 @@ assert not (set(eval_seeds) & train_seeds), "eval seed 에 학습 seed 가 섞�
 commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"],
                         capture_output=True, text=True).stdout.strip()
 meta = {"model": args.model, "unnorm_key": args.unnorm_key, "env_id": ENV_ID,
-        "step_cap": STEP_CAP, "instruction": INSTRUCTION, "n_episodes": N_EPISODES,
+        "max_episode_steps": MAX_EPISODE_STEPS, "action_repeat": ACTION_REPEAT,
+        "instruction": INSTRUCTION, "n_episodes": N_EPISODES,
         "quant": "nf4+dq+fp16", "commit": commit}
 
 
-env = gym.make(ENV_ID, obs_mode="rgb", control_mode="pd_ee_delta_pose")
+# 환경 생성 인자는 week0 실습 6 과 동일 -- 하나라도 다르면 before/after 가 성립하지 않는다
+env = gym.make(
+    ENV_ID,
+    obs_mode="rgb",
+    control_mode="pd_ee_delta_pose",
+    render_mode="rgb_array",
+    sensor_configs=dict(width=224, height=224),    # week0 과 동일 (관측 카메라 native 224)
+    max_episode_steps=MAX_EPISODE_STEPS,
+)
 
 
 # ===== episode 루프: 결과를 seed 단위로 즉시 append (중단 대비 + 짝지은 비교) =====
@@ -209,8 +221,10 @@ with open(args.out, "w") as out_file:
         obs, info = env.reset(seed=seed)
         stages = {"reached": False, "grasped": False, "lifted": False, "placed": False}
         reason = "step_cap"                        # 종료 사유 기본값
-        for step in range(STEP_CAP):
-            frame = np.asarray(obs[CAMERA_KEY[0]][CAMERA_KEY[1]][CAMERA_KEY[2]])
+        done = False
+        for policy_step in range(POLICY_STEPS):
+            # 카메라 텐서는 cuda 에 있으므로 host 로 복사한 뒤 numpy 로 변환한다
+            frame = obs[CAMERA_KEY[0]][CAMERA_KEY[1]][CAMERA_KEY[2]].cpu().numpy()
             if frame.ndim == 4:                    # 배치 차원 제거
                 frame = frame[0]
             image = Image.fromarray(frame.astype(np.uint8)).resize((IMAGE_SIZE, IMAGE_SIZE))
@@ -223,22 +237,28 @@ with open(args.out, "w") as out_file:
                     do_sample=False,               # 결정적 출력
                 )
             action = raw_action                    # <- week0 정변환 적용으로 교체
-            obs, reward, terminated, truncated, info = env.step(action)
+            for _ in range(ACTION_REPEAT):         # 같은 action 을 4 step (week0 과 동일한 실효 주기)
+                obs, reward, terminated, truncated, info = env.step(action)
 
-            # 부분 도달률: week0 실습 6 에서 정한 판정식과 임계값을 그대로 쓴다
-            # stages["reached"] |= <week0 판정식>
-            # stages["grasped"] |= <week0 판정식>
-            # stages["lifted"]  |= <week0 판정식>
-            stages["placed"] |= bool(info.get("success", False))
+                # 부분 도달률: week0 실습 6 에서 정한 판정식과 임계값을 그대로 쓴다
+                # stages["reached"] |= <week0 판정식>
+                # stages["grasped"] |= <week0 판정식>
+                # stages["lifted"]  |= <week0 판정식>
+                stages["placed"] |= bool(info["success"].item())
 
-            if stages["placed"]:
-                reason = "success"
+                if stages["placed"]:
+                    reason = "success"
+                    done = True
+                    break
+                if terminated or truncated:
+                    reason = "env_end"
+                    done = True
+                    break
+            if done:
                 break
-            if terminated or truncated:
-                reason = "env_end"
-                break
 
-        record = {"seed": seed, "steps": step + 1, "reason": reason, **stages}
+        # steps 는 정책 결정 횟수다 (env step 은 이 값 x ACTION_REPEAT 이하) -- week6 실습 2 가 이 키를 읽는다
+        record = {"seed": seed, "steps": policy_step + 1, "reason": reason, **stages}
         out_file.write(json.dumps(record) + "\n")  # 즉시 기록 (버퍼에 쌓아 두지 않는다)
         out_file.flush()
         print(f"   seed{seed:03d}: {record}")
@@ -259,6 +279,7 @@ print(f"\n완료: {args.out}")
 - 두 번째 `assert`: eval seed 에 학습 seed 가 섞이지 않았는지 본다. week1 에서 이미 확인했지만, N 을 늘려 목록을 확장했으므로 **확장 과정에서 새로 들어온 seed 가 학습 범위와 겹칠 수 있다.** 그래서 여기서 다시 검사한다.
 - `out_file.flush()`: 파이썬은 효율을 위해 출력을 버퍼에 모아 두고 나중에 쓴다. `flush()` 는 지금 바로 쓰게 한다. 이 한 줄이 중단 시 결과 보존의 실체다.
 - `{"_meta": meta}` 를 첫 줄에: 결과 파일이 조건을 스스로 들고 있게 한다. 실습 5 의 조건 대조가 이 줄을 읽는다.
+- `ACTION_REPEAT` 루프: week0 실습 6 과 같은 실효 주기(5 Hz)를 만든다. 이것이 빠지면 정책이 학습 주기보다 4배 빠르게 명령을 내는 셈이 되어, 측정 조건이 week0 과 달라지고 실습 4 의 week0 재현 검사도 통과할 수 없다.
 - `action = raw_action` 자리: week0 정변환을 적용해야 한다. 그대로 두면 물리량이 정규화 없이 env 로 들어간다.
 
 
@@ -291,12 +312,12 @@ print(f"\n완료: {args.out}")
 실습 2: 실행 시간을 계산해 N 을 결정 (계산만 -- 실행 없음)
 """
 LATENCY_MS = 300          # Measurements/openvla-rtx4070-int4 Block 1 실측 (본인 수치로 교체)
-STEP_CAP = 100            # week0 확정값
-OVERHEAD_MS = 20          # sim step + 이미지 변환 몫 (probe 로 확인해 교체)
+POLICY_STEPS = 50         # week0 확정값 (env step 200 / action repeat 4) -- 추론은 episode 당 최대 50회
+OVERHEAD_MS = 20          # sim step 4회 + 이미지 변환 몫 (probe 로 확인해 교체)
 
 
-per_step_s = (LATENCY_MS + OVERHEAD_MS) / 1000       # 스텝 1회 소요
-per_episode_s = per_step_s * STEP_CAP                # 최악(조기 종료 없음) 기준
+per_step_s = (LATENCY_MS + OVERHEAD_MS) / 1000       # 정책 결정 1회 소요
+per_episode_s = per_step_s * POLICY_STEPS            # 최악(조기 종료 없음) 기준
 print(f"스텝당 {per_step_s:.3f}s / episode 최대 {per_episode_s:.1f}s")
 
 

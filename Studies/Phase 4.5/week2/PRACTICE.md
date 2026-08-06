@@ -243,7 +243,7 @@ class ManiskillPickcube(tfds.core.GeneratorBasedBuilder):
                 "steps": tfds.features.Dataset({
                     "observation": tfds.features.FeaturesDict({
                         "image": tfds.features.Image(       # 관측 이미지
-                            shape=(224, 224, 3),            # <- week0 확정 해상도로 교체
+                            shape=(224, 224, 3),            # week0-1 확정 해상도 (관측 카메라 224x224)
                             dtype=np.uint8,
                             encoding_format="png",
                         ),
@@ -558,6 +558,7 @@ print("   instruction:", batch.get("language_instruction", "<키 확인 필요>"
 """
 import glob
 import json
+import os
 
 
 print("=" * 60)
@@ -566,7 +567,8 @@ print("=" * 60)
 
 
 # -- 5-1. 통계 캐시 파일 찾기 (빌더 데이터 디렉터리에 저장된다) --
-candidates = glob.glob("/root/tensorflow_datasets/maniskill_pickcube/**/*.json", recursive=True)
+candidates = glob.glob(os.path.expanduser("~/tensorflow_datasets/maniskill_pickcube/**/*.json"),
+                       recursive=True)
 for path in candidates:                         # 후보를 모두 출력해 어느 것이 통계인지 확인
     print("  ", path)
 
@@ -591,10 +593,10 @@ print("\n[5-3] 정규화 마스크:", mask)
 
 # -- 5-4. 캐시 신선도 확인 --
 # 데이터를 재생성했다면 통계도 다시 계산돼야 한다. 파일 수정 시각을 데이터와 비교한다.
-import os                                       # (이 실습에서만 쓰는 확인용)
 print("\n[5-4] 시각 비교")
 print("   통계 파일:", os.path.getmtime(STATS_PATH))
-data_files = glob.glob("/root/tensorflow_datasets/maniskill_pickcube/**/*.tfrecord*", recursive=True)
+data_files = glob.glob(os.path.expanduser("~/tensorflow_datasets/maniskill_pickcube/**/*.tfrecord*"),
+                       recursive=True)
 if data_files:
     print("   데이터 파일:", max(os.path.getmtime(p) for p in data_files))
 # 데이터가 통계보다 새로우면 캐시를 지우고 다시 만든다
