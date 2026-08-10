@@ -58,6 +58,13 @@ flowchart TD
 | **레지스트리** | "이름 -> 설정/함수" 딕셔너리. 이름이 없으면 로더가 데이터셋을 못 찾는다 |
 | **mixture** | 학습에 쓸 데이터셋 조합과 비율. 단일 데이터셋도 조합으로 등록한다 |
 | **`grep`** | 파일에서 문자열을 찾는 셸 명령. `-n` 은 줄 번호, `-A/-B` 는 앞뒤 줄 함께 출력 |
+| **editable 설치** | `pip install -e` 로 넣는 방식. 패키지를 복사하지 않고 원본 폴더를 가리키는 링크만 만든다. 원본을 고치면 즉시 반영된다 |
+| **`--no-deps`** | pip 옵션. 그 패키지가 요구하는 다른 패키지들을 함께 설치하지 않는다 |
+| **`--dry-run`** | pip 옵션. 설치했다면 어떻게 됐을지만 알려 주고 아무것도 바꾸지 않는다 |
+| **import 체인** | `import A` 를 만나면 A 가 import 하는 B 를, B 가 import 하는 C 를 줄줄이 따라가는 사슬 |
+| **자리표시자** | 스켈레톤 코드에서 "여기는 네가 채워라" 를 표시하려고 넣어 둔 가짜 값. `dataset = None` 이 그것 |
+| **로더** | 디스크의 데이터셋을 열어 학습에 쓸 형태로 꺼내 주는 코드 뭉치. 여기서는 `RLDSDataset` |
+| **배치** | 로더가 한 번에 내놓는 데이터 한 덩어리 |
 | **patch / diff** | 코드 변경 내용만 뽑아낸 텍스트. 다른 곳에서 같은 변경을 재현하는 데 쓴다 |
 | **기준 커밋** | 내가 수정을 얹은 원본 코드의 버전 식별자. 패치는 이 버전 위에서만 정확히 적용된다 |
 | **정규화 마스크** | 차원별로 정규화 적용 여부를 적은 True/False 배열 |
@@ -89,6 +96,9 @@ flowchart TD
 변환 도구는 TensorFlow 계열이라 sim venv 와 섞지 않는다. 섞으면 의존성 해결 과정에서 torch 버전이 갈릴 수 있고, 그러면 week0-1 환경이 깨진다.
 
 
+### 1단계: venv 와 리포
+
+
 ```bash
 cd "/workspace/study/physical-ai-study/Studies/Phase 4.5"
 python3 -m venv .venv-rlds                                     # 변환·등록·로드 검증용
@@ -102,7 +112,106 @@ cd week2
 ```
 
 
-> 설치 중 겪은 문제를 `outputs/env_rlds.md` 에 남긴다. 이 환경이 Section 0 후반 Docker 이미지의 학습 측 명세가 된다 — 그때 "무엇을 어떤 순서로 설치했더니 됐다" 를 다시 떠올릴 필요가 없게 된다.
+`week2/requirements.txt` 는 **openvla 를 설치하지 않는다.** 파일 안의 주석이 그렇게 적어 뒀다 — openvla 본체는 리포 자신의 지침을 따라야 하기 때문이다. 이 명령만 돌리고 `import prismatic` 을 시도하면 `ModuleNotFoundError` 가 난다. 정상이다. 2단계가 남아 있다.
+
+
+### 2단계: openvla 설치 — 리포 지침이 통하는지 먼저 확인
+
+
+openvla 리포는 **editable 설치**로 넣는다. 패키지를 복사하지 않고 원본 폴더를 가리키는 링크만 만드는 방식이라, `~/openvla` 의 파일을 고치면 즉시 반영된다. 실습 3 에서 등록 3파일을 고칠 것이므로 이 방식이어야 한다.
+
+
+설치하기 전에 **리포가 요구하는 버전 핀을 현재 python 으로 설치할 수 있는지** 확인한다. 리포 README 는 특정 python 버전을 전제로 쓰여 있는데, 내 환경이 그것과 다르면 핀이 통째로 안 맞을 수 있다.
+
+
+```bash
+python -V                                        # 내 python 버전
+sed -n '/^dependencies/,/^]/p' ~/openvla/pyproject.toml   # 리포가 요구하는 핀 목록
+
+# 의심스러운 핀을 하나씩 시험 설치해 본다 (--dry-run 은 실제로 설치하지 않는다)
+pip install --dry-run --no-deps "tensorflow==2.15.0"
+```
+
+
+`--dry-run` 은 "설치했다면 어떻게 됐을지" 만 알려 주고 아무것도 바꾸지 않는다. 여기서 `No matching distribution found` 가 나오면 **그 핀은 내 python 버전에 휠이 없다**는 뜻이다.
+
+
+| 확인 결과 | 다음 행동 |
+|---|---|
+| 모든 핀이 설치 가능 | 리포 README 절차를 그대로 따른다 (`pip install -e ~/openvla`) |
+| 일부 핀이 설치 불가 | 아래 3단계로 간다 |
+
+
+### 3단계: 핀이 안 맞을 때 — 본체만 얹고 의존성을 직접 채운다
+
+
+```bash
+pip install -e ~/openvla --no-deps
+```
+
+
+`--no-deps` 는 pyproject 의 의존성 해석을 통째로 건너뛴다. 설치 불가한 핀에서 막히지 않고 `prismatic` 패키지만 import 경로에 올릴 수 있다.
+
+
+대신 필요한 패키지가 하나도 안 깔린 상태가 되므로, **import 에러가 지목하는 대로 하나씩 채운다.**
+
+
+```bash
+python -c "from prismatic.vla.datasets import RLDSDataset; print('ok')"
+```
+
+
+`ModuleNotFoundError: No module named 'X'` 가 나오면 X 를 설치하고 같은 명령을 다시 돌린다. `ok` 가 나올 때까지 반복한다.
+
+
+**목록을 미리 받아 한 번에 설치하지 마라.** 하나씩 밟아야 "데이터로더가 실제로 요구하는 것" 과 "모델 학습에만 필요한 것" 의 경계가 손에 남는다. 그 경계가 Section 0 후반 Docker 이미지를 얇게 만드는 근거다.
+
+
+경로 분류는 트레이스백의 **마지막에서 두 번째 줄**이 알려 준다 — 그 모듈을 요구한 파일이 거기 찍힌다.
+
+
+| 요구한 파일 | 분류 |
+|---|---|
+| `prismatic/models/...` | 모델 경로. import 통과용인 경우가 많다 |
+| `prismatic/vla/datasets/rlds/...` | 데이터 경로. 실제로 데이터를 읽는 코드가 쓴다 |
+
+
+`prismatic/__init__.py:1` 이 `from .models import ...` 로 시작하므로 **데이터로더만 쓰더라도 모델 쪽 import 의존은 전부 채워야 한다.** 위 분류는 그 안에서 무엇이 실행에 관여하는지를 나누기 위한 것이다.
+
+
+반복 중에 판단이 필요한 지점이 셋 나온다.
+
+
+| 지점 | 판단 기준 |
+|---|---|
+| 버전 핀을 지킬까 | pyproject 에 핀이 없으면 최신. 핀이 있으면 일단 지킨다. 단 **그 패키지가 데이터 파이프라인 코드 경로에 있는가**를 함께 본다 |
+| pip 이 다른 패키지를 내리려 할 때 | 핀 걸린 패키지가 상한을 요구하면 그쪽이 이긴다. 정상이므로 막지 말고, 내려간 버전을 기록만 한다 |
+| numpy 와 얽힐 때 | 여기서 실제로 값을 판정하는 도구는 numpy 다. 정작 쓰지 않는 패키지의 핀 때문에 numpy 를 흔들어야 한다면, 그 핀을 버리는 쪽이 낫지 않은지 따져 본다 |
+
+
+설치할 때마다 pip 이 아래 블록을 낸다. **실패가 아니다.**
+
+
+```
+ERROR: pip's dependency resolver does not currently take into account all the packages
+       that are installed. ...
+openvla 0.0.3 requires torch==2.2.0, which is not installed.
+```
+
+
+`--no-deps` 로 얹었으니 pyproject 의 요구가 미충족 상태이고, pip 은 그것을 매번 재보고할 뿐이다. **같은 출력에 `Successfully installed ...` 가 있으면 그 설치는 성공한 것이다.** 목록은 한 라운드마다 줄어든다.
+
+
+### 통과 기준
+
+
+```bash
+python -c "from prismatic.vla.datasets import RLDSDataset; print('ok')"
+pip freeze > outputs/pip_freeze_rlds.txt
+```
+
+
+> 설치 중 겪은 문제를 `outputs/env_rlds.md` 에 남긴다. 최소한 이 넷을 적는다 — (1) 못 지킨 핀과 그 pip 에러 원문, (2) `--no-deps` 를 택했다면 그 대가로 upstream 과 달라진 항목, (3) 실제로 설치한 패키지와 데이터/모델 경로 분류, (4) 버전을 고를 때 내린 판단과 그 근거. 이 환경이 Section 0 후반 Docker 이미지의 학습 측 명세가 된다 — 그때 "무엇을 어떤 순서로 설치했더니 됐다" 를 다시 떠올릴 필요가 없게 된다.
 
 
 ---
@@ -514,6 +623,171 @@ print("   instruction:", batch.get("language_instruction", "<키 확인 필요>"
 ```
 
 
+### 4-1 을 채우는 법
+
+
+`~/openvla/vla-scripts/finetune.py` 에서 데이터셋을 만드는 부분을 찾는다.
+
+
+```bash
+grep -n "RLDSDataset\|make_dataset" ~/openvla/vla-scripts/finetune.py
+```
+
+
+나온 호출을 그대로 베낄 수는 없다. 거기 쓰인 `cfg` 와 `vla` 는 학습 스크립트 안에만 존재하기 때문이다.
+
+
+| 이름 | 정체 | 검증 스크립트에 없는 이유 |
+|---|---|---|
+| `cfg` | `FinetuneConfig` 설정 묶음 | 학습 실행 시 명령줄 인자로 만들어진다 |
+| `vla` | 이미 GPU 에 올라간 7B 모델 | 모델을 안 띄우므로 `vla.module.config.image_sizes` 를 읽을 수 없다 |
+
+
+**호출의 모양은 베끼되, 이 둘에서 나오는 값은 직접 정해 넣는다.** 진짜 정의는 `prismatic/vla/datasets/datasets.py` 의 `RLDSDataset.__init__` 이다. 인자가 8개인데 앞의 4개는 기본값이 없어 반드시 줘야 하고, 뒤의 4개는 기본값이 있다.
+
+
+**우선 앞의 4개만 채우고 나머지는 건드리지 않는다.** 한 번에 하나씩 확인하기 위해서다. 뒤의 4개까지 같이 바꾸면 문제가 생겼을 때 어느 것 때문인지 못 가린다.
+
+
+| 인자 | 무슨 뜻인가 | 정할 때 답할 것 |
+|---|---|---|
+| `data_root_dir` | 데이터셋들이 들어 있는 **상위 폴더**. 특정 데이터셋 폴더가 아니다 | `tfds build` 결과가 어디 떨어졌나? 거기서 `<데이터셋명>/<버전>/` 을 뺀 윗단이 답이다. 문자열로 줄지 `Path` 로 줄지는 `oxe/materialize.py` 가 이 값을 어떻게 쓰는지 보고 판단 |
+| 2번째 위치 인자 | 받는 쪽 파라미터 이름은 `data_mix` 다 | 아래 "2번째 인자의 함정" |
+| `batch_transform` | 로더가 배치를 내놓기 직전에 통과시키는 함수 | 아래 "batch_transform 판단". 이 실습에서 가장 중요한 결정 |
+| `resize_resolution` | 이미지를 몇 픽셀로 맞출지. `(가로, 세로)` 튜플 | 데이터를 몇 픽셀로 구웠는지 `features.json` 에서 확인한 값. 리사이즈가 아무 일도 안 하게 두는 것이 목적이다 — 검사 대상을 건드리지 않기 위해 |
+
+
+**2번째 인자의 함정**
+
+
+`finetune.py` 가 넘기는 변수 이름은 `dataset_name` 인데 받는 쪽 이름은 `data_mix` 다. 왜 어긋나는지는 `datasets.py` 의 `__init__` 안 분기가 알려 준다.
+
+
+```python
+if self.data_mix in OXE_NAMED_MIXTURES:
+    mixture_spec = OXE_NAMED_MIXTURES[self.data_mix]
+else:
+    # mixture 가 아니면 데이터셋 하나로 간주해 비율 1.0 짜리 조합을 만든다
+    mixture_spec = [(self.data_mix, 1.0)]
+```
+
+
+실습 3 에서 두 이름을 다 등록했다 — `mixtures.py` 의 mixture 이름과 `configs.py` 의 데이터셋 이름. **둘 중 아무거나 넣어도 돌아가지만 다른 분기를 탄다.** 어느 쪽을 넣을지, 그 선택이 무엇을 검증하고 무엇을 검증 안 된 채 남기는지 답하라. 힌트: week6 에서 학습을 돌릴 때 `--data_mix` 에 넣을 이름은 어느 쪽인가.
+
+
+**batch_transform 판단**
+
+
+이 자리에 무엇을 넣느냐가 실습 전체의 성패를 가른다. 세 가지를 순서대로 확인한다.
+
+
+첫째, **로더가 이 자리의 물건에게 요구하는 것.** `RLDSDataset.__iter__` 를 읽으면 원본 배치를 꺼내 `self.batch_transform(...)` 에 넣고 그 결과를 내놓는 것이 전부다. 즉 "배치를 받아 무언가를 돌려주는 호출 가능 객체" 면 만족한다. 파라미터에 타입이 `RLDSBatchTransform` 이라 적혀 있어도 파이썬은 검사하지 않는다.
+
+
+둘째, **`RLDSBatchTransform` 이 실제로 하는 일.** `datasets.py` 의 `RLDSBatchTransform.__call__` 을 읽어 보면 배치를 모델이 먹을 형태로 가공한 뒤 `pixel_values`, `input_ids`, `labels`, `dataset_name` 넷만 돌려준다. **`action` 이 없다.** 중간에 `action_tokenizer` 로 action 숫자를 토큰으로 바꿔 `labels` 안에 섞었기 때문이다.
+
+
+셋째, **그래서 4-3 이 성립하는가.**
+
+
+| 검사 항목 | 필요한 것 | 가공 후 남아 있나 |
+|---|---|---|
+| (b) action 7차원 | 원본 action 배열 | 없다 |
+| (c) 앞 6차원 범위 | 원본 action 값 | 없다 |
+| (d) gripper 원값 | 원본 action 마지막 차원 | 없다 |
+| (e) instruction 문자열 | 문자열 그대로 | 없다 (토큰으로 바뀜) |
+
+
+넷 다 불가능해진다. 게다가 이 함수를 만들려면 7B 모델을 받아야 한다. 그러니 이 자리에는 **받은 것을 그대로 돌려주는 것**을 넣어 파이프라인을 다 태운 원본 배치를 손에 넣는다.
+
+
+**이 선택의 대가를 반드시 인식하고 넘어가라.** 이렇게 하면 검증 범위가 "가공 직전까지" 로 제한된다. 학습 때 실제로 모델에 들어가는 데이터는 가공을 한 번 더 거치므로, 그 구간은 검증되지 않은 채 남는다. 잘못이 아니라 의도된 범위 제한이다 — 그 구간은 모델이 필요해 week6 에서 다룬다. **다만 이 사실을 `load_check.log` 에 한 줄로 적어 둬야** week6 에서 용의자 목록을 정확히 좁힐 수 있다.
+
+
+**4-1 통과 기준**
+
+
+객체 생성 직후 `len(dataset)` 과 `dataset.dataset_statistics` 를 찍어 예외 없이 나오는지 본다. **첫 실행은 오래 걸린다** — 통계 캐시가 없어 로더가 데이터셋 전체를 훑으며 차원별 통계를 계산하기 때문이다. 멈춘 것이 아니니 기다린다.
+
+
+```bash
+ls ~/tensorflow_datasets/<데이터셋명>/<버전>/dataset_statistics_*.json
+```
+
+
+이 파일이 생겨야 한다. 없으면 `~/.cache/orca/` 도 본다 (쓰기 실패 시 폴백 경로). **이 파일이 실습 5 의 실측 재료다.**
+
+
+**막히면**: 여기서 나는 에러는 대개 실습 3 등록 내용과 실제 데이터의 불일치다. 에러에 나온 키 이름을 셋과 대조한다 — `configs.py` 의 내 등록 항목, 빌드 결과의 `features.json`, 빌더 소스. 셋이 일치해야 하고 어긋난 곳이 범인이다.
+
+
+### 4-2 를 채우는 법
+
+
+`next(iter(dataset))` 은 "반복을 시작해 첫 번째 것 하나만 꺼내라" 는 뜻이다. 학습처럼 전부 돌리지 않고 하나만 본다.
+
+
+스켈레톤의 `pixel_values`, `actions` 는 **자리표시자이므로 대부분 틀린 이름이다.** 실제 이름의 근거는 `RLDSBatchTransform.__call__` 의 첫 세 줄이다 — 그 함수가 원본 배치에서 값을 꺼낼 때 쓰는 키가 진짜 이름이다.
+
+
+```python
+dataset_name, action = rlds_batch["dataset_name"], rlds_batch["action"][0]
+img = Image.fromarray(rlds_batch["observation"]["image_primary"][0])
+lang = rlds_batch["task"]["language_instruction"].decode().lower()
+```
+
+
+출력과 대조하며 답할 것.
+
+
+1. 이미지는 최상위인가 `observation` 안 중첩인가?
+2. 이미지 키가 빌더에 쓴 이름이 아니라 `image_primary` 인 이유는? (`configs.py` 에서 `"primary"` 슬롯에 매핑한 것과 연결된다)
+3. instruction 이 `task` 라는 하위 묶음에 있는 이유는? `.decode()` 가 붙은 것은 그 값이 무슨 타입이라는 뜻인가?
+
+
+### 4-3 의 shape 판정
+
+
+검사 코드를 채우기 전에 `action.shape` 을 찍어 본다. `(7,)` 이 아니면 앞에 축이 하나 더 붙어 있다는 뜻이다. 근거는 위 세 줄에서 **action 과 이미지 양쪽에 똑같이 `[0]` 이 붙는다**는 사실이다 — 두 항목에 같은 축이 붙어 있고 학습 코드는 첫 번째만 쓴다.
+
+
+그 축의 정체는 로더 설정에 있다.
+
+
+```bash
+grep -n "window_size\|future_action_window_size" ~/openvla/prismatic/vla/datasets/datasets.py
+```
+
+
+| 이름 | 뜻 |
+|---|---|
+| **window** | 과거 몇 프레임을 함께 볼 것인가 |
+| **future action window** | 미래 몇 스텝의 action 을 함께 예측할 것인가 |
+
+
+둘은 의미가 완전히 다르다. 답할 것.
+
+
+1. 붙어 있는 축은 둘 중 어느 쪽인가?
+2. `reshape(-1, 7)` 은 그 축을 눌러 **서로 다른 시점의 action 을 한 통에 섞는다.** (c) 는 차원별 값 범위를 보는 검사인데, 시점이 섞이면 판정이 망가지는가 무해한가?
+3. (f) 의 "한 배치에 여러 episode 가 섞이는가" 를 이 shape 만으로 답할 수 있는가, 다른 근거가 필요한가?
+
+
+2번의 답에 따라 `reshape` 을 그대로 둘지 바꿀지가 정해진다.
+
+
+### gripper 만 규칙이 다른 이유
+
+
+검사 코드를 채우기 전에 이것을 이해하고 넘어간다. action 인코딩을 `EEF_POS` 로 등록하면 로더가 `oxe/materialize.py` 에서 `action_normalization_mask = [True]*6 + [False]` 를 자동으로 만든다. 마지막 `False` 가 "7번째 차원은 정규화하지 마라" 는 뜻이다.
+
+
+이유는 물리적이다. 앞 6개는 **상대값**(얼마나 움직여라)이라 크기를 조정해도 뜻이 유지되지만, gripper 는 **절대값**(열어라 / 닫아라)이라 정규화하면 의미가 깨진다.
+
+
+즉 실습 3 에서 인코딩 한 줄을 적은 것이 파이프라인 전체의 정규화 동작을 정했다. (d) 검사는 그 한 줄이 의도대로 작동했는지를 보는 것이다.
+
+
 검사 코드의 판정 논리를 풀어 둔다.
 
 
@@ -532,7 +806,32 @@ print("   instruction:", batch.get("language_instruction", "<키 확인 필요>"
 | instruction 일치 | 빌더의 `INSTRUCTION` 상수 확인 |
 
 
-검사 출력을 `outputs/load_check.log` 로 저장한다. 이 로그가 "학습 전에 데이터 연결을 확인했다" 의 증거다. week6 의 배제 표에서 파일 경로째로 인용된다.
+검사 출력을 `outputs/load_check.log` 로 저장한다.
+
+
+```bash
+python practice_load_check.py 2>&1 | tee outputs/load_check.log
+```
+
+
+`2>&1` 은 에러 출력도 같은 곳으로 보내라는 뜻이고, `tee` 는 화면에 보여 주면서 동시에 파일에도 쓰라는 뜻이다.
+
+
+이 로그가 "학습 전에 데이터 연결을 확인했다" 의 증거다. week6 의 배제 표에서 파일 경로째로 인용된다. **로그 안에 검증 범위를 한 줄로 적어 둔다** — `batch_transform` 을 원본 통과로 두었으므로 이 로그가 증명하는 것은 가공 직전까지이고, 가공 구간은 week6 의 몫이다.
+
+
+**완료 게이트**
+
+
+로그가 나온 것으로 끝내지 않는다. 다음 세 질문에 문서를 안 보고 답할 수 있어야 이 실습이 닫힌다.
+
+
+1. gripper 차원만 정규화를 안 받는다. 그 결정을 내린 코드는 어느 파일 몇 번째 줄이고, 내가 실습 3 에서 무엇을 적었기 때문에 그렇게 됐는가?
+2. 내가 `batch_transform` 자리에 넣은 것과 `finetune.py` 가 넣는 것은 다르다. 그래서 학습 때는 이 로그가 본 것과 다른 데이터가 모델에 들어간다. 그 차이는 정확히 무엇이고, 그 구간은 무엇으로 검증할 것인가?
+3. 통계 캐시 파일 이름의 해시는 무엇으로부터 계산되는가? 실습 3 의 변환 함수를 한 글자 고치면 그 파일은 어떻게 되는가?
+
+
+2번이 이번 주에서 가장 값어치 있다. 검증의 **경계**를 아는 것이 검증 자체보다 중요하다 — 경계를 모르면 week6 에서 이 로그를 근거로 잘못된 배제를 하게 된다.
 
 
 ---
