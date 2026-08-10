@@ -40,7 +40,7 @@ show(batch)
 print("검사")
 # image = np.asarray()
 image = np.asarray(batch["observation"]["image_primary"])
-print(f"imgae shape={image.shape} dtype={image.dtype}")
+print(f"image shape={image.shape} dtype={image.dtype}")
 
 action = np.asarray(batch["action"])
 print(f"action shape={action.shape}")
