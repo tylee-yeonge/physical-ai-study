@@ -9,13 +9,35 @@
 
 ---
 
-## 실행 보드 — 지금 할 일 (순차, 2026.07-09)
+## 실행 보드 — 지금 할 일 (순차, 2026.08-11)
 
 > 위에서 아래로 순서대로 진행한다. **일상 체크는 이 절에서만 한다** — 아래 Phase 1·2 의 체크박스는 기록·통과 기준의 원본이며, Phase 2 는 대응 항목 완료 시점에 한 번에 닫는다.
 > 전제: 4070 (우분투 PC) 은 반납하지 않기로 확정 (2026-07-20, 결정 #5) 됐고 **2026.09 자택 이전이 확정**됐다 — 휴직 기간에도 물리 접근이 유지되므로 **GPU 작업의 8월 마감은 없다.** 배치 기준은 물리 접근이 아니라 가용 시간과 선후 의존이다. 가용: 재직 구간(-2026.08) 평일 저녁 약 2h (주 8-10h).
 > 월별 총부하·트랙 충돌 개관은 [2026 하반기 실행 가이드](2026-07-28-year-end-execution-guide.md) 참조 (체크는 이 절에서만).
 
-### 지금 (7월)
+### 항목별 학습 자료 경로 (Studies/)
+
+아래 실행 순서와 같은 순서다. 경로가 "없음" 인 항목은 학습 자료가 아니라 측정 기록·인프라·코드 작업이다.
+
+| 구간 | # | 항목 | Studies 경로 |
+|---|---|---|---|
+| 완료 | 4 | Section 0 전반 (sim + zero-shot baseline) | `Studies/Phase 4.5/week0/` |
+| 지금 | 7 | 8월 체크포인트 | `Studies/Phase 4/notes.md` 진행 원칙 |
+| 8월 | 15 | Sections 1-3 | `Studies/Phase 4.5/week3` -> `week4` -> `week5` -> `week6` |
+| 8월 | 6 | Section 0 후반 (Docker + RunPod + LoRA 실측) | `Studies/Phase 4.5/week3/` (4-bit 안착만 `week4/`) |
+| 9월 | 5 | v1 확장 구현 | 없음 — 기준은 `Studies/Phase 4/week8`-`week11`, 코드는 `ros2_ws/src/vla_inference/` |
+| 9월 | 8 | 재측정 + Block 3 | 측정 절차 원본 `Studies/Phase 4/week6/`, 기록은 `Measurements/openvla-rtx4070-int4/` |
+| 9월 | 8-1 | Block 4 | 없음 — `Measurements/.../findings.md` §4.4 (새 측정 없음) |
+| 9월 | 9 | 자가 검증 10문항 | 없음 — 문항은 `.private/reviews/` |
+| 10-11월 | 10 | Phase 3 재현 확인 | `Studies/Phase 3/week8/` |
+| 10-11월 | 11 | Rerun 1장 | `Studies/Phase 4/week12/` (노드는 `vla_node/rerun_logger.py`) |
+| 10-11월 | 12 | 원격 운용 점검 + Jetson | 없음 (인프라) |
+| 10-11월 | - | 하드웨어 스파이크 (2-3주) | `Studies/Hardware-Arm/` |
+| 12월 | - | Hardware-Arm Stage 1 본 빌드 착수 | `Studies/Hardware-Arm/` |
+| 10-11월 | 7-1 | NVIDIA SO-101 코스 Phase A | 없음 — `docs/research/isaac-sim-so101-course.md` §4.1 |
+| 파편 | 13 | 정독 잔여 | `Studies/Phase 4/week2`·`week4`·`week5`·`week6` |
+
+### 완료
 
 - [x] 1. **Block 1 — int4 메모리 산수** (2-3h, GPU 사용). 손계산 14GB → int4 예측 → 실측 대조 → 차이 원인. 결과는 [findings.md §4.1](../../../Measurements/openvla-rtx4070-int4/findings.md) 에 본인 문장으로 (Task 2-1)
   - 진행 (2026-07-10): 측정 완료 — `memory_breakdown.py` 실행, 수치는 methodology §4 에 기입 (context 0.19 / 로드 후 4.74 / 추론 후 5.05 GB, dtype 분해 포함). 부수 발견: 실측 5.05 GB 는 SETUP.md §1.3 의 "약 7GB (논문 실측)" 과 불일치 — 간극 해석은 Step 4, 문구 갱신은 Task 2-2 수치 갱신에서 처리
@@ -24,46 +46,65 @@
   - 진행 (2026-07-28, 커밋 `b2131ee`): findings §4.2 **Step 1-4 완료** — 직관 가정 체크, 선행 정독 (LLM.int8 §2·§3·§4 / QLoRA §3 재독 / bitsandbytes 0.49.2 소스 대조), Step 3 경로 대조표, Step 4 성공률 58.1% 인과 경로
   - 완료 (2026-07-28): Step 5 + 완료 판정 표 4행 작성 → §4.2 5개 Step 전부 닫힘. **단 Step 5·판정 표는 `(by claude)` 작성이다** (본인 요청, findings 내 표기됨) — 산출물은 완성됐으나 "답변 가능" 이라는 통과 기준의 판정은 **#9 자가 검증 10문항으로 이관**한다
   - 부수 산출 2건: (1) **A5000 의 bf16 Hz 가 논문에 없음**을 확인 → int4/bf16 비율은 미확인 종결, Figure 5 캡션의 정성 진술로 대체. (2) **소재 정정** — 속도 수치는 OpenVLA §5.4 본문이고 Table 2 는 성공률·메모리만 담는다. int4 3 Hz 를 §1 에 병기하고 §1 미해소 항목을 해소 표시로 갱신
-- [ ] 3. **JD 5-10개 정독 + 격차 매핑 1페이지** — 짧은 블록에 병행
+- [x] 4. **Phase 4.5 Section 0 전반: ManiSkill sim 구축 + zero-shot baseline** — 상세: [Roadmap/Phase 4.5.md](../../../Roadmap/Phase%204.5.md) Section 0
+  - 완료 (2026-08-03, `Studies/Phase 4.5/week0/`). sim 구축 -> 하네스 검증 (motion planning 상한 대조) -> zero-shot baseline 측정까지 닫혔다. 산출물: [`Measurements/openvla-maniskill-zeroshot/`](../../../Measurements/openvla-maniskill-zeroshot/)
 
-### 8월 초
+### 지금 (8월 중순)
 
-- [ ] 4. **Phase 4.5 Section 0 전반: ManiSkill sim 구축 + zero-shot baseline** — 상세: [Roadmap/Phase 4.5.md](../../../Roadmap/Phase%204.5.md) Section 0
-  - 미착수. 추정 20-30h — 주 8-10h 기준 2-3주 연속 블록이 필요하다. **실제 마감은 8월 말이 아니라 Section 1 착수 (9월 중순) 전 zero-shot baseline 확보**인데, 8월 2주차 착수 기준 가용이 약 24-30h 로 여유가 0 이고, 9월 초는 휴직 적응기라 가용이 줄 수 있다 (실행 가이드 §2) — **즉시 착수가 안전하다**
-- [ ] 5. **v1 확장 구현: `RobotPolicy` adapter + action schema validation + 벤치마크 재현 스크립트** (8-12h 추정) — #6 Docker 화 전에 코드 변경 완료. 상세: [Roadmap/Phase 4.md](../../../Roadmap/Phase%204.md) v1 체크리스트
+- [x] 7. **8월 체크포인트** — 결론 3건 (2026-08-12). 상세: [notes.md](../../../Studies/Phase%204/notes.md) 진행 원칙
+  - **git author 재작성: 실행 안 함으로 확정.** 이 레포 비공개 유지 + 공개 산출물 vla-lab 분리로 재작성 사유가 없다. 대체 조치로 두 레포의 커밋 신원을 `tylee-yeonge <tylee.yeonge@gmail.com>` 으로 통일했다 (레포 로컬 설정). **잔여 주의**: 작업 컨테이너의 `/root/.gitconfig` 는 읽기 전용이라 전역 설정이 회사 이메일로 남아 있다 — 새 레포를 만들 때마다 `git config user.email` 을 1회 걸어야 한다
+  - **정독 잠정치: 20-30h 를 유지하되 `week2` 실측으로 확정한다.** 실적 기록이 없어 지금 숫자를 바꿀 근거가 없다. 배치는 12월 몰림에서 파편 시간 (Phase 4.5 실행 대기) 으로 옮긴다
+  - **스파이크: 2026.09 구매 / 2026.10 실행으로 확정.** 9월은 휴직 적응기 + 자택 이전이 겹쳐 2-3주 하드웨어 블록에 부적합하고, Phase 4.5 를 8월에 완주하면 원안 10월의 충돌 사유 (Section 2-3 과 병행) 가 사라진다. 10월 실행이면 재평가 #1 (2026.11) 입력 타이밍도 맞는다
+
+### 8월 잔여 — Phase 4.5 완주 (단일 트랙, 끊지 않는다)
+
+- [ ] 15. **Phase 4.5 Sections 1-3** — 자료 `Studies/Phase 4.5/week1` - `week6`. week3 -> week4 -> week5 -> week6 순서 고정 (각 week 이 앞 week 산출물을 입력으로 받는다)
+  - 진행 (2026-08-11): Section 1 완료 — week1 (expert 데이터 수집 + action 변환 왕복 검증) / week2 (RLDS 변환 + 로더 등록 + 정규화 점검). week3 (RunPod LoRA) 진입 대기
+  - **조기 경보**: 8월 3주차까지 week3 의 20스텝 probe 가 안 돌면 8월 완주 전제를 그 자리에서 버리고 9-11월 배치를 다시 짠다. 9월은 휴직 적응기 + 자택 이전이 겹쳐 흡수 여력이 가장 낮다
 - [ ] 6. **Section 0 후반: Docker 컨테이너화 → RunPod 기동·재현 확인 + LoRA 1사이클 실측 + fine-tuned 4-bit 의 4070 안착 확인** (8-12h + 4-bit 안착 1-2h 추정. 마지막 항목만 4070 필요)
-  - 컨테이너화 범위는 **학습 측만**이다 (eval 은 로컬 유지 — 결정 #5). 8월에 닫을 수 있는 것은 Docker 이미지 + RunPod 기동 재현까지다. LoRA 1사이클 실측은 학습 데이터 (Section 1 산출) 가 입력이라 학습 자료 기준 week3 에서, 4-bit 안착은 그 머지 체크포인트가 필요해 week4 에서 닫힌다 — 이 두 항목의 마감은 달력 (8월) 이 아니라 **week3 (LoRA 본 학습) 진입 전**이다
-- [ ] 7. **8월 체크포인트**: git author (filter-repo) 실행 여부 결정 + 정독 잠정치 갱신 + 하드웨어 스파이크 시기 확정. 상세: [notes.md](../../../Studies/Phase%204/notes.md) 진행 원칙 (자택 이전 안건은 2026.09 이전 확정으로 닫힘)
-- [ ] 7-1. **NVIDIA SO-101 sim-to-real 코스 Phase A** (10-16h, GPU 로컬 불요 — RunPod headless). 이론 4개 모듈 + 워크숍 코드 읽기 + GR00T post-training·sim 평가 1회. 비용 약 1만-2.5만원. 상세: [`docs/research/isaac-sim-so101-course.md`](../../research/isaac-sim-so101-course.md) §4.1
-  - 선행 의존이 없어 언제 해도 되지만 **8월 부하와 경쟁한다** (#4 Section 0 20-30h, #8 4-6h 와 같은 달). 과밀하면 9월 이후로 이월해도 손실이 없다 — 팔·물리 접근이 모두 불요다
-  - 목적은 코스 완주가 아니라 **발화 가능 수준 확보**다. 완주는 실물 팔이 필요해 Phase B (Stage 1, 2027.01-02) 로 간다
+  - 컨테이너화 범위는 **학습 측만**이다 (eval 은 로컬 유지 — 결정 #5). 별도 작업이 아니라 week3 (Docker·RunPod·LoRA 1사이클) 과 week4 (4-bit 안착) 안에서 닫힌다
+
+### 9월 (휴직 개시)
+
+- [ ] 14. LinkedIn 헤드라인 교체 (승인 확정 2026-07-28 — 선행 조건 해소, 9월 1주 집행) + 현직자 커피챗 개시
+- [ ] 3. **JD 5-10개 정독 + 격차 매핑 1페이지** — 짧은 블록에 병행. 분기 재평가 #1 (2026.11) 의 입력이라 10월까지는 닫는다
+- [ ] 5. **v1 확장 구현: `RobotPolicy` adapter + action schema validation + 벤치마크 재현 스크립트** (8-12h 추정). 상세: [Roadmap/Phase 4.md](../../../Roadmap/Phase%204.md) v1 체크리스트
+  - **#8 재측정보다 먼저**다 — 구간 분해 계측이 `inference.py` 를 건드리므로, 리팩터를 나중에 하면 재측정 수치의 유효성을 다시 확인해야 한다
+  - 세 번째 항목 (벤치마크 재현 스크립트) 은 #8 의 methodology §3 잔여 2항목 (notebook -> `.py`, `summary.csv`) 과 같은 산출물이다 (Phase 4.md v1 체크리스트가 `Measurements/openvla-rtx4070-int4/` 연동을 명시). 한 번에 만든다
 - [ ] 8. **재측정 + Block 3** (4-6h, **GPU 필수**). 예측 → 측정 → 오차 설명. 구간 분해 (전처리 / vision encoder / prefill / decode 7토큰 / un-norm) + [methodology.md](../../../Measurements/openvla-rtx4070-int4/methodology.md) §3 미기록 4항목 (구간 분해·실카메라 입력·notebook→`.py`·`summary.csv`) + SETUP §1.3·README Evidence 표 갱신 → 커밋 (Task 2-2 Step 1·3·4)
-  - 배치 근거: GPU 물리 접근이 필요한 항목 중 가장 큰 덩어리다. **vla-lab 첫 발행의 트리거**이기도 해서 (career-sync Task 6) 8월 2-3주에 두고, 그 뒤 발행이 9월에 걸리도록 한다
+  - **vla-lab 첫 발행의 트리거**다 (career-sync Task 6) — 완료 즉시 발행에 착수한다. 연말 기준 외부에 보이는 2건 중 하나가 여기에 걸려 있다
   - Block 2 에서 인수한 과제: Step 5 가 "roofline 상한 약 4배 vs 실제 근사 동등" 의 간극 배분을 여기로 넘겼다. **decode 실측 (토큰당 ms) 을 대역폭 하한과 대조**해 (a) 가 어디까지 유효했는지 판정하고, vision encoder·prefill·decode 의 ms 비중으로 간극을 배분한다 (findings §4.2 Step 5 오차 설명 → §4.3 Step 3)
 - [ ] 8-1. **Block 4 — 3.33 Hz 조건부 판정** (2-3h, **GPU 불요**). 제어 계층 표 + task 유형별 판정 + action chunking. 입력은 Block 3 의 구간 분해 결과와 공개 문헌뿐 (findings §4.4 골격: "새 측정 없음") → 커밋 (Task 2-2 Step 2)
-  - GPU 가 필요 없다. 8월 4주에 붙이는 것이 자연스럽지만, 과밀 시 #9 와 함께 9월로 이월해도 안전하다
+  - 입력이 Block 3 의 구간 분해 결과라 #8 다음이다
 - [ ] 9. **자가 검증 10문항** — 문서 참조 없이 전부 답변 (문항: 검토 보고서 §2.6). 막히면 해당 Block 재수행 (Task 2-3)
   - 선후: **#8-1 다음**이다. 10문항 중 "병목 구간"·"Jetson 이식 예측" 은 Block 3, "task 경계" 는 Block 4 산출물이라 그 전에 치면 답이 없다
-  - 9월로 밀려도 안전하다. 자택 이전 확정으로 휴직 중에도 재측정이 가능하므로, "측정 기반 문항이 막혔을 때 GPU 로 돌아갈 수 없다" 는 리스크가 없다
 
-### 8월 중
+> 9월에는 하드웨어 작업을 넣지 않는다. SO-101 키트 **구매만** 진행한다 — 판매자 확인 4항목 ([Hardware-Arm.md](../../../Roadmap/Hardware-Arm.md) 주문 전 확인 절) 문의 -> 답변 -> 발주 (리드타임 3일). 조립·검증은 10월 스파이크에서 한다.
+
+### 10-11월
 
 - [ ] 10. **Phase 3 재현 확인** (GPU 필수) — TensorRT 엔진 재빌드 + week8 통합 노드 1회 구동, 결과 기록 (Task 2-4)
 - [ ] 11. **Rerun 스크린샷/gif 1장** → README Evidence 절 삽입 + `Measurements/.../plots/` 보존 → 커밋 (Task 2-4)
 - [ ] 12. GPU 필요 잔여분 (#6 의 4-bit 확인, #8, #10-11) 0건 확인 + **4070 원격 운용 전환 점검** — BIOS 전원 복구 자동 부팅 (Restore on AC Power Loss), 원격 접속 경로 이중화 (SSH + 오버레이 VPN 등), 커널 패닉 자동 리부트 (`kernel.panic` sysctl), (선택) 원격 전원 리셋 수단. 재부팅으로 안 풀리는 하드웨어 장애는 커버 불가 — 그 계층의 보험은 #6 의 RunPod 재현
   - Tailscale 경유 Isaac Sim 원격 GUI 검증은 **드롭한다** — PC 가 자택에 있으므로 GUI 는 로컬에서 띄운다. 출장지 원격 사용이 실제로 필요해질 때 수행한다 (약 30분, 절차는 [Hardware-Arm.md](../../../Roadmap/Hardware-Arm.md) Stage 1 실행 머신 절)
   - [ ] **Jetson Orin Nano CUDA 스택 확인** (약 30분) — 256GB SSD + Ubuntu 22.04 는 설치 완료 상태이므로 재플래시는 불요 전망. 확인할 것은 **CUDA·cuDNN 동반 여부**뿐이다 (`cat /etc/nv_tegra_release`, `dpkg -l nvidia-jetpack`) — 없으면 PyTorch GPU 가 안 붙고, JetPack 재설치에는 **x86 Ubuntu 호스트 (= 이 PC) 가 필요**하다. 맥북은 SDK Manager 호스트가 될 수 없다. PC 가 자택에 있으므로 시점 제약은 없고, Jetson 이 v3 배포 타깃으로 실제 필요해질 때 수행한다
+- [ ] **하드웨어 스파이크** (2-3주, 2026.10 확정) — 조립 전 드라이버 선검증. Feetech 버스 -> `feetech_ros2_driver` -> ros2_control -> 최소 URDF RViz 확인. 자료: `Studies/Hardware-Arm/`, 상세: [Hardware-Arm.md](../../../Roadmap/Hardware-Arm.md) 스파이크 절
+  - 이 구간의 최우선 항목이다. 결과가 분기 재평가 #1 (2026.11) 의 입력이고, 1단계에서 막히면 Stage 1 의 ROS2 드라이버 계획을 2026 년 안에 재산정해야 한다
+- [ ] 7-1. **NVIDIA SO-101 sim-to-real 코스 Phase A** (10-16h, GPU 로컬 불요 — RunPod headless). 이론 4개 모듈 + 워크숍 코드 읽기 + GR00T post-training·sim 평가 1회. 비용 약 1만-2.5만원. 상세: [`docs/research/isaac-sim-so101-course.md`](../../research/isaac-sim-so101-course.md) §4.1
+  - 선행 의존이 없어 언제 해도 된다. 목적은 코스 완주가 아니라 **발화 가능 수준 확보**다 — 완주는 실물 팔이 필요해 Phase B (Stage 1, 2027.01-02) 로 간다
 
-### 남는 시간에 (이월 가능 — GPU 작업과 충돌하면 무조건 뒤로)
+### 12월
 
-- [ ] 13. **정독 week2·4·5·6** (20-30h, GPU 무관 — 휴직 중으로 밀려도 안전). 상세: [notes.md](../../../Studies/Phase%204/notes.md) 순서 6
+- [ ] **Hardware-Arm Stage 1 본 빌드 착수** (2026.12-2027.01) — 조립 (리더+팔로워 6DOF) + 손목 카메라 장착 + URDF + ROS2 드라이버 셋업. 자료: `Studies/Hardware-Arm/`, 상세: [Hardware-Arm.md](../../../Roadmap/Hardware-Arm.md) Stage 1 절
+  - 착수 조건 2개 — 10월 스파이크 3단계 통과 + 11월 말 이월 잔량 약 15h 이하. 깨지면 원안 (2027.01-02) 으로 되돌리고 12월은 버퍼로 쓴다 (실행 가이드 §6.2)
+  - 준비는 11월 말에 — Stage 1 가이드 재확인 + 작업 공간 정리. 부품은 9월 일괄 구매분으로 충당된다
 
-### 휴직 개시 (2026.09) 직후
+### 파편 시간 (이월 가능 — 실행 대기 시간에 넣는다)
 
-- [ ] 14. LinkedIn 헤드라인 교체 (승인 확정 2026-07-28 — 선행 조건 해소, 9월 1주 집행) + 현직자 커피챗 개시
-- [ ] 15. Phase 4.5 Sections 1-3 착수 (2026.09-11)
+- [ ] 13. **정독 week2·4·5·6** (20-30h, GPU 무관). 상세: [notes.md](../../../Studies/Phase%204/notes.md) 순서 6
+  - week3 의 LoRA 학습 대기와 week5 의 eval N회 대기가 이 항목의 자리다. Phase 4 완료 기준 ("아키텍처를 막힘없이 설명") 을 닫는 항목이라 12월까지 미루면 v1 이 미완으로 남는다
 
-> **8월 배치 판정**: 자택 이전 확정으로 GPU 물리 접근 마감이 없어졌으므로, 8월에 둘 항목은 **선후 의존과 가용 시간**으로만 정한다. 재직 구간(-2026.08)이 주 8-10h 로 가장 빡빡하므로 시간이 많이 드는 항목(#8, Section 0)을 앞에 두고, 나머지는 9월 이월을 허용한다.
+> **배치 판정**: 메인 학습 트랙 (Phase 4.5) 을 8월 안에 단일 트랙으로 완주시키고, 증거·인프라 항목 (#3·#5·#8·#8-1·#9·#10·#11·#12·#7-1) 을 9-11월에 둔다. 근거 셋 — (1) week3-6 은 앞 week 산출물을 입력으로 받는 체인이라 끊었다 붙이는 비용이 크고 스택도 다르다 (v1 int4 vs RLDS·학습), (2) #8 을 8월로 당겨 얻는 것은 vla-lab 발행이 9월 초냐 중순이냐 차이뿐이다, (3) 8월 예산 (30-35h) 은 8/11 시점에 이미 소진됐다. 9-11월 잔여 추정 57-87h 는 예산 (90-105h) 안에 들어가되 스파이크 2-3주 (10월) 와 재평가 1주 (11월) 가 얹히므로 여유는 없다. 10월이 가장 빡빡한 달이 되므로, 9월에 #5·#8 라인을 밀리지 않게 끝내는 것이 이 배치의 성립 조건이다. 12월은 Hardware-Arm Stage 1 착수로 배정돼 이월 흡수처가 아니다.
 > Docker·RunPod (#6) 이 필요한 이유는 **LoRA 가 24GB+ 를 요구해 로컬 4070 으로 학습이 불가능하기 때문**이다 (장애 대비가 아니다). RunPod 은 Isaac Sim GUI 를 대체하지 못하므로 (UDP 미지원) Sim GUI 계열은 로컬 전용이다.
 
 ### 문서 지도 (뭘 어디서 보나)
@@ -72,6 +113,7 @@
 |---|---|
 | **본 문서 §실행 보드** | 지금 할 일 순서 — **유일한 일상 체크 보드** |
 | `docs/superpowers/plans/2026-07-28-year-end-execution-guide.md` | 2026.08-12 월별 배치·부하·트랙 충돌 개관 (체크박스 없음 — 배치를 다시 짤 때만 열기) |
+| `docs/superpowers/plans/2026-08-12-year-2027-execution-guide.md` | 2027 구간별 배치·게이트·산출물 소비 시점 개관 (체크박스 없음 — 재평가 #1 이후 갱신) |
 | `README.md` | 전체 로드맵·타임라인·실측 결과 (외부에 보여주는 얼굴) |
 | `Roadmap/Phase *.md` | Phase 별 상세 계획 (착수할 때만 열기) |
 | `Studies/Phase 4/notes.md` | Phase 4 학습 노트 + 정독 체크 |
@@ -628,7 +670,7 @@ git commit -m "docs: add memory and quantization analysis to openvla findings"
 - Modify: `Measurements/openvla-rtx4070-int4/methodology.md`, `findings.md`, `summary.csv`, `raw/`, `scripts/`
 - Modify (수치 갱신): `Studies/Phase 4/SETUP.md` §1.3, `README.md` 실측 결과 절
 
-> **시점 배치 (2026-07-28 정리)**: 두 Step 의 GPU 필요 여부가 다르므로 실행 보드에서 분리했다 — Step 1 은 #8 (8월 2-3주, GPU 필수), Step 2 는 #8-1 (GPU 불요, 9월 이월 가능). Step 3-4 는 Step 1 과 같은 세션에서 처리한다 (수치 갱신 대상이 Block 3 산출물이므로). 월별 배치 개관은 [실행 가이드](2026-07-28-year-end-execution-guide.md) §3.2 참조.
+> **시점 배치**: 두 Step 의 GPU 필요 여부가 다르므로 실행 보드에서 분리했다 — Step 1 은 #8 (GPU 필수), Step 2 는 #8-1 (GPU 불요). 둘 다 9월이고 Step 2 는 Step 1 의 구간 분해 결과를 입력으로 받아 순서가 고정이다. Step 3-4 는 Step 1 과 같은 세션에서 처리한다 (수치 갱신 대상이 Block 3 산출물이므로). 월별 배치 개관은 [실행 가이드](2026-07-28-year-end-execution-guide.md) §3.3 참조.
 
 - [ ] **Step 1: Block 3 — 300ms 해부 (4-6h, GPU 필수)**
 
