@@ -69,8 +69,8 @@
 | **활성값**(activation) | 순전파 중 각 층이 내놓은 중간 결과. 역전파에 필요해서 메모리에 남는다 |
 | **rank** | LoRA 보조 행렬의 크기를 정하는 값. 크면 표현력이 늘고 메모리·시간도 늘어난다 |
 | **batch size** | 한 번의 순전파·역전파에 함께 넣는 샘플 수 |
-| **grad accumulation** | 여러 스텝의 그래디언트를 모아 한 번만 갱신하는 기법. 유효 배치를 유지하며 메모리를 줄인다 |
-| **유효 배치**(effective batch) | `batch size x grad accumulation`. 실제 갱신 1회가 몇 샘플을 반영하는지 |
+| **grad accumulation** | 여러 스텝의 그래디언트를 모아 한 번만 갱신하는 기법. `grad_accumulation_steps` 로 몇 번 모을지 직접 지정한다 |
+| **유효 배치**(effective batch) | 갱신 1회가 반영하는 샘플 수. `batch size x grad accumulation x GPU 수` 로 계산되어 나오는 값이며 직접 지정하는 설정값이 아니다 |
 | **OOM**(out of memory) | GPU 메모리 부족으로 실행이 죽는 것 |
 | **step / max_steps** | 학습 갱신 1회 / 총 몇 회 갱신할지의 상한 |
 | **probe** | 본 실행 전에 아주 짧게 돌려 시간·메모리를 재는 예비 실행 |
@@ -147,6 +147,9 @@ upstream 이 제시하는 수치도 이 구조와 맞는다 — 배치 16 에서
 
 
 숫자로 보면 이해가 빠르다. `batch=16` 은 16개를 한 번에 GPU 에 올려 한 번 갱신한다. `batch=1, accumulation=16` 은 1개씩 16번 올려 그래디언트를 더해 두고 마지막에 한 번 갱신한다. **갱신 1회가 반영하는 샘플 수(유효 배치 16)는 같고, 동시에 GPU 에 올라가는 양은 1/16 이다.** 대신 순전파·역전파를 16번 하므로 시간이 늘어난다.
+
+
+두 용어는 서로 다른 것을 가리킨다. **grad accumulation 은 기법**이고 그 횟수를 정하는 설정값이 있는 반면, **유효 배치는 그 결과로 계산되어 나오는 수치**다. 유효 배치는 `batch size x grad accumulation x GPU 수` 라는 곱이고 accumulation 은 그 곱의 인수 하나일 뿐이다 (여기서는 GPU 1개이므로 마지막 인수는 1). 위 두 조합의 유효 배치가 똑같이 16 인 것도 곱이 같기 때문이다. 그래서 "grad accumulation 을 16 으로 준다" 는 맞는 말이지만 "유효 배치를 16 으로 준다" 는 엄밀히 틀린 말이다 — 유효 배치는 지정하는 값이 아니라 batch 와 accumulation 을 곱해 맞추는 값이다.
 
 
 따라서 24GB 에서는 `batch_size` 를 낮추고 `grad_accumulation_steps` 를 올려 유효 배치를 맞추는 조합을 찾는 것이 실습 3 의 일이다. **메모리는 batch 가, 시간은 유효 배치가 결정한다.**
