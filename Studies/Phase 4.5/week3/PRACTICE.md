@@ -55,6 +55,11 @@ flowchart TD
 | **`FROM`** | 베이스 이미지 지정. 여기서는 CUDA·python·torch 가 이미 들어 있는 이미지를 쓴다 |
 | **`ARG` / `COPY` / `RUN`** | 빌드 인자 / 파일 복사 / 명령 실행. Dockerfile 의 기본 명령들 |
 | **patch 적용** | week2 에서 뽑은 코드 변경을 다른 환경에서 같은 모양으로 다시 적용하는 것 |
+| **핀**(pin) | 패키지 버전을 `==` 로 못 박는 것. 리포의 `pyproject.toml` 이 정해 둔다 |
+| **전이 의존성** | 내가 설치한 패키지가 다시 끌고 오는 패키지. 핀이 없으면 설치 시점의 최신이 들어온다 |
+| **protobuf** | 구글의 데이터 직렬화 라이브러리. TensorFlow 계열이 내부적으로 쓰며, 버전이 어긋나면 import 단계에서 깨진다 |
+| **flash-attn** | 어텐션 연산을 메모리·속도 면에서 최적화한 구현. 학습 스크립트가 기본으로 켜 두므로 없으면 모델 로드에서 막힌다 |
+| **레이어**(layer) | Dockerfile 의 `RUN`/`COPY` 한 줄이 만드는 이미지 조각. 덧쌓기라서 뒤에서 지워도 앞 조각의 용량은 남는다 |
 | **pod** | RunPod 에서 빌린 GPU 인스턴스 1대 |
 | **network volume** | pod 와 분리된 저장소. pod 를 지워도 남는다 |
 | **`rsync`** | 파일 동기화 도구. `-P` 를 주면 끊긴 지점부터 이어받는다 |
@@ -74,9 +79,11 @@ flowchart TD
 
 | 위치 | 하는 일 |
 |---|---|
-| 로컬 `week3/` | Dockerfile 작성, 이미지 빌드, 전송 명령 실행, 기록(`outputs/`) |
+| 호스트 셸의 `week3/` | Dockerfile 작성, 이미지 빌드, 전송 명령 실행, 기록(`outputs/`) |
 | pod 안 `/workspace/openvla` | probe / 본 학습 실행 |
 | pod 의 `/workspace/volume/` | 체크포인트·로그 착지점 (network volume 마운트 경로) |
+
+**"호스트 셸" 을 강조하는 이유**: 이 레포를 편집하는 VS Code 세션은 그 자체가 컨테이너 안이다. 컨테이너 안에는 docker 명령이 없고 docker 데몬 소켓도 붙어 있지 않아 `docker build` 가 아예 되지 않는다. `docker` 를 설치해도 소용없다 — 명령을 받아 줄 데몬이 컨테이너 밖에 있기 때문이다. 이미지 빌드는 컨테이너를 띄운 **호스트 머신의 셸**에서 한다. 레포는 호스트 디렉터리를 그대로 붙인 것이라 파일을 옮길 필요는 없고, 경로만 호스트 기준으로 바꾸면 된다.
 
 
 ---
@@ -87,7 +94,7 @@ flowchart TD
 
 **무엇을 하나**: week2 의 환경 구성과 등록 패치를 Dockerfile 로 적어 이미지를 굽고, 등록이 실제로 들어갔는지 컨테이너 안에서 확인한다.
 **왜 하나**: 클라우드에서 같은 환경을 다시 만들어야 하는데, 손으로 설치하면 어딘가 달라진다. 그리고 로컬 PC 에 문제가 생겨도 학습을 계속할 수 있는 상태를 남기는 것이 두 번째 목적이다.
-**끝나면 손에 남는 것**: `openvla-train:v1` 이미지 + `outputs/image_build.md` (베이스 태그, 기준 커밋, 겪은 문제, 이미지 크기).
+**끝나면 손에 남는 것**: `openvla-train:v1` 이미지 + `outputs/image_build.md` (베이스 태그, 기준 커밋, 핀을 깬 패키지와 사유, 버전 목록, 이미지 크기, 겪은 문제).
 
 
 **파일명**: `Dockerfile`
@@ -98,7 +105,8 @@ week2 의 `.venv-rlds` 구성과 등록 패치를 이미지로 고정한다. 목
 
 ```dockerfile
 # 학습 측 이미지. sim 은 넣지 않는다 (Vulkan 요구로 난이도가 다르고, eval 은 로컬에서 돈다)
-# 베이스 태그는 week2 outputs/env_rlds.md 에 기록한 CUDA·python·torch 조합과 맞춘다
+# 베이스의 python 은 openvla 핀에 휠이 있는 버전이어야 한다.
+# week2 outputs/env_rlds.md 가 기록했듯 tensorflow==2.15.0 은 python 3.12 용 휠이 없다 -- 3.11 이면 핀이 그대로 선다
 FROM pytorch/pytorch:2.4.0-cuda12.1-cudnn9-devel
 
 # 시스템 의존성 (git 은 리포 클론과 패치 적용에 필요)
@@ -108,8 +116,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /workspace
 
-# OpenVLA 본체. 기준 커밋을 고정한다 -- week2 outputs/openvla_base_commit.txt 의 해시
-ARG OPENVLA_COMMIT=<week2 에서 기록한 해시로 교체>
+# OpenVLA 본체. 기준 커밋을 고정한다 -- week2 outputs/openvla_base_commit.txt 에 기록한 해시
+ARG OPENVLA_COMMIT=c8f03f48af692657d3060c19588038c7220e9af9
 RUN git clone https://github.com/openvla/openvla.git && \
     cd openvla && git checkout ${OPENVLA_COMMIT}
 
@@ -117,8 +125,23 @@ RUN git clone https://github.com/openvla/openvla.git && \
 COPY openvla_registration.patch /tmp/
 RUN cd openvla && git apply /tmp/openvla_registration.patch
 
-# 의존성 설치 (리포 지침을 따른다. 정확한 명령은 openvla README 확인)
-RUN cd openvla && pip install -e .
+# 의존성 설치 + 데이터 경로 패키지를 week2 가 검증한 조합으로 덮어쓰기.
+# 덮어쓰는 이유: openvla 의 tensorflow==2.15.0 핀이 protobuf 를 4.x 로 묶는데,
+#   핀이 없는 전이 의존성 tensorflow-metadata 는 최신이 들어와 protobuf 5.27+ 를 요구한다.
+#   그대로 두면 빌드는 성공하고 import 에서 깨진다. 값의 출처는 week2 outputs/pip_freeze_rlds.txt.
+# 한 RUN 으로 묶는 이유: 레이어를 나누면 버려질 TF 2.15 가 앞 레이어에 그대로 남아 이미지가 커진다
+RUN cd openvla && pip install --no-cache-dir -e . && \
+    pip install --no-cache-dir \
+        "tensorflow==2.21.0" \
+        "tensorflow-datasets==4.9.10" \
+        "tensorflow-metadata==1.21.0" \
+        "protobuf==6.33.6" && \
+    pip uninstall -y tensorflow-addons tensorflow-estimator
+
+# flash-attn. pyproject 45행에 주석으로만 적혀 있어 `pip install -e .` 로는 들어오지 않는다.
+# 소스 빌드라 30-90분 걸린다 -- pod 가 아니라 여기서 굽는다 (베이스가 -devel 이라 nvcc 가 있다)
+RUN pip install --no-cache-dir packaging ninja && \
+    pip install --no-cache-dir "flash-attn==2.5.5" --no-build-isolation
 
 # 데이터셋과 체크포인트는 이미지에 넣지 않는다 -- 실행 시 volume 으로 붙인다
 ```
@@ -134,30 +157,152 @@ Dockerfile 의 각 결정이 왜 그렇게 되어 있는지 풀어 둔다.
 | `ARG OPENVLA_COMMIT` + `git checkout` | 커밋을 고정하지 않으면 빌드 시점마다 다른 코드가 들어온다. 그러면 패치가 충돌하거나 동작이 달라진다 |
 | `COPY` + `git apply` | week2 의 수정을 손으로 다시 하지 않는다. 손으로 하면 컨테이너와 로컬이 미묘하게 달라진다 |
 | `pip install -e .` | 리포를 편집 가능한 상태로 설치한다. 컨테이너 안에서 코드를 확인·수정할 수 있다 |
+| `--no-cache-dir` | pip 이 받은 휠을 캐시로 남기지 않는다. torch 나 TF 는 휠 하나가 수백 MB - 수 GB 라 캐시가 그대로 이미지 용량이 된다 |
+| TF 계열 덮어쓰기 | 커밋을 고정해도 전이 의존성은 빌드 시점의 최신이 들어온다. 리포가 2024년 것이라 그 격차가 protobuf 에서 터진다 |
+| `pip uninstall tensorflow-addons` | openvla 가 직접 요구하는 게 아니라 `tensorflow-graphics` 가 끌고 온 것이고, TF 2.16 이상과 맞지 않는다. week2 환경에도 없으며 없는 상태로 `tensorflow_graphics` import 가 통과했다 |
+| flash-attn 별도 설치 | 리포의 `pyproject.toml` 이 주석 처리해 두고 "editable install 뒤에 따로 깔라" 고 지시한다. 자동으로 안 들어오는데 학습 경로는 이것을 기본으로 켜 둔다 |
 | 데이터를 이미지에 넣지 않음 | 데이터는 수 GB 이고 자주 바뀐다. 이미지는 환경만 담고 데이터는 실행 시 붙인다 |
+
+
+덮어쓰는 범위를 **데이터 경로 패키지로만** 한정하는 것이 이 Dockerfile 의 판단이다. week2 의 freeze 에는 torch 2.13.0 / timm 1.0.28 도 적혀 있지만 그쪽으로는 따라가지 않는다.
+
+week2 가 통과시킨 검사는 RLDS 로드 검증 하나이고, 그것이 지나는 길은 tfds - tensorflow-metadata - protobuf 로 이어지는 데이터 경로다. torch 와 timm 은 그 검사가 건드리지 않았고, week2 의 값은 핀을 풀었더니 pip 가 끌어온 최신일 뿐 무언가를 통과한 값이 아니다. 반대로 openvla 가 박아 둔 `torch==2.2.0` 은 upstream 이 실제로 학습을 돌려 본 조합이다. 검증되지 않은 쪽으로 모델 경로까지 옮길 이유가 없다.
+
+이 구분은 week2 `outputs/env_rlds.md` 가 세운 "데이터 경로 / 모델 경로" 분류를 그대로 쓴 것이다.
+
+빌드 중에 `openvla 0.0.3 requires tensorflow==2.15.0, but you have tensorflow 2.21.0` 경고가 지나간다. 핀을 의도적으로 깨는 것이므로 정상이고, 에러가 아니라 경고다. week2 도 torch 쪽에서 같은 형태의 메시지를 봤다.
+
+
+### flash-attn 을 왜 이미지에 굽나
+
+
+`pyproject.toml` 을 열어 보면 `flash_attn==2.5.5` 가 주석으로 처리되어 있고 "editable install 뒤에 따로 설치하라" 는 안내가 붙어 있다. 즉 `pip install -e .` 만으로는 절대 들어오지 않는다. 그런데 `prismatic/models/backbones/llm/llama2.py` 는 `use_flash_attention_2` 의 기본값을 `True` 로 둔다.
+
+
+이걸 지금 로컬에서 굽는 이유는 **비용이 아니라 시간의 위치** 때문이다. flash-attn 은 미리 만들어 둔 휠이 아니라 소스에서 컴파일하는 경우가 많고, 그럴 때 30-90분이 걸린다. pod 에 올라가서 이게 없다는 걸 알게 되면 그 컴파일 시간을 시간당 요금을 내며 기다린다. 로컬에서는 전기값만 든다.
+
+
+반대로 `bitsandbytes` 는 **넣지 않는다.** `vla-scripts/finetune.py` 의 `use_quantization` 기본값이 `False` 이고, §3 에서 4-bit 학습 경로를 쓰지 않기로 했기 때문이다. 스크립트 맨 위의 `BitsAndBytesConfig` import 는 transformers 가 제공하는 것이라 bitsandbytes 없이도 통과한다.
+
+
+### 이미지 크기
+
+
+이 이미지는 20GB 를 훌쩍 넘는다. 다음 주에 RunPod 으로 올릴 때 레지스트리에 push 해야 하므로, 크기가 그대로 업로드 시간이 된다. 도커 레이어는 덧쌓기라서 **뒤 레이어에서 지워도 앞 레이어의 용량은 남는다.** 중복이 생기는 자리는 셋이다.
+
+
+| 중복이 생기는 곳 | 왜 |
+|---|---|
+| pip 캐시 | 받은 휠을 캐시에 그대로 둔다. `--no-cache-dir` 로 막는다 |
+| TF 두 벌 | `-e .` 가 TF 2.15 를 깔고 뒤에서 2.21 로 갈아 끼운다. 한 `RUN` 으로 묶으면 최종 상태만 남는다 |
+| torch 두 벌 | 베이스의 torch 와 openvla 핀의 `torch==2.2.0` 이 다르면 두 벌이 쌓인다 |
+
+
+앞의 둘은 위 Dockerfile 이 이미 처리한다. 세 번째는 베이스 태그를 openvla 핀과 같은 torch 버전으로 고르면 사라지는데, 베이스를 바꾸면 python 버전도 함께 바뀐다는 점을 기억해야 한다. 바꾸기로 했다면 **빌드 전에** 후보 태그의 python 버전을 확인하고, 그 python 에서 위에 적은 TF 버전들이 설치되는지부터 본다. 베이스만 갈아 끼우고 나머지가 따라올 거라고 가정하면 안 된다.
+
+
+```bash
+docker run --rm <후보 태그> python -V
+```
 
 
 빌드와 검증:
 
 
+빌드는 **호스트 셸**에서 한다 (§0.4). 그리고 `Dockerfile` 과 패치가 같은 디렉터리에 있어야 하므로 `week3/` 에서 실행한다 — `outputs/` 는 기록물 자리이고, 거기서 실행하면 빌드 컨텍스트에 패치가 없어 `COPY` 단계에서 멈춘다.
+
+
 ```bash
-cd "/workspace/study/physical-ai-study/Studies/Phase 4.5/week3"
+cd "<호스트에서 레포가 있는 경로>/Studies/Phase 4.5/week3"
+ls Dockerfile                                           # 여기 있어야 한다. outputs/ 가 아니다
 cp ../week2/outputs/openvla_registration.patch .        # 이미지 빌드 컨텍스트로 복사
 docker build -t openvla-train:v1 .                      # 빌드
-# 등록이 실제로 들어갔는지 컨테이너 안에서 확인 (이미지가 조용히 잘못 만들어지는 것을 막는다)
+```
+
+
+`docker build` 가 성공했다는 것은 "명령들이 오류 없이 끝났다" 는 뜻일 뿐, **내 등록이 코드에 들어갔다는 뜻이 아니다.** 패치가 빈 파일이거나 경로가 어긋나도 빌드는 성공할 수 있다. 그래서 아래 네 가지를 컨테이너 안에서 직접 확인한다. 넷 다 통과해야 실습 1 이 닫힌다.
+
+
+#### 검사 1: mixture 가 등록됐나
+
+
+```bash
 docker run --rm openvla-train:v1 python -c \
   "from prismatic.vla.datasets.rlds.oxe.mixtures import OXE_NAMED_MIXTURES; \
    print([k for k in OXE_NAMED_MIXTURES if 'maniskill' in k])"
 ```
 
 
-마지막 명령이 이번 실습의 핵심이다. `docker build` 가 성공했다는 것은 "명령들이 오류 없이 끝났다" 는 뜻일 뿐, **내 등록이 코드에 들어갔다는 뜻이 아니다.** 패치가 빈 파일이거나 경로가 어긋나도 빌드는 성공할 수 있다. 그래서 컨테이너 안에서 실제로 import 해 mixture 이름이 보이는지 확인한다.
+`['maniskill_pickcube_only']` 가 나와야 한다. 이 한 줄은 생각보다 넓게 덮는다 — `prismatic.vla.datasets...` 를 부르면 `prismatic/__init__.py` 부터 dlimp - tfds - tensorflow-metadata - protobuf 까지 데이터 경로 전체가 딸려 온다. 그래서 등록 확인과 의존성 정합성 확인이 한 번에 닫힌다.
 
 
-**통과 판정**: 위 명령이 내 mixture 이름을 출력한다. 빈 목록이면 패치가 적용되지 않았거나 파일 경로가 어긋난 것이다.
+| 나오는 것 | 뜻 |
+|---|---|
+| `['maniskill_pickcube_only']` | 통과 |
+| 빈 목록 `[]` | 패치가 적용되지 않았거나 파일 경로가 어긋났다 |
+| `ImportError` / `ModuleNotFoundError` | 등록 이전 단계의 문제다. 의존성 버전을 먼저 맞춰야 한다 |
 
 
-**기록할 것** (`outputs/image_build.md`): 베이스 이미지 태그, 기준 커밋, 빌드 중 겪은 문제, 이미지 크기. 이 기록은 week4 의 버전 호환성 대조에서 학습 측 버전 목록으로 인용된다.
+#### 검사 2: 세 등록이 서로 맞물리나
+
+
+```bash
+docker run --rm openvla-train:v1 python -c "
+from prismatic.vla.datasets.rlds.oxe.mixtures import OXE_NAMED_MIXTURES
+from prismatic.vla.datasets.rlds.oxe.configs import OXE_DATASET_CONFIGS
+from prismatic.vla.datasets.rlds.oxe.transforms import OXE_STANDARDIZATION_TRANSFORMS
+for name, w in OXE_NAMED_MIXTURES['maniskill_pickcube_only']:
+    print(name, w, name in OXE_DATASET_CONFIGS, name in OXE_STANDARDIZATION_TRANSFORMS)
+"
+```
+
+
+`maniskill_pickcube 1.0 True True` 가 나와야 한다. mixture 이름은 `maniskill_pickcube_only` 인데 출력에 찍히는 데이터셋 이름은 `maniskill_pickcube` 로 다르다 — mixture 는 "데이터셋 여러 개를 비율로 묶은 이름" 이고 그 안의 원소가 데이터셋 이름이기 때문이다. 여기서는 데이터셋이 하나뿐이라 한 줄만 나온다.
+
+
+검사 1 이 왜 부족한지가 여기 있다. week2 패치는 파일 셋을 건드리는데 검사 1 은 그중 `mixtures.py` 만 본다. `git apply` 는 all-or-nothing 이라 셋 다 적용된 것은 맞지만, **mixture 가 가리키는 데이터셋 이름과 나머지 두 곳의 키가 같은지는 별개 문제**다. 한 글자만 어긋나도 패치는 깔끔히 적용되고 학습 시작 시 `KeyError` 로 죽는다. `False` 가 하나라도 보이면 패치의 키 이름을 맞춰 다시 굽는다.
+
+
+#### 검사 3: 컨테이너에서 GPU 가 보이나
+
+
+```bash
+docker run --rm --gpus all openvla-train:v1 python -c \
+  "import torch; print(torch.__version__, torch.cuda.is_available(), torch.cuda.get_device_name(0))"
+```
+
+
+`True` 와 GPU 이름이 나와야 한다. `--gpus all` 을 빼면 `cuInit` 실패와 드라이버 미검출 경고가 뜨는데, 검사 1-2 에서는 GPU 를 쓰지 않으니 그 경고는 무시해도 된다. 여기서만 확인하면 된다.
+
+
+#### 검사 4: 버전이 의도대로 갈렸나
+
+
+```bash
+docker run --rm openvla-train:v1 pip list | \
+  grep -iE "^torch|^timm|^transformers|^tensorflow|^protobuf|^peft|^flash"
+docker images openvla-train:v1
+```
+
+
+데이터 경로는 week2 값, 모델 경로는 openvla 핀 — 이렇게 갈려 있어야 한다. 눈으로 확인할 것:
+
+
+| 항목 | 기대 |
+|---|---|
+| tensorflow / tfds / tf-metadata / protobuf | week2 `pip_freeze_rlds.txt` 의 값과 일치 |
+| torch / torchvision / timm | openvla `pyproject.toml` 의 핀과 일치 |
+| tensorflow-addons, tensorflow-estimator | 목록에 없어야 한다 |
+| flash-attn | 목록에 있어야 한다 |
+
+
+`docker images` 의 크기는 다음 주 push 시간을 가늠하는 값이므로 그대로 기록에 옮긴다.
+
+
+**통과 판정**: 검사 1-4 를 모두 통과한다. 하나라도 걸리면 고쳐서 다시 굽는다 — 여기서 넘어간 문제는 다음 주에 요금을 내며 만난다.
+
+
+**기록할 것** (`outputs/image_build.md`): 베이스 이미지 태그, 기준 커밋, **핀을 깬 패키지와 그 사유**, 검사 4 의 버전 목록, 이미지 크기, 빌드 중 겪은 문제. 이 기록은 week4 의 버전 호환성 대조에서 학습 측 버전 목록으로 인용되므로, 리포의 `pyproject.toml` 과 다른 값이 들어간 항목은 빠짐없이 적는다.
 
 
 ---
