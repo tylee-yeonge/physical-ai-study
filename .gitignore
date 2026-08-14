@@ -16,4 +16,5 @@ __pycache__
 *.pt
 *.onnx*
 data/
-outputs/
+**/outputs/*
+!**/outputs/*.md
