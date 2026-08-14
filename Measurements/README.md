@@ -119,7 +119,7 @@ Measurements/
 
 **수치의 원본은 `methodology.md`, 해석은 `findings.md`** — 이 한 줄이 두 문서를 가르는 기준이다. 같은 수치를 두 곳에 적으면 나중에 한쪽만 고쳐 어긋난다.
 
-실제 예시는 [`openvla-rtx4070-int4/`](openvla-rtx4070-int4/) 하나뿐이므로, 새 실험을 시작할 때 그 디렉터리를 본보기로 삼는다.
+새 실험을 시작할 때는 기존 디렉터리를 본보기로 삼는다 — 추론 지연 실측은 [`openvla-rtx4070-int4/`](openvla-rtx4070-int4/), 성공률 측정 설계는 [`openvla-maniskill-zeroshot/`](openvla-maniskill-zeroshot/), 학습 사이클과 인프라 제약은 [`openvla-lora-runpod/`](openvla-lora-runpod/) 가 각각 다른 성격을 보여 준다.
 
 ## 5. 워크플로우 (실습 1건 종료 시)
 
