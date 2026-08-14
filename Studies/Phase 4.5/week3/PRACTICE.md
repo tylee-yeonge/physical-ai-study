@@ -672,9 +672,13 @@ grep -n "batch_size\|grad_accumulation_steps\|max_steps\|save_steps\|lora_rank\|
     vla-scripts/finetune.py | head -20
 
 
-# 3-2. wandb 가 대화형 질문을 띄우지 않게 한다.
-#   본 사이클은 몇 시간을 무인으로 돌리므로 프롬프트에서 멈추면 그 시간이 요금이다
+# 3-2. wandb 가 대화형 질문을 띄우지 않게 하고, 기록을 volume 에 남긴다.
+#   프롬프트: 본 사이클은 몇 시간을 무인으로 돌리므로 거기서 멈추면 그 시간이 요금이다
+#   WANDB_DIR: 기본 위치는 컨테이너 안이라 pod 를 정지하면 loss 기록이 사라진다.
+#     loss 는 stdout 에 찍히지 않고 wandb 로만 가므로, 이걸 놓치면 학습의
+#     정량 지표가 남지 않는다 (outputs/train_log.md §4)
 export WANDB_MODE=offline
+export WANDB_DIR=/workspace/wandb
 
 
 # 3-3. VRAM 을 백그라운드로 기록 (피크를 놓치지 않기 위해)
@@ -828,6 +832,7 @@ cd /opt/openvla
 #   save_steps 1000 -> 저장 2회. max_steps 가 이 값의 배수여야 마지막 상태가 저장된다
 #   인자 줄 끝의 백슬래시 뒤에는 주석을 붙이지 않는다 -- 줄 연속이 깨져 실행되지 않는다
 export WANDB_MODE=offline                # 대화형 프롬프트에서 멈추지 않게
+export WANDB_DIR=/workspace/wandb        # loss 기록을 volume 에 남긴다 (기본 위치는 pod 정지 시 소멸)
 
 torchrun --standalone --nnodes 1 --nproc-per-node 1 vla-scripts/finetune.py \
   --vla_path "openvla/openvla-7b" \
@@ -854,6 +859,7 @@ set -eo pipefail
 
 cd /opt/openvla
 export WANDB_MODE=offline
+export WANDB_DIR=/workspace/wandb
 
 torchrun --standalone --nnodes 1 --nproc-per-node 1 vla-scripts/finetune.py \
   --vla_path "openvla/openvla-7b" \
@@ -925,8 +931,14 @@ du -sh /workspace/*                       # volume 잔량 판단
 #     - 학습 로그
 
 
-# 4-3. loss 추이 추출
-grep -i "loss" /workspace/train.log | tail -40
+# 4-3. loss 추이
+#   train.log 에는 loss 가 없다 -- finetune.py 는 loss 를 stdout 에 찍지 않고
+#   wandb 로만 보낸다 (finetune.py:305). 최종 값은 요약 파일에 있다
+cat /workspace/wandb/offline-run-*/files/wandb-summary.json
+
+#   추이 전체가 필요하면 wandb 계정에 동기화해 웹에서 본다
+#   (계정이 없으면 이 디렉터리를 회수해 두고 나중에 동기화한다)
+wandb sync /workspace/wandb/offline-run-*
 ```
 
 
@@ -941,50 +953,104 @@ grep -i "loss" /workspace/train.log | tail -40
 | `/workspace/adapter-tmp/` (LoRA 어댑터) | 수백 MB | **가져온다** | 학습 결과의 본체. week4 가 로컬 base 와 머지한다 |
 | `dataset_statistics.json` | 수 KB | **가져온다** | 추론의 `unnorm_key` 근거. 없으면 fine-tuned 모델을 쓸 수 없다 (README §6) |
 | `config.json` / tokenizer / `preprocessor_config.json` | 수 MB | 가져온다 | 추론에 필요한 세트 |
-| `train.log` | 수 MB | 가져온다 | loss 추이의 원본. `Measurements/.../raw/` 에 보존 |
+| `/workspace/wandb/` | 수 MB | **가져온다** | **loss 추이가 여기에만 있다.** stdout 에는 찍히지 않는다 |
+| `train.log` | 수 MB | 가져온다 | 진행률·저장 이력·소요 시간 |
 | `model-0000N-of-0000M.safetensors` | 약 15GB | **안 가져온다** | 어댑터로 재머지 가능. 재머지가 확인될 때까지 volume 에 보존한다 |
 
 
 ```bash
-# pod 에서 묶는다. 15GB 가중치만 제외
+# pod 에서 묶는다. 15GB 가중치만 제외.
+#   결과 파일을 /workspace 에 두는 것이 중요하다 -- 그곳이 network volume 이고,
+#   그래야 pod 을 거치지 않고 S3 로 받을 수 있다
 cd /workspace
-tar czf recover.tar.gz adapter-tmp train.log
+tar czf recover.tar.gz adapter-tmp wandb train.log
 tar czf recover_run.tar.gz --exclude='model-0*.safetensors' runs
 ls -lh recover*.tar.gz          # 합쳐 수백 MB 여야 한다
-
-
-# 전송: 직접 TCP 가 있으면 rsync (재개 가능), 없으면 runpodctl
-runpodctl send recover.tar.gz
-runpodctl send recover_run.tar.gz
 ```
+
+
+`--exclude` 패턴을 `model-0*` 로 좁힌 이유: 어댑터 파일명이 `adapter_model.safetensors` 이므로 `*.safetensors` 로 제외하면 **정작 필요한 어댑터가 함께 빠진다.**
+
+
+#### 전송: network volume 의 S3 호환 API
+
+
+`runpodctl` 은 pod -> 로컬 방향에서 쓸 수 없다. 로컬이 고포트로 아웃바운드 연결을 걸어야 하는데 그것이 막히면 **연결은 맺어지고 데이터가 한 바이트도 오지 않는다**(받을 파일이 아예 생기지 않는다). 로컬 -> pod 방향은 pod 쪽이 연결을 걸어 성공하므로, 방향에 따라 갈린다.
+
+
+S3 API 는 HTTPS 만 쓰고 멀티파트라 재개된다. **pod 을 정지·삭제한 뒤에도 volume 이 남아 있으면 접근된다.**
+
+
+1. RunPod 콘솔 > Credentials > **S3 API Keys** 발급 (secret 은 한 번만 표시된다)
+2. Storage 화면에서 볼륨의 **ID** 확인 — 이것이 버킷 이름이다 (볼륨 이름이나 pod ID 가 아니다)
+3. 엔드포인트는 볼륨이 있는 데이터센터 코드를 **소문자로** 넣는다. 콘솔에 `EU-RO-1` 로 표시되면 `https://s3api-eu-ro-1.runpod.io` 이고, `aws configure` 의 region 에도 같은 값(`eu-ro-1`)을 쓴다
+
+
+**S3 API 는 일부 데이터센터만 지원한다.** 볼륨을 만들 때 지원 목록에 있는 곳을 고르는 것이 회수 경로를 미리 확보하는 방법이다 — 지원하지 않는 데이터센터에 볼륨을 만들면 프록시 SSH 와 `runpodctl` 만 남고, 둘 다 pod -> 로컬 방향에 취약하다.
 
 
 ```bash
-# 로컬(호스트) 에서 각 코드로 받아 outputs/ 아래에 푼다
-runpodctl receive <코드>
-mkdir -p "<레포>/Studies/Phase 4.5/week3/outputs/recovered"
-tar xzf recover.tar.gz -C "<레포>/Studies/Phase 4.5/week3/outputs/recovered"
-tar xzf recover_run.tar.gz -C "<레포>/Studies/Phase 4.5/week3/outputs/recovered"
+# 로컬(호스트). 쓰기 권한이 있는 디렉터리에서 실행한다
+sudo apt install -y awscli
+aws configure                     # access key / secret / region 은 데이터센터 코드
+aws configure set default.s3.addressing_style path
+
+export EP=https://s3api-<데이터센터>.runpod.io
+
+aws s3 ls --endpoint-url $EP                    # 버킷(=volume ID) 목록
+aws s3 ls s3://<volume-id>/ --endpoint-url $EP  # 내용 확인
+
+# 다운로드는 저수준 명령을 쓴다
+aws s3api get-object --bucket <volume-id> --key recover.tar.gz \
+    --endpoint-url $EP recover.tar.gz
+aws s3api get-object --bucket <volume-id> --key recover_run.tar.gz \
+    --endpoint-url $EP recover_run.tar.gz
 ```
 
 
-`--exclude` 패턴을 `model-0*` 로 좁힌 이유: 어댑터 파일명이 `adapter_model.safetensors` 일 수 있어 `*.safetensors` 로 제외하면 **정작 필요한 어댑터가 함께 빠진다.**
+두 가지 함정이 있다.
 
 
-`outputs/` 아래에 푸는 이유는 `.gitignore` 가 그 디렉터리를 제외하기 때문이다. `*.safetensors` 는 gitignore 목록에 없으므로 다른 위치에 두면 커밋 후보로 잡힌다.
+- **`aws s3 cp` 는 403 으로 실패한다.** 고수준 명령이 다운로드 전에 `HeadObject` 를 호출하는데 RunPod 의 구현이 그것을 허용하지 않는다. `aws s3api get-object` 는 그 사전 확인 없이 바로 받는다. `aws s3 ls` 가 성공하고 `cp` 만 403 이면 이 문제다
+- **레포의 `outputs/` 에 직접 받으면 `Permission denied` 가 난다.** 그 디렉터리는 VS Code 컨테이너가 root 로 만든 것이라 호스트 사용자가 쓸 수 없다. 홈 아래(`~/lora-recover` 등)에 받고, 레포 안에 두고 싶으면 컨테이너 쪽에서 옮긴다
 
 
-**회수 검증** — 두 파일이 실체가 있는지 확인한다. 없으면 week4 가 막힌다.
+받은 뒤 크기를 볼륨의 값과 대조하고 푼다.
 
 
 ```bash
-ls -la <풀어놓은 경로>/adapter-tmp/*/
-cat <풀어놓은 경로>/adapter-tmp/*/adapter_config.json
-find <풀어놓은 경로> -name "dataset_statistics.json"
+ls -l recover*.tar.gz            # aws s3 ls 가 보여준 바이트 수와 같아야 한다
+mkdir -p recovered
+tar xzf recover.tar.gz -C recovered
+tar xzf recover_run.tar.gz -C recovered
 ```
 
 
-`adapter_config.json` 에서 `r`(rank), `target_modules`, `base_model_name_or_path` 를 확인한다. 마지막 항목이 로컬 base 와 같아야 재머지가 성립한다.
+**회수 검증** — 셋이 실체가 있는지 확인한다. 없으면 week4 가 막힌다.
+
+
+```bash
+ls -la recovered/adapter-tmp/*/                       # adapter_model.safetensors 가 있어야 한다
+cat recovered/adapter-tmp/*/adapter_config.json
+find recovered -name "dataset_statistics.json"
+ls -la recovered/wandb/                               # loss 기록
+```
+
+
+`adapter_config.json` 에서 확인할 것은 셋이다.
+
+
+| 항목 | 확인 |
+|---|---|
+| `r` | 지정한 rank 와 같은가 |
+| `base_model_name_or_path` | 로컬 base 와 같은 모델인가 |
+| `auto_mapping.parent_library` 의 해시 | base 의 **리비전**이다. 로컬 HuggingFace 캐시의 스냅샷 해시와 대조한다 |
+
+
+마지막 항목이 재머지의 전제다. 리비전이 다르면 어댑터가 기대하는 모듈 구조와 로컬 base 가 어긋날 수 있다.
+
+
+어댑터 크기가 수백 MB 로 나오는 것은 정상이다. `target_modules` 에 `lm_head` 가 포함되어 어휘 x 임베딩 차원 행렬이 함께 저장되기 때문이다 (저장 시 `save_embedding_layers=True` 경고가 그 신호다). rank 32 어댑터만이라면 수십 MB 규모다.
 
 
 **volume 을 지우는 순서** — 되돌릴 수 없으므로 순서를 지킨다.
@@ -995,7 +1061,15 @@ find <풀어놓은 경로> -name "dataset_statistics.json"
 3. **그 확인 후에** volume 삭제
 
 
-2번이 실패하면(peft 버전 차이, base 리비전 불일치 등) 15GB 를 가져와야 한다. 그때는 직접 TCP 를 제공하는 pod 를 새로 만들거나 volume 의 S3 호환 API 를 쓴다. 볼륨을 먼저 지우면 그 선택지가 사라지고 학습을 다시 돌려야 한다.
+2번이 실패하면(peft 버전 차이, base 리비전 불일치 등) 15GB 를 가져와야 한다. 위 S3 경로로 받으면 되며 **pod 이 없어도 volume 이 남아 있으면 접근된다.**
+
+
+```bash
+aws s3 sync s3://<volume-id>/runs/ ./runs/ --endpoint-url $EP
+```
+
+
+**볼륨을 먼저 지우면 그 선택지가 사라지고 학습을 다시 돌려야 한다.** pod 삭제와 볼륨 삭제는 별개이므로, pod 을 정리할 때 볼륨을 함께 지우지 않도록 주의한다.
 
 
 4-2 에서 **통계 파일을 눈으로 훑지 말고 이름으로 확인**한다. 15GB 가중치 파일 옆에 수십 KB json 이 있으면 시선이 가지 않는다. `find . -name "*.json"` 으로 목록을 뽑아 확인하는 것이 안전하다.
