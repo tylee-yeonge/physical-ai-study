@@ -1,4 +1,4 @@
-# Week 4 실습: 전송 -> 4-bit 적재 -> 통계 전환 -> 검증
+# Week 4 실습: 재머지 -> 4-bit 적재 -> 통계 전환 -> 검증
 
 
 > **실습 목표**: fine-tuned 모델을 로컬 4070 에 4-bit 로 올리고, 4층 검증을 통과시켜 week0 하네스에 꽂는다.
@@ -23,7 +23,7 @@
 ### 0.1 한 문장으로
 
 
-> 클라우드에 있는 학습 산출물 4가지를 내 PC 로 내려받아, week0 과 **똑같은 4-bit 설정**으로 GPU 에 올리고, 역정규화 기준을 **내 데이터셋 통계로 바꾸고**, 그 모델이 week0 sim 루프에서 1 episode 도는 것까지 확인한다.
+> week3 이 회수한 LoRA 어댑터를 로컬 base 와 재머지해 15GB 머지 가중치를 되살리고, week0 과 **똑같은 4-bit 설정**으로 GPU 에 올리고, 역정규화 기준을 **내 데이터셋 통계로 바꾸고**, 그 모델이 week0 sim 루프에서 1 episode 도는 것까지 확인한다.
 
 
 ### 0.2 5개 실습이 이어지는 방식
@@ -31,7 +31,7 @@
 
 ```mermaid
 flowchart TD
-    P1["실습 1<br/>전송 + 무결성<br/>-> 로컬 모델 디렉터리<br/>-> 통계 파일 경로"]
+    P1["실습 1<br/>재머지 + 무결성<br/>-> 로컬 모델 디렉터리<br/>-> 통계 파일 경로"]
     P2["실습 2<br/>4-bit 적재<br/>-> VRAM 실측<br/>-> 1층 2층 판정"]
     P3["실습 3<br/>unnorm_key 전환<br/>-> 값 대역 검사<br/>-> 3층 판정"]
     P4["실습 4<br/>버전 + 결정성<br/>-> 4층 판정"]
@@ -41,7 +41,7 @@ flowchart TD
 ```
 
 
-점선이 이번 주에 가장 흔한 사고다. 통계 파일은 수십 KB 라 15GB 가중치 옆에서 눈에 띄지 않는다. 실습 1 에서 목록으로 확인하지 않으면 실습 3 에서 멈춘다.
+점선이 이번 주에 가장 흔한 사고다. 통계 파일은 수십 KB 라 15GB 가중치 옆에서 눈에 띄지 않는다. 실습 1 에서 머지 디렉터리로 복사하고 목록으로 확인하지 않으면 실습 3 에서 멈춘다.
 
 
 ### 0.3 자주 걸리는 용어 미리 풀기
@@ -49,10 +49,11 @@ flowchart TD
 
 | 용어 | 뜻 |
 |---|---|
-| **`rsync`** | 파일 동기화 도구. `-P` 를 주면 끊긴 지점부터 이어받는다 |
-| **무결성 검증** | 전송된 파일이 원본과 같은지 확인. 파일 수 / 총 바이트 / 체크섬 순으로 강해진다 |
+| **`merge_and_unload`** | LoRA 수정분을 base 가중치에 더해 어댑터 없는 일반 모델로 되돌리는 peft 함수 |
+| **무결성 검증** | 파일이 원본과 같은지 확인. 파일 수 / 총 바이트 / 체크섬 순으로 강해진다 |
 | **`du -sb`** | 디렉터리의 총 바이트를 센다 |
 | **safetensors** | 모델 가중치 저장 형식. 7B 는 여러 조각으로 나뉜다 |
+| **색인**(index) | `model.safetensors.index.json`. 조각난 가중치의 "텐서 이름 -> 조각 파일" 매핑(`weight_map`)과 총 바이트(`total_size`)를 담는다 |
 | **`BitsAndBytesConfig`** | 양자화 방식을 지정하는 설정 객체 |
 | **nf4** | 4-bit 양자화 방식의 한 종류 |
 | **double quant** | 양자화 보조 상수까지 양자화해 메모리를 더 줄이는 옵션 |
@@ -71,7 +72,9 @@ flowchart TD
 ### 0.4 어디서 실행하나
 
 
-추론은 Phase 4 의 공용 venv (`.venv-vla`) 에서 한다. 스크립트는 `week4/` 아래에 두고 cwd 도 `week4` 로 둔다. 모델 가중치는 프로젝트 폴더가 아니라 `~/models/` 아래에 둔다 — 15GB 를 레포 안에 두면 실수로 커밋 대상에 들어갈 위험이 있다.
+추론은 Phase 4 의 공용 venv (`.venv-vla`) 에서 한다. 스크립트는 `week4/` 아래에 두고 cwd 도 `week4` 로 둔다. 모델 가중치는 레포 밖의 `/workspace/models/` 아래에 둔다 — 15GB 를 레포 안에 두면 실수로 커밋 대상에 들어갈 위험이 있다. 컨테이너 홈(`/root/models`) 은 쓰지 않는다 — 호스트 마운트가 없어 호스트에서 만든 재머지 산출물이 그 경로로 도착하지 못한다.
+
+예외는 실습 1 의 재머지(1-0, 1-1)다 — docker 가 있는 **호스트 셸**에서 실행한다 (개발 컨테이너 안에는 docker 가 없다). 1-2 부터는 개발 컨테이너로 돌아온다.
 
 
 ---
@@ -98,64 +101,186 @@ cat outputs/local_versions.txt      # 실습 4 의 대조 기준
 ---
 
 
-## 실습 1: 회수·전송 + 무결성 검증
+## 실습 1: 재머지 + 무결성 검증
 
 
-**무엇을 하나**: pod(또는 volume) 에 남은 4항목을 로컬로 내려받고, 파일 수와 총 바이트를 양쪽에서 비교해 누락·잘림이 없는지 확인한다.
-**왜 하나**: 15GB 전송은 조용히 실패한다. 끊긴 파일도 파일로 남으므로 `ls` 로는 구분되지 않는다. 그리고 **통계 파일을 빠뜨리면 실습 3 에서 막히는데, 그때는 pod 를 이미 지웠을 수 있다.**
-**끝나면 손에 남는 것**: `~/models/openvla-maniskill-ft/` + `outputs/transfer_check.md` (전송량, 파일 수 대조, 4항목 존재 확인, 통계 파일 경로).
+**무엇을 하나**: week3 이 회수한 LoRA 어댑터를 로컬 base 와 다시 합쳐 15GB 머지 가중치를 만들고, 통계·processor 파일을 채워 `/workspace/models/openvla-maniskill-ft/` 를 완성한 뒤, 회수해 둔 색인과 대조해 pod 에 있던 머지 가중치와 같은 구조인지 확인한다.
+**왜 하나**: week3 은 15GB 머지 가중치를 내리지 않았다 — 머지 가중치 = base + 어댑터이고 base 15GB 는 로컬 캐시에 있으므로, 재머지가 전송을 대체한다 (week3 `outputs/train_log.md` §4.3). 다만 **재머지는 아직 한 번도 검증된 적이 없다** (같은 문서 §6) — 색인 대조가 그 검증이다. 그리고 **통계 파일을 머지 디렉터리에 채우지 않으면 실습 3 에서 막힌다.**
+**끝나면 손에 남는 것**: `/workspace/models/openvla-maniskill-ft/` + `outputs/remerge_check.md` (재머지 환경, 색인 대조 결과, 4항목 존재 확인, 통계 파일 경로).
 
 
-**산출물**: `outputs/transfer_check.md`
+**산출물**: `outputs/remerge_check.md`
 
 
-week3 이 남긴 4항목을 받는다. **통계 파일은 작아서 빠뜨리기 쉽다** — 목록으로 확인한다.
+재머지는 **학습과 같은 버전 조합**(`openvla-train:v2` — torch 2.2.0 / transformers 4.40.1 / peft 0.11.1)에서 한다. `.venv-vla` 는 torch 2.12 조합이라 쓰지 않는다. GPU 는 필요 없다 — bf16 가중치에 수정분을 더하는 CPU 작업이고, 4070 12GB 에는 15GB 가 올라가지도 않는다.
 
 
 ```bash
-# 1-1. 원격에서 회수 대상 확인 (pod 또는 volume)
-ssh <pod> "ls -la /workspace/volume/runs/*/"       # <- 접속 주소로 교체
-#   확인할 4항목:
-#     (a) 머지된 가중치 (*.safetensors 등, 15GB 급)
-#     (b) LoRA 어댑터 원본 (작다)
-#     (c) 데이터셋 통계 파일 (작다 -- 빠뜨리면 실습 3 에서 막힌다)
-#     (d) processor / config 파일 + 학습 로그
+# 1-0. 전제 확인 (docker 가 있는 호스트 셸에서)
+ls ~/.cache/huggingface/hub/models--openvla--openvla-7b/snapshots/
+#   -> 47a0ec7fc4ec123775a391911046cf33cf9ed83f
+#      어댑터가 기록한 base 리비전(recovered/.../adapter_config.json)과 같아야 한다.
+#      다르면 재머지 결과가 학습 때의 머지와 다른 모델이 된다.
+
+docker images openvla-train:v2      # 학습에 쓴 이미지가 있는지
+free -g                             # 가용 RAM 18GB 이상인지 (bf16 15GB 를 CPU 에 올린다)
+```
 
 
-# 1-2. 재개 가능한 전송 (끊겨도 이어받는다)
-mkdir -p ~/models/openvla-maniskill-ft
-rsync -avP <pod>:/workspace/volume/runs/<run-name>/ ~/models/openvla-maniskill-ft/
+**파일명**: `practice_remerge.py` (`week4/` 에 두고 컨테이너에 마운트해 실행한다)
 
 
-# 1-3. 무결성 검증 -- 파일 수와 총 바이트를 양쪽에서 비교
-ssh <pod> "find /workspace/volume/runs/<run-name> -type f | wc -l; du -sb /workspace/volume/runs/<run-name>"
-find ~/models/openvla-maniskill-ft -type f | wc -l
-du -sb ~/models/openvla-maniskill-ft
+```python
+"""
+실습 1: LoRA 어댑터를 base 에 재머지해 pod 의 머지 가중치를 로컬에서 재구성
+openvla-train:v2 컨테이너 안에서 실행한다 (학습과 같은 torch 2.2.0 / peft 0.11.1).
+학습 스크립트가 체크포인트 저장 때 하던 것과 같은 절차다: bf16 base 에 어댑터를 합쳐 저장.
+"""
+import torch
+from peft import PeftModel
+from transformers import AutoModelForVision2Seq
 
 
+# 컨테이너 안 경로 -- 아래 docker run 의 -v 마운트와 짝이 맞아야 한다
+ADAPTER_PATH = (
+    "/recover/adapter-tmp/"
+    "openvla-7b+maniskill_pickcube_only+b16+lr-0.0005+lora-r32+dropout-0.0--image_aug"
+)
+OUT_PATH = "/out/openvla-maniskill-ft"             # 개발 컨테이너의 /workspace/models/ 에 대응
+
+
+# -- base 적재: 학습 때와 같은 bf16 (HF_HUB_OFFLINE=1 이라 로컬 캐시만 읽는다) --
+base = AutoModelForVision2Seq.from_pretrained(
+    "openvla/openvla-7b",                          # 캐시의 스냅샷 (1-0 에서 확인한 리비전)
+    torch_dtype=torch.bfloat16,                    # 학습 저장과 같은 dtype
+    low_cpu_mem_usage=True,                        # 15GB 를 RAM 에 한 번만 올린다
+    trust_remote_code=True,                        # openvla 자체 모델 코드 허용
+)
+
+# -- 머지: 어댑터를 얹고 수정분을 가중치에 더해 일반 모델로 되돌린다 --
+merged = PeftModel.from_pretrained(base, ADAPTER_PATH).merge_and_unload()
+
+# -- 저장: 조각난 safetensors + config + 색인이 생긴다 --
+merged.save_pretrained(OUT_PATH)
+print("저장 완료:", OUT_PATH)
+```
+
+
+```bash
+# 1-1. 재머지 실행 (호스트 셸에서)
+REPO="<physical-ai-study 레포의 호스트 경로>"                          # <- 교체
+MODELS="<개발 컨테이너의 /workspace/models 에 해당하는 호스트 경로>"   # <- 교체
+mkdir -p "$MODELS"
+
+docker run --rm \
+    -e HF_HUB_OFFLINE=1 \
+    -v ~/.cache/huggingface:/root/.cache/huggingface \
+    -v "$REPO/Studies/Phase 4.5/week3/outputs/recovered:/recover:ro" \
+    -v "$REPO/Studies/Phase 4.5/week4:/week4:ro" \
+    -v "$MODELS":/out \
+    openvla-train:v2 \
+    python /week4/practice_remerge.py
+```
+
+
+여기부터는 개발 컨테이너로 돌아온다 — 산출물을 `/workspace/models` 로 받았으므로 양쪽에서 같은 파일이 보인다.
+
+
+```bash
+# 1-2. sidecar 채우기 -- save_pretrained 는 가중치와 config 만 쓴다.
+#      processor·tokenizer 설정과 통계 파일은 pod 머지 디렉터리에서 회수한 것을 복사한다.
+EXP="openvla-7b+maniskill_pickcube_only+b16+lr-0.0005+lora-r32+dropout-0.0--image_aug"
+REC="/workspace/study/physical-ai-study/Studies/Phase 4.5/week3/outputs/recovered/runs/$EXP"
+DST=/workspace/models/openvla-maniskill-ft
+
+for f in dataset_statistics.json preprocessor_config.json \
+         tokenizer.json tokenizer.model tokenizer_config.json \
+         added_tokens.json special_tokens_map.json; do
+    cp "$REC/$f" "$DST/"
+done
+# 복사하지 않는 것: model.safetensors.index.json (회수본).
+#   조각 분할이 재머지와 다를 수 있으므로 save_pretrained 가 만든 색인을 쓰고,
+#   회수본은 1-3 의 대조 기준으로만 쓴다.
+```
+
+
+다음이 이 실습의 판정이다. pod 가 없으므로 원격·로컬 바이트 비교는 불가능하지만, pod 의 머지 가중치가 남긴 색인은 회수돼 있다. 재머지가 같은 물건을 만들었다면 **총 바이트와 텐서 이름 목록이 같아야 한다.**
+
+
+```python
+"""1-3. 색인 대조 -- json 만 읽으므로 개발 컨테이너의 아무 python 에서나 돈다"""
+import json
+
+# pod 머지가 남긴 색인 (회수물) 과 재머지가 만든 색인의 경로
+REC = (
+    "/workspace/study/physical-ai-study/Studies/Phase 4.5/week3/outputs/recovered/runs/"
+    "openvla-7b+maniskill_pickcube_only+b16+lr-0.0005+lora-r32+dropout-0.0--image_aug"
+)
+DST = "/workspace/models/openvla-maniskill-ft"
+
+old = json.load(open(f"{REC}/model.safetensors.index.json"))   # pod 머지가 남긴 색인
+new = json.load(open(f"{DST}/model.safetensors.index.json"))   # 재머지가 만든 색인
+
+# 총 바이트: dtype 이나 텐서 크기가 하나라도 다르면 어긋난다
+print("total_size:", old["metadata"]["total_size"], new["metadata"]["total_size"])
+print("total_size 일치:", old["metadata"]["total_size"] == new["metadata"]["total_size"])
+
+# 텐서 이름 집합: 어댑터가 덜 합쳐졌으면 이름이 남거나 빠진다
+old_keys, new_keys = set(old["weight_map"]), set(new["weight_map"])
+print("텐서 이름 집합 일치:", old_keys == new_keys)
+print("한쪽에만 있는 이름 수:", len(old_keys ^ new_keys))
+```
+
+
+**판정**
+
+| 관측 | 해석 |
+|---|---|
+| 총 바이트·텐서 집합 모두 일치 | 재머지가 pod 머지와 같은 구조를 만들었다. train_log.md §6 의 "재머지 미검증" 항목이 닫힌다 |
+| 텐서 집합이 다르다 | 어댑터가 덜 합쳐졌거나(peft 버전 확인) base 리비전이 다르다 (1-0 재확인) |
+| 총 바이트만 다르다 | dtype 불일치 -- bf16 로 읽었는지 확인 |
+
+
+값 수준의 동일성(체크섬)은 pod 사본이 없으므로 확인할 수 없다. 그 몫은 실습 2 의 VRAM 대조와 실습 3 의 값 대역 검사가 기능적으로 대신한다.
+
+
+```bash
 # 1-4. 4항목 존재 확인 (눈으로 훑지 말고 목록으로)
-ls -la ~/models/openvla-maniskill-ft/
-find ~/models/openvla-maniskill-ft -name "*.json" | xargs ls -la    # 통계·config 확인
+find /workspace/models/openvla-maniskill-ft -type f | wc -l                  # 파일 개수
+du -sb /workspace/models/openvla-maniskill-ft                                # 15GB 급인지
+find /workspace/models/openvla-maniskill-ft -name "*.json" | xargs ls -la    # 통계·config 확인
+ls -la "/workspace/study/physical-ai-study/Studies/Phase 4.5/week3/outputs/recovered/adapter-tmp/$EXP/"   # 어댑터 원본
 ```
 
 
 명령의 낯선 부분:
 
 
-- `rsync -avP`: `-P` 가 이어받기 + 진행률이다. 15GB 전송에서 이것이 없으면 끊길 때마다 처음부터다.
+- `HF_HUB_OFFLINE=1`: 허브 접속을 끊는다. 캐시에 없는 파일을 조용히 새 리비전으로 받아오는 사고를 차단하고, 캐시가 모자라면 그 자리에서 실패한다.
+- `-v ...:ro`: 읽기 전용 마운트. 회수물과 레포는 이 작업의 입력이지 출력이 아니므로 실수로 덮어쓸 길을 막는다. 캐시 마운트는 ro 로 두지 않는다 — `from_pretrained` 가 락 파일을 만들 수 있다.
 - `find ... -type f | wc -l`: 파일 개수만 센다 (디렉터리는 제외).
 - `du -sb`: 총 바이트를 센다. `-s` 는 합계만, `-b` 는 바이트 단위.
 - `find ... -name "*.json" | xargs ls -la`: json 파일만 골라 크기와 함께 나열한다. **통계 파일을 이름으로 찾는 것이 이 명령의 목적**이다. `ls` 로 디렉터리를 훑으면 큰 파일들 사이에서 수십 KB 파일을 놓친다.
-- 1-3 을 원격·로컬 양쪽에서 실행하는 이유: 한쪽만 봐서는 비교할 기준이 없다. 두 숫자가 같아야 전송이 온전하다.
+
+
+4항목의 최종 소재:
+
+| 항목 | 소재 |
+|---|---|
+| (a) 머지된 가중치 (15GB 급) | `/workspace/models/openvla-maniskill-ft/` (재머지 산출) |
+| (b) LoRA 어댑터 원본 | `week3/outputs/recovered/adapter-tmp/` (그대로 보존 -- 재머지의 입력) |
+| (c) 데이터셋 통계 파일 | `/workspace/models/openvla-maniskill-ft/dataset_statistics.json` (1-2 에서 복사) |
+| (d) processor / config + 학습 로그 | 설정은 (a) 디렉터리 안, 로그는 `week3/outputs/recovered/` |
 
 
 **기록할 것**
 
 | 항목 | 값 |
 |---|---|
-| 전송 용량 / 소요 시간 | |
-| 파일 수 (원격 / 로컬) | |
-| 총 바이트 (원격 / 로컬) | |
+| 재머지 환경 (이미지 / torch / peft) | |
+| base 리비전 (캐시 스냅샷 = adapter_config) | |
+| 색인 대조 (total_size / 텐서 집합) | |
+| 파일 수 / 총 바이트 | |
 | 4항목 존재 확인 | |
 | 통계 파일 경로 | (실습 3 에서 쓴다) |
 
@@ -185,7 +310,7 @@ import torch
 from transformers import AutoModelForVision2Seq, AutoProcessor, BitsAndBytesConfig
 
 
-MODEL_PATH = "/root/models/openvla-maniskill-ft"   # <- 실습 1 의 로컬 경로
+MODEL_PATH = "/workspace/models/openvla-maniskill-ft"   # <- 실습 1 의 로컬 경로
 BASELINE_GB = 4.38                                 # week0/Block 1 실측 (4-bit OpenVLA 7B)
 
 
@@ -296,7 +421,7 @@ from PIL import Image
 # 실습 2 의 processor / vla 가 로드된 상태를 전제한다 (같은 세션에서 이어 실행)
 
 
-STATS_PATH = "/root/models/openvla-maniskill-ft/dataset_statistics.json"   # <- 실습 1 확인 경로
+STATS_PATH = "/workspace/models/openvla-maniskill-ft/dataset_statistics.json"   # <- 실습 1 확인 경로
 DATASET_KEY = "maniskill_pickcube"                 # week2 에서 등록한 이름
 INSTRUCTION = "pick up the cube"                   # week0-1 과 같은 문구
 
@@ -492,7 +617,7 @@ INSTRUCTION = "pick up the cube"                   # 같은 문구
 
 
 # 바뀌는 것은 이 두 개뿐이다
-MODEL_PATH = "/root/models/openvla-maniskill-ft"   # zero-shot 은 "openvla/openvla-7b" 였다
+MODEL_PATH = "/workspace/models/openvla-maniskill-ft"   # zero-shot 은 "openvla/openvla-7b" 였다
 UNNORM_KEY = "maniskill_pickcube"                  # zero-shot 은 "bridge_orig" 였다
 
 
@@ -593,7 +718,7 @@ print("성공/실패는 판정하지 않는다 -- week5 의 N회 측정에서 �
 
 | 산출물 | 착지점 |
 |---|---|
-| `outputs/transfer_check.md`, `outputs/compat_check.md` | `Measurements/openvla-lora-runpod/environment.md` |
+| `outputs/remerge_check.md`, `outputs/compat_check.md` | `Measurements/openvla-lora-runpod/environment.md` |
 | VRAM 실측 + 4층 검증 결과 | 같은 디렉터리 `findings.md` |
 | `practice_*.py` | 같은 디렉터리 `scripts/` |
 

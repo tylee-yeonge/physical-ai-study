@@ -1,5 +1,5 @@
 """
-Phase 4.5 Week 4 - 전송·양자화·검증 기초 퀴즈
+Phase 4.5 Week 4 - 재머지·양자화·검증 기초 퀴즈
 """
 
 
@@ -7,12 +7,13 @@ def problem1_scope():
     print("\n" + "=" * 50)
     print("문제 1: 이번 주 범위")
     print("=" * 50 + "\n")
-    print("질문: 원래 계획의 '머지' 작업이 이번 주에서 빠진 이유는?\n")
+    print("질문: 15GB 머지 가중치를 pod 에서 내려받는 대신")
+    print("      로컬 재머지로 만들 수 있는 근거는?\n")
     print("보기:")
-    print("  A) 머지는 Section 3 으로 이관됐다")
-    print("  B) 학습 스크립트가 체크포인트 저장 시 어댑터를 base 에 머지한다")
-    print("  C) 4-bit 양자화가 머지를 대체한다")
-    print("  D) LoRA 어댑터는 머지 없이 추론에 쓸 수 있다")
+    print("  A) 4-bit 양자화하면 가중치가 1/4 로 줄어 전송이 필요 없다")
+    print("  B) 머지 가중치 = base + 어댑터이고 base 는 이미 로컬 캐시에 있다")
+    print("  C) LoRA 어댑터는 머지 없이 추론에 쓸 수 있다")
+    print("  D) safetensors 색인만 있으면 가중치를 복원할 수 있다")
 
 
 def problem2_vram_baseline():

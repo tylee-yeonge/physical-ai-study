@@ -129,7 +129,7 @@ sim 패키지가 이 venv 에 없으면 week0 실습 1-6 의 판단(합칠지 �
 실행:
   python eval_harness.py --model openvla/openvla-7b --unnorm-key bridge_orig \
       --out outputs/eval_zeroshot.jsonl
-  python eval_harness.py --model /root/models/openvla-maniskill-ft --unnorm-key maniskill_pickcube \
+  python eval_harness.py --model /workspace/models/openvla-maniskill-ft --unnorm-key maniskill_pickcube \
       --out outputs/eval_finetuned.jsonl
 """
 import argparse                                    # 모델만 인자로 받기 위해
@@ -502,7 +502,7 @@ python eval_harness.py \
 
 ```bash
 python eval_harness.py \
-  --model /root/models/openvla-maniskill-ft \
+  --model /workspace/models/openvla-maniskill-ft \
   --unnorm-key maniskill_pickcube \
   --out outputs/eval_finetuned.jsonl \
   2>&1 | tee outputs/eval_finetuned.log
