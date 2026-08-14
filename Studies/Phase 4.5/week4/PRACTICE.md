@@ -72,9 +72,9 @@ flowchart TD
 ### 0.4 어디서 실행하나
 
 
-추론은 Phase 4 의 공용 venv (`.venv-vla`) 에서 한다. 스크립트는 `week4/` 아래에 두고 cwd 도 `week4` 로 둔다. 모델 가중치는 레포 밖의 `/workspace/models/` 아래에 둔다 — 15GB 를 레포 안에 두면 실수로 커밋 대상에 들어갈 위험이 있다. 컨테이너 홈(`/root/models`) 은 쓰지 않는다 — 호스트 마운트가 없어 호스트에서 만든 재머지 산출물이 그 경로로 도착하지 못한다.
+추론은 Phase 4 의 공용 venv (`.venv-vla`) 에서 한다. 스크립트는 `week4/` 아래에 두고 cwd 도 `week4` 로 둔다. 모델 가중치는 레포 밖의 `/workspace/models/` 아래에 둔다 — 15GB 를 레포 안에 두면 실수로 커밋 대상에 들어갈 위험이 있다. 컨테이너 홈(`/root/models`) 은 쓰지 않는다 — 컨테이너 자체 파일시스템(overlay)이라 컨테이너를 다시 만들면 사라진다. `/workspace` 는 호스트 디스크 마운트라 남는다.
 
-예외는 실습 1 의 재머지(1-0, 1-1)다 — docker 가 있는 **호스트 셸**에서 실행한다 (개발 컨테이너 안에는 docker 가 없다). 1-2 부터는 개발 컨테이너로 돌아온다.
+예외는 실습 1 의 재머지(1-0, 1-1)다 — 학습 버전 핀을 재현한 전용 venv `/workspace/venvs/remerge` 에서 실행한다 (만드는 법은 실습 1 의 1-0). 1-2 부터는 전용 venv 가 필요 없다.
 
 
 ---
@@ -112,28 +112,45 @@ cat outputs/local_versions.txt      # 실습 4 의 대조 기준
 **산출물**: `outputs/remerge_check.md`
 
 
-재머지는 **학습과 같은 버전 조합**(`openvla-train:v2` — torch 2.2.0 / transformers 4.40.1 / peft 0.11.1)에서 한다. `.venv-vla` 는 torch 2.12 조합이라 쓰지 않는다. GPU 는 필요 없다 — bf16 가중치에 수정분을 더하는 CPU 작업이고, 4070 12GB 에는 15GB 가 올라가지도 않는다.
+재머지는 **학습과 같은 버전 핀**(torch 2.2.0 / transformers 4.40.1 / peft 0.11.1 / timm 0.9.10)을 재현한 전용 venv 에서 한다. 개발 컨테이너에는 docker 가 없어 학습 이미지(`openvla-train:v2`)를 직접 돌릴 수 없지만, 재머지가 실제로 요구하는 것은 이미지가 아니라 이 핀 조합이다. `.venv-vla` 는 torch 2.12 조합이라 쓰지 않는다. GPU 는 필요 없다 — bf16 가중치에 수정분을 더하는 CPU 작업이고, 4070 12GB 에는 15GB 가 올라가지도 않는다.
 
 
 ```bash
-# 1-0. 전제 확인 (docker 가 있는 호스트 셸에서)
+# 1-0. 재머지 venv 준비 (한 번만) + 전제 확인 (개발 컨테이너)
+pip install uv                                    # python 3.11 을 받아 줄 도구
+uv venv --python 3.11 /workspace/venvs/remerge    # torch 2.2.0 휠은 3.11 까지 -- 시스템 python 3.12 로는 못 깐다
+VIRTUAL_ENV=/workspace/venvs/remerge uv pip install \
+    "torch==2.2.0+cpu" "torchvision==0.17.0+cpu" \
+    "transformers==4.40.1" "peft==0.11.1" "timm==0.9.10" \
+    "accelerate==0.30.1" "numpy==1.26.4" setuptools \
+    --extra-index-url https://download.pytorch.org/whl/cpu
+
 ls ~/.cache/huggingface/hub/models--openvla--openvla-7b/snapshots/
 #   -> 47a0ec7fc4ec123775a391911046cf33cf9ed83f
 #      어댑터가 기록한 base 리비전(recovered/.../adapter_config.json)과 같아야 한다.
 #      다르면 재머지 결과가 학습 때의 머지와 다른 모델이 된다.
 
-docker images openvla-train:v2      # 학습에 쓴 이미지가 있는지
-free -g                             # 가용 RAM 18GB 이상인지 (bf16 15GB 를 CPU 에 올린다)
+VIRTUAL_ENV=/workspace/venvs/remerge uv pip list | grep -iE "torch|transformers|peft|timm"   # 핀이 섰는지
+free -g   # 가용(available) RAM 18GB 이상인지 (bf16 15GB 를 CPU 에 올린다). 딱 걸치면 모델 올린 다른 세션을 먼저 내린다
 ```
 
 
-**파일명**: `practice_remerge.py` (`week4/` 에 두고 컨테이너에 마운트해 실행한다)
+설치 명령의 낯선 부분:
+
+
+- `+cpu` 를 붙이는 이유: PyPI 기본 torch 휠은 CUDA 라이브러리를 끌고 와 수 GB 인 데다, 핀 없이 나눠 설치하면 의존성 해석이 torch 를 최신으로 올려버린다 (timm -> 최신 torchvision -> torch 최신). 전 패키지를 **한 번에**, `+cpu` 로컬 버전까지 명시해 설치해야 고정된다. CPU 휠은 PyTorch 전용 인덱스에만 있어 `--extra-index-url` 이 필요하다.
+- `numpy==1.26.4`: torch 2.2.0 은 numpy 1.x 기준으로 컴파일됐다. 그대로 두면 numpy 2.x 가 들어와 import 에서 깨진다.
+- `setuptools`: uv 가 만드는 venv 에는 기본으로 들어 있지 않은데 peft 가 import 시점에 요구한다.
+- 이 venv 는 uv 가 받은 Python 3.11(컨테이너 홈 아래)에 연결돼 있어 컨테이너를 다시 만들면 함께 깨진다. 일회성 도구이므로 그때 이 블록을 다시 실행한다.
+
+
+**파일명**: `scripts/practice_remerge.py`
 
 
 ```python
 """
 실습 1: LoRA 어댑터를 base 에 재머지해 pod 의 머지 가중치를 로컬에서 재구성
-openvla-train:v2 컨테이너 안에서 실행한다 (학습과 같은 torch 2.2.0 / peft 0.11.1).
+전용 venv(/workspace/venvs/remerge -- 학습과 같은 torch 2.2.0 / peft 0.11.1)에서 실행한다.
 학습 스크립트가 체크포인트 저장 때 하던 것과 같은 절차다: bf16 base 에 어댑터를 합쳐 저장.
 """
 import torch
@@ -141,12 +158,13 @@ from peft import PeftModel
 from transformers import AutoModelForVision2Seq
 
 
-# 컨테이너 안 경로 -- 아래 docker run 의 -v 마운트와 짝이 맞아야 한다
+# 입력: week3 이 회수한 어댑터. 출력: 레포 밖 /workspace/models (15GB 를 커밋 대상에서 격리)
 ADAPTER_PATH = (
-    "/recover/adapter-tmp/"
+    "/workspace/study/physical-ai-study/Studies/Phase 4.5/week3/outputs/recovered/"
+    "adapter-tmp/"
     "openvla-7b+maniskill_pickcube_only+b16+lr-0.0005+lora-r32+dropout-0.0--image_aug"
 )
-OUT_PATH = "/out/openvla-maniskill-ft"             # 개발 컨테이너의 /workspace/models/ 에 대응
+OUT_PATH = "/workspace/models/openvla-maniskill-ft"
 
 
 # -- base 적재: 학습 때와 같은 bf16 (HF_HUB_OFFLINE=1 이라 로컬 캐시만 읽는다) --
@@ -167,23 +185,10 @@ print("저장 완료:", OUT_PATH)
 
 
 ```bash
-# 1-1. 재머지 실행 (호스트 셸에서)
-REPO="<physical-ai-study 레포의 호스트 경로>"                          # <- 교체
-MODELS="<개발 컨테이너의 /workspace/models 에 해당하는 호스트 경로>"   # <- 교체
-mkdir -p "$MODELS"
-
-docker run --rm \
-    -e HF_HUB_OFFLINE=1 \
-    -v ~/.cache/huggingface:/root/.cache/huggingface \
-    -v "$REPO/Studies/Phase 4.5/week3/outputs/recovered:/recover:ro" \
-    -v "$REPO/Studies/Phase 4.5/week4:/week4:ro" \
-    -v "$MODELS":/out \
-    openvla-train:v2 \
-    python /week4/practice_remerge.py
+# 1-1. 재머지 실행 (개발 컨테이너, cwd: week4)
+mkdir -p /workspace/models
+HF_HUB_OFFLINE=1 /workspace/venvs/remerge/bin/python scripts/practice_remerge.py
 ```
-
-
-여기부터는 개발 컨테이너로 돌아온다 — 산출물을 `/workspace/models` 로 받았으므로 양쪽에서 같은 파일이 보인다.
 
 
 ```bash
@@ -257,7 +262,6 @@ ls -la "/workspace/study/physical-ai-study/Studies/Phase 4.5/week3/outputs/recov
 
 
 - `HF_HUB_OFFLINE=1`: 허브 접속을 끊는다. 캐시에 없는 파일을 조용히 새 리비전으로 받아오는 사고를 차단하고, 캐시가 모자라면 그 자리에서 실패한다.
-- `-v ...:ro`: 읽기 전용 마운트. 회수물과 레포는 이 작업의 입력이지 출력이 아니므로 실수로 덮어쓸 길을 막는다. 캐시 마운트는 ro 로 두지 않는다 — `from_pretrained` 가 락 파일을 만들 수 있다.
 - `find ... -type f | wc -l`: 파일 개수만 센다 (디렉터리는 제외).
 - `du -sb`: 총 바이트를 센다. `-s` 는 합계만, `-b` 는 바이트 단위.
 - `find ... -name "*.json" | xargs ls -la`: json 파일만 골라 크기와 함께 나열한다. **통계 파일을 이름으로 찾는 것이 이 명령의 목적**이다. `ls` 로 디렉터리를 훑으면 큰 파일들 사이에서 수십 KB 파일을 놓친다.
@@ -277,7 +281,7 @@ ls -la "/workspace/study/physical-ai-study/Studies/Phase 4.5/week3/outputs/recov
 
 | 항목 | 값 |
 |---|---|
-| 재머지 환경 (이미지 / torch / peft) | |
+| 재머지 환경 (venv / torch / peft) | |
 | base 리비전 (캐시 스냅샷 = adapter_config) | |
 | 색인 대조 (total_size / 텐서 집합) | |
 | 파일 수 / 총 바이트 | |
