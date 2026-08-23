@@ -476,7 +476,11 @@ for key in ["bridge_orig", DATASET_KEY]:           # 남의 통계 vs 내 통계
 # week1 실습 6 의 히스토그램 범위와도 비교한다.
 action_stats = stats[DATASET_KEY]["action"]         # <- 실제 구조에 맞게 교체
 for name, value in action_stats.items():
-    print(f"   {name}: {np.round(np.asarray(value), 4)}")
+    value = np.asarray(value)
+    if value.dtype == bool:                        # mask 는 bool 배열 -- 반올림하면 캐스팅 에러
+        print(f"   {name}: {value}")
+    else:
+        print(f"   {name}: {np.round(value, 4)}")
 ```
 
 
@@ -488,6 +492,7 @@ for name, value in action_stats.items():
 - `.to("cuda:0", dtype=torch.float16)`: 전처리 결과를 GPU 로 올리고 자료형을 맞춘다. 모델이 fp16 으로 계산하므로 입력도 맞춰 준다.
 - `with torch.no_grad()`: 추론이므로 그래디언트가 필요 없다. 메모리와 시간을 아낀다.
 - `do_sample=False`: 확률적 샘플링을 끈다. 같은 입력에 항상 같은 출력이 나오게 하는 설정이고, 실습 4 의 결정성 검사가 이 값에 의존한다.
+- `mask`: action 통계 안에 함께 저장된 bool 배열로, 7개 차원 중 어느 차원을 역정규화할지 표시한다 (보통 gripper 차원만 `False`). 참/거짓 값이라 소수점이 없으므로 `np.round` 를 적용하면 캐스팅 에러가 난다 -- 그래서 bool 배열만 반올림 없이 그대로 출력한다.
 
 
 **판정**
