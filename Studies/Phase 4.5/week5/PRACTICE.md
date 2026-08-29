@@ -273,6 +273,14 @@ print(f"\n완료: {args.out}")
 
 
 - `argparse`: `--model` 같은 옵션을 정의하면 `args.model` 로 값을 받을 수 있다. **인자로 받는 것과 코드를 고치는 것의 차이**가 이번 주의 핵심이다. 인자는 결과 파일에 기록되므로 사후 검증이 되고, 코드 수정은 기록되지 않는다.
+- `AutoModelForVision2Seq`: 특정 모델 클래스가 아니라 디스패처다. 체크포인트의 `config.json` 을 읽고 이 모델이 OpenVLA 임을 판단해, 알맞은 실제 클래스를 대신 골라 인스턴스화한다.
+- `from_pretrained(...)` 의 인자들 — "어떤 코드로, 어떤 정밀도로, 어떤 attention 구현으로, 어떤 로딩 방식으로 GPU 에 올릴지" 를 지정한다:
+  - `args.model` (첫 위치 인자): 로드할 모델의 위치. 허브 이름(`openvla/openvla-7b`)이면 HuggingFace Hub 에서 내려받고, 로컬 경로면 그 디렉터리의 체크포인트를 읽는다. 두 측정 간에 바뀌는 유일한 모델 변수다.
+  - `attn_implementation="eager"`: attention 연산을 어떤 구현으로 돌릴지 고른다. `eager` 는 attention 수식을 PyTorch 기본 연산으로 그대로 계산한다 — 가장 느리지만 추가 패키지(flash-attn) 없이 어디서든 돌아간다. 구현이 달라도 수학적 결과는 같고 속도만 다르다. week4 와 같은 값을 쓰는 것 자체가 변인 통제다.
+  - `torch_dtype=torch.float16`: 가중치를 올릴 때의 부동소수점 정밀도. 지정하지 않으면 fp32(32비트)로 올라가 메모리를 2배로 먹는다. 4-bit 양자화와 함께 쓰이면 역할이 좁아져서, 양자화되지 않는 부분(LayerNorm 등)과 중간 연산의 정밀도만 정한다. `bnb_4bit_compute_dtype=torch.float16` 과 짝을 맞춘 값이다.
+  - `low_cpu_mem_usage=True`: 로딩 중 CPU RAM 피크를 줄인다. 기본 로딩은 "랜덤 초기화 모델을 먼저 만들고 체크포인트를 읽어 덮어쓰기" 순서라 한순간 모델 2벌 분량의 RAM 이 필요한데, 이 옵션은 빈 껍데기(meta device)에 체크포인트 텐서를 바로 채워 넣어 1벌 분량만 쓴다.
+  - `trust_remote_code=True`: OpenVLA 는 transformers 내장 아키텍처가 아니다. 모델 클래스 정의가 허브 레포 안의 파이썬 파일로 들어 있고, 이 플래그가 있어야 그 코드를 내려받아 실행한다. 임의 코드 실행에 동의하는 옵션이므로 신뢰하는 레포에만 쓴다. `AutoProcessor.from_pretrained` 에 붙은 것도 같은 이유다.
+  - `quantization_config=bnb_config`: 위에서 만든 4-bit 설정을 적용한다. Linear 층 가중치를 NF4 4비트로 압축해 GPU 에 올리므로 7B 모델이 fp16 약 14GB 에서 약 4GB 수준으로 줄어든다. 연산 시에는 4비트 값을 fp16 으로 풀어서(dequantize) 계산한다 — 그 계산 정밀도가 `bnb_4bit_compute_dtype` 이다. 두 모델에 같은 양자화를 걸어야 성능 차이가 fine-tuning 효과인지 양자화 손실인지 구분할 수 있다.
 - `subprocess.run(["git", "rev-parse", "--short", "HEAD"])`: 현재 커밋 해시를 읽어 메타에 넣는다. "이 결과가 어느 버전의 코드에서 나왔나" 를 결과 파일이 스스로 답하게 만드는 장치다.
 - `stages` 딕셔너리와 `|=`: `|=` 는 "한 번이라도 True 였으면 True 로 유지" 다. 도달 단계는 episode 중 한 번 달성하면 그 뒤에 상태가 바뀌어도 도달한 것으로 센다.
 - `assert set(base_seeds) <= set(eval_seeds)`: `<=` 는 부분집합 검사다. week0 목록이 새 목록에 포함돼야 week0 결과와의 대조(실습 4) 가 가능하다.
