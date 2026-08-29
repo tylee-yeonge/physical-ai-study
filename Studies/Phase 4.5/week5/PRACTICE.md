@@ -117,6 +117,7 @@ sim 패키지가 이 venv 에 없으면 week0 실습 1-6 의 판단(합칠지 �
 | 고정 상수 | 환경 id, step 예산, action repeat, instruction, 카메라 키, 이미지 크기, N | **절대 고정** |
 | 인자 | 모델 경로, `unnorm_key`, 출력 경로 | 이 셋만 바뀐다 |
 | 모델 적재 | week4 와 동일한 4-bit 설정 | 고정 |
+| 통계 주입 | 체크포인트 옆 dataset_statistics.json 을 norm_stats 에 병합 | 고정 (파일이 있을 때만 동작) |
 | seed 목록 | week0 산출물에서 읽고 규칙으로 확장 | 두 측정에서 동일 |
 | 실행 메타 | 조건을 결과 파일 첫 줄에 기록 | — |
 | episode 루프 | 결과를 seed 단위로 즉시 기록 | — |
@@ -134,6 +135,7 @@ sim 패키지가 이 venv 에 없으면 week0 실습 1-6 의 판단(합칠지 �
 """
 import argparse                                    # 모델만 인자로 받기 위해
 import json
+import os                                          # dataset_statistics.json 경로 조합/존재 확인용
 import subprocess                                  # 스크립트 커밋 해시 기록용
 import numpy as np
 import torch
@@ -152,6 +154,46 @@ INSTRUCTION = "pick up the cube"                   # week0-1 동일 문구
 CAMERA_KEY = ("sensor_data", "base_camera", "rgb")  # week0 확정 경로
 IMAGE_SIZE = 224                                   # OpenVLA 입력 크기 (관측 카메라도 224 native)
 N_EPISODES = 100                                   # 실습 2 에서 확정한 값
+POS_LIMIT = 0.1                                    # pd_ee_delta_pose 위치 한계 (m). action 1.0 = 0.1 m (계약 표 1번)
+ROT_SCALE = -0.1                                   # 회전 스케일 (rad). rot_lower 곱셈 때문에 부호 반전 (계약 표 4번)
+REACH_DIST = 0.05                                  # reached 임계값 (m). week0 실습 6 확정값
+LIFT_Z = 0.04                                      # lifted 임계값 (m). week0 실습 6 확정값
+
+
+# ===== 변환/판정 함수: week0 실습 6 과 동일한 규칙 =====
+def to_maniskill_action(raw_action):
+    """OpenVLA 물리량 출력(7,)을 ManiSkill pd_ee_delta_pose 정규화 action(7,)으로 바꾼다.
+
+    규칙의 근거는 week0 action_contract.md 계약 표. 두 모델 모두 물리량(m, rad,
+    gripper 0-1)을 내므로 같은 정변환을 쓴다 -- week1 이 학습 라벨을 역변환으로
+    같은 물리량 규약에 맞춰 저장했기 때문이다.
+
+    Args:
+        raw_action: vla.predict_action() 출력 numpy 배열 (7,)
+
+    Returns:
+        ManiSkill action (7,) float32. 전 차원 [-1, 1] 정규화값
+    """
+    pos = raw_action[:3] / POS_LIMIT               # 미터 -> 정규화 (±0.1 m 가 ±1)
+    rot = raw_action[3:6] / ROT_SCALE              # 라디안 -> 정규화, 부호 반전
+    rot_norm = np.linalg.norm(rot)                 # 회전은 축별이 아니라 3벡터 노름으로 제한된다
+    if rot_norm > 1.0:                             # 노름이 1 을 넘으면 방향을 유지한 채 축소
+        rot = rot / rot_norm
+    grip = 2.0 * raw_action[6] - 1.0               # [0,1](0=닫힘) -> [-1,1](-1=닫힘)
+    action = np.concatenate([np.clip(pos, -1, 1), rot, [np.clip(grip, -1, 1)]])
+    return action.astype(np.float32)               # env.step 이 받는 dtype 으로 맞춘다
+
+
+def to_vec(pose_field):
+    """(1, 3) 형태 GPU 텐서 좌표를 (3,) numpy 벡터로 바꾼다.
+
+    Args:
+        pose_field: pose.p 같은 배치 텐서
+
+    Returns:
+        (3,) float numpy 배열
+    """
+    return np.asarray(pose_field.cpu())[0]         # GPU -> CPU -> numpy, 배치 차원 제거
 
 
 # ===== 인자: 이 두 개만 바뀐다 =====
@@ -178,6 +220,18 @@ vla = AutoModelForVision2Seq.from_pretrained(
     trust_remote_code=True,
     quantization_config=bnb_config,
 )
+
+
+# ===== 통계 주입: 파인튜닝 체크포인트의 dataset_statistics.json (week4 실습 3 과 같은 주입) =====
+# 파인튜닝이 만든 새 데이터셋 통계는 config.json 의 norm_stats 에 병합되지 않고
+# 체크포인트 옆 dataset_statistics.json 별도 파일로만 저장된다.
+# 주입하지 않으면 predict_action 이 unnorm_key 를 찾지 못해 assert 로 죽는다.
+stats_path = os.path.join(args.model, "dataset_statistics.json")
+if os.path.exists(stats_path):                     # zero-shot(허브 이름)에는 이 파일이 없다
+    with open(stats_path) as f:
+        vla.norm_stats.update(json.load(f))        # 기존 키를 유지한 채 새 키만 추가
+
+
 prompt = f"In: What action should the robot take to {INSTRUCTION}?\nOut:"
 
 
@@ -200,7 +254,8 @@ commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"],
 meta = {"model": args.model, "unnorm_key": args.unnorm_key, "env_id": ENV_ID,
         "max_episode_steps": MAX_EPISODE_STEPS, "action_repeat": ACTION_REPEAT,
         "instruction": INSTRUCTION, "n_episodes": N_EPISODES,
-        "quant": "nf4+dq+fp16", "commit": commit}
+        "quant": "nf4+dq+fp16", "reach_dist": REACH_DIST, "lift_z": LIFT_Z,
+        "commit": commit}
 
 
 # 환경 생성 인자는 week0 실습 6 과 동일 -- 하나라도 다르면 before/after 가 성립하지 않는다
@@ -212,6 +267,7 @@ env = gym.make(
     sensor_configs=dict(width=224, height=224),    # week0 과 동일 (관측 카메라 native 224)
     max_episode_steps=MAX_EPISODE_STEPS,
 )
+base = env.unwrapped                               # 큐브·TCP 좌표는 wrapper 를 벗겨야 보인다
 
 
 # ===== episode 루프: 결과를 seed 단위로 즉시 append (중단 대비 + 짝지은 비교) =====
@@ -236,14 +292,16 @@ with open(args.out, "w") as out_file:
                     unnorm_key=args.unnorm_key,    # 인자로 받은 키
                     do_sample=False,               # 결정적 출력
                 )
-            action = raw_action                    # <- week0 정변환 적용으로 교체
+            action = to_maniskill_action(raw_action)   # week0 정변환 (안 거치면 위치가 1/10, 회전이 반대)
             for _ in range(ACTION_REPEAT):         # 같은 action 을 4 step (week0 과 동일한 실효 주기)
                 obs, reward, terminated, truncated, info = env.step(action)
 
-                # 부분 도달률: week0 실습 6 에서 정한 판정식과 임계값을 그대로 쓴다
-                # stages["reached"] |= <week0 판정식>
-                # stages["grasped"] |= <week0 판정식>
-                # stages["lifted"]  |= <week0 판정식>
+                # 부분 도달률: week0 실습 6 의 판정식과 임계값 그대로
+                tcp = to_vec(base.agent.tcp.pose.p)               # 그리퍼 끝 현재 위치
+                cube = to_vec(base.cube.pose.p)                   # 큐브 현재 위치
+                stages["reached"] |= bool(np.linalg.norm(tcp - cube) < REACH_DIST)
+                stages["grasped"] |= bool(info["is_grasped"].item())
+                stages["lifted"] |= bool(cube[2] > LIFT_Z)
                 stages["placed"] |= bool(info["success"].item())
 
                 if stages["placed"]:
@@ -281,6 +339,7 @@ print(f"\n완료: {args.out}")
   - `low_cpu_mem_usage=True`: 로딩 중 CPU RAM 피크를 줄인다. 기본 로딩은 "랜덤 초기화 모델을 먼저 만들고 체크포인트를 읽어 덮어쓰기" 순서라 한순간 모델 2벌 분량의 RAM 이 필요한데, 이 옵션은 빈 껍데기(meta device)에 체크포인트 텐서를 바로 채워 넣어 1벌 분량만 쓴다.
   - `trust_remote_code=True`: OpenVLA 는 transformers 내장 아키텍처가 아니다. 모델 클래스 정의가 허브 레포 안의 파이썬 파일로 들어 있고, 이 플래그가 있어야 그 코드를 내려받아 실행한다. 임의 코드 실행에 동의하는 옵션이므로 신뢰하는 레포에만 쓴다. `AutoProcessor.from_pretrained` 에 붙은 것도 같은 이유다.
   - `quantization_config=bnb_config`: 위에서 만든 4-bit 설정을 적용한다. Linear 층 가중치를 NF4 4비트로 압축해 GPU 에 올리므로 7B 모델이 fp16 약 14GB 에서 약 4GB 수준으로 줄어든다. 연산 시에는 4비트 값을 fp16 으로 풀어서(dequantize) 계산한다 — 그 계산 정밀도가 `bnb_4bit_compute_dtype` 이다. 두 모델에 같은 양자화를 걸어야 성능 차이가 fine-tuning 효과인지 양자화 손실인지 구분할 수 있다.
+- `vla.norm_stats.update(...)`: `predict_action` 은 `unnorm_key` 로 `norm_stats` 딕셔너리를 찾아 action 을 역정규화한다 (week4 실습 3). 허브의 zero-shot 모델은 사전학습에 쓴 데이터셋들의 통계를 `config.json` 에 들고 있지만, 파인튜닝 체크포인트는 새 데이터셋(`maniskill_pickcube`) 통계를 `config.json` 에 병합하지 않고 `dataset_statistics.json` 별도 파일로만 저장한다. 그래서 로드 직후 이 파일이 있으면 읽어 합친다. `os.path.exists` 분기 하나로 zero-shot(파일 없음)과 fine-tuned(파일 있음)를 같은 코드가 처리하므로, 스크립트를 나누지 않는다는 원칙이 유지된다.
 - `subprocess.run(["git", "rev-parse", "--short", "HEAD"])`: 현재 커밋 해시를 읽어 메타에 넣는다. "이 결과가 어느 버전의 코드에서 나왔나" 를 결과 파일이 스스로 답하게 만드는 장치다.
 - `stages` 딕셔너리와 `|=`: `|=` 는 "한 번이라도 True 였으면 True 로 유지" 다. 도달 단계는 episode 중 한 번 달성하면 그 뒤에 상태가 바뀌어도 도달한 것으로 센다.
 - `assert set(base_seeds) <= set(eval_seeds)`: `<=` 는 부분집합 검사다. week0 목록이 새 목록에 포함돼야 week0 결과와의 대조(실습 4) 가 가능하다.
@@ -288,12 +347,14 @@ print(f"\n완료: {args.out}")
 - `out_file.flush()`: 파이썬은 효율을 위해 출력을 버퍼에 모아 두고 나중에 쓴다. `flush()` 는 지금 바로 쓰게 한다. 이 한 줄이 중단 시 결과 보존의 실체다.
 - `{"_meta": meta}` 를 첫 줄에: 결과 파일이 조건을 스스로 들고 있게 한다. 실습 5 의 조건 대조가 이 줄을 읽는다.
 - `ACTION_REPEAT` 루프: week0 실습 6 과 같은 실효 주기(5 Hz)를 만든다. 이것이 빠지면 정책이 학습 주기보다 4배 빠르게 명령을 내는 셈이 되어, 측정 조건이 week0 과 달라지고 실습 4 의 week0 재현 검사도 통과할 수 없다.
-- `action = raw_action` 자리: week0 정변환을 적용해야 한다. 그대로 두면 물리량이 정규화 없이 env 로 들어간다.
+- `to_maniskill_action`: week0 정변환이다. OpenVLA 는 물리량(m, rad)을 내고 env 는 [-1, 1] 정규화값을 받으므로, 이 함수를 거치지 않으면 위치 명령이 의도의 1/10 로 줄고 회전이 반대로 돈다. fine-tuned 모델에도 같은 함수를 쓴다 — week1 이 학습 라벨을 역변환(`to_openvla_actions`)으로 같은 물리량 규약에 맞춰 저장했기 때문이다.
+- 단계 판정식: reached(tcp-큐브 거리 < 0.05 m) / grasped(`info["is_grasped"]`) / lifted(큐브 z > 0.04 m) / placed(`info["success"]`) 모두 week0 실습 6 의 판정 경로와 임계값 그대로다. 좌표는 `env.unwrapped` 로 wrapper 를 벗겨야 읽을 수 있다.
 
 
 **확인 포인트**
 
 - 상수 블록의 값이 week0/week4 기록과 하나도 다르지 않은가 (표로 대조한다 — week4 마무리의 "고정해 넘기는 것" 표가 그 대조표다)
+- fine-tuned 경로로 실행했을 때 `unnorm_key` assert 없이 첫 추론이 지나가는가 (통계 주입이 동작한다는 뜻)
 - `_meta` 첫 줄에 조건이 다 들어갔는가
 - 결과 파일이 실행 중에도 계속 자라는가 (즉시 기록 확인 — 다른 터미널에서 `wc -l` 로 줄 수가 늘어나는지 본다)
 
