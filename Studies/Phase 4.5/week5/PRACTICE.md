@@ -70,7 +70,7 @@ flowchart TD
 ### 0.4 어디서 실행하나
 
 
-week4 와 같은 venv(`.venv-vla`) 에서, `week5/` 를 cwd 로 두고 실행한다. 결과는 `week5/outputs/` 에 떨어진다.
+week4 와 같은 venv(`.venv-vla`) 에서, `week5/scripts/` 를 cwd 로 두고 실행한다. 결과는 `week5/outputs/` (스크립트 기준 `../outputs/`) 에 떨어진다.
 
 
 ---
@@ -84,8 +84,8 @@ week4 와 같은 환경이다. **버전을 바꾸지 않는다.** 여기서 라�
 
 ```bash
 source "/workspace/study/physical-ai-study/Studies/Phase 4/.venv-vla/bin/activate"
-cd "/workspace/study/physical-ai-study/Studies/Phase 4.5/week5"
-mkdir -p outputs
+cd "/workspace/study/physical-ai-study/Studies/Phase 4.5/week5/scripts"
+mkdir -p ../outputs
 ```
 
 
@@ -128,9 +128,9 @@ sim 패키지가 이 venv 에 없으면 week0 실습 1-6 의 판단(합칠지 �
 
 실행:
   python eval_harness.py --model openvla/openvla-7b --unnorm-key bridge_orig \
-      --out outputs/eval_zeroshot.jsonl
+      --out ../outputs/eval_zeroshot.jsonl
   python eval_harness.py --model /workspace/models/openvla-maniskill-ft --unnorm-key maniskill_pickcube \
-      --out outputs/eval_finetuned.jsonl
+      --out ../outputs/eval_finetuned.jsonl
 """
 import argparse                                    # 모델만 인자로 받기 위해
 import json
@@ -182,14 +182,14 @@ prompt = f"In: What action should the robot take to {INSTRUCTION}?\nOut:"
 
 
 # ===== eval seed 목록: week0 산출물에서 읽는다 (손으로 옮겨 적지 않는다) =====
-with open("../week0/outputs/zeroshot_baseline.json") as f:
+with open("../../week0/outputs/zeroshot_baseline.json") as f:
     base_seeds = json.load(f)["seeds"]             # week0 이 쓴 목록
 # N 을 늘렸으므로 목록을 확장한다. 규칙을 코드로 고정해 두 측정이 같은 목록을 쓰게 한다.
 # 주의: week1 개발에 쓴 seed (DUMP_SEED=100 등) 는 확장 목록에 넣지 않는다 -- 미리 들여다본 문제다
 eval_seeds = list(range(N_EPISODES))               # <- 실습 2 에서 정한 확장 규칙으로 교체
 assert set(base_seeds) <= set(eval_seeds), "week0 목록이 새 목록에 포함되어야 한다"
 # 학습 seed 와의 겹침 검사 (week1 collect_meta.json 의 train_seeds)
-with open("../week1/outputs/dataset/collect_meta.json") as f:
+with open("../../week1/outputs/dataset/collect_meta.json") as f:
     train_seeds = set(json.load(f)["train_seeds"])
 assert not (set(eval_seeds) & train_seeds), "eval seed 에 학습 seed 가 섞였다"
 
@@ -472,12 +472,12 @@ fine-tuned  {성공}/{N} (95% 구간 {하한}-{상한}%)
 
 
 ```bash
-cd "/workspace/study/physical-ai-study/Studies/Phase 4.5/week5"
+cd "/workspace/study/physical-ai-study/Studies/Phase 4.5/week5/scripts"
 python eval_harness.py \
   --model openvla/openvla-7b \
   --unnorm-key bridge_orig \
-  --out outputs/eval_zeroshot.jsonl \
-  2>&1 | tee outputs/eval_zeroshot.log
+  --out ../outputs/eval_zeroshot.jsonl \
+  2>&1 | tee ../outputs/eval_zeroshot.log
 ```
 
 
@@ -512,8 +512,8 @@ python eval_harness.py \
 python eval_harness.py \
   --model /workspace/models/openvla-maniskill-ft \
   --unnorm-key maniskill_pickcube \
-  --out outputs/eval_finetuned.jsonl \
-  2>&1 | tee outputs/eval_finetuned.log
+  --out ../outputs/eval_finetuned.jsonl \
+  2>&1 | tee ../outputs/eval_finetuned.log
 ```
 
 
@@ -534,8 +534,8 @@ def load(path):
     return lines[0]["_meta"], lines[1:]
 
 
-zero_meta, zero_records = load("outputs/eval_zeroshot.jsonl")
-ft_meta, ft_records = load("outputs/eval_finetuned.jsonl")
+zero_meta, zero_records = load("../outputs/eval_zeroshot.jsonl")
+ft_meta, ft_records = load("../outputs/eval_finetuned.jsonl")
 
 
 # 5-1. 조건 일치 검사: model/unnorm_key 만 달라야 한다
