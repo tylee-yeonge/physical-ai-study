@@ -4,14 +4,14 @@
 > 성격: **검토 보고서** (트렌드 취합 + 방향 판단). 원본 문서를 직접 수정하지 않으며, §7 의 갱신 지시 목록이 실제 수정의 입력이다
 > 사유: v1 설계 시점 (2026.06) 과 현재 사이에 VLA 필드가 한 세대 넘어갔다 (π0.7 / Gemini Robotics 2 / GR00T N1.7). [README 부록 D](../../README.md) 의 재평가 입력 *"OpenVLA 후속 모델 등장 여부"* 는 조건문의 결과가 이미 나온 상태라, 재평가 #1 (2026.11) 전에 입력을 문서로 정리해 둔다
 > 현재 상태: **v1.5 (Phase 4.5) 는 마지막 week (Section 3: eval + before/after 분석 + 블로그) 진행 중.** zero-shot baseline (2026-08-03) 과 RunPod LoRA 1사이클 (2026-08-13, 94분 / $1.18) 은 `Measurements/` 에 기록 완료 — 로드맵 원안 (Sections 1-3 = 2026.09-11) 대비 약 2개월 앞서 있다
-> **후속 결정 (2026-08-30)**: [실기 전환 plan](../superpowers/plans/2026-08-30-realworld-transition-plan.md) 확정 — 본 문서 초안의 **v1.6 (sim, 2번째 모델) 제안은 폐기**되고 실기 v2.5 로 흡수됐다. §0·§2·§4·§5·§7 은 그 결정을 반영한 갱신본이다 (같은 날 갱신)
+> **후속 결정 (2026-08-30)**: [실기 전환 plan](../superpowers/plans/2026-08-30-realworld-transition-execution.md) 확정 — 본 문서 초안의 **v1.6 (sim, 2번째 모델) 제안은 폐기**되고 실기 v2.5 로 흡수됐다. §0·§2·§4·§5·§7 은 그 결정을 반영한 갱신본이다 (같은 날 갱신)
 > 출처 주의: §1 의 트렌드 항목은 2026-08-30 웹 조사 (랩 블로그·논문·커뮤니티) 기준이다. 개별 수치를 외부 산출물 (블로그 등) 에 인용할 때는 원 출처를 재확인한다
 
 ---
 
 ## 0. 결론 먼저
 
-1. **v1.5 는 갈아엎지 않는다 — OpenVLA 로 그대로 마감한다.** v1.5 의 성공 기준은 "성공률 상승"이 아니라 "adaptation 파이프라인의 설계-실행-정량 분석"이고 (Phase 4.5 성공 기준 절), 그 기준은 OpenVLA 로 이미 성립했다. 모델이 구세대라는 사실은 둘째 층 증거의 유효성을 깎지 않는다. [실기 전환 plan](../superpowers/plans/2026-08-30-realworld-transition-plan.md)도 같은 전제 위에 선다 (plan 헤더: "v1.5 를 되돌리지 않는다").
+1. **v1.5 는 갈아엎지 않는다 — OpenVLA 로 그대로 마감한다.** v1.5 의 성공 기준은 "성공률 상승"이 아니라 "adaptation 파이프라인의 설계-실행-정량 분석"이고 (Phase 4.5 성공 기준 절), 그 기준은 OpenVLA 로 이미 성립했다. 모델이 구세대라는 사실은 둘째 층 증거의 유효성을 깎지 않는다. [실기 전환 plan](../superpowers/plans/2026-08-30-realworld-transition-execution.md)도 같은 전제 위에 선다 (plan 헤더: "v1.5 를 되돌리지 않는다").
 2. **모델 교체는 sim 을 경유하지 않고 실기 전환으로 간다** (2026-08-30 plan 확정): SO-101 즉시 구매 → 스파이크 2026.09 첫 2주 (LeRobot 네이티브: teleop + 녹화 + SmolVLA zero-shot + latency) → 통과 시 Stage 1 본 빌드 2026.10-11 → **v2.5 (SmolVLA 실기 before/after) 2026.11-12.** 본 검토 초안의 v1.6 (sim, 동일 하네스 2번째 모델) 은 폐기 — SmolVLA 는 LeRobot 커뮤니티 SO-100/101 데이터로 사전학습돼 실기 zero-shot 이 0% 에 붙지 않을 가능성이 높아, sim 우회 없이 실기에서 before/after 가 성립한다. 리포가 Phase 7 (2027.08) 로 미뤄둔 "둘째 층 증거의 real 승격"이 약 1년 당겨진다.
 3. **OpenVLA 실측 표 (300ms / 3.33Hz / int4) 는 "비교 baseline"으로 재정의한다.** 단독 표일 때는 한 모델의 수치지만, 같은 4070 에서 SmolVLA latency (스파이크 must 기준 4) 와 v2.5 비교표 (sim/real × AR/chunk) 가 나란히 붙는 순간 "AR VLA vs chunk VLA 를 동일 하드웨어에서 비교한 셋째 층 증거"로 격상된다.
 4. **문서 수정은 plan §8 + 본 검토 잔여분을 §7 로 통합했고, v1.5 마감 커밋과 분리해 별도 커밋으로 넣는다** (plan §10). 부록 B/D 의 낡은 조건문 교체, 타임라인 전진, Roadmap 4개 파일의 Dynamixel 잔재 (확정 하드웨어는 Feetech STS3215) 정리.
@@ -152,7 +152,7 @@
 
 ## 4. 모델 교체 경로 — v1.6 (sim) 폐기, 실기 v2.5 로 흡수 (2026-08-30 확정)
 
-> 본 절의 초안은 "v1.6: 동일 하네스 2번째 모델 (sim, SmolVLA)" 신설 제안이었다. 같은 날 [실기 전환 plan](../superpowers/plans/2026-08-30-realworld-transition-plan.md) 이 확정되며 **v1.6 은 검토 단계에서 폐기**됐다. 이유: SmolVLA 는 LeRobot 커뮤니티 SO-100/101 데이터로 사전학습돼 **실기 zero-shot 이 0% 에 붙지 않을 가능성이 높다** — sim 을 경유하지 않아도 실기에서 before/after 가 성립하므로, sim 에서 2번째 모델을 돌리는 중간 단계가 가치를 잃었다. 실행 정의의 원본은 plan 이다. 이 절은 요약 + 검토 초안에서 살아남는 논리만 남긴다.
+> 본 절의 초안은 "v1.6: 동일 하네스 2번째 모델 (sim, SmolVLA)" 신설 제안이었다. 같은 날 [실기 전환 plan](../superpowers/plans/2026-08-30-realworld-transition-execution.md) 이 확정되며 **v1.6 은 검토 단계에서 폐기**됐다. 이유: SmolVLA 는 LeRobot 커뮤니티 SO-100/101 데이터로 사전학습돼 **실기 zero-shot 이 0% 에 붙지 않을 가능성이 높다** — sim 을 경유하지 않아도 실기에서 before/after 가 성립하므로, sim 에서 2번째 모델을 돌리는 중간 단계가 가치를 잃었다. 실행 정의의 원본은 plan 이다. 이 절은 요약 + 검토 초안에서 살아남는 논리만 남긴다.
 
 ### 4.1 확정 경로 (plan 요약)
 
@@ -261,4 +261,4 @@ Phase 7 의 대상 모델 표기는 재평가와 무관하게 지금 고친다 �
 - HumanScale (2026.06), EgoScale, VLA-RFT, WMPO (ICLR'26), RehearseVLA (CVPR'26), World-VLA-Loop, X-VLA, RDT2, FASTer, OmniSAT — arXiv (제목 검색)
 - Hugging Face — SmolVLA 모델 카드 / LeRobot 문서
 - AGIBOT — AGIBOT WORLD 2026 · GO-2 발표 (2026.04)
-- 리포 내부: [실기 전환 plan](../superpowers/plans/2026-08-30-realworld-transition-plan.md) (2026-08-30 결정, §4·§7 의 원본) · [`Measurements/openvla-maniskill-zeroshot/`](../../Measurements/openvla-maniskill-zeroshot/findings.md) · [`Measurements/openvla-lora-runpod/`](../../Measurements/openvla-lora-runpod/findings.md) · [`Roadmap/Phase 4.5.md`](../../Roadmap/Phase%204.5.md) · [README 부록 B/D](../../README.md)
+- 리포 내부: [실기 전환 plan](../superpowers/plans/2026-08-30-realworld-transition-execution.md) (2026-08-30 결정, §4·§7 의 원본) · [`Measurements/openvla-maniskill-zeroshot/`](../../Measurements/openvla-maniskill-zeroshot/findings.md) · [`Measurements/openvla-lora-runpod/`](../../Measurements/openvla-lora-runpod/findings.md) · [`Roadmap/Phase 4.5.md`](../../Roadmap/Phase%204.5.md) · [README 부록 B/D](../../README.md)

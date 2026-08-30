@@ -4,7 +4,7 @@
 > 상태: Approved (2026-08-30 대화에서 확정. 스파이크 판정 (2026-09-21) 과 분기 재평가 #1 (2026.11) 결과로 갱신한다)
 > 대상: 모델 교체 경로와 하드웨어 확보 시점 — v1.5 마감 방침 (§2), sim v1.6 폐기 판단 (§3), 실기 전환 구조 (§4), 모델 선택 (§5), 리스크·되돌림 (§6)
 > 사유: 2026-08-30 VLA 트렌드 조사로 [README 부록 D](../../../README.md) 의 재평가 입력 *"OpenVLA 후속 모델 등장 여부"* 조건문의 결과가 확정됐다 (π0.7 / Gemini Robotics 2 / GR00T N1.7 — 한 세대 교체). 대응 경로를 하나의 의사결정 기록으로 남긴다
-> Plan: [`docs/superpowers/plans/2026-08-30-realworld-transition-plan.md`](../plans/2026-08-30-realworld-transition-plan.md) (실행 보드이자 절차·통과 기준의 원본 — 체크는 그쪽에서만)
+> Plan: [`docs/superpowers/plans/2026-08-30-realworld-transition-execution.md`](../plans/2026-08-30-realworld-transition-execution.md) (실행 보드이자 절차·통과 기준의 원본 — 체크는 그쪽에서만)
 > 근거 원본: [VLA 트렌드 취합 + 로드맵 방향 검토](../../research/2026-08-30-vla-trends-and-roadmap-review.md) — 트렌드 상세 (§1), 유지/변경 분석 (§2), 문서 갱신 지시 목록 (§7)
 
 ---
@@ -78,7 +78,7 @@ sim v1.6 의 존재 이유는 "새 모델 실측을 싸게 확보"였다. 그런
 
 ### 4.1 확정 경로
 
-절차·통과 기준·주차표·구매 체크리스트의 원본은 [실기 전환 plan](../plans/2026-08-30-realworld-transition-plan.md) 이다. 구조만 요약한다.
+절차·통과 기준·주차표·구매 체크리스트의 원본은 [실기 전환 plan](../plans/2026-08-30-realworld-transition-execution.md) 이다. 구조만 요약한다.
 
 | 단계 | 시점 | 게이트 |
 |---|---|---|
