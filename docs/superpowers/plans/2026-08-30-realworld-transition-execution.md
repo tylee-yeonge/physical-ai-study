@@ -452,7 +452,7 @@ nice: 부분 도달률 (reached / grasped) 기록 시도, 손목 카메라 추�
 
 - [ ] SO-101 키트 + 손목 카메라 + 작업대 자재 주문 (§4)
 - [ ] 키트 사양서로 모터 ID · 전원 · USB 보드 동봉 여부 확인 (§4)
-- [ ] **vla-lab repo 초기화** — README (repo 성격: physical-ai-study 의 공개 산출물 발행 채널) + 라이선스 + 디렉토리 골격 (`v1.5-openvla-lora-sim/` 등 산출물 단위)
+- [x] **vla-lab repo 초기화** — 완료 (2026-08-30): README (발행 채널 성격 + 산출물 표 + 보고 원칙) + MIT LICENSE (repo 생성 시 포함돼 있음) + `v1.5-openvla-lora-sim/` 골격 (마감 문서 7절 구조, 결과·분석은 작성 예정 표기)
 - [ ] **v1.5 마감 문서를 vla-lab 에 발행** — adaptation 설계-실행-분석 서사 + "선정 시점 (2026.06) vs 마감 시점의 필드 변화" 단락 (검토 보고서 §3.2) + 동반 코드/결과 표. LinkedIn 링크 공유
 - [x] `Studies/Hardware-Arm/spike/` 디렉토리 생성 + RESULT.md 골격 (§8.6 #58) — 완료 (2026-08-30)
 - [x] **문서 수정 실행 보드 §8 #1-63 전체 반영** — 단일 커밋, v1.5 마감 커밋과 분리 (§8.7) — 완료 (2026-08-30. 검증 grep 에서 잡힌 §8 목록 밖 잔재 — README Phase 7 요약 절 OpenVLA fork, Hardware-Arm 헤더 기간, Phase 3 velog 표기, Phase 4 체크포인트 기록, remediation plan 체크 항목 — 도 함께 정리)
