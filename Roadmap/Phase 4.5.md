@@ -3,10 +3,11 @@
 
 > **기간**: **Section 0 은 2026.08 (전진 배치)** / Sections 1-3 은 2026.09-11 (약 7-10주). 전진 사유: sim 환경과 zero-shot baseline 이 Sections 1-3 의 선행 조건이고, LoRA 학습을 RunPod 에서 돌리기 위한 컨테이너화를 여기서 끝내 둔다 (LoRA 는 24GB+ 를 요구해 로컬 4070 으로는 불가). v1 에서 sim 을 제외하면서 **sim 환경 구축 + zero-shot baseline 측정이 본 Phase 로 이관**돼 원안(6-8주)보다 약 1-2주 늘었다.
 > **목표**: sim task 의 zero-shot 성공률 베이스라인을 **본 Phase 에서 측정**하고, 그 위에서 OpenVLA 를 LoRA 로 **adaptation** 한 뒤 동일 sim task 의 성공률을 **before(zero-shot)/after(fine-tuned)** 로 비교·정량 분석한다.
-> **범위 (v1.5)**: 경량 LoRA adaptation, **sim 생성 데이터** (자작 팔 데이터 대기 안 함), 단일 task, 동일 embodiment. real 데이터 확장은 Phase 7.
+> **범위 (v1.5)**: 경량 LoRA adaptation, **sim 생성 데이터** (자작 팔 데이터 대기 안 함), 단일 task, 동일 embodiment. real 데이터 확장은 v2.5 (실기 전환 plan §7).
 > **언어**: **Python** (HuggingFace transformers + peft) + **ROS2 (rclpy)** (eval 루프 재사용)
 > **하드웨어**: 학습은 **RunPod RTX 4090** (Community Cloud, 24GB), 추론·eval 은 **로컬 RTX 4070 + 4-bit 양자화**
 > **주간 시간**: 약 6-8시간 (출장 주 보정)
+> **완료 (2026.09 초)**: Section 0-3 완료. 실측: `Measurements/openvla-maniskill-zeroshot/` (2026-08-03) · `Measurements/openvla-lora-runpod/` (2026-08-13). **후속 산출물: v2.5 (real, SmolVLA)** — 실기 전환 plan (`../docs/superpowers/plans/2026-08-30-realworld-transition-execution.md`) §7
 
 
 ---
@@ -18,7 +19,7 @@
 **핵심 산출물 (v1.5)**:
 - LoRA 파이프라인 (sim 데이터 포맷팅 -> RunPod 학습 -> 체크포인트 -> 로컬 머지/양자화)
 - eval harness: zero-shot vs fine-tuned 를 **동일 조건 N회** 로 비교 (N 과 분산까지 보고)
-- 블로그 1편: adaptation **설계-실행-분석** 서사 (성공률 상승 여부와 무관하게 성립)
+- vla-lab 공개 문서 1편: adaptation **설계-실행-분석** 서사 (성공률 상승 여부와 무관하게 성립. 발행 채널: velog → vla-lab, 2026-08-30)
 
 
 ---
@@ -45,7 +46,7 @@
 
 - before/after 를 동일 조건 **N회** 로 측정하고, **N 과 분산(표준편차 또는 신뢰구간)** 을 함께 보고한다.
 - 차이가 노이즈 범위 안이면, **그 사실과 원인 분석(데이터 규모/분포/학습 설정)** 자체를 산출물로 삼는다.
-- 즉 negative 결과여도 "왜 안 올랐는가"의 분석이 둘째 층 역량의 증거가 되도록 블로그 논지를 구성한다.
+- 즉 negative 결과여도 "왜 안 올랐는가"의 분석이 둘째 층 역량의 증거가 되도록 마감 문서 (vla-lab) 논지를 구성한다.
 - **before/after 가 신호를 만들려면 측정 지표가 바닥에 붙지 않아야 한다**: OpenVLA 의 sim zero-shot 성공률은 환경에 따라 편차가 크다 — real2sim 정합을 맞춘 Google Robot 계열에서는 중간대가 보고되지만 (visual matching 기준 pick coke can 16.3% / move near 46.2%), WidowX+Bridge 계열에서는 0% 근처다 (SimplerEnv, CoRL 2024). 즉 신호 유무를 결정하는 손잡이는 **task 난이도가 아니라 (1) 환경의 embodiment·카메라 규약 정합, (2) 지표의 해상도**다. 난이도를 낮춰 "중간 구간"을 만들려는 조정은 성립하지 않는다. 대응 두 가지: 최종 성공률과 함께 **단계별 부분 도달률**(reached / grasped / lifted / placed)을 측정해 before 쪽이 0 으로 잘리지 않게 하고, 0% 를 받았을 때 도메인 갭과 통합 버그를 구분할 수 있도록 하네스 검증을 먼저 통과시킨다 (Section 0). before/after 가 무의미해지는 조건은 before 가 0% 인 것이 아니라 **after 도 0%** 인 것이며, 그 경우는 위 negative 분석으로 받친다.
 
 
@@ -140,7 +141,7 @@
 | 주차 | 내용 | 핵심 |
 |------|------|------|
 | 5 | eval harness: zero-shot vs fine-tuned 를 **동일 조건 N회** | N / 분산 / 신뢰구간 명문화 |
-| 6 | before/after 정량 분석 + 블로그 1편 + v1.5 공개 | negative 결과도 성립하는 논지 |
+| 6 | before/after 정량 분석 + vla-lab 공개 문서 1편 + v1.5 공개 | negative 결과도 성립하는 논지 |
 
 
 > eval 은 본 Phase 에서 구축한 sim 단일 task 루프를 쓰되 모델만 zero-shot / fine-tuned 로 바꿔 N회 반복한다. 변인은 모델 하나로 고정.
@@ -167,7 +168,7 @@
 
 ### 산출물 v1.5 공개
 - [ ] LoRA 파이프라인 + eval harness 코드 정리 + README
-- [ ] 블로그 1편 (adaptation 설계-실행-분석 서사) + velog/LinkedIn 공개
+- [ ] vla-lab 공개 문서 1편 (adaptation 설계-실행-분석 서사 + 선정 시점 vs 마감 시점의 필드 변화 단락) + LinkedIn 링크 공유
 
 
 ---
@@ -201,4 +202,4 @@
 Phase 4.5 완료 후:
 - **6개월 분기 재평가 #1 (2026.11)** — sim adaptation 이 AI 트랙 JD 에서 둘째 층 증거로 읽히는지 점검 (sim 증거의 설득력 한계)
 - **Phase 6 (v2)**: sim-to-real gap(셋째 층)에 집중 — LoRA 는 본 Phase 로 이관됨
-- **Phase 7 (v3)**: 본 Phase 의 adaptation 파이프라인 + eval 을 **자작 팔 teleop(real) 데이터**로 확장 (둘째 층 증거를 real 도메인으로)
+- **v2.5 (2026.11-12)**: 본 Phase 의 eval 논리 (N회·분산·부분 도달률·하네스 검증) 를 **SO-101 실기 + SmolVLA** 로 이식 (둘째 층 증거를 real 도메인으로 — 실기 전환 plan §7). **Phase 7 (v3)** 은 그 위에 안전 인터록·디지털 트윈 결합

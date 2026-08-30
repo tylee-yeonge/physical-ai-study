@@ -8,7 +8,7 @@
 
 ## 실측 결과 (Evidence)
 
-> 이 리포의 가장 강한 증거를 먼저 둔다. 상세 데이터·방법론·판단 근거: [`Measurements/openvla-rtx4070-int4/`](./Measurements/openvla-rtx4070-int4/)
+> 이 리포의 가장 강한 증거를 먼저 둔다. 상세 데이터·방법론·판단 근거: [`Measurements/openvla-rtx4070-int4/`](./Measurements/openvla-rtx4070-int4/). 이 표는 AR 토큰 방식 VLA 의 **비교 baseline** 이다 — action-chunk 계열 (SmolVLA) 과의 동일 하드웨어 비교 (스파이크 must 4, v2.5 비교표) 가 이 수치를 분모로 쓴다.
 
 | 항목 | 결과 | 조건 |
 |---|---|---|
@@ -17,7 +17,7 @@
 | throughput | 3.33 Hz | quasi-static 단일 task 적합 추정 |
 | int8 경로 | 배제 — 성공률 58.1% (int4 71.9%), 1.2 Hz | OpenVLA 논문 Table 2·§5.4 근거 + 실측 판단 |
 
-측정: 2026-06, 재측정 (방법론 보강 + p50/p99/VRAM peak) 2026-08 예정. Rerun 시각화 gif 는 확보 시 이 절에 추가.
+측정: 2026-06. 재측정 (방법론 보강 + p50/p99/VRAM peak) 은 **SmolVLA 비교 측정과 통합해 2026.09 수행** (실기 전환 plan §5.2 must 4). Rerun 시각화 gif 는 확보 시 이 절에 추가.
 
 
 ---
@@ -72,8 +72,8 @@ gantt
     Phase 4.5 Section 0 (sim+Docker+RunPod) :a35a, 2026-08, 1M
     Phase 4.5 Sections 1-3 (LoRA+eval) :a35b, 2026-09, 3M
     section 자작 팔
-    HW 스파이크 (SO-101 드라이버 선검증) :crit, h0, 2026-10, 3w
-    Stage 1 (SO-101 본 빌드, v2 선행) :h1, 2026-12, 2M
+    HW 스파이크 (LeRobot 네이티브 실기 검증) :crit, h0, 2026-09, 2w
+    Stage 1 (SO-101 본 빌드 + ROS2 래핑, v2 선행) :h1, 2026-10, 2M
     Stage 2 (실작업 확장, v3 선행) :h2, 2027-04, 3M
     section 병행 학습 (실지원 이후 저강도)
     Phase 5 (Foundation Model) :a4, 2027-02, 3M
@@ -83,6 +83,7 @@ gantt
     육아휴직 (~2027.03 복직) :active, leave, 2026-09, 6M
     v1 레포 기록 (ROS2 dry-run, 외부 공개는 v2) :milestone, d1, 2026-10, 0d
     v1.5 공개 (LoRA adaptation) :milestone, d15, 2026-11, 0d
+    v2.5 공개 (teleop 데이터셋 + SmolVLA 실기 before-after) :milestone, d25, 2026-12, 0d
     복직 + 본격 실지원 개시 :milestone, d3, 2027-03, 0d
     본격 실지원 (복직 직후) :b2, 2027-03, 9M
     이직 실현 (레인지) :milestone, d2, 2027-12, 0d
@@ -111,13 +112,14 @@ gantt
 | 2026.03-05 | Stage 1 | Phase 2: Perception 기하 기초 (완료) | 카메라 모델 + Multi-view |
 | 2026.06 초 | Stage 1 | Phase 3 완료 (**supporting 공개** — 보조 엔지니어링 증거, 대표작 아님) | VLA wrapper 리허설 |
 | 2026.06-09 | Stage 1 | **Phase 4 (메인 단독): VLA v1 — pretrained OpenVLA zero-shot 추론 + ROS2 wrapper + 카메라/bag dry-run 측정 + 정독** | **산출물 v1 (2026 하반기 레포 기록, 외부 공개는 v2)** |
-| 2026.08 (Section 0) + 2026.09-11 (Sections 1-3) | Stage 1 | **Phase 4.5: VLA v1.5 — Section 0 (sim 구축·Docker·RunPod 이관, Sections 1-3 선행) + OpenVLA LoRA adaptation + before/after 정량 분석** (sim 데이터, v1 추론 노드 재사용) | **산출물 v1.5 (둘째 층 adaptation 증거)** |
+| 2026.08 (Section 0) + 2026.09-11 (Sections 1-3, 실측 선행 — 마감 2026.09 초) | Stage 1 | **Phase 4.5: VLA v1.5 — Section 0 (sim 구축·Docker·RunPod 이관, Sections 1-3 선행) + OpenVLA LoRA adaptation + before/after 정량 분석** (sim 데이터, v1 추론 노드 재사용) | **산출물 v1.5 (둘째 층 adaptation 증거)** |
 | 2026.07-08 (병행) | Stage 1 | **시장 신호 probe 1단 (저가시성)**: 타겟사 JD 5-10개 정독 + 격차 매핑, 공개 증거 정비 (별도 산출물 repo 신설) | 시장 실측 → 우선순위 보정 |
 | 2026.09- (병행) | Stage 1 | **시장 신호 probe 2단 (고가시성)**: LinkedIn 헤드라인 교체 + 현직자 커피챗 1-2건 (휴직 개시 후 — 승인 확정 2026-07-28) | 시장 실측 → 우선순위 보정 |
-| 2026.10 | Stage 1 | **하드웨어 스파이크 (2-3주)**: SO-101 모터 1-2개 + `feetech_ros2_driver` + ros2_control 파이프라인이 도는지만 검증 (조립 전 선검증) | 리스크 조기 검증 (분기 재평가 #1 입력) |
+| 2026.09 | Stage 1 | **하드웨어 스파이크 (2주 타임박스)**: SO-101 조립 + LeRobot 네이티브 (teleop + 10 에피소드 녹화 + SmolVLA zero-shot + latency). 판정 2026-09-21 1회 (실기 전환 plan §5) | 리스크 조기 검증 (분기 재평가 #1 입력) |
 | 2026.09-2027.02 | Career | **육아휴직** (2026-07-01 신청, 2026-07-28 승인 확정) — 구직 지원(정찰 포함) 안 함, 학습·산출물 집중. 2026.06-08 은 재직 구간 (4070 은 보유 지속 + 2026.09 자택 이전 확정 — 휴직 중에도 물리 접근 유지) | 학습 집중 기간 |
-| 2026.11 | Career | **분기 재평가 #1** (정찰 지원 없이 수행 — 입력: 스파이크 결과 / v1 결과 / 시장 신호 probe 반응 / 모델 갱신) | 중간 점검 |
-| 2026.12-2027.01 | Stage 1 | **Hardware-Arm Stage 1 (SO-101 본 빌드, 스파이크로 디리스크)** + URDF + Sim 디지털 트윈 (v2 선행). 2027.02 는 지연 흡수 버퍼 | v2 하드웨어 기반 |
+| 2026.11 | Career | **분기 재평가 #1** (정찰 지원 없이 수행 — 입력: 스파이크 판정 결과 / v1·v1.5 결과 / v2.5 진행률 / 시장 신호 probe 반응) | 중간 점검 |
+| 2026.10-11 | Stage 1 | **Hardware-Arm Stage 1 (본 빌드 + ROS2 래핑 + 이중 latency 측정)** + URDF (v2 선행). Isaac Sim 임포트는 nice — Phase 6 이월 허용. 12월-2027.02 는 v2.5 마무리 + 지연 흡수 버퍼 | v2 하드웨어 기반 |
+| 2026.11-12 | Stage 1 | **v2.5: SO-101 teleop 데이터셋 (LeRobot 포맷, HF Hub 공개) + SmolVLA 실기 zero-shot vs fine-tuned (N≥20, 분산·부분 도달률) + vla-lab 공개 문서** | **산출물 v2.5 (real 둘째 층 증거)** |
 | **2027.03~ (복직)** | **Career** | **본격 실지원 개시** (복직 직후, 트리거: v1 + 스파이크 확보 = "면접장에 들어갈 만큼") | 합격 |
 | 2027.02-04 (병행) | Stage 1 | Phase 5: Foundation Model (동작 원리 수준), 실지원과 병행 저강도 | 사전 지식 |
 | 2027.04-06 (병행) | Stage 1 | **Hardware-Arm Stage 2**: 실작업 확장 (수단은 2026.11 재평가 결정) + teleop + 안전 인터록 | v3 하드웨어 기반 |
@@ -175,8 +177,8 @@ gantt
 | Phase 5 | 미리 작성됨 — 진입 시 (2027.02) 다시 체크 | Python |
 | Phase 6 | 미리 작성됨 — 진입 시 (2027.05) 다시 체크 | Python + ROS2 |
 | Phase 7 | 미리 작성됨 — 진입 시 (2027.08) 다시 체크 | Python + C++ + ROS2 |
-| Hardware-Arm 스파이크 | 미리 작성됨 — 진입 시 (2026.10) 다시 체크 | ROS2 (SO-101 드라이버 선검증) |
-| Hardware-Arm Stage 1 | 미리 작성됨 — 진입 시 (2026.12) 다시 체크 | ROS2 + URDF |
+| Hardware-Arm 스파이크 | 미리 작성됨 — 진입 시 (2026.09) 다시 체크. 범위가 LeRobot 네이티브로 변경됨 — 실기 전환 plan §5 기준 재검토 | LeRobot (teleop·녹화·zero-shot·latency) |
+| Hardware-Arm Stage 1 | 미리 작성됨 — 진입 시 (2026.10) 다시 체크 | ROS2 + URDF |
 | Hardware-Arm Stage 2 | 미리 작성됨 — 진입 시 (2027.04) 다시 체크 | ROS2 + URDF + Sim 매칭 |
 
 
@@ -209,7 +211,7 @@ gantt
 > **Jetson 실기 배포는 v3 이후 옵션** — 전체 학습 (Phase 2-7) 완료 후 시간 여유 보고 결정
 
 
-**Phase 3 산출**: YOLO11 + Depth Anything V2 → PC TensorRT 추론 + ROS2 노드 래퍼 + latency 측정 → **repo 내 supporting 로그로 공개** (velog/LinkedIn 어필 안 함, 대표작 아님). TensorRT/양자화 배포 + ROS2 통합 경험은 VLA v1 에 흡수.
+**Phase 3 산출**: YOLO11 + Depth Anything V2 → PC TensorRT 추론 + ROS2 노드 래퍼 + latency 측정 → **repo 내 supporting 로그로 공개** (vla-lab/LinkedIn 어필 안 함, 대표작 아님). TensorRT/양자화 배포 + ROS2 통합 경험은 VLA v1 에 흡수.
 
 
 ### Phase 4: VLA v1 — OpenVLA zero-shot 추론 + ROS2 minimal demo (약 4개월, 2026.06-09)
@@ -220,18 +222,18 @@ gantt
 
 | 주차 | 내용 | 핵심 |
 |------|------|------|
-| 1-2,4-6 | RT-2 / OpenVLA 정독 (블로그 작성 week3·7 은 v2 이관) | Vision-Language → Action |
+| 1-2,4-6 | RT-2 / OpenVLA 정독 (vla-lab 문서 작성 week3·7 은 v2 이관) | Vision-Language → Action |
 | 8-12 | **OpenVLA zero-shot inference → ROS2 토픽 → 카메라/bag 추론 루프 dry-run (v1)** | Brain ↔ Body 첫 통합 |
-| 13-16 | 블로그 마무리 + 패키징 + 1분 영상 + 외부 공개 → **v2 이관** | (v1 제외) |
+| 13-16 | vla-lab 문서 마무리 + 패키징 + 1분 영상 + 외부 공개 → **v2 이관** | (v1 제외) |
 
-> 진행 순서 변형: 2026.06-07 선행 투입 구간은 표적 skim → week8-12 실습 선행, week1-7 정독은 2026.08-09 후행 (역순 학습 원칙). 블로그 작성·1분 영상·패키징·외부 공개는 v2 로 이관. 상세: [`Roadmap/Phase 4.md`](./Roadmap/Phase%204.md)
+> 진행 순서 변형: 2026.06-07 선행 투입 구간은 표적 skim → week8-12 실습 선행, week1-7 정독은 2026.08-09 후행 (역순 학습 원칙). vla-lab 문서 작성·1분 영상·패키징·외부 공개는 v2 로 이관. 상세: [`Roadmap/Phase 4.md`](./Roadmap/Phase%204.md)
 
 
 **산출물 v1** (2026 하반기까지 `physical-ai-study` 레포에 **결과 기록만**, 외부 공개는 v2 로 이관):
 - ROS2 패키지: OpenVLA zero-shot inference → `vla_action` 토픽, 카메라/bag 입력으로 1분 dry-run (sim task 성공률은 v1.5/Phase 4.5)
 - 레포 기록: README + latency/throughput 표 (+ 선택 Rerun 시각화 스크린샷/gif)
-- RT-2/OpenVLA 정독 — 아키텍처 이해 (블로그 작성은 v2)
-- 1분 영상·블로그 작성·velog/LinkedIn 외부 공개는 v2(Phase 6)로 이관 — v1(sim zero-shot)은 공개 산출물로 약해 공개 푸시는 실제 팔이 결합되는 v2 로 통합
+- RT-2/OpenVLA 정독 — 아키텍처 이해 (vla-lab 문서 작성은 v2)
+- 1분 영상·vla-lab 문서 작성·LinkedIn 공유는 v2(Phase 6)로 이관 — v1(sim zero-shot)은 공개 산출물로 약해 공개 푸시는 실제 팔이 결합되는 v2 로 통합
 - 한계 명시: v1 의 Body 는 sim, 실암 결합은 v2 예고
 
 
@@ -269,18 +271,18 @@ gantt
 
 
 ### Phase 7: Real-to-Sim-to-Real → 산출물 v3 (3개월, 2027.08~) — 차별화 정점
-> **목표**: OpenVLA fork + ROS2 노드 래핑 + 자작 6DOF 팔 + 디지털 트윈 (Isaac Sim) + 안전 인터록 + latency 측정 → **산출물 v3**
+> **목표**: v2.5 확정 모델 (SmolVLA 또는 GR00T N1.7) fork + ROS2 노드 래핑 + 자작 6DOF 팔 + 디지털 트윈 (Isaac Sim) + 안전 인터록 + latency 측정 → **산출물 v3**
 
 
 | 주차 | 내용 | 핵심 |
 |------|------|------|
-| 1-3 | OpenVLA fork + ROS2 통합 | inference 토픽 |
+| 1-3 | VLA 모델 fork (v2.5 확정 모델) + ROS2 통합 | inference 토픽 |
 | 4-6 | 안전 인터록 통합 | 위치/속도/토크 한계 + e-stop |
 | 7-9 | latency 측정 + Sim/Real gap 영상 | "VLA latency 200ms" 의 직접 증거 |
 | 10-12 | 통합 영상 + 패키징 | 이직 면접용 |
 
 
-**산출물 v3** (2027.08~): Real-to-Sim-to-Real — 자작 6DOF 팔 + Isaac Sim 디지털 트윈 + OpenVLA fork + ROS2 노드 + 안전 인터록 + latency 측정 + Sim/Real gap 영상
+**산출물 v3** (2027.08~): Real-to-Sim-to-Real — 자작 6DOF 팔 + Isaac Sim 디지털 트윈 + v2.5 확정 모델 fork + ROS2 노드 + 안전 인터록 + latency 측정 + Sim/Real gap 영상
 
 
 > *"Sim-only 산출물은 차별점이 되지 않는다 — 자작 실 팔과 결합되어야 본인 강점 (실배포·통합) 이 실린다."*
@@ -289,7 +291,7 @@ gantt
 ---
 
 
-### Hardware-Arm: 자작 팔 트랙 (스파이크 + 2단계, 2026.10-2027.06)
+### Hardware-Arm: 자작 팔 트랙 (스파이크 + 2단계, 2026.09-2027.06)
 > **왜 자작 팔인가**: *"Brain ↔ Body 통합 SW 엔지니어"* 의 가장 완전한 증거. 본인 약점 (VLA 신입급) 을 본인 강점 (AMR ROS 실무 5년, 2021.06~ + 펌웨어 2.5년 하드웨어 이해) 으로 직접 깨는 카드. 자작 팔은 cross-embodiment 의 첫 embodiment 증명이다.
 > **가장 중요한 증거일수록 가장 먼저 리스크를 깬다** — 첫 하드웨어는 계획의 2-3배 걸린다. 그래서 본 빌드 전에 짧은 스파이크로 먼저 굴린다. 조달·조립은 v1(sim) 과 병렬로 지금 착수해 v2 가 하드웨어 리드타임에 게이트되지 않게 한다.
 >
@@ -299,18 +301,18 @@ gantt
 > - **양산 비용 이해**: DIY 팔 BOM 표 — "이 가격대에 이 성능까지"
 
 
-#### 스파이크 (2026.10, 2-3주, 산출물 아님 = 리스크 검증)
-- **범위**: 키트 전체 조립 전에 모터 1-2개만 버스에 물려 전기·소프트웨어 경로만 확인. 안 예뻐도 됨.
-- **목표**: "Feetech 버스 + `feetech_ros2_driver` + ros2_control 이 내 환경에서 도는가" 만 확인. pick-and-place 아님.
-- **출력**: 예상보다 오래 걸리면 Stage 1 의 ROS2 통합 경로·일정을 **2026 년 안에** 재산정. 결과는 분기 재평가 #1 (2026.11) 입력.
+#### 스파이크 (2026.09, 2주 타임박스, 산출물 아님 = 리스크 검증)
+- **범위**: 조립 + LeRobot 네이티브 스택 검증. ROS2/URDF/Isaac Sim/파인튜닝은 범위 밖 (ROS2 는 Stage 1 로 이동). 안 예뻐도 됨.
+- **목표**: must 4 — teleop / `lerobot-record` 10 에피소드 + HF Hub / SmolVLA zero-shot 1회 실행 / latency 측정 (실기 전환 plan §5.2).
+- **출력**: **판정 2026-09-21 1회** — 통과 시 Stage 1 2026.10 개시, teleop 불가 또는 2주 초과 시 원안 일정 (10월 스파이크·12월 빌드) 롤백. 결과는 분기 재평가 #1 (2026.11) 입력.
 
 
-#### Stage 1 (2026.12-2027.01, 2개월, 추가 지출 없음) — 스파이크로 디리스크된 본 빌드 (v2 선행)
+#### Stage 1 (2026.10-11, 2개월, 추가 지출 없음) — 스파이크로 디리스크된 본 빌드 (v2 선행)
 - **하드웨어**: SO-101 리더 + 팔로워 6DOF 키트 (3D 프린팅 부품·전원·케이블 포함) + 손목 카메라 1대
-- **목표**: pick-and-place 단순 동작 + URDF + ROS2 드라이버 (`feetech_ros2_driver`) + Isaac Sim 디지털 트윈 첫 사이클
+- **목표**: pick-and-place 단순 동작 + 안전 기초 (소프트 리밋·토크 상한·물리 e-stop) + URDF + **ROS2 래핑 (`feetech_ros2_driver` + ros2_control, LeRobot 스택과 병행 운영 — 이중 latency 로 통합 오버헤드 측정)**. Isaac Sim 임포트는 nice (Phase 6 이월 허용)
 - **역할**: v2(헤드라인, sim-to-real gap)가 소비하는 선행 하드웨어. 동작 영상 + URDF + Sim 임포트 영상은 v2 의 입력 자료.
-- **이유**: 스파이크에서 드라이버 경로를 이미 검증했으므로 본 빌드는 조립과 동작 완성도에 집중.
-- **비용**: 팔 키트·손목 카메라·작업대 자재가 2026.09 에 선집행되므로 이 구간의 추가 지출은 없다.
+- **이유**: 스파이크에서 LeRobot 경로 (teleop·녹화·정책 실행) 를 이미 검증했으므로 본 빌드는 완성도 + ROS2 층에 집중.
+- **비용**: 팔 키트·손목 카메라·작업대 자재가 2026.08 말-09 초에 선집행되므로 이 구간의 추가 지출은 없다.
 
 
 #### Stage 2 (2027.04-06, 3개월) — 실지원과 병행 (v3 선행)
@@ -325,7 +327,7 @@ gantt
 |---|---|
 | 구성 | SO-101 / SO-ARM101 (TheRobotStudio + Hugging Face 오픈소스 설계). 리더 + 팔로워 미조립 키트, Feetech STS3215 기반 |
 | 비용 | 약 56-58만원 (팔 키트 약 55만원 + 손목 카메라 1-3만원) |
-| 조달 | 국내 판매자, 3D 프린팅 부품 포함, 리드타임 3일 → **2026.09 단일 구매** (팔 키트 + 손목 카메라 + 작업대 자재 일괄). 스파이크는 2026.10 |
+| 조달 | 국내 판매자, 3D 프린팅 부품 포함, 리드타임 3일 → **2026.08 말-09 초 즉시 단일 구매** (팔 키트 + 손목 카메라 + 작업대 자재 일괄). 스파이크는 2026.09 첫 2주 |
 | 근거 | LeRobot / Hugging Face 생태계 표준 — teleop 데이터 수집 (v2.5 데이터셋)·ACT 학습·HF Hub 공개가 이 생태계 위에서 이어진다 |
 
 > Koch v1.1 (Dynamixel 기반, 총 49-60만원) 과 커스텀 XL330+XM430 안 (BOM 150-225만원) 은 비채택 — 사유는 [Hardware-Arm.md](./Roadmap/Hardware-Arm.md) 비채택 기록. Stage 2 확장 수단은 2026.11 분기 재평가 안건.
@@ -463,13 +465,16 @@ Phase 4 끝 (2026 하반기): 산출물 v1 (OpenVLA zero-shot 추론 + ROS2 + �
 Phase 4.5 (2026 하반기, v1 직후): 산출물 v1.5 (OpenVLA LoRA adaptation + before/after 정량 분석, 둘째 층 증거)
       |
       v
-HW 스파이크 (2026.10): SO-101 드라이버 선검증 (산출물 아님)
+HW 스파이크 (2026.09): SO-101 LeRobot 네이티브 실기 검증 (산출물 아님)
       |
       v
-분기 재평가 #1 (2026.11): 스파이크 결과 + v1 결과 + 시장 신호 probe 반응 (정찰 지원 없이 수행)
+Hardware-Arm Stage 1 (2026.10-11): v2 선행 하드웨어 (본 빌드 + ROS2 래핑)
       |
       v
-Hardware-Arm Stage 1 (2026.12-2027.01): v2 선행 하드웨어 (자작 팔 본 빌드)
+v2.5 (2026.11-12): teleop 데이터셋 + SmolVLA 실기 before/after (vla-lab 공개)
+      |
+      v
+분기 재평가 #1 (2026.11): 스파이크 판정 + v1·v1.5 결과 + v2.5 진행률 + 시장 신호 probe 반응 (정찰 지원 없이 수행)
       |
       v
 복직 + 초기 패키징 + 본격 실지원 개시 (2027.03): v1 = "면접장에 들어갈 만큼"
@@ -530,19 +535,19 @@ Hardware-Arm Stage 1 (2026.12-2027.01): v2 선행 하드웨어 (자작 팔 본 �
 - [ ] 컴퓨트 사전 점검 (OpenVLA 7B 4-bit 가 RTX 4070 12GB 에 올라가는지 + latency 1회 측정)
 - [ ] 성공 task 1종 + 성공률 기준 N 정의
 - [ ] Phase 4 완료 (RT-2 + OpenVLA 정독 + OpenVLA zero-shot inference → ROS2 → 카메라/bag dry-run)
-- [ ] **레포에 산출물 v1 결과 기록** (README + latency/throughput 표) — 블로그 작성·1분 영상·velog/LinkedIn 외부 공개는 v2 로 이관
+- [ ] **레포에 산출물 v1 결과 기록** (README + latency/throughput 표) — vla-lab 문서 작성·1분 영상·LinkedIn 공유는 v2 로 이관
 
 
 #### 2026.08-12 (Phase 4.5 + 스파이크 — 구직 지원 없음)
 - [ ] (2026.08) **Phase 4.5 Section 0**: ManiSkill sim 구축 + zero-shot baseline + Docker 컨테이너화 + RunPod 이관 검증
 - [ ] (2026.09-11) **Phase 4.5 Sections 1-3 완료 → 산출물 v1.5 공개** (OpenVLA LoRA adaptation + before/after 정량 분석, 둘째 층 증거)
-- [ ] SO-101 모터 1-2개 + `feetech_ros2_driver` + ros2_control 로 각도 명령 1회 성공 (조립 전 선검증)
-- [ ] 스파이크 결과로 Stage 1 ROS2 통합 경로·일정 재산정 (터지면 즉시)
-- [ ] **6개월 분기 재평가 #1 (2026.11)** — 정찰 지원 없이 수행. 입력: 스파이크 결과 / v1 결과(레포) / 시장 신호 (probe 반응, 1순위 채용 활성도, OpenVLA 후속 모델 등장 여부)
+- [ ] 스파이크 must 4 (teleop / 10 에피소드 녹화+Hub / SmolVLA zero-shot / latency) + 판정 2026-09-21 (실기 전환 plan §5)
+- [ ] Hardware-Arm Stage 1 must 완성 (2026.10-11 — 조립 + 안전 기초 + ROS2 래핑 + URDF + 이중 latency + 1분 영상)
+- [ ] v2.5 완성 (2026.11-12 — teleop 데이터셋 HF Hub 공개 + SmolVLA before/after N≥20 + vla-lab 공개 문서)
+- [ ] **6개월 분기 재평가 #1 (2026.11)** — 정찰 지원 없이 수행. 입력: 스파이크 판정 결과 / v1·v1.5 결과(레포) / v2.5 진행률 / 시장 신호 (probe 반응, 1순위 채용 활성도)
 
 
-#### 2026.12-2027.02 (Hardware Stage 1 본 빌드 + 초기 패키징, 복직 직전)
-- [ ] Hardware-Arm Stage 1 must 완성 (SO-101 조립 + URDF + ROS2 드라이버 + pick-and-place + 1분 영상) — v2 선행. Isaac Sim 임포트·ACT 1회는 nice (이월 허용 — Hardware-Arm.md 체크리스트 must/nice 분해)
+#### 2026.12-2027.02 (v2.5 마무리 + 초기 패키징, 복직 직전)
 - [ ] 초기 패키징 (v1 면접용 정리, 이력서 국/영문 마감 + 공백기 답변 골자·산출물별 결정 근거 요약 — 서사 본문은 2027.02 말-03 C++·DDS 병합 트랙)
 - [ ] 이력서 영문 작성 + 지원 트래커 스프레드시트 생성 (복직 후 실지원 준비)
 - [ ] ACT-Diffusion-VLA 정책 계보 라잇 정리 노트 (면접 방어용, 학습 아님)
@@ -550,19 +555,18 @@ Hardware-Arm Stage 1 (2026.12-2027.01): v2 선행 하드웨어 (자작 팔 본 �
 
 #### 2027.03~ (복직 + 본격 실지원 개시 + 병행 학습, 저강도)
 - [ ] **본격 실지원 개시** (복직 직후, 트리거: v1 + 스파이크 확보 = "면접장에 들어갈 만큼")
-- [ ] (v2.5 착수) SO-101 teleop 데이터셋 수집 개시 + LeRobot ACT 1회 학습 (부록 B v2.5, 실지원 병행)
 - [ ] 분기당 면접 2-3건 목표 (1순위 우선 + 2순위 보완)
 - [ ] Phase 5 완료 (Foundation Model: ViT / CLIP / DINOv2 / SigLIP, 동작 원리 수준)
 - [ ] Hardware-Arm Stage 2 (실작업 확장 + teleop + 안전 인터록 + Sim 물리 파라미터 매칭) — v3 선행
 - [ ] Phase 6 완료 → **산출물 v2 공개** (Isaac Sim 디지털 트윈 + 자작 팔 결합 + sim-to-real gap 수치, 헤드라인)
 - [ ] Phase 7 → **산출물 v3 공개** (Real-to-Sim-to-Real, 정점 — 완성되면 포트폴리오/이력서 갱신)
-- [ ] **6개월 분기 재평가 #2 (2027.05)** — Phase 5 결과 / Stage 2 완성도 / VLA 모델 갱신 (OpenVLA 유지 or π0/Helix 등)
+- [ ] **6개월 분기 재평가 #2 (2027.05)** — Phase 5 결과 / Stage 2 완성도 / v3 모델 확정 (SmolVLA / GR00T N1.7 / 당시 최신)
 - [ ] **6개월 분기 재평가 #3 (2027.11)** — 면접 결과 누적 / 시장 매칭 / **2028.03 fallback 진입 여부** (착지점: 부록 E) / Jetson 옵션 진입 여부
 
 
 #### 측정 지표 (지속, 2026.06~)
 - [ ] 매월: 포트폴리오 Public Repo 커밋 그래프 + 채용 공고 모니터링
-- [ ] 매월: **콘텐츠 반응** — velog/LinkedIn 조회수 / 리크루터 인바운드 / 댓글·DM / GitHub star·issue (반응 0 에 가까우면 제목·배포 채널·주제 각도 조정)
+- [ ] 매월: **콘텐츠 반응** — vla-lab star·traffic / LinkedIn 반응 / 리크루터 인바운드 / 댓글·DM (반응 0 에 가까우면 제목·배포 채널·주제 각도 조정)
 - [ ] 매분기: 시장 시그널 1개 (커피챗 / LinkedIn 컨택 / 컨퍼런스 / 실지원)
 
 
@@ -608,7 +612,7 @@ Hardware-Arm Stage 1 (2026.12-2027.01): v2 선행 하드웨어 (자작 팔 본 �
 | Stage 1 Phase 5 | Foundation Model 기초 (실지원 병행) | 2027.02-04 | `Studies/Phase 5/` |
 | Stage 1 Phase 6 | Isaac Sim + 디지털 트윈 (산출물 v2) | 2027.05-07 | `Studies/Phase 6/` |
 | Stage 1 Phase 7 | Real-to-Sim-to-Real (산출물 v3) | 2027.08~ | `Studies/Phase 7/` |
-| Hardware-Arm | 자작 팔 트랙 (스파이크 + Stage 1 + Stage 2) | 2026.10-2027.06 | `Studies/Hardware-Arm/` |
+| Hardware-Arm | 자작 팔 트랙 (스파이크 + Stage 1 + Stage 2) | 2026.09-2027.06 | `Studies/Hardware-Arm/` |
 
 
 ---
@@ -617,17 +621,17 @@ Hardware-Arm Stage 1 (2026.12-2027.01): v2 선행 하드웨어 (자작 팔 본 �
 ## 부록 B: 산출물 정의
 
 
-> 산출물은 VLA 트랙 단계명 **v1/v2/v3** 로 구분한다. v1 은 레포 기록만 하고 외부 공개는 v2 로 이관했다 — 외부 공개 어필의 첫 산출물은 실제 팔이 결합되는 v2 다. perception 은 supporting 증거 (리포 내 공개, 어필 헤드라인 아님) 다. 외부 공개 산출물·블로그 동반 코드는 **별도 공개 산출물 repo** 에서 발행한다 — 이 레포는 비공개 유지 (2026-07-20 결정).
+> 산출물은 VLA 트랙 단계명 **v1/v2/v3** 로 구분한다. v1 은 레포 기록만 하고 외부 공개는 v2 로 이관했다 — 외부 공개 어필의 첫 산출물은 실제 팔이 결합되는 v2 다. perception 은 supporting 증거 (리포 내 공개, 어필 헤드라인 아님) 다. 외부 공개 산출물·서사 문서·동반 코드는 **공개 산출물 repo `vla-lab`** (본인 GitHub) 에서 발행한다 — 서사 발행 채널을 velog 블로그에서 vla-lab 마크다운 문서로 변경 (2026-08-30), LinkedIn 은 링크 공유 채널. 이 레포는 비공개 유지 (2026-07-20 결정).
 
 | 산출물 | 시점 | 내용 | 우선순위 |
 |---|---|---|---|
-| **v1** | 2026 하반기 | pretrained OpenVLA zero-shot 추론 → ROS2 wrapper → 카메라/bag dry-run (latency/throughput 측정, sim task 성공률은 v1.5) + RT-2/OpenVLA 정독 + adapter 추상화 (`RobotPolicy`) + action schema validation + 벤치마크 재현성 (안전 실행 스택은 v2). **레포 결과 기록만** (블로그 작성·1분 영상·외부 공개는 v2 로 이관) | **2 (기술 코어, v2 의 eval harness 기반)** |
-| **v1.5 (둘째 층 증거)** | 2026 하반기 (Section 0 은 2026.08 전진 — Sections 1-3 선행) | OpenVLA LoRA adaptation (sim 데이터) + zero-shot 대비 **before/after 성공률 정량 분석** (N회, 분산 포함) + 블로그 1편 (= Phase 4.5). 성공률 상승이 아닌 **설계-실행-분석** 이 기준 | **2 (둘째 층 adaptation 가점 카드)** |
-| **v2.5 (데이터 파이프라인 증거)** | 2027 상반기 (Stage 1 조립 후) | SO-101 리더-팔로워 teleop 으로 자작 데이터셋 수집 (100-500 episodes 는 실측 수집 속도 기준 재산정) → **LeRobot 포맷 + HF Hub 공개** + LeRobot ACT 1회 학습·결과 기록. Diffusion Policy 는 학습하지 않고 라잇 정리 (ACT-Diffusion-VLA 계보, 면접 방어용) | 2 (데이터 레짐·정책 계보 증거) |
-| **v2 강화 카드 (헤드라인)** | 2027 | 자작 팔 결합 + **sim-to-real gap 수치 측정·보고** (= Phase 6 디지털 트윈 + 자작 팔 Stage 1). v1.5(sim) 성공률이 gap 의 분모. LoRA 는 v1.5 로 이관. **v1 에서 이관된 RT-2/OpenVLA 블로그 + 1분 영상 + velog/LinkedIn 외부 공개를 여기서 첫 공개** | **1 (본인만 만드는 결정타, 첫 외부 공개)** |
-| **v3** | 2027 후반~ | 실작업 확장 (Stage 2) + Real-to-Sim-to-Real (= Phase 7): OpenVLA fork + ROS2 노드 래핑 + 안전 인터록 + latency 측정 + Sim/Real gap 영상 | 1 (차별화 정점) |
+| **v1** | 2026 하반기 | pretrained OpenVLA zero-shot 추론 → ROS2 wrapper → 카메라/bag dry-run (latency/throughput 측정, sim task 성공률은 v1.5) + RT-2/OpenVLA 정독 + adapter 추상화 (`RobotPolicy`) + action schema validation + 벤치마크 재현성 (안전 실행 스택은 v2). **레포 결과 기록만** (vla-lab 문서 작성·1분 영상·외부 공개는 v2 로 이관) | **2 (기술 코어, v2 의 eval harness 기반)** |
+| **v1.5 (둘째 층 증거)** | 2026 하반기 (마감 2026.09 초 — 실측 선행) | **모델: OpenVLA (선정 2026.06 기준 — 세대 교체 반영은 v2.5 의 SmolVLA)**. OpenVLA LoRA adaptation (sim 데이터) + zero-shot 대비 **before/after 성공률 정량 분석** (N회, 분산 포함) + vla-lab 공개 문서 1편 (= Phase 4.5). 성공률 상승이 아닌 **설계-실행-분석** 이 기준 | **2 (둘째 층 adaptation 가점 카드)** |
+| **v2.5 (real 둘째 층 증거)** | **2026.11-12** (Stage 1 본 빌드와 병행) | SO-101 리더-팔로워 teleop 자작 데이터셋 (단일 task 50-100 episodes, 실측 수집 속도 재산정) → **LeRobot 포맷 + HF Hub 공개** + **SmolVLA 실기 zero-shot vs fine-tuned before/after (N≥20, 성공률+부분 도달률+분산, 로컬 4070 파인튜닝)** + OpenVLA (sim, v1.5) 비교표 + vla-lab 공개 문서 1편. ACT 는 nice — Diffusion Policy 와 함께 계보 노트로만 (ACT-Diffusion-VLA, 면접 방어용) | **1-2 (real 둘째 층 증거 — 2027.03 첫 서류의 실물)** |
+| **v2 강화 카드 (헤드라인)** | 2027 | 자작 팔 결합 + **sim-to-real gap 수치 측정·보고** (= Phase 6 디지털 트윈 + 자작 팔 Stage 1). v1.5(sim) 성공률이 gap 의 분모. LoRA 는 v1.5 로 이관. **v1 에서 이관된 RT-2/OpenVLA 해설 문서 (vla-lab) + 1분 영상 + LinkedIn 공유를 여기서 첫 공개** | **1 (본인만 만드는 결정타, 첫 외부 공개)** |
+| **v3** | 2027 후반~ | 실작업 확장 (Stage 2) + Real-to-Sim-to-Real (= Phase 7): **v2.5 확정 모델 (SmolVLA 또는 GR00T N1.7) fork** + ROS2 노드 래핑 + 안전 인터록 + latency 측정 + Sim/Real gap 영상 | 1 (차별화 정점) |
 | (supporting) | 2026 상반기 | Phase 3 perception (YOLO11 + Depth Anything V2 + PC TensorRT + ROS2) — supporting system work 로 리포 내 공개, 어필 헤드라인 아님. VLA wrapper 리허설 | supporting |
-| Jetson 옵션 | v3 이후 | Jetson 실기 배포 — v1 또는 v3 의 Jetson 포팅판 | (옵션) |
+| Jetson 옵션 | v3 이후 | Jetson 실기 배포 — v1 또는 v3 의 Jetson 포팅판 (**SmolVLA 450M 기준 재검토** — 7B 대비 엣지 적합) | (옵션) |
 
 
 ---
@@ -660,8 +664,8 @@ Hardware-Arm Stage 1 (2026.12-2027.01): v2 선행 하드웨어 (자작 팔 본 �
 
 | 시점 | 재평가 항목 |
 |---|---|
-| **2026.11** | 하드웨어 스파이크 결과 (파이프라인 검증·일정 재산정) / 산출물 v1 결과(레포 기록) / 시장 신호 probe 반응 (JD 격차·커피챗, **육아휴직 중이라 정찰 지원 입력은 없음**) / **콘텐츠 반응** (조회·인바운드·댓글·star) / OpenVLA 후속 모델 등장 여부 / **둘째 층(adaptation) 증거 점검** (v1.5 sim adaptation 이 AI 트랙 JD 에서 둘째 층 증거로 읽히는지 + sim 증거의 설득력 한계 + real 확장 경로) / **cross-embodiment 좌표 점검** (매니퓰레이션 첫 증명 + 이동 해자 연결이 유효한지, heterogeneous fleet/mobile manipulation 타깃 적합성. 자작 팔을 첫 embodiment 증명으로 유지하되 이동 검증을 일부 끌어들일지를 스파이크 결과·시간 예산과 함께 판단) / **검토 보고서 v1.4 이행 점검** (재측정·이해 검증 10문항 통과 여부, Phase 3 재현 확인·Rerun 시각 자료 확보 여부, probe 2단이 2026.09 에 실제 개시됐는지 — plan: `docs/superpowers/plans/2026-07-07-repo-review-remediation.md`) / **동역학 라잇 트랙 편입 여부** (타겟 제조사 AI 트랙 JD 의 강체 동역학·수치 최적화 요구 대응. 갭은 매니퓰레이터 기구학(FK/IK)·강체 동역학 — 수치 최적화 기초는 Phase 1 week7-8 자산 재활용. 범위 상한: 순기구학·역기구학·자코비안·기초 동역학, must 만으로 면접 방어 수준. 편입 시 주 4-5시간 필요 — 총 예산(주 6-8시간) 안에서 대체 대상(무엇을 빼거나 늦출지)을 함께 결정. spec: `docs/superpowers/specs/2026-07-20-career-review-sync-design.md`) / **본격 실지원 개시 시점 재확인 + 지원 시퀀싱 설계** (사후지급금 폐지(2025.01 — 법령 원문 재확인 필요)로 휴직 중 지원의 경제 페널티 소멸, 채용 프로세스 1-3개월 감안 시 2027.01 지원 = 복직(2027.03) 접속 가능. 판단 입력: 타겟 공고 개폐 / v1·v1.5 완성도 / 스파이크 결과 / 고용주 관계·평판 리스크. **지원 시퀀싱**: 1순위 풀이 좁으므로 첫 웨이브(2027.03)에 전부 태울지, 일부를 v2 합류(2027.08 전망) 후 2차 웨이브로 남길지 — 재지원 쿨다운(통상 6개월-1년) vs 공고 개폐 타이밍의 트레이드오프. 2027.01 조기 지원 결정 시 초기 패키징(2027.02)을 1월로 당겨야 해 Stage 1 마무리와 겹치는 점을 함께 판단. 즉흥 변경 금지 — 본 재평가에서만 판단) / **DDS·C++ 스택 gap 트랙 편입 여부** (코어/엣지 포지셔닝의 면접 방어 대응. 배치안: 2026.12-2027.02 는 Hardware-Arm Stage 1 본 빌드 + 초기 패키징으로 차 있어 **Stage 1 과 배타 배치** — C++ 코어는 2027.02 말-03 에 DDS/ROS2 내부 서사화(2-3주)와 병합 배치. C++ 의 실질 마감은 서류 제출이 아니라 코딩테스트 시점(지원 후 2-4주, 2027.03 말-04 초)이다. 대체 대상은 Phase 5 착수의 2027.03 이후 순연. **편입 판단에 이 배타 배치의 성립 여부를 포함한다.** 동역학 라잇 트랙 안건과 같은 예산(주 6-8시간)을 두고 경쟁하므로 JD 정독 신호(시스템 SW 트랙 vs AI 트랙)로 두 안건의 우선순위를 함께 결정. spec: `docs/superpowers/specs/2026-08-05-career-positioning-vla-edge-design.md` §6.2) |
-| **2027.05** | 실지원 면접 결과 누적 / Phase 5 종료 시점 / 자작 팔 Stage 2 완성도 + v2 진행률 / VLA 모델 선정 재검토 (OpenVLA 유지 or π0/Helix/GR00T 등으로 갱신) / **콘텐츠 반응** 추이 |
+| **2026.11** | 하드웨어 스파이크 결과 (파이프라인 검증·일정 재산정) / 산출물 v1 결과(레포 기록) / 시장 신호 probe 반응 (JD 격차·커피챗, **육아휴직 중이라 정찰 지원 입력은 없음**) / **콘텐츠 반응** (조회·인바운드·댓글·star) / **스파이크 판정 결과·v2.5 진행률 / GR00T N1.7 2번째 모델 투입 여부** (모델 세대 교체는 2026-08-30 확정 — spec: `docs/superpowers/specs/2026-08-30-realworld-transition-design.md`) / **둘째 층(adaptation) 증거 점검** (v1.5 sim adaptation 이 AI 트랙 JD 에서 둘째 층 증거로 읽히는지 + sim 증거의 설득력 한계 + real 확장 경로) / **cross-embodiment 좌표 점검** (매니퓰레이션 첫 증명 + 이동 해자 연결이 유효한지, heterogeneous fleet/mobile manipulation 타깃 적합성. 자작 팔을 첫 embodiment 증명으로 유지하되 이동 검증을 일부 끌어들일지를 스파이크 결과·시간 예산과 함께 판단) / **검토 보고서 v1.4 이행 점검** (재측정·이해 검증 10문항 통과 여부, Phase 3 재현 확인·Rerun 시각 자료 확보 여부, probe 2단이 2026.09 에 실제 개시됐는지 — plan: `docs/superpowers/plans/2026-07-07-repo-review-remediation.md`) / **동역학 라잇 트랙 편입 여부** (타겟 제조사 AI 트랙 JD 의 강체 동역학·수치 최적화 요구 대응. 갭은 매니퓰레이터 기구학(FK/IK)·강체 동역학 — 수치 최적화 기초는 Phase 1 week7-8 자산 재활용. 범위 상한: 순기구학·역기구학·자코비안·기초 동역학, must 만으로 면접 방어 수준. 편입 시 주 4-5시간 필요 — 총 예산(주 6-8시간) 안에서 대체 대상(무엇을 빼거나 늦출지)을 함께 결정. spec: `docs/superpowers/specs/2026-07-20-career-review-sync-design.md`) / **본격 실지원 개시 시점 재확인 + 지원 시퀀싱 설계** (사후지급금 폐지(2025.01 — 법령 원문 재확인 필요)로 휴직 중 지원의 경제 페널티 소멸, 채용 프로세스 1-3개월 감안 시 2027.01 지원 = 복직(2027.03) 접속 가능. 판단 입력: 타겟 공고 개폐 / v1·v1.5 완성도 / 스파이크 결과 / 고용주 관계·평판 리스크. **지원 시퀀싱**: 1순위 풀이 좁으므로 첫 웨이브(2027.03)에 전부 태울지, 일부를 v2 합류(2027.08 전망) 후 2차 웨이브로 남길지 — 재지원 쿨다운(통상 6개월-1년) vs 공고 개폐 타이밍의 트레이드오프. 2027.01 조기 지원 결정 시 초기 패키징(2027.02)을 1월로 당겨야 해 Stage 1 마무리와 겹치는 점을 함께 판단. 즉흥 변경 금지 — 본 재평가에서만 판단) / **DDS·C++ 스택 gap 트랙 편입 여부** (코어/엣지 포지셔닝의 면접 방어 대응. 배치안: 2026.12-2027.02 는 Hardware-Arm Stage 1 본 빌드 + 초기 패키징으로 차 있어 **Stage 1 과 배타 배치** — C++ 코어는 2027.02 말-03 에 DDS/ROS2 내부 서사화(2-3주)와 병합 배치. C++ 의 실질 마감은 서류 제출이 아니라 코딩테스트 시점(지원 후 2-4주, 2027.03 말-04 초)이다. 대체 대상은 Phase 5 착수의 2027.03 이후 순연. **편입 판단에 이 배타 배치의 성립 여부를 포함한다.** 동역학 라잇 트랙 안건과 같은 예산(주 6-8시간)을 두고 경쟁하므로 JD 정독 신호(시스템 SW 트랙 vs AI 트랙)로 두 안건의 우선순위를 함께 결정. spec: `docs/superpowers/specs/2026-08-05-career-positioning-vla-edge-design.md` §6.2) |
+| **2027.05** | 실지원 면접 결과 누적 / Phase 5 종료 시점 / 자작 팔 Stage 2 완성도 + v2 진행률 / **v3 모델 확정 (SmolVLA / GR00T N1.7 / 당시 최신)** / **콘텐츠 반응** 추이 |
 | **2027.11** | 실지원 후 누적 면접 결과 / 시장 매칭 시그널 / **콘텐츠 반응** / **2028.03 fallback 진입 여부 판단** (착지점 정의: 부록 E) / Jetson 옵션 진입 여부 |
 
 
@@ -671,7 +675,7 @@ Hardware-Arm Stage 1 (2026.12-2027.01): v2 선행 하드웨어 (자작 팔 본 �
 **시그널 → 행동 매핑**:
 - 시장 신호 probe 반응 좋음 + v1·스파이크 확보 → 2027 본격 실지원 개시 (이미 기본선)
 - probe 반응 약함 + 시장 정체 → 2028.03 fallback 진입 (AMR/AV Perception SW, 부록 E) + Jetson 옵션 추가
-- OpenVLA 가 한 세대 뒤 → 2027.05 재평가 시점에 모델 갱신 (π0 / Helix / GR00T 중 1)
+- 모델 세대 교체 확인 (2026-08-30) → 실기 전환 확정 — 스파이크 09월 / Stage 1 10-11월 / v2.5 (real, SmolVLA) 11-12월 (spec: `docs/superpowers/specs/2026-08-30-realworld-transition-design.md`)
 
 
 ---
@@ -692,7 +696,7 @@ Hardware-Arm Stage 1 (2026.12-2027.01): v2 선행 하드웨어 (자작 팔 본 �
 - 도메인 이탈이 아니라 같은 로봇/자율주행 도메인 안에서의 횡이동 → 경력직 전환 리스크가 낮게 읽힌다.
 
 
-**무엇이 살아남나**: Phase 3 perception (Detection + Depth + PC TRT + ROS2 노드) 이 이 시나리오의 핵심 증거 — fallback 시 supporting 로그를 velog 1편으로 승격 공개. 자작 팔 / VLA 산출물 (v1, v1.5, v2, v3) 은 "추가 가점"으로 기능.
+**무엇이 살아남나**: Phase 3 perception (Detection + Depth + PC TRT + ROS2 노드) 이 이 시나리오의 핵심 증거 — fallback 시 supporting 로그를 vla-lab 문서 1편으로 승격 공개. 자작 팔 / VLA 산출물 (v1, v1.5, v2, v3) 은 "추가 가점"으로 기능.
 
 
 > **둘째 층(adaptation) 편입과 fallback 의 관계**: v1.5(LoRA adaptation)는 가점 카드이지 fallback 의 전제 조건이 아니다. 본 fallback 은 "VLA fine-tune 역량이 없어도 지원 가능"을 전제로 하며, 둘째 층 편입은 이 안전망을 약화시키지 않는다 — fallback 시에도 핵심 증거는 여전히 Phase 3 perception 로그다.

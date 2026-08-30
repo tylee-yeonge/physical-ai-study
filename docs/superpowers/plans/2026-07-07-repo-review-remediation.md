@@ -32,8 +32,8 @@
 | 10-11월 | 10 | Phase 3 재현 확인 | `Studies/Phase 3/week8/` |
 | 10-11월 | 11 | Rerun 1장 | `Studies/Phase 4/week12/` (노드는 `vla_node/rerun_logger.py`) |
 | 10-11월 | 12 | 원격 운용 점검 + Jetson | 없음 (인프라) |
-| 10-11월 | - | 하드웨어 스파이크 (2-3주) | `Studies/Hardware-Arm/` |
-| 12월 | - | Hardware-Arm Stage 1 본 빌드 착수 | `Studies/Hardware-Arm/` |
+| 10-11월 | - | 하드웨어 스파이크 (2-3주) → **2026-08-30 실기 전환으로 대체** (스파이크 2026.09 첫 2주 — [실기 전환 plan](2026-08-30-realworld-transition-execution.md) §5) | `Studies/Hardware-Arm/` |
+| 12월 | - | Hardware-Arm Stage 1 본 빌드 착수 → **2026-08-30 실기 전환으로 대체** (Stage 1 2026.10-11 — [실기 전환 plan](2026-08-30-realworld-transition-execution.md) §6) | `Studies/Hardware-Arm/` |
 | 10-11월 | 7-1 | NVIDIA SO-101 코스 Phase A | 없음 — `docs/research/isaac-sim-so101-course.md` §4.1 |
 | 파편 | 13 | 정독 잔여 | `Studies/Phase 4/week2`·`week4`·`week5`·`week6` |
 
@@ -54,7 +54,7 @@
 - [x] 7. **8월 체크포인트** — 결론 3건 (2026-08-12). 상세: [notes.md](../../../Studies/Phase%204/notes.md) 진행 원칙
   - **git author 재작성: 실행 안 함으로 확정.** 이 레포 비공개 유지 + 공개 산출물 vla-lab 분리로 재작성 사유가 없다. 대체 조치로 두 레포의 커밋 신원을 `tylee-yeonge <tylee.yeonge@gmail.com>` 으로 통일했다 (레포 로컬 설정). **잔여 주의**: 작업 컨테이너의 `/root/.gitconfig` 는 읽기 전용이라 전역 설정이 회사 이메일로 남아 있다 — 새 레포를 만들 때마다 `git config user.email` 을 1회 걸어야 한다
   - **정독 잠정치: 20-30h 를 유지하되 `week2` 실측으로 확정한다.** 실적 기록이 없어 지금 숫자를 바꿀 근거가 없다. 배치는 12월 몰림에서 파편 시간 (Phase 4.5 실행 대기) 으로 옮긴다
-  - **스파이크: 2026.09 구매 / 2026.10 실행으로 확정.** 9월은 휴직 적응기 + 자택 이전이 겹쳐 2-3주 하드웨어 블록에 부적합하고, Phase 4.5 를 8월에 완주하면 원안 10월의 충돌 사유 (Section 2-3 과 병행) 가 사라진다. 10월 실행이면 재평가 #1 (2026.11) 입력 타이밍도 맞는다
+  - **스파이크: 2026.09 구매 / 2026.10 실행으로 확정.** → **2026-08-30 실기 전환으로 대체: 즉시 구매 / 2026.09 첫 2주 실행 (LeRobot 네이티브)** — 9월은 휴직 적응기 + 자택 이전이 겹쳐 2-3주 하드웨어 블록에 부적합하고, Phase 4.5 를 8월에 완주하면 원안 10월의 충돌 사유 (Section 2-3 과 병행) 가 사라진다. 10월 실행이면 재평가 #1 (2026.11) 입력 타이밍도 맞는다
 
 ### 8월 잔여 — Phase 4.5 완주 (단일 트랙, 끊지 않는다)
 
@@ -88,14 +88,14 @@
 - [ ] 12. GPU 필요 잔여분 (#6 의 4-bit 확인, #8, #10-11) 0건 확인 + **4070 원격 운용 전환 점검** — BIOS 전원 복구 자동 부팅 (Restore on AC Power Loss), 원격 접속 경로 이중화 (SSH + 오버레이 VPN 등), 커널 패닉 자동 리부트 (`kernel.panic` sysctl), (선택) 원격 전원 리셋 수단. 재부팅으로 안 풀리는 하드웨어 장애는 커버 불가 — 그 계층의 보험은 #6 의 RunPod 재현
   - Tailscale 경유 Isaac Sim 원격 GUI 검증은 **드롭한다** — PC 가 자택에 있으므로 GUI 는 로컬에서 띄운다. 출장지 원격 사용이 실제로 필요해질 때 수행한다 (약 30분, 절차는 [Hardware-Arm.md](../../../Roadmap/Hardware-Arm.md) Stage 1 실행 머신 절)
   - [ ] **Jetson Orin Nano CUDA 스택 확인** (약 30분) — 256GB SSD + Ubuntu 22.04 는 설치 완료 상태이므로 재플래시는 불요 전망. 확인할 것은 **CUDA·cuDNN 동반 여부**뿐이다 (`cat /etc/nv_tegra_release`, `dpkg -l nvidia-jetpack`) — 없으면 PyTorch GPU 가 안 붙고, JetPack 재설치에는 **x86 Ubuntu 호스트 (= 이 PC) 가 필요**하다. 맥북은 SDK Manager 호스트가 될 수 없다. PC 가 자택에 있으므로 시점 제약은 없고, Jetson 이 v3 배포 타깃으로 실제 필요해질 때 수행한다
-- [ ] **하드웨어 스파이크** (2-3주, 2026.10 확정) — 조립 전 드라이버 선검증. Feetech 버스 -> `feetech_ros2_driver` -> ros2_control -> 최소 URDF RViz 확인. 자료: `Studies/Hardware-Arm/`, 상세: [Hardware-Arm.md](../../../Roadmap/Hardware-Arm.md) 스파이크 절
+- [ ] **하드웨어 스파이크** — **2026-08-30 실기 전환으로 대체** (2026.09 첫 2주, LeRobot 네이티브 must 4 — [실기 전환 plan](2026-08-30-realworld-transition-execution.md) §5). 구 정의 (드라이버 선검증) 는 Stage 1 첫 주로 이동. 자료: `Studies/Hardware-Arm/`, 기록: `Studies/Hardware-Arm/spike/RESULT.md`
   - 이 구간의 최우선 항목이다. 결과가 분기 재평가 #1 (2026.11) 의 입력이고, 1단계에서 막히면 Stage 1 의 ROS2 드라이버 계획을 2026 년 안에 재산정해야 한다
 - [ ] 7-1. **NVIDIA SO-101 sim-to-real 코스 Phase A** (10-16h, GPU 로컬 불요 — RunPod headless). 이론 4개 모듈 + 워크숍 코드 읽기 + GR00T post-training·sim 평가 1회. 비용 약 1만-2.5만원. 상세: [`docs/research/isaac-sim-so101-course.md`](../../research/isaac-sim-so101-course.md) §4.1
   - 선행 의존이 없어 언제 해도 된다. 목적은 코스 완주가 아니라 **발화 가능 수준 확보**다 — 완주는 실물 팔이 필요해 Phase B (Stage 1, 2027.01-02) 로 간다
 
 ### 12월
 
-- [ ] **Hardware-Arm Stage 1 본 빌드 착수** (2026.12-2027.01) — 조립 (리더+팔로워 6DOF) + 손목 카메라 장착 + URDF + ROS2 드라이버 셋업. 자료: `Studies/Hardware-Arm/`, 상세: [Hardware-Arm.md](../../../Roadmap/Hardware-Arm.md) Stage 1 절
+- [ ] **Hardware-Arm Stage 1 본 빌드 착수** — **2026-08-30 실기 전환으로 대체** (2026.10-11 — [실기 전환 plan](2026-08-30-realworld-transition-execution.md) §6). 조립 완성 + 안전 기초 + URDF + ROS2 래핑 + 이중 latency. 자료: `Studies/Hardware-Arm/`, 상세: [Hardware-Arm.md](../../../Roadmap/Hardware-Arm.md) Stage 1 절
   - 착수 조건 2개 — 10월 스파이크 3단계 통과 + 11월 말 이월 잔량 약 15h 이하. 깨지면 원안 (2027.01-02) 으로 되돌리고 12월은 버퍼로 쓴다 (실행 가이드 §6.2)
   - 준비는 11월 말에 — Stage 1 가이드 재확인 + 작업 공간 정리. 부품은 9월 일괄 구매분으로 충당된다
 
@@ -155,7 +155,7 @@
 - Phase 2 항목 (재측정, 이해 검증 4블록, Phase 3 재현 확인) 의 **수행 자체**는 본인 작업이다 — 본 plan 은 구조·통과 기준·데드라인만 제공하고, 산출물 품질 (면접 방어 가능 수준의 이해) 을 자동으로 만들지 않는다.
 - 이력서·LinkedIn 문구의 동일 지위 통일은 리포 밖 작업 — Task 1-4 에 리마인더로만 남긴다.
 - SO-101 확정 (2026-07-28) 에 따른 Stage 2 확장 수단 재설계는 본 plan 에서 판단하지 않는다 — BOM·구매 확정분만 반영하고, 재설계는 2026.11 분기 재평가 안건으로 이관한다. 스파이크는 완제품 키트에 맞춰 "선구매" 가 아니라 "조립 전 선검증" 으로 재정의됐다 (Hardware-Arm.md 스파이크 절).
-- Phase 4.5 Sections 1-3 (2026.09-11) 과 스파이크 (2026.10) 의 병행이 "한 구간 1트랙" 원칙과 충돌하는 문제 — 8월 체크포인트 / 2026.11 재평가 안건.
+- Phase 4.5 Sections 1-3 (2026.09-11) 과 스파이크 (2026.10) 의 병행이 "한 구간 1트랙" 원칙과 충돌하는 문제 — **해소 (2026-08-30)**: v1.5 실측 선행 마감 + 실기 전환으로 9월 스파이크가 단독 메인 트랙.
 - `Studies/` 하위 week 학습 자료 내부의 Colab 잔존 언급 (Phase 4 week1·week8, Phase 4.5 week1·3·4) 은 해당 week 진입 시 갱신한다 — "진입 시 재검토" 원칙과 일치, 본 plan 범위 밖.
 - 리포 전면 재편 (README 결과 중심 전면 개편, `Studies/` 재배치) 은 v1 레포 기록 시점 (2026 하반기) 별도 작업.
 

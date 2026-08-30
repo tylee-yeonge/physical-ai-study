@@ -2,7 +2,7 @@
 
 
 > **기간**: 약 3개월 (2027.08~, 실지원과 병행하는 강화 카드)
-> **목표**: OpenVLA fork + ROS2 노드 래핑 + 자작 6DOF 팔 + 디지털 트윈 (Isaac Sim) + 안전 인터록 + latency 측정 → **산출물 v3 (차별화 정점)**
+> **목표**: v2.5 확정 모델 (SmolVLA 또는 GR00T N1.7) fork + ROS2 노드 래핑 + 자작 6DOF 팔 + 디지털 트윈 (Isaac Sim) + 안전 인터록 + latency 측정 → **산출물 v3 (차별화 정점)**
 > **언어**: **Python** + **C++** (안전 인터록) + **ROS2**
 > **하드웨어**: Ubuntu PC (RTX 4070) + 자작 팔 (Hardware-Arm Stage 2, 6DOF) + Isaac Sim 디지털 트윈 (Phase 6 산출)
 > **주간 시간**: 약 6-8시간 (실지원 병행 저강도)
@@ -15,12 +15,12 @@
 
 
 **핵심 산출물 (v3, 결정타)**:
-> *Real-to-Sim-to-Real*: 자작 6DOF 팔 + Isaac Sim 디지털 트윈 + OpenVLA fork + ROS2 노드 래핑 + 안전 인터록 + latency 측정 + Sim/Real gap 영상
+> *Real-to-Sim-to-Real*: 자작 6DOF 팔 + Isaac Sim 디지털 트윈 + v2.5 확정 모델 fork + ROS2 노드 래핑 + 안전 인터록 + latency 측정 + Sim/Real gap 영상
 
 
 **산출물 v3** (2027.08~ `physical-ai-study` 레포 공개, 완성 시 포트폴리오/이력서 갱신):
 - 통합 데모 영상 1-3분
-- ROS2 패키지 (OpenVLA inference 노드 + 안전 인터록 노드 + 자작 팔 드라이버 통합)
+- ROS2 패키지 (VLA inference 노드 + 안전 인터록 노드 + 자작 팔 드라이버 통합)
 - latency 측정 보고서 (Sim, Real, 안전 인터록 오버헤드)
 - Sim/Real gap 비교 영상
 
@@ -38,7 +38,7 @@
 
 | 단계 | 주 장비 | 출장지 가능 여부 |
 |---|---|---|
-| OpenVLA fork + 환경 셋업 | Ubuntu PC (원격) | O |
+| VLA 모델 fork + 환경 셋업 | Ubuntu PC (원격) | O |
 | ROS2 노드 통합 | Ubuntu PC (원격) | O |
 | 자작 팔 실기 배포 | Ubuntu PC + 자작 팔 | △ (실기 시 로컬) |
 | 안전 인터록 (C++) | Ubuntu PC + 자작 팔 | △ |
@@ -63,15 +63,15 @@
 ---
 
 
-## Section 9.1: OpenVLA fork + ROS2 통합 (3주)
+## Section 9.1: VLA 모델 fork + ROS2 통합 (3주)
 
 
-> **둘째 층 파이프라인 재사용**: 본 절의 fine-tuning 은 처음부터 만드는 게 아니라, **v1.5(Phase 4.5)에서 sim 데이터로 확립한 LoRA adaptation 파이프라인 + eval harness 를 자작 팔 teleop(real) 데이터로 확장**하는 것이다. 즉 v1.5 의 sim adaptation 증거를 real 도메인으로 끌어올려 sim 증거의 설득력 한계(Phase 4.5 §0.3)를 보완한다. v3 는 셋째 층 정점을 유지하되, 둘째 층 파이프라인을 재사용한다.
+> **둘째 층 파이프라인 재사용**: 본 절의 fine-tuning 은 처음부터 만드는 게 아니다 — **v1.5 (sim, OpenVLA) 에서 확립하고 v2.5 (real, SmolVLA, 2026.11-12) 에서 이미 real 로 이식 완료한 adaptation 파이프라인 + eval harness** 를 인수한다 (실기 전환 plan §7). v3 는 셋째 층 정점 — 그 위에 안전 인터록·디지털 트윈·latency 체계를 결합해 확장한다.
 
 
 | 주차 | 내용 | 핵심 |
 |------|------|------|
-| 1 | OpenVLA fork + Phase 4.5 파이프라인을 자작 팔 teleop 데이터로 확장 | sim→real 데이터 교체, 파이프라인 재사용 (Stage 2 산출) |
+| 1 | v2.5 확정 모델 fork + v2.5 파이프라인·데이터셋 인수 (Stage 2 데이터로 확장) | real 파이프라인 재사용 |
 | 2 | inference 노드 통합 (Phase 4 demo 확장) | image + instruction → joint action |
 | 3 | Sim 환경 (Isaac Sim) 에서 dry-run | 디지털 트윈 활용 |
 
@@ -87,7 +87,7 @@
 
 | 주차 | 내용 | 핵심 |
 |------|------|------|
-| 4 | 위치 / 속도 / 토크 한계 (C++ 노드) | Dynamixel 피드백 활용 |
+| 4 | 위치 / 속도 / 토크 한계 (C++ 노드) | Feetech STS3215 피드백 (위치·부하·온도) 활용 |
 | 5 | e-stop + 충돌 감지 | 토크 급증 감지 |
 | 6 | inference 출력 → 안전 노드 → 모터 명령 | 인터록 오버헤드 측정 |
 
@@ -128,7 +128,7 @@
 
 
 ### OpenVLA 통합
-- [ ] OpenVLA fork + 자작 팔용 인터페이스 정리
+- [ ] v2.5 확정 모델 fork + 자작 팔용 인터페이스 정리
 - [ ] ROS2 inference 노드 (Phase 4 demo 확장)
 - [ ] Sim 환경 dry-run 동작
 
@@ -157,7 +157,7 @@
 ## Phase 7 완료 기준
 
 
-> "자작 6DOF 팔에 OpenVLA fork 를 ROS2 노드로 래핑해 배포하고, 안전 인터록 통과 + Sim/Real gap 측정 + latency 측정 까지 완료한 *Real-to-Sim-to-Real* 통합 영상을 공개한다."
+> "자작 6DOF 팔에 v2.5 확정 모델 fork 를 ROS2 노드로 래핑해 배포하고, 안전 인터록 통과 + Sim/Real gap 측정 + latency 측정 까지 완료한 *Real-to-Sim-to-Real* 통합 영상을 공개한다."
 
 
 ---
@@ -167,7 +167,7 @@
 
 
 - OpenVLA: https://openvla.github.io/
-- Dynamixel SDK / `dynamixel_hardware`: 자작 팔 트랙 ([Hardware-Arm.md](Hardware-Arm.md)) 참고
+- Feetech SDK / `feetech_ros2_driver`: 자작 팔 트랙 ([Hardware-Arm.md](Hardware-Arm.md)) 참고
 - Isaac Sim ROS2 Bridge ([Phase 6.md](Phase%206.md))
 
 
