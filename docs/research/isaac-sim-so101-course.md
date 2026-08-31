@@ -2,6 +2,7 @@
 
 > NVIDIA 공식 SO-101 sim-to-real 코스의 실제 요건을 조사해, 보유 장비로 어디까지 가능한지와 GPU 증설이 필요한지를 판정한다. Phase 6 진입 전 준비 항목(Isaac Lab 튜토리얼)과 Hardware-Arm Stage 1 의 Isaac Sim 항목이 이 조사에 의존한다.
 > 작성일: 2026-08-03
+> **⚠ 시점 갱신 (2026-08-31)**: 실기 전환 (2026-08-30) 으로 팔 확보는 2026.09, Stage 1 은 2026.10-11 로 전진 — §4.2 Phase B 의 "2027.01-02" 는 낡았다. Phase A 실행 여부·시점은 재평가 #1 안건 (v2.5 의 GR00T N1.7 옵션 선행 실측으로 재정위 검토 — [master roadmap](../superpowers/plans/2026-08-31-master-roadmap.md) §4·§5). 기본값: 실행 안 함
 
 ## TL;DR
 
