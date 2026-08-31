@@ -19,6 +19,15 @@
 
 측정: 2026-06. 재측정 (방법론 보강 + p50/p99/VRAM peak) 은 **SmolVLA 비교 측정과 통합해 2026.09 수행** (실기 전환 plan §5.2 must 4). Rerun 시각화 gif 는 확보 시 이 절에 추가.
 
+**v1.5 — LoRA adaptation before/after** (2026-08, 상세: [`Measurements/openvla-lora-eval/`](./Measurements/openvla-lora-eval/)): ManiSkill PickCube-v1, 동일 조건 N=100 (무행동 하한 seed 2개 제외 98쌍 기준).
+
+| 지표 | zero-shot | LoRA fine-tuned | 판정 |
+|---|---|---|---|
+| placed (최종 성공) | 0/98 (95% Wilson 0-3.8%) | 0/98 (95% Wilson 0-3.8%) | 판정 불가 — 불일치 쌍 0 |
+| reached / grasped / lifted (부분 도달, 기술 통계) | 0/98 / 0/98 / 0/98 | 92/98 / 75/98 / 1/98 | 검정 없음 (1차 지표 아님) |
+
+성공률 상승은 없었고, 원인 후보 10건 배제 / 7건 잔여를 파일 근거로 확정한 분석이 산출물이다 (`Measurements/openvla-lora-eval/findings.md` §3).
+
 
 ---
 

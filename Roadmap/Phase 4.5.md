@@ -154,21 +154,21 @@
 
 
 ### adaptation 파이프라인
-- [ ] sim 생성 데이터가 OpenVLA 미학습 분포임을 확인
-- [ ] LoRA 파인튜닝 1 사이클 완료 (RunPod) + 체크포인트
-- [ ] 로컬 머지 + 4-bit 양자화 + 호환성 검증 통과
+- [x] sim 생성 데이터가 OpenVLA 미학습 분포임을 확인 — week1 `outputs/distribution_check.md` (시각 도메인만 미학습, embodiment·task 는 겹침으로 정밀화)
+- [x] LoRA 파인튜닝 1 사이클 완료 (RunPod) + 체크포인트 — week3 `outputs/train_log.md` (2,000스텝 완주, 어댑터 회수)
+- [x] 로컬 머지 + 4-bit 양자화 + 호환성 검증 통과 — week4 `outputs/remerge_check.md`, `compat_check.md` (4층 검증)
 
 
 ### eval / 분석
-- [ ] before/after 신호가 성립하는 지표를 썼는지 확인 (최종 성공률 + 부분 도달률 병기, 부분 도달률이 전 단계 0 이 아님)
-- [ ] zero-shot vs fine-tuned 를 동일 조건 N회 측정 (N 명시)
-- [ ] 성공률 차이를 분산(표준편차/신뢰구간)과 함께 보고
-- [ ] 차이가 노이즈면 원인 분석을 산출물로 작성 (negative 대응)
+- [x] before/after 신호가 성립하는 지표를 썼는지 확인 (최종 성공률 + 부분 도달률 병기, 부분 도달률이 전 단계 0 이 아님) — fine-tuned reached 92/98, grasped 75/98 (`Measurements/openvla-lora-eval/findings.md`)
+- [x] zero-shot vs fine-tuned 를 동일 조건 N회 측정 (N 명시) — N=100, seed 0-99, 메타 차이 2항목 확인 (week5)
+- [x] 성공률 차이를 분산(표준편차/신뢰구간)과 함께 보고 — placed 0/98 양쪽, 95% Wilson [0%, 3.8%] + 짝지은 판정 (week6 `outputs/results.md`)
+- [x] 차이가 노이즈면 원인 분석을 산출물로 작성 (negative 대응) — week6 `outputs/causal_analysis.md` (배제 10건 / 잔여 7건)
 
 
 ### 산출물 v1.5 공개
-- [ ] LoRA 파이프라인 + eval harness 코드 정리 + README
-- [ ] vla-lab 공개 문서 1편 (adaptation 설계-실행-분석 서사 + 선정 시점 vs 마감 시점의 필드 변화 단락) + LinkedIn 링크 공유
+- [ ] LoRA 파이프라인 + eval harness 코드 정리 + README — 코드·기록은 `Measurements/openvla-lora-eval/` 로 마감했으나 vla-lab (공개 repo) 이관·README 미발행
+- [ ] vla-lab 공개 문서 1편 (adaptation 설계-실행-분석 서사 + 선정 시점 vs 마감 시점의 필드 변화 단락) + LinkedIn 링크 공유 — 초고 완성 (week6 `outputs/blog_draft.md`), 필드 변화 단락 미작성 + 발행·공유 대기 (LinkedIn 은 probe 2단 일정)
 
 
 ---
