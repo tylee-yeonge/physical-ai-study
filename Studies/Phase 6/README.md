@@ -1,5 +1,6 @@
 # Studies/Phase 6 — Isaac Sim + 디지털 트윈
 
+> **⚠ 구판 (2026-08-31 판정)**: week1 의 "본 phase 자체 산출물 없음" 은 v2 헤드라인 정의 (Roadmap/Phase 6.md) 와 정면 모순 — v2 정의 이전 작성분이다. Isaac Sim 4.x 전제 (현행 5.x)·주당 8-10h 도 낡음. Phase 6 자체가 **재평가 #2 재정의 안** (gap 측정 인프라 → EnvHub 기반 — master roadmap §5) 대상이므로 **재정의 전 재작성 금지, 진입 시 (2027.05) 재작성 전에는 사용 금지.**
 
 > **학습 기간**: 2027.05-07 (3개월, 12주)
 > **마스터 가이드**: [`Roadmap/Phase 6.md`](../../Roadmap/Phase%206.md)

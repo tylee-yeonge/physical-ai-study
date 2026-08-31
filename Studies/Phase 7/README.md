@@ -1,5 +1,6 @@
 # Studies/Phase 7 — Real-to-Sim-to-Real (정점 산출물 v3)
 
+> **⚠ 구판 (2026-08-31 판정)**: week1 부터 "OpenVLA fork + OpenX/RLDS 변환 + LoRA" — 2026-08-30 실기 전환으로 폐기된 전제다 (현행: v2.5 확정 모델 fork + LeRobot 파이프라인 인수 — Roadmap/Phase 7.md §9.1). **재작성 재료가 v2.5 산출물 (2026.12) 이므로 그 전 재작성 불가, 진입 시 (2027.08) 재작성 전에는 사용 금지.**
 
 > **학습 기간**: 2027.08~ (3개월, 12주)
 > **마스터 가이드**: [`Roadmap/Phase 7.md`](../../Roadmap/Phase%207.md)

@@ -1,5 +1,6 @@
 # Studies/Phase 5 — Foundation Model 기초 (ViT / CLIP / DINOv2 / SigLIP)
 
+> **⚠ 구판 (2026-08-31 판정)**: 본 디렉토리 전체는 OpenVLA 세대 전제로 작성됐다 (OpenVLA/OpenX 언급 22파일). 커리큘럼 자체 (ViT/CLIP/DINOv2/SigLIP 12주) 가 **재평가 #1 안건** (액션 토크나이저·flow-matching 교체 + 압축 여부 — master roadmap §5-1) 이므로 **결정 전 재작성 금지, 결정 후 재작성 전에는 사용 금지.** 주당 예상 시간 (5-10h) 도 예산 (주 6-8h) 초과 — 재작성 시 재산정.
 
 > **학습 기간**: 2027.02-04 (3개월, 12주)
 > **마스터 가이드**: [`Roadmap/Phase 5.md`](../../Roadmap/Phase%205.md)
