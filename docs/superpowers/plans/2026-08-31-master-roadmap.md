@@ -38,39 +38,74 @@
 
 ---
 
-## 3. 체크리스트 (2026년분만 — 2027 은 재평가 #1 후 이 절에 추가)
+## 3. 체크리스트 (2026년분 — 일/주 단위. 2027 은 재평가 #1 후 추가)
 
-### ~09.07 — 구매 주간
-- [ ] SO-101 키트 발주 (판매자 확인 4항목 문의 → 답변 → 발주. 키트 ~55만 + 손목 카메라 + 작업대 자재 + 예비 서보 선택)
-- [ ] (선택) 코스 BoM (vial·랙) 포함 여부 — 코스 Phase A/B 는 재평가 #1 안건이므로 기본 미포함
-- [ ] 수령 후 사양서 확인 (모터 ID 사전 할당·펌웨어)
-- [ ] v1.5 소화 — findings §2 표 + 면접 방어 3줄을 문서 없이 재생산 (구 자가검증 10문항 대체)
-- [ ] LinkedIn 헤드라인 교체 (+ vla-lab v1.5 링크 공유 여부 판단)
+> 일/주 배분은 가이드이지 관료제가 아니다 — 밀리면 다음 항목을 당기지 말고 버퍼로 흡수한다. **재료 지도**: 스파이크 = 실기 전환 plan §5.3 + `Studies/Hardware-Arm/spike/RESULT.md` / Stage 1 = `Studies/Hardware-Arm/stage1/` (4개 가이드) / v2.5 = **`Studies/Hardware-Arm/v25/`** (README + PRACTICE — 신설).
 
-### 09.07-21 — 스파이크 (절차: 실기 전환 plan §5)
-- [ ] must 1 teleop / - [ ] must 2 녹화 10ep+Hub / - [ ] must 3 SmolVLA zero-shot / - [ ] must 4 latency (n=100)
-- [ ] `spike/RESULT.md` 기록 + **판정 (09-21)**: 통과→Stage 1 10월 / teleop 실패·2주 초과→원안 롤백
+### ~09.07 — 구매 주간 (+ v1.5 소화)
 
-### 09 하순
-- [ ] 9월 실적 사후 집계 (가용 시간 재산정 — 재평가 #1 입력)
-- [ ] JD 정독 착수 — 대상 8곳 확정: [KR Physical AI JD 조사](../../research/2026-08-31-kr-physical-ai-jd-survey.md) §5 (로보티즈·RLWRLD·홀리데이·에이로봇·레인보우·두산·현대차 로보틱스랩·네이버랩스). 시장 지형 조사는 완료 — 남은 것은 JD 원문 정독 + 격차 매핑
+- [ ] 판매자 문의 발송 — 4항목 한 번에: ① 리더암 기어비 (C046 단일 vs 공식 혼합) ② 전원 어댑터 동봉 (팔로워 12V / 리더 규격) ③ USB-시리얼 보드 2개 동봉 ④ 3D 부품에 손목 카메라 마운트 포함
+- [ ] 답변 확인 → **발주** (키트 ~55만 + 손목 카메라 1-3만 + 클램프·매트. 예비 서보 선택, 코스 BoM 기본 미포함)
+- [ ] 수령 → 사양서 확인: 모터 ID 사전 할당 여부 / 펌웨어 버전 (미할당이면 Day 1 전에 ID 세팅 순서 추가)
+- [ ] v1.5 소화 ① — findings §2 "말할 수 있는 것/없는 것" 표를 안 보고 재생산 → 원본 대조 (재료: `Measurements/openvla-lora-eval/findings.md`)
+- [ ] v1.5 소화 ② — 면접 방어 3줄 (왜 했나 / 0인데 뭐가 산출물인가 / 다음) 을 소리 내어 1분 (재료: vla-lab v1.5 README §1·§5·§6)
+- [ ] v1.5 소화 ③ — week6 quiz_easy·quiz_medium (재료: `Studies/Phase 4.5/week6/`)
+- [ ] LinkedIn 헤드라인 교체 (v1.5 링크 공유 여부는 §6 미결)
 
-### 10-11월 — Stage 1 (절차: 실기 전환 plan §6)
-- [ ] ROS2 드라이버 검증 인수 (모터1→데이지체인→URDF+RViz, 첫 주)
-- [ ] 조립 완성 / - [ ] 안전 기초 (소프트리밋·토크상한·e-stop) / - [ ] ROS2 래핑 / - [ ] URDF+오프셋 / - [ ] 이중 latency / - [ ] 1분 영상
-- [ ] JD 정독 마감 (10월) — 자격요건 vs v1/v1.5/v2.5/Stage 1 격차 매핑 1페이지 (JD 조사 §5 목록, 현대차 9월 공고 포함)
-- [ ] probe 1건 (택1) — 커피챗 1-2건 **또는** 로보티즈 AI 사피엔스 공개 코드 정독 + 이슈·기여 1건 (후자가 더 강한 신호 — JD 조사 §6)
+### 09.07-21 — 스파이크 (Day 단위. 진행 체크는 `spike/RESULT.md` §2 와 동기)
 
-### 11-12월 — v2.5 (절차: 실기 전환 plan §7, **라이트 모드**)
-- [ ] 실기 측정 설계 1페이지 (N 해상도 역산 + 배치 마커·리셋 프로토콜) — 측정 전 고정
-- [ ] teleop 데이터셋 (단일 task, 규모는 수집 속도 실측 후) + HF Hub
-- [ ] SmolVLA zero-shot / 파인튜닝(로컬 4070) / fine-tuned 동일 조건 측정
-- [ ] 비교표 (OpenVLA sim 병기) → README 실측 절 / - [ ] vla-lab 글 1편 (문서 상한 준수)
+**Week 1 — 조립·캘리브레이션·teleop**
+- [ ] D1-2 팔로워 조립 — 모터 ID 확인 → 링크 → 배선 (막힘: ID 충돌 → 조립 전 재할당)
+- [ ] D3 리더 조립 (기어 구성을 사양서와 대조)
+- [ ] D4 LeRobot 설치 (`pip install -e ".[feetech]"`) → `lerobot-find-port` → `lerobot-calibrate` (막힘: `dialout` 권한, USB 전원 부족. 명령어는 LeRobot SO-101 문서로 재확인)
+- [ ] D5 `lerobot-teleoperate` → **must 1** (증거: 30초 영상. 막힘: 축 반전 → 캘리브 재실행)
+- [ ] D6-7 버퍼 (조립 재작업 흡수)
+
+**Week 2 — 녹화·zero-shot·latency**
+- [ ] D8 카메라 세팅 (정면 ELP 필수 + 손목 선택) + 테스트 녹화 (막힘: index·fps)
+- [ ] D9 task 정의 (예: 큐브→트레이) → `lerobot-record` 10ep → HF Hub(private) → **must 2** (증거: repo id. 부수 실측: **에피소드당 소요 시간** — v2.5 N 역산의 입력)
+- [ ] D10 `lerobot/smolvla_base` zero-shot 1회 → **must 3** (증거: 영상+로그. 막힘: 카메라 키 이름 불일치)
+- [ ] D11 latency n=100 → **must 4** (재료: Phase 4 측정 방법론 재사용. OpenVLA 300ms 병기)
+- [ ] D12-14 `RESULT.md` 기입 (증거 4건 + 소요 + 막힌 지점) → **판정 (09-21, 1회)** 기록
+
+### 09 하순 — 집계 + JD 착수
+
+- [ ] 9월 실적 집계 — 방법: 달력·커밋 로그로 주별 실투입 h 표 1개 (계획 대비. 재평가 #1 입력)
+- [ ] JD 정독 착수 — 회사별로 [JD 원문 저장 → 자격/우대 추출 → 산출물 매핑 메모] 1세트씩 ([JD 조사](../../research/2026-08-31-kr-physical-ai-jd-survey.md) §5 정독 포인트):
+  - [ ] 로보티즈 (시스템 개발직군)  - [ ] RLWRLD (Robotics S/W)  - [ ] 홀리데이로보틱스  - [ ] 에이로봇
+  - [ ] 레인보우로보틱스  - [ ] 두산로보틱스  - [ ] 현대차 로보틱스랩 (9월 공고 열리면 즉시)  - [ ] 네이버랩스
+
+### 10-11월 — Stage 1 (Week 단위. 재료: `stage1/` 가이드 4개)
+
+- [ ] **W1** ROS2 드라이버 검증 (재료: `ros2_driver_setup.md` §0-§1) — ① 모터 1개 위치 명령 ② 6축 데이지체인 + joint_states ③ 최소 URDF + RViz
+- [ ] **W2** `so101_description` 패키지 + controller config + bringup (재료: §2-§4)
+- [ ] **W3** 조립 완성 — 케이블 정리·작업대 고정·손목 카메라 마운트
+- [ ] **W4** URDF 재사용 + 캘리브 오프셋 반영·검증 (재료: `URDF_guide.md` §0)
+- [ ] **W5** 안전 기초 3종 — 소프트 리밋 (컨트롤러 limit = URDF 값과 일치) / 토크 상한 (드라이버 파라미터) / 물리 e-stop (전원 차단 스위치 배선)
+- [ ] **W6-7** 이중 latency — (a) LeRobot 직결 n=100 / (b) ROS2 경유 n=100 / (b)-(a) 통합 오버헤드 기록 (재료: `ros2_driver_setup.md` §5. Measurements 경량 1디렉토리)
+- [ ] **W8** 1분 영상 (teleop + 정책 실행 + e-stop) + `stage1/README.md` 체크리스트 대조
+- 병행 (≤2): - [ ] JD 격차 매핑 1페이지 마감 (10월 — 8개사 자격요건 vs v1/v1.5/v2.5/Stage 1)  - [ ] probe 택1 (커피챗 1-2건 **또는** 로보티즈 AI 사피엔스 코드 정독+이슈·기여 1건)
+- [ ] (nice) Isaac Sim 임포트 시도 (실패 시 Phase 6 이월 — `isaac_sim_import.md`)
+
+### 11-12월 — v2.5 (재료: **`Studies/Hardware-Arm/v25/`** README+PRACTICE, 라이트 모드)
+
+- [ ] **0. 측정 설계 1페이지 (착수 전 고정)** — N 역산 (스파이크 D9 의 에피소드 소요 실측 × 예산 → v25 README §1 표. 출발점 N=50), 배치 마커 템플릿, ABBA 세션 교차, 판정 규칙 cm 단위, 통계는 v1.5 `stat_method.md` 재사용
+- [ ] **1. 실기 하네스 검증** — 사람 teleop 을 같은 판정 규칙에 투입, ≥9/10 확인 (v25 README §3)
+- [ ] **2. 본 수집** — 단일 task, 규모 = 실측 속도 재산정 (50-100 목표) → HF Hub (v25 PRACTICE 1)
+- [ ] **3. zero-shot 측정** — N쌍, 부분 도달률 병기, 무행동(zero-action) probe 로 degenerate 배치 제외 (PRACTICE 2)
+- [ ] **4. SmolVLA 파인튜닝** — 로컬 4070, loss·VRAM 기록 (PRACTICE 3)
+- [ ] **5. fine-tuned 동일 조건 측정** (PRACTICE 2 재사용 — 변인은 모델 하나)
+- [ ] **6. 비교표** (OpenVLA sim 병기 — PRACTICE 4) → README 실측 절 갱신
+- [ ] **7. 발행** — vla-lab 글 1편 + Measurements 1디렉토리 (**상한 — 여기서 멈춘다**)
 - [ ] (nice) GR00T N1.7 2번째 모델
 
 ### 11월 하순 — 분기 재평가 #1 (§5 안건 일괄. 시장 신호 입력: [KR Physical AI JD 조사](../../research/2026-08-31-kr-physical-ai-jd-survey.md) + JD 격차 매핑)
 
+- [ ] 준비물 2개 확인 — 9월 실적 집계 표 / JD 격차 매핑 1페이지
+- [ ] §5 안건 1-8 + 부록 D 기존 안건 결정 → 결과를 본 문서에 반영 (2027 체크리스트 추가)
+
 ### 12월
+
 - [ ] v2.5 마무리 + Stage 1 이월분 흡수 (조건 미달 시 12월은 순수 버퍼)
 
 ---

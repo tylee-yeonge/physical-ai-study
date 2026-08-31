@@ -28,6 +28,9 @@ Studies/Hardware-Arm/
     isaac_sim_import.md        # URDF → USD 임포트 (nice — Phase 6 이월 허용)
     urdf/                      # URDF + 캘리브레이션 오프셋 반영본
     ros2_pkg/                  # ROS2 패키지 (드라이버 래핑 + 데모)
+  v25/
+    README.md                  # v2.5 학습 가이드 (N 역산·실기 측정 설계·하네스 검증)
+    PRACTICE.md                # 수집·eval·파인튜닝 명령 골격
   stage2/
     README.md                  # Stage 2 목표 + 진행 순서 (확장 수단·teleop 확장 가이드는 재평가 결정 후 작성)
     safety_interlock.md        # 위치/속도/토크 한계 + e-stop (C++)
