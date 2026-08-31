@@ -46,7 +46,7 @@ gh repo view --json visibility
 
 
 ```markdown
-| 2 | 2026 하반기 | OpenVLA + ROS2 minimal demo + 블로그 2편 | [01_VLA_v1](Portfolio/01_VLA_v1) |
+| 2 | 2026 하반기 | OpenVLA + ROS2 minimal demo + vla-lab 문서 2편 | [01_VLA_v1](Portfolio/01_VLA_v1) |
 ```
 
 
@@ -74,8 +74,8 @@ VLA (Vision-Language-Action) 의 정독 + 실측 + ROS2 통합 minimal demo 를 
 
 
 학습 흐름:
-- RT-2 정독 (closed) + 블로그 1편
-- OpenVLA 정독 (open) + RTX 4070 직접 실측 + 블로그 1편
+- RT-2 정독 (closed) + vla-lab 문서 1편
+- OpenVLA 정독 (open) + RTX 4070 직접 실측 + vla-lab 문서 1편
 - OpenVLA HuggingFace inference -> ROS2 토픽 minimal demo
 - 1분 시연 영상
 
@@ -91,7 +91,7 @@ VLA (Vision-Language-Action) 의 정독 + 실측 + ROS2 통합 minimal demo 를 
 양산 통합에는 hierarchical (slow VLA + fast safety) 구조 필수.
 
 
-블로그 2편:
+vla-lab 문서 2편:
 - RT-2 정독 노트: - OpenVLA + RTX 4070 실측: 
 
 ROS2 패키지 + 1분 영상:

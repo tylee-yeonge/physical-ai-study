@@ -1,7 +1,7 @@
 # Week 6 실습: 집계 -> 짝지은 비교 -> 배제 분석 -> 공개
 
 
-> **실습 목표**: week5 원시 결과에 미리 정한 방법을 적용해 결론을 내고, 배제/미배제 표와 블로그 초고를 만들어 v1.5 를 공개한다.
+> **실습 목표**: week5 원시 결과에 미리 정한 방법을 적용해 결론을 내고, 배제/미배제 표와 vla-lab 문서 초고를 만들어 v1.5 를 공개한다.
 > **예상 시간**: 8-10시간
 > **원칙**: 실습 1 을 시작하기 전에 `week5/outputs/stat_method.md` 를 다시 읽는다. 여기서 방법을 새로 고르지 않는다.
 
@@ -35,7 +35,7 @@ flowchart TD
     P2["실습 2<br/>짝지은 2x2<br/>-> 불일치 쌍<br/>-> p 값"]
     P3["실습 3<br/>표 · 그림<br/>-> results.md"]
     P4["실습 4<br/>배제 / 미배제<br/>-> causal_analysis.md"]
-    P5["실습 5<br/>블로그 초고<br/>-> blog_draft.md"]
+    P5["실습 5<br/>vla-lab 문서 초고<br/>-> blog_draft.md"]
     P6["실습 6<br/>공개<br/>-> 코드 정리<br/>-> 증거 마감"]
     P1 --> P2 --> P3 --> P4 --> P5 --> P6
     P1 -.->|"메타 차이가 2항목이<br/>아니면 분석 중단"| W5["week5 로 복귀"]
@@ -63,7 +63,7 @@ flowchart TD
 | **배제** | "이것은 원인이 아니다" 를 근거와 함께 확정 |
 | **잔여 후보** | 배제하지 못해 남은 원인 후보 |
 | **evidence-index** | 포트폴리오의 증거 목록 파일 |
-| **velog** | 이 프로젝트가 쓰는 블로그 플랫폼 |
+| **vla-lab** | 이 프로젝트가 쓰는 공개 산출물 repo (GitHub — 발행 채널, 2026-08-30 확정) |
 
 
 ### 0.4 어디서 실행하나
@@ -252,7 +252,7 @@ for records, name in [(zero_records, "zero"), (ft_records, "ft")]:
 
 
 **무엇을 하나**: week5 실습 3-3 에서 만든 보고 틀에 숫자를 채워 `outputs/results.md` 를 완성하고, 단계별 성공 수 막대 그림을 저장한다.
-**왜 하나**: 표와 그림이 블로그와 `Measurements/findings.md` 에 그대로 들어간다. 그리고 **틀을 미리 만들어 둔 덕에 유리한 지표만 골라 쓰는 일이 어려워진다.**
+**왜 하나**: 표와 그림이 vla-lab 문서와 `Measurements/findings.md` 에 그대로 들어간다. 그리고 **틀을 미리 만들어 둔 덕에 유리한 지표만 골라 쓰는 일이 어려워진다.**
 **끝나면 손에 남는 것**: `outputs/results.md` + `outputs/plots/stage_counts.png` + 한 문장 결론.
 
 
@@ -358,7 +358,7 @@ print("저장: outputs/plots/stage_counts.png")
 ---
 
 
-## 실습 5: 블로그 초고
+## 실습 5: vla-lab 문서 초고
 
 
 **무엇을 하나**: README §6 의 6절 구조로 글 한 편을 쓴다. 분량의 절반이 "무엇을 검증했는가" 와 "무엇이 배제되고 무엇이 남았는가" 에 간다.
@@ -416,7 +416,7 @@ sim 증거의 한계, real 확장(Phase 7), 남은 후보를 가르려면 무엇
 ## 실습 6: v1.5 공개
 
 
-**무엇을 하나**: 흩어진 코드를 정리하고 재현 절차를 README 로 쓰고, `Measurements/` 세 디렉터리를 마감하고, 증거 목록과 블로그를 공개한 뒤 Roadmap 체크리스트를 대조한다.
+**무엇을 하나**: 흩어진 코드를 정리하고 재현 절차를 README 로 쓰고, `Measurements/` 세 디렉터리를 마감하고, 증거 목록과 vla-lab 문서를 공개한 뒤 Roadmap 체크리스트를 대조한다.
 **왜 하나**: 이 Phase 의 결과가 남에게 검증 가능한 형태로 남아야 포트폴리오 증거가 된다. 그리고 닫히지 않은 항목을 정직하게 표시하는 것이 다음 Phase 계획의 전제가 된다.
 **끝나면 손에 남는 것**: 정리된 코드 + README + 마감된 `Measurements/` + `Portfolio/evidence-index.md` 한 줄 + 발행된 글.
 
@@ -463,7 +463,7 @@ ls Measurements/openvla-lora-eval/             # week5-6
 
 
 - `Portfolio/evidence-index.md` 에 행 추가 — 증거 / 날짜 / 위치 / 입증 역량
-- 블로그 발행 (velog). LinkedIn 공유는 probe 2단 일정에 맞춘다
+- vla-lab 문서 발행. LinkedIn 공유는 probe 2단 일정에 맞춘다
 - 루트 `README.md` 의 실측 결과 절에 v1.5 행 추가 여부 판단 — **구간을 함께 적을 수 있을 때만** 추가한다. 성공률만 단독으로 올리면 README 가 과잉 주장을 하는 자리가 된다
 
 

@@ -8,10 +8,10 @@
 
 OpenVLA 7B 는 RTX 4070 12GB 로 **학습이 불가능**하다. 따라서 무거운 LoRA 파인튜닝·sim 대규모 작업은 **RunPod** (Community Cloud RTX 4090 24GB) 에서, 가벼운 추론은 로컬 4070 + ROS2 환경에서 4bit 양자화로 돌린다. 환경 구축은 두 갈래로 진행된다. **Colab 은 SSH 불가·세션 휘발로 배제한다 (2026-07 결정).** 4070 은 반납하지 않기로 확정 (2026-07-20) 됐고 2026.09 자택 이전으로 휴직 중에도 접근이 유지되므로, 추론·eval 은 로컬에 둔다. RunPod 이관 대상은 로컬 사양으로 불가능한 학습 측이다 (Phase 4.5 Section 0).
 
-**적용 산출물**: 산출물 v1 (RT-2/OpenVLA 블로그 2편 + ROS2 minimal demo).
+**적용 산출물**: 산출물 v1 (RT-2/OpenVLA vla-lab 문서 2편 + ROS2 minimal demo).
 
 **핵심 원칙 연결**:
-- 결과물 없는 학습 금지 — 학습 자체가 아니라 *블로그 + ROS2 데모* 가 목표
+- 결과물 없는 학습 금지 — 학습 자체가 아니라 *vla-lab 문서 + ROS2 데모* 가 목표
 - 관심 != 공부 — 4070 에 7B 모델을 욱여넣는 데 시간을 태우지 않는다
 
 ---
@@ -82,7 +82,7 @@ Phase 4 진입 (2026.06 예정) 직전에 한 번 더 점검한다.
 ### 2.3 공통 도구
 - [x] `git`, `python3.10+`, `pip`
 - [x] Rerun viewer 0.23+ (양자화 추론 시각화; ENVIRONMENT.md §4 참고)
-- [x] 블로그 플랫폼 결정 (**Velog** / Medium / 본 레포 `Studies/Phase 4/blog/`)
+- [x] 블로그 플랫폼 결정 (**Velog**) → **2026-08-30 채널 변경: vla-lab (공개 산출물 repo) 발행으로 대체**
 
 ---
 
@@ -144,16 +144,16 @@ flowchart LR
 
 | Week | 작업 | 클라우드 GPU 필요 | 로컬 GPU 필요 | ROS2 필요 |
 |------|------|-----------|--------------|-----------|
-| 1-3  | RT-2 정독 + 블로그 1 | X | X | X |
+| 1-3  | RT-2 정독 + vla-lab 문서 1 | X | X | X |
 | 4-5  | OpenVLA 정독 | X | X | X |
 | 6    | OpenVLA HuggingFace 모델 카드 + 환경 셋업 | X | 선택 | X |
-| 7    | OpenVLA 블로그 1 | X | X | X |
+| 7    | OpenVLA vla-lab 문서 1 | X | X | X |
 | 8    | HuggingFace inference + 양자화 | X | O | X |
 | 9    | I/O spec + cv_bridge | X | O | O |
 | 10   | vla_node 패키지 골격 | X | X | O |
 | 11   | ROS2 dry-run (subscribe → inference → publish) | X | O | O |
 | 12   | Rerun 시각화 + 1분 영상 | X | O | O |
-| 13-16| 블로그 마무리 + 패키징 | X | O (영상 보강 시) | O |
+| 13-16| vla-lab 문서 마무리 + 패키징 | X | O (영상 보강 시) | O |
 | 병행 (선택) | LoRA 파인튜닝 | **O (RTX 4090)** | X | X |
 
 > LoRA 파인튜닝은 본 Phase 의 *필수* 트랙이 아니다. 시간/예산 제약 시 베이스 OpenVLA + 양자화 추론만으로도 minimal demo 산출 가능. Week 6-7 사이에 병행으로 시도하는 것을 권장.
@@ -297,7 +297,7 @@ sequenceDiagram
 4bit 로 떨구면 메모리는 줄지만 action 정확도가 떨어질 수 있다.
 
 - Phase 4 목표는 **"돌아가는 걸 보여주는 minimal demo"** — 품질 저하 허용 범위.
-- "성능이 좋다" 가 목표가 아님. 양자화 전후 비교 자체를 블로그 소재로 활용 (§10 참고).
+- "성능이 좋다" 가 목표가 아님. 양자화 전후 비교 자체를 vla-lab 문서 소재로 활용 (§10 참고).
 
 ### 9.2 리스크 3: RunPod 가용성·비용
 
@@ -313,18 +313,18 @@ sequenceDiagram
 
 ---
 
-## 10. 블로그 소재로의 활용 (산출물 v1 연결)
+## 10. vla-lab 문서 소재로의 활용 (산출물 v1 연결)
 
 이 분업 자체가 좋은 콘텐츠다. 같은 처지 (consumer GPU 보유자) 가 많아 검색 트래픽이 나온다.
 
 - **글감 1**: "Consumer GPU 로 VLA 배포하기 — 학습은 클라우드, 추론은 로컬 양자화"
-  - 권장 작성 시점: week 7 (OpenVLA 블로그) 의 부가 코너 또는 week 13-14 (블로그 마무리)
+  - 권장 작성 시점: week 7 (OpenVLA vla-lab 문서) 의 부가 코너 또는 week 13-14 (vla-lab 문서 마무리)
 - **글감 2**: "OpenVLA 4bit 양자화 추론 + ROS2 노드 통합 후기" (양자화 전후 성능/메모리 비교 표 포함)
   - 권장 작성 시점: week 12 (영상 마감) 직후 또는 week 13-14
 
 검색 태그 예: `OpenVLA`, `VLA fine-tuning RunPod`, `4bit quantization ROS2`, `RTX 4070 LLM`.
 
-velog 작성 + LinkedIn 공유까지가 한 사이클.
+vla-lab 문서 작성 + LinkedIn 공유까지가 한 사이클.
 
 ---
 
@@ -351,7 +351,7 @@ velog 작성 + LinkedIn 공유까지가 한 사이클.
 - [ ] Rerun 시각화 + 1분 데모 영상
 
 ### 11.4 산출물 (week 13-16)
-- [ ] 블로그 2편 작성 + LinkedIn 공유
+- [ ] vla-lab 문서 2편 작성 + LinkedIn 공유
 - [ ] 양자화 전후 비교 표 (§10 글감 2)
 
 ---

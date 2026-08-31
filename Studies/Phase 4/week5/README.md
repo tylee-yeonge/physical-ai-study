@@ -234,7 +234,7 @@ OpenVLA 표준화:
 | action token (이산) | 각 차원을 256 bin 으로 discretize 한 정수 토큰 | OpenVLA 가 Llama 로 출력 |
 
 
-OpenVLA 는 연속 EE-delta 를 차원별 **256 bin 으로 나눠 Llama vocabulary 의 토큰으로 치환**(자주 안 쓰는 256개 토큰을 덮어씀)해 출력한다 (아키텍처 다이어그램상 위치는 week4 §5). 즉 week2 의 "action 도 토큰" 이 여기서 구체화된다 — 연속 제어량을 언어 모델이 생성할 수 있는 이산 토큰으로 바꾼 것. 이 비교 축(관절각 -> EE-delta -> token)이 week7 OpenVLA 블로그의 "남이 안 짚는 각도" 재료가 된다.
+OpenVLA 는 연속 EE-delta 를 차원별 **256 bin 으로 나눠 Llama vocabulary 의 토큰으로 치환**(자주 안 쓰는 256개 토큰을 덮어씀)해 출력한다 (아키텍처 다이어그램상 위치는 week4 §5). 즉 week2 의 "action 도 토큰" 이 여기서 구체화된다 — 연속 제어량을 언어 모델이 생성할 수 있는 이산 토큰으로 바꾼 것. 이 비교 축(관절각 -> EE-delta -> token)이 week7 OpenVLA vla-lab 문서의 "남이 안 짚는 각도" 재료가 된다.
 
 
 §3 의 EE-delta 값(dx 등)은 +0.017 같은 연속 실수다. 그런데 OpenVLA 의 본체인 Llama 는 원래 단어(토큰)를 출력하는 언어 모델이라 소수점 숫자를 직접 뱉도록 만들어지지 않았다. 그래서 연속값을 정수 토큰으로 바꾸는 트릭을 쓴다.

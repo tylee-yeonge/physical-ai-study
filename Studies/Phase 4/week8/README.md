@@ -296,7 +296,7 @@ ROS2 launch file 에서 환경 변수 또는 ROS parameter 로 주입 가능.
 ---
 
 
-- 이전: [Week 7 - OpenVLA 블로그 1편](../week7/README.md)
+- 이전: [Week 7 - OpenVLA vla-lab 문서 1편](../week7/README.md)
 
 
 다음: [Week 9 - inference 입출력 인터페이스 정리](../week9/README.md)

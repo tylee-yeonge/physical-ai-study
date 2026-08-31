@@ -1,7 +1,7 @@
-# Week 13 실습: 블로그 2편 퇴고 + 다이어그램 통일
+# Week 13 실습: vla-lab 문서 2편 퇴고 + 다이어그램 통일
 
 
-> **실습 목표**: week 3 + week 7 의 두 블로그를 면접관 진입점 수준으로 다듬는다.
+> **실습 목표**: week 3 + week 7 의 두 vla-lab 문서를 면접관 진입점 수준으로 다듬는다.
 > **예상 시간**: 5-7시간
 
 
@@ -11,7 +11,7 @@
 ## 실습 1: 다이어그램 통일
 
 
-두 블로그의 Mermaid 다이어그램이 일관된 톤이어야 한다.
+두 vla-lab 문서의 Mermaid 다이어그램이 일관된 톤이어야 한다.
 
 
 ### 1-1. 통일 표준
@@ -53,7 +53,7 @@ flowchart LR
 **파일명**: `~/phase4_notes/week13/proofread_checklist.md`
 
 
-### RT-2 블로그 (week 3 발행본)
+### RT-2 vla-lab 문서 (week 3 발행본)
 
 
 ```markdown
@@ -66,13 +66,13 @@ flowchart LR
 ```
 
 
-### OpenVLA 블로그 (week 7 발행본)
+### OpenVLA vla-lab 문서 (week 7 발행본)
 
 
 ```markdown
 - [ ] latency 통계 표의 mean / p95 / p99 정확
 - [ ] '4-bit nf4' / '4-bit nf4 (bitsandbytes)' 표기 일관
-- [ ] RT-2 블로그와의 비교 표 양식 동일
+- [ ] RT-2 vla-lab 문서와의 비교 표 양식 동일
 - [ ] 자작 팔 / Phase 7 언급의 일관성
 ```
 
@@ -83,10 +83,10 @@ flowchart LR
 ## 실습 3: SEO 메타 정비
 
 
-각 블로그의 metadata:
+각 vla-lab 문서의 metadata:
 
 
-### RT-2 블로그
+### RT-2 vla-lab 문서
 
 
 ```
@@ -100,7 +100,7 @@ URL slug: rt2-vla-deep-dive
 ```
 
 
-### OpenVLA 블로그
+### OpenVLA vla-lab 문서
 
 
 ```
@@ -119,7 +119,7 @@ URL slug: openvla-rtx4070-latency
 ## 실습 4: cross-link 추가
 
 
-### RT-2 블로그 끝부분 (Section 8: 다음)
+### RT-2 vla-lab 문서 끝부분 (Section 8: 다음)
 
 
 ```markdown
@@ -135,7 +135,7 @@ inference 해 latency 를 측정한 결과를 다룹니다.
 ```
 
 
-### OpenVLA 블로그 시작부분 (Section 2: 배경)
+### OpenVLA vla-lab 문서 시작부분 (Section 2: 배경)
 
 
 ```markdown
@@ -154,9 +154,9 @@ open-source 버전 OpenVLA 를 직접 돌려본 결과를 다룹니다.
 ## 실습 체크리스트
 
 
-- [ ] 두 블로그 다이어그램 톤 통일
+- [ ] 두 vla-lab 문서 다이어그램 톤 통일
 - [ ] 본문 퇴고 체크리스트 모두 - [ ] SEO 메타 (제목 / 태그 / 설명) 업데이트
 - [ ] cross-link 양쪽에 추가
-- [ ] Velog 의 두 글 모두 업데이트 + 재발행
+- [ ] vla-lab 의 두 문서 모두 업데이트 + 재커밋
 - [ ] 본 레포 사본 (`Studies/Phase 4/blog/`) 도 sync + commit
 - [ ] quiz_easy / quiz_medium

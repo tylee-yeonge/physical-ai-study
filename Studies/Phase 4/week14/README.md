@@ -223,7 +223,7 @@ Llama 2 License (OpenVLA weights - commercial use 시 확인)
 ---
 
 
-- 이전: [Week 13 - 블로그 퇴고](../week13/README.md)
+- 이전: [Week 13 - vla-lab 문서 퇴고](../week13/README.md)
 
 
 다음: [Week 15 - 1분 영상 최종 + 자막](../week15/README.md)

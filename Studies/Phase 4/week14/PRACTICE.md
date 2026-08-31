@@ -31,8 +31,8 @@ OpenVLA 7B (4-bit nf4) inference 를 ROS2 토픽으로 받는 minimal demo. RTX 
 
 ## Demo
 - [1분 영상](vla_demo.mp4)
-- [RT-2 정독 블로그](https://velog.io/...)
-- [OpenVLA 정독 + 실측 블로그](https://velog.io/...)
+- [RT-2 정독 문서](https://github.com/<your-id>/vla-lab/...)
+- [OpenVLA 정독 + 실측 문서](https://github.com/<your-id>/vla-lab/...)
 
 
 ## Architecture

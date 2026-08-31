@@ -1,7 +1,7 @@
-# Week 7 실습: OpenVLA 블로그 1편 작성 + 발행
+# Week 7 실습: OpenVLA vla-lab 문서 1편 작성 + 발행
 
 
-> **실습 목표**: week 6 의 latency 데이터 + week 4-5 의 reading note 를 통합해 OpenVLA 블로그 1편 마감.
+> **실습 목표**: week 6 의 latency 데이터 + week 4-5 의 reading note 를 통합해 OpenVLA vla-lab 문서 1편 마감.
 > **예상 시간**: 8-10시간
 
 
@@ -11,7 +11,7 @@
 ## 환경 설정
 
 
-블로그 작성 + Mermaid 도구만 필요 (week 3 와 동일).
+vla-lab 문서 작성 + Mermaid 도구만 필요 (week 3 와 동일).
 
 
 ---
@@ -200,22 +200,22 @@ xychart-beta
 ## 실습 4: 발행 + 기록
 
 
-1. Velog 에 발행
+1. vla-lab 에 발행
 2. 본 레포 `Studies/Phase 4/blog/openvla.md` 에 사본 commit
 3. URL 기록 (`~/phase4_notes/week7/published_urls.md`)
 
 
 ```markdown
-# Phase 4 블로그 발행 기록 (2/2)
+# Phase 4 vla-lab 문서 발행 기록 (2/2)
 
 
-- RT-2 : https://velog.io/@<id>/rt-2-vla-deep-dive (week 3 발행)
-- OpenVLA : https://velog.io/@<id>/openvla-rtx4070-latency (week 7 발행)
+- RT-2 : https://github.com/<id>/vla-lab/blob/main/rt2-vla-deep-dive.md (week 3 발행)
+- OpenVLA : https://github.com/<id>/vla-lab/blob/main/openvla-rtx4070-latency.md (week 7 발행)
 
 
 산출물 v1 의 진행:
-- [x] RT-2 블로그
-- [x] OpenVLA 블로그
+- [x] RT-2 vla-lab 문서
+- [x] OpenVLA vla-lab 문서
 - [ ] OpenVLA -> ROS2 minimal demo (week 8~12)
 - [ ] 1분 영상 (week 12, 15)
 ```
@@ -232,7 +232,7 @@ xychart-beta
 - [ ] 본문 작성 (3500-4500 자)
 - [ ] week 6 의 latency 데이터 인용
 - [ ] self-review 통과
-- [ ] Velog 발행
+- [ ] vla-lab 발행
 - [ ] 본 레포 사본 commit
 - [ ] quiz_easy / quiz_medium 풀기
 
@@ -243,7 +243,7 @@ xychart-beta
 ## 참고 자료
 
 
-- week 3 (RT-2 블로그) 의 작성 가이드
+- week 3 (RT-2 vla-lab 문서) 의 작성 가이드
 - week 4-6 의 reading note + latency 데이터
 - [OpenVLA HuggingFace](https://huggingface.co/openvla/openvla-7b)
-- [Velog](https://velog.io)
+- [vla-lab](https://github.com/<your-id>/vla-lab)

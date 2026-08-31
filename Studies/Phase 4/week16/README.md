@@ -1,7 +1,7 @@
 # Week 16: 산출물 v1 공개 + 다음 phase 진입 준비
 
 
-> **[v1 범위 조정 — 2026-06]** 이 주차(v1 외부 공개 + LinkedIn 공지)는 **v1 에서 제외하고 v2(Phase 6)로 이관**했다. v1 은 레포에 결과 기록만 남기고 외부 공개(velog/LinkedIn)는 하지 않는다 — 첫 외부 공개는 실제 팔이 결합되는 v2 에서 수행한다. 아래 공개 체크리스트·LinkedIn 패턴·회고 틀은 v2 공개 시 참조용으로 보존한다. (Phase 4 회고 자체는 순서 5 의 8월 초 체크포인트에서 가볍게 수행 가능.) 결정 배경: `Roadmap/Phase 4.md` "산출물 v1" 절.
+> **[v1 범위 조정 — 2026-06]** 이 주차(v1 외부 공개 + LinkedIn 공지)는 **v1 에서 제외하고 v2(Phase 6)로 이관**했다. v1 은 레포에 결과 기록만 남기고 외부 공개(vla-lab/LinkedIn)는 하지 않는다 — 첫 외부 공개는 실제 팔이 결합되는 v2 에서 수행한다. 아래 공개 체크리스트·LinkedIn 패턴·회고 틀은 v2 공개 시 참조용으로 보존한다. (Phase 4 회고 자체는 순서 5 의 8월 초 체크포인트에서 가볍게 수행 가능.) 결정 배경: `Roadmap/Phase 4.md` "산출물 v1" 절.
 
 
 > **이번 주 목표**: 산출물 v1 (Portfolio/01_VLA_v1/) 를 GitHub Public 으로 공개 + LinkedIn 공지. Phase 5 진입 직전 정리. **Phase 4 마지막 주**.
@@ -32,7 +32,7 @@
 
 
 본 주가 끝나면:
-- **산출물 v1 완료**: 블로그 2편 + ROS2 minimal demo + 1분 영상
+- **산출물 v1 완료**: vla-lab 문서 2편 + ROS2 minimal demo + 1분 영상
 - **2026 하반기** 시점 본인이 가진 패: perception 로그 (Detection+Depth+TRT+ROS2, 비공개) + v1 (VLA) + v2 선행 (자작 팔 Stage 1)
 - **2027 실지원** 의 핵심 카드 준비
 
@@ -76,7 +76,7 @@
 | 산출물 | 시점 | 내용 | Link |
 |---|---|---|---|
 | (로그) | - | Detection + Depth + PC TensorRT + ROS2 (Phase 3, 비공개) | repo 내부 |
-| v1 | 2026 하반기 | OpenVLA + ROS2 + sim 단일 task 루프 + 블로그 | [01_VLA_v1](Portfolio/01_VLA_v1) |
+| v1 | 2026 하반기 | OpenVLA + ROS2 + sim 단일 task 루프 + vla-lab 문서 | [01_VLA_v1](Portfolio/01_VLA_v1) |
 | v2 선행 | 2027 | 자작 팔 Stage 1 (2~3DOF + URDF) | [Hardware-Arm/Stage1](...) |
 | v3 | 2027 후반~ | (예정) Real-to-Sim-to-Real (정점) | (작성중) |
 
@@ -97,7 +97,7 @@ VLA 의 정독 (RT-2 / OpenVLA) 과 실측 (RTX 4070, 4-bit nf4, 165ms latency)
 을 ROS2 환경에서 minimal demo 로 통합했습니다.
 
 
-블로그 2편:
+vla-lab 문서 2편:
 - RT-2 정독 노트 - OpenVLA + RTX 4070 실측 
 
 ROS2 패키지 + 1분 영상:
@@ -120,7 +120,7 @@ Real-to-Sim-to-Real (Phase 7, 2027.08~) - 자작 6DOF 팔 + Isaac Sim + OpenVLA
 
 
 ## 잘 한 것
-- 블로그 2편 (RT-2 + OpenVLA) 시리즈로 일관성
+- vla-lab 문서 2편 (RT-2 + OpenVLA) 시리즈로 일관성
 - RTX 4070 실측 (165ms, 6Hz) 의 정량적 증거
 - ROS2 통합으로 양산 SW 색깔 명확
 
@@ -182,7 +182,7 @@ Real-to-Sim-to-Real (Phase 7, 2027.08~) - 자작 6DOF 팔 + Isaac Sim + OpenVLA
 
 
 **Q1. Phase 4 의 산출물 v1 의 3 요소는?**
-> 블로그 2편 (RT-2 + OpenVLA) + OpenVLA → ROS2 minimal demo + 1분 영상.
+> vla-lab 문서 2편 (RT-2 + OpenVLA) + OpenVLA → ROS2 minimal demo + 1분 영상.
 
 
 **Q2. 산출물 v1 의 발행 후 즉시 해야 할 것은?**

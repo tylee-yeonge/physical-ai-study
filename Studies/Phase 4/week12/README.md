@@ -36,7 +36,7 @@ v1 의 종착점은 **순서 5(성공률 측정 + 레포 결과 기록)** 다. �
 - Rerun 시각화 스크린샷/gif (이번 주, 레포 기록용 선택)
 - 레포 기록: README + 성공률 표 + latency 수치
 
-v2(Phase 6)로 이관된 것: 블로그 2편(RT-2 + OpenVLA) + 1분 데모 영상 + 패키징 + velog/LinkedIn 외부 공개.
+v2(Phase 6)로 이관된 것: vla-lab 문서 2편(RT-2 + OpenVLA) + 1분 데모 영상 + 패키징 + vla-lab/LinkedIn 외부 공개.
 
 
 ---
@@ -258,7 +258,7 @@ physical-ai-study/
 
 
 ### 다음 주 (week 13) 준비
-- 블로그 2편 다시 읽고 부족한 부분 메모
+- vla-lab 문서 2편 다시 읽고 부족한 부분 메모
 - Portfolio 의 다른 산출물 (v2 선행 등) 정리 상태 점검
 
 
@@ -281,4 +281,4 @@ physical-ai-study/
 - 이전: [Week 11 - 실 inference 통합](../week11/README.md)
 
 
-다음: [Week 13 - 블로그 2편 퇴고 + 다이어그램](../week13/README.md)
+다음: [Week 13 - vla-lab 문서 2편 퇴고 + 다이어그램](../week13/README.md)

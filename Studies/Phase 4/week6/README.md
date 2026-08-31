@@ -1,7 +1,7 @@
 # Week 6: OpenVLA HuggingFace 모델 카드 + 환경 셋업
 
 
-> **이번 주 목표**: OpenVLA 의 HuggingFace 모델 카드를 정독하고, RTX 4070 12GB 환경에서 4-bit quantization 으로 inference 실행까지 가져간다. (week 7 블로그 + week 8~ ROS2 demo 의 사전 준비)
+> **이번 주 목표**: OpenVLA 의 HuggingFace 모델 카드를 정독하고, RTX 4070 12GB 환경에서 4-bit quantization 으로 inference 실행까지 가져간다. (week 7 vla-lab 문서 + week 8~ ROS2 demo 의 사전 준비)
 > **예상 시간**: 8-10시간
 > **핵심 질문**: "OpenVLA inference 가 내 환경에서 동작하는가? 한 frame 의 latency 는 몇 ms 인가?"
 
@@ -272,7 +272,7 @@ key 를 잘못 고르면 모델은 멀쩡히 동작값을 내는데 스케일이
 이번 주의 inference 셋업이 끝나면:
 
 
-- **week 7**: OpenVLA 블로그 1편 작성
+- **week 7**: OpenVLA vla-lab 문서 1편 작성
 - **week 8**: HuggingFace inference 셋업 (이번 주 결과 + 안정화)
 - **week 9**: inference 입출력 인터페이스 정리
 - **week 10**: ROS2 패키지 골격
@@ -321,8 +321,8 @@ key 를 잘못 고르면 모델은 멀쩡히 동작값을 내는데 스케일이
 
 
 ### 다음 주 (week 7) 준비
-- week 6 의 latency 측정 결과 + RT-2 블로그 (week 3) 와 비교
-- OpenVLA 블로그 outline 작성 시작
+- week 6 의 latency 측정 결과 + RT-2 vla-lab 문서 (week 3) 와 비교
+- OpenVLA vla-lab 문서 outline 작성 시작
 
 
 ---
@@ -335,7 +335,7 @@ key 를 잘못 고르면 모델은 멀쩡히 동작값을 내는데 스케일이
 2. **`predict_action()` + `unnorm_key`**: OpenVLA 의 custom inference API.
 3. **Latency ~ 100-200ms**: LM decoder 가 대부분.
 4. **첫 데이터 확보**: 산출물 v3 의 latency 측정의 baseline.
-5. **다음 주부터 블로그 + ROS2 demo**: 본격적 통합 시작.
+5. **다음 주부터 vla-lab 문서 + ROS2 demo**: 본격적 통합 시작.
 
 
 ---
@@ -344,4 +344,4 @@ key 를 잘못 고르면 모델은 멀쩡히 동작값을 내는데 스케일이
 - 이전: [Week 5 - OpenX-Embodiment + Fine-tuning](../week5/README.md)
 
 
-다음: [Week 7 - OpenVLA 블로그 1편 작성](../week7/README.md)
+다음: [Week 7 - OpenVLA vla-lab 문서 1편 작성](../week7/README.md)

@@ -37,10 +37,10 @@ Studies/Phase 4.5/
   week0/           # sim 신규 구축 + 하네스 검증 + zero-shot baseline (Section 0 전반)
   week1/ ~ week2/  # sim 데이터 생성 + OpenVLA 포맷 변환
   week3/ ~ week4/  # RunPod LoRA 학습 + 로컬 머지/양자화
-  week5/ ~ week6/  # eval harness (N회) + before/after 분석 + 블로그/공개
+  week5/ ~ week6/  # eval harness (N회) + before/after 분석 + vla-lab 문서/공개
   lora/            # LoRA 어댑터 (gitignore — *.pt/*.safetensors)
   eval/            # eval harness + 결과 표/그래프 (outputs/ gitignore)
-  blog/            # adaptation 설계-실행-분석 블로그 초고
+  blog/            # adaptation 설계-실행-분석 vla-lab 문서 초고
 ```
 
 

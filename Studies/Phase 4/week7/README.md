@@ -1,12 +1,12 @@
-# Week 7: OpenVLA 블로그 1편 작성
+# Week 7: OpenVLA vla-lab 문서 1편 작성
 
 
-> **[v1 범위 조정 — 2026-06]** 이 주차(OpenVLA 블로그 작성)는 **v1 에서 제외하고 v2(Phase 6)로 이관**했다. v1 범위는 week4-6 의 OpenVLA 정독(아키텍처 이해)까지다. 정독 노트와 v1 의 실측 latency·성공률 수치는 v2 블로그에서 재사용한다. 아래 블로그 작성 가이드는 v2 공개 단계 참조용으로 보존한다. 결정 배경: `Roadmap/Phase 4.md` "산출물 v1" 절.
+> **[v1 범위 조정 — 2026-06]** 이 주차(OpenVLA vla-lab 문서 작성)는 **v1 에서 제외하고 v2(Phase 6)로 이관**했다. v1 범위는 week4-6 의 OpenVLA 정독(아키텍처 이해)까지다. 정독 노트와 v1 의 실측 latency·성공률 수치는 v2 vla-lab 문서에서 재사용한다. 아래 vla-lab 문서 작성 가이드는 v2 공개 단계 참조용으로 보존한다. 결정 배경: `Roadmap/Phase 4.md` "산출물 v1" 절.
 
 
-> **이번 주 목표**: week 4-6 의 reading note + 한 페이지 요약 + 실측 latency 데이터를 합쳐서 OpenVLA 블로그 1편 (산출물 v1 의 2/3) 마감.
+> **이번 주 목표**: week 4-6 의 reading note + 한 페이지 요약 + 실측 latency 데이터를 합쳐서 OpenVLA vla-lab 문서 1편 (산출물 v1 의 2/3) 마감.
 > **예상 시간**: 10시간 (outline 1h + 본문 6h + 다이어그램 1h + 퇴고 2h)
-> **핵심 질문**: "OpenVLA 블로그가 RT-2 블로그 (week 3) 와 어떻게 차별화되는가? '내가 직접 돌려본 OpenVLA' 만의 가치가 있는가?"
+> **핵심 질문**: "OpenVLA vla-lab 문서가 RT-2 vla-lab 문서 (week 3) 와 어떻게 차별화되는가? '내가 직접 돌려본 OpenVLA' 만의 가치가 있는가?"
 
 
 ---
@@ -17,25 +17,25 @@
 
 | 순서 | 단계 | 파일/자료 | 설명 |
 |:----:|------|----------|------|
-| 1 | week 3 블로그 패턴 복습 | week3/README.md | 8-section 표준 구조 |
+| 1 | week 3 vla-lab 문서 패턴 복습 | week3/README.md | 8-section 표준 구조 |
 | 2 | OpenVLA outline 작성 | `PRACTICE.md` 1 | RT-2 와의 차별점 강조 |
 | 3 | 다이어그램 작성 | `PRACTICE.md` 2 | hybrid vision encoder 다이어그램 |
 | 4 | latency 데이터 인용 | week 6 의 `.npy` | "내가 직접 측정" 의 증거 |
-| 5 | 본문 작성 | 블로그 플랫폼 | 약 3500-4500 자 한국어 |
-| 6 | 퀴즈 | quiz_easy / quiz_medium | OpenVLA 블로그의 차별점 |
-| 7 | 퇴고 + 발행 | Velog + 본 레포 사본 | 산출물 v1 의 2/3 완성 |
+| 5 | 본문 작성 | vla-lab 문서 | 약 3500-4500 자 한국어 |
+| 6 | 퀴즈 | quiz_easy / quiz_medium | OpenVLA vla-lab 문서의 차별점 |
+| 7 | 퇴고 + 발행 | vla-lab + 본 레포 초고 | 산출물 v1 의 2/3 완성 |
 
 
 ---
 
 
-## 시작하기 전에 — RT-2 블로그와의 차별점
+## 시작하기 전에 — RT-2 vla-lab 문서와의 차별점
 
 
-OpenVLA 블로그는 week 3 의 RT-2 블로그와 동일한 8-section 구조지만, 핵심 차별점:
+OpenVLA vla-lab 문서는 week 3 의 RT-2 vla-lab 문서와 동일한 8-section 구조지만, 핵심 차별점:
 
 
-| RT-2 블로그 | OpenVLA 블로그 |
+| RT-2 vla-lab 문서 | OpenVLA vla-lab 문서 |
 |---|---|
 | 논문만 정독 | 논문 + **직접 inference 실행** |
 | Latency 는 추정 | **본인 RTX 4070 에서 직접 측정한 수치** |
@@ -43,13 +43,13 @@ OpenVLA 블로그는 week 3 의 RT-2 블로그와 동일한 8-section 구조지�
 | 일반론 | "내 자작 팔 (Phase 7) 에 어떻게 적용할지" 의 구체 계획 |
 
 
-> OpenVLA 블로그의 가장 큰 강점: "내가 직접 돌려본 데이터" 가 면접관에게 더 신뢰감을 준다.
+> OpenVLA vla-lab 문서의 가장 큰 강점: "내가 직접 돌려본 데이터" 가 면접관에게 더 신뢰감을 준다.
 
 
 ---
 
 
-## OpenVLA 블로그의 8-section 권장 내용
+## OpenVLA vla-lab 문서의 8-section 권장 내용
 
 
 ### Section 1: 한 줄 요약 (예시)
@@ -119,16 +119,16 @@ OpenVLA 블로그는 week 3 의 RT-2 블로그와 동일한 8-section 구조지�
 ---
 
 
-## RT-2 블로그와 한 줄로 차별화
+## RT-2 vla-lab 문서와 한 줄로 차별화
 
 
-**RT-2 블로그의 메시지**: "VLA 분야의 시작점인 RT-2 의 본질과 한계."
+**RT-2 vla-lab 문서의 메시지**: "VLA 분야의 시작점인 RT-2 의 본질과 한계."
 
 
-**OpenVLA 블로그의 메시지**: "그 한계를 실측으로 검증할 수 있는 open-source 모델. 내 RTX 4070 에서도 inference 가능. 실시간 30Hz 는 여전히 불가능."
+**OpenVLA vla-lab 문서의 메시지**: "그 한계를 실측으로 검증할 수 있는 open-source 모델. 내 RTX 4070 에서도 inference 가능. 실시간 30Hz 는 여전히 불가능."
 
 
-두 블로그가 함께 면접관에게 던지는 메시지:
+두 vla-lab 문서가 함께 면접관에게 던지는 메시지:
 > "이 사람은 VLA 의 학술적 흐름 (RT-2 -> OpenVLA) 을 알고, 그 한계를 본인 hardware 에서 직접 측정해서 양산 관점으로 해석할 수 있다."
 
 
@@ -138,19 +138,19 @@ OpenVLA 블로그는 week 3 의 RT-2 블로그와 동일한 8-section 구조지�
 ## 자체 점검
 
 
-**Q1. RT-2 블로그와 OpenVLA 블로그의 가장 큰 차별점은?**
-> OpenVLA 블로그는 본인이 직접 돌려본 실측 latency 데이터를 포함. "직접 검증" 의 신뢰감이 가장 큰 차이.
+**Q1. RT-2 vla-lab 문서와 OpenVLA vla-lab 문서의 가장 큰 차별점은?**
+> OpenVLA vla-lab 문서는 본인이 직접 돌려본 실측 latency 데이터를 포함. "직접 검증" 의 신뢰감이 가장 큰 차이.
 
 
-**Q2. OpenVLA 블로그 Section 5 의 핵심 표는?**
+**Q2. OpenVLA vla-lab 문서 Section 5 의 핵심 표는?**
 > latency 통계 표: mean / p95 / p99 / throughput / GPU memory. 양산 SW 엔지니어의 차별화 메시지.
 
 
-**Q3. 두 블로그 (RT-2 + OpenVLA) 를 함께 면접관에게 던지는 메시지는?**
+**Q3. 두 vla-lab 문서 (RT-2 + OpenVLA) 를 함께 면접관에게 던지는 메시지는?**
 > "VLA 의 학술적 흐름 (RT-2 -> OpenVLA) 의 이해 + 본인 hardware 에서 직접 검증 + 양산 관점 해석."
 
 
-**Q4. 4-bit quantization 의 trade-off 를 블로그에서 어떻게 다루는가?**
+**Q4. 4-bit quantization 의 trade-off 를 vla-lab 문서에서 어떻게 다루는가?**
 > "정확도 1-2%p 손실 vs 메모리 1/8 / 속도 1.5-2x" 같은 정량 trade-off. 양산 시점에는 어느 쪽이 우선인지 본인 의견.
 
 
@@ -166,11 +166,11 @@ OpenVLA 블로그는 week 3 의 RT-2 블로그와 동일한 8-section 구조지�
 
 ### 이번 주 실습 과제
 1. week 4-6 의 reading note + 한 페이지 노트 + latency 데이터 통합
-2. OpenVLA 블로그 outline (8-section)
+2. OpenVLA vla-lab 문서 outline (8-section)
 3. 다이어그램 2 개 작성 (Mermaid)
 4. 본문 작성 (3500-4500 자 한국어)
 5. self-review + 퇴고
-6. Velog 발행 + 본 레포 사본
+6. vla-lab 발행 + 본 레포 초고
 7. quiz_easy / quiz_medium 풀기
 
 
@@ -186,11 +186,11 @@ OpenVLA 블로그는 week 3 의 RT-2 블로그와 동일한 8-section 구조지�
 ## 이번 주 핵심 요약
 
 
-1. **RT-2 블로그와 차별화**: 직접 측정한 latency 데이터.
+1. **RT-2 vla-lab 문서와 차별화**: 직접 측정한 latency 데이터.
 2. **8-section 구조 동일**: week 3 의 패턴 그대로.
-3. **분량 3500-4500 자**: RT-2 블로그보다 약간 더 (실측 데이터 표 추가).
+3. **분량 3500-4500 자**: RT-2 vla-lab 문서보다 약간 더 (실측 데이터 표 추가).
 4. **양산 SW 엔지니어 메시지**: 5Hz 의 양산 의미.
-5. **산출물 v1 의 2/3 완료**: RT-2 블로그 (1/3) + OpenVLA 블로그 (2/3) + ROS2 demo (3/3).
+5. **산출물 v1 의 2/3 완료**: RT-2 vla-lab 문서 (1/3) + OpenVLA vla-lab 문서 (2/3) + ROS2 demo (3/3).
 
 
 ---

@@ -60,7 +60,7 @@ Block 1 (int4 메모리 산수) 과 Block 2 (int8 열위 메커니즘) 를 닫�
 | 8/5-8/6 | week1 — expert 데이터 수집 + action 변환 왕복 검증 | 완료 |
 | 8/10-8/11 | week2 — RLDS 변환 + 로더 등록 + 정규화 점검 | 완료 |
 | 8/12 | 8월 체크포인트 (결론 3건 — §6.1) | 완료 |
-| 8월 잔여 | week3 (Docker + RunPod + LoRA) -> week4 (머지·양자화·4-bit 안착) -> week5 (eval N회) -> week6 (before/after + 블로그) | 진행 |
+| 8월 잔여 | week3 (Docker + RunPod + LoRA) -> week4 (머지·양자화·4-bit 안착) -> week5 (eval N회) -> week6 (before/after + vla-lab 문서) | 진행 |
 
 week3 과 week4 안에서 실행 보드 #6 (Section 0 후반) 이 닫힌다 — 별도 작업이 아니다.
 
@@ -159,7 +159,7 @@ gantt
 | 산출물 | 상태 | 외부 가시성 |
 |---|---|---|
 | v1 (OpenVLA zero-shot + ROS2 dry-run) | 레포 기록 완료 (10월) | 비공개 레포 — 외부 공개는 v2 |
-| v1.5 (LoRA adaptation + eval) | 완주 (8월 말) | 블로그 1편 + velog. LinkedIn 게시는 probe 2단 개시 (9월) 이후 |
+| v1.5 (LoRA adaptation + eval) | 완주 (8월 말) | vla-lab 공개 문서 1편 (채널 변경 2026-08-30 — 구 velog). LinkedIn 게시는 probe 2단 개시 (9월) 이후 |
 | openvla-rtx4070-int4 실측 | 4블록 + 재측정 완료, vla-lab 발행 (9월) | **공개** (vla-lab) |
 | Phase 3 perception | 재현 확인 완료 (supporting) | 레포 내 기록 |
 | 자작 팔 | 키트·카메라 확보 (9월) + 드라이버 경로 검증 (10월) + **Stage 1 조립 착수 (12월)**. 완주는 2027.01 | — |

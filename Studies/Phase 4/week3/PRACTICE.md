@@ -1,7 +1,7 @@
-# Week 3 실습: RT-2 블로그 1편 작성 + 발행
+# Week 3 실습: RT-2 vla-lab 문서 1편 작성 + 발행
 
 
-> **실습 목표**: 공개 가능한 RT-2 블로그 1편을 마감하고, 본 레포 `Studies/Phase 4/blog/rt2.md` 에 사본 보관.
+> **실습 목표**: 공개 가능한 RT-2 vla-lab 문서 1편을 마감하고, 본 레포 `Studies/Phase 4/blog/rt2.md` 에 사본 보관.
 > **예상 시간**: 8-10시간
 
 
@@ -11,7 +11,7 @@
 ## 환경 설정
 
 
-이번 주는 거의 코드 없음. 블로그 작성 + Mermaid 다이어그램 도구만 필요.
+이번 주는 거의 코드 없음. vla-lab 문서 작성 + Mermaid 다이어그램 도구만 필요.
 
 
 ```bash
@@ -31,42 +31,25 @@ mkdir -p "$(git rev-parse --show-toplevel)/Studies/Phase 4/blog"
 ---
 
 
-## 실습 1: 블로그 플랫폼 결정
+## 실습 1: 발행 채널 확인
 
+### 1-1. 채널: vla-lab (확정)
 
-### 1-1. 후보 비교
+발행 채널은 **vla-lab (본인 GitHub 공개 산출물 repo)** 로 확정됐다 (2026-08-30 — velog/Medium 미사용, LinkedIn 은 링크 공유 채널). 플랫폼 비교·계정 준비는 더 이상 필요 없다.
 
-
-| 플랫폼 | 장점 | 단점 |
-|---|---|---|
-| Velog | 한국어 검색 노출 우수, 무료, 마크다운 지원 | 글로벌 노출 부족 |
-| Medium | 글로벌 노출, 디자인 깔끔 | 한국어 검색 약함, paywall 가능 |
-| Notion (Public) | 빠른 설정, 멀티미디어 | 검색 노출 약함 |
-| 본 레포 `Studies/Phase 4/blog/` | version control | 검색 노출 거의 없음 |
-
-
-### 1-2. 추천 조합 (본 로드맵)
-
-
-**Velog + 본 레포 사본**:
-- 메인 발행: Velog (한국어 면접관이 가장 자주 검색)
-- 사본 보관: `Studies/Phase 4/blog/rt2.md` (version control + 면접 시 직접 링크)
-
-
-### 1-3. Velog 계정 준비 (했다면 skip)
-
+### 1-2. 준비
 
 ```
-1. https://velog.io 에서 GitHub 로그인
-2. 프로필 설정: bio, github, linkedin 링크
-3. 첫 글 (이게 RT-2 블로그) 작성 준비
+1. vla-lab repo 접근 확인: https://github.com/<your-id>/vla-lab
+2. 문서 위치 규약 확인: 산출물 단위 디렉토리 (예: v1.5-openvla-lora-sim/)
+3. 본 레포 `Studies/Phase 4/blog/rt2.md` 는 초고 작업 공간 — 발행본은 vla-lab 에 커밋
 ```
 
 
 ---
 
 
-## 실습 2: 블로그 outline 잡기
+## 실습 2: vla-lab 문서 outline 잡기
 
 
 **파일명**: `rt2_blog_outline.md` (먼저 outline 만 작성)
@@ -296,7 +279,7 @@ RT-2 의 가장 영리한 아이디어는 robot action 도 동일하게 token �
 $EDITOR "$(git rev-parse --show-toplevel)/Studies/Phase 4/blog/rt2.md"
 
 
-# Velog 에 발행 (사본을 그대로 복사하여 plate)
+# vla-lab 에 발행 (같은 마크다운을 vla-lab repo 에 커밋·푸시)
 ```
 
 
@@ -310,7 +293,7 @@ $EDITOR "$(git rev-parse --show-toplevel)/Studies/Phase 4/blog/rt2.md"
 
 
 ```markdown
-# RT-2 블로그 self-review
+# RT-2 vla-lab 문서 self-review
 
 
 ## 구조
@@ -353,13 +336,13 @@ $EDITOR "$(git rev-parse --show-toplevel)/Studies/Phase 4/blog/rt2.md"
 ## 실습 7: 발행 + 기록
 
 
-### 7-1. Velog 발행
+### 7-1. vla-lab 발행
 
 
-1. https://velog.io 에 마크다운 그대로 paste
-2. 제목 / 태그 설정
-3. 첨부 이미지 (다이어그램) 업로드
-4. Publish
+1. vla-lab repo 에 문서 마크다운 + 다이어그램 이미지 커밋
+2. 산출물 디렉토리 README 에서 링크
+3. push 후 GitHub 렌더링 확인
+4. (선택) LinkedIn 링크 공유
 
 
 ### 7-2. 본 레포 사본 commit
@@ -368,7 +351,7 @@ $EDITOR "$(git rev-parse --show-toplevel)/Studies/Phase 4/blog/rt2.md"
 ```bash
 cd "$(git rev-parse --show-toplevel)"
 git add "Studies/Phase 4/blog/rt2.md"
-git commit -m "phase4 w3: rt-2 blog post draft (velog 발행)"
+git commit -m "phase4 w3: rt-2 blog post draft (vla-lab 발행)"
 ```
 
 
@@ -382,7 +365,7 @@ git commit -m "phase4 w3: rt-2 blog post draft (velog 발행)"
 # 발행 기록
 
 
-- RT-2 블로그: https://velog.io/@<your-id>/rt-2-vla-deep-dive
+- RT-2 문서: https://github.com/<your-id>/vla-lab/blob/main/rt2-vla-deep-dive.md
 - 발행 날짜: 2026-09-XX
 - 본 레포 사본: Studies/Phase 4/blog/rt2.md
 - 글자 수: 약 ____자
@@ -409,12 +392,12 @@ VLM 의 web knowledge 가 어떻게 robot 행동으로 transfer 되는가를 정
 ## 실습 체크리스트
 
 
-- [ ] 블로그 플랫폼 결정 (Velog 권장)
+- [ ] 발행 채널 확인 (vla-lab — 확정)
 - [ ] outline 작성 완료 (`rt2_blog_outline.md`)
 - [ ] Mermaid 다이어그램 1 ~ 2 개 작성
 - [ ] 본문 작성 완료 (한국어 3000 ~ 4000 자)
 - [ ] self-review 체크리스트 통과
-- [ ] Velog 발행
+- [ ] vla-lab 발행
 - [ ] 본 레포 `Studies/Phase 4/blog/rt2.md` 에 사본 commit
 - [ ] URL 기록
 - [ ] (선택) LinkedIn 공유
@@ -427,9 +410,9 @@ VLM 의 web knowledge 가 어떻게 robot 행동으로 transfer 되는가를 정
 ## 참고 자료
 
 
-### 블로그 작성 기법
+### vla-lab 문서 작성 기법
 - [좋은 기술 글쓰기 가이드 (Tech Writing Course)](https://developers.google.com/tech-writing)
-- [Velog 사용 가이드](https://velog.io/about)
+- [GitHub 에서 마크다운 쓰기](https://docs.github.com/en/get-started/writing-on-github)
 
 
 ### Mermaid
@@ -437,7 +420,7 @@ VLM 의 web knowledge 가 어떻게 robot 행동으로 transfer 되는가를 정
 - [Mermaid Live Editor](https://mermaid.live/)
 
 
-### RT-2 (블로그에서 인용할 source)
+### RT-2 (vla-lab 문서에서 인용할 source)
 - [RT-2 paper](https://arxiv.org/abs/2307.15818)
 - [RT-2 project page](https://robotics-transformer2.github.io/)
 - [DeepMind RT-2 blog](https://www.deepmind.com/blog/rt-2-new-model-translates-vision-and-language-into-action)
@@ -455,4 +438,4 @@ VLM 의 web knowledge 가 어떻게 robot 행동으로 transfer 되는가를 정
 | 분량이 너무 길어짐 | Section 4 외에는 압축. 표/다이어그램으로 본문 대체 |
 | 한계가 안 떠오름 | week 1 README 의 한계 5가지 그대로 인용 |
 | 다이어그램이 너무 복잡 | 핵심 6 노드만. 나머지는 본문 텍스트로 |
-| Velog 가 안 됨 | tistory / Medium / 본 레포 README 으로 대체 가능 |
+| vla-lab push 가 안 됨 | 로컬 커밋 후 재시도. 급하면 본 레포 blog/ 초고 경로를 임시 링크로 |

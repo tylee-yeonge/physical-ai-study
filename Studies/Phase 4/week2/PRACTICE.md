@@ -382,7 +382,7 @@ python practice_loss_simulation.py
 **파일명**: `~/phase4_notes/week2/action_token_one_page.md`
 
 
-이번 주의 산출물은 **week 3 블로그의 절반** 이 될 수 있는 한 페이지 노트:
+이번 주의 산출물은 **week 3 vla-lab 문서의 절반** 이 될 수 있는 한 페이지 노트:
 
 
 ```markdown

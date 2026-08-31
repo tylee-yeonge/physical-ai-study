@@ -92,7 +92,7 @@ DDS 트랙의 효율이 가장 높은 이유는 새로 배우는 것이 아니�
 
 | 트랙 | 항목 |
 |---|---|
-| 학습 | **Phase 6 마무리 -> 산출물 v2 공개 (헤드라인)** — Isaac Sim 디지털 트윈 + 자작 팔 결합 + sim-to-real gap 수치. v1 에서 이관한 블로그·1분 영상·외부 공개가 여기서 함께 집행된다 |
+| 학습 | **Phase 6 마무리 -> 산출물 v2 공개 (헤드라인)** — Isaac Sim 디지털 트윈 + 자작 팔 결합 + sim-to-real gap 수치. v1 에서 이관한 vla-lab 문서·1분 영상·외부 공개가 여기서 함께 집행된다 |
 | 학습 | **Phase 7 착수 (08-)** — Real-to-Sim-to-Real, 산출물 v3 |
 | 커리어 | 실지원 2차 웨이브 판단 지점 — v2 합류로 카드가 바뀐다 (§6.2) |
 
@@ -139,7 +139,7 @@ gantt
 | 산출물 | 완성 | 첫 웨이브 (2027.03) 에 쓸 수 있나 | 성격 |
 |---|---|---|---|
 | v1 (zero-shot + ROS2 dry-run) | 2026.10 | 가능 (레포 기록 + 패키징) | 통합·배포 증거 (셋째 층) |
-| v1.5 (LoRA adaptation + eval) | 2026.08-09 | 가능 (블로그 + vla-lab) | adaptation 증거 (둘째 층) |
+| v1.5 (LoRA adaptation + eval) | 2026.08-09 | 가능 (vla-lab 공개 문서) | adaptation 증거 (둘째 층) |
 | 실측 write-up (int4 latency) | 2026.09 | 가능 (vla-lab 공개) | 측정 방법론·제약 계산 |
 | Stage 1 must (자작 팔 동작 + 영상) | 2027.01 (마감 2027.02 말) | 가능 — **서류가 소비하는 유일한 real 증거** | Brain-Body 통합 실물 |
 | v2.5 (teleop 데이터셋) | 2027.03 착수 | 불가 (착수 시점) | LeRobot/HF 파이프라인 경험 |
@@ -171,7 +171,7 @@ gantt
 
 ### 6.4 분기 재평가 #3 (2027.11) 과 fallback
 
-**2028.03 fallback 진입 여부**를 판단한다. 착지점은 AMR/AV 의 Perception·센서퓨전 SW 포지션이고, 그 시나리오의 핵심 증거는 VLA 산출물이 아니라 **Phase 3 perception 로그**다 (fallback 시 velog 1편으로 승격 공개). v1-v3 는 가점으로 기능한다.
+**2028.03 fallback 진입 여부**를 판단한다. 착지점은 AMR/AV 의 Perception·센서퓨전 SW 포지션이고, 그 시나리오의 핵심 증거는 VLA 산출물이 아니라 **Phase 3 perception 로그**다 (fallback 시 vla-lab 문서 1편으로 승격 공개). v1-v3 는 가점으로 기능한다.
 
 fallback 은 도메인 이탈이 아니라 같은 로봇/자율주행 도메인 안에서의 횡이동이다 — 경력직 전환 리스크가 낮게 읽힌다는 것이 이 착지점을 고른 이유다.
 

@@ -337,7 +337,7 @@ python practice_action_tokenization.py
 - gripper step = 약 0.004 (256 단계)
 
 
-> 이 수치가 RT-2 의 "fine motion 한계" 의 정량적 근거. week 3 블로그에서 인용할 수 있다.
+> 이 수치가 RT-2 의 "fine motion 한계" 의 정량적 근거. week 3 vla-lab 문서에서 인용할 수 있다.
 
 
 ---
@@ -365,12 +365,12 @@ python practice_action_tokenization.py
 ### 산출물 권장 포맷
 
 
-- 형식: Markdown 또는 PDF (Markdown 추천 → 나중에 블로그로 재활용 가능)
+- 형식: Markdown 또는 PDF (Markdown 추천 → 나중에 vla-lab 문서로 재활용 가능)
 - 분량: A4 1 페이지에 들어가게 (글자 크기 조절)
 - 위치: `~/phase4_notes/week1/rt2_one_page.md`
 
 
-> 이 한 페이지가 week 3 (RT-2 블로그) 의 골격이 된다. 정성껏 작성하자.
+> 이 한 페이지가 week 3 (RT-2 vla-lab 문서) 의 골격이 된다. 정성껏 작성하자.
 
 
 ---

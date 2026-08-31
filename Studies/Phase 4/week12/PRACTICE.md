@@ -388,9 +388,9 @@ cat > README.md << EOF
 [![demo](vla_demo.mp4)](vla_demo.mp4)
 
 
-## 블로그
-- [RT-2 정독 노트](https://velog.io/...)
-- [OpenVLA + RTX 4070 실측](https://velog.io/...)
+## vla-lab 문서
+- [RT-2 정독 노트](https://github.com/<your-id>/vla-lab/...)
+- [OpenVLA + RTX 4070 실측](https://github.com/<your-id>/vla-lab/...)
 
 
 ## 구성

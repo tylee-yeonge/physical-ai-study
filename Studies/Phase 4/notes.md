@@ -15,9 +15,9 @@
 | 3 | `week11` 일부 선행 | sim 환경 선정 + embodiment 정합 + 성공 task 1종 정의 (→ latency 판정 수치 확정) | 6월 2-3주차 | 12h | 완료 |
 | 4 | `week8` → `week12` 순서대로 | 실습 압축: VLAInference → ROS2 노드 → 카메라/bag 1분 dry-run | 6/17 - 6월 4주차(목표 6/26, 5h 추세 시 6/29) | 34h | 완료 |
 | 5 | `week11`-`week12` 마무리 | dry-run 결과 정리 (latency/throughput 표) + 8월 체크포인트 | 6월 5주차(목표 6/30) | 4h | 완료 |
-| 6 | `week1`,`week2`,`week4`,`week5`,`week6` (정독만) | RT-2/OpenVLA 정독 — 아키텍처 이해 (블로그 작성 `week3`/`week7` 은 v2 로 이관) | 파편 시간 (Phase 4.5 실행 대기) | 20-30h 잠정 — `week2` 실측으로 확정 | 진행 중 |
+| 6 | `week1`,`week2`,`week4`,`week5`,`week6` (정독만) | RT-2/OpenVLA 정독 — 아키텍처 이해 (vla-lab 문서 작성 `week3`/`week7` 은 v2 로 이관) | 파편 시간 (Phase 4.5 실행 대기) | 20-30h 잠정 — `week2` 실측으로 확정 | 진행 중 |
 
-> 순서 7(블로그 마무리 + 패키징 + 1분 영상 + v1 공개)는 v1 에서 제외하고 v2(Phase 6)로 이관했다. **sim 단일 task 성공률 측정도 v1 에서 제외돼 Phase 4.5(v1.5, sim 결합)로 이관됐다 (2026-06)** — v1 은 sim 없이 카메라/bag dry-run 까지만 한다. v1 의 종착점은 순서 4(카메라/bag 1분 dry-run 으로 추론 루프 + latency/throughput 측정)이며, 순서 5 는 그 결과를 레포에 정리하는 단계이고, 순서 6 정독까지가 v1 범위다. 이관 사유와 범위는 `Roadmap/Phase 4.md` "산출물 v1" 절 참고.
+> 순서 7(vla-lab 문서 마무리 + 패키징 + 1분 영상 + v1 공개)는 v1 에서 제외하고 v2(Phase 6)로 이관했다. **sim 단일 task 성공률 측정도 v1 에서 제외돼 Phase 4.5(v1.5, sim 결합)로 이관됐다 (2026-06)** — v1 은 sim 없이 카메라/bag dry-run 까지만 한다. v1 의 종착점은 순서 4(카메라/bag 1분 dry-run 으로 추론 루프 + latency/throughput 측정)이며, 순서 5 는 그 결과를 레포에 정리하는 단계이고, 순서 6 정독까지가 v1 범위다. 이관 사유와 범위는 `Roadmap/Phase 4.md` "산출물 v1" 절 참고.
 
 ## 진행 원칙
 
@@ -27,7 +27,7 @@
 - 7-8월 배치: 순서 5(4h)는 6/30 주에 마치고, 순서 6 정독(20-30h, 평일 2h 기준 wall-clock 약 3-4주)을 7월에 배치한다. 7월 시간 미달 시 8월로 이월해도 순서 6 은 본래 8-9월 작업이라 안전하며, v1 기술 코어(순서 4)는 이미 6월에 끝나 영향받지 않는다.
 - 작업-시간 매칭: 연속 블록(통합·디버깅·dry-run)은 6월 종일 가용일에 우선 배치. 순서 5 결과 정리·quiz는 짧은 블록에서도 가능하므로 7월 단시간 가용일의 흡수처로 둔다.
 - 8월 체크포인트: 8-12월 예산·배치를 확정하는 자리였고 2026-08-12 에 닫혔다. 결론은 아래 "8월 체크포인트 결론" bullet 에 있다.
-- RT-2 정독 후행: RT-2 는 비공개 모델로 순수 개념·블로그용이므로 정독 전량을 8-9월로 이동. 6월의 표적 skim 은 구현에 필수인 부분집합(action 표현 / unnorm_key / 입력 형식 / embodiment 가정)만 다룬다.
+- RT-2 정독 후행: RT-2 는 비공개 모델로 순수 개념·vla-lab 문서용이므로 정독 전량을 8-9월로 이동. 6월의 표적 skim 은 구현에 필수인 부분집합(action 표현 / unnorm_key / 입력 형식 / embodiment 가정)만 다룬다.
 - git author 재작성(filter-repo): **실행하지 않는다** (2026-08-12 확정). 이 레포는 비공개로 유지하고 공개 산출물은 vla-lab 으로 분리하므로(2026-07-20) 히스토리 재작성 사유가 없다. 대신 커밋 신원을 `tylee-yeonge <tylee.yeonge@gmail.com>` 으로 통일했다 — 두 레포 모두 `.git/config` 로컬 설정. 작업 컨테이너의 `/root/.gitconfig` 는 읽기 전용이라 전역 설정이 회사 이메일로 남아 있으므로, **새 레포를 만들 때마다 `git config user.email` 을 1회 건다.**
 
 ## 순서 1 — Step 0: 환경 구축 + 레포 청소 + 실측 (6월 2주차, 6h) — 완료
@@ -52,7 +52,7 @@
 
 skim 목적은 구현에 필요한 사실 확인이지 정독이 아니다. 항목별로 답을 아래 노트 섹션에 적으면 끝.
 
-- [x] 라이선스 확인: OpenVLA HF 모델 카드 — 코드 MIT / weights 는 Llama 2 license. v1 공개물(블로그·영상·레포)에서의 사용 조건 확인 (노트 작성 완료)
+- [x] 라이선스 확인: OpenVLA HF 모델 카드 — 코드 MIT / weights 는 Llama 2 license. v1 공개물(vla-lab 문서·영상·레포)에서의 사용 조건 확인 (노트 작성 완료)
 - [x] action 표현: `week5/README.md` §3 (Action space 표준화) + §3.5 (관절각/EE-delta/token 비교 축) — OpenVLA 출력 7-DoF 가 무엇을 의미하는지
 - [x] unnorm_key / 입력 형식: OpenVLA HF 모델 카드의 사용 예시 코드 + `week6/README.md` "핵심 개념"의 모델 로드/추론 코드 절 — prompt 형식과 `predict_action(input_ids=..., pixel_values=..., unnorm_key=..., do_sample=False)` 호출. **주의**: processor 출력 전체를 `**inputs` 로 넘기는 패턴은 attention_mask 동봉으로 크래시한다 (순서 1 청소 항목의 근거 참조). 참고 자료에 옛 패턴이 남아 있으면 그 자리에서 수정
 - [x] embodiment 가정: `week5/README.md` §1 (OpenX-Embodiment 구조) + §2 (대표 embodiment 특징) + 공식 repo README — 어떤 로봇/카메라 시점을 전제로 학습됐는지, sim 이 거기에 맞을 수 있는지
@@ -75,7 +75,7 @@ skim 목적은 구현에 필요한 사실 확인이지 정독이 아니다. 항�
 
 - 코드(공식 repo, training codebase 포함): MIT. 복사·개작해 내 레포에 넣으면 MIT 저작권 고지 유지 필요.
 - weights(openvla-7b, openvla-v01-7b): Llama-2 파생이므로 Llama 2 Community License 적용. HF 모델 카드의 license 태그는 MIT 로 되어 있으나 GitHub README 가 Llama 2 적용을 명시 — 보수적으로 후자를 따른다.
-- v1 공개물 영향: 블로그·영상·레포 공개 모두 의무 없음. weights 를 레포에 포함하지 않고 HF 에서 로드만 하면 재배포에 해당하지 않는다. 출력물(추론 결과, latency 수치, sim 데모) 공개 제약 없음 — Llama 2 의 출력물 제한은 "다른 LLM 개선에 사용 금지"뿐.
+- v1 공개물 영향: vla-lab 문서·영상·레포 공개 모두 의무 없음. weights 를 레포에 포함하지 않고 HF 에서 로드만 하면 재배포에 해당하지 않는다. 출력물(추론 결과, latency 수치, sim 데모) 공개 제약 없음 — Llama 2 의 출력물 제한은 "다른 LLM 개선에 사용 금지"뿐.
 - 경계: int4 양자화본을 파일로 저장해 레포나 HF 에 올리면 weights 파생물 재배포 — 라이선스 사본 동봉 + "Llama 2 is licensed under the LLAMA 2 Community License, Copyright (c) Meta Platforms, Inc." 고지 의무 발생. 현재 계획(로컬 로드·양자화, 결과만 공개)에서는 해당 없음.
 
 ### 노트: action 표현
@@ -364,21 +364,21 @@ skim 목적은 구현에 필요한 사실 확인이지 정독이 아니다. 항�
 
   **4070 PC 자택 이전은 2026.09 로 확정됐다.** GPU 종속 작업의 8월 마감 근거가 소멸했으므로 8월 배치는 물리 접근이 아니라 가용 시간만으로 판단한다.
 
-## 순서 6 — week1-7 정독 (블로그 작성 제외, 파편 시간 배치)
+## 순서 6 — week1-7 정독 (vla-lab 문서 작성 제외, 파편 시간 배치)
 
-정독(아키텍처 이해)만 v1 범위다. 블로그 작성(`week3`/`week7`)은 v2(Phase 6)로 이관 — v2 에서 RT-2/OpenVLA 배경을 v2 공개 글에 녹여 쓴다.
+정독(아키텍처 이해)만 v1 범위다. vla-lab 문서 작성(`week3`/`week7`)은 v2(Phase 6)로 이관 — v2 에서 RT-2/OpenVLA 배경을 v2 공개 글에 녹여 쓴다.
 
 - [x] `week1/` RT-2 1회독 + reading note (PRACTICE 실습 1-3) + quiz
 - [ ] `week2/` Co-fine-tuning + action tokenization (PRACTICE 실습 1-3) + quiz
 - [ ] `week4/` OpenVLA 정독 — 순서 2 에서 안 본 부분 중심 (hybrid vision encoder, contribution, 한계) + 실습 1-3 + quiz
 - [ ] `week5/` OpenX-Embodiment + LoRA 흐름 정독 + 실습 1-4 + quiz
 - [ ] `week6/` README 개념 보충만 — 실습 1-2 는 순서 1 에서 이미 수행, 실습 3 (에러 기록) 은 미기록분 보완
-- (이관) `week3/` RT-2 블로그 / `week7/` OpenVLA 블로그 작성 → v2
+- (이관) `week3/` RT-2 vla-lab 문서 / `week7/` OpenVLA vla-lab 문서 작성 → v2
 
 ## 순서 7 — v2(Phase 6)로 이관
 
-원안의 순서 7(블로그 2편 퇴고 + 패키징 + 1분 영상 + v1 외부 공개, `week13`-`week16` + `week12` 실습 3-5)는 **v1 에서 제외하고 v2 로 이관**했다. 사유: v1(sim zero-shot)은 공개 산출물로 약해, 다듬은 영상·블로그·패키징·LinkedIn 공개에 50-70h 를 쓰는 것은 오배치다. 공개 푸시는 실제 팔이 결합되는 v2 가 훨씬 강하므로 그쪽으로 통합한다.
+원안의 순서 7(vla-lab 문서 2편 퇴고 + 패키징 + 1분 영상 + v1 외부 공개, `week13`-`week16` + `week12` 실습 3-5)는 **v1 에서 제외하고 v2 로 이관**했다. 사유: v1(sim zero-shot)은 공개 산출물로 약해, 다듬은 영상·vla-lab 문서·패키징·LinkedIn 공개에 50-70h 를 쓰는 것은 오배치다. 공개 푸시는 실제 팔이 결합되는 v2 가 훨씬 강하므로 그쪽으로 통합한다.
 
-v1 의 공개물 대체: 레포에 결과 기록만 남긴다 — 순서 5 의 README + latency/throughput 표 (+ 순서 4 week12 의 Rerun 스크린샷/짧은 gif 선택). sim task 성공률 표는 Phase 4.5 산출물이다. 외부 공개(velog/LinkedIn) 없음.
+v1 의 공개물 대체: 레포에 결과 기록만 남긴다 — 순서 5 의 README + latency/throughput 표 (+ 순서 4 week12 의 Rerun 스크린샷/짧은 gif 선택). sim task 성공률 표는 Phase 4.5 산출물이다. 외부 공개(vla-lab/LinkedIn) 없음.
 
 `week3`,`week7`,`week12`(실습 3-5),`week13`-`week16` 자료는 삭제하지 않고 v2 의 패키징·공개 단계 참조용으로 보존한다 (각 README 상단에 v2 이관 배너).

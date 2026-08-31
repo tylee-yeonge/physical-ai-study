@@ -237,7 +237,7 @@ LoRA fine-tuning 은 본 로드맵 Phase 7 의 산출물 v3 에서 자작 6DOF �
 ### 9. 한계 (OpenVLA 의 정직한 결점)
 
 
-블로그 (week 7) 에서 인용할 5 가지:
+vla-lab 문서 (week 7) 에서 인용할 5 가지:
 
 
 1. **데이터 분포 의존**: OpenX-Embodiment 에 없는 robot / 환경 / 작업은 zero-shot 실패율 큼
@@ -343,7 +343,7 @@ LoRA fine-tuning 은 본 로드맵 Phase 7 의 산출물 v3 에서 자작 6DOF �
 ---
 
 
-- 이전: [Week 3 - RT-2 블로그 1편 작성](../week3/README.md)
+- 이전: [Week 3 - RT-2 vla-lab 문서 1편 작성](../week3/README.md)
 
 
 다음: [Week 5 - OpenX-Embodiment 데이터 + Fine-tuning 흐름](../week5/README.md)

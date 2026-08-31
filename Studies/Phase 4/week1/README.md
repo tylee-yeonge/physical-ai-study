@@ -34,14 +34,14 @@
 Phase 4는 **VLA (Vision-Language-Action) 의 논문 이해 + ROS2 통합 첫 사이클** 이다. 4개월 (16주) 동안:
 
 
-- **week 1-3**: RT-2 정독 + 블로그 1편 (이번 주는 1주)
-- **week 4-7**: OpenVLA 정독 + 블로그 1편
+- **week 1-3**: RT-2 정독 + vla-lab 문서 1편 (이번 주는 1주)
+- **week 4-7**: OpenVLA 정독 + vla-lab 문서 1편
 - **week 8-12**: OpenVLA HuggingFace inference → ROS2 토픽 minimal demo (산출물 v1)
-- **week 13-16**: 블로그 2편 마무리 + 산출물 v1 패키징
+- **week 13-16**: vla-lab 문서 2편 마무리 + 산출물 v1 패키징
 
 
 본 phase의 최종 산출물 v1 (2026 하반기 공개):
-- RT-2 + OpenVLA 블로그 2편
+- RT-2 + OpenVLA vla-lab 문서 2편
 - OpenVLA inference → ROS2 토픽 `vla_action` publish 하는 minimal demo + 1분 영상
 
 
@@ -230,13 +230,13 @@ RT-2 의 가장 인상적인 결과는 robot data 에 명시적으로 없는 **�
 이게 가능한 이유: VLM 의 web knowledge (이미지 + 자연어 추론) 가 사라지지 않고 action 생성에 transfer 됨.
 
 
-> 이번 주 reading note 에 "emergent capability 의 4가지 사례" 를 꼭 한 줄씩 적어둘 것. week 3 블로그의 핵심 장면이 된다.
+> 이번 주 reading note 에 "emergent capability 의 4가지 사례" 를 꼭 한 줄씩 적어둘 것. week 3 vla-lab 문서의 핵심 장면이 된다.
 
 
 ### 8. 한계 및 비판 (RT-2 의 정직한 결점)
 
 
-블로그를 쓸 때 반드시 들어가야 할 부분:
+vla-lab 문서를 쓸 때 반드시 들어가야 할 부분:
 
 
 1. **속도**: 5B/55B 모델은 inference latency 가 ~200ms 이상. 실시간 30Hz 제어 어려움.

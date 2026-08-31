@@ -323,13 +323,13 @@ Robot sample 에서 output text 의 처음 7~11 token 이 action 으로 해석�
 4. `practice_action_token_simulation.py` 실행 - action token 추출/복원 시뮬레이션
 5. `practice_loss_simulation.py` 실행 - mock data 로 cross-entropy 계산
 6. quiz_easy / quiz_medium 풀기
-7. "한 페이지 Action Tokenization" 노트 산출 (week 3 블로그의 절반)
+7. "한 페이지 Action Tokenization" 노트 산출 (week 3 vla-lab 문서의 절반)
 
 
 ### 다음 주 (week 3) 준비
-- 블로그 플랫폼 선정 (Velog / Medium / 본 레포의 `Studies/Phase 4/blog/`)
+- 발행 채널 확인 — vla-lab 확정 (2026-08-30)
 - week 1, 2 의 reading note 와 한 페이지 노트 통합
-- 블로그 1편 (RT-2) 의 초안 작성 시작 (week 3 의 중심 작업)
+- vla-lab 문서 1편 (RT-2) 의 초안 작성 시작 (week 3 의 중심 작업)
 
 
 ---
@@ -351,4 +351,4 @@ Robot sample 에서 output text 의 처음 7~11 token 이 action 으로 해석�
 - 이전: [Week 1 - RT-2 1회독 + Architecture](../week1/README.md)
 
 
-다음: [Week 3 - RT-2 블로그 1편 작성](../week3/README.md)
+다음: [Week 3 - RT-2 vla-lab 문서 1편 작성](../week3/README.md)
