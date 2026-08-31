@@ -1,24 +1,36 @@
-# Hardware-Arm Stage 1 - URDF 작성 가이드
+# Hardware-Arm Stage 1 - URDF 가이드 (SO-101 재사용 + 검증)
 
 
-> 2026.11
+> 시기: 2026.10-11 (Stage 1) — **2026-08-30 갱신**: 처음부터 작성하지 않는다. **SO-101 공개 URDF 를 재사용**하고, 캘리브레이션 오프셋을 반영해 검증하는 것이 Stage 1 must 다.
 
 
 ---
 
 
-## URDF 의 기본 구조
+## 0. 기본 경로 — SO-101 공개 URDF 재사용
+
+
+1. 원본 확보: https://github.com/TheRobotStudio/SO-ARM100 (SO-101 URDF/STL — LeRobot 문서에서도 링크)
+2. `so101_description/urdf/` 로 복사 후 joint 이름·mesh 경로를 패키지 기준으로 정리
+3. **캘리브레이션 오프셋 반영**: 스파이크의 LeRobot 캘리브레이션 (`lerobot-calibrate`) 영점과 URDF 영점을 대조 — 어긋나면 `<origin rpy>` 또는 드라이버 오프셋으로 흡수
+4. 아래 §1-§4 는 재사용한 URDF 를 **읽고 고치기 위한** 기초다 (백지 작성용 아님)
+
+
+---
+
+
+## 1. URDF 의 기본 구조 (읽는 법)
 
 
 ```xml
-<robot name="my_arm">
+<robot name="so101">
   <!-- Base -->
   <link name="base_link">
     <visual>
-      <geometry><mesh filename="package://my_arm/meshes/base.stl"/></geometry>
+      <geometry><mesh filename="package://so101/meshes/base.stl"/></geometry>
     </visual>
     <collision>
-      <geometry><mesh filename="package://my_arm/meshes/base.stl"/></geometry>
+      <geometry><mesh filename="package://so101/meshes/base.stl"/></geometry>
     </collision>
     <inertial>
       <mass value="0.5"/>
@@ -58,7 +70,7 @@
 
 ```xml
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="my_arm">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="so101">
 
 
 <xacro:property name="link_length" value="0.1"/>
@@ -81,7 +93,7 @@
 
 `xacro` 명령으로 build:
 ```bash
-xacro my_arm.urdf.xacro > my_arm.urdf
+xacro so101.urdf.xacro > so101.urdf
 ```
 
 
@@ -102,24 +114,25 @@ xacro my_arm.urdf.xacro > my_arm.urdf
 ---
 
 
-## ros2_control 인터페이스 추가
+## ros2_control 인터페이스 추가 (feetech)
 
 
 ```xml
-<ros2_control name="MyArmHardware" type="system">
+<ros2_control name="SO101Hardware" type="system">
   <hardware>
-    <plugin>dynamixel_hardware/DynamixelHardware</plugin>
+    <!-- 플러그인 클래스명은 feetech_ros2_driver 버전으로 확인 (ros2_driver_setup.md §1) -->
+    <plugin>feetech_ros2_driver/FeetechHardwareInterface</plugin>
     <param name="usb_port">/dev/ttyUSB0</param>
     <param name="baud_rate">1000000</param>
   </hardware>
-  <joint name="joint_1">
+  <joint name="shoulder_pan">
     <param name="id">1</param>
     <command_interface name="position"/>
     <state_interface name="position"/>
     <state_interface name="velocity"/>
     <state_interface name="effort"/>
   </joint>
-  <!-- joint_2, joint_3 ... -->
+  <!-- 나머지 5 joint + gripper 동일 패턴 (ID 2-6) -->
 </ros2_control>
 ```
 
@@ -132,15 +145,15 @@ xacro my_arm.urdf.xacro > my_arm.urdf
 
 ```bash
 # 1. URDF 파싱 검증
-check_urdf my_arm.urdf
+check_urdf so101.urdf
 
 
 # 2. RViz 시각화
-ros2 launch urdf_tutorial display.launch.py model:=my_arm.urdf
+ros2 launch urdf_tutorial display.launch.py model:=so101.urdf
 
 
 # 3. Tree 확인
-urdf_to_graphviz my_arm.urdf
+urdf_to_graphviz so101.urdf
 # 결과 PDF 확인
 ```
 
@@ -166,10 +179,10 @@ urdf_to_graphviz my_arm.urdf
 ## 체크리스트
 
 
-- [ ] base_link + 2-3 link 정의
-- [ ] joint 의 axis / origin / limit 정확
+- [ ] SO-101 공개 URDF 확보 + 패키지로 이식
+- [ ] 캘리브레이션 오프셋 반영 (LeRobot 영점 대조)
+- [ ] joint 6 + gripper 의 axis / origin / limit 확인 (소프트 리밋 값은 안전 기초와 일치)
 - [ ] mesh 파일 로딩
-- [ ] inertial 추가
-- [ ] ros2_control 인터페이스
+- [ ] ros2_control 인터페이스 (feetech)
 - [ ] check_urdf 통과
 - [ ] RViz 시각화 정상

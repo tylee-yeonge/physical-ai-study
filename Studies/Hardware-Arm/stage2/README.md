@@ -1,63 +1,48 @@
 # Hardware-Arm Stage 2 - 가이드
 
-
-> **기간**: 2027.04-06 (3개월, 실지원 병행)
-> **목표**: 6DOF 확장 + teleop + 안전 인터록 + Sim 물리 파라미터 매칭
-> **약 100-150만원 추가**
-
-
----
-
-
-## Stage 2 일정
-
-
-```
-2027.04: XM430 추가 + 6DOF + URDF 갱신
-2027.03: Teleop + 데이터 수집 + 카메라-팔 캘리브
-2027.04: 안전 인터록 (C++) + Sim 물리 파라미터 매칭
-        -> Phase 6 / 7 의 하드웨어 기반
-```
-
+> **기간**: 2027.04-06 (3개월, 실지원 병행 저강도)
+> **전제**: Stage 1 (2026.10-11) 완료 — SO-101 이 ROS2 층까지 돌고, v2.5 (2026.11-12) 로 teleop 데이터셋 + SmolVLA before/after 파이프라인이 확립된 상태
+> **목표**: 실작업 확장 (수단은 2026.11 재평가 결정) + teleop 데이터 확장 + 카메라-팔 base 캘리브 + 안전 인터록 (C++) + Sim 물리 파라미터 매칭
+> **추가 비용**: 미정 — 확장 수단 결정 (2026.11 재평가) 에 종속
 
 ---
 
+## 범위 주의 (2026-08-30 갱신)
+
+- **"6DOF 확장" 은 Stage 2 의 과제가 아니다** — SO-101 이 이미 6DOF 다. 과제는 관절 수가 아니라 **페이로드·강성**이고, 수단 (상위 팔 도입 / 소프트웨어 스택 심화 / 양팔 확장) 은 2026.11 분기 재평가에서 결정한다. 결정 후 본 디렉토리에 확장 가이드를 작성한다 (선행 작성 금지 — 구 `stage2_6dof_extension.md` 는 XM430 전제라 폐기, 2026-08-31).
+- **teleop 셋업 가이드도 별도로 두지 않는다** — 리더-팔로워 teleop 과 수집 파이프라인 (`lerobot-record`, LeRobot 포맷, HF Hub) 은 스파이크·v2.5 에서 이미 확립된다. Stage 2 의 teleop 작업은 **v2.5 파이프라인의 인수·확장** (task 다양화, 에피소드 규모 확대 — 수집 속도는 v2.5 실측 기준 재산정) 이다 (구 `teleop_setup.md` 는 PS4/OpenX HDF5 전제라 폐기, 2026-08-31).
+
+## Stage 2 일정 (안 — 재평가 결정으로 갱신)
+
+```
+2027.04 : 확장 수단 실행 (재평가 결정분) + teleop 데이터 확장 개시
+2027.05 : 카메라-팔 base 캘리브 + 안전 인터록 (C++) 착수
+2027.06 : 안전 인터록 완성 + Sim 물리 파라미터 매칭
+        -> Phase 6 (병행) / Phase 7 의 하드웨어 기반
+```
 
 ## 학습 파일
 
-
 | 파일 | 내용 |
 |---|---|
-| [stage2_6dof_extension.md](stage2_6dof_extension.md) | 6DOF 확장 + URDF |
-| [teleop_setup.md](teleop_setup.md) | leader-follower / PS4 |
-| [safety_interlock.md](safety_interlock.md) | C++ 안전 인터록 |
-| [sim_real_param_match.md](sim_real_param_match.md) | Sim 물리 매칭 |
-
-
----
-
+| [safety_interlock.md](safety_interlock.md) | C++ 안전 인터록 (위치/속도/토크 한계 + e-stop) |
+| [sim_real_param_match.md](sim_real_param_match.md) | Sim 물리 파라미터 매칭 (Phase 6 연계) |
+| (재평가 후 작성) | 확장 수단 가이드 / teleop 확장 계획 |
 
 ## Phase 6, 7 와의 연결
 
-
 ```
-Stage 2 (2027.04~06) Phase 6 (2027.05~07) 와 병행:
-- Stage 2 URDF 갱신 -> Phase 6 의 Isaac Sim 임포트
-- Stage 2 안전 인터록 -> Phase 7 의 안전 노드
-- Stage 2 teleop 데이터 -> Phase 7 의 LoRA fine-tune
+Stage 2 (2027.04-06), Phase 6 (2027.05-07) 와 병행:
+- Stage 2 URDF 갱신        -> Phase 6 의 Isaac Sim 임포트
+- Stage 2 안전 인터록      -> Phase 7 의 안전 노드 (C++)
+- Stage 2 teleop 확장 데이터 -> Phase 7 은 v2.5 파이프라인 (LeRobot 포맷, SmolVLA) 을 인수·확장
 ```
 
+## 완료 체크리스트
 
----
-
-
-## 완료 체크리스트 (Stage 2)
-
-
-- [ ] 6DOF 조립 동작
-- [ ] URDF 갱신 + RViz
-- [ ] teleop 동작
-- [ ] teleop 데이터 수집 파이프라인
+- [ ] 확장 수단 실행 (2026.11 재평가 결정분)
+- [ ] teleop 데이터 확장 (task 다양화 + 규모 — v2.5 수집 속도로 재산정)
 - [ ] 카메라-팔 base 캘리브
-- [ ] 안전 인터록 (C++)
-- [ ] Sim 물리 매칭
+- [ ] 안전 인터록 (C++) — 위치/속도/토크 한계 + e-stop
+- [ ] Sim 물리 파라미터 매칭
+- [ ] URDF 갱신 + RViz 검증 (확장 반영 시)

@@ -33,8 +33,9 @@ public:
         };
         // 속도 한계 (rad/s)
         velocity_limits_ = std::vector<double>(6, 3.14);
-        // 토크 한계 (Nm)
-        torque_limits_ = std::vector<double>(6, 2.0); // XM430 80%
+        // 토크 한계 — STS3215 는 present current / present load 로 부하 감시
+        // (정격 대비 여유를 두고 실측으로 캘리브레이션; 값은 v2.5 실기 데이터 기준 재산정)
+        torque_limits_ = std::vector<double>(6, 2.0);
 
 
         cmd_sub_ = create_subscription<JointState>(

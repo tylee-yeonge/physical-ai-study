@@ -39,7 +39,7 @@ ros2 topic pub /joint_command ... "data: [slow speed]"
 
 
 ```
-3D 프린트 부품:
+3D 프린트 부품 (SO-101 키트 STL — 재출력 시):
 - mesh 의 volume 계산
 - PLA density: 1.24 g/cm^3
 - mass = volume * density

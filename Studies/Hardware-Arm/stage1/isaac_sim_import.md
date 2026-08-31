@@ -1,7 +1,7 @@
 # Hardware-Arm Stage 1 - Isaac Sim URDF 임포트
 
 
-> 2027.02
+> **nice 항목** (2026-08-30 실기 전환 — Stage 1 must 아님, **Phase 6 이월 허용**). 시도한다면 Stage 1 후반 (2026.11).
 
 
 ---
@@ -11,7 +11,7 @@
 
 
 Phase 6 (2027.05~) 의 디지털 트윈의 첫 사이클.
-본 단계는 **단순 임포트 + Joint 동작 확인** 만.
+본 단계는 **단순 임포트 + Joint 동작 확인** 만. 로컬 4070/RAM 31GB 는 Isaac Sim 최소 사양 미달 — 단일 팔 임포트는 가장 가벼운 축이라 시도 가치가 있고, 실패 시 그대로 Phase 6 이월.
 
 
 ---
@@ -22,7 +22,7 @@ Phase 6 (2027.05~) 의 디지털 트윈의 첫 사이클.
 
 ```python
 """
-practice_import_my_arm.py
+practice_import_so101.py
 """
 from isaacsim import SimulationApp
 sim_app = SimulationApp({"headless": False})
@@ -32,7 +32,7 @@ from omni.importer.urdf import _urdf
 import os
 
 
-urdf_path = os.path.expanduser("~/ros2_ws/src/my_arm_description/urdf/my_arm.urdf")
+urdf_path = os.path.expanduser("~/ros2_ws/src/so101_description/urdf/so101.urdf")
 
 
 cfg = _urdf.ImportConfig()
