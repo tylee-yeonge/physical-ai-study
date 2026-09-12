@@ -36,7 +36,7 @@
 | 10-11월 | 12 | 원격 운용 점검 + Jetson | 없음 (인프라) |
 | 10-11월 | - | 하드웨어 스파이크 (2-3주) → **2026-08-30 실기 전환으로 대체** (스파이크 2026.09 첫 2주 — [실기 전환 plan](2026-08-30-realworld-transition-execution.md) §5) | `Studies/Hardware-Arm/` |
 | 12월 | - | Hardware-Arm Stage 1 본 빌드 착수 → **2026-08-30 실기 전환으로 대체** (Stage 1 2026.10-11 — [실기 전환 plan](2026-08-30-realworld-transition-execution.md) §6) | `Studies/Hardware-Arm/` |
-| 10-11월 | 7-1 | NVIDIA SO-101 코스 Phase A | 없음 — `docs/research/isaac-sim-so101-course.md` §4.1 |
+| 10-11월 | 7-1 | NVIDIA SO-101 코스 Phase A | 없음 — `docs/research/2026-08-03-isaac-sim-so101-course.md` §4.1 |
 | 파편 | 13 | 정독 잔여 | `Studies/Phase 4/week2`·`week4`·`week5`·`week6` |
 
 ### 완료
@@ -92,7 +92,7 @@
   - [ ] **Jetson Orin Nano CUDA 스택 확인** (약 30분) — 256GB SSD + Ubuntu 22.04 는 설치 완료 상태이므로 재플래시는 불요 전망. 확인할 것은 **CUDA·cuDNN 동반 여부**뿐이다 (`cat /etc/nv_tegra_release`, `dpkg -l nvidia-jetpack`) — 없으면 PyTorch GPU 가 안 붙고, JetPack 재설치에는 **x86 Ubuntu 호스트 (= 이 PC) 가 필요**하다. 맥북은 SDK Manager 호스트가 될 수 없다. PC 가 자택에 있으므로 시점 제약은 없고, Jetson 이 v3 배포 타깃으로 실제 필요해질 때 수행한다
 - [ ] **하드웨어 스파이크** — **2026-08-30 실기 전환으로 대체** (2026.09 첫 2주, LeRobot 네이티브 must 4 — [실기 전환 plan](2026-08-30-realworld-transition-execution.md) §5). 구 정의 (드라이버 선검증) 는 Stage 1 첫 주로 이동. 자료: `Studies/Hardware-Arm/`, 기록: `Studies/Hardware-Arm/spike/RESULT.md`
   - 이 구간의 최우선 항목이다. 결과가 분기 재평가 #1 (2026.11) 의 입력이고, 1단계에서 막히면 Stage 1 의 ROS2 드라이버 계획을 2026 년 안에 재산정해야 한다
-- [ ] 7-1. **NVIDIA SO-101 sim-to-real 코스 Phase A** (10-16h, GPU 로컬 불요 — RunPod headless). 이론 4개 모듈 + 워크숍 코드 읽기 + GR00T post-training·sim 평가 1회. 비용 약 1만-2.5만원. 상세: [`docs/research/isaac-sim-so101-course.md`](../../research/isaac-sim-so101-course.md) §4.1
+- [ ] 7-1. **NVIDIA SO-101 sim-to-real 코스 Phase A** (10-16h, GPU 로컬 불요 — RunPod headless). 이론 4개 모듈 + 워크숍 코드 읽기 + GR00T post-training·sim 평가 1회. 비용 약 1만-2.5만원. 상세: [`docs/research/2026-08-03-isaac-sim-so101-course.md`](../../research/2026-08-03-isaac-sim-so101-course.md) §4.1
   - 선행 의존이 없어 언제 해도 된다. 목적은 코스 완주가 아니라 **발화 가능 수준 확보**다 — 완주는 실물 팔이 필요해 Phase B (Stage 1, 2027.01-02) 로 간다
 
 ### 12월
@@ -603,7 +603,7 @@ v2 행 앞에 v2.5 (데이터 파이프라인 증거) 행을 넣는다 — 자�
 ```markdown
 ## 진입 전 준비 (선행 가능)
 
-- [ ] **NVIDIA SO-101 sim-to-real 코스 Phase A** — 이론 모듈 + 워크숍 코드 읽기 + RunPod headless 로 GR00T post-training·sim 평가 1회 (약 1만-2.5만원, 팔 불요, 2026.08 가능). GUI 가 필요한 teleop·씬 편집과 실물 평가는 Phase B (Stage 1, 2027.01-02) 로 분리한다 — 코스 4개 옵션 전부 실물 팔을 요구한다. 근거·경로: [`docs/research/isaac-sim-so101-course.md`](../../research/isaac-sim-so101-course.md)
+- [ ] **NVIDIA SO-101 sim-to-real 코스 Phase A** — 이론 모듈 + 워크숍 코드 읽기 + RunPod headless 로 GR00T post-training·sim 평가 1회 (약 1만-2.5만원, 팔 불요, 2026.08 가능). GUI 가 필요한 teleop·씬 편집과 실물 평가는 Phase B (Stage 1, 2027.01-02) 로 분리한다 — 코스 4개 옵션 전부 실물 팔을 요구한다. 근거·경로: [`docs/research/2026-08-03-isaac-sim-so101-course.md`](../../research/2026-08-03-isaac-sim-so101-course.md)
 ```
 
 - [x] **Step 5: 검증**

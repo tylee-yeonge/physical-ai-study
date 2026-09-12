@@ -49,7 +49,7 @@
 ## Section 8.0: 시작 전 (Phase 5 종료 후)
 
 
-- [ ] **NVIDIA SO-101 sim-to-real 코스 — Phase A (선행 가능, 2026.08)** — 이론 4개 모듈 + 워크숍 코드 읽기 + RunPod headless 로 GR00T post-training·sim 평가 1회. 약 1만-2.5만원, 팔 불요. 목적: NVIDIA 표준 경로에 대한 최소 발화 가능 경험 확보 — "sim-to-real 을 다룬다" 주장의 정책 학습 측 방어. 요건·비용·경로는 [`docs/research/isaac-sim-so101-course.md`](../docs/research/isaac-sim-so101-course.md) §4.1
+- [ ] **NVIDIA SO-101 sim-to-real 코스 — Phase A (선행 가능, 2026.08)** — 이론 4개 모듈 + 워크숍 코드 읽기 + RunPod headless 로 GR00T post-training·sim 평가 1회. 약 1만-2.5만원, 팔 불요. 목적: NVIDIA 표준 경로에 대한 최소 발화 가능 경험 확보 — "sim-to-real 을 다룬다" 주장의 정책 학습 측 방어. 요건·비용·경로는 [`docs/research/2026-08-03-isaac-sim-so101-course.md`](../docs/research/2026-08-03-isaac-sim-so101-course.md) §4.1
 - [ ] **같은 코스 — Phase B** (캘리브레이션·teleop 수집·Real 평가·액추에이션 갭). **실물 팔이 필요하므로 Hardware-Arm Stage 1 (2027.01-02) 과 겹쳐 진행**한다. 코스의 4개 옵션 전부 실물 팔을 요구하므로 팔 없이 완주할 경로는 없다 (research §1.1)
 - [ ] Isaac Sim 4.x 설치 + Workstation 라이선스 확인
 - [ ] 자작 팔 URDF 검증 (Hardware-Arm Stage 1 자료 활용)

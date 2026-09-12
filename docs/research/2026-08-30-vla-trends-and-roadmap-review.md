@@ -89,7 +89,7 @@
 | 항목 | 내용 |
 |---|---|
 | **LeRobot = 사실상 표준 허브** | 2026.07 NVIDIA 가 GR00T 1.7 + Isaac Teleop 을 LeRobot 에 통합, Isaac Lab-Arena 를 LeRobot EnvHub 에 등록 — GR00T/Pi/SmolVLA 정책을 한 구조에서 학습·평가. Pi0/Pi0.5/Pi0-FAST/X-VLA/SmolVLA 포팅 완료 |
-| **SO-101 = 커뮤니티 기준 하드웨어** | SmolVLA (450M) 는 lerobot 태그 487개 커뮤니티 데이터셋 1,000만 프레임으로 학습. Gemini Robotics 2 데모에도 포함. NVIDIA 공식 SO-101 sim-to-real 코스 (→ [`isaac-sim-so101-course.md`](isaac-sim-so101-course.md)) |
+| **SO-101 = 커뮤니티 기준 하드웨어** | SmolVLA (450M) 는 lerobot 태그 487개 커뮤니티 데이터셋 1,000만 프레임으로 학습. Gemini Robotics 2 데모에도 포함. NVIDIA 공식 SO-101 sim-to-real 코스 (→ [`2026-08-03-isaac-sim-so101-course.md`](2026-08-03-isaac-sim-so101-course.md)) |
 | **평가의 독립화** | RoboArena / MolmoSpaces 같은 독립 운영 zero-shot 벤치마크로 이동. 오랫동안 non-Pi 모델이 크게 뒤처졌으나 2026 년 DreamZero 가 1위를 가져가며 판이 바뀜 |
 
 ### 1.4 커뮤니티의 비판적 시각
@@ -210,7 +210,7 @@ Phase 7 의 대상 모델 표기는 재평가와 무관하게 지금 고친다 �
 
 ### 5.3 Phase 6 진입 시 (2027.05) 체크 항목
 
-- Isaac Lab-Arena 가 LeRobot EnvHub 에 등록됨 (2026.07) + NVIDIA 공식 SO-101 sim-to-real 코스 → "Isaac Sim URDF 임포트 자체 구축" 대신 이 경로를 쓰면 디지털 트윈 셋업 주차 (1-7주) 단축 가능성. 지금 바꾸지 않고 진입 시 판단 (plan §2 도 Phase 6 은 이 체크 항목 추가 외 변경 없음으로 확정). 상세: [`isaac-sim-so101-course.md`](isaac-sim-so101-course.md)
+- Isaac Lab-Arena 가 LeRobot EnvHub 에 등록됨 (2026.07) + NVIDIA 공식 SO-101 sim-to-real 코스 → "Isaac Sim URDF 임포트 자체 구축" 대신 이 경로를 쓰면 디지털 트윈 셋업 주차 (1-7주) 단축 가능성. 지금 바꾸지 않고 진입 시 판단 (plan §2 도 Phase 6 은 이 체크 항목 추가 외 변경 없음으로 확정). 상세: [`2026-08-03-isaac-sim-so101-course.md`](2026-08-03-isaac-sim-so101-course.md)
 
 ---
 

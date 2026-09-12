@@ -13,7 +13,7 @@
 
 - **Ubuntu PC** — 메인 학습/실험 장비. RTX 4070 12GB VRAM / RAM 31GB / 28 코어 / 드라이버 580.173.02
   - **하드웨어 변경 불가** (RAM·GPU 증설 포함). 로컬 사양이 모자라는 작업은 증설이 아니라 **RunPod 이관**으로 대응한다
-  - **Isaac Sim 최소 사양 미달** — 5.x 최소가 VRAM 16GB / RAM 32GB 인데 이 PC 는 12GB / 31GB 다. 증설안(5070 Ti + RAM 64GB, 139-208만원)을 검토했으나 **보류**했다 — 사유와 재판정 조건은 [`docs/research/isaac-sim-so101-course.md`](docs/research/isaac-sim-so101-course.md) §5
+  - **Isaac Sim 최소 사양 미달** — 5.x 최소가 VRAM 16GB / RAM 32GB 인데 이 PC 는 12GB / 31GB 다. 증설안(5070 Ti + RAM 64GB, 139-208만원)을 검토했으나 **보류**했다 — 사유와 재판정 조건은 [`docs/research/2026-08-03-isaac-sim-so101-course.md`](docs/research/2026-08-03-isaac-sim-so101-course.md) §5
   - 단 **GUI 스트리밍이 필요한 작업은 RunPod 로 옮길 수 없다** — RunPod 은 UDP 미지원이고 Isaac Sim WebRTC 는 UDP 47998 이 필수다 (상세는 [Hardware-Arm.md](Roadmap/Hardware-Arm.md) Stage 1 실행 머신 절). headless 스크립트 워크로드만 이관 가능
   - **2026.09 자택 이전 확정** — 휴직 기간 (2026.09-2027.02) 내내 물리 접근이 유지된다. Isaac Sim GUI 와 USB 장치 작업이 로컬 전용이므로 Stage 1 (2027.01-02) 의 전제가 충족된다 (remediation plan 결정 #5)
 - **MacBook Pro 14 (M4 Pro)** — 원격 접속·문서 작업. LeRobot 은 macOS Apple Silicon 을 공식 지원해 teleop·record 백업 경로로 쓸 수 있으나, **ROS2 는 불가** (macOS 바이너리 패키지 없음 + Docker Desktop for Mac 의 USB 패스스루 미지원)

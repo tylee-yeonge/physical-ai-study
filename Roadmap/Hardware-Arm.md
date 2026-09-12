@@ -79,7 +79,7 @@ latency 측정, e-stop, BOM 이해는 로보틱스 랩에서도 일상적으로 
 
 ### 작업대 자재
 
-NVIDIA SO-101 코스의 실물 단계(Phase B)를 Stage 1 과 겹쳐 진행하므로, 그 코스의 BoM 자재(vial·랙 등 태스크 물체)를 **팔 구매 시점(2026.09)에 함께 잡는다.** 코스 요건과 두 단계 분할은 [`docs/research/isaac-sim-so101-course.md`](../docs/research/isaac-sim-so101-course.md) §4 다.
+NVIDIA SO-101 코스의 실물 단계(Phase B)를 Stage 1 과 겹쳐 진행하므로, 그 코스의 BoM 자재(vial·랙 등 태스크 물체)를 **팔 구매 시점(2026.09)에 함께 잡는다.** 코스 요건과 두 단계 분할은 [`docs/research/2026-08-03-isaac-sim-so101-course.md`](../docs/research/2026-08-03-isaac-sim-so101-course.md) §4 다.
 
 **리더에 달지 않는 이유**: 정책을 자율 실행할 때 리더는 존재하지 않는다. 카메라를 리더에 달면 데이터 수집 때와 자율 실행 때의 관측 분포가 완전히 달라져 학습이 무의미해진다. 관측 시점은 배포 시에도 존재하는 팔로워여야 한다. 부수적으로 리더는 사람이 계속 손으로 움직이는 팔이라 카메라 무게·케이블이 곧 조작 부하가 된다.
 
