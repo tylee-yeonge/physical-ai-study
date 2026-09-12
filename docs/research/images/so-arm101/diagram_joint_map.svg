@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" width="960" height="600" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif">
+<rect width="960" height="600" fill="#ffffff"/>
+<text x="20" y="34" font-size="20" font-weight="700" fill="#111">SO-ARM101 관절 ID와 서보 모델 (모든 서보는 Feetech STS3215, 12-bit 엔코더)</text>
+<line x1="60" y1="560" x2="900" y2="560" stroke="#999" stroke-width="2"/>
+<rect x="100" y="505" width="100" height="55" rx="6" fill="#e8e8e8" stroke="#555" stroke-width="2"/>
+<text x="150" y="590" font-size="13" fill="#555" text-anchor="middle">Base + Bus Servo Adapter</text>
+<line x1="150" y1="500" x2="150" y2="430" stroke="#333" stroke-width="10" stroke-linecap="round"/>
+<line x1="150" y1="430" x2="330" y2="220" stroke="#333" stroke-width="10" stroke-linecap="round"/>
+<line x1="330" y1="220" x2="560" y2="300" stroke="#333" stroke-width="10" stroke-linecap="round"/>
+<line x1="560" y1="300" x2="640" y2="335" stroke="#333" stroke-width="8" stroke-linecap="round"/>
+<line x1="640" y1="335" x2="720" y2="370" stroke="#333" stroke-width="8" stroke-linecap="round"/>
+<line x1="720" y1="370" x2="790" y2="352" stroke="#333" stroke-width="6" stroke-linecap="round"/>
+<line x1="720" y1="370" x2="790" y2="395" stroke="#333" stroke-width="6" stroke-linecap="round"/>
+<line x1="150" y1="500" x2="230" y2="500" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="4 3"/>
+<circle cx="150" cy="500" r="13" fill="#fff" stroke="#c0392b" stroke-width="3"/>
+<text x="150" y="505" font-size="14" font-weight="700" fill="#c0392b" text-anchor="middle">1</text>
+<rect x="230" y="470" width="300" height="66" rx="6" fill="#fafafa" stroke="#444" stroke-width="1.2"/>
+<text x="240" y="490" font-size="14" font-weight="700" fill="#111">ID 1  shoulder_pan (베이스 회전)</text>
+<text x="240" y="510" font-size="13" fill="#1a5276">Follower: C001 · 1/345</text>
+<text x="240" y="528" font-size="13" fill="#7d3c98">Leader: C044 · 1/191</text>
+<line x1="150" y1="430" x2="230" y2="430" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="4 3"/>
+<circle cx="150" cy="430" r="13" fill="#fff" stroke="#c0392b" stroke-width="3"/>
+<text x="150" y="435" font-size="14" font-weight="700" fill="#c0392b" text-anchor="middle">2</text>
+<rect x="230" y="388" width="300" height="66" rx="6" fill="#fafafa" stroke="#444" stroke-width="1.2"/>
+<text x="240" y="408" font-size="14" font-weight="700" fill="#111">ID 2  shoulder_lift (어깨)</text>
+<text x="240" y="428" font-size="13" fill="#1a5276">Follower: C001 · 1/345</text>
+<text x="240" y="446" font-size="13" fill="#7d3c98">Leader: C001 · 1/345</text>
+<line x1="330" y1="220" x2="330" y2="96" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="4 3"/>
+<circle cx="330" cy="220" r="13" fill="#fff" stroke="#c0392b" stroke-width="3"/>
+<text x="330" y="225" font-size="14" font-weight="700" fill="#c0392b" text-anchor="middle">3</text>
+<rect x="210" y="96" width="300" height="66" rx="6" fill="#fafafa" stroke="#444" stroke-width="1.2"/>
+<text x="220" y="116" font-size="14" font-weight="700" fill="#111">ID 3  elbow_flex (팔꿈치)</text>
+<text x="220" y="136" font-size="13" fill="#1a5276">Follower: C001 · 1/345</text>
+<text x="220" y="154" font-size="13" fill="#7d3c98">Leader: C044 · 1/191</text>
+<line x1="560" y1="300" x2="590" y2="150" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="4 3"/>
+<circle cx="560" cy="300" r="13" fill="#fff" stroke="#c0392b" stroke-width="3"/>
+<text x="560" y="305" font-size="14" font-weight="700" fill="#c0392b" text-anchor="middle">4</text>
+<rect x="580" y="150" width="300" height="66" rx="6" fill="#fafafa" stroke="#444" stroke-width="1.2"/>
+<text x="590" y="170" font-size="14" font-weight="700" fill="#111">ID 4  wrist_flex (손목 굽힘)</text>
+<text x="590" y="190" font-size="13" fill="#1a5276">Follower: C001 · 1/345</text>
+<text x="590" y="208" font-size="13" fill="#7d3c98">Leader: C046 · 1/147</text>
+<line x1="640" y1="335" x2="640" y2="466" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="4 3"/>
+<circle cx="640" cy="335" r="13" fill="#fff" stroke="#c0392b" stroke-width="3"/>
+<text x="640" y="340" font-size="14" font-weight="700" fill="#c0392b" text-anchor="middle">5</text>
+<rect x="600" y="400" width="300" height="66" rx="6" fill="#fafafa" stroke="#444" stroke-width="1.2"/>
+<text x="610" y="420" font-size="14" font-weight="700" fill="#111">ID 5  wrist_roll (손목 회전)</text>
+<text x="610" y="440" font-size="13" fill="#1a5276">Follower: C001 · 1/345</text>
+<text x="610" y="458" font-size="13" fill="#7d3c98">Leader: C046 · 1/147</text>
+<line x1="720" y1="370" x2="720" y2="236" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="4 3"/>
+<circle cx="720" cy="370" r="13" fill="#fff" stroke="#c0392b" stroke-width="3"/>
+<text x="720" y="375" font-size="14" font-weight="700" fill="#c0392b" text-anchor="middle">6</text>
+<rect x="660" y="236" width="300" height="66" rx="6" fill="#fafafa" stroke="#444" stroke-width="1.2"/>
+<text x="670" y="256" font-size="14" font-weight="700" fill="#111">ID 6  gripper (그리퍼 / 트리거)</text>
+<text x="670" y="276" font-size="13" fill="#1a5276">Follower: C001 · 1/345</text>
+<text x="670" y="294" font-size="13" fill="#7d3c98">Leader: C046 · 1/147</text>
+<text x="20" y="58" font-size="13" fill="#555">Follower: 6개 모두 1/345 (Standard C001 7.4V, Pro 키트 C047/C018 12V).  Leader: 항상 7.4V, 기어비가 낮을수록(1/147) 손으로 돌릴 때 가볍다.</text>
+</svg>

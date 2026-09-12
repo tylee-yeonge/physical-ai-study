@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 500" width="980" height="500" font-family="Noto Sans CJK KR, Noto Sans KR, Apple SD Gothic Neo, Malgun Gothic, sans-serif">
+<defs><marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#333"/></marker></defs>
+<rect width="980" height="500" fill="#fff"/>
+<text x="20" y="30" font-size="20" font-weight="700" fill="#111">배선과 전원 (팔 1개당 보드 1개, 서보 6개 데이지체인)</text>
+<text x="20" y="86" font-size="18" font-weight="700" fill="#1a5276">Follower</text>
+<rect x="20" y="150" width="120" height="56" rx="6" fill="#f4f6f7" stroke="#555"/>
+<text x="80" y="174" font-size="13" text-anchor="middle" fill="#111">PC</text>
+<text x="80" y="192" font-size="11" text-anchor="middle" fill="#555">USB-C 데이터 케이블</text>
+<line x1="140" y1="178" x2="180" y2="178" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="182" y="146" width="170" height="64" rx="6" fill="#fdfefe" stroke="#333" stroke-width="2"/>
+<text x="267" y="168" font-size="13" font-weight="700" text-anchor="middle" fill="#111">Bus Servo Adapter</text>
+<text x="267" y="186" font-size="11" text-anchor="middle" fill="#555">Waveshare, 점퍼 2개 = B(USB)</text>
+<text x="267" y="202" font-size="11" text-anchor="middle" fill="#555">baudrate 1,000,000</text>
+<rect x="400" y="94" width="330" height="44" rx="6" fill="#1a5276" fill-opacity="0.12" stroke="#1a5276" stroke-width="2"/>
+<text x="565" y="112" font-size="13" font-weight="700" text-anchor="middle" fill="#1a5276">DC 5V 4A  (Standard 키트, 7.4V 서보 C001)</text>
+<text x="565" y="130" font-size="11.5" text-anchor="middle" fill="#1a5276">Pro 키트(12V 서보 C047/C018)는 DC 12V 5A</text>
+<path d="M400,116 L300,116 L300,144" fill="none" stroke="#1a5276" stroke-width="2" marker-end="url(#arr)"/>
+<text x="305" y="110" font-size="10.5" fill="#1a5276">DC 5.5x2.1</text>
+<line x1="352" y1="178" x2="378" y2="178" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="380" y="150" width="84" height="56" rx="6" fill="#fff" stroke="#c0392b" stroke-width="1.5"/>
+<text x="422" y="172" font-size="14" font-weight="700" text-anchor="middle" fill="#c0392b">ID 1</text>
+<text x="422" y="192" font-size="10.5" text-anchor="middle" fill="#333">shoulder_pan</text>
+<line x1="464" y1="178" x2="476" y2="178" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="478" y="150" width="84" height="56" rx="6" fill="#fff" stroke="#c0392b" stroke-width="1.5"/>
+<text x="520" y="172" font-size="14" font-weight="700" text-anchor="middle" fill="#c0392b">ID 2</text>
+<text x="520" y="192" font-size="10.5" text-anchor="middle" fill="#333">shoulder_lift</text>
+<line x1="562" y1="178" x2="574" y2="178" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="576" y="150" width="84" height="56" rx="6" fill="#fff" stroke="#c0392b" stroke-width="1.5"/>
+<text x="618" y="172" font-size="14" font-weight="700" text-anchor="middle" fill="#c0392b">ID 3</text>
+<text x="618" y="192" font-size="10.5" text-anchor="middle" fill="#333">elbow_flex</text>
+<line x1="660" y1="178" x2="672" y2="178" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="674" y="150" width="84" height="56" rx="6" fill="#fff" stroke="#c0392b" stroke-width="1.5"/>
+<text x="716" y="172" font-size="14" font-weight="700" text-anchor="middle" fill="#c0392b">ID 4</text>
+<text x="716" y="192" font-size="10.5" text-anchor="middle" fill="#333">wrist_flex</text>
+<line x1="758" y1="178" x2="770" y2="178" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="772" y="150" width="84" height="56" rx="6" fill="#fff" stroke="#c0392b" stroke-width="1.5"/>
+<text x="814" y="172" font-size="14" font-weight="700" text-anchor="middle" fill="#c0392b">ID 5</text>
+<text x="814" y="192" font-size="10.5" text-anchor="middle" fill="#333">wrist_roll</text>
+<line x1="856" y1="178" x2="868" y2="178" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="870" y="150" width="84" height="56" rx="6" fill="#fff" stroke="#c0392b" stroke-width="1.5"/>
+<text x="912" y="172" font-size="14" font-weight="700" text-anchor="middle" fill="#c0392b">ID 6</text>
+<text x="912" y="192" font-size="10.5" text-anchor="middle" fill="#333">gripper</text>
+<text x="182" y="230" font-size="11.5" fill="#555">3핀 케이블: ID6 → ID5 → … → ID1 → 보드. ID1(shoulder_pan)의 케이블이 보드로 들어간다.</text>
+<text x="20" y="276" font-size="18" font-weight="700" fill="#7d3c98">Leader</text>
+<rect x="20" y="340" width="120" height="56" rx="6" fill="#f4f6f7" stroke="#555"/>
+<text x="80" y="364" font-size="13" text-anchor="middle" fill="#111">PC</text>
+<text x="80" y="382" font-size="11" text-anchor="middle" fill="#555">USB-C 데이터 케이블</text>
+<line x1="140" y1="368" x2="180" y2="368" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="182" y="336" width="170" height="64" rx="6" fill="#fdfefe" stroke="#333" stroke-width="2"/>
+<text x="267" y="358" font-size="13" font-weight="700" text-anchor="middle" fill="#111">Bus Servo Adapter</text>
+<text x="267" y="376" font-size="11" text-anchor="middle" fill="#555">Waveshare, 점퍼 2개 = B(USB)</text>
+<text x="267" y="392" font-size="11" text-anchor="middle" fill="#555">baudrate 1,000,000</text>
+<rect x="400" y="284" width="330" height="44" rx="6" fill="#7d3c98" fill-opacity="0.12" stroke="#7d3c98" stroke-width="2"/>
+<text x="565" y="302" font-size="13" font-weight="700" text-anchor="middle" fill="#7d3c98">DC 5V 4A  (항상)</text>
+<text x="565" y="320" font-size="11.5" text-anchor="middle" fill="#7d3c98">Leader는 어느 키트든 7.4V 서보 C044 / C001 / C046</text>
+<path d="M400,306 L300,306 L300,334" fill="none" stroke="#7d3c98" stroke-width="2" marker-end="url(#arr)"/>
+<text x="305" y="300" font-size="10.5" fill="#7d3c98">DC 5.5x2.1</text>
+<line x1="352" y1="368" x2="378" y2="368" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="380" y="340" width="84" height="56" rx="6" fill="#fff" stroke="#c0392b" stroke-width="1.5"/>
+<text x="422" y="362" font-size="14" font-weight="700" text-anchor="middle" fill="#c0392b">ID 1</text>
+<text x="422" y="382" font-size="10.5" text-anchor="middle" fill="#333">shoulder_pan</text>
+<line x1="464" y1="368" x2="476" y2="368" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="478" y="340" width="84" height="56" rx="6" fill="#fff" stroke="#c0392b" stroke-width="1.5"/>
+<text x="520" y="362" font-size="14" font-weight="700" text-anchor="middle" fill="#c0392b">ID 2</text>
+<text x="520" y="382" font-size="10.5" text-anchor="middle" fill="#333">shoulder_lift</text>
+<line x1="562" y1="368" x2="574" y2="368" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="576" y="340" width="84" height="56" rx="6" fill="#fff" stroke="#c0392b" stroke-width="1.5"/>
+<text x="618" y="362" font-size="14" font-weight="700" text-anchor="middle" fill="#c0392b">ID 3</text>
+<text x="618" y="382" font-size="10.5" text-anchor="middle" fill="#333">elbow_flex</text>
+<line x1="660" y1="368" x2="672" y2="368" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="674" y="340" width="84" height="56" rx="6" fill="#fff" stroke="#c0392b" stroke-width="1.5"/>
+<text x="716" y="362" font-size="14" font-weight="700" text-anchor="middle" fill="#c0392b">ID 4</text>
+<text x="716" y="382" font-size="10.5" text-anchor="middle" fill="#333">wrist_flex</text>
+<line x1="758" y1="368" x2="770" y2="368" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="772" y="340" width="84" height="56" rx="6" fill="#fff" stroke="#c0392b" stroke-width="1.5"/>
+<text x="814" y="362" font-size="14" font-weight="700" text-anchor="middle" fill="#c0392b">ID 5</text>
+<text x="814" y="382" font-size="10.5" text-anchor="middle" fill="#333">wrist_roll</text>
+<line x1="856" y1="368" x2="868" y2="368" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="870" y="340" width="84" height="56" rx="6" fill="#fff" stroke="#c0392b" stroke-width="1.5"/>
+<text x="912" y="362" font-size="14" font-weight="700" text-anchor="middle" fill="#c0392b">ID 6</text>
+<text x="912" y="382" font-size="10.5" text-anchor="middle" fill="#333">gripper</text>
+<text x="182" y="420" font-size="11.5" fill="#555">ID 설정·캘리브레이션·텔레옵 모두 DC + USB 동시 연결 필요. USB는 서보 전원을 공급하지 않는다.</text>
+<rect x="20" y="440" width="940" height="48" rx="6" fill="#fdecea" stroke="#c0392b"/>
+<text x="490" y="460" font-size="13" font-weight="700" text-anchor="middle" fill="#c0392b">12V 어댑터를 Leader 보드에 꽂으면 7.4V 서보가 소손된다. 어댑터에 LEADER 5V / FOLLOWER 5V 또는 12V 라벨을 붙일 것.</text>
+<text x="490" y="479" font-size="12" text-anchor="middle" fill="#7b241c">플러그 규격은 모두 DC 5.5 x 2.1 mm, center positive. 모양이 같아서 구분되지 않는다.</text>
+</svg>
