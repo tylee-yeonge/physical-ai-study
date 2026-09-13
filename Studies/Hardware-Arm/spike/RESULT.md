@@ -2,6 +2,7 @@
 
 > 기간: 2026.09 첫 2주 (타임박스) / 판정: 2026-09-21 1회
 > 절차·통과 기준의 원본: [실기 전환 plan](../../../docs/superpowers/plans/2026-08-30-realworld-transition-execution.md) §5
+> 실행 절차: Week 1 = [조립 가이드](../../../docs/research/2026-09-13-so-arm101-assembly-guide.md) / Week 2 (D8-D14) = [week2_guide.md](week2_guide.md)
 > 이 문서는 증거·소요·판단의 보존 기록이다 — `Measurements/` 원칙 (정답은 지우고 증거는 남긴다) 을 따르며 원복하지 않는다.
 
 ---
@@ -26,10 +27,10 @@ nice: 부분 도달률 (reached / grasped) 기록 — (있으면 기입)
 - [x] must 1 — teleop (6관절 + 그리퍼 추종 확인. §1 증거 영상 링크는 미기입)
 
 ### Week 2 — 데이터 녹화 · zero-shot · latency
-- [ ] 카메라 세팅 + 테스트 녹화
-- [ ] must 2 — 단일 task 10 에피소드 + Hub 업로드
-- [ ] must 3 — SmolVLA zero-shot 1회 실행
-- [ ] must 4 — latency 측정 (n=100)
+- [ ] 카메라 세팅 + 테스트 녹화 (week2_guide §1)
+- [ ] must 2 — 단일 task 10 에피소드 + Hub 업로드 (week2_guide §2)
+- [ ] must 3 — SmolVLA zero-shot 1회 실행 (week2_guide §3)
+- [ ] must 4 — latency 측정 (n=100) (week2_guide §4 + `scripts/measure_latency_smolvla.py`)
 
 ## 3. 소요 시간 (계획 대비)
 

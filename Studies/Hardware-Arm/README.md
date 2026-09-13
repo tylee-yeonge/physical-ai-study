@@ -21,6 +21,9 @@ Studies/Hardware-Arm/
   BOM.md                       # SO-101 키트 구매 리스트 + 확인 항목 (구매는 스파이크 선행)
   spike/
     RESULT.md                  # 스파이크 결과 기록 (must 4 증거 + 판정 2026-09-21)
+    week2_guide.md             # Week 2 (D8-D14) 실행 절차: 카메라 · 녹화 · zero-shot · latency · 판정
+    scripts/
+      measure_latency_smolvla.py   # D11 latency 측정 (must 4 — OpenVLA 300ms 와 병기)
   stage1/
     README.md                  # Stage 1 목표 + 진행 순서 (본 빌드: 완성도 + ROS2 층)
     URDF_guide.md              # SO-101 공개 URDF 재사용 + 검증

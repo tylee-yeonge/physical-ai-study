@@ -64,10 +64,10 @@
 - [x] D6-7 버퍼 — Week 1 산출물 완료로 소진
 
 **Week 2 — 녹화·zero-shot·latency**
-- [ ] D8 카메라 세팅 (정면 ELP 필수 + 손목 선택) + 테스트 녹화 (막힘: index·fps) — 기본 정면 거치 모듈에 ELP 장착 가능 여부(수령 확인 ③) 를 여기서 확인. 카메라는 USB 허브 없이 직결, MJPG, `lerobot-find-cameras opencv` (가이드 §7)
-- [ ] D9 task 정의 (예: 큐브→트레이) → `lerobot-record` 10ep → HF Hub(private) → **must 2** (증거: repo id. 부수 실측: **에피소드당 소요 시간** — v2.5 N 역산의 입력) — `--robot.id`/`--teleop.id` 는 캘리브레이션과 동일 값, 캘리브 경로 환경변수가 그 셸에 잡혀 있는지 먼저 확인 (없으면 기본 경로로 조용히 갈라진다 — 가이드 §6.3)
-- [ ] D10 `lerobot/smolvla_base` zero-shot 1회 → **must 3** (증거: 영상+로그. 막힘: 카메라 키 이름 불일치)
-- [ ] D11 latency n=100 → **must 4** (재료: Phase 4 측정 방법론 재사용. OpenVLA 300ms 병기)
+- [ ] D8 카메라 세팅 (정면 ELP 필수 + 손목 선택) + 테스트 녹화 (막힘: index·fps) — 기본 정면 거치 모듈에 ELP 장착 가능 여부(수령 확인 ③) 를 여기서 확인. 카메라는 USB 허브 없이 직결, MJPG, `lerobot-find-cameras opencv` (가이드 §7) — 절차: [week2_guide](../../../Studies/Hardware-Arm/spike/week2_guide.md) §1
+- [ ] D9 task 정의 (예: 큐브→트레이) → `lerobot-record` 10ep → HF Hub(private) → **must 2** (증거: repo id. 부수 실측: **에피소드당 소요 시간** — v2.5 N 역산의 입력) — `--robot.id`/`--teleop.id` 는 캘리브레이션과 동일 값, 캘리브 경로 환경변수가 그 셸에 잡혀 있는지 먼저 확인 (없으면 기본 경로로 조용히 갈라진다 — 가이드 §6.3) — 절차: week2_guide §2
+- [ ] D10 `lerobot/smolvla_base` zero-shot 1회 → **must 3** (증거: 영상+로그. 막힘: 카메라 키 이름 불일치) — 절차: week2_guide §3
+- [ ] D11 latency n=100 → **must 4** (재료: week2_guide §4 + `spike/scripts/measure_latency_smolvla.py` — Phase 4 측정 방법론 재사용. OpenVLA 300ms 병기)
 - [ ] D12-14 `RESULT.md` 기입 (증거 4건 + 소요 + 막힌 지점 — 막힌 지점은 가이드 §9 함정 표와 대조해 새로 만난 것만) → **판정 (09-21, 1회)** 기록
 
 ### 09 하순 — 집계 + JD 착수
