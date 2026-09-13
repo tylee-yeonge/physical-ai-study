@@ -124,7 +124,7 @@ NVIDIA SO-101 코스의 실물 단계(Phase B)를 Stage 1 과 겹쳐 진행하�
 3. `lerobot/smolvla_base` zero-shot 1회 실행 (팔이 반응해 움직임 — 성공 여부 무관) — 30초 영상 + 로그
 4. 추론 루프 latency 1회 측정 (4070, n=100) — OpenVLA 300ms 와 나란히 둘 비교 baseline 수치
 
-**판정은 2026-09-21 한 번만 한다** (세부 판정표: 실기 전환 plan §5.4 — 4 미완은 통과 간주, 3 실패는 통과 간주 + v2.5 첫 항목을 디버깅으로). 기존 ROS2 드라이버 검증 순서 (모터 위치 명령 → 데이지체인 → 최소 URDF+RViz) 는 삭제가 아니라 **Stage 1 첫 주로 이동**했다. 결과 기록: `Studies/Hardware-Arm/spike/RESULT.md`.
+**판정은 2026-09-21 한 번만 한다** (세부 판정표: 실기 전환 plan §5.4 — 4 미완은 통과 간주, 3 실패는 통과 간주 + v2.5 첫 항목을 디버깅으로). 기존 ROS2 드라이버 검증 순서 (모터 위치 명령 → 데이지체인 → 최소 URDF+RViz) 는 삭제가 아니라 **Stage 1 첫 주로 이동**했다. 결과 기록: `Studies/Hardware-Arm/spike/week2/RESULT.md`.
 
 
 ---

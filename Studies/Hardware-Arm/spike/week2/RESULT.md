@@ -1,8 +1,8 @@
 # 스파이크 결과 기록 — SO-101 LeRobot 네이티브 실기 검증
 
 > 기간: 2026.09 첫 2주 (타임박스) / 판정: 2026-09-21 1회
-> 절차·통과 기준의 원본: [실기 전환 plan](../../../docs/superpowers/plans/2026-08-30-realworld-transition-execution.md) §5
-> 실행 절차: Week 1 = [조립 가이드](../../../docs/research/2026-09-13-so-arm101-assembly-guide.md) / Week 2 (D8-D14) = [week2_guide.md](week2_guide.md)
+> 절차·통과 기준의 원본: [실기 전환 plan](../../../../docs/superpowers/plans/2026-08-30-realworld-transition-execution.md) §5
+> 실행 절차: Week 1 = [조립 가이드](../week1/2026-09-13-so-arm101-assembly-guide.md) / Week 2 (D8-D14) = [week2_guide.md](week2_guide.md)
 > 이 문서는 증거·소요·판단의 보존 기록이다 — `Measurements/` 원칙 (정답은 지우고 증거는 남긴다) 을 따르며 원복하지 않는다.
 
 ---

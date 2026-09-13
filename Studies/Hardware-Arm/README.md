@@ -20,10 +20,14 @@ Studies/Hardware-Arm/
   README.md                    # 본 파일
   BOM.md                       # SO-101 키트 구매 리스트 + 확인 항목 (구매는 스파이크 선행)
   spike/
-    RESULT.md                  # 스파이크 결과 기록 (must 4 증거 + 판정 2026-09-21)
-    week2_guide.md             # Week 2 (D8-D14) 실행 절차: 카메라 · 녹화 · zero-shot · latency · 판정
-    scripts/
-      measure_latency_smolvla.py   # D11 latency 측정 (must 4 — OpenVLA 300ms 와 병기)
+    week1/
+      2026-09-13-so-arm101-assembly-guide.md   # Week 1 (D1-D7) 실행 절차: 검수 · 모터 ID · 조립 · 캘리브 · teleop
+      images/so-arm101/        # 조립 가이드 그림
+    week2/
+      week2_guide.md           # Week 2 (D8-D14) 실행 절차: 카메라 · 녹화 · zero-shot · latency · 판정
+      RESULT.md                # 스파이크 결과 기록 (must 4 증거 + 판정 2026-09-21)
+      scripts/
+        measure_latency_smolvla.py   # D11 latency 측정 (must 4 — OpenVLA 300ms 와 병기)
   stage1/
     README.md                  # Stage 1 목표 + 진행 순서 (본 빌드: 완성도 + ROS2 층)
     URDF_guide.md              # SO-101 공개 URDF 재사용 + 검증
@@ -54,7 +58,7 @@ Studies/Hardware-Arm/
 | 시점 | 활동 |
 |---|---|
 | 2026.08 말-09 초 | **SO-101 키트 즉시 구매** (약 55만원 + 손목 카메라, 리드타임 3일 — `stage1/BOM.md`) |
-| 2026.09 첫 2주 | **스파이크 (타임박스)** — 조립 + LeRobot 네이티브 검증. must 4: teleop / 10 에피소드 녹화+Hub / SmolVLA zero-shot / latency. **판정 2026-09-21 1회** → `spike/RESULT.md` |
+| 2026.09 첫 2주 | **스파이크 (타임박스)** — 조립 + LeRobot 네이티브 검증. must 4: teleop / 10 에피소드 녹화+Hub / SmolVLA zero-shot / latency. **판정 2026-09-21 1회** → `spike/week2/RESULT.md` |
 | 2026.10-11 | **Stage 1 본 빌드** — 완성도 + 안전 기초 + ROS2 래핑 + 이중 latency (v2 선행 하드웨어) |
 | 2026.11-12 | **v2.5 병행** — teleop 데이터셋 (LeRobot 포맷, HF Hub) + SmolVLA 실기 before/after + vla-lab 공개 문서 |
 | 2026.11 | 6개월 분기 재평가 #1 (스파이크 판정 + v2.5 진행률 + **Stage 2 확장 수단 결정**) |

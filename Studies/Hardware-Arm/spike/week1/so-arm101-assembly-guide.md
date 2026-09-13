@@ -1,6 +1,6 @@
 # SO-ARM101 조립 가이드 — Leader + Follower 검수·모터 설정·조립·캘리브레이션·텔레옵
 
-> LeRobot SO-ARM101 2-arm 세트(3D 프린트 파트 포함 키트)를 부품 검수부터 텔레옵 검증까지 끌고 가는 절차와 함정을 정리한다. 스파이크 Week 1 의 실행 절차이자, Stage 1(ROS2 드라이버·안전·캘리브 오프셋)과 v2.5(record 규약)가 참조하는 하드웨어 사실의 원본이다 ([master roadmap](../superpowers/plans/2026-08-31-master-roadmap.md) §3).
+> LeRobot SO-ARM101 2-arm 세트(3D 프린트 파트 포함 키트)를 부품 검수부터 텔레옵 검증까지 끌고 가는 절차와 함정을 정리한다. 스파이크 Week 1 의 실행 절차이자, Stage 1(ROS2 드라이버·안전·캘리브 오프셋)과 v2.5(record 규약)가 참조하는 하드웨어 사실의 원본이다 ([master roadmap](../../../../docs/superpowers/plans/2026-08-31-master-roadmap.md) §3).
 > 작성일: 2026-09-13 (절차 기준일 2026-09-05)
 > 원문: TheRobotStudio SO-ARM100 README, LeRobot 공식 문서 `so101`, Seeed Studio wiki
 > 그림 출처: 관절별 조립 그림은 LeRobot 공식 문서의 조립 영상(Hugging Face `documentation-images`)에서 추출한 프레임에 단계 번호를 붙인 것이고, 사진은 TheRobotStudio 리포지토리(Apache-2.0)의 것이다. 도식 3장은 이 문서용으로 작성했다. 그림 파일은 `images/so-arm101/`. 움직이는 순서까지 보려면 §11 의 공식 문서 영상을 같이 본다
@@ -23,7 +23,7 @@
 
 ## 0. 이 레포의 키트에 적용
 
-구매 키트 구성은 [BOM.md](../../Studies/Hardware-Arm/BOM.md) 기준이다. 아래 §1-§11 은 일반 가이드이고, 이 절이 그 가이드를 이 키트에 맞춰 읽는 방법이다.
+구매 키트 구성은 [BOM.md](../../BOM.md) 기준이다. 아래 §1-§11 은 일반 가이드이고, 이 절이 그 가이드를 이 키트에 맞춰 읽는 방법이다.
 
 | 항목 | 이 키트 | 가이드 상 해당 | 적용 |
 |---|---|---|---|
@@ -450,7 +450,7 @@ lerobot-teleoperate \
 
 ## 8. 체크리스트 (재조립·부품 교체 시 재사용)
 
-진행 상태는 여기 두지 않는다 — 스파이크 진행은 [master roadmap](../superpowers/plans/2026-08-31-master-roadmap.md) §3 과 `Studies/Hardware-Arm/spike/RESULT.md` §2 에서 추적한다.
+진행 상태는 여기 두지 않는다 — 스파이크 진행은 [master roadmap](../../../../docs/superpowers/plans/2026-08-31-master-roadmap.md) §3 과 [RESULT.md](../week2/RESULT.md) §2 에서 추적한다.
 
 조립 전
 

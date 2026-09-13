@@ -1,7 +1,7 @@
 # 스파이크 Week 2 가이드 — 카메라 · 녹화 · SmolVLA zero-shot · latency (D8-D14)
 
-> 스파이크 2주차 (2026-09-14 - 09-21) 의 실행 절차. Week 1 (조립 · 모터 ID · 캘리브레이션 · teleop) 은 [조립 가이드](../../../docs/research/2026-09-13-so-arm101-assembly-guide.md) 가 담당하고, 이 문서는 그 마지막 줄 — "카메라 추가 후 `lerobot-record` 로 넘어간다" — 부터 판정 기록까지를 잇는다.
-> 통과 기준 · 판정표의 원본: [실기 전환 plan](../../../docs/superpowers/plans/2026-08-30-realworld-transition-execution.md) §5.2-§5.4 / 일 단위 체크: [master roadmap](../../../docs/superpowers/plans/2026-08-31-master-roadmap.md) §3 + [RESULT.md](RESULT.md) §2
+> 스파이크 2주차 (2026-09-14 - 09-21) 의 실행 절차. Week 1 (조립 · 모터 ID · 캘리브레이션 · teleop) 은 [조립 가이드](../week1/2026-09-13-so-arm101-assembly-guide.md) 가 담당하고, 이 문서는 그 마지막 줄 — "카메라 추가 후 `lerobot-record` 로 넘어간다" — 부터 판정 기록까지를 잇는다.
+> 통과 기준 · 판정표의 원본: [실기 전환 plan](../../../../docs/superpowers/plans/2026-08-30-realworld-transition-execution.md) §5.2-§5.4 / 일 단위 체크: [master roadmap](../../../../docs/superpowers/plans/2026-08-31-master-roadmap.md) §3 + [RESULT.md](RESULT.md) §2
 > 작성일: 2026-09-13
 > 호스트: Ubuntu 22.04 + RTX 4070 12GB, conda env `lerobot` (Python 3.12, extras `core_scripts,feetech`)
 > LeRobot 버전 주의: 명령어 · 옵션 이름은 버전에 따라 바뀐다. 이 문서의 명령은 2026 중반 공식 문서 기준 골격이고, **각 Day 의 첫 단계는 `--help` 로 옵션 이름 대조**다. 이름이 다르면 이 문서를 고친다.
@@ -42,7 +42,7 @@ hf auth login        # write 권한 토큰 입력. 구버전 CLI 는 huggingface
 hf auth whoami       # 로그인된 아이디 확인
 export HF_USER=<본인 HF 아이디>              # 아래 모든 repo_id 의 앞부분
 
-export SPIKE_OUT=<레포 경로>/Studies/Hardware-Arm/spike/outputs   # 로그 · 측정 결과 (gitignore 대상)
+export SPIKE_OUT=<레포 경로>/Studies/Hardware-Arm/spike/week2/outputs   # 로그 · 측정 결과 (gitignore 대상)
 mkdir -p $SPIKE_OUT
 ```
 
@@ -66,8 +66,8 @@ D11 은 팔 · 카메라 없이 GPU 만 쓴다. D10 이 밀리면 D11 을 먼저
 
 ### 0.4 이 문서가 다루지 않는 것
 
-- 데이터 품질 · 성공률 · 부분 도달률의 통계 — v2.5 (`../v25/README.md`)
-- ROS2 층, 이중 latency — Stage 1 (`../stage1/ros2_driver_setup.md` §5)
+- 데이터 품질 · 성공률 · 부분 도달률의 통계 — v2.5 (`../../v25/README.md`)
+- ROS2 층, 이중 latency — Stage 1 (`../../stage1/ros2_driver_setup.md` §5)
 - 손목 카메라 — 마운트가 옵션 별매라 스파이크는 정면 1대. 마운트가 있으면 §1.4 의 설정 문자열에 `wrist:` 항목을 한 줄 추가하는 것으로 끝난다 (nice)
 
 ---
@@ -171,7 +171,7 @@ find $DS -name "*.mp4" | head -2       # 영상 파일. 하나를 열어 카메�
 ## 2. D9 — task 정의 · 10 에피소드 · Hub 업로드
 
 **무엇을**: 단일 task 를 지시문 · 물체 · 시작 자세 · 종료 조건까지 고정하고, 리더로 시범 10회를 녹화해 HF Hub private 데이터셋으로 올린다.
-**왜**: must 2 의 증거는 repo id 하나지만, 이 10 에피소드는 v2.5 파인튜닝 데이터의 규약 원형이고, 에피소드당 소요 시간은 v2.5 N 역산의 입력이다 (`../v25/README.md` §1).
+**왜**: must 2 의 증거는 repo id 하나지만, 이 10 에피소드는 v2.5 파인튜닝 데이터의 규약 원형이고, 에피소드당 소요 시간은 v2.5 N 역산의 입력이다 (`../../v25/README.md` §1).
 **끝나면 손에 남는 것**: Hub private 데이터셋 repo id, 에피소드당 소요 시간 1개, task 정의 표.
 
 ### 2.1 task 정의 (녹화 전에 고정)
@@ -185,7 +185,7 @@ find $DS -name "*.mp4" | head -2       # 영상 파일. 하나를 열어 카메�
 | 물체 시작 위치 | 테이프로 표시한 칸 1-3개 중 하나. 에피소드별로 어느 칸인지 메모 | v2.5 배치 마커의 축소판 |
 | 에피소드 상한 | 30 s (`episode_time_s`) | 리더 시범 1회는 10-20 s 면 끝난다. 끝나면 → 키로 일찍 종료 |
 | 리셋 | 15 s (`reset_time_s`) | 큐브를 시작 칸으로, 리더를 시작 자세로 되돌리는 시간 |
-| 실패한 시범 | ← 키로 취소하고 재녹화 | 데이터셋에는 성공 시범만 남긴다 (`../v25/PRACTICE.md` 1 의 품질 게이트) |
+| 실패한 시범 | ← 키로 취소하고 재녹화 | 데이터셋에는 성공 시범만 남긴다 (`../../v25/PRACTICE.md` 1 의 품질 게이트) |
 
 물체 · 문장을 바꾸려면 여기서 바꾸고 D10 · D11 · 스크립트의 `TASK` 상수까지 같은 문장으로 맞춘다.
 
@@ -234,7 +234,7 @@ python -c "import json; d=json.load(open('$DS/meta/info.json')); print(d['total_
 ```
 
 - Hub 에서 `https://huggingface.co/datasets/<HF_USER>/so101-spike-pick-cube` 가 열리고 Private 표시가 있는지 본다. **이 repo id 가 must 2 의 증거** → RESULT.md §1 행 2.
-- 에피소드당 소요 = (종료 시각 - 시작 시각) / 10. 순수 녹화 초와의 차이가 리셋 · 조작 오버헤드다. 두 값을 RESULT.md §3 에 적는다 — v2.5 N 역산 (`../v25/README.md` §1 표) 의 입력.
+- 에피소드당 소요 = (종료 시각 - 시작 시각) / 10. 순수 녹화 초와의 차이가 리셋 · 조작 오버헤드다. 두 값을 RESULT.md §3 에 적는다 — v2.5 N 역산 (`../../v25/README.md` §1 표) 의 입력.
 
 ### 2.5 막힐 때
 
@@ -330,7 +330,7 @@ lerobot-record \
 ## 4. D11 — latency n=100
 
 **무엇을**: `scripts/measure_latency_smolvla.py` 로 4070 에서 SmolVLA 의 추론 시간을 100회 재고 mean / p95 를 얻는다. 팔 · 카메라 연결이 필요 없다 — 랜덤 입력으로 GPU 만 쓴다.
-**왜**: OpenVLA 300.3 ms (레포 README 실측 표) 는 "AR 토큰 방식 VLA" 의 숫자다. 같은 4070 에서 action-chunk 방식 (SmolVLA) 의 숫자를 나란히 놓는 것이 이 측정의 목적이고, v2.5 비교표 (`../v25/PRACTICE.md` §4) 의 latency 행이 이 값을 그대로 쓴다.
+**왜**: OpenVLA 300.3 ms (레포 README 실측 표) 는 "AR 토큰 방식 VLA" 의 숫자다. 같은 4070 에서 action-chunk 방식 (SmolVLA) 의 숫자를 나란히 놓는 것이 이 측정의 목적이고, v2.5 비교표 (`../../v25/PRACTICE.md` §4) 의 latency 행이 이 값을 그대로 쓴다.
 **끝나면 손에 남는 것**: 수치 1줄 + `outputs/` 의 npy · csv.
 
 ### 4.1 무엇을 "1회" 로 볼 것인가 (측정 정의)
@@ -355,7 +355,7 @@ lerobot-record \
 
 ```bash
 cd <레포 경로>
-python Studies/Hardware-Arm/spike/scripts/measure_latency_smolvla.py
+python Studies/Hardware-Arm/spike/week2/scripts/measure_latency_smolvla.py
 ```
 
 출력 (숫자는 자리표시):
@@ -374,7 +374,7 @@ p95    : ___ ms
 peak VRAM (memory_allocated): _.__ GB
 
 RESULT.md 1줄: SmolVLA base (4070, torch.float32): chunk mean ___ / p95 ___ ms (n=100, 50 actions/chunk, action 당 _.__ ms, 전처리 밖) vs OpenVLA int4 300.3 / 304.8 ms (action 1개)
-저장: .../spike/outputs/smolvla_latency_4070.npy, smolvla_latency_4070_summary.csv
+저장: .../spike/week2/outputs/smolvla_latency_4070.npy, smolvla_latency_4070_summary.csv
 ```
 
 마지막 "RESULT.md 1줄" 을 그대로 RESULT.md §1 행 4 에 붙인다. `outputs/` 는 gitignore 대상이라 수치는 문서에 옮겨 적어야 남는다.
@@ -441,7 +441,7 @@ grep -n "def predict_action" -A 40 $(python -c "import lerobot.utils.control_uti
 | D10 | "already exists" | 같은 repo_id 의 로컬 데이터셋 잔존 | repo_id 변경 또는 로컬 디렉터리 삭제 |
 | D11 | latency 가 대부분 0-1 ms | action 큐에서 꺼내기만 하고 모델이 안 돎 | 스크립트의 `policy.reset()` 이 루프 안에 있는지 확인 |
 | D11 | `KeyError: observation.language.tokens` 류 | 신버전인데 preprocessor 를 안 거침 | 스크립트의 preprocessor 분기 + §4.3 |
-| 공통 | ELP 좌 · 우 붙은 프레임을 그대로 씀 | 스파이크는 "반응" 만 보므로 크롭하지 않음. 모델이 정사각형으로 패딩 리사이즈해 실효 해상도가 낮아짐 | must 기준 영향 없음. 크롭 (왼쪽 절반) 또는 일반 웹캠 교체는 v2.5 측정 설계 (`../v25/README.md` §0) 에서 결정 |
+| 공통 | ELP 좌 · 우 붙은 프레임을 그대로 씀 | 스파이크는 "반응" 만 보므로 크롭하지 않음. 모델이 정사각형으로 패딩 리사이즈해 실효 해상도가 낮아짐 | must 기준 영향 없음. 크롭 (왼쪽 절반) 또는 일반 웹캠 교체는 v2.5 측정 설계 (`../../v25/README.md` §0) 에서 결정 |
 
 ---
 
@@ -451,4 +451,4 @@ grep -n "def predict_action" -A 40 $(python -c "import lerobot.utils.control_uti
 - LeRobot 카메라 문서 (`lerobot-find-cameras`, OpenCV 설정 키): https://huggingface.co/docs/lerobot/cameras
 - LeRobot SmolVLA 문서: https://huggingface.co/docs/lerobot/smolvla
 - `lerobot/smolvla_base` 모델 카드: https://huggingface.co/lerobot/smolvla_base
-- OpenVLA 측정 조건의 원본: [`Measurements/openvla-rtx4070-int4/methodology.md`](../../../Measurements/openvla-rtx4070-int4/methodology.md) §1
+- OpenVLA 측정 조건의 원본: [`Measurements/openvla-rtx4070-int4/methodology.md`](../../../../Measurements/openvla-rtx4070-int4/methodology.md) §1

@@ -16,7 +16,7 @@
 | Phase 4 (v1) | OpenVLA int4 실측 (300ms/3.33Hz) + ROS2 dry-run — 레포 기록 |
 | **Phase 4.5 (v1.5) 전체** | sim 구축·하네스 검증·zero-shot·LoRA·before/after eval (0/98 vs 0/98, 배제 10/잔여 7) + **vla-lab 발행 (2026-08-31)** |
 | 결정·문서 | 실기 전환 확정, 발행 채널 vla-lab, Hardware-Arm 가이드 SO-101 화, vla-lab 초기화 |
-| **스파이크 Week 1** | SO-101 팔로워·리더 조립, 모터 ID 12개 설정, LeRobot 설치, 캘리브레이션, teleop 6관절+그리퍼 추종 확인 — 절차·함정의 원본은 [조립 가이드](../../research/2026-09-13-so-arm101-assembly-guide.md) |
+| **스파이크 Week 1** | SO-101 팔로워·리더 조립, 모터 ID 12개 설정, LeRobot 설치, 캘리브레이션, teleop 6관절+그리퍼 추종 확인 — 절차·함정의 원본은 [조립 가이드](../../../Studies/Hardware-Arm/spike/week1/2026-09-13-so-arm101-assembly-guide.md) |
 
 ---
 
@@ -42,7 +42,7 @@
 
 ## 3. 체크리스트 (2026년분 — 일/주 단위. 2027 은 재평가 #1 후 추가)
 
-> 일/주 배분은 가이드이지 관료제가 아니다 — 밀리면 다음 항목을 당기지 말고 버퍼로 흡수한다. **재료 지도**: 스파이크 = 실기 전환 plan §5.3 + `Studies/Hardware-Arm/spike/RESULT.md` + 조립·캘리브·teleop 절차 [조립 가이드](../../research/2026-09-13-so-arm101-assembly-guide.md) / Stage 1 = `Studies/Hardware-Arm/stage1/` (4개 가이드) / v2.5 = **`Studies/Hardware-Arm/v25/`** (README + PRACTICE — 신설).
+> 일/주 배분은 가이드이지 관료제가 아니다 — 밀리면 다음 항목을 당기지 말고 버퍼로 흡수한다. **재료 지도**: 스파이크 = 실기 전환 plan §5.3 + `Studies/Hardware-Arm/spike/week2/RESULT.md` + 조립·캘리브·teleop 절차 [조립 가이드](../../../Studies/Hardware-Arm/spike/week1/2026-09-13-so-arm101-assembly-guide.md) / Stage 1 = `Studies/Hardware-Arm/stage1/` (4개 가이드) / v2.5 = **`Studies/Hardware-Arm/v25/`** (README + PRACTICE — 신설).
 
 ### ~09.07 — 구매 주간 (+ v1.5 소화)
 
@@ -54,7 +54,7 @@
 - [ ] v1.5 소화 ③ — week6 quiz_easy·quiz_medium (재료: `Studies/Phase 4.5/week6/`)
 - [ ] LinkedIn 헤드라인 교체 (v1.5 링크 공유 여부는 §6 미결)
 
-### 09.07-21 — 스파이크 (Day 단위. 진행 체크는 `spike/RESULT.md` §2 와 동기)
+### 09.07-21 — 스파이크 (Day 단위. 진행 체크는 `spike/week2/RESULT.md` §2 와 동기)
 
 **Week 1 — 조립·캘리브레이션·teleop**
 - [x] D1-2 팔로워 조립 — 서보 12개 라벨링(F1-F6 / L1-L6) → 조립 전 `lerobot-setup-motors` 로 ID 설정 → 링크 조립과 배선 병행 (가이드 §4-§5)
@@ -64,10 +64,10 @@
 - [x] D6-7 버퍼 — Week 1 산출물 완료로 소진
 
 **Week 2 — 녹화·zero-shot·latency**
-- [ ] D8 카메라 세팅 (정면 ELP 필수 + 손목 선택) + 테스트 녹화 (막힘: index·fps) — 기본 정면 거치 모듈에 ELP 장착 가능 여부(수령 확인 ③) 를 여기서 확인. 카메라는 USB 허브 없이 직결, MJPG, `lerobot-find-cameras opencv` (가이드 §7) — 절차: [week2_guide](../../../Studies/Hardware-Arm/spike/week2_guide.md) §1
+- [ ] D8 카메라 세팅 (정면 ELP 필수 + 손목 선택) + 테스트 녹화 (막힘: index·fps) — 기본 정면 거치 모듈에 ELP 장착 가능 여부(수령 확인 ③) 를 여기서 확인. 카메라는 USB 허브 없이 직결, MJPG, `lerobot-find-cameras opencv` (가이드 §7) — 절차: [week2_guide](../../../Studies/Hardware-Arm/spike/week2/week2_guide.md) §1
 - [ ] D9 task 정의 (예: 큐브→트레이) → `lerobot-record` 10ep → HF Hub(private) → **must 2** (증거: repo id. 부수 실측: **에피소드당 소요 시간** — v2.5 N 역산의 입력) — `--robot.id`/`--teleop.id` 는 캘리브레이션과 동일 값, 캘리브 경로 환경변수가 그 셸에 잡혀 있는지 먼저 확인 (없으면 기본 경로로 조용히 갈라진다 — 가이드 §6.3) — 절차: week2_guide §2
 - [ ] D10 `lerobot/smolvla_base` zero-shot 1회 → **must 3** (증거: 영상+로그. 막힘: 카메라 키 이름 불일치) — 절차: week2_guide §3
-- [ ] D11 latency n=100 → **must 4** (재료: week2_guide §4 + `spike/scripts/measure_latency_smolvla.py` — Phase 4 측정 방법론 재사용. OpenVLA 300ms 병기)
+- [ ] D11 latency n=100 → **must 4** (재료: week2_guide §4 + `spike/week2/scripts/measure_latency_smolvla.py` — Phase 4 측정 방법론 재사용. OpenVLA 300ms 병기)
 - [ ] D12-14 `RESULT.md` 기입 (증거 4건 + 소요 + 막힌 지점 — 막힌 지점은 가이드 §9 함정 표와 대조해 새로 만난 것만) → **판정 (09-21, 1회)** 기록
 
 ### 09 하순 — 집계 + JD 착수

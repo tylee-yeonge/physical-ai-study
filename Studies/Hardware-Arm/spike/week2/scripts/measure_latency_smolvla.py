@@ -19,10 +19,10 @@ OpenVLA 와 다른 점 (RESULT.md 에 수치와 함께 적는다):
 
 실행 (팔·카메라 연결 불필요 -- GPU 만 쓴다):
     conda activate lerobot
-    python Studies/Hardware-Arm/spike/scripts/measure_latency_smolvla.py
+    python Studies/Hardware-Arm/spike/week2/scripts/measure_latency_smolvla.py
 출력 (outputs/ 는 gitignore 대상 -- 수치는 RESULT.md §1 행 4 에 옮겨 적는다):
-    Studies/Hardware-Arm/spike/outputs/smolvla_latency_4070.npy
-    Studies/Hardware-Arm/spike/outputs/smolvla_latency_4070_summary.csv
+    Studies/Hardware-Arm/spike/week2/outputs/smolvla_latency_4070.npy
+    Studies/Hardware-Arm/spike/week2/outputs/smolvla_latency_4070_summary.csv
 """
 
 import contextlib
