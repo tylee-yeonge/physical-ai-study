@@ -11,13 +11,14 @@
 
 
 ```bash
-# ELP Stereo 의 USB 연결
-ls /dev/video*
-# 기대: /dev/video0, /dev/video2 (stereo 의 left/right)
+# ELP Stereo 의 USB 연결 -- 컨테이너에서는 so101-attach 가 USB 시리얼로 고정 노드를 만든다
+so101-attach
+ls -la /dev/so101_cam_overview
+# 기대: crw-r--r-- ... 81, N /dev/so101_cam_overview  (좌/우는 별도 노드가 아니라 한 프레임 안에 붙어 있다)
 
 
 # OpenCV 로 read
-python -c "import cv2; cap=cv2.VideoCapture(0); ret, img = cap.read(); print(img.shape if ret else 'fail')"
+python -c "import cv2; cap=cv2.VideoCapture('/dev/so101_cam_overview'); ret, img = cap.read(); print(img.shape if ret else 'fail')"
 ```
 
 
@@ -25,7 +26,8 @@ ELP Stereo 의 양쪽 image 가 한 frame 에 결합 (1280x480).
 한 쪽 (left) 만 사용:
 ```python
 import cv2
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture("/dev/so101_cam_overview")  # so101-attach 가 만든 고정 경로
+cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))  # YUYV 는 1280x480 에서 15 fps 가 한계, MJPG 는 25/60
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 ret, frame = cap.read()
@@ -75,7 +77,10 @@ import cv2
 import numpy as np
 
 
-elp = cv2.VideoCapture(0)
+elp = cv2.VideoCapture("/dev/so101_cam_overview")  # so101-attach 가 만든 고정 경로
+elp.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))  # 무압축 YUYV 로는 30 fps 가 안 나온다
+elp.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)  # 기본 협상은 640x240 이라 명시해야 좌/우 640 씩 나온다
+elp.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 # Sim setup ... (camera 부착)
 
 
