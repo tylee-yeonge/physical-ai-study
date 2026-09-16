@@ -8,7 +8,7 @@
 
 ## TL;DR
 
-- **카메라는 고정 경로로 잡는다.** `/dev/video*` 번호는 재부팅 · 재연결로 바뀐다. `/dev/v4l/by-id/` 의 `-video-index0` 항목을 쓴다 (시리얼 포트를 `/dev/serial/by-id/` 로 잡은 것과 같은 원리).
+- **카메라는 고정 경로로 잡는다.** `/dev/video*` 번호는 재부팅 · 재연결로 바뀐다. `so101-attach` 가 USB 시리얼로 만드는 `/dev/so101_cam_overview` · `/dev/so101_cam_wrist` 를 쓴다 (서보 보드를 `/dev/so101_follower` 로 잡은 것과 같은 원리).
 - **ELP Stereo 는 좌 · 우 영상이 한 프레임에 붙어 나온다.** 스파이크는 자르지 않고 그대로 쓴다. 크롭 여부는 v2.5 측정 설계에서 결정한다.
 - **본 녹화 전에 2 에피소드 테스트 녹화를 한다 (업로드 없이).** fps 가 설정보다 낮게 나오는 문제, 캘리브 경로가 다른 셸에서 갈라지는 문제는 10 에피소드를 다시 찍기 전에 잡는다.
 - **zero-shot 실행은 별도 명령이 아니라 `lerobot-record` 에 `--policy.path` 를 주는 것이다.** 카메라 이름은 데이터셋용이 아니라 모델 config 의 `input_features` 키에 맞춘다. `--robot.max_relative_target` 으로 한 스텝 이동량을 제한한 뒤 돌린다.
@@ -23,31 +23,31 @@
 
 | 항목 | 값 | 어디서 정했나 |
 |---|---|---|
-| conda env | `lerobot` (Python 3.12) | 조립 가이드 §3.1 |
-| 포트 환경변수 | `$FOLLOWER_PORT`, `$LEADER_PORT` (`/dev/serial/by-id/` 고정 경로) | 조립 가이드 §4.1 |
+| Python 환경 | venv `/workspace/venvs/lerobot` (lerobot 0.6.2, alias `acl`) | 컨테이너 Dockerfile |
+| 포트 환경변수 | `$FOLLOWER_PORT`, `$LEADER_PORT` (`so101-attach` 가 USB 시리얼로 만드는 `/dev/so101_follower`, `/dev/so101_leader`) | 컨테이너 Dockerfile · `so101-help` |
 | 팔 id | `so101_follower_01`, `so101_leader_01` | 조립 가이드 §6.1-§6.2 |
 | 캘리브 파일 | `$HF_LEROBOT_CALIBRATION` 아래 `robots/so_follower/*.json`, `teleoperators/so_leader/*.json` | 조립 가이드 §6.3 |
 | teleop 동작 | must 1 기능 충족. 30초 증거 영상이 없으면 D12 에 촬영 | master roadmap §3 D5 |
 
 ### 0.2 Week 2 공통 준비
 
-용어: **HF Hub**(Hugging Face Hub)는 데이터셋 · 모델 저장소. `lerobot-record` 가 녹화 결과를 여기로 올리고, `lerobot/smolvla_base` 도 여기서 받는다. 업로드에는 **write 권한 토큰**으로 로그인이 필요하다.
+용어: **HF Hub**(Hugging Face Hub)는 데이터셋 · 모델 저장소. `lerobot-record` 가 녹화 결과를 여기로 올리고, `lerobot/smolvla_base` 도 여기서 받는다. 업로드에는 **write 권한 토큰**이 필요한데, 호스트 compose 의 `.env` (`HF_WRITE_TOKEN`) 가 컨테이너 환경변수 `HF_TOKEN` 으로 넣어 주므로 컨테이너 안에서 로그인하지 않는다.
 
 ```bash
-conda activate lerobot
-echo $FOLLOWER_PORT $LEADER_PORT $HF_LEROBOT_CALIBRATION   # 셋 다 값이 찍혀야 한다 (빈 값이면 ~/.bashrc 확인)
+so101-attach         # 팔 · 카메라 USB 를 꽂은 뒤, 그리고 컨테이너 재시작 뒤 매번. /dev/so101_* 노드 생성
+acl                  # venv 활성화 (/workspace/venvs/lerobot)
+echo $FOLLOWER_PORT $LEADER_PORT $HF_LEROBOT_CALIBRATION   # 셋 다 값이 찍혀야 한다 (컨테이너 환경변수. 빈 값이면 컨테이너 설정 확인)
 ls $HF_LEROBOT_CALIBRATION/robots/so_follower/ $HF_LEROBOT_CALIBRATION/teleoperators/so_leader/   # json 2개
 
-hf auth login        # write 권한 토큰 입력. 구버전 CLI 는 huggingface-cli login
-hf auth whoami       # 로그인된 아이디 확인
-export HF_USER=<본인 HF 아이디>              # 아래 모든 repo_id 의 앞부분
+hf auth whoami       # 환경변수 HF_TOKEN 으로 로그인된 아이디가 찍혀야 한다. `hf auth login` 은 하지 않는다 (환경변수가 파일 토큰보다 우선)
+echo $HF_USER        # 컨테이너 환경변수 (호스트 .env 의 HF_USER). 아래 모든 repo_id 의 앞부분
 
-export SPIKE_OUT=<레포 경로>/Studies/Hardware-Arm/spike/week2/outputs   # 로그 · 측정 결과 (gitignore 대상)
+export SPIKE_OUT=/workspace/study/physical-ai-study/Studies/Hardware-Arm/spike/week2/outputs   # 로그 · 측정 결과 (gitignore 대상). 세션마다 잡는다
 mkdir -p $SPIKE_OUT
 ```
 
 - `HF_LEROBOT_CALIBRATION` 이 빈 셸에서 `lerobot-record` 를 실행하면 에러 없이 기본 경로 (`~/.cache/huggingface/lerobot/calibration/`) 를 보고 "캘리브 파일 없음" 으로 새 캘리브레이션을 요구한다 (조립 가이드 §6.3). 새 터미널을 열 때마다 `echo` 로 확인한다.
-- `HF_USER` 와 `SPIKE_OUT` 도 `~/.bashrc` 에 넣어 두면 매 세션 다시 잡지 않아도 된다.
+- 포트 · 캘리브 경로 · `HF_TOKEN` · `HF_USER` 는 호스트 compose (`.env`) 가 컨테이너 환경변수로 넣는다. 컨테이너 안 `~/.bashrc` 는 이미지가 만든 것이라 재생성 시 수정이 사라지므로 거기에 적지 않는다. `SPIKE_OUT` 만 세션마다 export 한다.
 
 ### 0.3 Day 사이의 의존 관계
 
@@ -68,13 +68,12 @@ D11 은 팔 · 카메라 없이 GPU 만 쓴다. D10 이 밀리면 D11 을 먼저
 
 - 데이터 품질 · 성공률 · 부분 도달률의 통계 — v2.5 (`../../v25/README.md`)
 - ROS2 층, 이중 latency — Stage 1 (`../../stage1/ros2_driver_setup.md` §5)
-- 손목 카메라 — 마운트가 옵션 별매라 스파이크는 정면 1대. 마운트가 있으면 §1.4 의 설정 문자열에 `wrist:` 항목을 한 줄 추가하는 것으로 끝난다 (nice)
 
 ---
 
 ## 1. D8 — 카메라 세팅 + 테스트 녹화
 
-**무엇을**: ELP 를 정면 거치 모듈에 고정하고, LeRobot 이 그 카메라를 원하는 해상도 · fps 로 여는지 확인한 뒤, 2 에피소드짜리 테스트 녹화를 한다 (Hub 업로드 없음).
+**무엇을**: ELP 를 고정하고, LeRobot 이 그 카메라를 원하는 해상도 · fps 로 여는지 확인한 뒤, 2 에피소드짜리 테스트 녹화를 한다 (Hub 업로드 없음).
 **왜**: D9 본 녹화에서 카메라 문제를 처음 만나면 10 에피소드를 다시 찍게 된다. 카메라 번호가 바뀌는 문제, fps 가 설정보다 낮게 나오는 문제는 본 녹화 전에 끝내야 한다.
 **끝나면 손에 남는 것**: 카메라 고정 경로 1개 (`$FRONT_CAM`), `--robot.cameras` 설정 문자열 1개 (`$CAMS`), 로컬 테스트 데이터셋 1개, 수령 확인 ③ 의 답.
 
@@ -89,24 +88,28 @@ python -c "import dataclasses; from lerobot.cameras.opencv import OpenCVCameraCo
 
 ### 1.2 물리 장착 (수령 확인 ③)
 
-- 기본 정면 거치 모듈에 ELP 가 1/4 인치 나사로 붙는지 확인한다. 안 붙으면 클램프 · 테이프로 임시 고정한다 — 스파이크는 "안 예뻐도 된다" (plan §5.1). 결과를 RESULT.md §4 에 1줄 적는다.
-- 위치: 팔 전체 + 작업면 (큐브 시작 칸과 트레이) 이 한 화면에 들어오게. 팔을 최대로 뻗어도 화면 밖으로 나가지 않는지 teleop 으로 확인한다.
+- 수령 확인 ③ 의 결과: ELP 는 키트 기본 정면 거치 모듈에 붙지 않는다 (RESULT.md §4 #5). 현재 ELP 는 팔로워 **왼쪽 측면** 에 임시 고정, 손목 카메라는 그리퍼에 장착 — 스파이크는 "안 예뻐도 된다" (plan §5.1).
+- 측면 시점은 문제가 아니다. 팔이 앞으로 뻗는 동작이 화면을 가로지르는 이동으로 보여 정면보다 잘 잡힌다. 대신 좌우 이동은 깊이로 바뀌어 약해지므로 큐브 → 트레이 동선을 주로 앞뒤 방향으로 잡는다.
+- 구도 확인 (D9 전에 teleop 으로): ① 최대 신장 · 최좌 · 최우 · 최고 높이에서 팔이 화면 밖으로 잘리지 않는가 ② 큐브 위치와 트레이 위치에서 집는 순간 그리퍼 끝이 전완에 가려지지 않는가 ③ 큐브와 트레이가 둘 다 보이고 크기로 구분되는가. 안 되면 카메라를 조금 높여 30-45도 내려다보게 한다.
+- 기준 프레임을 남긴다: 구도가 확정되면 `lerobot-find-cameras opencv` 의 샘플 이미지를 `$SPIKE_OUT/ref_overview.png` 로 복사해 두고, D9 · D10 직전에 새 샘플과 겹쳐 밀림이 없는지 본다.
 - 한 번 고정하면 Week 2 내내 움직이지 않는다. 데이터셋 (D9) 과 zero-shot (D10) 이 같은 시점을 봐야 한다.
-- USB 는 허브 없이 PC 에 직결한다. 허브는 대역폭을 나눠 fps 가 떨어진다.
+- USB 허브: ELP 는 USB 2.0 허브 뒤에 있지만 손목 카메라와 동시 스트리밍에서 60 / 30 fps 가 그대로 나온다 (실측). fps 가 실측으로 미달할 때만 직결을 시도한다.
 
 ### 1.3 카메라 식별 — 고정 경로
 
 용어: **UVC**(USB Video Class)는 드라이버 설치 없이 꽂으면 되는 USB 카메라 규격. 리눅스는 UVC 카메라 하나에 `/dev/videoN` 두 개를 만든다 (N 은 영상, N+1 은 메타데이터). 그래서 `ls /dev/video*` 의 개수가 카메라 수의 2배로 보이고, `lerobot-find-cameras` 는 영상 노드만 보여 준다.
 
+컨테이너 /dev 는 tmpfs 라 호스트 udev 가 만드는 `/dev/v4l/by-id/` 가 없다. 대신 `so101-attach` 가 USB 시리얼로 카메라를 찾아 고정 이름의 노드를 만든다 (`so101-attach list` 로 보이는 카메라와 시리얼 확인).
+
 ```bash
-lerobot-find-cameras opencv     # 열리는 카메라 목록 + 기본 해상도/fps. 샘플 이미지를 ./outputs/captured_images/ 에 저장
-ls -l /dev/v4l/by-id/           # 시리얼 기반 고정 경로. `-video-index0` 가 영상 노드
+so101-attach                    # 카메라를 다시 꽂았거나 컨테이너를 재시작했으면 재실행
+ls -la /dev/so101_cam_*         # so101_cam_overview = ELP (캡처 노드), so101_cam_wrist = 손목 카메라
+lerobot-find-cameras opencv     # 열리는 카메라 목록 + 기본 해상도/fps. /dev/videoN 이름으로 표시되지만 설정에는 위 고정 이름을 쓴다. 샘플 이미지를 ./outputs/captured_images/ 에 저장
 ```
 
-ELP 가 어느 항목인지는 한 번만 확인한다: ELP 의 USB 를 뽑고 위 명령을 다시 실행해서 사라진 항목이 ELP 다 (조립 가이드 §4.1 의 시리얼 포트 식별과 같은 방법).
-
 ```bash
-export FRONT_CAM=/dev/v4l/by-id/<ELP 항목>-video-index0     # ~/.bashrc 에도 추가
+export FRONT_CAM=/dev/so101_cam_overview
+export WRIST_CAM=/dev/so101_cam_wrist
 ```
 
 샘플 이미지 (`outputs/captured_images/`) 를 열어 본다. ELP Stereo 는 좌 · 우 영상이 한 프레임에 나란히 붙어 나온다 (Phase 6 week7 에서 확인한 1280x480). 스파이크는 이 프레임을 자르지 않고 그대로 쓴다 — 이유와 한계는 §6 표 마지막 행.
@@ -116,17 +119,24 @@ sudo apt install -y v4l-utils
 v4l2-ctl -d $FRONT_CAM --list-formats-ext   # 픽셀 포맷 (MJPG / YUYV) 별로 지원하는 해상도 · fps 목록
 ```
 
-용어: **YUYV** 는 무압축 전송. USB 2.0 에서 1280x480 은 10 fps 근처가 한계다. **MJPG** 는 카메라가 JPEG 로 압축해 보내는 모드로, 같은 해상도에서 30 fps 가 나온다. 목록에서 MJPG 30 fps 가 있는 해상도를 고른다.
+용어: **YUYV** 는 무압축 전송. USB 2.0 에서 1280x480 은 15 fps 가 한계다. **MJPG** 는 카메라가 JPEG 로 압축해 보내는 모드로, 같은 해상도에서 높은 fps 가 나온다. 목록에 있는 fps 만 설정에 적는다.
+
+| 카메라 | MJPG 해상도 | 지원 fps |
+|---|---|---|
+| ELP (`so101_cam_overview`) | 1280x480 (좌 · 우 결합) | 25, 60 (30 없음 — 30 을 적으면 `failed to set fps=30` 으로 중단) |
+| ELP | 2560x720 | 25, 60 |
+| 손목 (`so101_cam_wrist`) | 1280x720 | 30 |
+| 손목 | 640x480 | 30 |
 
 ### 1.4 카메라 설정 문자열
 
 ```bash
-export CAMS="{ front: {type: opencv, index_or_path: $FRONT_CAM, width: 1280, height: 480, fps: 30} }"
+export CAMS="{ front: {type: opencv, index_or_path: $FRONT_CAM, width: 1280, height: 480, fps: 60, fourcc: MJPG}, wrist: {type: opencv, index_or_path: $WRIST_CAM, width: 1280, height: 720, fps: 30, fourcc: MJPG} }"
 ```
 
-- `front` 는 데이터셋의 이미지 키 이름 (`observation.images.front`) 이 된다. D9 는 이 이름을 쓰고, D10 은 모델이 기대하는 이름으로 바꿔 쓴다 (§3.2).
-- `width` / `height` / `fps` 는 §1.3 목록에 있는 조합만 적는다. 없는 조합을 적으면 카메라가 가장 가까운 값으로 조용히 바꾸거나 열기에 실패한다.
-- §1.1 에서 확인한 설정 키에 픽셀 포맷 옵션이 있으면 MJPG 로 지정한다. 옵션이 없고 fps 가 안 나오면 해상도를 640x480 으로 내린다 (§6).
+- `front` / `wrist` 는 데이터셋의 이미지 키 이름 (`observation.images.front`, `observation.images.wrist`) 이 된다. D9 는 이 이름을 쓰고, D10 은 모델이 기대하는 이름으로 바꿔 쓴다 (§3.2).
+- `width` / `height` / `fps` 는 §1.3 표에 있는 조합만 적는다. 없는 fps 를 적으면 lerobot 이 카메라 연결 단계에서 예외를 내고 멈춘다.
+- `fourcc: MJPG` 는 lerobot 0.6.2 `OpenCVCameraConfig` 의 `fourcc` 필드다. 카메라 fps 와 데이터셋 fps (§1.5 의 `--dataset.fps=30`) 는 별개다 — record 루프는 매 틱 카메라의 최신 프레임을 가져오므로 ELP 를 60 으로 두면 30 fps 의 매 틱에 새 프레임이 들어간다.
 
 ### 1.5 테스트 녹화 (2 에피소드, 업로드 없음)
 
@@ -139,7 +149,7 @@ lerobot-record \
     --teleop.type=so101_leader \
     --teleop.port=$LEADER_PORT \
     --teleop.id=so101_leader_01 \
-    --display_data=true \
+    --display_data=false \
     --dataset.repo_id=$HF_USER/so101-spike-test \
     --dataset.num_episodes=2 \
     --dataset.fps=30 \
@@ -149,13 +159,14 @@ lerobot-record \
     --dataset.push_to_hub=false
 ```
 
-- `--display_data=true` 는 Rerun 창을 띄워 카메라 영상과 관절값을 실시간으로 보여 준다. 원격 (headless) 세션이면 `false`.
+- `--display_data=false`: 이 컨테이너는 헤드리스 (DISPLAY 없음) 라 Rerun 창을 못 띄운다. 영상은 녹화 뒤 mp4 로 확인한다.
+- 키 조작 (→ · ← · q) 은 VS Code 터미널처럼 TTY 인 셸에서만 듣는다. 비대화형 셸이면 타이머만으로 진행된다.
 - 흐름: 카메라 · 팔 연결 → 에피소드 1 녹화 (20초) → 리셋 구간 (10초) → 에피소드 2 → 영상 인코딩. 녹화 중 키 조작은 §2.3.
 
 확인:
 
 ```bash
-DS=~/.cache/huggingface/lerobot/$HF_USER/so101-spike-test     # 데이터셋 기본 저장 위치
+DS=$(ls -d ~/.cache/huggingface/lerobot/$HF_USER/so101-spike-test* | tail -1)   # 기본 저장 위치. lerobot 0.6.2 는 repo_id 뒤에 _YYYYMMDD_HHMMSS 를 붙인다 (--dataset.no_stamp=true 로 끔)
 python -c "import json; d=json.load(open('$DS/meta/info.json')); print(d['fps'], d['total_episodes'], d['total_frames'])"
 # 기대: 30 2 약 1200 (= 30 fps x 20 s x 2, 화살표 키로 일찍 끝내지 않았을 때)
 # 프레임 수가 크게 모자라면 카메라 fps 또는 녹화 루프가 못 따라간 것 -- §6
@@ -179,7 +190,7 @@ find $DS -name "*.mp4" | head -2       # 영상 파일. 하나를 열어 카메�
 | 항목 | 이 스파이크의 값 | 왜 고정하나 |
 |---|---|---|
 | 지시문 (`single_task`) | `Pick up the red cube and place it on the tray.` | 데이터셋 · zero-shot · latency 가 같은 문장을 쓴다. 영어 — `smolvla_base` 가 영어 지시문으로 학습됨 |
-| 물체 | 3-4 cm 큐브 1개, 배경과 대비되는 색 | 그리퍼가 물 수 있고 카메라에서 잘 보이는 것 |
+| 물체 | 3-4 cm 큐브 1개, 책상과 **밝기** 가 대비되는 것 | 전체 뷰 ELP 는 흑백 센서라 색상 대비는 손목 카메라에서만 보인다. 문장의 "red" 는 손목 카메라 기준 |
 | 목표 | 종이 트레이 또는 테이프로 표시한 사각형 | 성공 여부를 눈으로 판정할 수 있게 |
 | 팔 시작 자세 | 리더를 테이프로 표시한 자세에 두고 시작 | 에피소드마다 첫 프레임이 같아야 학습 데이터가 된다 |
 | 물체 시작 위치 | 테이프로 표시한 칸 1-3개 중 하나. 에피소드별로 어느 칸인지 메모 | v2.5 배치 마커의 축소판 |
@@ -192,6 +203,9 @@ find $DS -name "*.mp4" | head -2       # 영상 파일. 하나를 열어 카메�
 ### 2.2 본 녹화
 
 ```bash
+acl                                                  # venv
+export CAMS="{ front: {type: opencv, index_or_path: /dev/so101_cam_overview, width: 1280, height: 480, fps: 60, fourcc: MJPG}, wrist: {type: opencv, index_or_path: /dev/so101_cam_wrist, width: 1280, height: 720, fps: 30, fourcc: MJPG} }"
+ls -la /dev/so101_* && echo $CAMS $HF_USER && hf auth whoami   # 노드 4개 · 두 변수 · 계정이 찍혀야 한다
 date +%T    # 시작 시각 -- 에피소드당 소요 계산용
 lerobot-record \
     --robot.type=so101_follower \
@@ -201,8 +215,9 @@ lerobot-record \
     --teleop.type=so101_leader \
     --teleop.port=$LEADER_PORT \
     --teleop.id=so101_leader_01 \
-    --display_data=true \
+    --display_data=false \
     --dataset.repo_id=$HF_USER/so101-spike-pick-cube \
+    --dataset.no_stamp=true \
     --dataset.num_episodes=10 \
     --dataset.fps=30 \
     --dataset.episode_time_s=30 \
@@ -213,7 +228,9 @@ lerobot-record \
 date +%T    # 종료 시각
 ```
 
-- `--dataset.private=true` 가 `--help` 에 없으면 일단 올린 뒤 Hub 데이터셋 페이지의 Settings 에서 Private 로 바꾼다.
+- `--dataset.no_stamp=true`: lerobot 0.6.2 는 기본으로 repo_id 뒤에 `_YYYYMMDD_HHMMSS` 를 붙여 로컬 폴더와 Hub 이름이 모두 바뀐다. D10 과 RESULT.md §1 이 같은 repo_id 를 참조하므로 끈다.
+- `--display_data=false`: 헤드리스 컨테이너 (§1.5). 카메라 fps 는 `$CAMS` 의 값 (ELP 60, 손목 30) 이고 `--dataset.fps=30` 은 녹화 루프 주기다. 둘은 별개라 ELP 가 30 을 지원하지 않아도 무관하다.
+- 실행 전 같은 셸에서 `echo $CAMS $HF_USER` 로 둘 다 찍히는지 본다. `$CAMS` 는 §1.4 의 export 를 세션마다 다시 해야 한다.
 - 중간에 끊기면 같은 repo_id 로 `--resume=true` 를 붙여 이어 찍는다.
 - 리더를 잡기 전에 팔로워 가동 범위 안에 손 · 케이블이 없는지 본다.
 
@@ -298,7 +315,7 @@ lerobot-record \
     --robot.id=so101_follower_01 \
     --robot.cameras="$CAMS_ZS" \
     --robot.max_relative_target=10 \
-    --display_data=true \
+    --display_data=false \
     --dataset.repo_id=$HF_USER/eval_so101-spike-pick-cube \
     --dataset.num_episodes=1 \
     --dataset.fps=30 \
@@ -427,10 +444,10 @@ grep -n "def predict_action" -A 40 $(python -c "import lerobot.utils.control_uti
 
 | Day | 증상 | 원인 | 조치 |
 |---|---|---|---|
-| D8 | `lerobot-find-cameras` 의 카메라 수가 `/dev/video*` 의 절반 | UVC 는 장치당 video 노드 2개 (영상 + 메타데이터) | 정상. `/dev/v4l/by-id/` 의 `-video-index0` 만 쓴다 |
+| D8 | `lerobot-find-cameras` 의 카메라 수가 `/dev/video*` 의 절반 | UVC 는 장치당 video 노드 2개 (영상 + 메타데이터) | 정상. `so101-attach` 가 만드는 `/dev/so101_cam_*` 는 캡처 노드만이다 |
 | D8 | 재부팅 후 카메라가 다른 번호로 잡힘 | `/dev/videoN` 번호는 열거 순서에 따라 바뀜 | §1.3 고정 경로 |
-| D8 | fps 가 설정보다 훨씬 낮음 (5-10) | YUYV 무압축의 USB 대역폭 한계 | MJPG 지정 (설정 키가 있으면) 또는 해상도 640x480 으로 하향. `v4l2-ctl --list-formats-ext` 로 지원 조합 확인 |
-| D8 | 카메라가 열리다 실패 / 프레임 드롭 | USB 허브 대역폭 공유 | PC 직결 |
+| D8 | fps 가 설정보다 훨씬 낮음 (5-10) | YUYV 무압축의 USB 대역폭 한계 | `fourcc: MJPG` 지정 + §1.3 표에 있는 fps 만 적는다 |
+| D8 | 카메라가 열리다 실패 / 프레임 드롭 | USB 허브 대역폭 공유 (현 구성은 실측으로 문제 없음) | fps 실측이 미달할 때만 PC 직결 |
 | D8-D9 | `lerobot-record` 가 캘리브레이션을 새로 요구 | 그 셸에 `HF_LEROBOT_CALIBRATION` 이 없어 기본 경로를 봄 | `echo $HF_LEROBOT_CALIBRATION` 확인 후 재실행. 새로 캘리브하지 않는다 |
 | D9 | 업로드 401 / 403 | 로그인 안 됨 또는 read 토큰 | `hf auth login` 을 write 토큰으로 다시 |
 | D9 | 인코딩 단계에서 멈춤 또는 오류 | ffmpeg / torchcodec 문제 | `conda install ffmpeg -c conda-forge` (조립 가이드 §3.1) |
