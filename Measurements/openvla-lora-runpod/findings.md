@@ -31,7 +31,7 @@ Roadmap Section 0 이 이번 측정에 걸어 둔 질문이다. 실패하면 이
 
 upstream 이 제시하는 LoRA 파인튜닝 메모리는 배치 16 에서 약 72GB, 배치를 줄여도 **약 27GB** 다. 24GB 는 그 하한보다 작다.
 
-바닥을 만드는 것은 옵티마이저나 활성값이 아니라 **frozen base 가중치 15GB**(7B x bf16 2바이트)다. LoRA 가 줄이는 것은 학습 대상(어댑터 수십 MB + 그 옵티마이저 상태 수백 MB)이지 base 가 아니며, 얼려 둔 가중치도 순전파에 쓰이므로 GPU 에 올라가 있어야 한다.
+바닥을 만드는 것은 옵티마이저나 활성값이 아니라 **frozen base 가중치 15GB**(7B x bf16 2바이트)다. LoRA 가 줄이는 것은 학습 대상(어댑터 약 211MB — 110,828,288 파라미터 x bf16, [`raw/train.log`](raw/train.log) 12행 + 그 옵티마이저 상태 수백 MB)이지 base 가 아니며, 얼려 둔 가중치도 순전파에 쓰이므로 GPU 에 올라가 있어야 한다.
 
 넘긴 방법은 `batch_size 1` + `grad_accumulation_steps 16` 이다. 활성값은 배치에 비례하므로 배치를 1 로 내려 줄이고, 그래디언트를 16회 누적해 **유효 배치 16 을 유지**했다. 결과가 18.5GB 이고 6GB 가 남았다.
 
@@ -157,7 +157,16 @@ S3 API 는 볼륨을 만들 때 **지원 데이터센터를 골라야** 쓸 수 
 
 전제는 **base 리비전 일치**다. 어댑터가 자기 설정에 base 리비전을 기록하므로([`raw/adapter_config.json`](raw/adapter_config.json)) 로컬 캐시의 스냅샷 해시와 대조할 수 있고, 이 측정에서는 일치를 확인했다.
 
-어댑터가 462MB 인 것은 `target_modules` 에 `lm_head` 가 포함되어 어휘 x 임베딩 차원 행렬이 함께 저장되기 때문이다. rank 32 어댑터만이라면 수십 MB 다.
+어댑터 462MB 의 구성은 둘이다.
+
+| 구성 | 계산 | 바이트 |
+|---|---|---|
+| LoRA A/B 행렬 (15개 모듈, rank 32) | 110,828,288 파라미터 x bf16 2바이트 ([`raw/train.log`](raw/train.log) 12행) | 221,656,576 (약 211MB) |
+| `lm_head` 전체 가중치 | 32,064 x 4,096 x bf16 2바이트 | 262,668,288 (약 251MB) |
+| 합계 | | 484,324,864 |
+| 실제 파일 | `adapter_model.safetensors` | 484,458,600 (차이는 safetensors 헤더) |
+
+`target_modules` 에 `lm_head` 가 포함되면 peft 가 그 층의 base 가중치까지 함께 저장한다(저장 시 `save_embedding_layers=True` 경고). 그러나 LoRA 행렬 자체가 이미 211MB 다 — `target_modules` 가 all-linear 라 Llama 의 attention·FFN 7개 모듈 외에 vision encoder 의 선형층(`qkv`, `proj`, `fc1`-`fc3`, `q`, `kv`)까지 포함되기 때문이며([`raw/adapter_config.json`](raw/adapter_config.json)), Llama 7개 모듈만 대상으로 했더라도 약 8,000만 파라미터, 153MB 다.
 
 ---
 
