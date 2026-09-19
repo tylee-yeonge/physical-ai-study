@@ -362,8 +362,26 @@ lerobot-calibrate \
 
 ![캘리브레이션](images/so-arm101/step_calibrate.jpg)
 
-1. 모든 관절을 가동 범위의 중앙에 둔다 → Enter.
+1. **팔을 들어 올려** 모든 관절을 각자 가동 범위의 가운데에 둔 채 → Enter (아래 "가운데 자세").
 2. 각 관절을 양끝까지 천천히 왕복시킨다. 터미널의 `MIN` / `MAX` 열이 관절마다 갱신되는지 보면서 진행한다. 그리퍼까지 전 관절을 마친 뒤 → Enter.
+3. 캘리브 직후 판정 (§6.2 끝) 을 통과하는지 확인한다.
+
+**가운데 자세**
+
+용어: 1번 단계가 **호밍**(homing)이다. Enter 를 누른 순간의 자세를 각 서보의 기준값 (raw 2047 — 한 바퀴 0-4095 의 한가운데) 으로 삼는다. 그래서 이 순간의 자세가 캘리브 전체를 좌우한다.
+
+| 관절 | 가운데 자세 |
+|---|---|
+| `shoulder_pan` | 정면 |
+| `shoulder_lift` | 상완이 거의 수직 (완전히 뒤로 젖힌 위치와 앞으로 숙인 위치의 중간) |
+| `elbow_flex` | 전완이 상완과 약 90도 (완전히 접힌 위치와 편 위치의 중간) |
+| `wrist_flex` | 그리퍼가 전완과 일직선 |
+| `wrist_roll` | 중앙 |
+| `gripper` | 반쯤 열림 |
+
+- 팔이 공중에 떠 있는 자세다. 한 손으로 팔을 받친 채 다른 손으로 Enter 를 누른다. **책상에 내려놓은 휴식 자세에서 누르면 안 된다** — 휴식 자세는 `shoulder_lift` · `elbow_flex` 가 가동 범위의 끝에 붙은 자세다.
+- 정확할 필요는 없다. 각 관절이 양 끝에서 30도 이상만 떨어져 있으면 된다.
+- 이유: 서보는 한 바퀴를 0-4095 로 세고, 4095 다음은 0 으로 돌아간다. 가운데에서 호밍하면 양 끝이 기준값에서 약 100도씩 떨어져 이 경계 (기준값에서 180도) 에 닿지 않는다. 끝에서 호밍하면 반대쪽 끝이 약 200도 떨어져 경계를 넘고, 그 너머에서는 읽히는 각도가 360도 튄다. 그 상태로 텔레옵 · 녹화를 하면 리더가 그 지점을 지날 때 팔로워가 가동 범위를 가로질러 반대로 돌 수 있다.
 
 ### 6.2 Leader
 
@@ -374,24 +392,64 @@ lerobot-calibrate \
     --teleop.id=so101_leader_01
 ```
 
+절차와 가운데 자세는 §6.1 과 같다.
+
+**캘리브 직후 판정 (두 팔 모두)**
+
+호밍 자세가 맞았는지는 json 에 기록된 가동 범위의 폭으로 바로 알 수 있다. 캘리브를 마칠 때마다 확인한다.
+
+```bash
+python -c "
+import json, os
+base = os.environ['HF_LEROBOT_CALIBRATION']
+for p in ['robots/so_follower/so101_follower_01', 'teleoperators/so_leader/so101_leader_01']:
+    for n, c in json.load(open(f'{base}/{p}.json')).items():
+        print(p.split('/')[-1], n.ljust(14), c['range_min'], c['range_max'], round((c['range_max'] - c['range_min']) * 360 / 4095), 'deg')
+"
+```
+
+| 관절 | 정상 | 잘못된 호밍 (휴식 자세에서 Enter) |
+|---|---|---|
+| `shoulder_lift` · `elbow_flex` | 폭 185-210도, `range_min` 이 0 에서 멀다 (이 키트 실측: 팔로워 847-3226 · 719-3058) | 폭 약 358-360도, `range_min` 이 0 근처이고 `range_max` 가 4095 근처 |
+| `wrist_roll` | 0-4095 (360도) — lerobot 이 측정 없이 써 넣는 값 | 같음 (판정에 쓰지 않는다) |
+| 나머지 | 폭이 기계적 가동 범위와 비슷 (`shoulder_pan` · `wrist_flex` 약 200도, `gripper` 약 110-135도) | — |
+
+이 두 관절은 기구적으로 한 바퀴를 돌 수 없다. 폭이 360도에 가깝게 찍혔다면 실제로 그만큼 움직인 것이 아니라 범위 기록 중에 값이 4095 → 0 경계를 넘었다는 흔적이다. 잘못된 호밍으로 나오면 그 팔을 다시 캘리브한다 (§6.3 의 재캘리브).
+
 ### 6.3 캘리브레이션 파일
 
 - 기본 저장 위치: `~/.cache/huggingface/lerobot/calibration/` 하위 `robots/so_follower/<id>.json`, `teleoperators/so_leader/<id>.json`. 디렉터리명은 `--robot.type` 의 `so101_follower` 가 아니라 클래스명 기준 `so_follower` 다.
-- 기본 위치를 그대로 쓰지 않고 사용자 관리 디렉터리로 옮겨두는 것을 권장한다. `~/.cache` 는 규약상 재생성 가능한 데이터 자리라 디스크 정리로 지워질 수 있는데, 캘리브레이션은 재생성에 물리 작업이 들고, 데이터셋 수집 후 값이 바뀌면 기존 데이터와 관절 매핑이 어긋나는 보존 대상이다.
-- 위치 변경은 `HF_LEROBOT_CALIBRATION` 환경변수로 한다. calibrate / teleoperate / record 등 모든 명령에 일괄 적용되고, 내부 디렉터리 구조는 그대로 유지된다.
+- 기본 위치를 쓰지 않고 사용자 관리 디렉터리에 둔다. `~/.cache` 는 규약상 재생성 가능한 데이터 자리라 디스크 정리로 지워질 수 있는데, 캘리브레이션은 재생성에 물리 작업이 들고, 데이터셋 수집 후 값이 바뀌면 기존 데이터와 관절 매핑이 어긋나는 보존 대상이다.
+- 위치 변경은 `HF_LEROBOT_CALIBRATION` 환경변수로 한다. calibrate / teleoperate / record / rollout 등 모든 명령에 일괄 적용되고, 내부 디렉터리 구조는 그대로 유지된다.
+
+이 레포의 환경 (도커 컨테이너) 에서의 값:
+
+| 항목 | 값 |
+|---|---|
+| 호스트의 실제 위치 | `~/Documents/so-arm101/calibration` |
+| 컨테이너 안 경로 | `/root/so-arm101/calibration` — 위 디렉터리의 bind mount |
+| 환경변수 | `HF_LEROBOT_CALIBRATION=/root/so-arm101/calibration` — 호스트 compose 가 컨테이너 환경변수로 넣는다 |
+| 파일 | `robots/so_follower/so101_follower_01.json`, `teleoperators/so_leader/so101_leader_01.json` |
+
+- 용어: **bind mount** 는 호스트의 디렉터리를 컨테이너 안 경로에 그대로 연결하는 것이다. 복사본이 아니라 같은 파일이라, 컨테이너에서 캘리브하면 그 순간 호스트 파일이 바뀐다. 따로 옮기거나 동기화할 것이 없고, 컨테이너를 재생성해도 남는다.
+- 환경변수는 compose 가 넣으므로 컨테이너 안 `~/.bashrc` 에 적지 않는다 (이미지가 만든 파일이라 재생성 시 수정이 사라진다). 새 터미널에서는 `echo $HF_LEROBOT_CALIBRATION` 으로 값이 찍히는지만 확인한다.
+- 환경변수가 없는 세션은 에러 없이 기본 경로로 돌아가 파일이 두 벌로 갈라질 수 있다. 증상은 "캘리브 파일이 있는데도 새 캘리브레이션을 요구한다" 이다. 이때는 새로 캘리브하지 말고 환경변수부터 확인한다.
+- 명령별 `--robot.calibration_dir` / `--teleop.calibration_dir` 옵션도 있으나(이때는 하위 구조 없이 그 디렉터리에 `<id>.json` 이 바로 놓인다), 매 명령 지정이라 빠뜨리면 일관성이 깨지므로 환경변수 방식을 쓴다.
+- `id` 는 이후 teleoperate / record / replay / rollout 에서 동일하게 써야 한다.
+- 캘리브 값은 json 과 **서보의 EEPROM 양쪽**에 저장된다. lerobot 은 팔에 연결할 때마다 두 곳의 값 (`homing_offset`, `range_min`, `range_max`) 을 비교하고, 다르면 캘리브 프롬프트를 띄운다.
+
+**재캘리브** (부품 교체 · 재조립 · §6.2 판정에서 잘못된 호밍으로 나온 경우)
 
 ```bash
-mkdir -p ~/Documents/so-arm101/calibration
-# 기본 위치에 이미 만든 파일이 있으면 구조째 이동
-mv ~/.cache/huggingface/lerobot/calibration/* ~/Documents/so-arm101/calibration/
-# 포트 환경변수(4.1절)와 함께 ~/.bashrc에 넣어 모든 터미널에 적용
-echo 'export HF_LEROBOT_CALIBRATION=$HOME/Documents/so-arm101/calibration' >> ~/.bashrc
+# 덮어쓰기 전에 백업. bind mount 된 디렉터리 안에 둬야 컨테이너를 재생성해도 남는다
+mkdir -p $HF_LEROBOT_CALIBRATION/backup-$(date +%m%d)
+cp -r $HF_LEROBOT_CALIBRATION/robots $HF_LEROBOT_CALIBRATION/teleoperators $HF_LEROBOT_CALIBRATION/backup-$(date +%m%d)/
+# 이후 §6.1 / §6.2 의 lerobot-calibrate 명령을 그대로 실행
 ```
 
-- 환경변수가 없는 세션은 에러 없이 기본 경로로 돌아가 파일이 두 벌로 갈라질 수 있다. bashrc 를 타지 않는 실행 경로(cron, IDE 가 직접 띄우는 프로세스 등)에서 주의한다.
-- 명령별 `--robot.calibration_dir` / `--teleop.calibration_dir` 옵션도 있으나(이때는 하위 구조 없이 그 디렉터리에 `<id>.json` 이 바로 놓인다), 매 명령 지정이라 빠뜨리면 일관성이 깨지므로 환경변수 방식을 쓴다.
-- `id` 는 이후 record / replay / eval 에서 동일하게 써야 한다.
-- 부품 교체·재조립 후에는 해당 json 을 삭제하고 다시 캘리브레이션한다. 남겨두면 오류가 난다.
+- 기존 json 이 있으면 첫 프롬프트가 "ENTER = 기존 파일 사용, `c` = 새 캘리브레이션" 이다. **`c` 를 입력한다.** ENTER 는 기존 파일의 값을 서보에 다시 쓸 뿐이라, 재조립 후라면 틀린 값이 들어간다. json 을 지울 필요는 없다.
+- 재캘리브하면 각도의 0 기준이 바뀐다. 그 전에 녹화한 데이터셋은 관절값이 새 기준과 어긋나므로, 데이터 수집을 시작한 뒤에는 캘리브를 바꾸지 않는다. 바꿔야 하면 데이터셋을 다시 찍는다.
+- 재캘리브 후에는 §6.2 의 판정과 §7 텔레옵 검증을 다시 한다.
 
 ### 6.4 `Magnitude NNNN exceeds 2047` 오류
 
@@ -471,7 +529,7 @@ lerobot-teleoperate \
 
 조립 후
 
-- Follower / Leader 캘리브레이션 완료, json 파일 생성 확인
+- Follower / Leader 캘리브레이션 완료, json 파일 생성 + 가동 범위 폭 판정 통과 (§6.2)
 - 텔레옵에서 6관절 + 그리퍼 정상 추종
 - Leader 자중 처짐 없음
 
@@ -489,7 +547,8 @@ lerobot-teleoperate \
 | 텔레옵 시 특정 관절만 무겁거나 leader 가 처짐 | Leader 서보 기어비 배치 오류 | §2.2 표대로 재배치, 재캘리브레이션 |
 | 텔레옵에서 포트 반대로 잡힘 | `/dev/ttyACM*` 번호가 동시 연결 시 변동 | §4.1 `/dev/serial/by-id/` 고정 경로 사용, 임시로는 실행 전 `lerobot-find-port` |
 | 조립 후 배선 불가 | 파트 결합 후 틈이 좁음 | 조립과 배선 병행, 슬림 니들노즈 플라이어 |
-| 재조립 후 캘리브레이션 오류 | 이전 json 잔존 | 캘리브레이션 디렉터리(§6.3) 하위의 해당 json 삭제 |
+| 캘리브 json 의 `shoulder_lift` · `elbow_flex` 폭이 약 360도 | 호밍을 가운데 자세가 아니라 휴식 자세에서 함 — 범위 기록 중 인코더 값이 4095 → 0 경계를 넘음. 그대로 쓰면 팔을 크게 편 지점에서 읽히는 각도가 360도 튄다 | §6.1 의 가운데 자세로 재캘리브 후 §6.2 판정 |
+| 재조립 후 팔에 연결할 때마다 캘리브 프롬프트가 뜸 | 서보 EEPROM 의 값과 json 이 다름 | `lerobot-calibrate` 에서 `c` 로 새 캘리브레이션 (§6.3). ENTER 는 옛 값을 서보에 다시 쓴다 |
 
 ---
 
