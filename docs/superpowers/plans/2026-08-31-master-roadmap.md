@@ -16,7 +16,7 @@
 | Phase 4 (v1) | OpenVLA int4 실측 (300ms/3.33Hz) + ROS2 dry-run — 레포 기록 |
 | **Phase 4.5 (v1.5) 전체** | sim 구축·하네스 검증·zero-shot·LoRA·before/after eval (0/98 vs 0/98, 배제 10/잔여 7) + **vla-lab 발행 (2026-08-31)** |
 | 결정·문서 | 실기 전환 확정, 발행 채널 vla-lab, Hardware-Arm 가이드 SO-101 화, vla-lab 초기화 |
-| **스파이크 Week 1** | SO-101 팔로워·리더 조립, 모터 ID 12개 설정, LeRobot 설치, 캘리브레이션, teleop 6관절+그리퍼 추종 확인 — 절차·함정의 원본은 [조립 가이드](../../../Studies/Hardware-Arm/spike/week1/2026-09-13-so-arm101-assembly-guide.md) |
+| **스파이크 Week 1** | SO-101 팔로워·리더 조립, 모터 ID 12개 설정, LeRobot 설치, 캘리브레이션, teleop 6관절+그리퍼 추종 확인 — 절차·함정의 원본은 [조립 가이드](../../../Studies/Hardware-Arm/spike/week1/so-arm101-assembly-guide.md) |
 
 ---
 
@@ -42,7 +42,7 @@
 
 ## 3. 체크리스트 (2026년분 — 일/주 단위. 2027 은 재평가 #1 후 추가)
 
-> 일/주 배분은 가이드이지 관료제가 아니다 — 밀리면 다음 항목을 당기지 말고 버퍼로 흡수한다. **재료 지도**: 스파이크 = 실기 전환 plan §5.3 + `Studies/Hardware-Arm/spike/week2/RESULT.md` + 조립·캘리브·teleop 절차 [조립 가이드](../../../Studies/Hardware-Arm/spike/week1/2026-09-13-so-arm101-assembly-guide.md) / Stage 1 = `Studies/Hardware-Arm/stage1/` (4개 가이드) / v2.5 = **`Studies/Hardware-Arm/v25/`** (README + PRACTICE — 신설).
+> 일/주 배분은 가이드이지 관료제가 아니다 — 밀리면 다음 항목을 당기지 말고 버퍼로 흡수한다. **재료 지도**: 스파이크 = 실기 전환 plan §5.3 + `Studies/Hardware-Arm/spike/week2/RESULT.md` + 조립·캘리브·teleop 절차 [조립 가이드](../../../Studies/Hardware-Arm/spike/week1/so-arm101-assembly-guide.md) / Stage 1 = `Studies/Hardware-Arm/stage1/` (4개 가이드) / v2.5 = **`Studies/Hardware-Arm/v25/`** (README + PRACTICE — 신설).
 
 ### ~09.07 — 구매 주간 (+ v1.5 소화)
 

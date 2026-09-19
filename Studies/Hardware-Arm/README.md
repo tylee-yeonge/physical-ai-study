@@ -21,7 +21,7 @@ Studies/Hardware-Arm/
   BOM.md                       # SO-101 키트 구매 리스트 + 확인 항목 (구매는 스파이크 선행)
   spike/
     week1/
-      2026-09-13-so-arm101-assembly-guide.md   # Week 1 (D1-D7) 실행 절차: 검수 · 모터 ID · 조립 · 캘리브 · teleop
+      so-arm101-assembly-guide.md   # Week 1 (D1-D7) 실행 절차: 검수 · 모터 ID · 조립 · 캘리브 · teleop
       images/so-arm101/        # 조립 가이드 그림
     week2/
       week2_guide.md           # Week 2 (D8-D14) 실행 절차: 카메라 · 녹화 · zero-shot · latency · 판정
