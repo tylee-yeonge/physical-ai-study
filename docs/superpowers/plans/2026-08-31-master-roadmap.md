@@ -49,10 +49,10 @@
 - [x] 판매자 확인 4항목 — **판매 페이지로 해소 (2026-08-31, 문의 불필요)**: ① 리더 6개 전부 19kg/7.4V **1:147 단일** (공식 혼합 아님 — 조작감만 차이, 기존 판단대로 감수) ② 어댑터 동봉 — 리더 5V 4A / 팔로워 12V 2A ③ 모터 드라이버 모듈(버스 서보 어댑터) ×2 + USB-C 케이블 ×2 동봉 ④ 손목 카메라 마운트는 기본 구성에 **없음** — Wrist/Belly/Top 카메라·마운트는 **옵션 별매** (기본 포함은 정면 '카메라 거치 모듈' 1개)
 - [x] **발주 완료 (2026-09-01)** — 리드타임 3일 → 수령 전망 ~09.03-04. 스파이크는 수령 즉시 Day 1 개시 가능 (판정일 09-21 까지 여유 충분)
 - [x] 수령 시 확인 — ① 구성품 대조 완료 (조립 가이드 §2.1) ② 모터 ID 사전 할당 **없음** (출하 시 전부 ID 1) → 조립 전 `lerobot-setup-motors` 로 12개 설정 완료. 펌웨어 버전은 별도 확인 없이 setup-motors·캘리브 정상 동작으로 갈음 ③ 기본 정면 거치 모듈에 보유 ELP 장착 가능 여부 (1/4 나사) 는 **D8 로 이관**
-- [ ] v1.5 소화 ① — findings §2 "말할 수 있는 것/없는 것" 표를 안 보고 재생산 → 원본 대조 (재료: `Measurements/openvla-lora-eval/findings.md`)
-- [ ] v1.5 소화 ② — 면접 방어 3줄 (왜 했나 / 0인데 뭐가 산출물인가 / 다음) 을 소리 내어 1분 (재료: vla-lab v1.5 README §1·§5·§6)
-- [ ] v1.5 소화 ③ — week6 quiz_easy·quiz_medium (재료: `Studies/Phase 4.5/week6/`)
-- [ ] LinkedIn 헤드라인 교체 (v1.5 링크 공유 여부는 §6 미결)
+- [ ] ~~v1.5 소화 ① — findings §2 "말할 수 있는 것/없는 것" 표를 안 보고 재생산 → 원본 대조 (재료: `Measurements/openvla-lora-eval/findings.md`)~~
+- [ ] ~~v1.5 소화 ② — 면접 방어 3줄 (왜 했나 / 0인데 뭐가 산출물인가 / 다음) 을 소리 내어 1분 (재료: vla-lab v1.5 README §1·§5·§6)~~
+- [ ] ~~v1.5 소화 ③ — week6 quiz_easy·quiz_medium (재료: `Studies/Phase 4.5/week6/`)~~
+- [ ] ~~LinkedIn 헤드라인 교체 (v1.5 링크 공유 여부는 §6 미결)~~
 
 ### 09.07-21 — 스파이크 (Day 단위. 진행 체크는 `spike/week2/RESULT.md` §2 와 동기)
 
@@ -60,7 +60,7 @@
 - [x] D1-2 팔로워 조립 — 서보 12개 라벨링(F1-F6 / L1-L6) → 조립 전 `lerobot-setup-motors` 로 ID 설정 → 링크 조립과 배선 병행 (가이드 §4-§5)
 - [x] D3 리더 조립 — 리더 보드에는 5V 어댑터만 (12V 인가 시 7.4V 서보 소손 — 가이드 §2.3)
 - [x] D4 LeRobot 설치 (Python 3.12, `pip install -e ".[core_scripts,feetech]"`) → `lerobot-find-port` → `lerobot-calibrate`. 포트는 `/dev/serial/by-id/` 고정 경로, 캘리브 파일 위치는 `HF_LEROBOT_CALIBRATION` 로 사용자 디렉터리 (가이드 §4.1·§6.3 규약)
-- [x] D5 `lerobot-teleoperate` — 6관절 + 그리퍼 추종, 리더 자중 처짐 없음 확인 (**must 1** 기능 충족). **증거 30초 영상은 미확인** — 미촬영이면 D12 전에 촬영해 `RESULT.md` §1 에 링크
+- [x] D5 `lerobot-teleoperate` — 6관절 + 그리퍼 추종, 리더 자중 처짐 없음 확인 (**must 1**). 증거 (2026-09-19, 가운데 자세로 다시 잡은 캘리브 기준): teleop 을 `lerobot-record` 로 30초 1 에피소드 녹화 — 영상 2개 (ELP · 손목) + 추종 수치 (지연 100-170 ms, 지연 보정 후 RMSE 0.5-1.7도, 값 튐 없음). 최대 신장 자세는 미확인. 데이터셋 경로와 상세는 `RESULT.md` §1 행 1
 - [x] D6-7 버퍼 — Week 1 산출물 완료로 소진
 
 **Week 2 — 녹화·zero-shot·latency**
@@ -68,15 +68,21 @@
   - [x] 수령 확인 ③ — 기본 정면 거치 모듈에 ELP 1/4 나사 장착 **불가**. 임시 고정으로 우회, Week 2 내내 구도 유지 — `RESULT.md` §4 #5
 - [ ] D9 task 정의 (예: 큐브→트레이) → `lerobot-record` 10ep → HF Hub(private) → **must 2** (증거: repo id. 부수 실측: **에피소드당 소요 시간** — v2.5 N 역산의 입력) — `--robot.id`/`--teleop.id` 는 캘리브레이션과 동일 값, 캘리브 경로 환경변수가 그 셸에 잡혀 있는지 먼저 확인 (없으면 기본 경로로 조용히 갈라진다 — 가이드 §6.3). `--dataset.no_stamp=true` 필수 (없으면 repo id 에 타임스탬프가 붙어 D10 참조가 어긋남), `--display_data=false`, VS Code 터미널(TTY) 에서 실행 (키 조작) — 절차: week2_guide §2
 - [ ] D10 `lerobot/smolvla_base` zero-shot 1회 → **must 3** (증거: 영상+로그. 막힘: 카메라 키 이름 불일치) — 실행은 `lerobot-rollout` (lerobot 0.6.2 의 `lerobot-record` 는 녹화 전용), 카메라 이름은 `camera1`(손목) · `camera2`(ELP), 첫 실행 `--robot.max_relative_target=3` (틱당 도). 예상 동작은 모든 관절이 0도 근처로 모이는 것 (정규화 통계 미적용 — `RESULT.md` §4 #8) — 절차: week2_guide §3
-- [x] D11 latency n=100 → **must 4** (재료: week2_guide §4 + `spike/week2/scripts/measure_latency_smolvla.py` — Phase 4 측정 방법론 재사용. OpenVLA 300ms 병기). 2026-09-19 완료: SmolVLA base bfloat16, chunk mean 106.2 / p95 108.1 ms (50 actions/chunk, action 당 2.12 ms), peak VRAM 0.97 GB. 팔 · 카메라가 필요 없는 측정이라 D9 · D10 보다 먼저 수행 — 수치 · 조건 · 막힌 지점은 `RESULT.md` §1 행 4 · §4 #6
+- [x] D11 latency n=100 → **must 4** (재료: week2_guide §4 + `spike/week2/scripts/measure_latency_smolvla.py` — Phase 4 측정 방법론 재사용. OpenVLA 300ms 병기). 2026-09-19 완료: SmolVLA base bfloat16, chunk mean 106.3 / p95 108.9 ms (50 actions/chunk, action 당 2.13 ms), peak VRAM 0.97 GB. 팔 · 카메라가 필요 없는 측정이라 D9 · D10 보다 먼저 수행 — 수치 · 조건 · 막힌 지점은 `RESULT.md` §1 행 4 · §4 #6
 - [ ] D12-14 `RESULT.md` 기입 (증거 4건 + 소요 + 막힌 지점 — 막힌 지점은 가이드 §9 함정 표와 대조해 새로 만난 것만) → **판정 (09-21, 1회)** 기록
 
 ### 09 하순 — 집계 + JD 착수
 
 - [ ] 9월 실적 집계 — 방법: 달력·커밋 로그로 주별 실투입 h 표 1개 (계획 대비. 재평가 #1 입력)
 - [ ] JD 정독 착수 — 회사별로 [JD 원문 저장 → 자격/우대 추출 → 산출물 매핑 메모] 1세트씩 ([JD 조사](../../research/2026-08-31-kr-physical-ai-jd-survey.md) §5 정독 포인트):
-  - [ ] 로보티즈 (시스템 개발직군)  - [ ] RLWRLD (Robotics S/W)  - [ ] 홀리데이로보틱스  - [ ] 에이로봇
-  - [ ] 레인보우로보틱스  - [ ] 두산로보틱스  - [ ] 현대차 로보틱스랩 (9월 공고 열리면 즉시)  - [ ] 네이버랩스
+  - [ ] 로보티즈 (시스템 개발직군)  
+  - [ ] RLWRLD (Robotics S/W)  
+  - [ ] 홀리데이로보틱스  
+  - [ ] 에이로봇
+  - [ ] 레인보우로보틱스  
+  - [ ] 두산로보틱스  
+  - [ ] 현대차 로보틱스랩 (9월 공고 열리면 즉시)  
+  - [ ] 네이버랩스
 
 ### 10-11월 — Stage 1 (Week 단위. 재료: `stage1/` 가이드 4개)
 
