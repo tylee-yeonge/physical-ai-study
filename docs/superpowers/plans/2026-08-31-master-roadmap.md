@@ -68,7 +68,7 @@
   - [x] 수령 확인 ③ — 기본 정면 거치 모듈에 ELP 1/4 나사 장착 **불가**. 임시 고정으로 우회, Week 2 내내 구도 유지 — `RESULT.md` §4 #5
 - [ ] D9 task 정의 (예: 큐브→트레이) → `lerobot-record` 10ep → HF Hub(private) → **must 2** (증거: repo id. 부수 실측: **에피소드당 소요 시간** — v2.5 N 역산의 입력) — `--robot.id`/`--teleop.id` 는 캘리브레이션과 동일 값, 캘리브 경로 환경변수가 그 셸에 잡혀 있는지 먼저 확인 (없으면 기본 경로로 조용히 갈라진다 — 가이드 §6.3). `--dataset.no_stamp=true` 필수 (없으면 repo id 에 타임스탬프가 붙어 D10 참조가 어긋남), `--display_data=false`, VS Code 터미널(TTY) 에서 실행 (키 조작) — 절차: week2_guide §2
 - [ ] D10 `lerobot/smolvla_base` zero-shot 1회 → **must 3** (증거: 영상+로그. 막힘: 카메라 키 이름 불일치) — 절차: week2_guide §3
-- [ ] D11 latency n=100 → **must 4** (재료: week2_guide §4 + `spike/week2/scripts/measure_latency_smolvla.py` — Phase 4 측정 방법론 재사용. OpenVLA 300ms 병기)
+- [x] D11 latency n=100 → **must 4** (재료: week2_guide §4 + `spike/week2/scripts/measure_latency_smolvla.py` — Phase 4 측정 방법론 재사용. OpenVLA 300ms 병기). 2026-09-19 완료: SmolVLA base bfloat16, chunk mean 106.2 / p95 108.1 ms (50 actions/chunk, action 당 2.12 ms), peak VRAM 0.97 GB. 팔 · 카메라가 필요 없는 측정이라 D9 · D10 보다 먼저 수행 — 수치 · 조건 · 막힌 지점은 `RESULT.md` §1 행 4 · §4 #6
 - [ ] D12-14 `RESULT.md` 기입 (증거 4건 + 소요 + 막힌 지점 — 막힌 지점은 가이드 §9 함정 표와 대조해 새로 만난 것만) → **판정 (09-21, 1회)** 기록
 
 ### 09 하순 — 집계 + JD 착수
