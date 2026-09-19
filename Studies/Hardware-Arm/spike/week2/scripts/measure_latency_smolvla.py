@@ -18,7 +18,7 @@ OpenVLA 와 다른 점 (RESULT.md 에 수치와 함께 적는다):
       어느 쪽이었는지 출력에 찍힌다
 
 실행 (팔·카메라 연결 불필요 -- GPU 만 쓴다):
-    conda activate lerobot
+    acl    # lerobot venv 활성화 (/workspace/venvs/lerobot)
     python Studies/Hardware-Arm/spike/week2/scripts/measure_latency_smolvla.py
 출력 (outputs/ 는 gitignore 대상 -- 수치는 RESULT.md §1 행 4 에 옮겨 적는다):
     Studies/Hardware-Arm/spike/week2/outputs/smolvla_latency_4070.npy
@@ -52,7 +52,7 @@ OUT_DIR = os.path.normpath(
 
 device = torch.device("cuda")  # RTX 4070
 
-# --- 모델 로드 (lerobot-record 가 --policy.path 로 하는 것과 같은 경로) ----------------
+# --- 모델 로드 (lerobot-rollout 이 --policy.path 로 하는 것과 같은 경로) ---------------
 policy = SmolVLAPolicy.from_pretrained(MODEL_ID)  # HF Hub 에서 가중치 + config 다운로드
 policy.to(device)  # GPU 로 이동
 policy.eval()  # dropout 등 학습 전용 동작 끔
@@ -66,7 +66,7 @@ if make_pre_post_processors is not None:
     # 신버전: Hub 의 processor 설정으로 정규화·토크나이즈 파이프라인 생성 (postprocessor 는 불필요)
     preprocessor, _ = make_pre_post_processors(policy.config, pretrained_path=MODEL_ID)
 
-# lerobot-record 의 제어 루프와 같은 조건 -- config 가 AMP 를 켜 두었으면 autocast 로 실행
+# lerobot-rollout 의 sync 추론과 같은 조건 -- config 가 AMP 를 켜 두었으면 autocast 로 실행
 amp = (
     torch.autocast(device_type="cuda")
     if policy.config.use_amp

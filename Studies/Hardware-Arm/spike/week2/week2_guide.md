@@ -3,7 +3,7 @@
 > 스파이크 2주차 (2026-09-14 - 09-21) 의 실행 절차. Week 1 (조립 · 모터 ID · 캘리브레이션 · teleop) 은 [조립 가이드](../week1/2026-09-13-so-arm101-assembly-guide.md) 가 담당하고, 이 문서는 그 마지막 줄 — "카메라 추가 후 `lerobot-record` 로 넘어간다" — 부터 판정 기록까지를 잇는다.
 > 통과 기준 · 판정표의 원본: [실기 전환 plan](../../../../docs/superpowers/plans/2026-08-30-realworld-transition-execution.md) §5.2-§5.4 / 일 단위 체크: [master roadmap](../../../../docs/superpowers/plans/2026-08-31-master-roadmap.md) §3 + [RESULT.md](RESULT.md) §2
 > 작성일: 2026-09-13
-> 호스트: Ubuntu 22.04 + RTX 4070 12GB, conda env `lerobot` (Python 3.12, extras `core_scripts,feetech`)
+> 환경: 호스트 Ubuntu 22.04 + RTX 4070 12GB 위의 도커 컨테이너 (Ubuntu 24.04), venv `/workspace/venvs/lerobot` (Python 3.12, lerobot 0.6.2, extras `core_scripts,feetech,smolvla`)
 > LeRobot 버전 주의: 명령어 · 옵션 이름은 버전에 따라 바뀐다. 이 문서의 명령은 2026 중반 공식 문서 기준 골격이고, **각 Day 의 첫 단계는 `--help` 로 옵션 이름 대조**다. 이름이 다르면 이 문서를 고친다.
 
 ## TL;DR
@@ -11,7 +11,7 @@
 - **카메라는 고정 경로로 잡는다.** `/dev/video*` 번호는 재부팅 · 재연결로 바뀐다. `so101-attach` 가 USB 시리얼로 만드는 `/dev/so101_cam_overview` · `/dev/so101_cam_wrist` 를 쓴다 (서보 보드를 `/dev/so101_follower` 로 잡은 것과 같은 원리).
 - **ELP Stereo 는 좌 · 우 영상이 한 프레임에 붙어 나온다.** 스파이크는 자르지 않고 그대로 쓴다. 크롭 여부는 v2.5 측정 설계에서 결정한다.
 - **본 녹화 전에 2 에피소드 테스트 녹화를 한다 (업로드 없이).** fps 가 설정보다 낮게 나오는 문제, 캘리브 경로가 다른 셸에서 갈라지는 문제는 10 에피소드를 다시 찍기 전에 잡는다.
-- **zero-shot 실행은 별도 명령이 아니라 `lerobot-record` 에 `--policy.path` 를 주는 것이다.** 카메라 이름은 데이터셋용이 아니라 모델 config 의 `input_features` 키에 맞춘다. `--robot.max_relative_target` 으로 한 스텝 이동량을 제한한 뒤 돌린다.
+- **zero-shot 실행은 `lerobot-rollout` 이다.** lerobot 0.6.2 의 `lerobot-record` 는 리더 시범을 녹화하는 전용 도구이고, 정책으로 팔을 움직이는 일은 `lerobot-rollout` 이 맡는다. 카메라 이름은 데이터셋용이 아니라 모델 config 의 `input_features` 키에 맞춘다. `--robot.max_relative_target` 으로 한 스텝 이동량을 제한한 뒤 돌린다.
 - **latency 는 "chunk 1개 생성 시간" 으로 정의한다.** SmolVLA 는 한 번 모델을 돌려 action 을 여러 개 만들어 큐에 쌓으므로, 큐를 비우지 않고 100번 호출하면 대부분 0 ms 근처가 찍힌다. `scripts/measure_latency_smolvla.py` 가 매 반복 큐를 비운다.
 - **판정은 09-21 에 한 번만.** RESULT.md §1 의 4칸을 채우고 plan §5.4 표의 한 행을 §5 에 적는다.
 
@@ -48,6 +48,14 @@ mkdir -p $SPIKE_OUT
 
 - `HF_LEROBOT_CALIBRATION` 이 빈 셸에서 `lerobot-record` 를 실행하면 에러 없이 기본 경로 (`~/.cache/huggingface/lerobot/calibration/`) 를 보고 "캘리브 파일 없음" 으로 새 캘리브레이션을 요구한다 (조립 가이드 §6.3). 새 터미널을 열 때마다 `echo` 로 확인한다.
 - 포트 · 캘리브 경로 · `HF_TOKEN` · `HF_USER` 는 호스트 compose (`.env`) 가 컨테이너 환경변수로 넣는다. 컨테이너 안 `~/.bashrc` 는 이미지가 만든 것이라 재생성 시 수정이 사라지므로 거기에 적지 않는다. `SPIKE_OUT` 만 세션마다 export 한다.
+
+D10 · D11 은 SmolVLA 를 실제로 GPU 에 올리므로 `smolvla` extra 가 추가로 필요하다. 용어: **extra** 는 pip 패키지의 선택 설치 묶음이다. lerobot 은 정책마다 필요한 라이브러리를 extra 로 나눠 두어서, Week 1 의 `core_scripts,feetech` (텔레옵 · 녹화 · 서보) 만으로는 SmolVLA 안의 시각-언어 모델 (SmolVLM2) 을 읽어 들이는 `transformers` 가 설치되지 않는다. venv 에 1회만 설치하면 된다 — venv 가 `/workspace` 마운트 위에 있어 컨테이너를 재생성해도 남는다.
+
+```bash
+pip install "lerobot[smolvla]"     # transformers · accelerate · num2words 추가. 설치된 lerobot 본체 (git 커밋 고정) 는 그대로 두고 빠진 의존성만 채운다
+python -c "import transformers, accelerate, num2words; print(transformers.__version__)"   # 기대: 5.4.x 또는 5.5.x (lerobot 0.6.2 의 smolvla extra 가 요구하는 범위. 실측 5.5.4)
+python -c "import torch; print(torch.__version__, torch.cuda.is_available())"             # 기대: 2.11.0+cu130 True -- pip 이 torch 를 CPU 판으로 바꾸지 않았는지 확인
+```
 
 ### 0.3 Day 사이의 의존 관계
 
@@ -265,9 +273,11 @@ python -c "import json; d=json.load(open('$DS/meta/info.json')); print(d['total_
 **왜**: must 3 는 "팔이 명령에 반응해 움직이는가" 만 본다. 성공률은 v2.5 가 잰다. 여기서 확인하는 것은 관측 → 모델 → 명령의 경로가 이 환경에서 끊기지 않고 이어지는가다. 용어: **zero-shot** = 이 팔 · 이 작업의 데이터를 전혀 학습하지 않은 상태로 실행.
 **끝나면 손에 남는 것**: 30초 영상 + 로그 파일. 부수로 모델이 기대하는 입력 키 목록 (D11 이 그대로 쓴다).
 
-LeRobot 에서 실기 정책 실행은 별도 명령이 아니라 **`lerobot-record` 에 `--policy.path` 를 주는 것**이다. 리더 대신 정책이 팔로워를 움직이고, 그 결과가 데이터셋 형식으로 로컬에 남는다.
+lerobot 0.6.2 에서 실기 정책 실행은 **`lerobot-rollout`** 이 맡는다. 용어: **rollout** = 학습된 정책을 실제 환경에서 굴려 보는 것. `lerobot-record` 는 리더 시범 녹화 전용이라 `--teleop.*` 없이 실행하면 "use lerobot-rollout instead" 로 멈춘다. rollout 은 실행 방식을 `--strategy.type` 으로 고르는데, 이 스파이크는 녹화 없이 정책만 돌리는 `base` 를 쓴다 — must 3 의 증거는 스마트폰 영상과 로그라서 데이터셋이 필요 없다.
 
 ### 3.1 모델 받기 + 기대 입력 확인
+
+먼저 §0.2 의 `smolvla` extra 설치를 끝낸다. 이 절의 명령은 파일을 받아 JSON 을 읽기만 하므로 extra 없이도 통과한다 — 통과했다고 모델이 로드된다는 뜻은 아니다. 모델을 실제로 올리는 §3.4 와 D11 스크립트는 `transformers` 가 없으면 시작 직후 ImportError 로 멈춘다.
 
 ```bash
 hf download lerobot/smolvla_base      # 구버전 CLI 는 huggingface-cli download
@@ -290,45 +300,49 @@ EOF
 
 ### 3.2 카메라 키 맞추기
 
-정책은 자기 config 에 있는 이미지 키만 관측에서 찾는다. 데이터셋용 이름 `front` 가 그 목록에 없으면 "이미지 키 없음" 류 오류로 멈춘다 — master roadmap 이 D10 의 막힘으로 꼽은 "카메라 키 이름 불일치" 가 이것이다. 해법은 카메라 이름을 모델 쪽에 맞추는 것:
+정책은 자기 config 에 있는 이미지 키만 관측에서 찾는다. 데이터셋용 이름 `front` 가 그 목록에 없으면 `Visual feature mismatch` 오류로 멈춘다 — master roadmap 이 D10 의 막힘으로 꼽은 "카메라 키 이름 불일치" 가 이것이다. 해법은 카메라 이름을 모델 쪽에 맞추는 것:
 
 ```bash
-# 예: 모델 키가 observation.images.camera1 이면 카메라 이름을 camera1 로
-export CAMS_ZS="{ camera1: {type: opencv, index_or_path: $FRONT_CAM, width: 1280, height: 480, fps: 30} }"
+# smolvla_base 의 이미지 키는 observation.images.camera1 · camera2 · camera3 (§3.1 출력). 손목을 camera1, 전체 뷰 ELP 를 camera2 로 둔다
+# 이름만 다르고 해상도 · fps · fourcc 는 §1.4 의 $CAMS 와 같다 (ELP 는 30 fps 를 지원하지 않는다 -- §1.3 표)
+export CAMS_ZS="{ camera1: {type: opencv, index_or_path: /dev/so101_cam_wrist, width: 1280, height: 720, fps: 30, fourcc: MJPG}, camera2: {type: opencv, index_or_path: /dev/so101_cam_overview, width: 1280, height: 480, fps: 60, fourcc: MJPG} }"
 ```
 
-카메라 1대 vs 모델 키 여러 개: 없는 키는 정책이 건너뛰거나 빈 이미지로 채운다. 먼저 그대로 실행하고, 없는 키 때문에 오류가 나면 `--policy.empty_cameras=<없는 개수>` 를 붙인다 (옵션 유무는 `lerobot-record --help | grep -i empty`).
+카메라 2대 vs 모델 키 3개: `camera3` 은 비워 둔 채로 돈다. lerobot 0.6.2 의 검사는 "로봇이 주는 이미지 이름이 전부 모델 키 안에 들어 있는가" 만 본다 — {`camera1`, `camera2`} 는 {`camera1`, `camera2`, `camera3`} 안에 들어 있으므로 통과한다. 모델 쪽도 관측에 없는 키는 건너뛰고 있는 이미지만 쓴다 (`modeling_smolvla.py` 의 `prepare_images`). 반대로 이름이 하나라도 모델 키 밖이면 (`front` 등) 이 검사에서 걸린다.
+
+`--policy.empty_cameras` 는 붙이지 않는다. 이 옵션은 없는 키 자리를 마스크된 빈 이미지로 채워 넣는 용도이고 `smolvla_base` 의 기본값은 0 (채우지 않음) 이다. 붙이지 않아도 위 검사를 통과하므로 스파이크에서는 기본값 그대로 둔다.
 
 ### 3.3 안전 준비
 
 - 작업면 위에는 큐브 · 트레이만. 손 · 케이블 · 리더 팔은 팔로워 가동 범위 밖.
 - `--robot.max_relative_target=10`: 한 스텝에 관절이 움직일 수 있는 양의 상한. 정규화 범위 -100..100 기준 10 이면 한 스텝에 전체 범위의 5 %. 처음엔 이 값으로 시작하고, 팔이 너무 굼뜨면 20-30 으로 올린다.
 - 비상 정지: USB 를 뽑으면 그 자리에서 멈추고, DC 를 뽑으면 토크가 풀려 떨어진다 (조립 가이드 §7). 손은 USB 쪽에 둔다.
+- 종료 동작: 30초가 지나거나 Ctrl+C 를 누르면 rollout 은 팔을 **실행 직전의 자세로 약 3초에 걸쳐 되돌린 뒤** 연결을 끊는다 (`--return_to_initial_position` 기본값 true). 팔이 멈춘 것처럼 보여도 로그에 `Rollout finished` 가 찍히기 전에는 가동 범위에 손을 넣지 않는다.
 - 스마트폰 촬영 준비 — 30초 영상이 증거다.
 
 ### 3.4 실행
 
 ```bash
-lerobot-record \
+lerobot-rollout \
+    --strategy.type=base \
+    --policy.path=lerobot/smolvla_base \
+    --policy.device=cuda \
     --robot.type=so101_follower \
     --robot.port=$FOLLOWER_PORT \
     --robot.id=so101_follower_01 \
     --robot.cameras="$CAMS_ZS" \
     --robot.max_relative_target=10 \
-    --display_data=false \
-    --dataset.repo_id=$HF_USER/eval_so101-spike-pick-cube \
-    --dataset.num_episodes=1 \
-    --dataset.fps=30 \
-    --dataset.episode_time_s=30 \
-    --dataset.single_task="Pick up the red cube and place it on the tray." \
-    --dataset.push_to_hub=false \
-    --policy.path=lerobot/smolvla_base \
-    --policy.device=cuda \
+    --task="Pick up the red cube and place it on the tray." \
+    --fps=30 \
+    --duration=30 \
     2>&1 | tee $SPIKE_OUT/d10_zeroshot.log
 ```
 
+- `--strategy.type=base`: 녹화 없이 정책만 실행한다. `--dataset.*` 옵션을 같이 주면 "does not record data" 오류로 멈춘다. 실행 결과를 데이터셋으로도 남기는 `episodic` 전략이 있지만 must 3 에는 필요 없다.
 - `--teleop.*` 는 넣지 않는다 — 정책이 리더 역할을 한다.
-- repo_id 의 `eval_` 접두어는 공식 문서의 정책 실행 관례다. 같은 이름의 로컬 데이터셋이 이미 있으면 "already exists" 오류가 나므로 이름을 바꾸거나 로컬 디렉터리를 지운다.
+- `--task` 는 D9 의 `single_task` 와 같은 문장. `--fps=30` 은 제어 루프 주기 (D9 의 `--dataset.fps` 와 같은 값), `--duration=30` 은 30초 뒤 루프 종료 (0 이면 무한).
+- 추론 방식은 기본값 `sync` 다 — 제어 틱마다 정책을 부르고, action 큐가 빈 틱에만 모델이 실제로 돈다. D11 실측 chunk 약 106 ms 는 30 Hz 기준 3틱 분량이라 50 스텝 (약 1.7초) 마다 팔이 잠깐 멈칫할 수 있다. 고장이 아니다. 느린 VLA 용 `--inference.type=rtc` 는 스파이크에서 쓰지 않는다.
+- 화면 표시는 기본값이 꺼짐이라 `--display_data` 를 적지 않는다 (헤드리스 컨테이너 — §1.5).
 - 로그는 `tee` 로 파일과 화면에 동시에 남긴다. 이 파일 경로가 증거의 절반이다.
 
 ### 3.5 판정과 증거
@@ -359,14 +373,14 @@ lerobot-record \
 | 조건 | OpenVLA (2026-06, methodology §1) | SmolVLA (이 스크립트) |
 |---|---|---|
 | n / warm-up / batch | 100 / 5 / 1 | 동일 |
-| 입력 이미지 | 224x224 랜덤 RGB, 매 반복 새로 | config 가 선언한 모양의 랜덤 텐서, 매 반복 새로 (모델 내부에서 512x512 로 패딩 리사이즈) |
+| 입력 이미지 | 224x224 랜덤 RGB 1장, 매 반복 새로 | config 가 선언한 이미지 키 3개 (`camera1` · `camera2` · `camera3`, 각 256x256) 모두에 랜덤 텐서, 매 반복 새로 (모델 내부에서 512x512 로 패딩 리사이즈) |
 | 지시문 | 고정 1문장 | 고정 1문장 (D9 · D10 과 동일) |
 | GPU 동기화 | `synchronize()` 앞뒤 | 동일 |
 | 1회의 산출 | action 1개 (7 dim) | action `n_action_steps` 개 (chunk) |
-| 정밀도 | int4 (nf4) | 양자화 없음 — dtype 은 출력에 찍힘 |
+| 정밀도 | int4 (nf4) | 양자화 없음 — 가중치 dtype 은 bfloat16 (출력에 찍힘) |
 | 전처리 | processor 는 측정 밖 | preprocessor 파이프라인이 있으면 밖, 없는 구버전은 안 — 어느 쪽인지 출력에 찍힘 |
 
-스크립트는 chunk 값과 함께 상각값 (chunk ms / `n_action_steps`) 도 출력한다. RESULT.md 에는 chunk 값을 주 수치로 적고 상각값을 괄호에 넣는다. 두 수치의 뜻이 다르다는 것 (한 번 판단에 걸리는 시간 vs action 하나당 평균) 을 같이 적는다.
+스크립트는 chunk 값과 함께 상각값 (chunk ms / `n_action_steps`) 도 출력한다. RESULT.md 에는 chunk 값을 주 수치로 적고 상각값을 괄호에 넣는다. 두 수치의 뜻이 다르다는 것 (한 번 판단에 걸리는 시간 vs action 하나당 평균) 을 같이 적는다. 측정은 이미지 3장 기준이고 D10 실기는 카메라 2대 (§3.2) 라, 실기의 chunk 시간은 이 값과 다를 수 있다.
 
 ### 4.2 실행
 
@@ -378,8 +392,8 @@ python Studies/Hardware-Arm/spike/week2/scripts/measure_latency_smolvla.py
 출력 (숫자는 자리표시):
 
 ```
-입력 키: ['observation.images.camera1', ..., 'observation.state']
-n_action_steps=50 chunk_size=50 dtype=torch.float32 use_amp=False
+입력 키: ['observation.state', 'observation.images.camera1', 'observation.images.camera2', 'observation.images.camera3']
+n_action_steps=50 chunk_size=50 dtype=torch.bfloat16 use_amp=False
 preprocessor 분리: True (True 면 전처리는 측정 구간 밖)
 로드 직후 memory_allocated: _.__ GB
 warm-up 완료
@@ -390,7 +404,7 @@ mean   : ___ ms  (action 당 _.__ ms)
 p95    : ___ ms
 peak VRAM (memory_allocated): _.__ GB
 
-RESULT.md 1줄: SmolVLA base (4070, torch.float32): chunk mean ___ / p95 ___ ms (n=100, 50 actions/chunk, action 당 _.__ ms, 전처리 밖) vs OpenVLA int4 300.3 / 304.8 ms (action 1개)
+RESULT.md 1줄: SmolVLA base (4070, torch.bfloat16): chunk mean ___ / p95 ___ ms (n=100, 50 actions/chunk, action 당 _.__ ms, 전처리 밖) vs OpenVLA int4 300.3 / 304.8 ms (action 1개)
 저장: .../spike/week2/outputs/smolvla_latency_4070.npy, smolvla_latency_4070_summary.csv
 ```
 
@@ -398,10 +412,10 @@ RESULT.md 1줄: SmolVLA base (4070, torch.float32): chunk mean ___ / p95 ___ ms 
 
 ### 4.3 스크립트가 안 돌 때
 
-D10 이 돌았다면 모델 로드는 같은 경로라 통과한다. 남는 실패 지점은 관측 배치 만들기와 전처리 분기 두 곳이고, 정답은 `lerobot-record` 가 정책을 부르는 코드에 있다:
+D10 이 돌았다면 모델 로드는 같은 경로라 통과한다. D10 보다 먼저 돌려 `ImportError: 'transformers' is required but not installed` 가 나면 §0.2 의 `smolvla` extra 설치가 빠진 것이다. 남는 실패 지점은 관측 배치 만들기와 전처리 분기 두 곳이고, 정답은 `lerobot-rollout` 의 `sync` 추론이 정책을 부르는 코드에 있다:
 
 ```bash
-grep -n "def predict_action" -A 40 $(python -c "import lerobot.utils.control_utils as m; print(m.__file__)")
+grep -n "def get_action" -A 30 $(python -c "import lerobot.rollout.inference.sync as m; print(m.__file__)")
 ```
 
 이 함수가 관측 dict 에 무엇을 넣고 (`task` 키, batch 차원), 어떤 순서로 부르는지 (preprocessor → `select_action` → postprocessor) 를 스크립트의 루프와 대조해 다른 줄만 고친다. 고친 내용은 스크립트 상단 docstring 의 "OpenVLA 와 다른 점" 에 반영한다.
@@ -452,10 +466,11 @@ grep -n "def predict_action" -A 40 $(python -c "import lerobot.utils.control_uti
 | D9 | 업로드 401 / 403 | 로그인 안 됨 또는 read 토큰 | `hf auth login` 을 write 토큰으로 다시 |
 | D9 | 인코딩 단계에서 멈춤 또는 오류 | ffmpeg / torchcodec 문제 | `conda install ffmpeg -c conda-forge` (조립 가이드 §3.1) |
 | D9 | 녹화 중 팔로워가 멈칫함 (`Failed to sync read`) | 12V 2A 어댑터의 전압 강하 | 조립 가이드 §0 표 — 5A 급 교체 |
-| D10 | "이미지 키 없음" 류 오류 | 카메라 이름 ≠ 모델 `input_features` 키 | §3.2 |
+| D10 | `A teleoperator is required for recording ... use lerobot-rollout instead` | `lerobot-record` 에 `--policy.path` 를 준 옛 방식. lerobot 0.6.2 의 record 는 녹화 전용이다 | §3.4 의 `lerobot-rollout` |
+| D10 | `Visual feature mismatch between policy and robot hardware` | 카메라 이름 ≠ 모델 `input_features` 키 | §3.2 |
 | D10 | 팔이 전혀 안 움직임 | `max_relative_target` 과소, 또는 로그의 예외 | 로그 확인 → 값을 20-30 으로 |
 | D10 | 팔이 극단 위치로 튐 | action 스케일 규약 차이 (정규화 -100..100 vs 각도) | must 3 는 통과. 원인은 v2.5 첫 항목으로 (§3.5) |
-| D10 | "already exists" | 같은 repo_id 의 로컬 데이터셋 잔존 | repo_id 변경 또는 로컬 디렉터리 삭제 |
+| D10-D11 | `ImportError: 'transformers' is required but not installed` | venv 에 `smolvla` extra 가 없음. lerobot 은 이 검사를 import 시점이 아니라 정책 객체를 만드는 시점 (`from_pretrained`) 에 하므로 `import` 와 §3.1 은 통과한다 | §0.2 의 `pip install "lerobot[smolvla]"` |
 | D11 | latency 가 대부분 0-1 ms | action 큐에서 꺼내기만 하고 모델이 안 돎 | 스크립트의 `policy.reset()` 이 루프 안에 있는지 확인 |
 | D11 | `KeyError: observation.language.tokens` 류 | 신버전인데 preprocessor 를 안 거침 | 스크립트의 preprocessor 분기 + §4.3 |
 | 공통 | ELP 좌 · 우 붙은 프레임을 그대로 씀 | 스파이크는 "반응" 만 보므로 크롭하지 않음. 모델이 정사각형으로 패딩 리사이즈해 실효 해상도가 낮아짐 | must 기준 영향 없음. 크롭 (왼쪽 절반) 또는 일반 웹캠 교체는 v2.5 측정 설계 (`../../v25/README.md` §0) 에서 결정 |
