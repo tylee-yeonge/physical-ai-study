@@ -28,6 +28,8 @@ Studies/Hardware-Arm/
       RESULT.md                # 스파이크 결과 기록 (must 4 증거 + 판정 2026-09-21)
       scripts/
         measure_latency_smolvla.py   # D11 latency 측정 (must 4 — OpenVLA 300ms 와 병기)
+        live_view.py                 # 카메라 실시간 화면 (헤드리스 컨테이너용 MJPEG 스트림 — 구도 확인)
+        analyze_teleop_tracking.py   # teleop 녹화에서 추종 지연 · 오차 계산 (must 1 의 수치 증거)
   stage1/
     README.md                  # Stage 1 목표 + 진행 순서 (본 빌드: 완성도 + ROS2 층)
     URDF_guide.md              # SO-101 공개 URDF 재사용 + 검증
