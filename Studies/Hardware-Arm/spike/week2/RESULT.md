@@ -30,6 +30,7 @@ nice: 부분 도달률 (reached / grasped) 기록 — (있으면 기입)
 - [x] 카메라 세팅 + 테스트 녹화 (week2_guide §1) — 2026-09-16. 로컬 데이터셋 `~/.cache/huggingface/lerobot/local/so101-spike-test_20260916_233310` (30 fps · 2 ep · 1198 frames · front 1280x480 + wrist 1280x720, 루프 29.92 Hz · 예산 초과 틱 0/1196). 로그 `outputs/d8_record.log`. 리더를 잡지 않은 정지 녹화라 관절값은 일정 — 파이프라인 검증만. 수령 확인 ③ 은 §4 #5 (거치 모듈 장착 불가, 임시 고정)
 - [ ] must 2 — 단일 task 10 에피소드 + Hub 업로드 (week2_guide §2)
 - [ ] must 3 — SmolVLA zero-shot 1회 실행 (week2_guide §3)
+  - 사전 검증 (2026-09-19, 팔을 움직이지 않음 — 모터 버스 읽기 전용 연결, 쓰기 · 토크 변경 · `send_action` 차단): 가이드 §3.4 의 `lerobot-rollout` 명령 파싱, 캘리브 일치 (`is_calibrated=True`), 카메라 2대 동시 연결 (실측 30.4 / 60.4 fps), 카메라 이름 검사, 실제 관측으로 정책 출력까지 통과. chunk 생성 mean 90.9 / p95 91.6 ms (n=20, 카메라 2대). 미검증: `send_action`, 토크가 켜지는 순간의 거동, 종료 시 시작 자세 복귀, 30 Hz 루프 유지
 - [x] must 4 — latency 측정 (n=100) (week2_guide §4 + `scripts/measure_latency_smolvla.py`) — 2026-09-19. chunk mean 106.2 / p95 108.1 ms (수치 · 조건은 §1 행 4). 팔 · 카메라 없이 GPU 만 쓰는 측정이라 must 2 · 3 보다 먼저 수행 (week2_guide §0.3). 막힌 지점은 §4 #6
 
 ## 3. 소요 시간 (계획 대비)
@@ -50,6 +51,8 @@ nice: 부분 도달률 (reached / grasped) 기록 — (있으면 기입)
 | 4 | 녹화 중 키 조작 불가 (`Keyboard controls unavailable: no usable display ... stdin is not an interactive terminal`) | 헤드리스 컨테이너 + 비대화형 stdin | 타이머만으로 진행돼 테스트 녹화에는 무관. D9 는 TTY 터미널에서 실행해야 화살표 · `r` · `q` 가 듣는다 | — |
 | 5 | 수령 확인 ③ — ELP 가 키트 기본 정면 카메라 거치 모듈에 안 붙음 | 거치 모듈의 1/4 나사 체결부와 ELP 가 맞지 않음 | 임시 고정으로 우회 (스파이크는 "안 예뻐도 된다" — plan §5.1). Week 2 내내 카메라를 움직이지 않는다. 고정 방식 확정 + 위치 마킹은 Stage 1 W3 에서 | — |
 | 6 | `measure_latency_smolvla.py` 가 `SmolVLAPolicy.from_pretrained` 에서 `ImportError: 'transformers' is required but not installed` 로 중단 | venv 가 Week 1 의 extras `core_scripts,feetech` 로만 설치됨. SmolVLA 의 시각-언어 모델을 읽는 `transformers` 는 `smolvla` extra 에 들어 있고, lerobot 은 이를 import 시점이 아니라 정책 객체 생성 시점에 검사 | `pip install "lerobot[smolvla]"` — transformers 5.5.4 · accelerate 1.15.0 · num2words 0.5.14 추가. lerobot 본체 (git 커밋 고정) 와 torch 2.11.0+cu130 은 그대로. 가이드 §0.2 | — |
+| 7 | 가이드 §3.4 의 `lerobot-record --policy.path` 로는 정책 실행 불가 (D10 실행 전 소스 확인으로 발견) | lerobot 0.6.2 의 `lerobot-record` 는 녹화 전용 — `--teleop.*` 없이는 "use lerobot-rollout instead" 로 중단하고 `eval_` repo_id 도 거부. `lerobot.utils.control_utils` 도 없어 가이드 §4.3 의 grep 이 실패 | `lerobot-rollout --strategy.type=base --duration=30` (추론 `sync`). 가이드 §3 · §4.3 을 이 기준으로 작성 | — |
+| 8 | zero-shot 의 관절 목표가 6개 모두 0 근처 (±2 이내) 로 과제와 무관 (사전 검증에서 발견 — 팔에 보내지는 않음) | `smolvla_base` 의 정규화 통계 키가 `so100.` · `so100-blue.` · `so100-red.` 접두어라 0.6.2 의 역정규화가 `action` 키를 못 찾고 값을 그대로 통과시킴. 입력 관절값도 정규화되지 않음. 0.6.2 팔로워의 단위는 각도 (`use_degrees=true`) 라 `max_relative_target` 은 틱당 도 | must 3 ("반응하는가") 판정에는 무관 — 예상 동작으로 가이드 §3.5 에 기록, 첫 실행은 `max_relative_target=3`. 통계 · 단위 규약 맞추기는 v2.5 첫 항목 | — |
 
 ## 5. 판정 (2026-09-21, 1회만 — plan §5.4 표 기준)
 

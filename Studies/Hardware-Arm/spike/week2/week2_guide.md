@@ -315,7 +315,7 @@ export CAMS_ZS="{ camera1: {type: opencv, index_or_path: /dev/so101_cam_wrist, w
 ### 3.3 안전 준비
 
 - 작업면 위에는 큐브 · 트레이만. 손 · 케이블 · 리더 팔은 팔로워 가동 범위 밖.
-- `--robot.max_relative_target=10`: 한 스텝에 관절이 움직일 수 있는 양의 상한. 정규화 범위 -100..100 기준 10 이면 한 스텝에 전체 범위의 5 %. 처음엔 이 값으로 시작하고, 팔이 너무 굼뜨면 20-30 으로 올린다.
+- `--robot.max_relative_target=3`: 한 틱 (제어 루프 1회) 에 관절 목표가 현재 위치에서 벗어날 수 있는 양의 상한. lerobot 0.6.2 의 팔로워는 기본이 각도 모드 (`use_degrees=true`) 라 단위는 **도** 다 (그리퍼만 0-100). 틱마다 적용되므로 30 Hz 에서 3 이면 초당 최대 90도, 10 이면 초당 300도다. 첫 실행은 3 으로 시작하고, 움직임을 눈으로 확인한 뒤에만 올린다.
 - 비상 정지: USB 를 뽑으면 그 자리에서 멈추고, DC 를 뽑으면 토크가 풀려 떨어진다 (조립 가이드 §7). 손은 USB 쪽에 둔다.
 - 종료 동작: 30초가 지나거나 Ctrl+C 를 누르면 rollout 은 팔을 **실행 직전의 자세로 약 3초에 걸쳐 되돌린 뒤** 연결을 끊는다 (`--return_to_initial_position` 기본값 true). 팔이 멈춘 것처럼 보여도 로그에 `Rollout finished` 가 찍히기 전에는 가동 범위에 손을 넣지 않는다.
 - 스마트폰 촬영 준비 — 30초 영상이 증거다.
@@ -331,7 +331,7 @@ lerobot-rollout \
     --robot.port=$FOLLOWER_PORT \
     --robot.id=so101_follower_01 \
     --robot.cameras="$CAMS_ZS" \
-    --robot.max_relative_target=10 \
+    --robot.max_relative_target=3 \
     --task="Pick up the red cube and place it on the tray." \
     --fps=30 \
     --duration=30 \
@@ -341,7 +341,7 @@ lerobot-rollout \
 - `--strategy.type=base`: 녹화 없이 정책만 실행한다. `--dataset.*` 옵션을 같이 주면 "does not record data" 오류로 멈춘다. 실행 결과를 데이터셋으로도 남기는 `episodic` 전략이 있지만 must 3 에는 필요 없다.
 - `--teleop.*` 는 넣지 않는다 — 정책이 리더 역할을 한다.
 - `--task` 는 D9 의 `single_task` 와 같은 문장. `--fps=30` 은 제어 루프 주기 (D9 의 `--dataset.fps` 와 같은 값), `--duration=30` 은 30초 뒤 루프 종료 (0 이면 무한).
-- 추론 방식은 기본값 `sync` 다 — 제어 틱마다 정책을 부르고, action 큐가 빈 틱에만 모델이 실제로 돈다. D11 실측 chunk 약 106 ms 는 30 Hz 기준 3틱 분량이라 50 스텝 (약 1.7초) 마다 팔이 잠깐 멈칫할 수 있다. 고장이 아니다. 느린 VLA 용 `--inference.type=rtc` 는 스파이크에서 쓰지 않는다.
+- 추론 방식은 기본값 `sync` 다 — 제어 틱마다 정책을 부르고, action 큐가 빈 틱에만 모델이 실제로 돈다. 실기 구성의 chunk 생성은 약 91 ms (§4.1) 로 30 Hz 기준 약 3틱 분량이라 50 스텝 (약 1.7초) 마다 팔이 잠깐 멈칫할 수 있다. 고장이 아니다. 느린 VLA 용 `--inference.type=rtc` 는 스파이크에서 쓰지 않는다.
 - 화면 표시는 기본값이 꺼짐이라 `--display_data` 를 적지 않는다 (헤드리스 컨테이너 — §1.5).
 - 로그는 `tee` 로 파일과 화면에 동시에 남긴다. 이 파일 경로가 증거의 절반이다.
 
@@ -352,7 +352,13 @@ lerobot-rollout \
 | 팔이 지시문과 무관하게라도 스스로 움직인다 | must 3 통과 |
 | 큐브 쪽으로 간다 (reached) / 집는다 (grasped) | nice — RESULT.md §1 nice 행에 기록 |
 | 전혀 안 움직임 / 예외로 종료 | §6 표 |
-| 극단 위치로 튄다 | 반응은 한 것 — must 3 통과. 원인 (action 스케일 규약 차이) 은 디버깅하지 않고 v2.5 첫 항목으로 기록 (plan §5.4 의 "1-2 통과, 3 실패" 행과 같은 처리) |
+| 팔이 일어나 모든 관절이 0도 근처 (가운데 자세) 로 모인 뒤 작게 떨린다 | **예상되는 동작** (아래 문단) — must 3 통과. 디버깅하지 않고 v2.5 첫 항목으로 기록 (plan §5.4 의 "1-2 통과, 3 실패" 행과 같은 처리) |
+| 그 밖의 이상 동작 (극단 위치로 튐 등) | 반응은 한 것 — must 3 통과. USB 를 뽑아 멈추고 로그를 남긴다 |
+
+예상 동작의 근거 (2026-09-19 사전 검증 — 팔을 움직이지 않고 실제 카메라 · 관절값으로 정책 출력까지만 확인): 정책이 낸 관절 목표가 6개 모두 0 근처 (±4 이내) 였다. `smolvla_base` 의 정규화 통계는 `so100.` · `so100-blue.` · `so100-red.` 접두어가 붙은 키로 저장돼 있는데, lerobot 0.6.2 의 역정규화 단계는 접두어 없는 `action` 키를 찾고, 없으면 값을 그대로 통과시킨다. 그래서 모델이 낸 정규화된 값이 그대로 관절 목표 (도) 로 나간다. 입력 쪽 관절값도 같은 이유로 정규화되지 않은 채 들어간다. 각도 모드의 0도는 캘리브 파일의 `range_min` 과 `range_max` 의 중간 위치다.
+
+- 이 실행이 보여 주는 것은 "관측 → 모델 → 명령 경로가 이어지는가" 뿐이다. 과제 수행 능력에 대해서는 아무것도 말해 주지 않는다 — 큐브 쪽으로 가지 않는 것이 정상이다.
+- 휴식 자세에서 시작하면 팔이 **일어난다.** 0도는 각 관절 가동 범위의 가운데 (상완이 거의 수직, 팔꿈치 약 90도) 이고, 토크가 꺼진 휴식 자세는 `shoulder_lift` 약 -102도, `elbow_flex` 약 +103도, `wrist_flex` 약 +63도로 읽힌다 (사전 검증 실측). 이 세 관절이 각각 100도 · 100도 · 60도가량 움직여 공중의 가운데 자세로 올라가며, `max_relative_target=3` 이면 약 1.2초 걸린다. 팔 위쪽과 앞쪽 공간을 비워 둔다. 목표 위치는 6개 관절 모두 캘리브 범위 안이다.
 
 증거: 영상 파일 경로 + `$SPIKE_OUT/d10_zeroshot.log` → RESULT.md §1 행 3.
 
@@ -380,7 +386,7 @@ lerobot-rollout \
 | 정밀도 | int4 (nf4) | 양자화 없음 — 가중치 dtype 은 bfloat16 (출력에 찍힘) |
 | 전처리 | processor 는 측정 밖 | preprocessor 파이프라인이 있으면 밖, 없는 구버전은 안 — 어느 쪽인지 출력에 찍힘 |
 
-스크립트는 chunk 값과 함께 상각값 (chunk ms / `n_action_steps`) 도 출력한다. RESULT.md 에는 chunk 값을 주 수치로 적고 상각값을 괄호에 넣는다. 두 수치의 뜻이 다르다는 것 (한 번 판단에 걸리는 시간 vs action 하나당 평균) 을 같이 적는다. 측정은 이미지 3장 기준이고 D10 실기는 카메라 2대 (§3.2) 라, 실기의 chunk 시간은 이 값과 다를 수 있다.
+스크립트는 chunk 값과 함께 상각값 (chunk ms / `n_action_steps`) 도 출력한다. RESULT.md 에는 chunk 값을 주 수치로 적고 상각값을 괄호에 넣는다. 두 수치의 뜻이 다르다는 것 (한 번 판단에 걸리는 시간 vs action 하나당 평균) 을 같이 적는다. 측정은 이미지 3장 (랜덤 텐서) 기준이다. D10 실기 구성 (카메라 2대, 실제 관측) 으로 확인한 chunk 생성은 mean 약 91 ms (n=20) 였다 — 조건이 다르므로 must 4 의 수치로는 이 표의 조건으로 잰 값만 쓴다.
 
 ### 4.2 실행
 
@@ -468,8 +474,8 @@ grep -n "def get_action" -A 30 $(python -c "import lerobot.rollout.inference.syn
 | D9 | 녹화 중 팔로워가 멈칫함 (`Failed to sync read`) | 12V 2A 어댑터의 전압 강하 | 조립 가이드 §0 표 — 5A 급 교체 |
 | D10 | `A teleoperator is required for recording ... use lerobot-rollout instead` | `lerobot-record` 에 `--policy.path` 를 준 옛 방식. lerobot 0.6.2 의 record 는 녹화 전용이다 | §3.4 의 `lerobot-rollout` |
 | D10 | `Visual feature mismatch between policy and robot hardware` | 카메라 이름 ≠ 모델 `input_features` 키 | §3.2 |
-| D10 | 팔이 전혀 안 움직임 | `max_relative_target` 과소, 또는 로그의 예외 | 로그 확인 → 값을 20-30 으로 |
-| D10 | 팔이 극단 위치로 튐 | action 스케일 규약 차이 (정규화 -100..100 vs 각도) | must 3 는 통과. 원인은 v2.5 첫 항목으로 (§3.5) |
+| D10 | 팔이 전혀 안 움직임 | 로그의 예외, 또는 정책 목표 (모든 관절 0도 근처) 가 시작 자세와 거의 같음 | 로그 확인. 목표와 시작 자세가 같은 경우는 §3.5. `max_relative_target` 은 틱당 각도라 3 이어도 초당 90도 — 원인이 아니다 |
+| D10 | 모든 관절이 0도 근처로 모이고 과제와 무관하게 움직임 | `smolvla_base` 의 정규화 통계 키가 `so100.` 접두어라 역정규화가 적용되지 않음 — 정규화된 값이 그대로 관절 목표로 나간다 | 예상된 동작. must 3 는 통과. 원인은 v2.5 첫 항목으로 (§3.5) |
 | D10-D11 | `ImportError: 'transformers' is required but not installed` | venv 에 `smolvla` extra 가 없음. lerobot 은 이 검사를 import 시점이 아니라 정책 객체를 만드는 시점 (`from_pretrained`) 에 하므로 `import` 와 §3.1 은 통과한다 | §0.2 의 `pip install "lerobot[smolvla]"` |
 | D11 | latency 가 대부분 0-1 ms | action 큐에서 꺼내기만 하고 모델이 안 돎 | 스크립트의 `policy.reset()` 이 루프 안에 있는지 확인 |
 | D11 | `KeyError: observation.language.tokens` 류 | 신버전인데 preprocessor 를 안 거침 | 스크립트의 preprocessor 분기 + §4.3 |
