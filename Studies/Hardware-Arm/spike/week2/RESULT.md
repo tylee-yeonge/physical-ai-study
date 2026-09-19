@@ -11,10 +11,10 @@
 
 | # | 기준 | 증거 (링크/ID/수치) | 확보일 |
 |---|---|---|---|
-| 1 | 리더-팔로워 teleop (6축 추종) | (30초 영상 링크) | — |
+| 1 | 리더-팔로워 teleop (6축 추종) | 로컬 데이터셋 `~/.cache/huggingface/lerobot/tylee-yeonge/so101-spike-teleop_20260919_233008` (보존용 사본: `outputs/evidence/` 아래 같은 이름) — teleop 을 `lerobot-record` 로 30초 1 에피소드 녹화 (898 프레임, 29.91 Hz, 예산 초과 틱 0/897). 영상: `videos/observation.images.front/chunk-000/file-000.mp4` (ELP — 리더를 조작하는 손과 따라 움직이는 팔로워가 한 화면), `videos/observation.images.wrist/...` (손목). 수치 (`action` = 리더 목표 vs `observation.state` = 팔로워 실제 위치): 6관절 모두 추종, 지연 100-170 ms (측정 해상도 33 ms), 지연 보정 후 RMSE 0.5-1.7도 (그리퍼 2.2 / 100), 편향 최대 +1.27도 (`elbow_flex` — P 제어의 중력 부하 오차), 1틱 최대 변화 8.7도 (값 튐 없음). 2026-09-19 22:56 재캘리브 기준 (호밍 자세를 가운데로 바로잡은 캘리브 — 조립 가이드 §6.1). 미확인: 최대 신장 자세 — `shoulder_lift` +39도 / `elbow_flex` -57도까지만 움직였다 (한계 +105 / -103도) | 2026-09-19 |
 | 2 | `lerobot-record` 단일 task 10 에피소드 + HF Hub (private) | (데이터셋 repo id) | — |
 | 3 | `lerobot/smolvla_base` zero-shot 1회 실행 (반응 확인 — 성공 여부 무관) | (30초 영상 + 로그 경로) | — |
-| 4 | 추론 루프 latency (4070, n=100) | SmolVLA base (4070, torch.bfloat16): chunk mean 106.2 / p95 108.1 ms (n=100, 50 actions/chunk, action 당 2.12 ms, 전처리 밖) vs OpenVLA int4 300.3 / 304.8 ms (action 1개). 두 수치는 뜻이 다르다 — chunk 값은 모델이 한 번 판단하는 데 걸리는 시간, action 당 값은 그것을 50 으로 나눈 평균이다. 조건 차이: 정밀도 bfloat16 (양자화 없음) vs int4, 이미지 입력 3장 (config 의 camera1-3 모두 랜덤 텐서) vs 1장. 분포: median 105.9 / std 2.2 / min 104.6 / max 125.8 ms (max 는 본 측정 3번째 반복), p99 109.1 ms, 9.41 chunk/s. VRAM: 로드 직후 0.93 GB, peak 0.97 GB. 원본: `outputs/smolvla_latency_4070.npy` · `outputs/smolvla_latency_4070_summary.csv` | 2026-09-19 |
+| 4 | 추론 루프 latency (4070, n=100) | SmolVLA base (4070, torch.bfloat16): chunk mean 106.3 / p95 108.9 ms (n=100, 50 actions/chunk, action 당 2.13 ms, 전처리 밖) vs OpenVLA int4 300.3 / 304.8 ms (action 1개). 두 수치는 뜻이 다르다 — chunk 값은 모델이 한 번 판단하는 데 걸리는 시간, action 당 값은 그것을 50 으로 나눈 평균이다. 조건 차이: 정밀도 bfloat16 (양자화 없음) vs int4, 이미지 입력 3장 (config 의 camera1-3 모두 랜덤 텐서) vs 1장. 분포: median 106.7 / std 1.6 / min 103.9 / max 109.7 ms (max 는 본 측정 3번째 반복), p99 109.6 ms, 9.41 chunk/s. VRAM: 로드 직후 0.93 GB, peak 0.97 GB. 원본: `outputs/evidence/smolvla_latency_4070_20260919_2305.npy` · `outputs/evidence/smolvla_latency_4070_summary_20260919_2305.csv` (스크립트는 매번 `outputs/smolvla_latency_4070.*` 에 덮어쓰므로 시각을 붙여 고정한 사본). 재현성: 같은 날 앞서 돌린 실행의 mean 은 106.2 ms 로 0.02 ms 차이였다 (그 실행의 raw 파일은 덮어써져 남아 있지 않다) | 2026-09-19 |
 
 nice: 부분 도달률 (reached / grasped) 기록 — (있으면 기입)
 
@@ -24,14 +24,14 @@ nice: 부분 도달률 (reached / grasped) 기록 — (있으면 기입)
 - [x] 팔로워 조립 (모터 ID 확인 → 링크 조립 → 배선)
 - [x] 리더 조립 (기어 제거 여부는 키트 사양서 확인)
 - [x] LeRobot 설치 + 포트 탐색 + 캘리브레이션
-- [x] must 1 — teleop (6관절 + 그리퍼 추종 확인. §1 증거 영상 링크는 미기입)
+- [x] must 1 — teleop (6관절 + 그리퍼 추종 확인. 증거 영상 · 추종 수치는 §1 행 1 — 2026-09-19 재캘리브 후 녹화분)
 
 ### Week 2 — 데이터 녹화 · zero-shot · latency
-- [x] 카메라 세팅 + 테스트 녹화 (week2_guide §1) — 2026-09-16. 로컬 데이터셋 `~/.cache/huggingface/lerobot/local/so101-spike-test_20260916_233310` (30 fps · 2 ep · 1198 frames · front 1280x480 + wrist 1280x720, 루프 29.92 Hz · 예산 초과 틱 0/1196). 로그 `outputs/d8_record.log`. 리더를 잡지 않은 정지 녹화라 관절값은 일정 — 파이프라인 검증만. 수령 확인 ③ 은 §4 #5 (거치 모듈 장착 불가, 임시 고정)
+- [x] 카메라 세팅 + 테스트 녹화 (week2_guide §1) — 2026-09-16. 로컬 데이터셋 `~/.cache/huggingface/lerobot/local/so101-spike-test_20260916_233310` (보존용 사본: `outputs/evidence/` 아래 같은 이름. 30 fps · 2 ep · 1198 frames · front 1280x480 + wrist 1280x720, 루프 29.92 Hz · 예산 초과 틱 0/1196). 로그 `outputs/d8_record.log`. 리더를 잡지 않은 정지 녹화라 관절값은 일정 — 파이프라인 검증만. 수령 확인 ③ 은 §4 #5 (거치 모듈 장착 불가, 임시 고정)
 - [ ] must 2 — 단일 task 10 에피소드 + Hub 업로드 (week2_guide §2)
 - [ ] must 3 — SmolVLA zero-shot 1회 실행 (week2_guide §3)
   - 사전 검증 (2026-09-19, 팔을 움직이지 않음 — 모터 버스 읽기 전용 연결, 쓰기 · 토크 변경 · `send_action` 차단): 가이드 §3.4 의 `lerobot-rollout` 명령 파싱, 캘리브 일치 (`is_calibrated=True`), 카메라 2대 동시 연결 (실측 30.4 / 60.4 fps), 카메라 이름 검사, 실제 관측으로 정책 출력까지 통과. chunk 생성 mean 90.9 / p95 91.6 ms (n=20, 카메라 2대). 미검증: `send_action`, 토크가 켜지는 순간의 거동, 종료 시 시작 자세 복귀, 30 Hz 루프 유지
-- [x] must 4 — latency 측정 (n=100) (week2_guide §4 + `scripts/measure_latency_smolvla.py`) — 2026-09-19. chunk mean 106.2 / p95 108.1 ms (수치 · 조건은 §1 행 4). 팔 · 카메라 없이 GPU 만 쓰는 측정이라 must 2 · 3 보다 먼저 수행 (week2_guide §0.3). 막힌 지점은 §4 #6
+- [x] must 4 — latency 측정 (n=100) (week2_guide §4 + `scripts/measure_latency_smolvla.py`) — 2026-09-19. chunk mean 106.3 / p95 108.9 ms (수치 · 조건은 §1 행 4). 팔 · 카메라 없이 GPU 만 쓰는 측정이라 must 2 · 3 보다 먼저 수행 (week2_guide §0.3). 막힌 지점은 §4 #6
 
 ## 3. 소요 시간 (계획 대비)
 
