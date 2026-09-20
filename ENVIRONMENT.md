@@ -15,12 +15,12 @@
   - **하드웨어 변경 불가** (RAM·GPU 증설 포함). 로컬 사양이 모자라는 작업은 증설이 아니라 **RunPod 이관**으로 대응한다
   - **Isaac Sim 최소 사양 미달** — 5.x 최소가 VRAM 16GB / RAM 32GB 인데 이 PC 는 12GB / 31GB 다. 증설안(5070 Ti + RAM 64GB, 139-208만원)을 검토했으나 **보류**했다 — 사유와 재판정 조건은 [`docs/research/2026-08-03-isaac-sim-so101-course.md`](docs/research/2026-08-03-isaac-sim-so101-course.md) §5
   - 단 **GUI 스트리밍이 필요한 작업은 RunPod 로 옮길 수 없다** — RunPod 은 UDP 미지원이고 Isaac Sim WebRTC 는 UDP 47998 이 필수다 (상세는 [Hardware-Arm.md](Roadmap/Hardware-Arm.md) Stage 1 실행 머신 절). headless 스크립트 워크로드만 이관 가능
-  - **2026.09 자택 이전 확정** — 휴직 기간 (2026.09-2027.02) 내내 물리 접근이 유지된다. Isaac Sim GUI 와 USB 장치 작업이 로컬 전용이므로 Stage 1 (2027.01-02) 의 전제가 충족된다 (remediation plan 결정 #5)
+  - **2026.09 자택 이전 확정** — 휴직 기간 (2026.09-2027.02) 내내 물리 접근이 유지된다. Isaac Sim GUI 와 USB 장치 작업이 로컬 전용이므로 Stage 1 (2026.10-11) 의 전제가 충족된다 (remediation plan 결정 #5)
 - **MacBook Pro 14 (M4 Pro)** — 원격 접속·문서 작업. LeRobot 은 macOS Apple Silicon 을 공식 지원해 teleop·record 백업 경로로 쓸 수 있으나, **ROS2 는 불가** (macOS 바이너리 패키지 없음 + Docker Desktop for Mac 의 USB 패스스루 미지원)
 - **Jetson Orin Nano (8GB)** — **256GB SSD + Ubuntu 22.04 설치 완료**. Ubuntu 22.04 이므로 **ROS 2 Humble 을 apt 로 설치**할 수 있고 (Phase 3 배포판과 동일 절차) LeRobot 이 요구하는 Python 3.10 도 기본이다. SO-101 + LeRobot 구동 사례가 공개돼 있고 NVIDIA 공식 SO-101 코스의 기준 구성이기도 하다. **Stage 1 의 팔 옆 기계는 4070 PC 이므로, Jetson 은 v3 실기 배포 타깃과 백업 경로로 남는다** — 상세는 [Hardware-Arm.md](Roadmap/Hardware-Arm.md) Stage 1 실행 머신 절
   - 한계: ACT 학습은 소규모 데이터셋에서 보고된 사례가 있으나 정석은 4070/RunPod. **Isaac Sim 은 불가** (x86 전용), OpenVLA 7B 도 비현실적
   - 확인 필요: JetPack / L4T 버전과 **CUDA·cuDNN 동반 설치 여부** (Ubuntu 22.04 만 올린 경우 CUDA 스택이 없으면 PyTorch GPU 가 안 붙는다) — `cat /etc/nv_tegra_release`, `dpkg -l nvidia-jetpack`
-- **ELP Stereo Camera** — USB 연결 주변기기. SO-101 전체 뷰 카메라 (팔로워 왼쪽 측면에 임시 고정). 흑백, 좌 · 우가 한 프레임에 결합 (1280x480 MJPG 25/60 fps)
+- **ELP Stereo Camera** — USB 연결 주변기기. SO-101 전체 뷰 카메라 (팔로워 왼쪽 측면에 임시 고정). 흑백, 좌 · 우가 한 프레임에 결합 (1280x480 MJPG 25/60 fps). 전체 뷰 전용 카메라 + 고정수단이 배송 중이며 도착하면 이 역할을 넘긴다 (Stage 1 W3)
 - **손목 카메라** — Realtek UVC 웹캠 (0bda:5844, 1280x720 MJPG 30 fps). SO-101 팔로워 그리퍼에 장착 완료 (2026.09)
 
 

@@ -205,7 +205,7 @@ Output : /vla/action (팔: EE-delta [dx,dy,dz,rx,ry,rz] -> geometry_msgs/Twist +
 
 Phase 4 완료 후 (2026 하반기):
 - **Phase 4.5 (VLA v1.5)** — OpenVLA LoRA adaptation + before/after 정량 분석 (둘째 층 증거). Section 0 (sim 구축·Docker·RunPod 이관) 은 2026.08 전진 확정 (Sections 1-3 의 선행 조건 + RunPod 학습 준비), Sections 1-3 은 2026.09-11 ([Phase 4.5.md](Phase%204.5.md))
-- **하드웨어 스파이크** (2026.09, 2주) — SO-101 (Feetech) LeRobot 네이티브 검증 (정의: [Hardware-Arm.md](Hardware-Arm.md))
+- **하드웨어 스파이크** (2026.09) — SO-101 (Feetech) LeRobot 네이티브 검증. 완료 — 판정 2026-09-20 must 4개 통과 (정의: [Hardware-Arm.md](Hardware-Arm.md))
 - **6개월 분기 재평가 #1 (2026.11)** — 스파이크 결과 / v1 결과(레포) / VLA 모델 갱신 검토 / 시장 신호 probe 반응 / cross-embodiment 좌표 점검. **육아휴직(2026.09-2027.02) 중이라 정찰 지원은 하지 않으며, 본격 실지원은 복직(2027.03) 직후 개시한다.**
-- **Hardware-Arm Stage 1 본 빌드** (2027.01-02) → v2 선행 하드웨어
+- **Hardware-Arm Stage 1 본 빌드** (2026.10-11) → v2 선행 하드웨어
 - **Phase 6 (Isaac Sim 디지털 트윈) + 자작 팔 결합 → 산출물 v2** (헤드라인, sim-to-real gap)

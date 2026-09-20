@@ -17,7 +17,7 @@
 | throughput | 3.33 Hz | quasi-static 단일 task 적합 추정 |
 | int8 경로 | 배제 — 성공률 58.1% (int4 71.9%), 1.2 Hz | OpenVLA 논문 Table 2·§5.4 근거 + 실측 판단 |
 
-측정: 2026-06. 재측정 (방법론 보강 + p50/p99/VRAM peak) 은 **SmolVLA 비교 측정과 통합해 2026.09 수행** (실기 전환 plan §5.2 must 4). Rerun 시각화 gif 는 확보 시 이 절에 추가.
+측정: 2026-06. **SmolVLA 비교 측정** (2026-09-19, 같은 RTX 4070 — 스파이크 must 4): `smolvla_base` bfloat16, chunk mean 106.3 / p95 108.9 ms (n=100, 50 actions/chunk → action 당 2.13 ms), peak VRAM 0.97 GB. 두 수치는 뜻이 다르다 — OpenVLA 는 action 1개, SmolVLA 는 action 50개 묶음을 한 번 내는 시간이고, 정밀도 (int4 vs bfloat16) 와 이미지 입력 수 (1장 vs 3장) 도 다르다. 상세: [`Studies/Hardware-Arm/spike/week2/RESULT.md`](./Studies/Hardware-Arm/spike/week2/RESULT.md) §1 행 4.
 
 **v1.5 — LoRA adaptation before/after** (2026-08, 상세: [`Measurements/openvla-lora-eval/`](./Measurements/openvla-lora-eval/)): ManiSkill PickCube-v1, 동일 조건 N=100 (무행동 하한 seed 2개 제외 98쌍 기준).
 
@@ -124,7 +124,7 @@ gantt
 | 2026.08 (Section 0) + 2026.09-11 (Sections 1-3, 실측 선행 — 마감 2026.09 초) | Stage 1 | **Phase 4.5: VLA v1.5 — Section 0 (sim 구축·Docker·RunPod 이관, Sections 1-3 선행) + OpenVLA LoRA adaptation + before/after 정량 분석** (sim 데이터, v1 추론 노드 재사용) | **산출물 v1.5 (둘째 층 adaptation 증거)** |
 | 2026.07-08 (병행) | Stage 1 | **시장 신호 probe 1단 (저가시성)**: 타겟사 JD 5-10개 정독 + 격차 매핑, 공개 증거 정비 (별도 산출물 repo 신설) | 시장 실측 → 우선순위 보정 |
 | 2026.09- (병행) | Stage 1 | **시장 신호 probe 2단 (고가시성)**: LinkedIn 헤드라인 교체 + 현직자 커피챗 1-2건 (휴직 개시 후 — 승인 확정 2026-07-28) | 시장 실측 → 우선순위 보정 |
-| 2026.09 | Stage 1 | **하드웨어 스파이크 (2주 타임박스)**: SO-101 조립 + LeRobot 네이티브 (teleop + 10 에피소드 녹화 + SmolVLA zero-shot + latency). 판정 2026-09-21 1회 (실기 전환 plan §5) | 리스크 조기 검증 (분기 재평가 #1 입력) |
+| 2026.09 | Stage 1 | **하드웨어 스파이크 (2주 타임박스)**: SO-101 조립 + LeRobot 네이티브 (teleop + 10 에피소드 녹화 + SmolVLA zero-shot + latency). **완료 — 판정 2026-09-20: must 4개 통과** (실기 전환 plan §5) | 리스크 조기 검증 (분기 재평가 #1 입력) |
 | 2026.09-2027.02 | Career | **육아휴직** (2026-07-01 신청, 2026-07-28 승인 확정) — 구직 지원(정찰 포함) 안 함, 학습·산출물 집중. 2026.06-08 은 재직 구간 (4070 은 보유 지속 + 2026.09 자택 이전 확정 — 휴직 중에도 물리 접근 유지) | 학습 집중 기간 |
 | 2026.11 | Career | **분기 재평가 #1** (정찰 지원 없이 수행 — 입력: 스파이크 판정 결과 / v1·v1.5 결과 / v2.5 진행률 / 시장 신호 probe 반응) | 중간 점검 |
 | 2026.10-11 | Stage 1 | **Hardware-Arm Stage 1 (본 빌드 + ROS2 래핑 + 이중 latency 측정)** + URDF (v2 선행). Isaac Sim 임포트는 nice — Phase 6 이월 허용. 12월-2027.02 는 v2.5 마무리 + 지연 흡수 버퍼 | v2 하드웨어 기반 |
@@ -302,7 +302,7 @@ gantt
 
 ### Hardware-Arm: 자작 팔 트랙 (스파이크 + 2단계, 2026.09-2027.06)
 > **왜 자작 팔인가**: *"Brain ↔ Body 통합 SW 엔지니어"* 의 가장 완전한 증거. 본인 약점 (VLA 신입급) 을 본인 강점 (AMR ROS 실무 5년, 2021.06~ + 펌웨어 2.5년 하드웨어 이해) 으로 직접 깨는 카드. 자작 팔은 cross-embodiment 의 첫 embodiment 증명이다.
-> **가장 중요한 증거일수록 가장 먼저 리스크를 깬다** — 첫 하드웨어는 계획의 2-3배 걸린다. 그래서 본 빌드 전에 짧은 스파이크로 먼저 굴린다. 조달·조립은 v1(sim) 과 병렬로 지금 착수해 v2 가 하드웨어 리드타임에 게이트되지 않게 한다.
+> **가장 중요한 증거일수록 가장 먼저 리스크를 깬다** — 첫 하드웨어는 계획의 2-3배 걸린다. 그래서 본 빌드 전에 짧은 스파이크로 먼저 굴린다. 구매·조립·스파이크는 2026.09 에 마쳤다.
 >
 > 실행 품질로 증명하는 3가지 — latency 측정, e-stop, BOM 이해는 로보틱스 랩에서도 일상적으로 다룬다 (항목 자체가 희소한 것이 아니다). 차별점은 양산 ROS 5년 경험자가 이것들을 제품 수준 감각 (측정 방법론, 안전 설계 관행, 원가 구조) 으로 수행한다는 **실행 품질**이다:
 > - **latency**: 추론 → 모터 명령까지 ms 단위 측정
@@ -313,15 +313,15 @@ gantt
 #### 스파이크 (2026.09, 2주 타임박스, 산출물 아님 = 리스크 검증)
 - **범위**: 조립 + LeRobot 네이티브 스택 검증. ROS2/URDF/Isaac Sim/파인튜닝은 범위 밖 (ROS2 는 Stage 1 로 이동). 안 예뻐도 됨.
 - **목표**: must 4 — teleop / `lerobot-record` 10 에피소드 + HF Hub / SmolVLA zero-shot 1회 실행 / latency 측정 (실기 전환 plan §5.2).
-- **출력**: **판정 2026-09-21 1회** — 통과 시 Stage 1 2026.10 개시, teleop 불가 또는 2주 초과 시 원안 일정 (10월 스파이크·12월 빌드) 롤백. 결과는 분기 재평가 #1 (2026.11) 입력.
+- **출력**: 판정 1회 — **2026-09-20 must 4개 통과** → Stage 1 2026.10 개시, v2.5 2026.11 개시. 롤백 조건 (teleop 불가 또는 2주 초과) 은 발동하지 않았다. 결과는 분기 재평가 #1 (2026.11) 입력 (`Studies/Hardware-Arm/spike/week2/RESULT.md`).
 
 
 #### Stage 1 (2026.10-11, 2개월, 추가 지출 없음) — 스파이크로 디리스크된 본 빌드 (v2 선행)
 - **하드웨어**: SO-101 리더 + 팔로워 6DOF 키트 (3D 프린팅 부품·전원·케이블 포함) + 손목 카메라 1대
-- **목표**: pick-and-place 단순 동작 + 안전 기초 (소프트 리밋·토크 상한·물리 e-stop) + URDF + **ROS2 래핑 (`feetech_ros2_driver` + ros2_control, LeRobot 스택과 병행 운영 — 이중 latency 로 통합 오버헤드 측정)**. Isaac Sim 임포트는 nice (Phase 6 이월 허용)
+- **목표**: pick-and-place 단순 동작 + 안전 기초 (소프트 리밋·토크 상한·소프트웨어 정지) + URDF + **ROS2 래핑 (`feetech_ros2_driver` + ros2_control, LeRobot 스택과 병행 운영 — 이중 latency 로 통합 오버헤드 측정)**. Isaac Sim 임포트는 nice (Phase 6 이월 허용)
 - **역할**: v2(헤드라인, sim-to-real gap)가 소비하는 선행 하드웨어. 동작 영상 + URDF + Sim 임포트 영상은 v2 의 입력 자료.
 - **이유**: 스파이크에서 LeRobot 경로 (teleop·녹화·정책 실행) 를 이미 검증했으므로 본 빌드는 완성도 + ROS2 층에 집중.
-- **비용**: 팔 키트·손목 카메라·작업대 자재가 2026.08 말-09 초에 선집행되므로 이 구간의 추가 지출은 없다.
+- **비용**: 팔 키트·손목 카메라·작업대 자재는 2026.09 에 구매를 마쳤고 전체 뷰 카메라 + 고정수단은 배송 중이라, 이 구간의 추가 지출은 없다.
 
 
 #### Stage 2 (2027.04-06, 3개월) — 실지원과 병행 (v3 선행)
@@ -335,8 +335,8 @@ gantt
 | 항목 | 내용 |
 |---|---|
 | 구성 | SO-101 / SO-ARM101 (TheRobotStudio + Hugging Face 오픈소스 설계). 리더 + 팔로워 미조립 키트, Feetech STS3215 기반 |
-| 비용 | 약 56-58만원 (팔 키트 약 55만원 + 손목 카메라 1-3만원) |
-| 조달 | 국내 판매자, 3D 프린팅 부품 포함, 리드타임 3일 → **2026.08 말-09 초 즉시 단일 구매** (팔 키트 + 손목 카메라 + 작업대 자재 일괄). 스파이크는 2026.09 첫 2주 |
+| 비용 | 60만원 (팔 키트 + Wrist 카메라 옵션). 작업대 자재와 전체 뷰 카메라는 별도 — [BOM](./Studies/Hardware-Arm/BOM.md) |
+| 조달 | 국내 판매자, 3D 프린팅 부품 포함, 리드타임 3일 — 2026-09-01 발주, 2026-09-12 조립, 2026-09-20 스파이크 must 4개 통과 |
 | 근거 | LeRobot / Hugging Face 생태계 표준 — teleop 데이터 수집 (v2.5 데이터셋)·ACT 학습·HF Hub 공개가 이 생태계 위에서 이어진다 |
 
 > Koch v1.1 (Dynamixel 기반, 총 49-60만원) 과 커스텀 XL330+XM430 안 (BOM 150-225만원) 은 비채택 — 사유는 [Hardware-Arm.md](./Roadmap/Hardware-Arm.md) 비채택 기록. Stage 2 확장 수단은 2026.11 분기 재평가 안건.
@@ -541,17 +541,17 @@ v2.5 (2026.11-12): teleop 데이터셋 + SmolVLA 실기 before/after (vla-lab �
 
 #### 2026.06-09 (Phase 4 VLA v1, 메인 단독)
 - [ ] OpenVLA 지원 embodiment/action space 확인 + sim 환경 정합
-- [ ] 컴퓨트 사전 점검 (OpenVLA 7B 4-bit 가 RTX 4070 12GB 에 올라가는지 + latency 1회 측정)
+- [x] 컴퓨트 사전 점검 (OpenVLA 7B 4-bit 가 RTX 4070 12GB 에 올라가는지 + latency 1회 측정)
 - [ ] 성공 task 1종 + 성공률 기준 N 정의
 - [ ] Phase 4 완료 (RT-2 + OpenVLA 정독 + OpenVLA zero-shot inference → ROS2 → 카메라/bag dry-run)
-- [ ] **레포에 산출물 v1 결과 기록** (README + latency/throughput 표) — vla-lab 문서 작성·1분 영상·LinkedIn 공유는 v2 로 이관
+- [x] **레포에 산출물 v1 결과 기록** (README + latency/throughput 표) — vla-lab 문서 작성·1분 영상·LinkedIn 공유는 v2 로 이관
 
 
 #### 2026.08-12 (Phase 4.5 + 스파이크 — 구직 지원 없음)
-- [ ] (2026.08) **Phase 4.5 Section 0**: ManiSkill sim 구축 + zero-shot baseline + Docker 컨테이너화 + RunPod 이관 검증
-- [ ] (2026.09-11) **Phase 4.5 Sections 1-3 완료 → 산출물 v1.5 공개** (OpenVLA LoRA adaptation + before/after 정량 분석, 둘째 층 증거)
-- [ ] 스파이크 must 4 (teleop / 10 에피소드 녹화+Hub / SmolVLA zero-shot / latency) + 판정 2026-09-21 (실기 전환 plan §5)
-- [ ] Hardware-Arm Stage 1 must 완성 (2026.10-11 — 조립 + 안전 기초 + ROS2 래핑 + URDF + 이중 latency + 1분 영상)
+- [x] (2026.08) **Phase 4.5 Section 0**: ManiSkill sim 구축 + zero-shot baseline + Docker 컨테이너화 + RunPod 이관 검증
+- [x] **Phase 4.5 Sections 1-3 완료 → 산출물 v1.5 공개** (OpenVLA LoRA adaptation + before/after 정량 분석, 둘째 층 증거) — vla-lab 발행 2026-08-31
+- [x] 스파이크 must 4 (teleop / 10 에피소드 녹화+Hub / SmolVLA zero-shot / latency) + 판정 — 2026-09-20 must 4개 통과 (실기 전환 plan §5)
+- [ ] Hardware-Arm Stage 1 must 완성 (2026.10-11 — 조립 완성 + 안전 기초 + ROS2 래핑 + URDF + 이중 latency + 1분 영상)
 - [ ] v2.5 완성 (2026.11-12 — teleop 데이터셋 HF Hub 공개 + SmolVLA before/after N≥20 + vla-lab 공개 문서)
 - [ ] **6개월 분기 재평가 #1 (2026.11)** — 정찰 지원 없이 수행. 입력: 스파이크 판정 결과 / v1·v1.5 결과(레포) / v2.5 진행률 / 시장 신호 (probe 반응, 1순위 채용 활성도)
 

@@ -145,20 +145,20 @@ nice: 부분 도달률 (reached / grasped) 기록 시도, 손목 카메라 추�
 | 항목 | must / nice | 내용 |
 |---|---|---|
 | 조립 완성 | must | 케이블 정리, 작업대 고정, 손목 카메라 마운트 |
-| 안전 기초 | must | 소프트 리밋 (관절 범위), 토크 상한, 물리 e-stop (전원 차단 스위치) |
+| 안전 기초 | must | 소프트 리밋 (관절 범위), 토크 상한, 소프트웨어 정지 (키 또는 ROS2 서비스 호출로 토크를 유지한 채 현 위치 정지). 물리 전원 차단 스위치는 두지 않는다 — DC 차단은 토크 해제로 팔이 낙하한다 |
 | ROS2 래핑 | must | `feetech_ros2_driver` + ros2_control 로 joint state / command 노드 — **LeRobot 스택과 병행 운영**. LeRobot 은 데이터·학습, ROS2 는 배포·통합 층 |
 | URDF | must | SO-101 공개 URDF 재사용 + 캘리브레이션 오프셋 반영 |
 | Isaac Sim 임포트 | nice | Phase 6 로 이월 허용 |
-| 1분 영상 | must | teleop + 정책 실행 + e-stop 시연 |
+| 1분 영상 | must | teleop + 정책 실행 + 소프트웨어 정지 시연 |
 
 > ROS2 래핑 시 latency 를 두 경로로 측정한다: (a) LeRobot 직결, (b) ROS2 토픽 경유. (b)-(a) 가 "통합 오버헤드" 수치가 되고, 셋째 층 증거로 쓴다.
 
 - [ ] 조립 완성 (must)
-- [ ] 안전 기초 — 소프트 리밋 + 토크 상한 + 물리 e-stop (must)
+- [ ] 안전 기초 — 소프트 리밋 + 토크 상한 + 소프트웨어 정지 (must)
 - [ ] ROS2 래핑 — `feetech_ros2_driver` + ros2_control 노드 (must)
 - [ ] URDF — 공개 URDF 재사용 + 오프셋 반영 (must)
 - [ ] 이중 latency 측정 — (a) LeRobot 직결 / (b) ROS2 경유 / (b)-(a) 통합 오버헤드 (must)
-- [ ] 1분 영상 — teleop + 정책 실행 + e-stop (must)
+- [ ] 1분 영상 — teleop + 정책 실행 + 소프트웨어 정지 (must)
 - [ ] Isaac Sim 임포트 (nice — Phase 6 이월 허용)
 
 ---
