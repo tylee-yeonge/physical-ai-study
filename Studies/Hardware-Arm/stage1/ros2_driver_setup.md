@@ -1,7 +1,8 @@
 # Hardware-Arm Stage 1 - ROS2 Driver Setup (feetech_ros2_driver)
 
 > 시기: 2026.10 (Stage 1 첫 주 — 구 스파이크의 ROS2 검증 항목을 여기서 인수)
-> 전제: 스파이크 (2026.09) 에서 팔이 LeRobot 네이티브로 이미 돈다 — teleop·캘리브레이션 완료 상태
+> 전제: 스파이크 (2026.09, 판정 2026-09-20 통과) 에서 팔이 LeRobot 네이티브로 이미 돈다 — teleop·캘리브레이션 완료 상태
+> **이 환경의 사실**: 작업은 Ubuntu PC 위 Docker 컨테이너 (Ubuntu 24.04, ROS 2 Jazzy, root) 에서 한다. 팔로워 포트는 `so101-attach` 가 만드는 **`/dev/so101_follower`** 이고 (`ls -la /dev/so101_*` 로 확인, 없으면 `so101-attach`), 모터 ID 는 1-6, 보드레이트는 1,000,000 이다. `feetech_ros2_driver` 가 Jazzy 에서 빌드되는지는 §1 에서 가장 먼저 확인한다
 > **역할 분리**: 데이터·학습 = LeRobot / 배포·통합 = ROS 2. **같은 시리얼 포트를 쓰므로 동시에 한 스택만 버스에 붙인다** (LeRobot 프로세스 종료 후 ROS2 기동)
 
 ---
@@ -114,10 +115,10 @@ ros2 topic pub --once /position_controller/commands std_msgs/msg/Float64MultiArr
 
 | 증상 | 해결 |
 |---|---|
-| /dev/ttyUSB* 권한 | `dialout` 그룹 추가 (chmod 666 은 임시) |
+| 포트가 안 열림 | 컨테이너에서는 `/dev/so101_follower` 가 있는지 먼저 본다 — 없으면 `so101-attach` (USB 를 뽑았다 꽂으면 다시 실행). 컨테이너는 root 라 `dialout` 그룹은 필요 없다. 호스트에서 직접 돌릴 때만 `dialout` 그룹 추가 |
 | 모터 검출 안 됨 | LeRobot 프로세스가 포트 점유 중인지 먼저 확인 → 보드레이트·프로토콜 확인 |
 | Joint 이름 mismatch | URDF 와 yaml 의 joint name 동일하게 |
-| 위치 단위/오프셋 | URDF: rad. STS3215: 12비트 스텝 — LeRobot 캘리브레이션 오프셋과 드라이버 영점이 일치하는지 대조 |
+| 위치 단위/오프셋 | URDF: rad. STS3215: 12비트 스텝. lerobot 0.6.2 의 SO 팔로워는 도 단위다 (`use_degrees=True`, 그리퍼만 0-100) — LeRobot 캘리브레이션 오프셋과 드라이버 영점이 일치하는지 대조할 때 단위부터 맞춘다 |
 
 ---
 

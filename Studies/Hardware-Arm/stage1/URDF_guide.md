@@ -122,7 +122,8 @@ xacro so101.urdf.xacro > so101.urdf
   <hardware>
     <!-- 플러그인 클래스명은 feetech_ros2_driver 버전으로 확인 (ros2_driver_setup.md §1) -->
     <plugin>feetech_ros2_driver/FeetechHardwareInterface</plugin>
-    <param name="usb_port">/dev/ttyUSB0</param>
+    <!-- 컨테이너에서는 so101-attach 가 만드는 고정 경로를 쓴다 -->
+    <param name="usb_port">/dev/so101_follower</param>
     <param name="baud_rate">1000000</param>
   </hardware>
   <joint name="shoulder_pan">
