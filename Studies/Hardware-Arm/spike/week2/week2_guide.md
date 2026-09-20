@@ -415,9 +415,16 @@ grep -E "Cadence \(episode" $SPIKE_OUT/d9_record.log
 
 **무엇을**: 사전학습 SmolVLA (`lerobot/smolvla_base`) 를 파인튜닝 없이 그대로 팔에 연결해 30초 1 에피소드를 돌린다. 리더 없이 카메라 영상 + 관절값 + 지시문 → 모델 → 팔로워 명령.
 **왜**: must 3 는 "팔이 명령에 반응해 움직이는가" 만 본다. 성공률은 v2.5 가 잰다. 여기서 확인하는 것은 관측 → 모델 → 명령의 경로가 이 환경에서 끊기지 않고 이어지는가다. 용어: **zero-shot** = 이 팔 · 이 작업의 데이터를 전혀 학습하지 않은 상태로 실행.
-**끝나면 손에 남는 것**: 30초 영상 + 로그 파일. 부수로 모델이 기대하는 입력 키 목록 (D11 이 그대로 쓴다).
+**끝나면 손에 남는 것**: 30초 영상 + 로그 파일. 부수로 모델이 기대하는 입력 키 목록 (D11 이 그대로 쓴다). 2차 실행 (선택) 까지 하면 ELP · 손목 영상과 관절값이 든 로컬 데이터셋 1개.
 
-lerobot 0.6.2 에서 실기 정책 실행은 **`lerobot-rollout`** 이 맡는다. 용어: **rollout** = 학습된 정책을 실제 환경에서 굴려 보는 것. `lerobot-record` 는 리더 시범 녹화 전용이라 `--teleop.*` 없이 실행하면 "use lerobot-rollout instead" 로 멈춘다. rollout 은 실행 방식을 `--strategy.type` 으로 고르는데, 이 스파이크는 녹화 없이 정책만 돌리는 `base` 를 쓴다 — must 3 의 증거는 스마트폰 영상과 로그라서 데이터셋이 필요 없다.
+lerobot 0.6.2 에서 실기 정책 실행은 **`lerobot-rollout`** 이 맡는다. 용어: **rollout** = 학습된 정책을 실제 환경에서 굴려 보는 것. `lerobot-record` 는 리더 시범 녹화 전용이라 `--teleop.*` 없이 실행하면 "use lerobot-rollout instead" 로 멈춘다. rollout 은 실행 방식을 `--strategy.type` 으로 고른다. 이 스파이크가 쓰는 것은 둘이다.
+
+| 전략 | 하는 일 | 이 스파이크에서의 역할 |
+|---|---|---|
+| `base` | 녹화 없이 정책만 돌린다 | **1차 실행 — must 3 판정.** 증거는 스마트폰 영상 + 로그 (§3.4) |
+| `episodic` | 정책을 돌리면서 카메라 영상 · 관절값 · 정책 명령을 데이터셋으로 남긴다 | 2차 실행 (선택) — "팔이 스스로 움직였다" 를 관절 궤적 수치로도 남긴다 (§3.4 의 2차 실행) |
+
+rollout 이 도는 동안에는 ELP 를 따로 찍을 수 없다. rollout 이 ELP 를 `camera2` 로 잡고 있고, 카메라는 한 번에 한 프로세스만 스트리밍하기 때문이다 (§1.2). ELP 영상을 남기려면 rollout 자신이 녹화하는 `episodic` 을 쓴다.
 
 ### 3.1 모델 받기 + 기대 입력 확인
 
@@ -474,12 +481,12 @@ echo $CAMS_ZS                                        # §3.2 의 export 가 이 
 
 **공간과 안전**
 
-이 실행에서 팔은 휴식 자세에서 **일어난다** (§3.5). 어깨와 팔꿈치가 각각 100도가량 움직여 상완이 수직, 팔꿈치가 90도인 자세로 올라간다. 팔 위쪽과 앞쪽에 팔 길이만큼의 공간이 비어 있어야 한다.
+이 실행에서 팔은 휴식 자세에서 **일어난다** (§3.5). 약 3초에 걸쳐 상완이 수직으로 서고, 전완은 앞쪽 아래로 비스듬히 뻗은 자세에서 멈춘다 (실측 — §3.5). 그리퍼 끝이 책상 가까이까지 내려오므로 팔 위쪽과 앞쪽에 팔 길이만큼의 공간이 비어 있어야 한다.
 
 - 작업면 위에는 큐브 · 트레이만. 손 · 케이블 · 리더 팔은 팔로워 가동 범위 밖. 리더는 연결하지 않아도 된다 (명령에 `--teleop.*` 가 없다).
 - `--robot.max_relative_target=3`: 한 틱 (제어 루프 1회) 에 관절 목표가 현재 위치에서 벗어날 수 있는 양의 상한. lerobot 0.6.2 의 팔로워는 기본이 각도 모드 (`use_degrees=true`) 라 단위는 **도** 다 (그리퍼만 0-100). 틱마다 적용되므로 30 Hz 에서 3 이면 초당 최대 90도, 10 이면 초당 300도다. 첫 실행은 3 으로 시작하고, 움직임을 눈으로 확인한 뒤에만 올린다.
 - 비상 정지: USB 를 뽑으면 그 자리에서 멈추고, DC 를 뽑으면 토크가 풀려 떨어진다 (조립 가이드 §7). 손은 USB 쪽에 둔다.
-- 종료 동작: 30초가 지나거나 Ctrl+C 를 누르면 rollout 은 팔을 **실행 직전의 자세로 약 3초에 걸쳐 되돌린 뒤** 연결을 끊는다 (`--return_to_initial_position` 기본값 true). 팔이 멈춘 것처럼 보여도 로그에 `Rollout finished` 가 찍히기 전에는 가동 범위에 손을 넣지 않는다.
+- 종료 동작: 30초가 지나거나 Ctrl+C 를 누르면 rollout 은 팔을 **실행 직전의 자세로 약 3초에 걸쳐 되돌린 뒤** 연결을 끊는다 (`--return_to_initial_position` 기본값 true). 팔이 멈춘 것처럼 보여도 로그에 `Rollout finished` 가 찍히기 전에는 가동 범위에 손을 넣지 않는다. 2차 실행 (`episodic`) 은 30초가 끝난 뒤 영상을 저장하는 동안 **팔이 일어난 자세로 약 19초 굳어 있다가** 복귀한다 — 멈춘 것이 아니다 (§3.4 의 2차 실행).
 - 스마트폰 촬영 준비 — 30초 영상이 증거다. 팔이 일어났을 때의 높이까지 화면에 들어오도록 세우고, 명령을 실행하기 **전에** 녹화를 시작한다 (모델을 올리는 동안 몇 초에서 수십 초가 지나간다).
 
 ### 3.4 실행
@@ -500,7 +507,7 @@ lerobot-rollout \
     2>&1 | tee -i $SPIKE_OUT/d10_zeroshot.log
 ```
 
-- `--strategy.type=base`: 녹화 없이 정책만 실행한다. `--dataset.*` 옵션을 같이 주면 "does not record data" 오류로 멈춘다. 실행 결과를 데이터셋으로도 남기는 `episodic` 전략이 있지만 must 3 에는 필요 없다.
+- `--strategy.type=base`: 녹화 없이 정책만 실행한다. `--dataset.*` 옵션을 같이 주면 "does not record data" 오류로 멈춘다. must 3 판정은 이 실행으로 끝난다. 실행 결과를 데이터셋으로도 남기는 `episodic` 은 아래 "2차 실행" 에 있다.
 - `--teleop.*` 는 넣지 않는다 — 정책이 리더 역할을 한다.
 - `--task` 는 D9 의 `single_task` 와 같은 문장. `--fps=30` 은 제어 루프 주기 (D9 의 `--dataset.fps` 와 같은 값), `--duration=30` 은 30초 뒤 루프 종료 (0 이면 무한).
 - 추론 방식은 기본값 `sync` 다 — 제어 틱마다 정책을 부르고, action 큐가 빈 틱에만 모델이 실제로 돈다. 실기 구성의 chunk 생성은 약 91 ms (§4.1) 로 30 Hz 기준 약 3틱 분량이라 50 스텝 (약 1.7초) 마다 팔이 잠깐 멈칫할 수 있다. 고장이 아니다. 느린 VLA 용 `--inference.type=rtc` 는 스파이크에서 쓰지 않는다.
@@ -516,7 +523,7 @@ rollout 은 모델을 먼저 올리고, 그다음에 로봇에 연결한다. 그
 | 모델 로드 | `Loading policy from 'lerobot/smolvla_base'...` → `Policy loaded: type=smolvla, device=cuda` | 토크가 꺼진 채 그대로. 아직 하드웨어에 손대지 않는다 |
 | 연결 | `Connecting robot (so101_follower)...` → `Robot connected` → `Captured initial robot position (6 keys)` | 토크가 켜져 현재 자세로 굳는다. **이때의 자세가 종료 시 되돌아갈 자세다** |
 | 시작 | `Rollout setup complete, starting rollout...` → `Base strategy control loop started` | 0도 자세를 향해 일어나기 시작한다 (초당 최대 90도) |
-| 진행 | 출력 없음 — 화면 표시가 꺼져 있으면 틱마다 찍는 로그가 없다 | 가운데 자세 근처에서 작게 움직인다. 약 1.7초마다 잠깐 멈칫한다 (모델이 도는 틱) |
+| 진행 | 출력 없음 — 화면 표시가 꺼져 있으면 틱마다 찍는 로그가 없다 | 약 3초 만에 멈춘 뒤 그 자세를 유지한다 (관절별 흔들림은 표준편차 0.6도 이하 — 실측). `Relative goal position magnitude had to be clamped to be safe.` 경고가 거의 매 틱 찍힌다 — 정상 (§3.5) |
 | 시간 종료 | `Duration limit reached (30s)` → `Base strategy control loop ended` → `Cadence summary` | 멈춘다 |
 | 복귀 | `Returning robot to initial position before shutdown...` | 약 3초에 걸쳐 시작 자세로 내려온다 |
 | 해제 | `Disconnecting robot...` → `Rollout finished` | 토크가 꺼진다. 여기까지 와야 손을 넣어도 된다 |
@@ -534,6 +541,57 @@ rollout 은 모델을 먼저 올리고, 그다음에 로봇에 연결한다. 그
 
 USB 를 뽑아 멈춘 뒤에는 팔이 공중에 굳어 있다. **손으로 팔을 받친 채 DC 를 뽑아** 토크를 풀고 휴식 자세로 내려놓는다 (조립 가이드 §7). 다시 시작하려면 USB · DC 를 연결하고 `so101-attach` 부터 한다.
 
+**2차 실행 (선택) — ELP 영상과 관절값을 데이터셋으로 남기기**
+
+**무엇을**: 같은 zero-shot 을 `episodic` 전략으로 한 번 더 돌려, 정책이 팔을 움직이는 30초를 데이터셋 1 에피소드로 남긴다.
+**왜**: 1차 실행의 증거는 스마트폰 영상이라 "움직였다" 를 눈으로만 보인다. 데이터셋에는 ELP · 손목 영상과 함께 `observation.state` (팔의 실제 관절값) 와 `action` (정책이 낸 관절 목표) 이 30 Hz 로 기록되므로, 팔이 스스로 움직였다는 것과 정책 출력이 0 근처에 모인다는 것 (§3.5) 을 수치로 확인할 수 있다.
+**언제**: 1차 실행에서 팔이 예상대로 움직이는 것을 본 **뒤에** 한다. must 3 은 1차 실행으로 이미 닫혔으므로 이 실행이 실패해도 판정은 그대로다. §3.3 의 공간 · 안전 준비는 1차와 똑같이 한다.
+
+```bash
+lerobot-rollout \
+    --strategy.type=episodic \
+    --policy.path=lerobot/smolvla_base \
+    --policy.device=cuda \
+    --robot.type=so101_follower \
+    --robot.port=$FOLLOWER_PORT \
+    --robot.id=so101_follower_01 \
+    --robot.cameras="$CAMS_ZS" \
+    --robot.max_relative_target=3 \
+    --task="Pick up the red cube and place it on the tray." \
+    --fps=30 \
+    --dataset.repo_id=$HF_USER/rollout_so101-spike-zeroshot \
+    --dataset.num_episodes=1 \
+    --dataset.episode_time_s=30 \
+    --dataset.push_to_hub=false \
+    2>&1 | tee -i $SPIKE_OUT/d10_zeroshot_episodic.log
+```
+
+1차 명령과 다른 곳:
+
+- `--strategy.type=episodic`: 정책을 돌리면서 매 틱의 관측과 명령을 데이터셋에 쌓는다. 리더는 필요 없다 (`--teleop.*` 를 넣지 않는다).
+- `--duration` 이 없다. `episodic` 은 이 옵션을 보지 않고 `--dataset.episode_time_s=30` 으로 길이를 정한다.
+- `--dataset.repo_id`: 이름 부분이 **`rollout_` 로 시작해야 한다.** 아니면 `Dataset names for rollout must start with 'rollout_'` 로 멈춘다. lerobot 이 뒤에 `_YYYYMMDD_HHMMSS` 를 붙이므로 다시 돌려도 이름이 충돌하지 않는다.
+- `--dataset.num_episodes=1`: 에피소드가 하나뿐이면 리셋 구간이 없다.
+- `--dataset.push_to_hub=false`: 로컬 (`~/.cache/huggingface/lerobot/$HF_USER/`) 에만 남긴다.
+- `--task` 만 주면 같은 문장이 데이터셋의 `single_task` 에도 들어간다.
+- 이 전략은 키 입력을 듣는다 (`→` 에피소드 조기 종료, `←` 버리고 다시, `Esc` 종료). 실행 중에 터미널 키를 건드리지 않는다.
+
+터미널에 찍히는 것과 팔의 동작 — 모델 로드 · 연결까지는 1차 실행의 표와 같고, 그 뒤가 다르다:
+
+| 단계 | 터미널에 찍히는 것 | 팔 |
+|---|---|---|
+| 데이터셋 준비 | `Setting up dataset (repo_id=...)` → `Dataset ready` | 토크가 켜진 채 시작 자세 |
+| 시작 | `Episodic strategy ready` → `Recording episode 0` | 0도 자세를 향해 일어난다 |
+| 진행 | 클램프 경고만 찍힌다 (30초) | 약 3초 만에 멈춘 뒤 그 자세를 유지한다 |
+| 저장 | `Svt[info]` 로 시작하는 줄이 쏟아진다 | **일어난 자세로 굳은 채 약 19초** (실측). 멈춘 것이 아니다 |
+| 종료 | `Episodic control loop ended` → `Cadence summary` → `Stop recording` → `Finalizing dataset...` | 그대로 |
+| 복귀 | `Returning robot to initial position before shutdown...` | 약 3초에 걸쳐 시작 자세로 내려온다 |
+| 해제 | `Disconnecting robot...` → `Exiting` → `Episodic strategy teardown complete` → `Rollout finished` | 토크가 꺼진다. 1차와 똑같이 `Rollout finished` 가 찍혀야 손을 넣어도 된다 |
+
+멈추는 법은 1차 실행과 같다 (`Ctrl+C` 는 저장 → 복귀 → 해제를 거친다. 위험하면 USB).
+
+검증 범위: 위 명령은 이 환경에서 끝까지 통과했다 (2026-09-20 — 데이터셋 생성 · 855 프레임 기록 · 저장 · 시작 자세 복귀, 데이터셋 29 MB. RESULT.md §1 행 3). 실패했을 때 알아 둘 것: rollout 은 모델 로드 → 로봇 연결 → 데이터셋 생성 순서로 준비하므로 (`rollout/context.py`), 데이터셋 생성에서 오류가 나면 팔은 토크가 켜진 채 (휴식 자세로 굳은 채) 프로세스만 끝난다. 그때는 DC 를 뽑았다 꽂아 토크를 푼다 (조립 가이드 §7).
+
 ### 3.5 판정과 증거
 
 | 관찰 | 판정 |
@@ -541,13 +599,15 @@ USB 를 뽑아 멈춘 뒤에는 팔이 공중에 굳어 있다. **손으로 팔�
 | 팔이 지시문과 무관하게라도 스스로 움직인다 | must 3 통과 |
 | 큐브 쪽으로 간다 (reached) / 집는다 (grasped) | nice — RESULT.md §1 nice 행에 기록 |
 | 전혀 안 움직임 / 예외로 종료 | §6 표 |
-| 팔이 일어나 모든 관절이 0도 근처 (가운데 자세) 로 모인 뒤 작게 떨린다 | **예상되는 동작** (아래 문단) — must 3 통과. 디버깅하지 않고 v2.5 첫 항목으로 기록 (plan §5.4 의 "1-2 통과, 3 실패" 행과 같은 처리) |
+| 팔이 일어나 관절들이 0도 쪽으로 모인 뒤 멈춘다. `elbow_flex` 는 0도까지 못 가고 중간에서 멈춘다 | **예상되는 동작** (아래 문단) — must 3 통과. 디버깅하지 않고 v2.5 첫 항목으로 기록 (plan §5.4 의 "1-2 통과, 3 실패" 행과 같은 처리) |
 | 그 밖의 이상 동작 (극단 위치로 튐 등) | 반응은 한 것 — must 3 통과. USB 를 뽑아 멈추고 로그를 남긴다 |
 
 예상 동작의 근거 (2026-09-19 사전 검증 — 팔을 움직이지 않고 실제 카메라 · 관절값으로 정책 출력까지만 확인): 정책이 낸 관절 목표가 6개 모두 0 근처 (±4 이내) 였다. `smolvla_base` 의 정규화 통계는 `so100.` · `so100-blue.` · `so100-red.` 접두어가 붙은 키로 저장돼 있는데, lerobot 0.6.2 의 역정규화 단계는 접두어 없는 `action` 키를 찾고, 없으면 값을 그대로 통과시킨다. 그래서 모델이 낸 정규화된 값이 그대로 관절 목표 (도) 로 나간다. 입력 쪽 관절값도 같은 이유로 정규화되지 않은 채 들어간다. 각도 모드의 0도는 캘리브 파일의 `range_min` 과 `range_max` 의 중간 위치다.
 
 - 이 실행이 보여 주는 것은 "관측 → 모델 → 명령 경로가 이어지는가" 뿐이다. 과제 수행 능력에 대해서는 아무것도 말해 주지 않는다 — 큐브 쪽으로 가지 않는 것이 정상이다.
-- 휴식 자세에서 시작하면 팔이 **일어난다.** 0도는 각 관절 가동 범위의 가운데 (상완이 거의 수직, 팔꿈치 약 90도) 이고, 토크가 꺼진 휴식 자세는 `shoulder_lift` 약 -102도, `elbow_flex` 약 +103도, `wrist_flex` 약 +63도로 읽힌다 (사전 검증 실측). 이 세 관절이 각각 100도 · 100도 · 60도가량 움직여 공중의 가운데 자세로 올라가며, `max_relative_target=3` 이면 약 1.2초 걸린다. 팔 위쪽과 앞쪽 공간을 비워 둔다. 목표 위치는 6개 관절 모두 캘리브 범위 안이다.
+- 휴식 자세에서 시작하면 팔이 **일어난다.** 0도는 각 관절 가동 범위의 가운데 (상완이 거의 수직, 팔꿈치 약 90도) 이고, 토크가 꺼진 휴식 자세는 `shoulder_lift` 약 -102도, `elbow_flex` 약 +103도, `wrist_flex` 약 +63도로 읽힌다 (사전 검증 실측). 정책은 이 세 관절을 0도 쪽으로 보내고, `max_relative_target=3` 에서 팔이 멈추기까지 약 3초 걸린다 (실측). 팔 위쪽과 앞쪽 공간을 비워 둔다. 목표 위치는 6개 관절 모두 캘리브 범위 안이다.
+- **`elbow_flex` 는 목표에 도달하지 못한다.** 실측에서 `shoulder_lift` 는 +2도, `wrist_flex` 는 0도까지 갔지만 `elbow_flex` 는 목표 약 +2도에 못 미친 +42도에서 완전히 멈췄다 — 상완은 수직인데 전완이 수평까지 올라오지 못하고 앞쪽 아래로 비스듬히 뻗은 자세다. 가장 유력한 설명은 `max_relative_target=3` 이 서보에 보내는 목표를 "현재 위치 ± 3도" 로 묶기 때문이다. 서보는 P 제어라 위치 오차에 비례한 토크만 내는데, 오차가 3도로 묶이면 토크도 묶여 전완 + 그리퍼 + 손목 카메라를 중력에 맞서 더 들어 올리지 못한다 (RESULT.md §4 #11). must 3 판정에는 무관하다.
+- 그래서 `Relative goal position magnitude had to be clamped to be safe.` 경고가 30초 동안 약 1000줄 찍힌다. 목표와 현재 위치의 차이가 3도를 넘는 관절이 있는 틱마다 나오는 경고이고, 이 실행에서는 `elbow_flex` 가 끝까지 그 상태다. 오류가 아니다.
 
 **끝난 뒤 확인**
 
@@ -559,14 +619,43 @@ grep -n -A8 "Cadence summary" $SPIKE_OUT/d10_zeroshot.log
 # 제어 루프 주기 요약. 모델이 도는 틱은 33 ms 예산을 넘기므로 "ticks over the ... budget" 이 0 이 아닌 것이 정상이다
 ```
 
-- 예상 (계산값, 실측 아님): 모델은 50틱에 한 번 돌고 그 틱이 약 95 ms 걸린다. 그래서 예산 초과 틱은 약 2 %, 실효 주기는 30 Hz 보다 조금 낮은 29 Hz 안팎이 된다. 예산 초과가 이보다 훨씬 많으면 카메라 읽기나 GPU 쪽을 의심한다.
+- 실측 (2026-09-20, 1차 · 2차 실행 모두): 모델은 50틱에 한 번 돌고 그 틱이 약 100 ms 걸린다 (첫 추론만 약 340 ms). 예산 초과 틱은 17개 (2.0 %), 실효 주기는 28.5 Hz 다. 예산 초과가 이보다 훨씬 많으면 카메라 읽기나 GPU 쪽을 의심한다.
 - 스마트폰 영상을 `$SPIKE_OUT/evidence/` 로 옮긴다. `/workspace` 는 호스트 디렉터리의 bind mount 라 컨테이너를 재생성해도 남는다.
+
+2차 실행 (`episodic`) 을 했다면 데이터셋으로 같은 것을 수치로 본다:
+
+```bash
+grep -nE "Dataset ready|Recording episode|control loop ended|Finalizing dataset|Returning robot|Rollout finished|Traceback|Error" $SPIKE_OUT/d10_zeroshot_episodic.log | grep -v spd-say   # spd-say 경고는 음성 도구가 없다는 뜻이라 무해하다
+
+DSZ=$(ls -d ~/.cache/huggingface/lerobot/$HF_USER/rollout_so101-spike-zeroshot* | tail -1)   # 타임스탬프가 붙은 실제 폴더
+find $DSZ -name "*.mp4"                                                # camera1 (손목) · camera2 (ELP) 영상
+python - <<EOF
+import json
+import numpy as np
+import pandas as pd
+info = json.load(open("$DSZ/meta/info.json"))                      # 관절 이름 · 프레임 수가 여기 있다
+names = info["features"]["action"]["names"]
+df = pd.read_parquet("$DSZ/data/chunk-000/file-000.parquet")       # 프레임당 1행
+state = np.stack(df["observation.state"].to_numpy())               # 팔의 실제 관절값
+action = np.stack(df["action"].to_numpy())                         # 정책이 낸 관절 목표
+print(info["total_episodes"], "episode |", info["total_frames"], "frames")
+for j, name in enumerate(names):
+    print(f"{name:18s} state {state[0, j]:7.1f} -> {state[-1, j]:7.1f} (moved {np.ptp(state[:, j]):6.1f}) | action {action[:, j].min():6.1f} .. {action[:, j].max():6.1f}")
+EOF
+```
+
+읽는 법:
+
+- `1 episode | 약 900 frames` 가 찍혀야 한다 (30 s x 30 fps).
+- `state A -> B` 는 첫 프레임과 마지막 프레임의 관절값이다. 녹화는 복귀 전에 끝나므로 마지막 값은 일어난 자세다. 휴식 자세에서 시작했다면 `shoulder_lift` 가 약 -100 → 0 근처, `elbow_flex` 가 약 +100 → 0 근처로 찍힌다. `moved` (그 관절이 움직인 폭) 가 큰 값이면 **팔이 스스로 움직였다는 수치 증거다.**
+- `action min .. max` 가 6개 관절 모두 0 근처의 좁은 범위면 위의 "예상되는 동작" (정규화 통계 미적용) 을 실측으로 확인한 것이다.
+- ELP 영상 (`camera2`) 에서 팔이 일어났을 때 팔꿈치가 화면 위쪽에 걸칠 수 있다 (D9 구도의 위쪽 여유가 작다). 관절값이 같이 남으므로 판정에는 지장이 없다.
 
 **기록**
 
 | 어디에 | 무엇을 |
 |---|---|
-| RESULT.md §1 행 3 | 영상 파일 경로 + `outputs/d10_zeroshot.log` + 확보일. 관찰한 동작을 한 줄로 (위 판정 표의 어느 행이었는지) |
+| RESULT.md §1 행 3 | 영상 파일 경로 + `outputs/d10_zeroshot.log` + 확보일. 관찰한 동작을 한 줄로 (위 판정 표의 어느 행이었는지). 2차 실행을 했다면 데이터셋 폴더 + `outputs/d10_zeroshot_episodic.log` + 위 출력의 관절별 `moved` · `action` 범위 |
 | RESULT.md §1 nice | reached / grasped 를 봤을 때만 |
 | RESULT.md §2 | must 3 체크 |
 | RESULT.md §4 | §6 표에 **없는** 막힌 지점만 |
@@ -661,7 +750,7 @@ grep -n "def get_action" -A 30 $(python -c "import lerobot.rollout.inference.syn
 |---|---|---|
 | §1 행 1 | teleop 을 녹화한 데이터셋 경로 (영상 2개 포함) + 추종 수치 (지연 · RMSE · 최대 1틱 변화) | §2.1 의 teleop 확인 — `scripts/analyze_teleop_tracking.py` |
 | §1 행 2 | 데이터셋 repo id | §2.4 |
-| §1 행 3 | 영상 경로 + `d10_zeroshot.log` 경로 + 관찰한 동작 한 줄 | §3.5 |
+| §1 행 3 | 영상 경로 + `d10_zeroshot.log` 경로 + 관찰한 동작 한 줄. 2차 실행을 했다면 데이터셋 폴더 + 관절별 움직인 폭 · 정책 출력 범위 | §3.5 |
 | §1 행 4 | "RESULT.md 1줄" (chunk mean / p95, OpenVLA 병기) + 고정해 둔 원본 파일 경로 | §4.2 |
 | §1 nice | reached / grasped 관찰 | §3.5 (있을 때만) |
 | §2 체크박스 | Week 2 4개 | 각 Day 완료 시 |
@@ -709,6 +798,7 @@ RESULT.md 는 경로를 적을 뿐이고, 증거 자체는 아래 위치에 있�
 | must 1 데이터셋, D8 테스트 녹화 | `~/.cache/huggingface/lerobot/` — docker named volume `hf-cache` | `docker volume rm` · `docker compose down -v` · `docker volume prune`. 컨테이너 재생성에는 남는다 | `outputs/evidence/` 에 폴더째 사본 |
 | must 2 데이터셋 | HF Hub (private) + 위 볼륨 | Hub 에서 직접 지울 때 | Hub 가 원본 |
 | must 3 영상 · 로그 | `outputs/evidence/`, `outputs/d10_zeroshot.log` | 직접 지울 때 | — |
+| must 3 2차 실행 데이터셋 (선택) | `~/.cache/huggingface/lerobot/$HF_USER/rollout_so101-spike-zeroshot_*` — 위 `hf-cache` 볼륨. 로그는 `outputs/d10_zeroshot_episodic.log` | must 1 데이터셋과 같다 | must 1 데이터셋과 같다 |
 | must 4 측정 원본 | `outputs/evidence/smolvla_latency_4070_*` | 직접 지울 때. `outputs/` 바로 아래의 같은 이름 파일은 재실행 때마다 덮어써진다 | §4.2 의 고정 절차 |
 | 캘리브 파일 | `$HF_LEROBOT_CALIBRATION` — 호스트 `~/Documents/so-arm101/calibration` 의 bind mount | 직접 지우거나 재캘리브로 덮어쓸 때 | 조립 가이드 §6.3 의 백업 |
 
@@ -742,6 +832,10 @@ RESULT.md 는 경로를 적을 뿐이고, 증거 자체는 아래 위치에 있�
 | D10 | 화면이 D9 때와 다른 곳을 비춘다 | D9 뒤에 카메라가 밀렸다 | `$SPIKE_OUT/ref_overview.png` 와 실시간 화면을 비교해 되돌린다 (§1.2). 스파이크 판정에는 무관하지만 D9 데이터와 시점이 달라진다 |
 | D10 | 로그가 30초 가까이 조용하다 | 정상. 화면 표시가 꺼져 있으면 제어 루프는 틱마다 로그를 찍지 않는다 | 기다린다. `Duration limit reached` 가 찍힌다 (§3.4 의 표) |
 | D10 | `Ctrl+C` 를 눌렀는데 팔이 바로 풀리지 않고 움직인다 | 정상. rollout 은 종료할 때 팔을 시작 자세로 약 3초에 걸쳐 되돌린 뒤 토크를 끈다 | `Rollout finished` 가 찍힐 때까지 손을 넣지 않는다. 즉시 멈춰야 하면 USB 를 뽑는다 (§3.4 의 "멈추는 법") |
+| D10 2차 | `Dataset names for rollout must start with 'rollout_'` | `lerobot-rollout` 은 데이터셋 이름이 `rollout_` 로 시작하지 않으면 거부한다 | `--dataset.repo_id=$HF_USER/rollout_so101-spike-zeroshot` (§3.4 의 2차 실행) |
+| D10 2차 | 30초가 지났는데 팔이 일어난 채 굳어 있고 `Svt[info]` 줄이 쏟아진다 | 정상. `episodic` 은 에피소드를 저장 (영상 인코딩) 한 뒤에 복귀한다. 그동안 제어 루프가 멈춰 팔은 마지막 자세를 유지한다 | 약 19초 기다린다. `Returning robot to initial position` 뒤에 내려온다 |
+| D10 | `Relative goal position magnitude had to be clamped to be safe.` 경고가 쏟아진다 | 정상. `max_relative_target=3` 이 목표를 현재 위치 ± 3도로 자를 때마다 찍힌다. `elbow_flex` 가 목표에 못 미친 채 멈춰 있어 매 틱 나온다 (§3.5) | 무시한다. 단계 확인은 `grep` 으로 신호 줄만 본다 (§3.5 의 "끝난 뒤 확인") |
+| D10 2차 | 오류로 끝났는데 팔이 휴식 자세로 굳어 있다 (손으로 안 움직인다) | 로봇 연결 뒤의 준비 단계 (데이터셋 생성) 에서 예외가 나 연결 해제를 거치지 못했다. 토크가 켜진 채 남는다 | DC 를 뽑았다 꽂아 토크를 푼다 (조립 가이드 §7). 로그의 `Traceback` 을 읽고 원인을 고친 뒤 재실행 |
 | D10-D11 | `ImportError: 'transformers' is required but not installed` | venv 에 `smolvla` extra 가 없음. lerobot 은 이 검사를 import 시점이 아니라 정책 객체를 만드는 시점 (`from_pretrained`) 에 하므로 `import` 와 §3.1 은 통과한다 | §0.2 의 `pip install "lerobot[smolvla]"` |
 | D11 | latency 가 대부분 0-1 ms | action 큐에서 꺼내기만 하고 모델이 안 돎 | 스크립트의 `policy.reset()` 이 루프 안에 있는지 확인 |
 | D11 | `KeyError: observation.language.tokens` 류 | 신버전인데 preprocessor 를 안 거침 | 스크립트의 preprocessor 분기 + §4.3 |
