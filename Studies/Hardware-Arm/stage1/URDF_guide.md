@@ -11,8 +11,8 @@
 
 
 1. 원본 확보: https://github.com/TheRobotStudio/SO-ARM100 (SO-101 URDF/STL — LeRobot 문서에서도 링크)
-2. `so101_description/urdf/` 로 복사 후 joint 이름·mesh 경로를 패키지 기준으로 정리
-3. **캘리브레이션 오프셋 반영**: 스파이크의 LeRobot 캘리브레이션 (`lerobot-calibrate`) 영점과 URDF 영점을 대조 — 어긋나면 `<origin rpy>` 또는 드라이버 오프셋으로 흡수
+2. `so101_description/urdf/` 로 복사 후 joint 이름·mesh 경로를 패키지 기준으로 정리 — 패키지 원본은 이 레포의 `stage1/ros2_pkg/so101_description/` 이고 URDF 는 그 안 `urdf/` 한 곳에만 둔다 ([ros2_driver_setup.md](ros2_driver_setup.md) §2)
+3. **캘리브레이션 오프셋 반영**: 스파이크의 LeRobot 캘리브레이션 (`lerobot-calibrate`) 영점과 URDF 영점을 대조 — 어긋나면 URDF 의 `<origin rpy>` 로 먼저 맞춘다. 드라이버의 `homing_offset` 은 서보 EEPROM 에 직접 기록돼 LeRobot 캘리브레이션과 같은 자리를 덮어쓰므로 마지막 수단이다 ([ros2_driver_setup.md](ros2_driver_setup.md) §1.2)
 4. 아래 §1-§4 는 재사용한 URDF 를 **읽고 고치기 위한** 기초다 (백지 작성용 아님)
 
 
@@ -123,19 +123,21 @@ xacro so101.urdf.xacro > so101.urdf
     <!-- 플러그인 클래스명은 feetech_ros2_driver 버전으로 확인 (ros2_driver_setup.md §1) -->
     <plugin>feetech_ros2_driver/FeetechHardwareInterface</plugin>
     <!-- 컨테이너에서는 so101-attach 가 만드는 고정 경로를 쓴다 -->
+    <!-- 보드레이트는 파라미터가 없다 — 드라이버 코드의 기본값이 1000000 이다 (ros2_driver_setup.md §1.2) -->
     <param name="usb_port">/dev/so101_follower</param>
-    <param name="baud_rate">1000000</param>
   </hardware>
   <joint name="shoulder_pan">
     <param name="id">1</param>
     <command_interface name="position"/>
+    <!-- 드라이버가 내보내는 상태는 position / velocity 두 개다 (effort 는 없다) -->
     <state_interface name="position"/>
     <state_interface name="velocity"/>
-    <state_interface name="effort"/>
   </joint>
-  <!-- 나머지 5 joint + gripper 동일 패턴 (ID 2-6) -->
+  <!-- 나머지 5 joint 동일 패턴 (shoulder_lift 2, elbow_flex 3, wrist_flex 4, wrist_roll 5, gripper 6) -->
 </ros2_control>
 ```
+
+실제로 쓰는 블록은 `ros2_pkg/so101_description/urdf/so101.urdf.xacro` 의 끝에 있다 (6 joint 전부 + 팔 없이 시험하는 `use_mock_hardware` 분기).
 
 
 ---

@@ -29,10 +29,12 @@ sim_app = SimulationApp({"headless": False})
 
 
 from omni.importer.urdf import _urdf
-import os
 
 
-urdf_path = os.path.expanduser("~/ros2_ws/src/so101_description/urdf/so101.urdf")
+# 컨테이너 기준 경로. 원본은 레포의 stage1/ros2_pkg/so101_description/ 이고
+# 워크스페이스 src/ 에는 심링크가 걸려 있다 (ros2_driver_setup.md §2).
+# Isaac Sim 을 컨테이너 밖에서 돌리면 그 기계에서 보이는 레포 경로로 바꾼다.
+urdf_path = "/workspace/so101_ws/src/so101_description/urdf/so101.urdf"
 
 
 cfg = _urdf.ImportConfig()

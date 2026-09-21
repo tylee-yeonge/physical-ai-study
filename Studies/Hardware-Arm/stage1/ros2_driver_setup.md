@@ -2,8 +2,9 @@
 
 > 시기: 2026.10 (Stage 1 첫 주 — 구 스파이크의 ROS2 검증 항목을 여기서 인수)
 > 전제: 스파이크 (2026.09, 판정 2026-09-20 통과) 에서 팔이 LeRobot 네이티브로 이미 돈다 — teleop·캘리브레이션 완료 상태
-> **이 환경의 사실**: 작업은 Ubuntu PC 위 Docker 컨테이너 (Ubuntu 24.04, ROS 2 Jazzy, root) 에서 한다. 팔로워 포트는 `so101-attach` 가 만드는 **`/dev/so101_follower`** 이고 (`ls -la /dev/so101_*` 로 확인, 없으면 `so101-attach`), 모터 ID 는 1-6, 보드레이트는 1,000,000 이다. `feetech_ros2_driver` 가 Jazzy 에서 빌드되는지는 §1 에서 가장 먼저 확인한다
+> **이 환경의 사실**: 작업은 Ubuntu PC 위 Docker 컨테이너 (Ubuntu 24.04, ROS 2 Jazzy, root) 에서 한다. 팔로워 포트는 `so101-attach` 가 만드는 **`/dev/so101_follower`** 이고 (세션을 시작할 때마다 `so101-attach` 를 실행한다 — `ls` 로 노드가 보이는 것만으로는 연결돼 있다는 뜻이 아니다, "자주 발생 문제" 첫 행), 모터 ID 는 1-6, 보드레이트는 1,000,000 이다. `feetech_ros2_driver` 가 Jazzy 에서 빌드되는지는 §1 에서 가장 먼저 확인한다
 > **역할 분리**: 데이터·학습 = LeRobot / 배포·통합 = ROS 2. **같은 시리얼 포트를 쓰므로 동시에 한 스택만 버스에 붙인다** (LeRobot 프로세스 종료 후 ROS2 기동)
+> **코드 배치**: 워크스페이스 (빌드하는 곳) 는 **`/workspace/so101_ws`**, 직접 만드는 패키지의 원본은 **이 레포의 `stage1/ros2_pkg/`** 다. 둘은 심링크로 잇는다 (§2). 컨테이너의 홈 (`~` = `/root`) 은 컨테이너를 다시 만들면 지워지므로 워크스페이스를 `~/ros2_ws` 에 두지 않는다 — 남는 곳은 `/workspace` 뿐이다
 
 ---
 
@@ -19,35 +20,134 @@
 
 ## 1. feetech_ros2_driver 설치
 
+### 1.0 선행 설치 (컨테이너에 없는 것)
+
+이 컨테이너에는 ROS 2 Jazzy 본체 (`ros-jazzy-desktop`) 만 들어 있고 아래 다섯 개가 없다. 없는 채로 §1.1 의 명령을 치면 `rosdep: command not found` 에서 멈춘다.
+
+| 패키지 | 무엇인가 | 없으면 |
+|---|---|---|
+| `python3-rosdep` | `package.xml` 에 적힌 의존성 이름을 apt 패키지로 바꿔 한 번에 깔아 주는 도구 | `rosdep: command not found` |
+| `python3-colcon-common-extensions` | ROS 2 워크스페이스 빌드 도구 `colcon` | 시스템에 `colcon` 이 없다 — venv 안에 pip 로 깔린 것만 잡힌다 |
+| `ros-jazzy-ros2-control` | ros2_control 본체 (`hardware_interface` · `controller_manager`). 드라이버가 이것을 상속한다 | 드라이버 빌드 실패 |
+| `ros-jazzy-ros2-controllers` | `joint_state_broadcaster` · `forward_command_controller` 등 §3 의 컨트롤러 | §4 에서 컨트롤러 로드 실패 |
+| `ros-jazzy-xacro` | `.urdf.xacro` 를 `.urdf` 로 펴 주는 도구 | §2 · URDF_guide 의 `xacro` 명령 실패 |
+
 ```bash
-cd ~/ros2_ws/src
+deactivate                      # venv 가 켜져 있으면 끈다 (프롬프트 앞의 (.venv-...) 가 사라진다)
+apt update
+apt install -y python3-rosdep python3-colcon-common-extensions \
+    ros-jazzy-ros2-control ros-jazzy-ros2-controllers ros-jazzy-xacro
+rosdep init                     # 1회 — /etc/ros/rosdep/sources.list.d/ 를 만든다
+rosdep update                   # 의존성 이름 -> apt 패키지 대응표를 받는다
+which colcon rosdep             # 기대: /usr/bin/colcon, /usr/bin/rosdep
+```
+
+- **venv 를 끄는 이유**: 이 워크스페이스는 C++ 패키지라 파이썬 venv 가 필요 없다. venv 를 켠 채 빌드하면 `colcon` 과 CMake 가 venv 의 파이썬을 잡아 시스템 쪽 ROS 파이썬 모듈을 못 찾는 오류가 날 수 있다. `/workspace/so101_ws` 에서는 항상 venv 없이 작업한다.
+- **컨테이너를 다시 만들면 이 설치는 사라진다**: `apt install` 은 컨테이너 안에만 남는다 (`/workspace` 밖). `build/` · `install/` 은 `/workspace` 에 있어 남지만, 빌드된 드라이버가 기대는 apt 라이브러리가 사라지므로 다시 깔아야 돈다. 재생성 뒤에도 남게 하려면 호스트의 compose 프로젝트 (`vscode-tunnel`) 의 Dockerfile 에 아래 블록을 넣는다. ROS 2 Jazzy 를 설치하는 줄보다 뒤에 둔다.
+
+```dockerfile
+# SO-101 Stage 1: ros2_control + feetech_ros2_driver 의 빌드 · 실행에 필요한 패키지
+RUN apt-get update && apt-get install -y \
+        python3-rosdep \
+        python3-colcon-common-extensions \
+        ros-jazzy-ros2-control \
+        ros-jazzy-ros2-controllers \
+        ros-jazzy-xacro \
+        ros-jazzy-joint-state-publisher \
+        ros-jazzy-joint-state-publisher-gui \
+        libserial-dev \
+        libexpected-dev \
+        librange-v3-dev \
+    && rm -rf /var/lib/apt/lists/* \
+    && (rosdep init || true) \
+    && rosdep update --rosdistro jazzy
+```
+
+이 목록은 이 컨테이너의 apt 설치 기록 (`/var/log/apt/history.log`) 에서 뽑은 것이다 — 위의 다섯 개, `rosdep install` 이 드라이버용으로 깐 `libserial-dev` · `librange-v3-dev` · `libexpected-dev`, 패키지용으로 깐 `joint-state-publisher` 두 개. Dockerfile 은 컨테이너 안에서 보이지 않으므로 호스트에서 고친다.
+
+### 1.1 드라이버 빌드
+
+```bash
+mkdir -p /workspace/so101_ws/src      # 워크스페이스는 /workspace 아래 (컨테이너 재생성에도 남는다)
+cd /workspace/so101_ws/src
 git clone https://github.com/JafarAbdi/feetech_ros2_driver.git
+git -C feetech_ros2_driver log --oneline -1   # 받은 커밋 확인 — §1.2 는 18aed7f 기준이다
 cd ..
 rosdep install --from-paths src --ignore-src -r -y
 colcon build --packages-select feetech_ros2_driver
 source install/setup.bash
 ```
 
-> 플러그인 클래스명·파라미터 스키마는 저장소 버전에 따라 다르다 — 진입 시 저장소 README 로 재확인하고 아래 예시를 맞춘다.
+> 플러그인 클래스명·파라미터 스키마는 저장소 버전에 따라 다르다. 받은 커밋이 `18aed7f` 가 아니면 저장소의 `doc/user.md` 를 다시 읽고 §1.2 와 아래 예시를 그 버전에 맞춘다.
+> `feetech_ros2_driver` 는 남의 저장소라 워크스페이스에만 둔다 (이 레포에 넣지 않는다).
+
+### 1.2 이 드라이버의 사실 (v0.2.2, 커밋 `18aed7f` — `doc/user.md` 와 `src/feetech_ros2_driver.cpp` 에서 확인)
+
+| 항목 | 사실 | 이 작업에 주는 영향 |
+|---|---|---|
+| 지원 배포판 | 저장소 CI 가 jazzy · humble · rolling 을 빌드한다 | Jazzy 빌드는 저장소가 관리하는 경로다 |
+| 플러그인 이름 | `feetech_ros2_driver/FeetechHardwareInterface` | [URDF_guide.md](URDF_guide.md) 의 `<plugin>` 예시와 같다 |
+| 하드웨어 파라미터 | `usb_port` (필수), `joint_config_file` (선택) 두 개만 읽는다. 보드레이트는 파라미터가 아니라 코드 기본값 1,000,000 이다 | `/dev/so101_follower` 만 넣으면 된다. 서보가 1,000,000 bps 로 설정돼 있어 그대로 맞는다 |
+| 관절 파라미터 | `id` (필수). 선택: `homing_offset`, `range_min`, `range_max`, `max_torque_limit`, `protection_current`, `overload_torque`, `p/i/d_coefficient`, `return_delay_time`, `acceleration` | W5 의 토크 상한 = `max_torque_limit`, 서보 단의 각도 한계 = `range_min` · `range_max` (단위는 도가 아니라 0-4095 틱) |
+| **선택 파라미터를 적으면 서보에 기록된다** | 기동할 때 토크를 끄고 EEPROM 잠금을 푼 뒤, **적혀 있는 파라미터만** 서보에 쓴다. 적지 않은 것은 건드리지 않는다 | 서보의 EEPROM 은 LeRobot 과 공유한다. LeRobot 캘리브레이션도 같은 자리 (`Homing_Offset` · `Min/Max_Position_Limit`) 에 값을 써 두었다. LeRobot 은 연결할 때마다 서보에서 이 값들을 읽어 캘리브 json 과 비교하고, 하나라도 다르면 "캘리브가 안 맞는다" 로 보고 캘리브 절차로 들어간다 (lerobot 0.6.2 `is_calibrated`). **W1-W2 에서는 `id` 만 적는다.** 다른 값은 W4 · W5 에서 LeRobot 캘리브 json 과 대조하며 하나씩 넣는다 |
+| 영점 | 드라이버는 항상 2048 틱을 0 rad 로 본다 | **틱 기준은 두 스택이 같고, 각도의 0 은 다르다.** LeRobot 캘리브는 호밍 자세가 2047 틱으로 읽히게 `Homing_Offset` 을 서보에 써 둔다 (lerobot 0.6.2 `_get_half_turn_homings`) — 드라이버의 2048 과 1틱 (0.09도) 차이라 틱 기준은 같다고 봐도 된다. 그런데 LeRobot 이 내주는 **도 단위 값의 0 은 2047 틱이 아니라 캘리브 범위의 중점** `(range_min + range_max) / 2` 다 (`motors_bus.py` 의 DEGREES 정규화). 이 팔의 캘리브 json 으로 계산한 차이 (중점 - 2047): `shoulder_pan` +0.2도, `shoulder_lift` -0.9도, `elbow_flex` **-13.9도**, `wrist_flex` +3.8도, `wrist_roll` 0도 (그리퍼는 LeRobot 에서 0-100 단위라 해당 없음). 같은 자세를 두 스택이 다른 숫자로 읽는다는 뜻이다 — `elbow_flex` 는 ROS2 쪽 값이 LeRobot 쪽 값보다 약 14도 작게 나온다. W4 에서 두 스택의 값을 대조하거나 W6-7 · v2.5 에서 값을 오갈 때 이 차이를 관절별로 더해 줘야 한다 |
+| 기동 시 | 명령 인터페이스가 있는 관절의 토크를 켜고, 첫 목표를 현재 위치로 둔다 | launch 를 띄우는 순간 팔이 튀지 않고 그 자세로 굳는다. 실제 팔에서 확인했다 (2026-09-22) — 기동 직후 6개 관절 모두 목표값 (command interface) 이 현재 위치 (state interface) 와 같았다 (`/controller_manager/introspection_data/full` 로 읽음). 그래도 **기동은 팔을 휴식 자세에 두고 한다** — 끌 때 토크가 풀리기 때문이다 (아래 행) |
+| **종료 시 토크 OFF** | `on_deactivate` 가 모든 관절의 토크를 끈다 | **launch 를 `Ctrl+C` 로 끄면 팔이 자중으로 떨어진다.** 끄기 전에 팔을 휴식 자세로 보내거나 손으로 받친다. W5 의 소프트웨어 정지를 "launch 종료" 로 구현하면 안 되는 이유이기도 하다 |
 
 ---
 
 ## 2. so101_description 패키지
 
+직접 만드는 패키지는 **원본을 이 레포에 두고, 워크스페이스에는 심링크 (바로가기) 만 건다.** 이유는 두 가지다.
+
+- 캘리브 오프셋을 반영한 URDF 와 controller config 는 Stage 1 의 must 산출물이다 — 레포 안에 있어야 git 으로 이력이 남는다.
+- 빌드 결과물 (`build/` · `install/` · `log/`) 은 `colcon build` 를 실행한 폴더에 생긴다. 워크스페이스에서 빌드하면 레포에는 소스만 남는다. colcon 은 `src/` 안의 심링크를 따라가 패키지를 찾는다.
+
 ```bash
-cd ~/ros2_ws/src
+# 1) 원본은 레포 안에 만든다
+PKG_HOME=/workspace/study/physical-ai-study/Studies/Hardware-Arm/stage1/ros2_pkg
+mkdir -p $PKG_HOME
+cd $PKG_HOME
 ros2 pkg create so101_description --build-type ament_cmake
 
-# 디렉토리 구조
+# 2) 워크스페이스 src/ 에 심링크를 건다
+ln -s $PKG_HOME/so101_description /workspace/so101_ws/src/so101_description
+ls -la /workspace/so101_ws/src      # 기대: so101_description -> /workspace/study/physical-ai-study/Studies/Hardware-Arm/stage1/ros2_pkg/so101_description
+
+# 3) 빌드는 항상 워크스페이스에서 한다 (레포 폴더 안에서 colcon build 를 돌리지 않는다)
+cd /workspace/so101_ws
+colcon build --packages-select so101_description --symlink-install
+source install/setup.bash
+
+# 디렉토리 구조 (원본 = 레포의 stage1/ros2_pkg/so101_description/)
 so101_description/
-  CMakeLists.txt
-  package.xml
-  urdf/so101.urdf.xacro     # SO-101 공개 URDF 재사용 + 오프셋 (URDF_guide.md)
+  CMakeLists.txt            # 컴파일할 코드 없음 — 아래 폴더 4개를 share/ 로 설치만 한다
+  package.xml               # launch 가 쓰는 패키지를 exec_depend 로 적어 둠 (rosdep 이 읽는다)
+  urdf/so101.urdf.xacro     # SO-101 공개 URDF 재사용 + <ros2_control> 블록 — URDF 는 여기 한 곳에만 둔다
+  meshes/*.stl              # 공개 URDF 가 참조하는 STL 13개 (16 MB)
   config/so101_controllers.yaml
   launch/
-    display.launch.py
-    bringup.launch.py
+    display.launch.py       # 팔 없이 URDF 만 본다
+    bringup.launch.py       # 드라이버 + 컨트롤러 (팔에 붙는다)
 ```
+
+> `--symlink-install` 은 설치 폴더에 파일을 복사하지 않고 원본을 가리키게 한다 — URDF · yaml · launch 를 고친 뒤 다시 빌드하지 않아도 바로 반영된다 (새 파일을 추가했을 때만 다시 빌드).
+
+**패키지가 기대는 것을 한 번 더 깐다.** `package.xml` 에 적힌 패키지 중 컨테이너에 없는 것 (`joint_state_publisher` · `joint_state_publisher_gui`) 이 있다. `display.launch.py` 가 이것을 쓴다.
+
+```bash
+cd /workspace/so101_ws
+rosdep install --from-paths src --ignore-src -r -y
+```
+
+**URDF 의 출처**: TheRobotStudio/SO-ARM100 의 `Simulation/SO101/so101_new_calib.urdf` (커밋 `eecbe3e`, Apache-2.0). `new_calib` 은 각 관절의 0 이 가동 범위의 가운데인 버전이고 LeRobot 캘리브레이션과 같은 규약이다. 원본에서 바꾼 것은 네 가지뿐이다 — mesh 경로를 `package://so101_description/meshes/` 로, robot 이름을 `so101` 로, ROS 1 형식 `<transmission>` 블록 6개 제거, 끝에 `<ros2_control>` 블록 추가. link · joint 의 수치는 원본 그대로다.
+
+**launch 인자 두 개**
+
+| 인자 | 기본값 | 뜻 |
+|---|---|---|
+| `use_mock_hardware` (bringup 만) | `false` | `true` 면 실제 드라이버 대신 가짜 하드웨어 (`mock_components/GenericSystem`) 를 쓴다. 시리얼 포트를 열지 않고, 받은 명령을 그대로 현재 위치로 돌려준다. 팔 없이 launch · 컨트롤러 설정을 시험하는 용도다 |
+| `gui` | `false` | `true` 면 RViz (display 는 관절 슬라이더 창도) 를 띄운다. 이 컨테이너에는 화면 (`DISPLAY`) 이 없어 창을 띄울 수 없으므로 기본값이 `false` 다 |
 
 ---
 
@@ -84,30 +184,187 @@ position_controller:
 
 ## 4. 동작 검증
 
+띄우기 전과 끄기 전에 한 가지씩 지킨다 (근거는 §1.2).
+
+- **띄우기 전**: 팔을 휴식 자세에 둔다. launch 가 뜨면 토크가 켜지면서 팔이 그 자세로 굳는다.
+- **끄기 전**: Terminal 1 에서 `Ctrl+C` 를 누르면 드라이버가 모든 관절의 토크를 끄고, 팔이 자중으로 떨어진다. 먼저 팔을 휴식 자세로 보내거나 손으로 받친 뒤에 끈다.
+
+### 4.1 먼저 팔 없이 (mock)
+
+실제 팔에 붙이기 전에 launch · 컨트롤러 설정 · 명령 순서를 가짜 하드웨어로 확인한다. 팔은 움직이지 않는다.
+
 ```bash
-# Terminal 1: Launch
-ros2 launch so101_description bringup.launch.py
+# Terminal 1
+ros2 launch so101_description bringup.launch.py use_mock_hardware:=true
+# 로그에서 확인: Loaded hardware 'SO101Hardware' from plugin 'mock_components/GenericSystem'
 
-# Terminal 2: Topic 확인
-ros2 topic list   # 기대: /joint_states, /position_controller/commands
-
-# Terminal 3: 소폭 명령 (안전 기초 적용 전 — 팔 주변 비우고 소각도만)
+# Terminal 2
+ros2 control list_controllers
+# 기대: position_controller ... active / joint_state_broadcaster ... active
 ros2 topic pub --once /position_controller/commands std_msgs/msg/Float64MultiArray \
     "data: [0.1, 0.0, 0.0, 0.0, 0.0, 0.0]"
+ros2 topic echo /joint_states --once
+# 기대: shoulder_pan 의 position 만 0.1 (mock 은 받은 명령을 그대로 현재 위치로 돌려준다)
 ```
+
+여기서 **두 토픽의 관절 순서가 다르다**는 것을 눈으로 확인해 둔다.
+
+| 토픽 | 순서 |
+|---|---|
+| `/position_controller/commands` (보내는 쪽) | yaml 의 `joints` 순서 — `shoulder_pan`, `shoulder_lift`, `elbow_flex`, `wrist_flex`, `wrist_roll`, `gripper` |
+| `/joint_states` (읽는 쪽) | 알파벳 순서 — `elbow_flex`, `gripper`, `shoulder_lift`, `shoulder_pan`, `wrist_flex`, `wrist_roll` |
+
+`/joint_states` 의 값은 위치 (몇 번째) 가 아니라 **`name` 배열의 이름으로** 찾아야 한다.
+
+### 4.2 실제 팔
+
+> **위 mock 의 명령 `[0.1, 0, 0, 0, 0, 0]` 을 실제 팔에 그대로 보내면 안 된다.** `position_controller` 는 배열의 6개 값을 전부 목표로 쓴다. 0 은 "그대로 둔다" 가 아니라 "0 rad (가동 범위의 가운데) 로 가라" 다. 휴식 자세의 팔은 0 rad 에서 멀리 떨어져 있어서 (스파이크 실측: `shoulder_lift` 약 -70도, `elbow_flex` 약 +100도), 이 명령은 다섯 관절을 한꺼번에 가운데 자세로 보낸다. 이 컨트롤러에는 보간도 속도 제한도 없어 서보의 최고 속도로 움직인다.
+> **첫 명령은 "지금 읽은 위치 그대로 + 한 관절만 조금" 이다.**
+
+```bash
+# Terminal 1: 보드가 실제로 연결돼 있는지부터 (노드를 새로 만든다. 실패하면 USB 를 확인)
+so101-attach
+
+# Terminal 1: Launch (팔은 휴식 자세. LeRobot 프로세스는 꺼져 있어야 한다)
+ros2 launch so101_description bringup.launch.py
+# 로그에서 확인: ... from plugin 'feetech_ros2_driver/FeetechHardwareInterface'
+
+# Terminal 2: 상태 확인
+ros2 control list_controllers          # 둘 다 active
+
+# Terminal 2: 붙여 넣을 명령을 만든다 (읽기만 한다 — 팔에는 아무것도 보내지 않는다)
+python3 /workspace/study/physical-ai-study/Studies/Hardware-Arm/stage1/scripts/print_joint_command.py
+```
+
+**Terminal 1 에 찍히는 것 — 어디까지가 정상인가**
+
+정상 기동이면 아래 줄이 차례로 나오고, 마지막 줄 뒤로는 조용해진다. 멈춘 것이 아니라 제어 루프가 100 Hz 로 돌고 있는 상태다.
+
+| 로그 | 뜻 |
+|---|---|
+| `Loaded hardware 'SO101Hardware' from plugin 'feetech_ros2_driver/FeetechHardwareInterface'` | 실제 드라이버를 불렀다 (mock 이면 `mock_components/GenericSystem`) |
+| `Connecting to port: /dev/so101_follower` 다음에 `Successful initialization` · `Successful 'configure'` · `Successful 'activate'` | 포트가 열렸고 서보 6개가 응답했다. 이 시점에 토크가 켜진다 |
+| `Configured and activated joint_state_broadcaster` / `... position_controller` | 컨트롤러 2개가 켜졌다 |
+| `[spawner-3]: process has finished cleanly` | **오류가 아니다.** spawner 는 컨트롤러를 켜고 나면 할 일이 끝나 스스로 종료하는 프로그램이다 |
+
+`[WARN]` 두 줄은 매번 나오고 무시해도 된다.
+
+| 경고 | 뜻 |
+|---|---|
+| `Could not enable FIFO RT scheduling policy ... Operation not permitted` | 컨테이너에 실시간 스케줄링 권한이 없어 제어 루프가 보통 우선순위로 돈다. 100 Hz 는 유지된다 (`ros2 topic hz /joint_states` 실측 100.0 Hz). 주기의 흔들림이 문제가 되는 것은 W6-7 의 latency 측정 때다 |
+| `kdl_parser: The root link base_link has an inertia specified in the URDF` | 공개 URDF 의 뿌리 링크에 관성값이 적혀 있는데 TF 계산 라이브러리 (KDL) 가 그것을 쓰지 않는다는 알림이다. 관절 위치 계산에는 영향이 없다 |
+
+`[INFO]` 지만 기억해 둘 줄이 하나 있다 — `Enforcing command limits is disabled. Command limits from URDF will be ignored.` URDF 의 `<limit>` 가 적용되지 않는다는 뜻이고, W5 소프트 리밋의 출발점이다.
+
+진짜 오류는 `[ERROR]` · `[error]` 로 찍히고, 그 뒤에 `process has died` 가 따라온다 ("자주 발생 문제" 표). 예외가 하나 있다 — `Ctrl+C` 로 끌 때 찍히는 `[ERROR] [controller_manager.pal_statistics]: Exception in publisher thread: context cannot be slept with because it's invalid!` 두 줄은 종료 중에 통계 발행 스레드가 내는 소음이다. 바로 뒤에 `Successful 'deactivate'` 와 `process has finished cleanly` 가 나오면 정상 종료다.
+
+스크립트는 `/joint_states` 를 한 번 읽어 관절값을 이름으로 찾고, 명령 순서 (yaml 의 `joints` 순서) 로 다시 늘어놓은 명령 두 줄을 찍는다. 아래는 출력 예시다 — **숫자는 그때그때 다르므로 예시를 베끼지 말고 자기 터미널에 찍힌 줄을 붙여 넣는다.**
+
+```
+관절            rad        도
+shoulder_pan    +0.0890     +5.10
+shoulder_lift   +0.5139    +29.44
+...
+
+# shoulder_pan 만 +0.0500 rad (+2.86도) 움직인다
+ros2 topic pub --once /position_controller/commands std_msgs/msg/Float64MultiArray "data: [0.139, 0.5139, 0.3513, 0.0092, 0.0046, -0.0046]"
+
+# 지금 읽은 자세로 되돌린다
+ros2 topic pub --once /position_controller/commands std_msgs/msg/Float64MultiArray "data: [0.089, 0.5139, 0.3513, 0.0092, 0.0046, -0.0046]"
+```
+
+- 첫 줄을 붙여 넣으면 `shoulder_pan` 하나만 약 3도 돈다. 나머지 다섯 값은 지금 읽은 위치 그대로라 움직이지 않는다. 둘째 줄로 되돌린다.
+- 다른 관절은 뒤에 이름과 변화량 (rad) 을 붙인다:
+
+  ```bash
+  python3 /workspace/study/physical-ai-study/Studies/Hardware-Arm/stage1/scripts/print_joint_command.py elbow_flex -0.05
+  ```
+- 표의 값이 눈앞의 팔 자세와 말이 되는지 본다 (어느 관절이 0 근처이고 어느 관절이 크게 꺾여 있는가). 이 대조가 W4 의 출발점이다.
+- 변화량은 작게 (0.05 rad 안팎) 시작한다. 이 컨트롤러는 받은 목표로 서보 최고 속도로 가고, 소프트 리밋 · 토크 상한은 W5 에 가서야 생긴다.
+- 명령을 직접 손으로 짜지 않는다. 값 6개의 순서나 부호를 틀리면 그 관절이 그만큼 튄다.
+- 끄기 전에는 이 절 맨 위의 "끄기 전" 을 따른다.
 
 ---
 
-## 5. 이중 latency 측정 (Stage 1 must)
+## 5. 이중 latency 측정 (Stage 1 must, W6-7)
 
-같은 추론 출력을 두 경로로 보내 왕복을 잰다:
+**무엇을**: 같은 명령 (한 관절의 목표값) 을 두 길로 팔에 보낸다 — (a) LeRobot 으로 직접, (b) ROS2 토픽을 거쳐. 각 길에서 "명령을 넘긴 순간부터 팔이 움직이기 시작할 때까지" 를 100번씩 잰다. 두 평균의 차이 **(b)-(a) 가 통합 오버헤드**, 곧 ROS2 를 거치는 대가로 늘어나는 시간이다.
+**왜**: "VLA 를 ROS2 시스템에 얹으면 얼마나 느려지는가" 에 숫자로 답하기 위해서다. 스파이크 must 4 의 106 ms 는 모델이 action 을 만드는 비용이고, 이 측정은 그 뒤 — 만들어진 action 이 모터에 닿기까지의 비용이다.
+**끝나면 손에 남는 것**: (a) · (b) · (b)-(a) 의 mean / p95 + Measurements 디렉토리 1개.
+**언제**: W5 (안전 기초) 뒤. 팔을 200번 넘게 움직이는 측정이라 소프트 리밋 · 토크 상한 · 소프트웨어 정지가 선 다음에 한다.
 
-| 경로 | 측정 |
+### 5.1 추론 시간은 이 측정에 넣지 않는다
+
+스파이크 must 4 는 팔 없이 GPU 의 추론 시간만 쟀다 ([week2_guide](../spike/week2/week2_guide.md) §4). 그 방법을 (a) 로 그대로 쓰면 (a) 는 "추론", (b) 는 "추론 + 전달 + 모터 응답" 이 돼서 빼도 뜻이 없다.
+
+추론은 두 길에 똑같이 들어가는 항이다. 똑같이 들어가는 항은 뺄 때 사라지므로 넣어 봐야 얻는 것이 없고, 추론 시간의 흔들림 (표준편차 1.6 ms) 만 남아 몇 ms 짜리 오버헤드를 가린다. 그래서 **추론을 빼고 "명령이 전달되는 길" 만 잰다.** must 4 에서 가져오는 것은 수치가 아니라 방법이다 — n=100, warm-up 5, mean / p95 / std, 원본 npy + 요약 csv, 환경 기록.
+
+### 5.2 두 길에서 시간이 드는 곳
+
+| 단계 | (a) LeRobot 직결 | (b) ROS2 경유 |
+|---|---|---|
+| 명령을 넘긴다 (t0) | `robot.send_action()` 을 부르기 직전 | `/position_controller/commands` 에 publish 하기 직전 |
+| 스택 안 | 함수 호출 → 시리얼 쓰기 | DDS 전송 → 컨트롤러가 받아서 보관 → **다음 제어 주기까지 대기** (100 Hz 면 0-10 ms) → 드라이버 `write()` → 시리얼 쓰기 |
+| 두 길 공통 | USB · 서보 버스 전송 → 서보가 움직이기 시작 | 같음 |
+| 움직임을 본다 (t1) | `Present_Position` 을 읽어 변화 감지 | `/joint_states` 에서 변화 감지 |
+
+"두 길 공통" 은 뺄 때 사라진다. 남는 것이 "스택 안" 의 차이이고, 그것이 이 측정이 알고 싶은 값이다.
+
+### 5.3 측정 정의 (착수 전에 고정하고 methodology 에 그대로 적는다)
+
+**1회 = 한 관절에 작은 계단 명령 1개를 보내고, 그 관절이 움직이기 시작할 때까지의 시간 (t1 - t0).**
+
+| 항목 | 기본안 | 왜 |
+|---|---|---|
+| 움직일 관절 | `shoulder_pan` | 중력을 받지 않아 도는 방향에 따라 응답이 달라지지 않는다 |
+| 계단 크기 | +0.05 rad 와 -0.05 rad 를 번갈아 | 작아서 안전하고, 번갈아 보내면 팔이 제자리를 오간다 |
+| t0 | 명령을 스택에 넘기기 직전의 시각 | 두 길에서 같은 위치다 |
+| t1 | 위치가 계단 전 값에서 문턱 (3틱 = 0.26도) 넘게 벗어난 첫 샘플의 시각. (b) 에서는 메시지를 받은 시각이 아니라 `/joint_states` 의 `header.stamp` | 서보는 서 있을 때도 1-2틱 떨린다 — 그것을 움직임으로 잡지 않기 위한 문턱이다. `header.stamp` 를 쓰는 것은 상태가 되돌아오는 길의 DDS 시간이 (b) 에만 더해지지 않게 하기 위해서다 |
+| **관측 주기** | **두 길 모두 10 ms** | 아래 설명 |
+| 반복 사이 | 팔이 멈춘 뒤 0.5 s | 앞 반복의 움직임이 다음 반복에 섞이지 않게 |
+| n / warm-up | 100 / 5 | must 4 와 같다 |
+| LeRobot 의 `max_relative_target` | 끄고 잰다 | 켜면 `send_action` 이 쓰기 전에 현재 위치를 한 번 더 읽는다. ROS2 길에는 없는 단계라 (a) 에만 시간이 더해진다 |
+
+**관측 주기를 맞추는 이유.** 움직임은 "위치를 읽는 순간" 에만 보인다. 10 ms 마다 읽으면 실제보다 평균 5 ms 늦게 알아챈다. (b) 는 `/joint_states` 가 100 Hz 로 나오므로 10 ms 로 정해져 있다. (a) 에서 LeRobot 으로 그보다 촘촘히 읽으면 (a) 만 덜 늦게 보이고, 그만큼 (b)-(a) 가 부풀려진다. (a) 도 10 ms 마다 읽으면 이 늦음이 양쪽에 똑같이 들어가 뺄 때 사라진다.
+
+기본안을 바꾸면 (관절 · 계단 크기 · 문턱) 바꾼 값과 이유를 methodology 에 적는다.
+
+### 5.4 절차
+
+측정 스크립트는 아직 없다. W6 에 들어갈 때 5.3 의 표를 요구 사항으로 삼아 `stage1/scripts/` 에 두 개 (ROS2 용 · LeRobot 용) 를 만든다. 순서는 다음과 같다.
+
+1. **(b) 를 mock 으로 먼저 잰다** (`use_mock_hardware:=true`, 팔 없음). mock 은 받은 명령을 다음 주기에 그대로 현재 위치로 돌려준다. 그래서 이 값은 서보와 시리얼이 빠진 "DDS + 제어 주기 대기" 만의 시간이다. 스크립트 검증이자 (b) 의 하한 대조군이다
+2. **(b) 를 실제 팔로 잰다.** `so101-attach` → 팔을 낮은 자세로 받치고 bringup → 측정 → 팔을 받치고 종료
+3. **스택을 바꾼다.** ROS2 launch 가 완전히 꺼진 것을 확인한 뒤 LeRobot 으로 연결한다 (같은 시리얼 포트)
+4. **(a) 를 잰다.** 2번과 같은 날, 같은 자세, 같은 관절로
+5. 세 실행의 원본 (npy) 과 요약 (csv) 을 시각을 붙여 보존한다 ([week2_guide](../spike/week2/week2_guide.md) §4.2 의 "결과 파일을 고정해 둔다" 와 같은 방식)
+
+### 5.5 값싼 검증 — "돌아간다" 와 "맞다" 는 다르다
+
+| 확인 | 어긋나면 |
 |---|---|
-| (a) LeRobot 직결 | 스파이크 must 4 방법 재사용 (n=100) |
-| (b) ROS2 토픽 경유 | 추론 → `/position_controller/commands` → 모터 응답 (n=100) |
+| (b)-(a) 가 0 보다 크다 | ROS2 를 거친 길이 직결보다 빠를 수는 없다. t0 · t1 을 찍는 위치나 관측 주기가 두 길에서 다르다 |
+| (b) mock 이 (b) 실제 팔보다 작다 | mock 에는 서보와 시리얼이 없다. 크게 나오면 mock 측정이 다른 것을 재고 있다 |
+| 문턱을 3틱에서 5틱으로 바꿔도 (b)-(a) 가 거의 같다 | 문턱은 두 길에 똑같이 들어가는 항이다. 달라지면 두 길의 관측 조건이 같지 않다 |
+| (선택) `update_rate` 를 100 에서 200 으로 올리면 (b) 가 줄어든다 | "스택 안" 에서 가장 큰 몫이 제어 주기 대기라면 줄어야 한다. 줄지 않으면 다른 곳에 시간이 들고 있다 — 그것을 찾는 것이 findings 다 |
 
-**(b)-(a) = 통합 오버헤드** — 셋째 층 증거로 기록 (Measurements 3분할 형식: environment / methodology / findings).
+### 5.6 기록
+
+`Measurements/` 아래 새 디렉토리 1개. 기존 측정들과 같은 3분할이다.
+
+| 파일 | 담는 것 |
+|---|---|
+| `environment.md` | PC · 컨테이너 · ROS 2 Jazzy · ros2_control 버전 · 드라이버 커밋 (`18aed7f`) · lerobot 0.6.2 · `update_rate` · 실시간 스케줄링이 꺼져 있다는 사실 (bringup 로그의 `Could not enable FIFO RT scheduling policy`) · LeRobot 에서 위치를 한 번 읽는 데 걸리는 시간 |
+| `methodology.md` | 5.1 (추론을 뺀 이유) · 5.3 의 표 (바꾼 값 포함) · 5.4 의 순서 · 5.5 의 검증 결과 |
+| `findings.md` | (a) · (b) · (b) mock · (b)-(a) 의 mean / p95 / std, 분포 그림, 시간이 어디에 드는가에 대한 해석 |
+
+### 5.7 끝났다고 하기 전에 스스로 답해 보는 질문
+
+1. 추론 시간을 넣고 재면 (b)-(a) 의 평균은 어떻게 되고, 흔들림은 어떻게 되는가?
+2. 서보가 명령을 받고 움직이기 시작할 때까지의 지연은 (a) · (b) 값에는 들어 있는데 (b)-(a) 에는 없다. 왜인가?
+3. (a) 의 관측 주기를 2 ms 로, (b) 를 10 ms 로 두고 재면 결과가 어느 방향으로 얼마나 틀리는가?
+4. `update_rate` 를 올리면 (b) 가 줄어든다. 어디까지 올릴 수 있고, 그 한계를 정하는 것은 무엇인가?
+5. 정책을 30 Hz 로 돌릴 때 (action 하나에 33 ms) 이 오버헤드는 큰가 작은가? chunk 하나 (106 ms) 에 견주면?
 
 ---
 
@@ -115,7 +372,8 @@ ros2 topic pub --once /position_controller/commands std_msgs/msg/Float64MultiArr
 
 | 증상 | 해결 |
 |---|---|
-| 포트가 안 열림 | 컨테이너에서는 `/dev/so101_follower` 가 있는지 먼저 본다 — 없으면 `so101-attach` (USB 를 뽑았다 꽂으면 다시 실행). 컨테이너는 root 라 `dialout` 그룹은 필요 없다. 호스트에서 직접 돌릴 때만 `dialout` 그룹 추가 |
+| launch 로그에 `Open [/dev/so101_follower]: Bad file descriptor` → `LibSerial::NotOpen` 으로 `ros2_control_node` 가 죽고, spawner 가 `waiting for service /controller_manager/list_controllers` 만 되풀이한다. `/joint_states` 가 안 나온다 | 서보 보드의 USB 가 호스트에 연결돼 있지 않다. **`/dev/so101_follower` 노드가 `ls` 에 보여도 소용없다** — 이 노드는 `so101-attach` 가 `mknod` 로 만든 것이라 USB 를 뽑아도 껍데기가 그대로 남고, 열 때에야 "그런 장치 없음" (ENXIO) 이 난다. 드라이버는 이것을 `Bad file descriptor` 로 찍는다. 확인: `so101-attach list` 의 `serial boards` 아래에 `ttyACM` 줄이 있어야 한다. 비어 있으면 팔로워 보드의 USB-C 를 꽂고 `so101-attach` 를 다시 실행한다 (DC 어댑터와는 별개다 — 보드의 USB 칩은 USB 전원으로 돈다). 이 상태에서 `Ctrl+C` 를 누르면 노드가 스택 트레이스를 찍느라 바로 안 죽고 15초쯤 뒤 강제 종료된다 |
+| 포트는 있는데 권한 오류 | 컨테이너는 root 라 `dialout` 그룹은 필요 없다. 호스트에서 직접 돌릴 때만 `dialout` 그룹 추가 |
 | 모터 검출 안 됨 | LeRobot 프로세스가 포트 점유 중인지 먼저 확인 → 보드레이트·프로토콜 확인 |
 | Joint 이름 mismatch | URDF 와 yaml 의 joint name 동일하게 |
 | 위치 단위/오프셋 | URDF: rad. STS3215: 12비트 스텝. lerobot 0.6.2 의 SO 팔로워는 도 단위다 (`use_degrees=True`, 그리퍼만 0-100) — LeRobot 캘리브레이션 오프셋과 드라이버 영점이 일치하는지 대조할 때 단위부터 맞춘다 |
@@ -128,4 +386,4 @@ ros2 topic pub --once /position_controller/commands std_msgs/msg/Float64MultiArr
 - [ ] feetech_ros2_driver 빌드 성공
 - [ ] so101_description 패키지 + bringup 동작
 - [ ] joint_states 발행 + position 명령 → 모터 동작
-- [ ] 이중 latency 측정 기록 ((a)/(b)/오버헤드)
+- [ ] 이중 latency 측정 기록 ((a) / (b) / (b) mock / 오버헤드 — §5.3 의 정의대로)
