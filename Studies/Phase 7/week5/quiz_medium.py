@@ -12,7 +12,7 @@ def p2():
     print("\n문제 2: e-stop 의 ROS2 통합")
     print("  /estop topic publish")
     print("  모든 노드가 subscribe -> emergency state")
-    print("  motor controller 가 disable")
+    print("  motor controller 가 명령을 막고 현 위치 정지 (토크 유지)")
 
 
 def p3():

@@ -18,7 +18,8 @@
 ### e-stop
 - Hardware button (preferred): GPIO 입력
 - Software (keyboard): test 용
-- Action: 즉시 motor disable + ROS2 emergency state
+- Action: 명령 차단 + 현재 위치를 목표로 써서 그 자리에 정지 (토크 유지) + ROS2 emergency state
+- motor disable (토크 OFF) 은 정지 동작으로 쓰지 않는다 — 토크가 풀리면 팔이 자중으로 낙하한다. 명령을 버리기만 해도 안 된다 — 위치 제어는 마지막 목표를 계속 따라간다 ([Stage 2 안전 인터록](../../Hardware-Arm/stage2/safety_interlock.md) e-stop 절)
 
 
 ### 충돌 감지 (토크 급증)
@@ -35,8 +36,8 @@ bool collision_detected(JointState current) {
 
 
 ### Latency
-- e-stop -> motor disable: ~ 2 ms
-- collision detect -> motor disable: ~ 5 ms
+- e-stop -> 현 위치 정지 명령 발행: ~ 2 ms
+- collision detect -> 현 위치 정지 명령 발행: ~ 5 ms
 
 
 ## 자체 점검

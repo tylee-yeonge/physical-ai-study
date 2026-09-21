@@ -18,7 +18,7 @@ def p3():
 
 def p4():
     print("\n문제 4: 충돌 감지의 응용")
-    print("  A) 학습 데이터\n  B) Real-time safety (즉시 motor disable)\n  C) Visualization\n  D) Logging")
+    print("  A) 학습 데이터\n  B) Real-time safety (즉시 현 위치 정지)\n  C) Visualization\n  D) Logging")
 
 
 if __name__ == "__main__":
