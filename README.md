@@ -186,7 +186,7 @@ gantt
 | Phase 5 | 미리 작성됨 — 진입 시 (2027.02) 다시 체크 | Python |
 | Phase 6 | 미리 작성됨 — 진입 시 (2027.05) 다시 체크 | Python + ROS2 |
 | Phase 7 | 미리 작성됨 — 진입 시 (2027.08) 다시 체크 | Python + C++ + ROS2 |
-| Hardware-Arm 스파이크 | 미리 작성됨 — 진입 시 (2026.09) 다시 체크. 범위가 LeRobot 네이티브로 변경됨 — 실기 전환 plan §5 기준 재검토 | LeRobot (teleop·녹화·zero-shot·latency) |
+| Hardware-Arm 스파이크 | 실행 완료 (판정 2026-09-20, must 4개 통과) — 절차·증거 기록: [`spike/week1/`](./Studies/Hardware-Arm/spike/week1/so-arm101-assembly-guide.md) · [`spike/week2/`](./Studies/Hardware-Arm/spike/week2/week2_guide.md) · [`RESULT.md`](./Studies/Hardware-Arm/spike/week2/RESULT.md) | LeRobot (teleop·녹화·zero-shot·latency) |
 | Hardware-Arm Stage 1 | 미리 작성됨 — 진입 시 (2026.10) 다시 체크 | ROS2 + URDF |
 | Hardware-Arm Stage 2 | 미리 작성됨 — 진입 시 (2027.04) 다시 체크 | ROS2 + URDF + Sim 매칭 |
 
