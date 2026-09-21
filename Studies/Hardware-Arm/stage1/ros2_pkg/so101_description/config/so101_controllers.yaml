@@ -1,0 +1,27 @@
+# SO-101 팔로워의 ros2_control 컨트롤러 설정.
+# joint 이름은 urdf/so101.urdf.xacro 의 <ros2_control> 블록과 글자 하나까지 같아야 한다.
+
+controller_manager:
+  ros__parameters:
+    # 제어 루프 주기 (Hz) — 이 주기로 서보를 읽고 (read) 명령을 쓴다 (write)
+    update_rate: 100
+
+    # 서보에서 읽은 관절 위치 / 속도를 /joint_states 토픽으로 내보내는 컨트롤러
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    # 토픽으로 받은 목표 위치를 그대로 하드웨어에 넘기는 컨트롤러 (보간 / 속도 제한 없음)
+    position_controller:
+      type: forward_command_controller/ForwardCommandController
+
+position_controller:
+  ros__parameters:
+    # /position_controller/commands 의 data 배열 순서가 이 순서다 (단위 rad)
+    joints:
+      - shoulder_pan
+      - shoulder_lift
+      - elbow_flex
+      - wrist_flex
+      - wrist_roll
+      - gripper
+    interface_name: position
