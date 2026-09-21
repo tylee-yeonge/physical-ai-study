@@ -29,7 +29,7 @@ v2 영상의 추가 요소:
 
 ```bash
 # week 6 의 clip_node 빌드
-cd ~/ros2_ws
+cd /workspace/phase4_workspace/ros2_ws
 colcon build --packages-select vla_node --symlink-install
 source install/setup.bash
 

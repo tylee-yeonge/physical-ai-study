@@ -61,7 +61,7 @@ vla_node/
 
 
 ```bash
-cd ~/ros2_ws/src
+cd /workspace/phase4_workspace/ros2_ws/src
 ros2 pkg create vla_node \
   --build-type ament_python \
   --dependencies rclpy sensor_msgs geometry_msgs std_msgs cv_bridge
@@ -191,7 +191,7 @@ self.get_logger().fatal('Cannot continue')
 
 ```bash
 # 빌드
-cd ~/ros2_ws
+cd /workspace/phase4_workspace/ros2_ws
 colcon build --packages-select vla_node --symlink-install
 
 

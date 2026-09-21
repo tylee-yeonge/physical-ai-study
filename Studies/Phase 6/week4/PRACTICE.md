@@ -14,17 +14,18 @@
 
 
 ```bash
-# 위치
-~/ros2_ws/src/my_arm_description/urdf/my_arm.urdf
+# 위치 — Stage 1 의 so101_description 패키지
+# (원본은 레포 Studies/Hardware-Arm/stage1/ros2_pkg/so101_description/, 워크스페이스에는 심링크)
+cd /workspace/so101_ws/src/so101_description/urdf
 
 
 # 검토
-xacro my_arm.urdf.xacro > my_arm_check.urdf
-diff my_arm.urdf my_arm_check.urdf
+xacro so101.urdf.xacro > so101_check.urdf
+diff so101.urdf so101_check.urdf
 
 
 # Visualization (RViz2)
-ros2 launch urdf_tutorial display.launch.py model:=my_arm.urdf
+ros2 launch urdf_tutorial display.launch.py model:=so101.urdf
 ```
 
 
@@ -43,10 +44,11 @@ sim_app = SimulationApp({"headless": False})
 
 
 from omni.importer.urdf import _urdf
-import os
 
 
-urdf_path = os.path.expanduser("~/ros2_ws/src/my_arm_description/urdf/my_arm.urdf")
+# 컨테이너 기준 경로 (Stage 1 의 isaac_sim_import.md 와 같은 파일).
+# Isaac Sim 을 컨테이너 밖에서 돌리면 그 기계에서 보이는 레포 경로로 바꾼다.
+urdf_path = "/workspace/so101_ws/src/so101_description/urdf/so101.urdf"
 
 
 import_config = _urdf.ImportConfig()
@@ -58,7 +60,7 @@ import_config.distance_scale = 1.0
 
 
 status, stage_path = _urdf.parse_and_import_urdf(urdf_path, import_config)
-print(f"Imported to: {stage_path}") # /World/my_arm
+print(f"Imported to: {stage_path}") # /World/<URDF 의 robot name>
 
 
 # Articulation 으로 동작
@@ -67,7 +69,7 @@ from omni.isaac.core.articulations import Articulation
 
 
 world = World()
-arm = Articulation(prim_path="/World/my_arm")
+arm = Articulation(prim_path=stage_path)  # prim 이름은 URDF 의 robot name 을 따른다
 
 
 world.reset()

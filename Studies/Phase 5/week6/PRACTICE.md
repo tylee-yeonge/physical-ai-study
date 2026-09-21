@@ -57,7 +57,7 @@ if __name__ == '__main__':
 
 ```python
 """
-~/ros2_ws/src/vla_node/vla_node/clip_node.py
+/workspace/phase4_workspace/ros2_ws/src/vla_node/vla_node/clip_node.py
 """
 import rclpy
 from rclpy.node import Node

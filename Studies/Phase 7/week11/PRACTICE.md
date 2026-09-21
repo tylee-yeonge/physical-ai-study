@@ -6,9 +6,12 @@
 mkdir -p Portfolio/03_VLA_v3/{src,data,scripts,notebooks}
 
 
-# 코드 복사
-cp -r ~/ros2_ws/src/vla_node Portfolio/03_VLA_v3/src/
-cp -r ~/ros2_ws/src/safety_node Portfolio/03_VLA_v3/src/
+# 코드 복사 (레포 루트에서 실행)
+# vla_node 는 Phase 4 워크스페이스에 있다
+cp -r /workspace/phase4_workspace/ros2_ws/src/vla_node Portfolio/03_VLA_v3/src/
+# safety_node 는 레포의 원본에서 복사한다 — 워크스페이스 (/workspace/so101_ws/src/) 쪽은 심링크라
+# cp -r 하면 내용이 아니라 링크만 복사된다
+cp -r Studies/Hardware-Arm/stage2/ros2_pkg/safety_node Portfolio/03_VLA_v3/src/
 ...
 
 
