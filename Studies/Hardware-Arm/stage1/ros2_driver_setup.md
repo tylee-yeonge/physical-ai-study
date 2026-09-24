@@ -304,23 +304,31 @@ ros2 topic pub --once /position_controller/commands std_msgs/msg/Float64MultiArr
 | 항목 | 기본안 | 왜 |
 |---|---|---|
 | 움직일 관절 | `shoulder_pan` | 중력을 받지 않아 도는 방향에 따라 응답이 달라지지 않는다 |
-| 계단 크기 | +0.05 rad 와 -0.05 rad 를 번갈아 | 작아서 안전하고, 번갈아 보내면 팔이 제자리를 오간다 |
+| 계단 크기 | 33틱 (0.0506 rad, 2.9도). 시작 위치와 시작 + 33틱 두 목표를 번갈아 보낸다 | 0.05 rad 에 가장 가까운 정수 틱이라 두 길에서 같은 틱 수를 보낼 수 있다. 작아서 안전하고, 절대 목표 두 개를 오가므로 정지 오차 (되돌아온 자리가 몇 틱 어긋나는 것) 가 쌓여 흘러가지 않는다 |
 | t0 | 명령을 스택에 넘기기 직전의 시각 | 두 길에서 같은 위치다 |
 | t1 | 위치가 계단 전 값에서 문턱 (3틱 = 0.26도) 넘게 벗어난 첫 샘플의 시각. (b) 에서는 메시지를 받은 시각이 아니라 `/joint_states` 의 `header.stamp` | 서보는 서 있을 때도 1-2틱 떨린다 — 그것을 움직임으로 잡지 않기 위한 문턱이다. `header.stamp` 를 쓰는 것은 상태가 되돌아오는 길의 DDS 시간이 (b) 에만 더해지지 않게 하기 위해서다 |
 | **관측 주기** | **두 길 모두 10 ms** | 아래 설명 |
 | 반복 사이 | 팔이 멈춘 뒤 0.5 s | 앞 반복의 움직임이 다음 반복에 섞이지 않게 |
 | n / warm-up | 100 / 5 | must 4 와 같다 |
 | LeRobot 의 `max_relative_target` | 끄고 잰다 | 켜면 `send_action` 이 쓰기 전에 현재 위치를 한 번 더 읽는다. ROS2 길에는 없는 단계라 (a) 에만 시간이 더해진다 |
+| 서보의 가속도 · 속도 | 두 길 모두 `Acceleration` 50 · `Goal_Velocity` 2400 | 드라이버는 매 `write()` 마다 이 두 값을 목표 위치와 한 패킷으로 보낸다 (`feetech_ros2_driver.cpp` 의 상수). LeRobot 은 `connect()` 에서 `Acceleration` 을 254 로 두므로 그대로 재면 서보가 문턱 3틱을 넘는 데 걸리는 시간이 두 길에서 달라진다 (정지에서 3틱: 가속도 5000 tick/s^2 이면 약 35 ms, 25400 이면 약 15 ms). 두 길 공통이어야 할 항이라 (a) 스크립트가 시작할 때 드라이버와 같은 값을 써 넣는다. P · I · D · `Return_Delay_Time` 은 EEPROM 값이라 LeRobot `connect()` 가 쓴 값이 ROS2 에서도 그대로 쓰인다 (URDF 에 해당 param 이 없으면 드라이버는 건드리지 않는다) |
 
-**관측 주기를 맞추는 이유.** 움직임은 "위치를 읽는 순간" 에만 보인다. 10 ms 마다 읽으면 실제보다 평균 5 ms 늦게 알아챈다. (b) 는 `/joint_states` 가 100 Hz 로 나오므로 10 ms 로 정해져 있다. (a) 에서 LeRobot 으로 그보다 촘촘히 읽으면 (a) 만 덜 늦게 보이고, 그만큼 (b)-(a) 가 부풀려진다. (a) 도 10 ms 마다 읽으면 이 늦음이 양쪽에 똑같이 들어가 뺄 때 사라진다.
+**관측 주기를 맞추는 이유.** 움직임은 "위치를 읽는 순간" 에만 보인다. 10 ms 마다 읽으면 실제보다 평균 5 ms 늦게 알아챈다. (b) 는 `/joint_states` 가 100 Hz 로 나오므로 10 ms 로 정해져 있다. (a) 에서 LeRobot 으로 그보다 촘촘히 읽으면 (a) 만 덜 늦게 보이고, 그만큼 (b)-(a) 가 부풀려진다. (a) 도 10 ms 마다 읽으면 이 늦음이 양쪽에 똑같이 들어가 뺄 때 사라진다. 단, "평균 5 ms" 는 명령이 읽기 주기의 아무 위상에나 고르게 떨어질 때의 값이다. 스크립트가 읽기 도착에 맞춰 깨어난 직후에 명령을 보내면 매번 같은 위상에 보내게 되므로, 두 스크립트 모두 명령 직전에 0-10 ms 의 난수만큼 기다린다.
 
 기본안을 바꾸면 (관절 · 계단 크기 · 문턱) 바꾼 값과 이유를 methodology 에 적는다.
 
 ### 5.4 절차
 
-측정 스크립트는 아직 없다. W6 에 들어갈 때 5.3 의 표를 요구 사항으로 삼아 `stage1/scripts/` 에 두 개 (ROS2 용 · LeRobot 용) 를 만든다. 순서는 다음과 같다.
+스크립트는 `stage1/scripts/` 에 두 개다. 둘 다 5.3 의 표를 그대로 구현하고, 결과를 `stage1/outputs/` 에 npy (원본 100개, 실패한 반복은 NaN) 와 csv (요약 1행 — 통계 + 측정 조건 + 시작 시각) 로 남긴다 (`outputs/` 는 gitignore 대상).
 
-1. **(b) 를 mock 으로 먼저 잰다** (`use_mock_hardware:=true`, 팔 없음). mock 은 받은 명령을 다음 주기에 그대로 현재 위치로 돌려준다. 그래서 이 값은 서보와 시리얼이 빠진 "DDS + 제어 주기 대기" 만의 시간이다. 스크립트 검증이자 (b) 의 하한 대조군이다
+| 스크립트 | 길 | 실행 |
+|---|---|---|
+| `measure_latency_ros2.py` | (b) | bringup 이 떠 있는 상태에서 다른 터미널로 `python3 Studies/Hardware-Arm/stage1/scripts/measure_latency_ros2.py`. mock 인지 실제 팔인지는 `/robot_description` 의 플러그인 이름으로 스스로 판정해 `latency_ros2_mock.*` 또는 `latency_ros2_real.*` 로 저장한다 |
+| `measure_latency_lerobot.py` | (a) | bringup 을 끈 뒤 `acl` → `python Studies/Hardware-Arm/stage1/scripts/measure_latency_lerobot.py`. 끝날 때 토크를 풀기 전에 Enter 를 기다린다 (팔을 받친다) |
+
+순서는 다음과 같다.
+
+1. **(b) 를 mock 으로 먼저 잰다** (`use_mock_hardware:=true`, 팔 없음). mock 은 받은 명령을 다음 주기에 그대로 현재 위치로 돌려준다. 그래서 이 값은 서보와 시리얼이 빠진 "DDS + 제어 주기 대기" 만의 시간이다. 스크립트 검증이자 (b) 의 하한 대조군이다. 이 컨테이너 실측 (2026-09-25): 10.2-19.9 ms 에 고르게 퍼지고 mean 14.6 ms — 명령이 제어 주기의 아무 위상에나 떨어져 다음 주기까지 0-10 ms 를 기다리고, mock 이 그 명령을 그다음 주기의 read 에서야 돌려주므로 한 주기 10 ms 가 더 붙는다. DDS 전송 자체는 1 ms 미만이다 (min 이 10 ms 를 겨우 넘는다)
 2. **(b) 를 실제 팔로 잰다.** `so101-attach` → 팔을 낮은 자세로 받치고 bringup → 측정 → 팔을 받치고 종료
 3. **스택을 바꾼다.** ROS2 launch 가 완전히 꺼진 것을 확인한 뒤 LeRobot 으로 연결한다 (같은 시리얼 포트)
 4. **(a) 를 잰다.** 2번과 같은 날, 같은 자세, 같은 관절로
@@ -332,18 +340,19 @@ ros2 topic pub --once /position_controller/commands std_msgs/msg/Float64MultiArr
 |---|---|
 | (b)-(a) 가 0 보다 크다 | ROS2 를 거친 길이 직결보다 빠를 수는 없다. t0 · t1 을 찍는 위치나 관측 주기가 두 길에서 다르다 |
 | (b) mock 이 (b) 실제 팔보다 작다 | mock 에는 서보와 시리얼이 없다. 크게 나오면 mock 측정이 다른 것을 재고 있다 |
-| 문턱을 3틱에서 5틱으로 바꿔도 (b)-(a) 가 거의 같다 | 문턱은 두 길에 똑같이 들어가는 항이다. 달라지면 두 길의 관측 조건이 같지 않다 |
-| (선택) `update_rate` 를 100 에서 200 으로 올리면 (b) 가 줄어든다 | "스택 안" 에서 가장 큰 몫이 제어 주기 대기라면 줄어야 한다. 줄지 않으면 다른 곳에 시간이 들고 있다 — 그것을 찾는 것이 findings 다 |
+| 문턱을 3틱에서 5틱으로 바꿔도 (b)-(a) 가 거의 같다 (두 스크립트의 `THRESHOLD_TICKS` 를 5 로 바꿔 다시 잰다) | 문턱은 두 길에 똑같이 들어가는 항이다. 달라지면 두 길의 관측 조건이 같지 않다 |
+| (선택) `update_rate` 를 100 에서 200 으로 올리면 (b) 가 줄어든다 (`so101_controllers.yaml` 의 값. (b) 스크립트는 관측 주기를 `/joint_states` 주기에서 따라가므로 5 ms 가 되고, 요약 csv 의 `observe_period_ms` 에 그대로 찍힌다) | "스택 안" 에서 가장 큰 몫이 제어 주기 대기라면 줄어야 한다. 줄지 않으면 다른 곳에 시간이 들고 있다 — 그것을 찾는 것이 findings 다 |
 
 ### 5.6 기록
 
-`Measurements/` 아래 새 디렉토리 1개. 기존 측정들과 같은 3분할이다.
+`Measurements/` 아래 새 디렉토리 1개. 기존 측정들과 같은 구조다 (환경 · 방법 · 결과 세 문서 + `raw/`).
 
 | 파일 | 담는 것 |
 |---|---|
-| `environment.md` | PC · 컨테이너 · ROS 2 Jazzy · ros2_control 버전 · 드라이버 커밋 (`18aed7f`) · lerobot 0.6.2 · `update_rate` · 실시간 스케줄링이 꺼져 있다는 사실 (bringup 로그의 `Could not enable FIFO RT scheduling policy`) · LeRobot 에서 위치를 한 번 읽는 데 걸리는 시간 |
-| `methodology.md` | 5.1 (추론을 뺀 이유) · 5.3 의 표 (바꾼 값 포함) · 5.4 의 순서 · 5.5 의 검증 결과 |
-| `findings.md` | (a) · (b) · (b) mock · (b)-(a) 의 mean / p95 / std, 분포 그림, 시간이 어디에 드는가에 대한 해석 |
+| `environment.md` | PC · 컨테이너 · ROS 2 Jazzy · ros2_control 버전 · 드라이버 커밋 (`18aed7f`) · lerobot 0.6.2 · `update_rate` ((b) 요약 csv 의 `update_rate_hz`) · 실시간 스케줄링이 꺼져 있다는 사실 (bringup 로그의 `Could not enable FIFO RT scheduling policy`) · LeRobot 에서 위치를 한 번 읽는 데 걸리는 시간 ((a) 요약 csv 의 `read_ms_mean` · `read_ms_max`) · 서보 레지스터 실제값 ((a) 요약 csv 의 `servo_*` 열 — P · I · D · Acceleration · Goal_Velocity · Return_Delay_Time) |
+| `methodology.md` | 5.1 (추론을 뺀 이유) · 5.3 의 표 (바꾼 값 포함 — 요약 csv 의 `step_ticks` · `threshold_ticks` · `observe_period_ms` 와 대조) · 5.4 의 순서 · 5.5 의 검증 결과 · 세 실행의 시작 시각 (요약 csv 의 `started_at`) |
+| `findings.md` | (a) · (b) · (b) mock · (b)-(a) 의 mean / p95 / std, 분포 그림 (npy 세 개에서 그린다), 시간이 어디에 드는가에 대한 해석 |
+| `raw/` | 세 실행의 npy 와 요약 csv 사본 (5.4 순서 5 에서 시각을 붙인 것) |
 
 ### 5.7 끝났다고 하기 전에 스스로 답해 보는 질문
 

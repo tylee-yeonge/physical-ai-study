@@ -148,9 +148,9 @@ flowchart TD
 
 ### W6-7 — 이중 latency
 
-- **여는 곳**: [ros2_driver_setup.md](ros2_driver_setup.md) §5 (5.1 → 5.3 → 5.4 순서로). 방법론의 출발점은 [week2_guide](../spike/week2/week2_guide.md) §4 와 `../spike/week2/scripts/measure_latency_smolvla.py`
+- **여는 곳**: [ros2_driver_setup.md](ros2_driver_setup.md) §5 (5.1 → 5.3 → 5.4 순서로). 방법론의 출발점은 [week2_guide](../spike/week2/week2_guide.md) §4 와 `../spike/week2/scripts/measure_latency_smolvla.py`. 측정 스크립트는 `scripts/measure_latency_ros2.py` ((b)) 와 `scripts/measure_latency_lerobot.py` ((a)) 두 개다 — §5.4 의 표
 - **무엇을 재는가**: 추론 시간이 아니라 **명령이 전달되는 길** 이다. 한 관절에 작은 계단 명령을 보내고 팔이 움직이기 시작할 때까지를, LeRobot 직결 (a) 과 ROS2 경유 (b) 로 각각 100번 잰다. 스파이크 must 4 는 팔 없이 추론만 쟀으므로 (a) 로 그대로 쓸 수 없다 (§5.1)
-- **하는 일**: §5.3 의 측정 정의를 고정한다 (특히 두 길의 관측 주기를 10 ms 로 맞춘다) → 스크립트 2개 작성 → (b) mock → (b) 실제 팔 → 스택 전환 → (a) → §5.5 의 검증 → Measurements 디렉토리 1개
+- **하는 일**: §5.3 의 측정 정의를 읽고 두 스크립트가 그것을 어떻게 맞추는지 (관측 주기 10 ms · 서보 가속도 · 명령 위상) 확인한다 → (b) mock (스크립트 검증 겸 하한 대조군) → (b) 실제 팔 → 스택 전환 → (a) → §5.5 의 검증 → Measurements 디렉토리 1개. 실제 팔은 W5 의 안전 기초가 선 뒤, 낮은 자세로 받친 채 돌린다
 - **끝나면 남는 것**: (a) · (b) · (b)-(a) 의 mean / p95 와 그 측정 조건, §5.7 의 질문에 대한 자기 답
 
 ### W8 — 1분 영상 + 체크리스트 대조
