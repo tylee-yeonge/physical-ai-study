@@ -20,9 +20,9 @@
 
 ## 1. feetech_ros2_driver 설치
 
-### 1.0 선행 설치 (컨테이너에 없는 것)
+### 1.0 선행 설치 (이미지에 없을 때)
 
-이 컨테이너에는 ROS 2 Jazzy 본체 (`ros-jazzy-desktop`) 만 들어 있고 아래 다섯 개가 없다. 없는 채로 §1.1 의 명령을 치면 `rosdep: command not found` 에서 멈춘다.
+`vscode-tunnel` v1.18.0 보다 앞선 이미지로 만든 컨테이너에는 ROS 2 Jazzy 본체 (`ros-jazzy-desktop`) 만 들어 있고 아래 다섯 개가 없다. 없는 채로 §1.1 의 명령을 치면 `rosdep: command not found` 에서 멈춘다.
 
 | 패키지 | 무엇인가 | 없으면 |
 |---|---|---|
@@ -43,27 +43,14 @@ which colcon rosdep             # 기대: /usr/bin/colcon, /usr/bin/rosdep
 ```
 
 - **venv 를 끄는 이유**: 이 워크스페이스는 C++ 패키지라 파이썬 venv 가 필요 없다. venv 를 켠 채 빌드하면 `colcon` 과 CMake 가 venv 의 파이썬을 잡아 시스템 쪽 ROS 파이썬 모듈을 못 찾는 오류가 날 수 있다. `/workspace/so101_ws` 에서는 항상 venv 없이 작업한다.
-- **컨테이너를 다시 만들면 이 설치는 사라진다**: `apt install` 은 컨테이너 안에만 남는다 (`/workspace` 밖). `build/` · `install/` 은 `/workspace` 에 있어 남지만, 빌드된 드라이버가 기대는 apt 라이브러리가 사라지므로 다시 깔아야 돈다. 재생성 뒤에도 남게 하려면 호스트의 compose 프로젝트 (`vscode-tunnel`) 의 Dockerfile 에 아래 블록을 넣는다. ROS 2 Jazzy 를 설치하는 줄보다 뒤에 둔다.
+- **이 패키지들은 컨테이너 이미지에도 들어 있다**: 호스트의 compose 프로젝트 (`vscode-tunnel`) 가 v1.18.0 부터 Dockerfile 에서 같은 목록을 설치하고 `rosdep init` · `rosdep update` 까지 끝낸다. v1.18.0 이후의 이미지로 만든 컨테이너에서는 이 절을 건너뛰고 아래 확인만 한다. 그보다 앞선 이미지의 컨테이너에서는 위 명령으로 직접 깐다 — `apt install` 은 컨테이너 안에만 남아 (`/workspace` 밖) 컨테이너를 다시 만들면 사라진다. 워크스페이스의 `build/` · `install/` 은 `/workspace` 에 있어 어느 쪽이든 남는다.
 
-```dockerfile
-# SO-101 Stage 1: ros2_control + feetech_ros2_driver 의 빌드 · 실행에 필요한 패키지
-RUN apt-get update && apt-get install -y \
-        python3-rosdep \
-        python3-colcon-common-extensions \
-        ros-jazzy-ros2-control \
-        ros-jazzy-ros2-controllers \
-        ros-jazzy-xacro \
-        ros-jazzy-joint-state-publisher \
-        ros-jazzy-joint-state-publisher-gui \
-        libserial-dev \
-        libexpected-dev \
-        librange-v3-dev \
-    && rm -rf /var/lib/apt/lists/* \
-    && (rosdep init || true) \
-    && rosdep update --rosdistro jazzy
+```bash
+which colcon rosdep             # 기대: /usr/bin/colcon, /usr/bin/rosdep
+ros2 pkg prefix controller_manager && ros2 pkg prefix xacro     # 기대: /opt/ros/jazzy 두 줄
 ```
 
-이 목록은 이 컨테이너의 apt 설치 기록 (`/var/log/apt/history.log`) 에서 뽑은 것이다 — 위의 다섯 개, `rosdep install` 이 드라이버용으로 깐 `libserial-dev` · `librange-v3-dev` · `libexpected-dev`, 패키지용으로 깐 `joint-state-publisher` 두 개. Dockerfile 은 컨테이너 안에서 보이지 않으므로 호스트에서 고친다.
+이미지에 들어가는 목록은 위의 다섯 개에 다섯 개를 더한 것이다 — `rosdep install` 이 드라이버용으로 깔던 `libserial-dev` · `libexpected-dev` · `librange-v3-dev`, 패키지용으로 깔던 `ros-jazzy-joint-state-publisher` · `ros-jazzy-joint-state-publisher-gui`. 이 이미지에서 아무것도 손으로 깔지 않고 `/workspace/so101_ws` 의 두 패키지가 빌드되는 것을 확인했다.
 
 ### 1.1 드라이버 빌드
 
