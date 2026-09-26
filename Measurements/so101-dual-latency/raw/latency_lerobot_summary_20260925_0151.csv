@@ -1,0 +1,2 @@
+path,hardware,joint,step_ticks,threshold_ticks,observe_period_ms,n,warmup,n_timeout,mean_ms,median_ms,std_ms,min_ms,max_ms,p95_ms,p99_ms,read_ms_mean,read_ms_max,servo_acceleration,servo_goal_velocity,servo_max_acceleration,servo_p,servo_i,servo_d,servo_return_delay_time,lerobot_version,started_at
+lerobot,real,shoulder_pan,33,3,10.0,100,5,0,65.372,65.138,3.281,59.096,71.888,70.990,71.211,0.395,2.012,50,2400,254,16,0,32,0,0.6.2,2026-09-25T01:49:38

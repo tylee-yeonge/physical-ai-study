@@ -1,0 +1,2 @@
+path,hardware,joint,step_ticks,threshold_ticks,observe_period_ms,update_rate_hz,n,warmup,n_timeout,mean_ms,median_ms,std_ms,min_ms,max_ms,p95_ms,p99_ms,servo_acceleration,servo_goal_velocity,started_at
+ros2,mock,shoulder_pan,33,3,10.0,100,100,5,0,15.576,16.036,3.034,10.298,20.218,19.918,20.152,50,2400,2026-09-25T01:45:15

@@ -24,7 +24,7 @@
 실행 (ROS2 bringup 이 완전히 꺼진 뒤. 같은 시리얼 포트를 쓴다):
     so101-attach
     acl
-    python Studies/Hardware-Arm/stage1/scripts/measure_latency_lerobot.py
+    python /workspace/study/physical-ai-study/Studies/Hardware-Arm/stage1/scripts/measure_latency_lerobot.py
 출력 (outputs/ 는 gitignore 대상 -- 기록에 쓸 실행은 §5.4 순서 5 대로 시각을 붙여 복사한다):
     Studies/Hardware-Arm/stage1/outputs/latency_lerobot.npy (+ latency_lerobot_summary.csv)
 

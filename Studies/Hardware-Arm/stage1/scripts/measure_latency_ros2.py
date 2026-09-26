@@ -15,7 +15,7 @@
     어느 쪽인지는 /robot_description 의 플러그인 이름으로 스크립트가 판정해 파일명에 붙인다.
 
 실행 (bringup.launch.py 가 떠 있는 상태에서 다른 터미널로):
-    python3 Studies/Hardware-Arm/stage1/scripts/measure_latency_ros2.py
+    python3 /workspace/study/physical-ai-study/Studies/Hardware-Arm/stage1/scripts/measure_latency_ros2.py
 출력 (outputs/ 는 gitignore 대상 -- 기록에 쓸 실행은 §5.4 순서 5 대로 시각을 붙여 복사한다):
     Studies/Hardware-Arm/stage1/outputs/latency_ros2_mock.npy (+ latency_ros2_mock_summary.csv)
     Studies/Hardware-Arm/stage1/outputs/latency_ros2_real.npy (+ latency_ros2_real_summary.csv)

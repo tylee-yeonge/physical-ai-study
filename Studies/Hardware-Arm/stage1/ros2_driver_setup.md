@@ -277,7 +277,8 @@ ros2 topic pub --once /position_controller/commands std_msgs/msg/Float64MultiArr
 
 **무엇을**: 같은 명령 (한 관절의 목표값) 을 두 길로 팔에 보낸다 — (a) LeRobot 으로 직접, (b) ROS2 토픽을 거쳐. 각 길에서 "명령을 넘긴 순간부터 팔이 움직이기 시작할 때까지" 를 100번씩 잰다. 두 평균의 차이 **(b)-(a) 가 통합 오버헤드**, 곧 ROS2 를 거치는 대가로 늘어나는 시간이다.
 **왜**: "VLA 를 ROS2 시스템에 얹으면 얼마나 느려지는가" 에 숫자로 답하기 위해서다. 스파이크 must 4 의 106 ms 는 모델이 action 을 만드는 비용이고, 이 측정은 그 뒤 — 만들어진 action 이 모터에 닿기까지의 비용이다.
-**끝나면 손에 남는 것**: (a) · (b) · (b)-(a) 의 mean / p95 + Measurements 디렉토리 1개.
+**끝나면 손에 남는 것**: (a) · (b) · (b)-(a) 의 mean / p95 + Measurements 디렉토리 1개 ([`Measurements/so101-dual-latency/`](../../../Measurements/so101-dual-latency/) — 측정 정의는 [methodology.md](../../../Measurements/so101-dual-latency/methodology.md)).
+**실측 (2026-09-25)**: (a) 65.4 / (b) 102.8 / (b) mock 15.6 / **(b)-(a) 37.5 ms** (각 n=100, 실패 0). 그중 메커니즘으로 설명되는 것은 10 ms 안팎이고 나머지 25-30 ms 의 출처는 미해결이다 — 해석과 다음 실험은 [findings.md](../../../Measurements/so101-dual-latency/findings.md). §5.5 의 검증 6개 중 문턱 5틱 · `update_rate` 200 은 미실시.
 **언제**: W5 (안전 기초) 뒤. 팔을 200번 넘게 움직이는 측정이라 소프트 리밋 · 토크 상한 · 소프트웨어 정지가 선 다음에 한다.
 
 ### 5.1 추론 시간은 이 측정에 넣지 않는다
@@ -297,7 +298,9 @@ ros2 topic pub --once /position_controller/commands std_msgs/msg/Float64MultiArr
 
 "두 길 공통" 은 뺄 때 사라진다. 남는 것이 "스택 안" 의 차이이고, 그것이 이 측정이 알고 싶은 값이다.
 
-### 5.3 측정 정의 (착수 전에 고정하고 methodology 에 그대로 적는다)
+### 5.3 측정 정의 (고정 — 정본은 methodology.md)
+
+정의는 착수 전에 고정했고, 정본은 [`Measurements/so101-dual-latency/methodology.md`](../../../Measurements/so101-dual-latency/methodology.md) 다 (조건 표 + 각 조건이 막는 오측정 + 두 경로에서 같아야 하는 것의 점검표 + 절차 + 검증 기준). 아래는 그 요약이다. 두 문서가 어긋나면 methodology.md 를 따르고 이 절을 고친다.
 
 **1회 = 한 관절에 작은 계단 명령 1개를 보내고, 그 관절이 움직이기 시작할 때까지의 시간 (t1 - t0).**
 
@@ -323,16 +326,30 @@ ros2 topic pub --once /position_controller/commands std_msgs/msg/Float64MultiArr
 
 | 스크립트 | 길 | 실행 |
 |---|---|---|
-| `measure_latency_ros2.py` | (b) | bringup 이 떠 있는 상태에서 다른 터미널로 `python3 Studies/Hardware-Arm/stage1/scripts/measure_latency_ros2.py`. mock 인지 실제 팔인지는 `/robot_description` 의 플러그인 이름으로 스스로 판정해 `latency_ros2_mock.*` 또는 `latency_ros2_real.*` 로 저장한다 |
-| `measure_latency_lerobot.py` | (a) | bringup 을 끈 뒤 `acl` → `python Studies/Hardware-Arm/stage1/scripts/measure_latency_lerobot.py`. 끝날 때 토크를 풀기 전에 Enter 를 기다린다 (팔을 받친다) |
+| `measure_latency_ros2.py` | (b) | bringup 이 떠 있는 상태에서 다른 터미널로 `python3 /workspace/study/physical-ai-study/Studies/Hardware-Arm/stage1/scripts/measure_latency_ros2.py`. mock 인지 실제 팔인지는 `/robot_description` 의 플러그인 이름으로 스스로 판정해 `latency_ros2_mock.*` 또는 `latency_ros2_real.*` 로 저장한다 |
+| `measure_latency_lerobot.py` | (a) | bringup 을 끈 뒤 `acl` → `python /workspace/study/physical-ai-study/Studies/Hardware-Arm/stage1/scripts/measure_latency_lerobot.py`. 끝날 때 토크를 풀기 전에 Enter 를 기다린다 (팔을 받친다) |
 
 순서는 다음과 같다.
 
-1. **(b) 를 mock 으로 먼저 잰다** (`use_mock_hardware:=true`, 팔 없음). mock 은 받은 명령을 다음 주기에 그대로 현재 위치로 돌려준다. 그래서 이 값은 서보와 시리얼이 빠진 "DDS + 제어 주기 대기" 만의 시간이다. 스크립트 검증이자 (b) 의 하한 대조군이다. 이 컨테이너 실측 (2026-09-25): 10.2-19.9 ms 에 고르게 퍼지고 mean 14.6 ms — 명령이 제어 주기의 아무 위상에나 떨어져 다음 주기까지 0-10 ms 를 기다리고, mock 이 그 명령을 그다음 주기의 read 에서야 돌려주므로 한 주기 10 ms 가 더 붙는다. DDS 전송 자체는 1 ms 미만이다 (min 이 10 ms 를 겨우 넘는다)
+1. **(b) 를 mock 으로 먼저 잰다** (`use_mock_hardware:=true`, 팔 없음). mock 은 받은 명령을 다음 주기에 그대로 현재 위치로 돌려준다. 그래서 이 값은 서보와 시리얼이 빠진 "DDS + 제어 주기 대기" 만의 시간이다. 스크립트 검증이자 (b) 의 하한 대조군이다. 실측 (2026-09-25): 10.3-20.2 ms 에 고르게 퍼지고 mean 15.6 ms — 명령이 제어 주기의 아무 위상에나 떨어져 다음 주기까지 0-10 ms 를 기다리고, mock 이 그 명령을 그다음 주기의 read 에서야 돌려주므로 한 주기 10 ms 가 더 붙는다. DDS 전송 자체는 0.3 ms 안팎이다 (min 10.30 ms)
 2. **(b) 를 실제 팔로 잰다.** `so101-attach` → 팔을 낮은 자세로 받치고 bringup → 측정 → 팔을 받치고 종료
 3. **스택을 바꾼다.** ROS2 launch 가 완전히 꺼진 것을 확인한 뒤 LeRobot 으로 연결한다 (같은 시리얼 포트)
 4. **(a) 를 잰다.** 2번과 같은 날, 같은 자세, 같은 관절로
-5. 세 실행의 원본 (npy) 과 요약 (csv) 을 시각을 붙여 보존한다 ([week2_guide](../spike/week2/week2_guide.md) §4.2 의 "결과 파일을 고정해 둔다" 와 같은 방식)
+5. **세 실행의 원본 (npy) 과 요약 (csv) 을 시각을 붙여 보존한다** ([week2_guide](../spike/week2/week2_guide.md) §4.2 의 "결과 파일을 고정해 둔다" 와 같은 방식). 스크립트는 돌릴 때마다 같은 이름에 덮어쓰므로, 기록에 쓸 실행을 마친 직후 아래를 그대로 실행한다. 로컬 `outputs/evidence/` (gitignore) 와 `Measurements/so101-dual-latency/raw/` (git 정본) 두 곳에 같은 STAMP 로 남는다.
+
+   ```bash
+   STAMP=$(date +%Y%m%d_%H%M)
+   OUT=/workspace/study/physical-ai-study/Studies/Hardware-Arm/stage1/outputs
+   RAW=/workspace/study/physical-ai-study/Measurements/so101-dual-latency/raw
+   mkdir -p $OUT/evidence $RAW
+   for f in latency_ros2_mock latency_ros2_real latency_lerobot; do
+       cp $OUT/$f.npy $OUT/evidence/${f}_$STAMP.npy
+       cp $OUT/${f}_summary.csv $OUT/evidence/${f}_summary_$STAMP.csv
+       cp $OUT/$f.npy $RAW/${f}_$STAMP.npy
+       cp $OUT/${f}_summary.csv $RAW/${f}_summary_$STAMP.csv
+   done
+   ls $OUT/evidence $RAW
+   ```
 
 ### 5.5 값싼 검증 — "돌아간다" 와 "맞다" 는 다르다
 
@@ -345,12 +362,12 @@ ros2 topic pub --once /position_controller/commands std_msgs/msg/Float64MultiArr
 
 ### 5.6 기록
 
-`Measurements/` 아래 새 디렉토리 1개. 기존 측정들과 같은 구조다 (환경 · 방법 · 결과 세 문서 + `raw/`).
+[`Measurements/so101-dual-latency/`](../../../Measurements/so101-dual-latency/) 한 곳. 기존 측정들과 같은 구조다 (환경 · 방법 · 결과 세 문서 + `raw/`). `methodology.md` 는 이미 있고, 나머지 둘과 `raw/` 는 세 실행 뒤에 채운다.
 
 | 파일 | 담는 것 |
 |---|---|
 | `environment.md` | PC · 컨테이너 · ROS 2 Jazzy · ros2_control 버전 · 드라이버 커밋 (`18aed7f`) · lerobot 0.6.2 · `update_rate` ((b) 요약 csv 의 `update_rate_hz`) · 실시간 스케줄링이 꺼져 있다는 사실 (bringup 로그의 `Could not enable FIFO RT scheduling policy`) · LeRobot 에서 위치를 한 번 읽는 데 걸리는 시간 ((a) 요약 csv 의 `read_ms_mean` · `read_ms_max`) · 서보 레지스터 실제값 ((a) 요약 csv 의 `servo_*` 열 — P · I · D · Acceleration · Goal_Velocity · Return_Delay_Time) |
-| `methodology.md` | 5.1 (추론을 뺀 이유) · 5.3 의 표 (바꾼 값 포함 — 요약 csv 의 `step_ticks` · `threshold_ticks` · `observe_period_ms` 와 대조) · 5.4 의 순서 · 5.5 의 검증 결과 · 세 실행의 시작 시각 (요약 csv 의 `started_at`) |
+| [`methodology.md`](../../../Measurements/so101-dual-latency/methodology.md) | 5.1 (추론을 뺀 이유) · 5.3 의 표 (바꾼 값 포함 — 요약 csv 의 `step_ticks` · `threshold_ticks` · `observe_period_ms` 와 대조) · 5.4 의 순서 · 5.5 의 검증 결과 · 세 실행의 시작 시각 (요약 csv 의 `started_at`). 결과 수치는 §5 에 실행 뒤 기입 |
 | `findings.md` | (a) · (b) · (b) mock · (b)-(a) 의 mean / p95 / std, 분포 그림 (npy 세 개에서 그린다), 시간이 어디에 드는가에 대한 해석 |
 | `raw/` | 세 실행의 npy 와 요약 csv 사본 (5.4 순서 5 에서 시각을 붙인 것) |
 
