@@ -8,7 +8,7 @@
 
 ---
 
-## 1. 완료 (2026-09-21 기준)
+## 1. 완료 (2026-09-26 기준)
 
 | 구간 | 완료 |
 |---|---|
@@ -18,6 +18,7 @@
 | 결정·문서 | 실기 전환 확정, 발행 채널 vla-lab, Hardware-Arm 가이드 SO-101 화, vla-lab 초기화 |
 | **하드웨어 구매** | SO-101 키트 + Wrist 카메라 옵션 (발주 2026-09-01, 60만원), 작업대 자재 구매·세팅. 전체 뷰 카메라 + 고정수단은 배송 중 — [BOM](../../../Studies/Hardware-Arm/BOM.md) |
 | **스파이크 전체** | 조립 (2026-09-12) · 모터 ID 12개 · LeRobot 0.6.2 설치 · 캘리브레이션 · teleop (must 1) / 10 에피소드 녹화 + HF Hub (must 2) / SmolVLA zero-shot (must 3) / latency 106.3 ms per chunk (must 4) — **판정 2026-09-20: must 4개 통과.** 증거·소요·막힌 지점 11개는 [RESULT](../../../Studies/Hardware-Arm/spike/week2/RESULT.md), 절차·함정의 원본은 [조립 가이드](../../../Studies/Hardware-Arm/spike/week1/so-arm101-assembly-guide.md) · [week2_guide](../../../Studies/Hardware-Arm/spike/week2/week2_guide.md) |
+| **Stage 1 조기 착수분** | W1 ①② (드라이버 Jazzy 빌드 · 실제 팔 6축 `/joint_states` · 한 관절 위치 명령, 2026-09-22) / W2 (`so101_description` bringup) / W6-7 (이중 latency 측정 2026-09-25, (b)-(a) 37.5 ms 잠정 — [Measurements/so101-dual-latency](../../../Measurements/so101-dual-latency/findings.md)). 남은 항목은 §3 Stage 1 |
 | 09 하순 경량 | 9월 실적 집계 (09-20 까지 — §3), JD 정독 8개사 (`.private/jd/2026-09-jd-reading.md`) |
 
 ---
@@ -26,8 +27,8 @@
 
 | 구간 | 메인 (1트랙) | 경량 병행 (≤2) | 게이트 |
 |---|---|---|---|
-| 09 하순 | 휴식·버퍼 + 9월 실적 집계 | JD 정독 시작 | — |
-| **10-11월** | **Stage 1 본 빌드** (must 6) | JD 정독 마감(10월), probe 택1(커피챗 or AI 사피엔스 기여) | Stage 1 must 완주 목표 11월 |
+| 09 하순 | 9월 실적 집계 + Stage 1 조기 착수 (W1 ①② · W2 · W6-7, 09-22 - 09-25) | JD 정독 8개사 | — |
+| **10-11월** | **Stage 1 본 빌드** (must 6 — 잔여 W1 ③ · W3 · W4 · W5 · W8) | JD 격차 매핑 마감(10월), probe 택1(커피챗 or AI 사피엔스 기여) | Stage 1 must 완주 목표 11월 |
 | **11-12월** | **v2.5** (SmolVLA 실기 before/after, 라이트 모드) | — | vla-lab 발행 |
 | 11월 하순 | **분기 재평가 #1** (§5 안건) | — | 결정의 날 1회 |
 | 12-2027.02 | v2.5 마무리 → 버퍼 → **초기 패키징**(02) | **코테·면접 준비 주 2h (확정 2026-09-01)**, (재평가 결정 시) C++·DDS 집중 2-3주 | Stage 1 must 최종 마감 02말 |
@@ -102,12 +103,16 @@
 
 ### 10-11월 — Stage 1 (Week 단위. 재료: `stage1/` 가이드 4개)
 
+> 진행 (2026-09-26 기준): 10월을 기다리지 않고 09-22 에 착수했다. W1 ①② · W2 · W6-7 완료, W1 ③ · W3 · W4 · W5 · W8 잔여. W6-7 은 W5 (안전 기초) 가 이 보드에 기록되기 전에 실행했다.
+
 - [ ] **W1** ROS2 드라이버 검증 (재료: `ros2_driver_setup.md` §0-§1) — ① 모터 1개 위치 명령 ② 6축 데이지체인 + joint_states ③ 최소 URDF + RViz (하드웨어 사실: ID 1-6, 1,000,000 bps, 포트는 컨테이너의 `/dev/so101_follower` — `so101-attach` 가 생성, multi-turn 오류 처치 — 가이드 §2.3·§4.1·§6.4. 컨테이너는 ROS 2 Jazzy 라 `feetech_ros2_driver` 의 Jazzy 빌드 여부를 가장 먼저 확인)
-- [ ] **W2** `so101_description` 패키지 + controller config + bringup (재료: §2-§4)
+  - 진행 (2026-09-26): ①② 완료 — Jazzy 빌드는 이미지 v1.18.0 에서 손으로 깔지 않고 되는 것을 확인 (가이드 §1.0), 실제 팔 bringup 에서 6축 `/joint_states` 가 읽히고 기동 직후 명령값 = 상태값인 것을 확인 (2026-09-22, 가이드 §4.2 표), `shoulder_pan` 위치 명령은 W6-7 (b) 측정에서 100회 (2026-09-25). ③ 은 남았다 — 시각화 경로 (Foxglove 기본, VNC + RViz 최후 수단) 를 정하고 URDF 의 joint state 반영을 눈으로 본 기록이 없다
+- [x] **W2** `so101_description` 패키지 + controller config + bringup (재료: §2-§4) — 완료 (2026-09-22): 패키지는 [stage1/ros2_pkg/so101_description/](../../../Studies/Hardware-Arm/stage1/ros2_pkg/so101_description/) (공개 URDF 재사용 + controller yaml + launch 2개). 실제 팔에서 띄우기 → 읽기 → 한 관절 명령 → 끄기 를 통과했고, W6-7 의 (b) 측정 (mock 1회 · 실제 팔 1회) 이 이 bringup 에서 출발했다
 - [ ] **W3** 조립 완성 — 케이블 정리·손목 카메라 마운트·전체 뷰 카메라 교체 (새 카메라 + 고정수단 배송 중 — 도착 후 장착, 고정 방식 확정 + 위치 마킹. `so101-attach` 의 `/dev/so101_cam_overview` 매핑을 새 카메라의 USB 시리얼로 바꾸고 해상도·fps 를 다시 확인한다). 작업대 고정은 완료 (자재 구매·세팅 — [BOM](../../../Studies/Hardware-Arm/BOM.md))
 - [ ] **W4** URDF 재사용 + 캘리브 오프셋 반영·검증 (재료: `URDF_guide.md` §0. 캘리브 json 위치·`id` 규약은 가이드 §6.3)
 - [ ] **W5** 안전 기초 3종 — 소프트 리밋 (컨트롤러 limit = URDF 값과 일치) / 토크 상한 (드라이버 파라미터) / 소프트웨어 정지 (키 또는 ROS2 서비스 호출 1회로 명령 스트림을 끊고, 토크를 유지한 채 현 위치에서 정지. 최후 수단은 USB 분리 — 현 위치 유지, 가이드 §7). **결정 (2026-09-21)**: 물리 e-stop (전원 차단 스위치) 은 두지 않는다 — DC 차단은 토크 해제로 팔이 낙하한다. 영향 문서: `stage1/README.md` · [실기 전환 plan](2026-08-30-realworld-transition-execution.md) §6 · `Roadmap/Hardware-Arm.md` Stage 1 절 · 루트 `README.md` Stage 1 목표 · 조립 가이드 §0 · `BOM.md`
-- [ ] **W6-7** 이중 latency — (a) LeRobot 직결 n=100 / (b) ROS2 경유 n=100 / (b)-(a) 통합 오버헤드 기록 (재료: `ros2_driver_setup.md` §5. Measurements 경량 1디렉토리)
+- [x] **W6-7** 이중 latency — (a) LeRobot 직결 n=100 / (b) ROS2 경유 n=100 / (b)-(a) 통합 오버헤드 기록 (재료: `ros2_driver_setup.md` §5. Measurements 경량 1디렉토리) — 완료 (2026-09-25): (a) 65.4 / (b) 102.8 / (b) mock 15.6 / **(b)-(a) 37.5 ms** (각 n=100, 실패 0) → [Measurements/so101-dual-latency](../../../Measurements/so101-dual-latency/findings.md). 37.5 는 잠정값이다 — 메커니즘으로 설명되는 것은 10 ms 안팎이고 25-30 ms 의 출처가 미해결이라 "ROS 2 통합 오버헤드" 로 최종 보고하지 않는다 (findings §3)
+  - [ ] W6-7 잔여 — 37.5 를 최종값으로 쓰려면 필요: 검증 2개 실시 (문턱 5틱 · `update_rate` 200, methodology §4) + 25-30 ms 출처 판별 (findings §4 의 실험 순서)
 - [ ] **W8** 1분 영상 (teleop + 정책 실행 + 소프트웨어 정지 시연) + `stage1/README.md` 체크리스트 대조
 - 병행 (≤2): - [ ] JD 격차 매핑 1페이지 마감 (10월 — 8개사 자격요건 vs v1/v1.5/v2.5/Stage 1. 입력: `.private/jd/2026-09-jd-reading.md` §3-§4. 원문 확인 결과 매핑의 기준 공고는 로보티즈 모방학습·네비게이션 엔지니어와 RLWRLD Applied Research Engineer (Robotics)·Robotics Deployment Engineer 다 — 위 09 하순 체크박스의 "시스템 개발직군"·"Robotics S/W" 는 각각 펌웨어·실시간 제어 직무였다)  - [ ] probe 택1 (커피챗 1-2건 **또는** 로보티즈 AI 사피엔스 코드 정독+이슈·기여 1건)
 - [ ] (nice) Isaac Sim 임포트 시도 (실패 시 Phase 6 이월 — `isaac_sim_import.md`)
