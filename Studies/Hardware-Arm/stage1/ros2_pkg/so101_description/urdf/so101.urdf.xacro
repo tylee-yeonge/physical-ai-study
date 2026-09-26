@@ -11,8 +11,8 @@
     2. robot 이름: so101_new_calib -> so101
     3. ROS 1 형식 <transmission> 블록 6개 제거 (ros2_control 은 쓰지 않는다)
     4. 파일 끝에 <ros2_control> 블록 추가
-  link / joint 의 수치 (origin, inertia, limit) 는 원본 그대로다.
-  캘리브 오프셋 반영은 Stage 1 W4 에서 한다 (URDF_guide.md 0절).
+    5. W4 캘리브 오프셋 (2026-09-27): shoulder_lift · elbow_flex · gripper 의 joint origin rpy 를 실물 영점에 맞춰 회전
+       (각 joint 의 주석과 URDF_guide.md 5절). 그 밖의 link / joint 수치 (xyz, inertia, limit) 는 원본 그대로다.
 -->
 <!-- Generated using onshape-to-robot -->
 <!-- Onshape https://cad.onshape.com/documents/7715cc284bb430fe6dab4ffd/w/4fd0791b683777b02f8d975a/e/826c553ede3b7592eb9ca800 -->
@@ -346,7 +346,10 @@
 
   <!-- Joint from gripper to moving_jaw_so101_v1 -->
   <joint name="gripper" type="revolute">
-    <origin xyz="0.0202 0.0188 -0.0234" rpy="1.5708 -5.24284e-08 -1.41553e-15"/>
+    <!-- W4 캘리브 오프셋 보정 (2026-09-27): 관절축 둘레 +39.7도 (+0.6925 rad). 원본 rpy 는 1.5708 0 0.
+       LeRobot 캘리브레이션은 그리퍼도 가동 범위 가운데를 서보 0 으로 두어, 실물 닫힘이 -0.867 rad 로 읽힌다.
+       URDF 에서 조가 닿는 각도는 하한 -0.1745 rad 이므로 그 차이만큼 돌린다. -->
+    <origin xyz="0.0202 0.0188 -0.0234" rpy="1.57080 -0.69250 -0.00000"/>
     <parent link="gripper_link"/>
     <child link="moving_jaw_so101_v1_link"/>
     <axis xyz="0 0 1"/>
@@ -377,7 +380,9 @@
   <!-- Joint from upper_arm to lower_arm -->
   <!-- Note: 5-degree calibration offset applied to joint limits -->
   <joint name="elbow_flex" type="revolute">
-    <origin xyz="-0.11257 -0.028 1.73763e-16" rpy="-3.63608e-16 8.74301e-16 1.5708"/>
+    <!-- W4 캘리브 오프셋 보정 (2026-09-27): 관절축 둘레 +12.6도 (+0.21991 rad). 원본 rpy 는 0 0 1.5708.
+       영점 자세에서 실물 아래팔이 수평보다 22.8도 아래였고 (위팔 기울기 7.4도 포함) 그때 관절값이 +2.8도였다. -->
+    <origin xyz="-0.11257 -0.028 1.73763e-16" rpy="0 0 1.79071"/>
     <parent link="upper_arm_link"/>
     <child link="lower_arm_link"/>
     <axis xyz="0 0 1"/>
@@ -387,7 +392,9 @@
 
   <!-- Joint from shoulder to upper_arm -->
   <joint name="shoulder_lift" type="revolute">
-    <origin xyz="-0.0303992 -0.0182778 -0.0542" rpy="-1.5708 -1.5708 0"/>
+    <!-- W4 캘리브 오프셋 보정 (2026-09-27): 관절축 둘레 +4.7도 (+0.08203 rad). 원본 rpy 는 -1.5708 -1.5708 0.
+       영점 자세에서 실물 위팔이 수직보다 앞으로 7.4도 기울어 있었고 그때 관절값이 +2.7도였다. -->
+    <origin xyz="-0.0303992 -0.0182778 -0.0542" rpy="-1.5708 -1.48877 0"/>
     <parent link="shoulder_link"/>
     <child link="upper_arm_link"/>
     <axis xyz="0 0 1"/>
