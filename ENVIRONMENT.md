@@ -65,11 +65,11 @@
 |---|---|---|
 | **Rerun.io** | perception 주력 (이미지, depth, point cloud, 3D box) | `pip install rerun-sdk` / https://rerun.io/docs/getting-started |
 | Jupyter inline | 정적 이미지 빠른 확인 (matplotlib, PIL) | `pip install jupyterlab` |
-| Foxglove Studio | ROS 2 토픽 실시간 모니터링 (ROS 2 쓰는 경우 한정) | https://foxglove.dev/ |
+| Foxglove | ROS 2 토픽 · URDF · TF 시각화 — Hardware-Arm Stage 1 의 기본 화면 (헤드리스 컨테이너라 RViz 불가) | 앱: app.foxglove.dev 또는 데스크톱. 컨테이너의 `foxglove_bridge` 에 Tailnet `wss://` 로 접속 (호스트 vscode-tunnel v1.20.0 의 compose 매핑 + `tailscale serve`). 절차: [Studies/Hardware-Arm/stage1/ros2_driver_setup.md](Studies/Hardware-Arm/stage1/ros2_driver_setup.md) §4.3 |
 | VNC (TigerVNC) | rviz2 불가피 시 최후 수단 | `apt install tigervnc-standalone-server` |
 
 
-기본 원칙: **Rerun.io + Jupyter inline** 으로 대부분 해결. VNC 는 최후의 수단.
+기본 원칙: **Rerun.io + Jupyter inline** 으로 대부분 해결. ROS 2 토픽은 Foxglove. VNC 는 최후의 수단.
 
 
 ### 4-1. Rerun 사용 시나리오 (원격 PC + 로컬 viewer)

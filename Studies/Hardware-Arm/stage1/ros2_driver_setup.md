@@ -12,7 +12,7 @@
 
 1. 모터 1개 경로: `feetech_ros2_driver` (ros2_control 하드웨어 인터페이스) 로 위치 명령 1회 전달
 2. 6축 데이지체인: ID 1-6 인식 + joint_states 발행 확인
-3. 최소 URDF → RViz 에서 joint state 반영 확인 ([URDF_guide.md](URDF_guide.md))
+3. 최소 URDF → Foxglove 에서 joint state 반영 확인 (§4.3, [URDF_guide.md](URDF_guide.md))
 
 1번에서 막히면 드라이버 이슈 (권한/보드레이트/프로토콜), 2번에서 막히면 ID·배선 이슈로 분리해 디버깅한다.
 
@@ -134,7 +134,7 @@ rosdep install --from-paths src --ignore-src -r -y
 | 인자 | 기본값 | 뜻 |
 |---|---|---|
 | `use_mock_hardware` (bringup 만) | `false` | `true` 면 실제 드라이버 대신 가짜 하드웨어 (`mock_components/GenericSystem`) 를 쓴다. 시리얼 포트를 열지 않고, 받은 명령을 그대로 현재 위치로 돌려준다. 팔 없이 launch · 컨트롤러 설정을 시험하는 용도다 |
-| `gui` | `false` | `true` 면 RViz (display 는 관절 슬라이더 창도) 를 띄운다. 이 컨테이너에는 화면 (`DISPLAY`) 이 없어 창을 띄울 수 없으므로 기본값이 `false` 다 |
+| `gui` | `false` | `true` 면 RViz (display 는 관절 슬라이더 창도) 를 띄운다. 이 컨테이너에는 화면 (`DISPLAY`) 이 없어 창을 띄울 수 없으므로 기본값이 `false` 다. 화면은 §4.3 의 Foxglove 로 본다 |
 
 ---
 
@@ -271,6 +271,49 @@ ros2 topic pub --once /position_controller/commands std_msgs/msg/Float64MultiArr
 - 명령을 직접 손으로 짜지 않는다. 값 6개의 순서나 부호를 틀리면 그 관절이 그만큼 튄다.
 - 끄기 전에는 이 절 맨 위의 "끄기 전" 을 따른다.
 
+### 4.3 화면으로 보기 (Foxglove)
+
+이 컨테이너에는 화면 (`DISPLAY`) 이 없어 RViz 를 띄울 수 없다. 대신 컨테이너에서 **foxglove_bridge** (ROS2 토픽을 WebSocket 으로 내보내는 노드) 를 띄우고, 맥북의 **Foxglove** (웹앱 app.foxglove.dev 또는 데스크톱 앱) 로 붙어서 본다. 브리지는 컨테이너 이미지에 들어 있다 (vscode-tunnel v1.19.0+).
+
+**경로**: 컨테이너 8765 (브리지) → 호스트 루프백 `127.0.0.1:8766` (compose 매핑) → `tailscale serve` 가 Tailnet 에 https 8766 으로 공개 → 맥북. 웹앱은 https 페이지라 `wss://` 로만 붙을 수 있고, 인증서는 Tailscale 이 발급한다. 호스트 쪽 설정은 vscode-tunnel 레포 README 의 "Foxglove 브리지" 절 (v1.20.0) 에 있고 재부팅 후에도 유지된다. VS Code 의 포트 전달 (devtunnels 주소) 은 로그인 쿠키가 있는 브라우저 탭만 통과시키므로 Foxglove 에는 쓸 수 없다.
+
+**터미널 배치** — 세 개를 쓴다. 1 · 2 는 켜 둔 채로 두고 3 에서만 명령을 친다.
+
+| 터미널 | 역할 | 켜 두는가 |
+|---|---|---|
+| 1 | bringup (§4.1 mock 또는 §4.2 실제 팔) | 켜 둔다. 끄면 `/joint_states` 가 사라진다 |
+| 2 | 브리지 | 켜 둔다. bringup 을 껐다 켜도 그대로 둔다 (Foxglove 가 알아서 다시 구독한다) |
+| 3 | `print_joint_command.py`, `ros2 topic pub`, `ros2 control ...` | 그때그때 |
+
+`print_joint_command.py` 를 실행했는데 아무것도 안 찍히고 멈춰 있으면, 그 터미널의 문제가 아니라 **터미널 1 의 bringup 이 꺼져 있는 것**이다. 스크립트는 `/joint_states` 의 첫 메시지를 기다리는데 발행자가 없으면 영원히 기다린다. `Ctrl+C` 로 끊고 bringup 부터 띄운다.
+
+```bash
+# Terminal 2: 브리지. so101 워크스페이스를 반드시 소싱한다 — URDF 의 mesh 경로가 package://so101_description/... 이라
+# 브리지가 이 패키지를 알아야 Foxglove 에 mesh 파일을 넘겨줄 수 있다. 빼먹으면 팔이 축과 이름표로만 보인다
+source /opt/ros/jazzy/setup.bash && source /workspace/so101_ws/install/setup.bash && ros2 launch foxglove_bridge foxglove_bridge_launch.xml
+```
+
+**Foxglove 에서**
+
+1. Open connection → Foxglove WebSocket → 주소는 `wss://` + 호스트의 Tailnet 이름 + `:8766`. 이름은 호스트 터미널에서 아래로 확인한다 (레포가 공개라 문서에는 적지 않는다).
+
+   ```bash
+   tailscale status --json | grep -m1 DNSName
+   ```
+2. 붙으면 하단의 시계가 흐른다. Problems 탭에 빨간 표시가 있으면 연결 실패다. 앱이 오래된 버전이면 브리지 3.x 의 프로토콜 (`foxglove.sdk.v1`) 을 몰라 거절되므로 최신으로 올린다. 웹앱은 Chrome 130 이상을 요구한다.
+3. 3D 패널: 설정 (톱니) 의 Topics 에서 `/robot_description` 을 켠다. 팔은 30 cm 라 1 m 격자 가운데에 작게 보이므로 스크롤로 확대한다. 링크 이름표 (`upper_arm_link` 등) 는 `/tf` 에서 온 것이고, 팔 형상이 같이 보이면 URDF 와 mesh 까지 된 것이다.
+4. 모델은 `/tf` 로 움직인다 — bringup 의 robot_state_publisher 가 `/joint_states` 를 읽어 `/tf` 를 낸다. `/joint_states` 를 Foxglove 에서 따로 켤 필요는 없다.
+5. (선택) Plot 패널에 `/position_controller/commands` 를 넣으면 보낸 명령이 찍힌다.
+
+**확인 순서** (W1 ③ 의 완료 기준)
+
+- mock: 터미널 3 에서 헬퍼로 명령을 뽑아 보낸다. mock 은 팔이 없으니 변화량을 크게 잡아도 된다. 3D 패널의 팔이 그만큼 돌면 된다.
+
+  ```bash
+  source /opt/ros/jazzy/setup.bash && source /workspace/so101_ws/install/setup.bash && python3 /workspace/study/physical-ai-study/Studies/Hardware-Arm/stage1/scripts/print_joint_command.py shoulder_pan 0.5
+  ```
+- 실제 팔: §4.2 대로 헬퍼의 +0.05 rad 명령을 보내고, 눈앞의 팔과 화면의 팔이 같은 관절을 같은 방향으로 움직이는지 본다. 같으면 W1 ③ 완료이고, 이 화면이 W4 (자세 대조) 의 도구다. 손으로 관절을 밀어서 확인하지 않는다 — 토크가 켜져 있어 서보가 버틴다.
+
 ---
 
 ## 5. 이중 latency 측정 (Stage 1 must, W6-7)
@@ -395,7 +438,7 @@ ros2 topic pub --once /position_controller/commands std_msgs/msg/Float64MultiArr
 
 ## 체크리스트
 
-- [ ] 검증 순서 1-3 통과 (모터 1개 → 데이지체인 → URDF+RViz)
+- [ ] 검증 순서 1-3 통과 (모터 1개 → 데이지체인 → URDF+Foxglove)
 - [ ] feetech_ros2_driver 빌드 성공
 - [ ] so101_description 패키지 + bringup 동작
 - [ ] joint_states 발행 + position 명령 → 모터 동작
