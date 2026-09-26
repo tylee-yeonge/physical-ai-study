@@ -1,7 +1,7 @@
 # Studies/Hardware-Arm — 자작 팔 트랙 (SO-101)
 
 > **기간**: 2026.09-2027.06 (스파이크: 2026.09 → Stage 1: 2026.09 하순-11 → Stage 2: 2027.04-06)
-> **현재 위치**: **Stage 1 진행 중** (2026-09-22 착수). 스파이크는 판정 2026-09-20 must 4개 통과 ([`spike/week2/RESULT.md`](spike/week2/RESULT.md)). 완료: W1 (드라이버 Jazzy 빌드 · 실제 팔 6축 `/joint_states` · 한 관절 명령 · Foxglove 화면 확인) / W2 (`so101_description` bringup) / W6-7 (이중 latency 측정 2026-09-25, (b)-(a) 37.5 ms 잠정 — [`Measurements/so101-dual-latency/`](../../Measurements/so101-dual-latency/findings.md)). 남은 것: W3 조립 완성 (카메라 도착 대기) · W4 URDF 오프셋 (진행 중 — 관절 6개 방향 검사 통과, 영점 오프셋 대조 남음) · W5 안전 기초 · W8 영상. 체크는 [master roadmap](../../docs/superpowers/plans/2026-08-31-master-roadmap.md) §3 에만
+> **현재 위치**: **Stage 1 진행 중** (2026-09-22 착수). 스파이크는 판정 2026-09-20 must 4개 통과 ([`spike/week2/RESULT.md`](spike/week2/RESULT.md)). 완료: W1 (드라이버 Jazzy 빌드 · 실제 팔 6축 `/joint_states` · 한 관절 명령 · Foxglove 화면 확인) / W2 (`so101_description` bringup) / W4 (URDF 캘리브 오프셋 보정 2026-09-27) / W6-7 (이중 latency 측정 2026-09-25, (b)-(a) 37.5 ms 잠정 — [`Measurements/so101-dual-latency/`](../../Measurements/so101-dual-latency/findings.md)). 남은 것: W3 조립 완성 (카메라 도착 대기) · W5 안전 기초 · W8 영상. 체크는 [master roadmap](../../docs/superpowers/plans/2026-08-31-master-roadmap.md) §3 에만
 > **하드웨어**: SO-101 (SO-ARM101) 리더-팔로워, Feetech STS3215 (2026-07 확정 — Koch·커스텀 비채택 기록은 마스터 가이드)
 > **마스터 가이드**: [`Roadmap/Hardware-Arm.md`](../../Roadmap/Hardware-Arm.md) / 절차·판정 원본: [실기 전환 plan](../../docs/superpowers/plans/2026-08-30-realworld-transition-execution.md) §5-§7 / 주 단위 체크: [master roadmap](../../docs/superpowers/plans/2026-08-31-master-roadmap.md) §3
 > **Stage 1 가이드는 실제 팔 bringup 을 반영해 갱신된 상태. v2.5 · Stage 2 가이드는 미리 작성됨** — 진입 시 (v2.5: 2026.11, Stage 2: 2027.04) 다시 체크 후 작업 시작. `spike/` 는 실행을 마친 절차·증거 기록이고, Stage 1 · v2.5 가 하드웨어 사실 (포트·모터 ID·캘리브·record 규약) 의 원본으로 참조한다
@@ -68,7 +68,7 @@ Studies/Hardware-Arm/
 |---|---|
 | 2026.09 초 | **SO-101 키트 + Wrist 카메라 옵션 구매** — 완료 (발주 2026-09-01, 60만원, 리드타임 3일 — [`BOM.md`](BOM.md)) |
 | 2026.09 | **스파이크 (타임박스)** — 완료. 조립 (2026-09-12) + LeRobot 네이티브 검증. must 4: teleop / 10 에피소드 녹화+Hub / SmolVLA zero-shot / latency. **판정 2026-09-20: must 4개 통과** → `spike/week2/RESULT.md` |
-| 2026.09 하순-11 | **Stage 1 본 빌드** — 진행 중 (2026-09-22 착수). must 6: 조립 완성 + 안전 기초 (소프트 리밋·토크 상한·소프트웨어 정지) + ROS2 래핑 + URDF 오프셋 + 이중 latency + 1분 영상 (v2 선행 하드웨어). 완료: ROS2 래핑 (W1 · W2, 2026-09-22 - 09-26) · 이중 latency (W6-7, 2026-09-25, 37.5 ms 잠정). 잔여: W3 · W4 · W5 · W8. must 최종 마감 2027.02 말 |
+| 2026.09 하순-11 | **Stage 1 본 빌드** — 진행 중 (2026-09-22 착수). must 6: 조립 완성 + 안전 기초 (소프트 리밋·토크 상한·소프트웨어 정지) + ROS2 래핑 + URDF 오프셋 + 이중 latency + 1분 영상 (v2 선행 하드웨어). 완료: ROS2 래핑 (W1 · W2, 2026-09-22 - 09-26) · URDF 오프셋 (W4, 2026-09-27) · 이중 latency (W6-7, 2026-09-25, 37.5 ms 잠정). 잔여: W3 · W5 · W8. must 최종 마감 2027.02 말 |
 | 2026.11-12 | **v2.5 병행** — teleop 데이터셋 (LeRobot 포맷, HF Hub) + SmolVLA 실기 before/after + vla-lab 공개 문서. 착수 전 선결 2개: 정규화 통계 · 단위 규약 맞추기, `max_relative_target` 하한 실측 (`spike/week2/RESULT.md` §4 #8 · #11) |
 | 2026.11 | 6개월 분기 재평가 #1 (스파이크 판정 + v2.5 진행률 + **Stage 2 확장 수단 결정**) |
 | 2027.04-06 | **Stage 2 진행** — Phase 6 와 병행, 실지원 병행 |
