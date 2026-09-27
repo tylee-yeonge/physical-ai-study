@@ -334,9 +334,15 @@ LeRobot 캘리브레이션은 그리퍼도 다른 관절처럼 가동 범위의 
 
 ### 5.5 보정과 마무리
 
-측정한 오프셋 θ 는 그 joint 의 `<origin>` 회전에 관절축 (자식 z) 둘레의 θ 회전을 곱해 넣는다. 이 파일의 origin 은 rpy 세 성분이 다 있는 경우가 많아 (예: shoulder_lift 의 `rpy="-1.5708 -1.5708 0"`) yaw 에 θ 를 더하는 것으로는 안 되고, 회전 행렬을 곱한 뒤 rpy 로 다시 환산해야 한다. 각도 표를 들고 계산한다.
+측정한 오프셋 θ 는 그 joint 의 `<origin>` 회전에 관절축 (자식 z) 둘레의 θ 회전을 곱해 넣는다 (`R_new = R_old · Rz(θ)`). 이 파일의 origin 은 rpy 세 성분이 다 있는 경우가 많아 (예: shoulder_lift 의 `rpy="-1.5708 -1.5708 0"`) yaw 에 θ 를 더하는 것으로는 안 되고, 회전 행렬을 곱한 뒤 rpy 로 다시 환산해야 한다. 그 계산은 `scripts/apply_joint_offset.py` 가 한다. joint 이름과 오프셋 (도) 을 주면 현재 rpy 를 파일에서 읽어 새 rpy 와 옮겨 적을 줄을 찍는다 (파일은 고치지 않는다).
 
-1. `so101.urdf.xacro` 의 해당 joint `<origin rpy>` 만 수정한다 (`xyz` 와 다른 joint 는 손대지 않는다)
+```bash
+python3 /workspace/study/physical-ai-study/Studies/Hardware-Arm/stage1/scripts/apply_joint_offset.py shoulder_lift 4.7
+```
+
+오프셋의 부호는 §5.3 과 같다 — 관절의 +방향으로 실물이 더 돌아 있으면 +. 수평계 값에서 그때의 관절값을 뺀 것이 오프셋이다 (위팔 7.4도, 관절값 2.7도 → 4.7도. 아래팔은 위팔 기울기까지 빼서 22.8 - 7.4 - 2.8 = 12.6도). 같은 joint 에 두 번 적용하면 두 번 돌아가므로, 이미 보정된 파일에 다시 잴 때는 "추가로" 어긋난 각도만 준다.
+
+1. `so101.urdf.xacro` 의 해당 joint `<origin rpy>` 만 스크립트 출력으로 바꾼다 (`xyz` 와 다른 joint 는 손대지 않는다). joint 위 주석에 날짜 · 오프셋 · 측정 근거를 적는다
 2. "검증 단계" 1번 (`xacro` + `check_urdf`)
 3. bringup 재시작 → Foxglove 에서 영점 자세가 실물과 같은지 확인
 4. 영점 자세의 실물 사진 1장을 `stage1/outputs/` 에 남기고 커밋. master roadmap W4 체크

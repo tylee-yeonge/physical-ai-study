@@ -39,6 +39,7 @@ Studies/Hardware-Arm/
     isaac_sim_import.md        # URDF → USD 임포트 (nice — Phase 6 이월 허용)
     scripts/
       print_joint_command.py   # 현재 관절값을 읽어 붙여 넣을 위치 명령을 출력 (읽기 전용 — ros2_driver_setup.md §4.2)
+      apply_joint_offset.py    # 수평계로 잰 영점 오프셋을 joint origin rpy 로 환산 (읽기 전용 — URDF_guide.md §5.5)
       measure_latency_ros2.py      # 이중 latency (b) ROS2 경유 n=100. mock / 실제 팔을 스스로 판정 (ros2_driver_setup.md §5.4)
       measure_latency_lerobot.py   # 이중 latency (a) LeRobot 직결 n=100. 서보 프로파일을 (b) 와 맞춰 잰다 (ros2_driver_setup.md §5.4)
     outputs/                   # latency 원본 npy · 요약 csv — gitignore, 로컬에만 보존. 기록용 사본은 Measurements/ 로
