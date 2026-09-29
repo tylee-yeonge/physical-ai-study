@@ -139,9 +139,9 @@ flowchart TD
 
 ### W5 — 안전 기초 3종
 
-- **여는 곳**: `stage1/` 에 전용 가이드가 없다. 정의는 위 must 표의 "안전 기초" 행과 master roadmap 의 W5 줄이다. 재료는 [URDF_guide.md](URDF_guide.md) 체크리스트의 limit 항목, [ros2_driver_setup.md](ros2_driver_setup.md) §1.2 (토크 상한 = `max_torque_limit`, 서보 단 각도 한계 = `range_min` · `range_max`, 적은 값은 서보 EEPROM 에 기록된다는 점), [조립 가이드](../spike/week1/so-arm101-assembly-guide.md) §7, [Stage 2 안전 인터록](../stage2/safety_interlock.md) e-stop 절 (정지 동작의 정의 — Stage 2 가 이 주의 소프트웨어 정지를 C++ 로 인수한다)
+- **여는 곳**: [ros2_driver_setup.md](ros2_driver_setup.md) §6 (6.1 어디에 무엇을 거는가 → 6.2 소프트 리밋 → 6.3 토크 상한 → 6.4 소프트웨어 정지 → 6.5 완료 기준). 정의는 위 must 표의 "안전 기초" 행과 master roadmap 의 W5 줄, 정지 동작의 정의는 [Stage 2 안전 인터록](../stage2/safety_interlock.md) e-stop 절 (Stage 2 가 이 주의 소프트웨어 정지를 C++ 로 인수한다). 소프트 리밋 값은 LeRobot 캘리브 파일에서 나오므로 (§6.2 표) 팔을 움직이지 않고 시작할 수 있다
 - **하는 일**
-  1. 소프트 리밋 — 기본 상태에서는 URDF 의 `<limit>` 가 적용되지 않는다 (bringup 로그: `Enforcing command limits is disabled. Command limits from URDF will be ignored.`). 켜는 방법부터 찾는다. 그다음 컨트롤러의 limit 을 URDF `<limit>` 와 같은 값으로 두고, 한계 밖 명령을 보냈을 때 팔이 한계를 넘지 않는지 확인 (명령이 거부되든 한계값으로 잘리든, 어느 쪽으로 동작하는지도 적어 둔다)
+  1. 소프트 리밋 — 기본 상태에서는 URDF 의 `<limit>` 가 적용되지 않는다 (bringup 로그: `Enforcing command limits is disabled. Command limits from URDF will be ignored.`). yaml 의 `enforce_command_limits: true` 로 켜고, URDF `<limit>` 를 LeRobot 캘리브 파일의 실물 범위로 바꾼다. 한계 밖 명령은 한계값으로 잘려 넘어간다. mock 에서 한계 밖 명령으로 확인 (§6.2)
   2. 토크 상한 — 드라이버 파라미터로 건다. 상한을 너무 낮게 잡으면 팔이 중력을 못 이겨 목표 자세에 못 간다 (스파이크에서 `elbow_flex` 가 실제로 그랬다 — [RESULT](../spike/week2/RESULT.md) §4 #11). "팔을 든 자세를 유지할 수 있는 최소값" 을 먼저 재고 그 위로 잡는다
   3. 소프트웨어 정지 — 키 또는 ROS2 서비스 호출 1회로 명령 스트림을 끊고, 현재 위치를 목표로 써서 토크를 유지한 채 멈춘다. **팔이 이동하는 중에 걸어서** 그 자리에 서는지 확인한다 (명령을 끊기만 하면 마지막 목표까지 간다)
 - **끝나면 남는 것**: 3종이 켜진 bringup. 이후의 정책 실행은 항상 이 상태에서 한다

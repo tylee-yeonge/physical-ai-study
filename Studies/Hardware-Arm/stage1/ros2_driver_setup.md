@@ -75,7 +75,7 @@ source install/setup.bash
 | 지원 배포판 | 저장소 CI 가 jazzy · humble · rolling 을 빌드한다 | Jazzy 빌드는 저장소가 관리하는 경로다 |
 | 플러그인 이름 | `feetech_ros2_driver/FeetechHardwareInterface` | [URDF_guide.md](URDF_guide.md) 의 `<plugin>` 예시와 같다 |
 | 하드웨어 파라미터 | `usb_port` (필수), `joint_config_file` (선택) 두 개만 읽는다. 보드레이트는 파라미터가 아니라 코드 기본값 1,000,000 이다 | `/dev/so101_follower` 만 넣으면 된다. 서보가 1,000,000 bps 로 설정돼 있어 그대로 맞는다 |
-| 관절 파라미터 | `id` (필수). 선택: `homing_offset`, `range_min`, `range_max`, `max_torque_limit`, `protection_current`, `overload_torque`, `p/i/d_coefficient`, `return_delay_time`, `acceleration` | W5 의 토크 상한 = `max_torque_limit`, 서보 단의 각도 한계 = `range_min` · `range_max` (단위는 도가 아니라 0-4095 틱) |
+| 관절 파라미터 | `id` (필수). 선택: `homing_offset`, `range_min`, `range_max`, `max_torque_limit`, `protection_current`, `overload_torque`, `p/i/d_coefficient`, `return_delay_time`, `acceleration` | W5 의 토크 상한 = `max_torque_limit` (§6.3). `range_min` · `range_max` 는 서보 단의 각도 한계 (0-4095 틱) 인데 LeRobot 캘리브가 쓰는 자리라 W5 에서도 쓰지 않는다 — 각도 한계는 ros2_control 단의 소프트 리밋으로 건다 (§6.2) |
 | **선택 파라미터를 적으면 서보에 기록된다** | 기동할 때 토크를 끄고 EEPROM 잠금을 푼 뒤, **적혀 있는 파라미터만** 서보에 쓴다. 적지 않은 것은 건드리지 않는다 | 서보의 EEPROM 은 LeRobot 과 공유한다. LeRobot 캘리브레이션도 같은 자리 (`Homing_Offset` · `Min/Max_Position_Limit`) 에 값을 써 두었다. LeRobot 은 연결할 때마다 서보에서 이 값들을 읽어 캘리브 json 과 비교하고, 하나라도 다르면 "캘리브가 안 맞는다" 로 보고 캘리브 절차로 들어간다 (lerobot 0.6.2 `is_calibrated`). **W1-W2 에서는 `id` 만 적는다.** 다른 값은 W4 · W5 에서 LeRobot 캘리브 json 과 대조하며 하나씩 넣는다 |
 | 영점 | 드라이버는 항상 2048 틱을 0 rad 로 본다 | **틱 기준은 두 스택이 같고, 각도의 0 은 다르다.** LeRobot 캘리브는 호밍 자세가 2047 틱으로 읽히게 `Homing_Offset` 을 서보에 써 둔다 (lerobot 0.6.2 `_get_half_turn_homings`) — 드라이버의 2048 과 1틱 (0.09도) 차이라 틱 기준은 같다고 봐도 된다. 그런데 LeRobot 이 내주는 **도 단위 값의 0 은 2047 틱이 아니라 캘리브 범위의 중점** `(range_min + range_max) / 2` 다 (`motors_bus.py` 의 DEGREES 정규화). 이 팔의 캘리브 json 으로 계산한 차이 (중점 - 2047): `shoulder_pan` +0.2도, `shoulder_lift` -0.9도, `elbow_flex` **-13.9도**, `wrist_flex` +3.8도, `wrist_roll` 0도 (그리퍼는 LeRobot 에서 0-100 단위라 해당 없음). 같은 자세를 두 스택이 다른 숫자로 읽는다는 뜻이다 — `elbow_flex` 는 ROS2 쪽 값이 LeRobot 쪽 값보다 약 14도 작게 나온다. W4 에서 두 스택의 값을 대조하거나 W6-7 · v2.5 에서 값을 오갈 때 이 차이를 관절별로 더해 줘야 한다 |
 | 기동 시 | 명령 인터페이스가 있는 관절의 토크를 켜고, 첫 목표를 현재 위치로 둔다 | launch 를 띄우는 순간 팔이 튀지 않고 그 자세로 굳는다. 실제 팔에서 확인했다 (2026-09-22) — 기동 직후 6개 관절 모두 목표값 (command interface) 이 현재 위치 (state interface) 와 같았다 (`/controller_manager/introspection_data/full` 로 읽음). 그래도 **기동은 팔을 휴식 자세에 두고 한다** — 끌 때 토크가 풀리기 때문이다 (아래 행) |
@@ -424,6 +424,145 @@ source /opt/ros/jazzy/setup.bash && source /workspace/so101_ws/install/setup.bas
 
 ---
 
+## 6. 안전 기초 3종 (Stage 1 must, W5)
+
+**무엇을**: 세 가지를 켠다. (1) **소프트 리밋** — 관절이 실물 가동 범위 밖으로 가라는 명령을 받지 않게 (2) **토크 상한** — 서보가 낼 수 있는 힘의 상한 (3) **소프트웨어 정지** — 서비스 호출 한 번으로 명령 흐름을 끊고 토크를 유지한 채 그 자리에 서게.
+**왜**: 지금까지 팔을 움직인 작업 (W4 의 명령, W6-7 의 200회 넘는 계단) 은 전부 이것 없이 했다. 사람이 짠 명령이 아니라 모델이 낸 명령을 팔에 보내는 W8 과 v2.5 는 이 셋이 켜진 상태에서만 한다.
+**끝나면 손에 남는 것**: 3종이 켜진 bringup (yaml + URDF + 정지 노드가 launch 에 포함), 값의 근거 표 (§6.2 · §6.3), 시험 기록.
+**언제**: W4 뒤, 팔을 움직이는 다음 작업 전.
+
+### 6.1 어디에 무엇을 거는가
+
+| 항목 | 거는 곳 | 메커니즘 | 서보 EEPROM |
+|---|---|---|---|
+| 소프트 리밋 | `so101_controllers.yaml` 의 `enforce_command_limits: true` + URDF 의 `<limit lower upper>` | controller_manager 가 매 주기 명령을 한계 안으로 자른 뒤 하드웨어에 넘긴다 (JointSaturationLimiter). Jazzy 는 기본이 꺼져 있어 지금 bringup 로그에 `Enforcing command limits is disabled` 가 찍힌다 | 안 건드린다 |
+| 토크 상한 | URDF `<ros2_control>` 의 joint 마다 `<param name="max_torque_limit">` | 드라이버가 기동 때 서보의 `Max_Torque_Limit` 레지스터 (0-1000 = 0-100 %) 에 쓴다 | **쓴다.** LeRobot 은 이 레지스터를 건드리지 않으므로 (0.6.2 `configure_motors` 는 가속도 · 응답 지연만 쓴다) 여기서 쓴 값이 teleop · 녹화에도 그대로 적용된다 |
+| 소프트웨어 정지 | 정지 노드 (`scripts/soft_stop.py`, bringup 에 포함) | 현재 위치를 목표로 한 번 쓰고 `position_controller` 를 비활성화한다 | 안 건드린다 |
+
+**쓰지 않는 파라미터**: `range_min` · `range_max` · `homing_offset`. LeRobot 캘리브레이션이 쓰는 같은 레지스터라 (§1.2), 적으면 LeRobot 이 다음 접속 때 "캘리브가 안 맞는다" 로 판단한다. 각도 한계는 서보가 아니라 ros2_control 단에서 건다.
+
+### 6.2 소프트 리밋
+
+**값의 출처는 LeRobot 캘리브레이션 파일이다.** `/root/so-arm101/calibration/robots/so_follower/so101_follower_01.json` 에 관절마다 `range_min` · `range_max` (틱) 가 있고, `(틱 - 2048) / 4096 · 2π` 로 바꾸면 드라이버가 내보내는 rad 와 같은 좌표다 (그리퍼 하한이 -0.865 rad 로 나오는데 W4 에서 실측한 닫힘 -0.867 과 같다 — 환산이 맞다는 증거). 팔을 움직이지 않고 값을 정할 수 있다.
+
+원본 URDF 의 `<limit>` 는 이 팔의 실물 범위와 다르다. 휴식 자세의 `shoulder_lift` (-1.772) 와 그리퍼 닫힘 (-0.867) 이 URDF 한계 밖이라, 원본 값으로 리밋을 켜면 휴식 자세로 못 가고 그리퍼를 못 닫는다. 캘리브 범위에서 안쪽으로 0.02 rad (1.1도) 여유를 둔 값을 쓴다.
+
+| 관절 | 캘리브 범위 (rad) | 원본 URDF | **새 lower / upper** |
+|---|---|---|---|
+| shoulder_pan | -1.715 / +1.720 | ±1.920 | -1.695 / +1.700 |
+| shoulder_lift | -1.842 / +1.807 | ±1.745 | -1.822 / +1.787 |
+| elbow_flex | -2.039 / +1.549 | ±1.690 | -2.019 / +1.529 |
+| wrist_flex | -1.706 / +1.836 | ±1.658 | -1.686 / +1.816 |
+| wrist_roll | 0 / 4095 틱 (한 바퀴, 미캘리브) | -2.744 / +2.841 | 원본 유지 (케이블이 감기는 한계는 실물로 확인) |
+| gripper | -0.865 / +1.482 | -0.175 / +1.745 | -0.845 / +1.462 (조를 꽉 조이지는 않는다) |
+
+**수정 1 — URDF.** `so101.urdf.xacro` 의 joint 6개에서 `<limit>` 의 `lower` · `upper` 만 위 표로 바꾼다. `effort` · `velocity` 는 그대로 둔다. 리밋 강제는 `velocity` 도 적용해서 (주기당 최대 이동 = `velocity` × 0.01 s) `velocity="10"` 이면 주기당 0.1 rad 가 상한인데, 서보 최고 속도보다 빠르므로 지금은 제한이 아니다. 나중에 속도 제한 노브로 쓸 수 있다 (예: 3 이면 주기당 0.03 rad ≈ 1.7도). W6-7 의 잔여 실험은 0.05 rad 계단이라 `velocity` 가 5 이상이면 영향이 없다.
+
+**수정 2 — yaml.** `config/so101_controllers.yaml` 의 `controller_manager` 에 한 줄을 넣는다.
+
+```yaml
+controller_manager:
+  ros__parameters:
+    update_rate: 100
+    # URDF 의 <limit> 를 명령에 강제한다 (Jazzy 기본 false). 한계 밖 명령은 한계값으로 잘려 하드웨어에 넘어간다
+    enforce_command_limits: true
+```
+
+**시험 — 팔 없이 (mock).** Terminal 1 에 mock bringup 을 띄우고 로그에 `Enforcing command limits is enabled` 가 찍히는지 본다. 그다음 Terminal 3 에서 한계 밖 명령을 보낸다 (mock 이라 안전하다. **실제 팔에는 절대 보내지 않는다** — 다섯 관절이 가운데로 튄다).
+
+```bash
+source /opt/ros/jazzy/setup.bash && ros2 topic pub --once /position_controller/commands std_msgs/msg/Float64MultiArray "data: [3.0, 0.0, 0.0, 0.0, 0.0, 0.0]"
+```
+
+```bash
+source /opt/ros/jazzy/setup.bash && ros2 topic echo /joint_states --once --field position
+```
+
+기대: `shoulder_pan` (알파벳 순 4번째) 이 3.0 이 아니라 상한 1.700 에서 멈춘다. 하한도 `-3.0` 으로 같은 방식으로 본다. 그리퍼는 `[0, 0, 0, 0, 0, -3.0]` 으로 -0.845 에서 멈추는지.
+
+**시험 — 실제 팔.** 한계까지 갈 필요 없다. 리밋이 켜진 채 §4.2 의 헬퍼 +0.05 rad 명령이 전과 같이 동작하는지만 본다 (회귀). 휴식 자세로 접을 때 `shoulder_lift` 가 -1.822 까지 가는지 (원본 한계였으면 -1.745 에서 걸렸다) 를 보면 값이 실물 범위로 바뀐 것까지 확인된다.
+
+### 6.3 토크 상한
+
+`Max_Torque_Limit` 는 서보가 쓰는 최대 토크의 상한이다 (1000 = 100 %, 출하 기본 1000). 낮추면 팔이 사람 손이나 물건에 부딪혔을 때 미는 힘이 줄고, 너무 낮추면 중력을 못 이겨 목표 자세에 못 간다 (스파이크에서 `elbow_flex` 가 그랬다 — [RESULT](../spike/week2/RESULT.md) §4 #11). 그래서 값은 **"팔을 앞으로 뻗은 자세를 유지하는 최소값" 을 재고 그 위로** 잡는다.
+
+**절차**
+
+1. URDF `<ros2_control>` 의 joint 6개에 `<param name="max_torque_limit">500</param>` 을 넣는다 (`id` 줄 아래). 첫 후보 500.
+2. 실제 팔 bringup 을 띄운다. 드라이버가 기동 때 여섯 서보에 값을 쓴다 (로그의 `Successful 'configure'` 뒤).
+3. §5.2 순서 (팔꿈치 → 어깨 → 손목) 로 관절값 0 근처, 팔을 앞으로 뻗은 자세로 보낸다. 중력 부하가 가장 큰 자세다.
+4. 30초 뒤 헬퍼 (인자 없이) 로 관절값을 읽어 `shoulder_lift` · `elbow_flex` 가 명령값에서 얼마나 처졌는지 적는다. 0.02 rad (1도) 넘게 처지면 값이 낮은 것이다.
+5. 처지면 700 으로 올리고, 안 처지면 300 으로 내려 2번부터 반복한다. 매 값마다 bringup 재시작이 필요하다 (EEPROM 에 쓰는 시점이 기동 때다).
+6. 유지되는 최소값에 1.3 배를 곱해 확정하고 URDF 에 남긴다. 아래 표를 채운다.
+
+| 시도 | `max_torque_limit` | `shoulder_lift` 처짐 (rad) | `elbow_flex` 처짐 (rad) | 판정 |
+|---|---|---|---|---|
+| 1 | 500 | | | |
+| 2 | | | | |
+| 확정 | | | | |
+
+**써졌는지 확인.** 드라이버는 이 레지스터를 읽지 않으므로 bringup 을 끈 뒤 LeRobot 으로 읽는다. `robot.connect()` 는 토크를 껐다 켜므로 쓰지 않고 버스만 연다 (읽기 전용).
+
+```bash
+acl
+python - <<'EOF'
+import os
+from lerobot.robots.so_follower import SOFollower, SOFollowerRobotConfig
+robot = SOFollower(SOFollowerRobotConfig(port=os.environ["FOLLOWER_PORT"], id="so101_follower_01"))
+robot.bus.connect()                          # 포트 열기 + ping 만 한다
+for name in ("shoulder_pan", "shoulder_lift", "elbow_flex", "wrist_flex", "wrist_roll", "gripper"):
+    print(f"{name:14s} Max_Torque_Limit = {robot.bus.read('Max_Torque_Limit', name, normalize=False)}")
+robot.bus.disconnect(disable_torque=False)   # 토크를 끄지 않고 포트만 닫는다
+EOF
+```
+
+**teleop 회귀.** 이 값은 LeRobot 에도 그대로 적용되므로, 확정한 뒤 `lerobot-teleoperate` 를 1분 돌려 리더를 따라오는 데 문제가 없는지 본다 (조립 가이드 §7 의 검증 항목). 여기서 처지면 v2.5 수집이 망가지므로 값을 올린다.
+
+### 6.4 소프트웨어 정지
+
+**정의** ([Stage 2 안전 인터록](../stage2/safety_interlock.md) e-stop 절과 같다): 토크를 유지한 채 현 위치에 정지. 토크 OFF 는 정지가 아니다 (팔이 떨어진다). **명령을 끊기만 해서는 멈추지 않는다** — 위치 제어는 마지막 목표까지 계속 가므로, 이동 중에 걸면 그 목표까지 간다. 그래서 현재 위치를 목표로 덮어쓴 뒤에 명령 흐름을 끊는다. Stage 2 의 C++ 인터록이 이것을 인수한다.
+
+**구현 — `scripts/soft_stop.py`** (W5 에서 작성하는 rclpy 노드. 이 절이 명세다)
+
+| 항목 | 내용 |
+|---|---|
+| 노드 이름 | `soft_stop` |
+| 서비스 `/soft_stop/stop` (`std_srvs/srv/Trigger`) | ① `/joint_states` 의 최신 메시지에서 6개 위치를 **이름으로** 찾아 yaml 의 `joints` 순서로 늘어놓고 `/position_controller/commands` 에 1회 publish ② `/controller_manager/switch_controller` 를 호출해 `deactivate_controllers: [position_controller]`, `strictness: 2` (STRICT) ③ 응답 `message` 에 쓴 6개 값을 넣는다. `/joint_states` 를 아직 못 받았으면 `success: false` 로 거부하고 아무것도 보내지 않는다 |
+| 서비스 `/soft_stop/release` (`std_srvs/srv/Trigger`) | `activate_controllers: [position_controller]`. 해제 뒤 첫 명령은 다시 §4.2 규칙 (현재 위치 + 한 관절만 조금) 을 따른다 |
+| 정지 중 | `position_controller` 가 비활성이라 `/position_controller/commands` 로 오는 명령은 하드웨어에 전달되지 않는다 (차단). `joint_state_broadcaster` 는 그대로 돌아 `/joint_states` 와 Foxglove 는 살아 있다 |
+| launch | `bringup.launch.py` 에 노드를 추가해 bringup 마다 같이 뜬다 (mock 에서도) |
+| 키 한 번 | 호스트 bashrc 가 아니라 컨테이너 이미지의 alias 에 `so101-stop` 을 두려면 vscode-tunnel 레포 수정이 필요하다. 그 전까지는 아래 명령을 터미널 3 에 미리 쳐 두고 Enter 만 남긴다 |
+
+```bash
+source /opt/ros/jazzy/setup.bash && ros2 service call /soft_stop/stop std_srvs/srv/Trigger
+```
+
+```bash
+source /opt/ros/jazzy/setup.bash && ros2 service call /soft_stop/release std_srvs/srv/Trigger
+```
+
+**시험 — mock.** ① 정지 상태에서 명령을 보내도 `/joint_states` 가 안 변하는지 (차단) ② release 뒤 명령이 다시 먹는지 ③ 이동 중 정지: mock 은 명령을 그대로 현재 위치로 돌려주므로 "이동 중" 이 없다. 이 항목은 실제 팔에서만 본다.
+
+**시험 — 실제 팔 (1회).** 중력 부하가 없는 `wrist_roll` 로 한다. 터미널 3 에 정지 명령을 쳐 두고, 터미널 2 (또는 다른 터미널) 에서 헬퍼로 `wrist_roll 1.0` 명령을 보낸 직후 (0.3초 안에) Enter. 손목이 1.0 rad 를 다 돌지 않고 도중에 서면 통과. `/joint_states` 의 `wrist_roll` 이 명령값이 아닌 중간값에서 멈춰 있고, 토크가 걸려 있어 손으로 밀면 버틴다. 되돌릴 때는 release → 헬퍼로 원래 값.
+
+### 6.5 완료 기준
+
+- [ ] mock 로그에 `Enforcing command limits is enabled`, 한계 밖 명령이 한계값에서 멈춤 (§6.2 시험)
+- [ ] 실제 팔에서 리밋이 켜진 채 §4.2 의 +0.05 명령 동작, 휴식 자세 (`shoulder_lift` -1.77) 도달
+- [ ] `max_torque_limit` 확정값이 URDF 에 있고, 뻗은 자세 30초에 처짐 0.02 rad 이하, 서보 레지스터 읽기로 값 확인, teleop 1분 회귀
+- [ ] 정지 서비스가 이동 중 실제 팔을 도중에 세우고 (토크 유지), 정지 중 명령 차단, release 로 복귀
+- [ ] `bringup.launch.py` 한 줄로 3종이 다 켜진 상태가 뜬다. 이후 §4.2 · §5 · W8 은 전부 이 상태에서 한다
+- [ ] 값의 근거 (캘리브 범위 표, 토크 시도 표) 가 이 절에 채워져 있고 커밋됨 → master roadmap W5 체크
+
+### 6.6 끝났다고 하기 전에 스스로 답해 보는 질문
+
+1. 소프트 리밋은 명령을 자르는 것이지 팔을 세우는 것이 아니다. 한계 안의 명령으로도 팔이 탁자를 칠 수 있는 자세는 어떤 것이고, 그것은 무엇으로 막는가?
+2. 토크 상한을 서보 EEPROM 에 쓰면 LeRobot teleop 도 같은 값을 쓴다. 두 스택이 다른 값을 원하면 어떻게 해야 하는가?
+3. 정지 노드가 `/joint_states` 를 못 받고 있을 때 정지를 누르면 어떻게 되어야 하는가? 지금 명세는 무엇을 택했고 왜인가?
+4. USB 분리는 정지 수단이지만 `/joint_states` 도 끊긴다. Foxglove 에서 그것을 어떻게 알아채는가?
+
+---
+
 ## 자주 발생 문제
 
 | 증상 | 해결 |
@@ -443,3 +582,4 @@ source /opt/ros/jazzy/setup.bash && source /workspace/so101_ws/install/setup.bas
 - [ ] so101_description 패키지 + bringup 동작
 - [ ] joint_states 발행 + position 명령 → 모터 동작
 - [ ] 이중 latency 측정 기록 ((a) / (b) / (b) mock / 오버헤드 — §5.3 의 정의대로)
+- [ ] 안전 기초 3종 (소프트 리밋 · 토크 상한 · 소프트웨어 정지 — §6.5 의 기준대로)
