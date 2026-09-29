@@ -478,7 +478,9 @@ source /opt/ros/jazzy/setup.bash && ros2 topic pub --once /position_controller/c
 source /opt/ros/jazzy/setup.bash && ros2 topic echo /joint_states --once --field position
 ```
 
-기대: `shoulder_pan` (알파벳 순 4번째) 이 3.0 이 아니라 상한 1.700 에서 멈춘다. 하한도 `-3.0` 으로 같은 방식으로 본다. 그리퍼는 `[0, 0, 0, 0, 0, -3.0]` 으로 -0.845 에서 멈추는지.
+기대: `shoulder_pan` (알파벳 순 4번째) 이 3.0 이 아니라 상한 1.700 에서 멈춘다. 하한도 `-3.0` 으로 같은 방식으로 본다. 그리퍼는 `[0, 0, 0, 0, 0, -3.0]` 으로 -0.845 에서 멈추는지. `echo --once` 첫 줄의 `A message was lost` 는 구독 직후 100 Hz 메시지 하나를 놓쳤다는 알림일 뿐이다.
+
+결과 (2026-09-30, mock): 로그 `Enforcing command limits is enabled`. `shoulder_pan` 3.0 → 1.700, -3.0 → -1.695, gripper -3.0 → -0.845. 통과.
 
 **시험 — 실제 팔.** 한계까지 갈 필요 없다. 리밋이 켜진 채 §4.2 의 헬퍼 +0.05 rad 명령이 전과 같이 동작하는지만 본다 (회귀). 휴식 자세로 접을 때 `shoulder_lift` 가 -1.822 까지 가는지 (원본 한계였으면 -1.745 에서 걸렸다) 를 보면 값이 실물 범위로 바뀐 것까지 확인된다.
 
