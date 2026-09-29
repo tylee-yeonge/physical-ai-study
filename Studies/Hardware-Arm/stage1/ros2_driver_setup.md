@@ -75,7 +75,7 @@ source install/setup.bash
 | 지원 배포판 | 저장소 CI 가 jazzy · humble · rolling 을 빌드한다 | Jazzy 빌드는 저장소가 관리하는 경로다 |
 | 플러그인 이름 | `feetech_ros2_driver/FeetechHardwareInterface` | [URDF_guide.md](URDF_guide.md) 의 `<plugin>` 예시와 같다 |
 | 하드웨어 파라미터 | `usb_port` (필수), `joint_config_file` (선택) 두 개만 읽는다. 보드레이트는 파라미터가 아니라 코드 기본값 1,000,000 이다 | `/dev/so101_follower` 만 넣으면 된다. 서보가 1,000,000 bps 로 설정돼 있어 그대로 맞는다 |
-| 관절 파라미터 | `id` (필수). 선택: `homing_offset`, `range_min`, `range_max`, `max_torque_limit`, `protection_current`, `overload_torque`, `p/i/d_coefficient`, `return_delay_time`, `acceleration` | W5 의 토크 상한 = `max_torque_limit` (§6.3). `range_min` · `range_max` 는 서보 단의 각도 한계 (0-4095 틱) 인데 LeRobot 캘리브가 쓰는 자리라 W5 에서도 쓰지 않는다 — 각도 한계는 ros2_control 단의 소프트 리밋으로 건다 (§6.2) |
+| 관절 파라미터 | `id` (필수). 선택: `homing_offset`, `range_min`, `range_max`, `max_torque_limit`, `protection_current`, `overload_torque`, `p/i/d_coefficient`, `return_delay_time`, `acceleration` | W5 의 토크 상한은 서보의 `Max_Torque_Limit` 레지스터인데, 드라이버 파라미터 `max_torque_limit` 로 쓰면 EEPROM 응답을 5 ms 안에 못 받아 기동이 실패하므로 LeRobot 으로 쓴다 (§6.3 A). `range_min` · `range_max` 는 서보 단의 각도 한계 (0-4095 틱) 인데 LeRobot 캘리브가 쓰는 자리라 W5 에서도 쓰지 않는다 — 각도 한계는 ros2_control 단의 소프트 리밋으로 건다 (§6.2). 결국 URDF 에는 `id` 만 남긴다 |
 | **선택 파라미터를 적으면 서보에 기록된다** | 기동할 때 토크를 끄고 EEPROM 잠금을 푼 뒤, **적혀 있는 파라미터만** 서보에 쓴다. 적지 않은 것은 건드리지 않는다 | 서보의 EEPROM 은 LeRobot 과 공유한다. LeRobot 캘리브레이션도 같은 자리 (`Homing_Offset` · `Min/Max_Position_Limit`) 에 값을 써 두었다. LeRobot 은 연결할 때마다 서보에서 이 값들을 읽어 캘리브 json 과 비교하고, 하나라도 다르면 "캘리브가 안 맞는다" 로 보고 캘리브 절차로 들어간다 (lerobot 0.6.2 `is_calibrated`). **W1-W2 에서는 `id` 만 적는다.** 다른 값은 W4 · W5 에서 LeRobot 캘리브 json 과 대조하며 하나씩 넣는다 |
 | 영점 | 드라이버는 항상 2048 틱을 0 rad 로 본다 | **틱 기준은 두 스택이 같고, 각도의 0 은 다르다.** LeRobot 캘리브는 호밍 자세가 2047 틱으로 읽히게 `Homing_Offset` 을 서보에 써 둔다 (lerobot 0.6.2 `_get_half_turn_homings`) — 드라이버의 2048 과 1틱 (0.09도) 차이라 틱 기준은 같다고 봐도 된다. 그런데 LeRobot 이 내주는 **도 단위 값의 0 은 2047 틱이 아니라 캘리브 범위의 중점** `(range_min + range_max) / 2` 다 (`motors_bus.py` 의 DEGREES 정규화). 이 팔의 캘리브 json 으로 계산한 차이 (중점 - 2047): `shoulder_pan` +0.2도, `shoulder_lift` -0.9도, `elbow_flex` **-13.9도**, `wrist_flex` +3.8도, `wrist_roll` 0도 (그리퍼는 LeRobot 에서 0-100 단위라 해당 없음). 같은 자세를 두 스택이 다른 숫자로 읽는다는 뜻이다 — `elbow_flex` 는 ROS2 쪽 값이 LeRobot 쪽 값보다 약 14도 작게 나온다. W4 에서 두 스택의 값을 대조하거나 W6-7 · v2.5 에서 값을 오갈 때 이 차이를 관절별로 더해 줘야 한다 |
 | 기동 시 | 명령 인터페이스가 있는 관절의 토크를 켜고, 첫 목표를 현재 위치로 둔다 | launch 를 띄우는 순간 팔이 튀지 않고 그 자세로 굳는다. 실제 팔에서 확인했다 (2026-09-22) — 기동 직후 6개 관절 모두 목표값 (command interface) 이 현재 위치 (state interface) 와 같았다 (`/controller_manager/introspection_data/full` 로 읽음). 그래도 **기동은 팔을 휴식 자세에 두고 한다** — 끌 때 토크가 풀리기 때문이다 (아래 행) |
@@ -436,7 +436,7 @@ source /opt/ros/jazzy/setup.bash && source /workspace/so101_ws/install/setup.bas
 | 항목 | 거는 곳 | 메커니즘 | 서보 EEPROM |
 |---|---|---|---|
 | 소프트 리밋 | `so101_controllers.yaml` 의 `enforce_command_limits: true` + URDF 의 `<limit lower upper>` | controller_manager 가 매 주기 명령을 한계 안으로 자른 뒤 하드웨어에 넘긴다 (JointSaturationLimiter). Jazzy 는 기본이 꺼져 있어 지금 bringup 로그에 `Enforcing command limits is disabled` 가 찍힌다 | 안 건드린다 |
-| 토크 상한 | URDF `<ros2_control>` 의 joint 마다 `<param name="max_torque_limit">` | 드라이버가 기동 때 서보의 `Max_Torque_Limit` 레지스터 (0-1000 = 0-100 %) 에 쓴다 | **쓴다.** LeRobot 은 이 레지스터를 건드리지 않으므로 (0.6.2 `configure_motors` 는 가속도 · 응답 지연만 쓴다) 여기서 쓴 값이 teleop · 녹화에도 그대로 적용된다 |
+| 토크 상한 | 서보의 `Max_Torque_Limit` 레지스터 (0-1000 = 0-100 %). **LeRobot 버스로 한 번 쓴다** (§6.3 A). URDF 의 `<param name="max_torque_limit">` 는 쓰지 않는다 | EEPROM 값이라 한 번 쓰면 bringup 을 껐다 켜도, LeRobot 으로 넘어가도 유지된다. 드라이버 파라미터로 쓰면 시리얼 응답 대기가 5 ms 뿐이라 EEPROM 쓰기 응답을 못 기다리고 기동이 실패한다 ("자주 발생 문제") | **쓴다.** LeRobot 은 이 레지스터를 스스로 건드리지 않으므로 (0.6.2 `configure_motors` 는 가속도 · 응답 지연만 쓴다) 여기서 쓴 값이 teleop · 녹화에도 그대로 적용된다 |
 | 소프트웨어 정지 | 정지 노드 (`scripts/soft_stop.py`, bringup 에 포함) | 현재 위치를 목표로 한 번 쓰고 `position_controller` 를 비활성화한다 | 안 건드린다 |
 
 **쓰지 않는 파라미터**: `range_min` · `range_max` · `homing_offset`. LeRobot 캘리브레이션이 쓰는 같은 레지스터라 (§1.2), 적으면 LeRobot 이 다음 접속 때 "캘리브가 안 맞는다" 로 판단한다. 각도 한계는 서보가 아니라 ros2_control 단에서 건다.
@@ -521,29 +521,33 @@ source /opt/ros/jazzy/setup.bash && source /workspace/so101_ws/install/setup.bas
 
 `Max_Torque_Limit` 는 서보가 쓰는 최대 토크의 상한이다 (1000 = 100 %, 출하 기본 1000). 낮추면 팔이 사람 손이나 물건에 부딪혔을 때 미는 힘이 줄고, 너무 낮추면 중력을 못 이겨 목표 자세에 못 간다 (스파이크에서 `elbow_flex` 가 그랬다 — [RESULT](../spike/week2/RESULT.md) §4 #11). 그래서 값은 **"팔을 앞으로 뻗은 자세를 유지하는 최소값" 을 재고 그 위로** 잡는다.
 
-값은 서보 EEPROM 에 남으므로 (bringup 을 껐다 켜도, LeRobot 으로 넘어가도 유지) 절차는 "bringup 으로 한 번 써 넣기 → LeRobot teleop 으로 빠르게 판정 → 확정값만 ROS 에서 뻗은 자세로 처짐 측정" 순이다. 후보값마다 팔을 뻗었다 접을 필요가 없다.
+값은 서보 EEPROM 에 남으므로 (bringup 을 껐다 켜도, LeRobot 으로 넘어가도 유지) 절차는 "LeRobot 으로 한 번 써 넣기 → LeRobot teleop 으로 빠르게 판정 → 확정값만 ROS 에서 뻗은 자세로 처짐 측정" 순이다. 후보값마다 팔을 뻗었다 접을 필요가 없다. **ROS 드라이버로는 쓰지 않는다** — URDF 에 `<param name="max_torque_limit">` 를 넣으면 드라이버가 기동 때 EEPROM 에 쓰기는 하지만 응답을 5 ms 만 기다려 타임아웃으로 기동이 실패하고, 서보마다 값 · 잠금 · 토크 상태가 제각각으로 남는다 (2026-09-30 재현. "자주 발생 문제").
 
-**A. 값 써 넣기** (후보값마다 반복. 첫 후보 500)
+**A. 값 써 넣기** (후보값마다 반복. 첫 후보 500. bringup 은 꺼져 있어야 한다 — 포트 공유)
 
-1. 터미널 3: URDF 의 `<ros2_control>` 블록에서 joint 6개의 `id` 줄 아래에 `max_torque_limit` 줄을 넣는다. 처음 한 번만 실행한다 (두 번 실행하면 줄이 두 개가 된다).
-
-```bash
-sed -i 's|^\(      <param name="id">[1-6]</param>\)$|\1\n      <param name="max_torque_limit">500</param>|' /workspace/study/physical-ai-study/Studies/Hardware-Arm/stage1/ros2_pkg/so101_description/urdf/so101.urdf.xacro && grep -c '<param name="max_torque_limit">' /workspace/study/physical-ai-study/Studies/Hardware-Arm/stage1/ros2_pkg/so101_description/urdf/so101.urdf.xacro
-```
-
-기대 출력: `6` (joint 6개에 한 줄씩). 두 번째 후보부터는 값만 바꾼다 (예: 700).
+팔을 휴식 자세에 둔다. 아래는 토크를 잠깐 끄고 (잠금 해제) 여섯 서보에 쓴 뒤 토크를 다시 켜고 (잠금) 읽어서 보여 준다. 휴식 자세라 토크가 꺼져도 팔은 그 자리에 있다. 다음 후보는 `500` 을 바꿔 다시 실행한다.
 
 ```bash
-sed -i 's|<param name="max_torque_limit">[0-9]*</param>|<param name="max_torque_limit">700</param>|' /workspace/study/physical-ai-study/Studies/Hardware-Arm/stage1/ros2_pkg/so101_description/urdf/so101.urdf.xacro && grep '<param name="max_torque_limit">' /workspace/study/physical-ai-study/Studies/Hardware-Arm/stage1/ros2_pkg/so101_description/urdf/so101.urdf.xacro
+acl
+python - <<'EOF'
+import os
+from lerobot.robots.so_follower import SOFollower, SOFollowerRobotConfig
+MOTORS = ("shoulder_pan", "shoulder_lift", "elbow_flex", "wrist_flex", "wrist_roll", "gripper")
+robot = SOFollower(SOFollowerRobotConfig(port=os.environ["FOLLOWER_PORT"], id="so101_follower_01"))
+robot.bus.connect()                                   # 포트 열기 + ping 만 한다 (robot.connect() 는 쓰지 않는다)
+robot.bus.disable_torque()                            # 토크 끄기 + EEPROM 잠금 해제
+for m in MOTORS:
+    robot.bus.write("Max_Torque_Limit", m, 500, normalize=False, num_retry=2)
+robot.bus.enable_torque()                             # 토크 켜기 + EEPROM 잠금
+for m in MOTORS:
+    print(f"{m:14s} Max_Torque_Limit = {robot.bus.read('Max_Torque_Limit', m, normalize=False)}")
+robot.bus.disconnect(disable_torque=False)            # 토크를 켠 채 포트만 닫는다
+EOF
 ```
 
-2. 터미널 1: 팔을 휴식 자세에 두고 실제 팔 bringup 을 띄운다 (§6.2 의 2번과 같은 명령). 드라이버가 기동 때 여섯 서보에 값을 쓴다. 로그에 `Successful 'configure'` 가 나오면 써진 것이다. 팔을 움직일 필요는 없다. `Ctrl+C` 로 끈다 (휴식 자세라 안전).
+기대 출력: 여섯 줄 모두 후보값. 적용 (2026-09-30): 여섯 서보 500.
 
-```bash
-source /opt/ros/jazzy/setup.bash && source /workspace/so101_ws/install/setup.bash && ros2 launch so101_description bringup.launch.py
-```
-
-**B. 써졌는지 확인** (bringup 을 끈 뒤. 포트를 공유하므로 ROS 가 떠 있으면 안 된다) — 아래 "써졌는지 확인" 의 스니펫. 여섯 값이 후보값과 같아야 한다.
+**B. 써졌는지 확인** — 위 A 가 끝에 읽어서 보여 주므로 따로 할 일은 없다. 나중에 값만 다시 보려면 아래 "써졌는지 확인" 의 읽기 전용 스니펫을 쓴다 (bringup 이 꺼져 있을 때).
 
 **C. teleop 으로 1차 판정** (bringup 꺼진 상태, 리더 팔 연결. 조립 가이드 §7 의 명령 그대로)
 
@@ -654,6 +658,7 @@ source /opt/ros/jazzy/setup.bash && ros2 service call /soft_stop/release std_srv
 | 모터 검출 안 됨 | LeRobot 프로세스가 포트 점유 중인지 먼저 확인 → 보드레이트·프로토콜 확인 |
 | Joint 이름 mismatch | URDF 와 yaml 의 joint name 동일하게 |
 | 컨트롤러가 켜진 직후 `Joint position is out of bounds for the joint` 로 `ros2_control_node` 가 죽음 (`enforce_command_limits: true` 일 때) | 실제 위치가 URDF `<limit>` 밖. 리미터는 명령은 자르지만 실제 위치가 한계 밖이면 예외를 던진다. 한계를 실물 범위 바깥으로 넓힌다 (§6.2 표: 캘리브 ± 0.05). 남은 `robot_state_publisher` 는 `Ctrl+C` 로 정리 |
+| 기동 때 `FeetechHardwareInterface::configure_joints_ -> CommunicationProtocol::check_head -> SerialPort::read_exact [Read timeout]` 로 하드웨어 초기화 실패, 그 뒤 `Waiting for data on 'robot_description' topic` 이 무한 반복 | URDF 의 `<ros2_control>` joint 에 EEPROM 파라미터 (`max_torque_limit` 등) 를 적었을 때. 드라이버는 쓰기 뒤 응답을 5 ms 만 기다리는데 (`serial_port.hpp` 의 `timeout_`) EEPROM 쓰기 응답은 그보다 늦다. 값은 써지고 응답만 놓치므로 서보마다 값 · Lock · 토크 상태가 제각각이 된다. 처치: 파라미터를 URDF 에서 지우고 (`id` 만 남긴다), 값은 LeRobot 으로 쓴다 (§6.3 A — 이 스니펫이 Lock · 토크도 정리한다). launch 는 `Ctrl+C` 로 끝낸다 |
 | 위치 단위/오프셋 | URDF: rad. STS3215: 12비트 스텝. lerobot 0.6.2 의 SO 팔로워는 도 단위다 (`use_degrees=True`, 그리퍼만 0-100) — LeRobot 캘리브레이션 오프셋과 드라이버 영점이 일치하는지 대조할 때 단위부터 맞춘다 |
 
 ---
