@@ -359,7 +359,7 @@
     <!--
     <limit effort="10" velocity="10" lower="-0.174533" upper="1.74533"/>
     -->
-    <limit effort="10" velocity="10" lower="-0.845" upper="1.462"/>
+    <limit effort="10" velocity="10" lower="-0.915" upper="1.532"/>
   </joint>
 
 
@@ -382,7 +382,7 @@
     <!--
     <limit effort="10" velocity="10" lower="-1.65806" upper="1.65806"/>
     -->
-    <limit effort="10" velocity="10" lower="-1.686" upper="1.816"/>
+    <limit effort="10" velocity="10" lower="-1.756" upper="1.886"/>
   </joint>
 
 
@@ -398,7 +398,7 @@
     <!--
     <limit effort="10" velocity="10" lower="-1.69" upper="1.69"/>
     -->
-    <limit effort="10" velocity="10" lower="-2.019" upper="1.529"/>
+    <limit effort="10" velocity="10" lower="-2.089" upper="1.599"/>
   </joint>
 
 
@@ -413,7 +413,7 @@
     <!--
     <limit effort="10" velocity="10" lower="-1.74533" upper="1.74533"/>
     -->
-    <limit effort="10" velocity="10" lower="-1.822" upper="1.787"/>
+    <limit effort="10" velocity="10" lower="-1.892" upper="1.857"/>
   </joint>
 
 
@@ -426,7 +426,7 @@
     <!--
     <limit effort="10" velocity="10" lower="-1.91986" upper="1.91986"/>
     -->
-    <limit effort="10" velocity="10" lower="-1.695" upper="1.700"/>
+    <limit effort="10" velocity="10" lower="-1.765" upper="1.770"/>
   </joint>
 
 
