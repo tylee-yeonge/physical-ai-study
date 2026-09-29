@@ -12,7 +12,10 @@
     3. ROS 1 형식 <transmission> 블록 6개 제거 (ros2_control 은 쓰지 않는다)
     4. 파일 끝에 <ros2_control> 블록 추가
     5. W4 캘리브 오프셋 (2026-09-27): shoulder_lift · elbow_flex · gripper 의 joint origin rpy 를 실물 영점에 맞춰 회전
-       (각 joint 의 주석과 URDF_guide.md 5절). 그 밖의 link / joint 수치 (xyz, inertia, limit) 는 원본 그대로다.
+       (각 joint 의 주석과 URDF_guide.md 5절)
+    6. W5 소프트 리밋 (2026-09-30): wrist_roll 을 뺀 joint 5개의 <limit lower/upper> 를 LeRobot 캘리브 파일의
+       실물 범위 안쪽 0.02 rad 로 교체 (ros2_driver_setup.md 6.2절). 원본 값은 각 joint 의 주석에 남겼다.
+  그 밖의 link / joint 수치 (xyz, inertia, effort, velocity) 는 원본 그대로다.
 -->
 <!-- Generated using onshape-to-robot -->
 <!-- Onshape https://cad.onshape.com/documents/7715cc284bb430fe6dab4ffd/w/4fd0791b683777b02f8d975a/e/826c553ede3b7592eb9ca800 -->
@@ -353,7 +356,10 @@
     <parent link="gripper_link"/>
     <child link="moving_jaw_so101_v1_link"/>
     <axis xyz="0 0 1"/>
+    <!--
     <limit effort="10" velocity="10" lower="-0.174533" upper="1.74533"/>
+    -->
+    <limit effort="10" velocity="10" lower="-0.845" upper="1.462"/>
   </joint>
 
 
@@ -373,7 +379,10 @@
     <parent link="lower_arm_link"/>
     <child link="wrist_link"/>
     <axis xyz="0 0 1"/>
+    <!--
     <limit effort="10" velocity="10" lower="-1.65806" upper="1.65806"/>
+    -->
+    <limit effort="10" velocity="10" lower="-1.686" upper="1.816"/>
   </joint>
 
 
@@ -386,7 +395,10 @@
     <parent link="upper_arm_link"/>
     <child link="lower_arm_link"/>
     <axis xyz="0 0 1"/>
+    <!--
     <limit effort="10" velocity="10" lower="-1.69" upper="1.69"/>
+    -->
+    <limit effort="10" velocity="10" lower="-2.019" upper="1.529"/>
   </joint>
 
 
@@ -398,7 +410,10 @@
     <parent link="shoulder_link"/>
     <child link="upper_arm_link"/>
     <axis xyz="0 0 1"/>
+    <!--
     <limit effort="10" velocity="10" lower="-1.74533" upper="1.74533"/>
+    -->
+    <limit effort="10" velocity="10" lower="-1.822" upper="1.787"/>
   </joint>
 
 
@@ -408,7 +423,10 @@
     <parent link="base_link"/>
     <child link="shoulder_link"/>
     <axis xyz="0 0 1"/>
+    <!--
     <limit effort="10" velocity="10" lower="-1.91986" upper="1.91986"/>
+    -->
+    <limit effort="10" velocity="10" lower="-1.695" upper="1.700"/>
   </joint>
 
 

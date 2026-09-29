@@ -6,6 +6,9 @@ controller_manager:
     # 제어 루프 주기 (Hz) — 이 주기로 서보를 읽고 (read) 명령을 쓴다 (write)
     update_rate: 100
 
+    # URDF 의 <limit> 를 명령에 강제한다 (Jazzy 기본 false). 한계 밖 명령은 한계값으로 잘려 하드웨어에 넘어간다
+    enforce_command_limits: true
+
     # 서보에서 읽은 관절 위치 / 속도를 /joint_states 토픽으로 내보내는 컨트롤러
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
