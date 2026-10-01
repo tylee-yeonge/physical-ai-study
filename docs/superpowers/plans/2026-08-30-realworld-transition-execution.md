@@ -153,12 +153,12 @@ nice: 부분 도달률 (reached / grasped) 기록 시도, 손목 카메라 추�
 
 > ROS2 래핑 시 latency 를 두 경로로 측정한다: (a) LeRobot 직결, (b) ROS2 토픽 경유. (b)-(a) 가 "통합 오버헤드" 수치가 되고, 셋째 층 증거로 쓴다.
 
-- [ ] 조립 완성 (must)
-- [ ] 안전 기초 — 소프트 리밋 + 토크 상한 + 소프트웨어 정지 (must)
-- [ ] ROS2 래핑 — `feetech_ros2_driver` + ros2_control 노드 (must)
-- [ ] URDF — 공개 URDF 재사용 + 오프셋 반영 (must)
-- [ ] 이중 latency 측정 — (a) LeRobot 직결 / (b) ROS2 경유 / (b)-(a) 통합 오버헤드 (must)
-- [ ] 1분 영상 — teleop + 정책 실행 + 소프트웨어 정지 (must)
+- [x] 조립 완성 (must) — 2026-10-01
+- [x] 안전 기초 — 소프트 리밋 + 토크 상한 + 소프트웨어 정지 (must) — 2026-10-01
+- [x] ROS2 래핑 — `feetech_ros2_driver` + ros2_control 노드 (must) — 2026-09-22
+- [x] URDF — 공개 URDF 재사용 + 오프셋 반영 (must) — 2026-09-27
+- [x] 이중 latency 측정 — (a) LeRobot 직결 / (b) ROS2 경유 / (b)-(a) 통합 오버헤드 (must) — 2026-09-25 (잠정값)
+- [ ] ~~1분 영상 — teleop + 정책 실행 + 소프트웨어 정지 (must)~~ — 생략 (2026-10-01 결정): v2.5 의 실기 1분 영상 (fine-tuned 정책이 과제를 수행하는 장면 + 정지 시연) 으로 대체한다. 지금 찍으면 정책 실행 장면이 zero-shot 의 0도 자세 이동뿐이라 증거 가치가 없다
 - [ ] Isaac Sim 임포트 (nice — Phase 6 이월 허용)
 
 ---
@@ -472,13 +472,13 @@ nice: 부분 도달률 (reached / grasped) 기록 시도, 손목 카메라 추�
 
 ### 2026.10-11 — Stage 1 본 빌드 (§6, 판정 통과 시)
 
-- [ ] ROS2 드라이버 검증 인수 (모터 위치 명령 → 데이지체인 → 최소 URDF+RViz — 구 스파이크 항목, 첫 주)
-- [ ] 조립 완성 (must)
-- [ ] 안전 기초 — 소프트 리밋 + 토크 상한 + 물리 e-stop (must)
-- [ ] ROS2 래핑 — `feetech_ros2_driver` + ros2_control 노드 (must)
-- [ ] URDF — 공개 URDF 재사용 + 캘리브레이션 오프셋 (must)
-- [ ] 이중 latency 측정 — (a) LeRobot 직결 / (b) ROS2 경유 / 통합 오버헤드 (must)
-- [ ] 1분 영상 — teleop + 정책 실행 + e-stop (must)
+- [x] ROS2 드라이버 검증 인수 (모터 위치 명령 → 데이지체인 → 최소 URDF+RViz — 구 스파이크 항목, 첫 주) — 2026-09-26
+- [x] 조립 완성 (must) — 2026-10-01
+- [x] 안전 기초 — 소프트 리밋 + 토크 상한 + 소프트웨어 정지 (must. 물리 e-stop 은 두지 않기로 2026-09-21 결정) — 2026-10-01
+- [x] ROS2 래핑 — `feetech_ros2_driver` + ros2_control 노드 (must) — 2026-09-22
+- [x] URDF — 공개 URDF 재사용 + 캘리브레이션 오프셋 (must) — 2026-09-27
+- [x] 이중 latency 측정 — (a) LeRobot 직결 / (b) ROS2 경유 / 통합 오버헤드 (must) — 2026-09-25 (잠정값)
+- [ ] ~~1분 영상 — teleop + 정책 실행 + 소프트웨어 정지 (must)~~ — 생략 (2026-10-01 결정): v2.5 의 실기 1분 영상 (fine-tuned 정책이 과제를 수행하는 장면 + 정지 시연) 으로 대체한다. 지금 찍으면 정책 실행 장면이 zero-shot 의 0도 자세 이동뿐이라 증거 가치가 없다
 - [ ] Isaac Sim 임포트 (nice — Phase 6 이월 허용)
 
 ### 2026.11-12 — v2.5 (§7)
