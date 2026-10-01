@@ -42,6 +42,11 @@ lerobot-record \
 - `--dataset.no_stamp=true`: 이름 뒤에 날짜가 붙지 않아 로컬 폴더와 Hub 이름이 고정된다. 이어 찍기와 학습 (§3) 이 같은 이름을 쓴다.
 - 녹화 중 키 조작과 에피소드 리듬 (녹화 → 리셋 → 저장 약 20초) 은 week2_guide §2.2-§2.3. 큐브를 놓친 시범은 `←` 로 버린다 (expert 데이터만).
 - 에피소드 메타에 배치 번호를 남긴다 (태그 또는 별도 CSV — 0번에서 형식 확정).
+- **영상은 따로 찍지 않아도 남는다.** 데이터셋에 카메라마다 AV1 mp4 (`videos/observation.images.front/`, `.../wrist/`) 로 전 에피소드가 이어져 저장된다. 시연용 클립 (vla-lab 글 · 1분 영상의 teleop 장면) 은 아래 스크립트로 에피소드 하나를 골라 두 카메라를 나란히 붙인 H.264 로 뽑는다 (30초 에피소드 약 12 MB).
+
+```bash
+python /workspace/study/physical-ai-study/Studies/Hardware-Arm/v25/scripts/episode_to_video.py /root/.cache/huggingface/lerobot/tylee-yeonge/so101-pick-cube-v25 0 /workspace/study/physical-ai-study/Studies/Hardware-Arm/v25/outputs/clip_record_ep0.mp4
+```
 
 ## 2. 실기 eval 루프 (zero-shot / fine-tuned 공용)
 
@@ -102,6 +107,7 @@ lerobot-rollout \
 - zero-shot 은 착수 전 항목 ① (정규화 통계 키) 을 닫은 뒤에 돌린다. 안 닫으면 출력이 영상과 무관하게 0 근처다.
 - `--dataset.repo_id` 는 `rollout_` 로 시작해야 한다. `tee -a` 라 실행마다 같은 로그 파일 뒤에 이어 붙는다.
 - 끝난 뒤 수치 확인 (관절별 이동 폭, 정책 출력 범위) 은 week2_guide §3.5 의 parquet 스니펫.
+- 정책 실행 장면의 클립도 같은 스크립트로 뽑는다 (rollout 데이터셋은 이름 뒤에 시각이 붙으므로 `ls -d ~/.cache/huggingface/lerobot/$HF_USER/rollout_so101-pick-cube-v25-*` 로 폴더를 고른다). 1분 영상의 세 장면 중 teleop 과 정책 실행은 이렇게 데이터셋에서 나오고, 소프트웨어 정지 시연만 ROS2 bringup 중이라 lerobot 이 녹화하지 않는다 — 그 장면은 스마트폰으로 찍는다.
 
 기록 형식: v1.5 `eval_*.jsonl` 스키마 재사용 (메타 1줄 + 에피소드 N줄) — 분석 스크립트 (`analyze_results.py`) 를 그대로 다시 쓴다.
 

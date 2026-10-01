@@ -44,10 +44,13 @@ Studies/Hardware-Arm/
       measure_latency_lerobot.py   # 이중 latency (a) LeRobot 직결 n=100. 서보 프로파일을 (b) 와 맞춰 잰다 (ros2_driver_setup.md §5.4)
     outputs/                   # latency 원본 npy · 요약 csv — gitignore, 로컬에만 보존. 기록용 사본은 Measurements/ 로
     ros2_pkg/                  # 직접 만드는 ROS2 패키지의 원본. /workspace/so101_ws/src/ 에 심링크를 걸어 빌드한다
-      so101_description/       #   URDF (공개 URDF 재사용, urdf/ 한 곳에만) + meshes + controller config + launch 2개. 캘리브 오프셋 반영은 W4
+      so101_description/       #   URDF (공개 URDF 재사용, urdf/ 한 곳에만) + meshes + controller config + launch 2개 + scripts/soft_stop.py (소프트웨어 정지 노드, bringup 에 포함). 캘리브 오프셋 반영은 W4
   v25/
     README.md                  # v2.5 학습 가이드 (N 역산·실기 측정 설계·하네스 검증)
-    PRACTICE.md                # 수집·eval·파인튜닝 명령 골격
+    PRACTICE.md                # 수집·eval·파인튜닝 명령 (현재 구성의 실제 값. N 과 max_relative_target 만 착수 시 확정)
+    scripts/
+      episode_to_video.py      # 데이터셋 에피소드 하나를 두 카메라 나란히 H.264 클립으로 (시연용 — PRACTICE 1·2)
+    outputs/                   # 녹화·eval·학습 로그, 체크포인트, 클립 — gitignore, 로컬에만 보존
   stage2/
     README.md                  # Stage 2 목표 + 진행 순서 (확장 수단·teleop 확장 가이드는 재평가 결정 후 작성)
     safety_interlock.md        # 위치/속도/토크 한계 + e-stop (C++)
