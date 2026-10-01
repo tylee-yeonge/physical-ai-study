@@ -43,7 +43,7 @@ except ImportError:
     make_pre_post_processors = None
 
 MODEL_ID = "lerobot/smolvla_base"  # D10 zero-shot 과 같은 모델
-TASK = "Pick up the red cube and place it on the tray."  # D9/D10 과 같은 문장 (고정)
+TASK = "Pick up the pink cube and place it in the yellow square."  # D9/D10 과 같은 문장 (고정)
 N_WARMUP = 5  # 버리는 예비 실행 횟수 (CUDA 커널 로딩·메모리 할당 비용 제외)
 N_ITER = 100  # 본 측정 횟수 (OpenVLA 와 동일)
 OUT_DIR = os.path.normpath(

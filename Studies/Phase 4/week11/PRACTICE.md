@@ -516,7 +516,7 @@ atexit.register(lambda: rr.save("dryrun.rrd"))
 
 
 ```bash
-# 자작 팔 환경 1분 동영상 녹화 (스마트폰 또는 ELP)
+# 자작 팔 환경 1분 동영상 녹화 (스마트폰 또는 전체 뷰 카메라 /dev/so101_cam_overview)
 # -> 224x224 또는 640x480 으로 resize
 # -> ROS2 bag 으로 변환
 

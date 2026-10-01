@@ -1,7 +1,7 @@
 # Week 11: 실제 inference 연결 + dry-run
 
 
-> **이번 주 목표**: week 10 의 dummy 노드를 **week 8 의 VLAInference 와 연결**. ros2 bag 으로 녹화한 video 또는 ELP Stereo 실시간 input 으로 dry-run 성공.
+> **이번 주 목표**: week 10 의 dummy 노드를 **week 8 의 VLAInference 와 연결**. ros2 bag 으로 녹화한 video 또는 자작 팔 전체 뷰 카메라의 실시간 input 으로 dry-run 성공.
 > **예상 시간**: 10시간
 > **핵심 질문**: "내 노드가 1분 동안 실시간 image input 으로 한 번도 fail 없이 action publish 하는가?"
 
@@ -18,7 +18,7 @@
 | 2 | preprocess pipeline | `PRACTICE.md` 2 | cv_bridge -> BGR -> RGB -> PIL |
 | 3 | image age check | `PRACTICE.md` 3 | header.stamp 기반 |
 | 4 | error handling | `PRACTICE.md` 4 | week 8 의 exception 들 |
-| 5 | 1분 dry-run | `PRACTICE.md` 5 | bag play 또는 ELP 실시간 |
+| 5 | 1분 dry-run | `PRACTICE.md` 5 | bag play 또는 전체 뷰 카메라 실시간 |
 | 6 | 퀴즈 | quiz_easy / quiz_medium | 통합 / 디버깅 |
 
 
@@ -33,7 +33,7 @@
 
 1. **vla_node 가 실제 OpenVLA inference** 를 호출
 2. **image -> action** 의 full pipeline 동작
-3. **1분 dry-run** (bag 또는 ELP 실시간) 에서 0 fail
+3. **1분 dry-run** (bag 또는 전체 뷰 카메라 실시간) 에서 0 fail
 4. **latency 측정 데이터** 가 ROS topic 으로 publish
 
 
@@ -142,7 +142,7 @@ class VLANode(Node):
 
 
 ```bash
-# bag 녹화 (한 번만, ELP Stereo 직접 사용)
+# bag 녹화 (한 번만, 전체 뷰 카메라 /dev/so101_cam_overview 를 퍼블리시하는 노드에서)
 ros2 bag record /camera/image_raw -o my_test_bag
 
 

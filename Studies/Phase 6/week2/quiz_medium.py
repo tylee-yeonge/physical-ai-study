@@ -17,10 +17,10 @@ def p1():
 
 def p2():
     """Sim 의 image 와 Real 의 image 차이"""
-    print("\n문제 2: Sim image vs Real ELP Stereo")
+    print("\n문제 2: Sim image vs Real 전체 뷰 카메라 (웹캠)")
     print()
     print("  주요 차이:")
-    print("  - Lens distortion (ELP 의 barrel distortion)")
+    print("  - Lens distortion (웹캠의 barrel distortion)")
     print("  - 노이즈 (sensor noise)")
     print("  - White balance / exposure")
     print("  - 광원 색온도")

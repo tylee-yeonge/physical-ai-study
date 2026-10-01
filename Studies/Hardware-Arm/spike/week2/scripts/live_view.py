@@ -2,8 +2,8 @@
 
 실행:
     acl
-    python Studies/Hardware-Arm/spike/week2/scripts/live_view.py          # 전체 뷰 ELP
-    python Studies/Hardware-Arm/spike/week2/scripts/live_view.py wrist    # 손목 카메라
+    python /workspace/study/physical-ai-study/Studies/Hardware-Arm/spike/week2/scripts/live_view.py          # 전체 뷰 카메라
+    python /workspace/study/physical-ai-study/Studies/Hardware-Arm/spike/week2/scripts/live_view.py wrist    # 손목 카메라
 그다음 VS Code 의 PORTS 패널에서 18080 을 포워딩하고 브라우저로 http://localhost:18080 을 연다.
 끝낼 때는 Ctrl+C. 켜 둔 동안에는 lerobot 이 같은 카메라를 열지 못한다 (장치는 한 번에 한 프로세스만 연다).
 """
@@ -17,7 +17,7 @@ import cv2
 
 # 카메라별 설정 -- lerobot 에 주는 값 (week2_guide §1.4) 과 같게 해서 "lerobot 이 보는 화면" 을 그대로 본다
 CAMERAS = {
-    "overview": ("/dev/so101_cam_overview", 1280, 480, 60),
+    "overview": ("/dev/so101_cam_overview", 1280, 720, 30),
     "wrist": ("/dev/so101_cam_wrist", 1280, 720, 30),
 }
 NAME = sys.argv[1] if len(sys.argv) > 1 else "overview"

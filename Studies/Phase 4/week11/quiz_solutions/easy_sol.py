@@ -71,7 +71,7 @@ def problem4_solution():
     print("    - 시간 / 장소 영향 없는 테스트")
     print()
     print("  본 phase 의 활용:")
-    print("    1. ELP Stereo 로 1분 녹화 (한 번)")
+    print("    1. 전체 뷰 카메라 (/dev/so101_cam_overview) 로 1분 녹화 (한 번)")
     print("    2. bag 으로 저장")
     print("    3. dry-run 시 bag play 로 재생")
     print("    4. latency 측정 / fail rate / 성공률 모두 동일 input 기반")

@@ -5,14 +5,15 @@
 > 작성일: 2026-09-13
 > 환경: 호스트 Ubuntu 22.04 + RTX 4070 12GB 위의 도커 컨테이너 (Ubuntu 24.04), venv `/workspace/venvs/lerobot` (Python 3.12, lerobot 0.6.2, extras `core_scripts,feetech,smolvla`)
 > LeRobot 버전 주의: 명령어 · 옵션 이름은 버전에 따라 바뀐다. 이 문서의 명령은 2026 중반 공식 문서 기준 골격이고, **각 Day 의 첫 단계는 `--help` 로 옵션 이름 대조**다. 이름이 다르면 이 문서를 고친다.
+> 실측 수치의 조건: 녹화 쪽 실측 (저장 시간, 에피소드 용량, 제어 루프 주기, teleop 추종) 은 2026-10-01 에 지금 구성 (전체 뷰 · 손목 모두 1280x720 @ 30 fps) 으로 30초 에피소드 2개를 찍어 확인한 값이다. §3-§4 의 zero-shot · latency 쪽 실측 (실기 구성의 chunk 시간, 예산 초과 틱) 은 2026-09-20 에 전체 뷰 카메라가 ELP Stereo (1280x480 @ 60 fps) 였던 구성으로 잰 것이고 지금 구성으로는 다시 재지 않았다.
 
 ## TL;DR
 
-- **카메라는 고정 경로로 잡는다.** `/dev/video*` 번호는 재부팅 · 재연결로 바뀐다. `so101-attach` 가 USB 시리얼로 만드는 `/dev/so101_cam_overview` · `/dev/so101_cam_wrist` 를 쓴다 (서보 보드를 `/dev/so101_follower` 로 잡은 것과 같은 원리).
-- **ELP Stereo 는 좌 · 우 영상이 한 프레임에 붙어 나온다.** 스파이크는 자르지 않고 그대로 쓴다. 크롭 여부는 v2.5 측정 설계에서 결정한다.
+- **카메라는 고정 경로로 잡는다.** `/dev/video*` 번호는 재부팅 · 재연결로 바뀐다. `so101-attach` 가 만드는 `/dev/so101_cam_overview` · `/dev/so101_cam_wrist` 를 쓴다 (서보 보드를 `/dev/so101_follower` 로 잡은 것과 같은 원리).
+- **두 카메라는 같은 모델이라 꽂은 USB 포트로 구분한다.** USB 시리얼 번호까지 같아서 `so101-attach` 가 포트 위치로 전체 뷰와 손목을 가른다. 두 카메라의 포트를 서로 바꿔 꽂으면 오류 없이 영상만 뒤바뀐다 (§1.3). 지원하는 fps 는 30 하나뿐이다.
 - **구도는 실시간 화면으로 보고, 다 봤으면 뷰어를 끈다.** 이 컨테이너는 화면이 없어 `scripts/live_view.py` 가 카메라를 브라우저로 보내 준다 (§1.2). 카메라는 한 번에 한 프로세스만 열 수 있어서, 뷰어를 켜 둔 채로는 녹화도 zero-shot 도 카메라 연결에서 실패한다.
 - **본 녹화 전에 2 에피소드 테스트 녹화를 한다 (업로드 없이).** fps 가 설정보다 낮게 나오는 문제, 캘리브 경로가 다른 셸에서 갈라지는 문제는 10 에피소드를 다시 찍기 전에 잡는다.
-- **에피소드 하나는 녹화 → 리셋 → 저장 세 구간이다.** 저장 (30초 에피소드에 약 17초) 중에는 아무것도 녹화되지 않는다. 음성 안내가 나오지 않는 환경이라, 터미널에 `Recording episode N` 이 찍힌 것을 보고 시범을 시작한다 (§2.2).
+- **에피소드 하나는 녹화 → 리셋 → 저장 세 구간이다.** 저장 (30초 에피소드에 약 20초) 중에는 아무것도 녹화되지 않는다. 음성 안내가 나오지 않는 환경이라, 터미널에 `Recording episode N` 이 찍힌 것을 보고 시범을 시작한다 (§2.2).
 - **zero-shot 실행은 `lerobot-rollout` 이다.** lerobot 0.6.2 의 `lerobot-record` 는 리더 시범을 녹화하는 전용 도구이고, 정책으로 팔을 움직이는 일은 `lerobot-rollout` 이 맡는다. 카메라 이름은 데이터셋용이 아니라 모델 config 의 `input_features` 키에 맞춘다. `--robot.max_relative_target` 으로 한 틱 이동량을 제한한 뒤 돌린다. 예상 동작은 과제 수행이 아니라 **팔이 휴식 자세에서 일어나 가운데 자세로 모이는 것**이다 (§3.5).
 - **latency 는 "chunk 1개 생성 시간" 으로 정의한다.** SmolVLA 는 한 번 모델을 돌려 action 을 여러 개 만들어 큐에 쌓으므로, 큐를 비우지 않고 100번 호출하면 대부분 0 ms 근처가 찍힌다. `scripts/measure_latency_smolvla.py` 가 매 반복 큐를 비운다.
 - **판정은 09-21 에 한 번만.** RESULT.md §1 의 4칸을 채우고 plan §5.4 표의 한 행을 §5 에 적는다.
@@ -88,14 +89,13 @@ D11 은 팔 · 카메라 없이 GPU 만 쓴다. D10 이 밀리면 D11 을 먼저
 
 ## 1. D8 — 카메라 세팅 + 테스트 녹화
 
-**무엇을**: ELP 를 고정하고, LeRobot 이 그 카메라를 원하는 해상도 · fps 로 여는지 확인한 뒤, 2 에피소드짜리 테스트 녹화를 한다 (Hub 업로드 없음).
+**무엇을**: 전체 뷰 카메라를 고정하고, LeRobot 이 그 카메라를 원하는 해상도 · fps 로 여는지 확인한 뒤, 2 에피소드짜리 테스트 녹화를 한다 (Hub 업로드 없음).
 **왜**: D9 본 녹화에서 카메라 문제를 처음 만나면 10 에피소드를 다시 찍게 된다. 카메라 번호가 바뀌는 문제, fps 가 설정보다 낮게 나오는 문제는 본 녹화 전에 끝내야 한다.
 **끝나면 손에 남는 것**: 카메라 고정 경로 1개 (`$FRONT_CAM`), `--robot.cameras` 설정 문자열 1개 (`$CAMS`), 로컬 테스트 데이터셋 1개, 수령 확인 ③ 의 답.
 
 ### 1.1 명령 확인
 
 ```bash
-lerobot-find-cameras --help
 lerobot-record --help | grep -i -A2 "cameras"
 # OpenCV 카메라 설정에 어떤 키가 있는지 (fourcc 같은 픽셀 포맷 옵션 유무를 여기서 본다)
 python -c "import dataclasses; from lerobot.cameras.opencv import OpenCVCameraConfig; print([f.name for f in dataclasses.fields(OpenCVCameraConfig)])"
@@ -103,19 +103,24 @@ python -c "import dataclasses; from lerobot.cameras.opencv import OpenCVCameraCo
 
 ### 1.2 물리 장착과 구도 (수령 확인 ③)
 
-- 수령 확인 ③ 의 결과: ELP 는 키트 기본 정면 거치 모듈에 붙지 않는다 (RESULT.md §4 #5). 현재 ELP 는 팔로워 **왼쪽 측면** 에 임시 고정, 손목 카메라는 그리퍼에 장착 — 스파이크는 "안 예뻐도 된다" (plan §5.1).
-- 측면 시점은 문제가 아니다. 팔이 앞으로 뻗는 동작이 화면을 가로지르는 이동으로 보여 정면보다 잘 잡힌다. 대신 좌우 이동은 깊이로 바뀌어 약해지므로 큐브 → 트레이 동선을 주로 앞뒤 방향으로 잡는다.
-- 구도 확인 (D9 전에 teleop 으로): ① 최대 신장 · 최좌 · 최우 · 최고 높이에서 팔이 화면 밖으로 잘리지 않는가 ② 큐브 위치와 트레이 위치에서 집는 순간 그리퍼 끝이 전완에 가려지지 않는가 ③ 큐브와 트레이가 둘 다 보이고 크기로 구분되는가. 안 되면 카메라를 조금 높여 30-45도 내려다보게 한다.
+- 전체 뷰 카메라는 팔로워의 대각선 앞쪽 위에서 약 45도로 내려다본다 (확정한 구도는 기준 프레임 `outputs/ref_overview.png`). 손목 카메라는 그리퍼에 장착한다. 수령 확인 ③ (키트 기본 정면 거치 모듈에 보유 카메라가 붙는가) 의 결과는 RESULT.md §4 #5 에 있다.
+- 대각선 위 시점에서는 책상 위의 앞뒤 · 좌우 이동과 그리퍼 높이가 모두 화면에 드러난다. 피할 자리는 두 곳이다. 팔 바로 뒤에 두면 팔을 뻗을 때 전완이 집는 지점을 가리고, 리더 쪽에 두면 리더와 조작하는 손이 화면에 들어온다 — 리더의 자세가 곧 기록되는 action 이라 정책이 그것을 보고 베끼게 된다.
+- 구도 확인 (D9 전에 teleop 으로): ① 큐브를 집고 옮기는 높이와 범위에서 팔이 화면 밖으로 잘리지 않는가 (팔을 완전히 세운 자세까지 담으려고 카메라를 뒤로 빼면 큐브와 목표가 작아진다) ② 큐브 위치와 목표 사각형 위치에서 집는 순간 그리퍼 끝이 전완에 가려지지 않는가 ③ 큐브와 목표 사각형이 둘 다 보이고 크기로 구분되는가. 안 되면 카메라를 조금 높여 30-45도 내려다보게 한다.
 - 구도가 확정되면 D9 본 녹화부터 D10 이 끝날 때까지 카메라를 움직이지 않는다. 데이터셋 (D9) 과 zero-shot (D10) 이 같은 시점을 봐야 한다.
-- USB 허브: ELP 는 USB 2.0 허브 뒤에 있지만 손목 카메라와 동시 스트리밍에서 60 / 30 fps 가 그대로 나온다 (실측). fps 가 실측으로 미달할 때만 직결을 시도한다.
+- USB 연결: 두 카메라 모두 허브 없이 PC 의 USB 포트에 직접 꽂는다. 두 카메라를 1280x720 MJPG 로 동시에 열어도 각각 30 fps 가 그대로 나온다 (실측 30.2).
 
 **실시간 화면으로 구도 보기**
 
 이 컨테이너는 화면 (DISPLAY) 이 없고 `ffplay` 같은 뷰어도 없다. 그래서 `scripts/live_view.py` 가 카메라 영상을 MJPEG 로 내보내고, VS Code 의 포트 포워딩을 거쳐 브라우저로 본다. 용어 — **포트 포워딩**은 컨테이너 안의 주소를 내 PC 의 브라우저에서 열 수 있게 이어 주는 VS Code 기능이다.
 
 ```bash
-python Studies/Hardware-Arm/spike/week2/scripts/live_view.py          # 전체 뷰 ELP (1280x480, §1.4 와 같은 설정)
-python Studies/Hardware-Arm/spike/week2/scripts/live_view.py wrist    # 손목 카메라 (1280x720)
+python /workspace/study/physical-ai-study/Studies/Hardware-Arm/spike/week2/scripts/live_view.py          # 전체 뷰 카메라 (1280x720, §1.4 와 같은 설정)
+```
+
+손목 카메라를 볼 때는 위 뷰어를 끄고 아래를 실행한다 (뷰어는 한 번에 하나만 켠다 — 같은 포트 `18080` 을 쓴다).
+
+```bash
+python /workspace/study/physical-ai-study/Studies/Hardware-Arm/spike/week2/scripts/live_view.py wrist    # 손목 카메라 (1280x720)
 ```
 
 1. VS Code 하단 패널의 **PORTS** 탭 → **Forward a Port** → `18080`.
@@ -125,7 +130,7 @@ python Studies/Hardware-Arm/spike/week2/scripts/live_view.py wrist    # 손목 �
 - **뷰어를 켜 둔 동안에는 lerobot 이 그 카메라를 열지 못한다.** 카메라 장치는 한 번에 한 프로세스만 스트리밍할 수 있다. `lerobot-record` · `lerobot-rollout` 전에 반드시 끈다. 카메라를 쓰지 않는 `so101-teleop` 은 뷰어와 동시에 켜도 된다 — 리더로 팔을 움직이면서 구도를 볼 때 쓴다.
 - 서버는 `127.0.0.1` 에만 열린다. 집 안 영상이라 컨테이너 네트워크에는 열지 않고 VS Code 포워딩으로만 접근한다.
 - 브라우저로 보내는 속도는 약 15 fps 다 (터널 대역폭을 아끼려는 값. 스크립트 상단의 `STREAM_FPS`). 로컬 PC 에서 `18080` 이 이미 쓰이고 있으면 스크립트의 `PORT` 한 줄을 바꾼다.
-- ELP 는 좌 · 우 영상이 한 프레임에 붙어 나오는데 두 렌즈의 시야가 조금 다르다. **한쪽 절반에서만 팔이 잘리는 경우가 있으므로** 양쪽 절반을 다 본다.
+- 뷰어는 브라우저 연결을 한 번에 하나만 받는다. 탭을 두 개 열면 두 번째 탭은 첫 탭을 닫을 때까지 빈 화면으로 기다린다.
 
 **기준 프레임 남기기**
 
@@ -134,8 +139,8 @@ python Studies/Hardware-Arm/spike/week2/scripts/live_view.py wrist    # 손목 �
 ```bash
 python -c "
 import cv2
-c = cv2.VideoCapture('/dev/so101_cam_overview', cv2.CAP_V4L2)          # 전체 뷰 ELP
-c.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG')); c.set(3, 1280); c.set(4, 480)   # 녹화와 같은 설정 (3 = 가로, 4 = 세로)
+c = cv2.VideoCapture('/dev/so101_cam_overview', cv2.CAP_V4L2)          # 전체 뷰 카메라
+c.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG')); c.set(3, 1280); c.set(4, 720)   # 녹화와 같은 설정 (3 = 가로, 4 = 세로)
 [c.read() for _ in range(15)]                                          # 자동 노출이 자리 잡도록 몇 장 버린다
 cv2.imwrite('$SPIKE_OUT/ref_overview.png', c.read()[1]); c.release()
 "
@@ -144,14 +149,19 @@ ls -la $SPIKE_OUT/ref_overview.png
 
 ### 1.3 카메라 식별 — 고정 경로
 
-용어: **UVC**(USB Video Class)는 드라이버 설치 없이 꽂으면 되는 USB 카메라 규격. 리눅스는 UVC 카메라 하나에 `/dev/videoN` 두 개를 만든다 (N 은 영상, N+1 은 메타데이터). 그래서 `ls /dev/video*` 의 개수가 카메라 수의 2배로 보이고, `lerobot-find-cameras` 는 영상 노드만 보여 준다.
+용어: **UVC**(USB Video Class)는 드라이버 설치 없이 꽂으면 되는 USB 카메라 규격. 리눅스는 UVC 카메라 하나에 `/dev/videoN` 두 개를 만든다 (N 은 영상, N+1 은 메타데이터). 그래서 호스트에서 `ls /dev/video*` 의 개수가 카메라 수의 2배로 보인다.
 
-컨테이너 /dev 는 tmpfs 라 호스트 udev 가 만드는 `/dev/v4l/by-id/` 가 없다. 대신 `so101-attach` 가 USB 시리얼로 카메라를 찾아 고정 이름의 노드를 만든다 (`so101-attach list` 로 보이는 카메라와 시리얼 확인).
+컨테이너 /dev 는 tmpfs 라 호스트의 `/dev/video*` 도 `/dev/v4l/by-id/` 도 보이지 않는다. 대신 `so101-attach` 가 카메라를 찾아 고정 이름의 노드를 만든다. 그래서 `/dev/video*` 를 뒤지는 `lerobot-find-cameras opencv` 는 이 컨테이너에서 카메라를 0대로 보고한다 — 쓰지 않는다.
+
+`so101-attach` 가 카메라를 찾는 기준은 USB 시리얼 번호 또는 USB 포트 위치다. 이 환경의 두 카메라는 같은 모델이라 시리얼 번호까지 같아서 (`200901010001`) 포트 위치로 구분한다. 용어: **USB 인터페이스 경로** 는 장치가 꽂힌 자리의 이름이다 — `1-3:1.0` 은 1번 USB 버스의 3번 포트라는 뜻이다. 호스트 compose 의 `.env` 에 손목 `1-4:1.0`, 전체 뷰 `1-3:1.0` 으로 적혀 있다.
+
+- **각 카메라는 항상 같은 USB 포트에 꽂는다.** 두 포트를 서로 바꿔 꽂으면 오류 없이 전체 뷰와 손목 영상이 뒤바뀐다. 그 밖의 포트에 꽂으면 `so101-attach` 가 `camera ... not found` 로 실패한다.
+- 재부팅으로는 포트 위치가 바뀌지 않는다. 바뀌는 것은 `/dev/videoN` 번호뿐이고 `so101-attach` 는 그 번호를 쓰지 않는다.
 
 ```bash
 so101-attach                    # 카메라를 다시 꽂았거나 컨테이너를 재시작했으면 재실행
-ls -la /dev/so101_cam_*         # so101_cam_overview = ELP (캡처 노드), so101_cam_wrist = 손목 카메라
-lerobot-find-cameras opencv     # 열리는 카메라 목록 + 기본 해상도/fps. /dev/videoN 이름으로 표시되지만 설정에는 위 고정 이름을 쓴다. 샘플 이미지를 ./outputs/captured_images/ 에 저장
+so101-attach list               # 보이는 카메라와 usb= 값 (꽂힌 포트). 손목 1-4:1.0, 전체 뷰 1-3:1.0 이어야 한다
+ls -la /dev/so101_cam_*         # so101_cam_overview = 전체 뷰 카메라, so101_cam_wrist = 손목 카메라 (둘 다 캡처 노드)
 ```
 
 ```bash
@@ -159,31 +169,35 @@ export FRONT_CAM=/dev/so101_cam_overview
 export WRIST_CAM=/dev/so101_cam_wrist
 ```
 
-샘플 이미지 (`outputs/captured_images/`) 를 열어 본다. ELP Stereo 는 좌 · 우 영상이 한 프레임에 나란히 붙어 나온다 (Phase 6 week7 에서 확인한 1280x480). 스파이크는 이 프레임을 자르지 않고 그대로 쓴다 — 이유와 한계는 §6 표 마지막 행.
+두 노드가 맞는 카메라를 가리키는지는 눈으로 확인한다. §1.2 의 뷰어를 `wrist` 로 켰을 때 집게가 보이면 맞다. 손목 카메라는 팔과 함께 뽑았다 꽂게 되므로, 다시 꽂은 날에는 이 확인을 한 번 한다.
 
 ```bash
-sudo apt install -y v4l-utils
+sudo apt update && sudo apt install -y v4l-utils   # 이미지에 패키지 목록이 없어 update 가 먼저 필요하다. 컨테이너를 재생성하면 다시 설치한다
 v4l2-ctl -d $FRONT_CAM --list-formats-ext   # 픽셀 포맷 (MJPG / YUYV) 별로 지원하는 해상도 · fps 목록
 ```
 
-용어: **YUYV** 는 무압축 전송. USB 2.0 에서 1280x480 은 15 fps 가 한계다. **MJPG** 는 카메라가 JPEG 로 압축해 보내는 모드로, 같은 해상도에서 높은 fps 가 나온다. 목록에 있는 fps 만 설정에 적는다.
+용어: **YUYV** 는 무압축 전송. 이 카메라는 YUYV 로 1280x720 을 10 fps 까지만 보낸다. **MJPG** 는 카메라가 JPEG 로 압축해 보내는 모드로, 같은 해상도에서 30 fps 가 나온다. 목록에 있는 해상도 · fps 조합만 설정에 적는다.
+
+두 카메라가 같은 모델이라 지원 목록도 같다.
 
 | 카메라 | MJPG 해상도 | 지원 fps |
 |---|---|---|
-| ELP (`so101_cam_overview`) | 1280x480 (좌 · 우 결합) | 25, 60 (30 없음 — 30 을 적으면 `failed to set fps=30` 으로 중단) |
-| ELP | 2560x720 | 25, 60 |
+| 전체 뷰 (`so101_cam_overview`) | 1280x720 | 30 (다른 값 없음 — 60 을 적으면 `failed to set fps=60` 으로 중단) |
+| 전체 뷰 | 640x480 | 30 |
 | 손목 (`so101_cam_wrist`) | 1280x720 | 30 |
 | 손목 | 640x480 | 30 |
+
+목록에 없는 해상도를 적어도 연결 단계에서 멈춘다 (예: 1280x480 은 `failed to set capture_width=1280`).
 
 ### 1.4 카메라 설정 문자열
 
 ```bash
-export CAMS="{ front: {type: opencv, index_or_path: $FRONT_CAM, width: 1280, height: 480, fps: 60, fourcc: MJPG}, wrist: {type: opencv, index_or_path: $WRIST_CAM, width: 1280, height: 720, fps: 30, fourcc: MJPG} }"
+export CAMS="{ front: {type: opencv, index_or_path: $FRONT_CAM, width: 1280, height: 720, fps: 30, fourcc: MJPG}, wrist: {type: opencv, index_or_path: $WRIST_CAM, width: 1280, height: 720, fps: 30, fourcc: MJPG} }"
 ```
 
 - `front` / `wrist` 는 데이터셋의 이미지 키 이름 (`observation.images.front`, `observation.images.wrist`) 이 된다. D9 는 이 이름을 쓰고, D10 은 모델이 기대하는 이름으로 바꿔 쓴다 (§3.2).
-- `width` / `height` / `fps` 는 §1.3 표에 있는 조합만 적는다. 없는 fps 를 적으면 lerobot 이 카메라 연결 단계에서 예외를 내고 멈춘다.
-- `fourcc: MJPG` 는 lerobot 0.6.2 `OpenCVCameraConfig` 의 `fourcc` 필드다. 카메라 fps 와 데이터셋 fps (§1.5 의 `--dataset.fps=30`) 는 별개다 — record 루프는 매 틱 카메라의 최신 프레임을 가져오므로 ELP 를 60 으로 두면 30 fps 의 매 틱에 새 프레임이 들어간다.
+- `width` / `height` / `fps` 는 §1.3 표에 있는 조합만 적는다. 없는 값을 적으면 lerobot 이 카메라 연결 단계에서 예외를 내고 멈춘다.
+- `fourcc: MJPG` 는 lerobot 0.6.2 `OpenCVCameraConfig` 의 `fourcc` 필드다. 카메라 fps 와 데이터셋 fps (§1.5 의 `--dataset.fps=30`) 는 별개의 설정이다 — 카메라 fps 는 카메라가 프레임을 내보내는 속도이고, 데이터셋 fps 는 record 루프가 도는 주기다. 루프는 매 틱 카메라의 최신 프레임을 가져온다. 이 구성은 둘 다 30 이다.
 
 ### 1.5 테스트 녹화 (2 에피소드, 업로드 없음)
 
@@ -222,7 +236,7 @@ find $DS -name "*.mp4" | head -2       # 영상 파일. 하나를 열어 카메�
 
 ### 1.6 막힐 때
 
-§6 표의 D8 행. 가장 흔한 순서: 카메라 번호 변동 (고정 경로로 해결) → fps 미달 (MJPG 또는 해상도 하향) → 캘리브 파일 못 찾음 (`HF_LEROBOT_CALIBRATION` 빈 셸).
+§6 표의 D8 행. 가장 흔한 순서: 카메라가 안 잡히거나 두 영상이 뒤바뀜 (꽂은 USB 포트 확인 — §1.3) → 카메라가 지원하지 않는 해상도 · fps 를 적음 (§1.3 표의 조합만) → 캘리브 파일 못 찾음 (`HF_LEROBOT_CALIBRATION` 빈 셸).
 
 ---
 
@@ -246,7 +260,7 @@ find $DS -name "*.mp4" | head -2       # 영상 파일. 하나를 열어 카메�
 
 ```bash
 DS=$(ls -d ~/.cache/huggingface/lerobot/$HF_USER/so101-spike-teleop* | tail -1)
-python Studies/Hardware-Arm/spike/week2/scripts/analyze_teleop_tracking.py $DS
+python /workspace/study/physical-ai-study/Studies/Hardware-Arm/spike/week2/scripts/analyze_teleop_tracking.py $DS
 # 관절별 지연 · 추종 오차 (RMSE) · 편향 · 최대 1틱 변화. 최대 1틱 변화가 수백 도로 찍히면 값이 튄 것이다 (캘리브 문제)
 ```
 
@@ -256,11 +270,11 @@ python Studies/Hardware-Arm/spike/week2/scripts/analyze_teleop_tracking.py $DS
 
 | 항목 | 이 스파이크의 값 | 왜 고정하나 |
 |---|---|---|
-| 지시문 (`single_task`) | `Pick up the red cube and place it on the tray.` | 데이터셋 · zero-shot · latency 가 같은 문장을 쓴다. 영어 — `smolvla_base` 가 영어 지시문으로 학습됨 |
-| 물체 | 3-4 cm 큐브 1개, 책상과 **밝기** 가 대비되는 것 | 전체 뷰 ELP 는 흑백 센서라 색상 대비는 손목 카메라에서만 보인다. 문장의 "red" 는 손목 카메라 기준 |
-| 목표 | 종이 트레이 또는 테이프로 표시한 사각형 | 성공 여부를 눈으로 판정할 수 있게 |
+| 지시문 (`single_task`) | `Pick up the pink cube and place it in the yellow square.` | 데이터셋 · zero-shot · latency 가 같은 문장을 쓴다. 영어 — `smolvla_base` 가 영어 지시문으로 학습됨 |
+| 물체 | 3-4 cm 큐브 1개, 책상과 색 · 밝기가 대비되는 것 | 두 카메라 모두 컬러다. 지시문의 색 이름은 화면에 보이는 색과 같아야 한다 — 큐브는 분홍 (`pink`), 목표 테이프는 노랑 (`yellow`) |
+| 목표 | 노란 테이프로 테두리를 두른 사각형 | 성공 여부를 눈으로 판정할 수 있게. 지시문의 "yellow square" 가 가리키는 것 |
 | 팔 시작 자세 | 리더를 테이프로 표시한 자세에 두고 시작 | 에피소드마다 첫 프레임이 같아야 학습 데이터가 된다 |
-| 물체 시작 위치 | 테이프로 표시한 칸 1-3개 중 하나. 에피소드별로 어느 칸인지 메모 | v2.5 배치 마커의 축소판 |
+| 물체 시작 위치 | 큐브에 가려지는 작은 X 표시 1-3개 중 하나. 에피소드별로 어느 칸인지 메모 | v2.5 배치 마커의 축소판. 목표와 같은 사각형 테두리로 표시하면 화면에 사각형이 둘이 된다 |
 | 에피소드 상한 | 30 s (`episode_time_s`) | 리더 시범 1회는 10-20 s 면 끝난다. 끝나면 → 키로 일찍 종료 |
 | 리셋 | 15 s (`reset_time_s`) | 큐브를 시작 칸으로, 리더를 시작 자세로 되돌리는 시간 |
 | 실패한 시범 | ← 키로 취소하고 재녹화 | 데이터셋에는 성공 시범만 남긴다 (`../../v25/PRACTICE.md` 1 의 품질 게이트) |
@@ -269,31 +283,30 @@ python Studies/Hardware-Arm/spike/week2/scripts/analyze_teleop_tracking.py $DS
 
 **작업 공간 준비**
 
-- [ ] 큐브 1개 (3-4 cm). 전체 뷰 ELP 는 **흑백 센서**라 색이 아니라 **밝기**로 책상과 구분돼야 한다. 색 대비는 손목 카메라에서만 보인다.
-- [ ] 트레이 또는 테이프로 표시한 사각형 — 성공 여부를 눈으로 판정할 수 있는 크기
-- [ ] 큐브 시작 칸 1-3개를 테이프로 표시. 에피소드마다 어느 칸이었는지 적는다 (§2.3 의 표)
+- [ ] 큐브 1개 (3-4 cm). 책상과 색 · 밝기가 뚜렷이 달라야 한다.
+- [ ] 노란 테이프로 테두리를 두른 목표 사각형 — 성공 여부를 눈으로 판정할 수 있는 크기
+- [ ] 큐브 시작 칸 1-3개를 큐브에 가려지는 작은 X 표시로 남긴다. 큐브는 매번 같은 방향으로 올려 둔다. 에피소드마다 어느 칸이었는지 적는다 (§2.3 의 표)
 - [ ] 리더의 시작 자세를 테이프로 표시. 매 에피소드 이 자세에서 시작한다
-- [ ] 화면에 들어오는 불필요한 물체를 치운다 — 검은 케이블, 충전 패드처럼 흑백 화면에서 큐브와 헷갈릴 수 있는 것
-- [ ] 큐브 → 트레이 동선은 팔로워의 통상 작업 범위 안에 둔다. 팔을 끝까지 뻗어야 닿는 위치는 피한다 (teleop 확인에서 최대 신장 자세를 시험하지 않았다면 더욱)
+- [ ] 화면에 들어오는 불필요한 물체를 치운다 — 마우스나 의자처럼 위치가 바뀌는 것, 큐브 · 목표와 비슷한 색의 물건, 책상 위에 늘어진 케이블
+- [ ] 큐브 → 목표 사각형 동선은 팔로워의 통상 작업 범위 안에 둔다. 팔을 끝까지 뻗어야 닿는 위치는 피한다 (teleop 확인에서 최대 신장 자세를 시험하지 않았다면 더욱)
 
 | 메모할 것 | 값 |
 |---|---|
 | 큐브 (크기 · 색) | |
-| 트레이 (종류 · 위치) | |
+| 목표 사각형 (크기 · 위치) | |
 | 큐브 시작 칸 개수 | |
 
 **카메라 구도**
 
-데이터셋의 영상이 곧 정책의 눈이다. §1.2 의 실시간 화면을 켜고 ELP 를 팔로워의 작업 공간 쪽으로 겨눈다. must 1 증거를 찍느라 카메라를 리더 쪽으로 돌려 뒀다면 여기서 반드시 되돌린다 — 그대로 녹화하면 큐브와 그리퍼가 배경에 작게 들어간다.
+데이터셋의 영상이 곧 정책의 눈이다. §1.2 의 실시간 화면을 켜고 전체 뷰 카메라를 팔로워의 작업 공간 쪽으로 겨눈다. must 1 증거를 찍느라 카메라를 리더 쪽으로 돌려 뒀다면 여기서 반드시 되돌린다 — 그대로 녹화하면 큐브와 그리퍼가 배경에 작게 들어간다.
 
 - [ ] 리더 팔과 조작하는 내 팔이 화면에 **들어오지 않는다**
-- [ ] 팔로워가 큐브 시작 칸과 트레이에 닿는 자세에서 화면 밖으로 잘리지 않는다 (다른 터미널에서 `acl` 후 `so101-teleop` 을 켜고 리더로 움직여 본다. 확인이 끝나면 `Ctrl+C`)
+- [ ] 팔로워가 큐브 시작 칸과 목표 사각형에 닿는 자세에서 화면 밖으로 잘리지 않는다 (다른 터미널에서 `acl` 후 `so101-teleop` 을 켜고 리더로 움직여 본다. 확인이 끝나면 `Ctrl+C`)
 - [ ] 집는 순간 그리퍼 끝이 전완에 가려지지 않는다
-- [ ] 큐브와 트레이가 둘 다 보이고 크기로 구분된다
-- [ ] 좌 · 우 절반 양쪽에서 위 항목이 성립한다
+- [ ] 큐브와 목표 사각형이 둘 다 보이고 크기로 구분된다
 - [ ] 손목 카메라 (`live_view.py wrist`) 에 집게와 그 앞의 책상이 보인다
 - [ ] 뷰어를 끄고 기준 프레임 `$SPIKE_OUT/ref_overview.png` 를 저장했다 (§1.2)
-- [ ] 이 시점부터 D10 이 끝날 때까지 ELP 를 건드리지 않는다
+- [ ] 이 시점부터 D10 이 끝날 때까지 전체 뷰 카메라를 건드리지 않는다
 
 ### 2.2 본 녹화
 
@@ -301,7 +314,7 @@ python Studies/Hardware-Arm/spike/week2/scripts/analyze_teleop_tracking.py $DS
 
 ```bash
 acl                                                  # venv
-export CAMS="{ front: {type: opencv, index_or_path: /dev/so101_cam_overview, width: 1280, height: 480, fps: 60, fourcc: MJPG}, wrist: {type: opencv, index_or_path: /dev/so101_cam_wrist, width: 1280, height: 720, fps: 30, fourcc: MJPG} }"
+export CAMS="{ front: {type: opencv, index_or_path: /dev/so101_cam_overview, width: 1280, height: 720, fps: 30, fourcc: MJPG}, wrist: {type: opencv, index_or_path: /dev/so101_cam_wrist, width: 1280, height: 720, fps: 30, fourcc: MJPG} }"
 ls -la /dev/so101_* && echo $CAMS $HF_USER && hf auth whoami   # 노드 4개 · 두 변수 · 계정이 찍혀야 한다
 pgrep -af live_view || echo "뷰어 꺼짐"              # 켜져 있으면 카메라 연결에서 실패한다
 ls -d ~/.cache/huggingface/lerobot/$HF_USER/so101-spike-pick-cube 2>/dev/null || echo "로컬에 같은 이름 없음 (정상)"
@@ -320,7 +333,7 @@ lerobot-record \
     --dataset.fps=30 \
     --dataset.episode_time_s=30 \
     --dataset.reset_time_s=15 \
-    --dataset.single_task="Pick up the red cube and place it on the tray." \
+    --dataset.single_task="Pick up the pink cube and place it in the yellow square." \
     --dataset.private=true \
     --dataset.push_to_hub=true \
     2>&1 | tee -i $SPIKE_OUT/d9_record.log
@@ -328,7 +341,8 @@ lerobot-record \
 
 - `tee -i`: 로그를 화면과 파일에 동시에 남긴다. 소요 시간을 이 로그의 시각으로 잰다 (§2.4). `-i` 는 `Ctrl+C` 를 tee 가 무시하게 하는 옵션이다 — 없으면 `Ctrl+C` 를 눌렀을 때 tee 가 먼저 죽어 그 뒤의 로그 (저장 · 연결 해제) 가 파일에 남지 않는다. 키 조작은 `tee` 를 붙여도 그대로 된다 — lerobot 은 표준 입력이 터미널인지만 본다.
 - `--dataset.no_stamp=true`: lerobot 0.6.2 는 기본으로 repo_id 뒤에 `_YYYYMMDD_HHMMSS` 를 붙여 로컬 폴더와 Hub 이름이 모두 바뀐다. D10 과 RESULT.md §1 이 같은 repo_id 를 참조하므로 끈다.
-- `--display_data=false`: 헤드리스 컨테이너 (§1.5). 카메라 fps 는 `$CAMS` 의 값 (ELP 60, 손목 30) 이고 `--dataset.fps=30` 은 녹화 루프 주기다. 둘은 별개라 ELP 가 30 을 지원하지 않아도 무관하다.
+- **`so101-spike-pick-cube` 라는 이름은 이미 쓰였다.** 스파이크 must 2 의 증거 데이터셋이 이 이름으로 Hub 와 로컬에 있다 (RESULT.md §1 행 2). 그래서 위 명령은 지금 그대로 실행하면 `FileExistsError` 로 멈춘다. 다시 녹화할 때는 로컬 폴더를 지우지 말고 `--dataset.repo_id` 를 새 이름으로 바꾼다 — 같은 이름으로 올리면 Hub 의 증거가 덮어써진다.
+- `--display_data=false`: 헤드리스 컨테이너 (§1.5). 카메라 fps 는 `$CAMS` 의 값 (둘 다 30) 이고 `--dataset.fps=30` 은 녹화 루프 주기다 (§1.4).
 - 실행 전 같은 셸에서 `echo $CAMS $HF_USER` 로 둘 다 찍히는지 본다. `$CAMS` 는 §1.4 의 export 를 세션마다 다시 해야 한다.
 **에피소드 하나의 리듬**
 
@@ -338,12 +352,12 @@ lerobot-record \
 |---|---|---|---|
 | 녹화 | `Recording episode N` | 최대 30초 | 시범. 끝났으면 `→` 로 바로 넘긴다 |
 | 리셋 | `Reset the environment` | 최대 15초 | 큐브를 다음 시작 칸에, 리더를 시작 자세에 둔다. 끝났으면 `→`. 마지막 에피소드 뒤에는 이 구간이 없다 |
-| 저장 | `Svt[info]` 로 시작하는 줄이 쏟아진다 | 약 17초 (30초 에피소드 실측. 짧게 끝낸 에피소드는 더 짧다) | **기다린다.** 이 구간은 녹화되지 않는다 |
+| 저장 | `Svt[info]` 로 시작하는 줄이 쏟아진다 | 약 20초 (30초 에피소드 실측 19-20초. 짧게 끝낸 에피소드는 더 짧다) | **기다린다.** 이 구간은 녹화되지 않는다 |
 
 - 용어 — **인코딩**은 찍은 프레임들을 mp4 영상으로 압축하는 작업이다. 저장 구간이 긴 이유가 이것이다. 이 환경은 PyAV 의 `libsvtav1` (AV1 코덱) 을 쓴다.
 - 저장 중에는 제어 루프가 멈춰 있어 팔로워가 리더를 따라오지 않는다. **리더를 시작 자세에 둔 채 기다린다.** 이때 리더를 다른 자세로 옮겨 두면 다음 에피소드가 시작되는 순간 팔로워가 그 자세로 한 번에 따라붙고, 그 장면이 에피소드 첫머리에 녹화된다.
 - `Recording episode N` 이 찍히기 전에 시범을 시작하면 앞부분이 잘린다.
-- 10 에피소드를 전부 상한까지 쓰면 약 10분 (30 + 15 + 17초씩 10번) 이고, 그 뒤 업로드가 이어진다. 30초 에피소드 하나가 영상 2개 포함 약 30 MB 다.
+- 10 에피소드를 전부 상한까지 쓰면 약 11분 (30 + 15 + 20초씩 10번) 이고, 그 뒤 업로드가 이어진다. 30초 에피소드 하나가 영상 2개 포함 약 26 MB 다 (전체 뷰 약 15 MB, 손목 약 11 MB).
 
 **중간에 끊겼을 때**
 
@@ -361,7 +375,7 @@ lerobot-record \
 
 **시범 요령**
 
-- 큐브를 놓친 시범, 트레이 밖에 떨어뜨린 시범은 `←` 로 버린다. 데이터셋에는 성공한 시범만 남긴다.
+- 큐브를 놓친 시범, 목표 사각형 밖에 떨어뜨린 시범은 `←` 로 버린다. 데이터셋에는 성공한 시범만 남긴다.
 - 서두르지 않는다. teleop 지연이 100-170 ms 라 리더를 빠르게 휘두르면 팔로워가 뒤따라오며 흔들리고, 손목 카메라 영상이 흐려진다 (실내 조명에서 30 fps 웹캠은 빠른 움직임에 모션 블러가 생긴다).
 - 에피소드마다 큐브를 어느 칸에 뒀는지 적는다.
 
@@ -388,8 +402,8 @@ grep -E "Cadence \(episode" $SPIKE_OUT/d9_record.log
 # 에피소드별 제어 루프 주기. 30 Hz 근처이고 "ticks over the ... budget" 이 0 에 가까워야 한다
 ```
 
-- [ ] 영상 하나를 열어 본다 (`$DS/videos/observation.images.front/chunk-000/` 의 mp4). 큐브 · 트레이 · 그리퍼가 보이고 리더 · 내 팔이 없는지
-- [ ] 브라우저에서 `https://huggingface.co/datasets/<HF_USER>/so101-spike-pick-cube` 가 열리고 Private 표시가 있다
+- [ ] 영상 하나를 열어 본다 (`$DS/videos/observation.images.front/chunk-000/` 의 mp4). 큐브 · 목표 사각형 · 그리퍼가 보이고 리더 · 내 팔이 없는지
+- [ ] 브라우저에서 `https://huggingface.co/datasets/tylee-yeonge/so101-spike-pick-cube` 가 열리고 Private 표시가 있다
 
 에피소드당 소요와 순수 녹화 초의 차이가 리셋 · 저장 · 조작에 든 오버헤드다. 이 값이 v2.5 에서 몇 에피소드를 찍을 수 있는지 계산하는 입력이다 (`../../v25/README.md` §1 표).
 
@@ -415,7 +429,7 @@ grep -E "Cadence \(episode" $SPIKE_OUT/d9_record.log
 
 **무엇을**: 사전학습 SmolVLA (`lerobot/smolvla_base`) 를 파인튜닝 없이 그대로 팔에 연결해 30초 1 에피소드를 돌린다. 리더 없이 카메라 영상 + 관절값 + 지시문 → 모델 → 팔로워 명령.
 **왜**: must 3 는 "팔이 명령에 반응해 움직이는가" 만 본다. 성공률은 v2.5 가 잰다. 여기서 확인하는 것은 관측 → 모델 → 명령의 경로가 이 환경에서 끊기지 않고 이어지는가다. 용어: **zero-shot** = 이 팔 · 이 작업의 데이터를 전혀 학습하지 않은 상태로 실행.
-**끝나면 손에 남는 것**: 30초 영상 + 로그 파일. 부수로 모델이 기대하는 입력 키 목록 (D11 이 그대로 쓴다). 2차 실행 (선택) 까지 하면 ELP · 손목 영상과 관절값이 든 로컬 데이터셋 1개.
+**끝나면 손에 남는 것**: 30초 영상 + 로그 파일. 부수로 모델이 기대하는 입력 키 목록 (D11 이 그대로 쓴다). 2차 실행 (선택) 까지 하면 전체 뷰 · 손목 영상과 관절값이 든 로컬 데이터셋 1개.
 
 lerobot 0.6.2 에서 실기 정책 실행은 **`lerobot-rollout`** 이 맡는다. 용어: **rollout** = 학습된 정책을 실제 환경에서 굴려 보는 것. `lerobot-record` 는 리더 시범 녹화 전용이라 `--teleop.*` 없이 실행하면 "use lerobot-rollout instead" 로 멈춘다. rollout 은 실행 방식을 `--strategy.type` 으로 고른다. 이 스파이크가 쓰는 것은 둘이다.
 
@@ -424,7 +438,7 @@ lerobot 0.6.2 에서 실기 정책 실행은 **`lerobot-rollout`** 이 맡는다
 | `base` | 녹화 없이 정책만 돌린다 | **1차 실행 — must 3 판정.** 증거는 스마트폰 영상 + 로그 (§3.4) |
 | `episodic` | 정책을 돌리면서 카메라 영상 · 관절값 · 정책 명령을 데이터셋으로 남긴다 | 2차 실행 (선택) — "팔이 스스로 움직였다" 를 관절 궤적 수치로도 남긴다 (§3.4 의 2차 실행) |
 
-rollout 이 도는 동안에는 ELP 를 따로 찍을 수 없다. rollout 이 ELP 를 `camera2` 로 잡고 있고, 카메라는 한 번에 한 프로세스만 스트리밍하기 때문이다 (§1.2). ELP 영상을 남기려면 rollout 자신이 녹화하는 `episodic` 을 쓴다.
+rollout 이 도는 동안에는 전체 뷰 카메라를 따로 찍을 수 없다. rollout 이 그 카메라를 `camera1` 로 잡고 있고, 카메라는 한 번에 한 프로세스만 스트리밍하기 때문이다 (§1.2). 전체 뷰 영상을 남기려면 rollout 자신이 녹화하는 `episodic` 을 쓴다.
 
 ### 3.1 모델 받기 + 기대 입력 확인
 
@@ -454,10 +468,12 @@ EOF
 정책은 자기 config 에 있는 이미지 키만 관측에서 찾는다. 데이터셋용 이름 `front` 가 그 목록에 없으면 `Visual feature mismatch` 오류로 멈춘다 — master roadmap 이 D10 의 막힘으로 꼽은 "카메라 키 이름 불일치" 가 이것이다. 해법은 카메라 이름을 모델 쪽에 맞추는 것:
 
 ```bash
-# smolvla_base 의 이미지 키는 observation.images.camera1 · camera2 · camera3 (§3.1 출력). 손목을 camera1, 전체 뷰 ELP 를 camera2 로 둔다
-# 이름만 다르고 해상도 · fps · fourcc 는 §1.4 의 $CAMS 와 같다 (ELP 는 30 fps 를 지원하지 않는다 -- §1.3 표)
-export CAMS_ZS="{ camera1: {type: opencv, index_or_path: /dev/so101_cam_wrist, width: 1280, height: 720, fps: 30, fourcc: MJPG}, camera2: {type: opencv, index_or_path: /dev/so101_cam_overview, width: 1280, height: 480, fps: 60, fourcc: MJPG} }"
+# smolvla_base 의 이미지 키는 observation.images.camera1 · camera2 · camera3 (§3.1 출력). 전체 뷰를 camera1, 손목을 camera2 로 둔다
+# 이름만 다르고 해상도 · fps · fourcc 는 §1.4 의 $CAMS 와 같다
+export CAMS_ZS="{ camera1: {type: opencv, index_or_path: /dev/so101_cam_overview, width: 1280, height: 720, fps: 30, fourcc: MJPG}, camera2: {type: opencv, index_or_path: /dev/so101_cam_wrist, width: 1280, height: 720, fps: 30, fourcc: MJPG} }"
 ```
+
+어느 카메라를 몇 번에 두는지는 임의가 아니다. `smolvla_base` 의 사전학습 데이터는 카메라를 시점 종류로 정렬해 번호를 붙였다 — 1번이 위에서 내려다보는 시점 (top), 2번이 손목 (wrist), 3번이 옆 (side) 이다 (SmolVLA 논문 §3.2, arXiv 2506.01844). 이 환경의 전체 뷰는 대각선 위에서 내려다보므로 1번, 손목은 2번에 둔다.
 
 카메라 2대 vs 모델 키 3개: `camera3` 은 비워 둔 채로 돈다. lerobot 0.6.2 의 검사는 "로봇이 주는 이미지 이름이 전부 모델 키 안에 들어 있는가" 만 본다 — {`camera1`, `camera2`} 는 {`camera1`, `camera2`, `camera3`} 안에 들어 있으므로 통과한다. 모델 쪽도 관측에 없는 키는 건너뛰고 있는 이미지만 쓴다 (`modeling_smolvla.py` 의 `prepare_images`). 반대로 이름이 하나라도 모델 키 밖이면 (`front` 등) 이 검사에서 걸린다.
 
@@ -483,7 +499,7 @@ echo $CAMS_ZS                                        # §3.2 의 export 가 이 
 
 이 실행에서 팔은 휴식 자세에서 **일어난다** (§3.5). 약 3초에 걸쳐 상완이 수직으로 서고, 전완은 앞쪽 아래로 비스듬히 뻗은 자세에서 멈춘다 (실측 — §3.5). 그리퍼 끝이 책상 가까이까지 내려오므로 팔 위쪽과 앞쪽에 팔 길이만큼의 공간이 비어 있어야 한다.
 
-- 작업면 위에는 큐브 · 트레이만. 손 · 케이블 · 리더 팔은 팔로워 가동 범위 밖. 리더는 연결하지 않아도 된다 (명령에 `--teleop.*` 가 없다).
+- 작업면 위에는 큐브 · 목표 사각형만. 손 · 케이블 · 리더 팔은 팔로워 가동 범위 밖. 리더는 연결하지 않아도 된다 (명령에 `--teleop.*` 가 없다).
 - `--robot.max_relative_target=3`: 한 틱 (제어 루프 1회) 에 관절 목표가 현재 위치에서 벗어날 수 있는 양의 상한. lerobot 0.6.2 의 팔로워는 기본이 각도 모드 (`use_degrees=true`) 라 단위는 **도** 다 (그리퍼만 0-100). 틱마다 적용되므로 30 Hz 에서 3 이면 초당 최대 90도, 10 이면 초당 300도다. 첫 실행은 3 으로 시작하고, 움직임을 눈으로 확인한 뒤에만 올린다.
 - 비상 정지: USB 를 뽑으면 그 자리에서 멈추고, DC 를 뽑으면 토크가 풀려 떨어진다 (조립 가이드 §7). 손은 USB 쪽에 둔다.
 - 종료 동작: 30초가 지나거나 Ctrl+C 를 누르면 rollout 은 팔을 **실행 직전의 자세로 약 3초에 걸쳐 되돌린 뒤** 연결을 끊는다 (`--return_to_initial_position` 기본값 true). 팔이 멈춘 것처럼 보여도 로그에 `Rollout finished` 가 찍히기 전에는 가동 범위에 손을 넣지 않는다. 2차 실행 (`episodic`) 은 30초가 끝난 뒤 영상을 저장하는 동안 **팔이 일어난 자세로 약 19초 굳어 있다가** 복귀한다 — 멈춘 것이 아니다 (§3.4 의 2차 실행).
@@ -501,7 +517,7 @@ lerobot-rollout \
     --robot.id=so101_follower_01 \
     --robot.cameras="$CAMS_ZS" \
     --robot.max_relative_target=3 \
-    --task="Pick up the red cube and place it on the tray." \
+    --task="Pick up the pink cube and place it in the yellow square." \
     --fps=30 \
     --duration=30 \
     2>&1 | tee -i $SPIKE_OUT/d10_zeroshot.log
@@ -541,10 +557,10 @@ rollout 은 모델을 먼저 올리고, 그다음에 로봇에 연결한다. 그
 
 USB 를 뽑아 멈춘 뒤에는 팔이 공중에 굳어 있다. **손으로 팔을 받친 채 DC 를 뽑아** 토크를 풀고 휴식 자세로 내려놓는다 (조립 가이드 §7). 다시 시작하려면 USB · DC 를 연결하고 `so101-attach` 부터 한다.
 
-**2차 실행 (선택) — ELP 영상과 관절값을 데이터셋으로 남기기**
+**2차 실행 (선택) — 전체 뷰 영상과 관절값을 데이터셋으로 남기기**
 
 **무엇을**: 같은 zero-shot 을 `episodic` 전략으로 한 번 더 돌려, 정책이 팔을 움직이는 30초를 데이터셋 1 에피소드로 남긴다.
-**왜**: 1차 실행의 증거는 스마트폰 영상이라 "움직였다" 를 눈으로만 보인다. 데이터셋에는 ELP · 손목 영상과 함께 `observation.state` (팔의 실제 관절값) 와 `action` (정책이 낸 관절 목표) 이 30 Hz 로 기록되므로, 팔이 스스로 움직였다는 것과 정책 출력이 0 근처에 모인다는 것 (§3.5) 을 수치로 확인할 수 있다.
+**왜**: 1차 실행의 증거는 스마트폰 영상이라 "움직였다" 를 눈으로만 보인다. 데이터셋에는 전체 뷰 · 손목 영상과 함께 `observation.state` (팔의 실제 관절값) 와 `action` (정책이 낸 관절 목표) 이 30 Hz 로 기록되므로, 팔이 스스로 움직였다는 것과 정책 출력이 0 근처에 모인다는 것 (§3.5) 을 수치로 확인할 수 있다.
 **언제**: 1차 실행에서 팔이 예상대로 움직이는 것을 본 **뒤에** 한다. must 3 은 1차 실행으로 이미 닫혔으므로 이 실행이 실패해도 판정은 그대로다. §3.3 의 공간 · 안전 준비는 1차와 똑같이 한다.
 
 ```bash
@@ -557,7 +573,7 @@ lerobot-rollout \
     --robot.id=so101_follower_01 \
     --robot.cameras="$CAMS_ZS" \
     --robot.max_relative_target=3 \
-    --task="Pick up the red cube and place it on the tray." \
+    --task="Pick up the pink cube and place it in the yellow square." \
     --fps=30 \
     --dataset.repo_id=$HF_USER/rollout_so101-spike-zeroshot \
     --dataset.num_episodes=1 \
@@ -628,7 +644,7 @@ grep -n -A8 "Cadence summary" $SPIKE_OUT/d10_zeroshot.log
 grep -nE "Dataset ready|Recording episode|control loop ended|Finalizing dataset|Returning robot|Rollout finished|Traceback|Error" $SPIKE_OUT/d10_zeroshot_episodic.log | grep -v spd-say   # spd-say 경고는 음성 도구가 없다는 뜻이라 무해하다
 
 DSZ=$(ls -d ~/.cache/huggingface/lerobot/$HF_USER/rollout_so101-spike-zeroshot* | tail -1)   # 타임스탬프가 붙은 실제 폴더
-find $DSZ -name "*.mp4"                                                # camera1 (손목) · camera2 (ELP) 영상
+find $DSZ -name "*.mp4"                                                # camera1 (전체 뷰) · camera2 (손목) 영상
 python - <<EOF
 import json
 import numpy as np
@@ -649,7 +665,7 @@ EOF
 - `1 episode | 약 900 frames` 가 찍혀야 한다 (30 s x 30 fps).
 - `state A -> B` 는 첫 프레임과 마지막 프레임의 관절값이다. 녹화는 복귀 전에 끝나므로 마지막 값은 일어난 자세다. 휴식 자세에서 시작했다면 `shoulder_lift` 가 약 -100 → 0 근처, `elbow_flex` 가 약 +100 → 0 근처로 찍힌다. `moved` (그 관절이 움직인 폭) 가 큰 값이면 **팔이 스스로 움직였다는 수치 증거다.**
 - `action min .. max` 가 6개 관절 모두 0 근처의 좁은 범위면 위의 "예상되는 동작" (정규화 통계 미적용) 을 실측으로 확인한 것이다.
-- ELP 영상 (`camera2`) 에서 팔이 일어났을 때 팔꿈치가 화면 위쪽에 걸칠 수 있다 (D9 구도의 위쪽 여유가 작다). 관절값이 같이 남으므로 판정에는 지장이 없다.
+- 전체 뷰 영상 (`camera1`) 에서 팔이 일어났을 때 위쪽이 화면 밖으로 잘릴 수 있다 (§1.2 의 구도는 큐브를 집고 옮기는 높이까지만 담는다). 관절값이 같이 남으므로 판정에는 지장이 없다.
 
 **기록**
 
@@ -690,8 +706,7 @@ EOF
 ### 4.2 실행
 
 ```bash
-cd <레포 경로>
-python Studies/Hardware-Arm/spike/week2/scripts/measure_latency_smolvla.py
+python /workspace/study/physical-ai-study/Studies/Hardware-Arm/spike/week2/scripts/measure_latency_smolvla.py
 ```
 
 출력 (숫자는 자리표시):
@@ -811,19 +826,21 @@ RESULT.md 는 경로를 적을 뿐이고, 증거 자체는 아래 위치에 있�
 
 | Day | 증상 | 원인 | 조치 |
 |---|---|---|---|
-| D8 | `lerobot-find-cameras` 의 카메라 수가 `/dev/video*` 의 절반 | UVC 는 장치당 video 노드 2개 (영상 + 메타데이터) | 정상. `so101-attach` 가 만드는 `/dev/so101_cam_*` 는 캡처 노드만이다 |
+| D8 | `lerobot-find-cameras opencv` 가 `Found 0 OpenCV cameras` | 이 도구는 `/dev/video*` 를 뒤지는데 컨테이너에는 그 노드가 없다 | 정상. 카메라는 `so101-attach list` 로 확인하고 설정에는 `/dev/so101_cam_*` 를 적는다 (§1.3) |
 | D8 | 재부팅 후 카메라가 다른 번호로 잡힘 | `/dev/videoN` 번호는 열거 순서에 따라 바뀜 | §1.3 고정 경로 |
+| D8 | 전체 뷰와 손목 영상이 서로 바뀌어 나온다 | 두 카메라가 같은 모델이라 USB 포트 위치로 구분하는데, 두 포트를 바꿔 꽂았다 | 원래 포트에 다시 꽂고 `so101-attach`. 손목 뷰어에 집게가 보이는지로 확인한다 (§1.3) |
+| D8 | `so101-attach` 가 `camera ... not found` | 카메라를 `.env` 에 적힌 포트가 아닌 곳에 꽂았다 | `so101-attach list` 의 `usb=` 값을 보고 원래 포트 (손목 `1-4:1.0`, 전체 뷰 `1-3:1.0`) 에 다시 꽂는다 |
 | D8 | fps 가 설정보다 훨씬 낮음 (5-10) | YUYV 무압축의 USB 대역폭 한계 | `fourcc: MJPG` 지정 + §1.3 표에 있는 fps 만 적는다 |
-| D8 | 카메라가 열리다 실패 / 프레임 드롭 | USB 허브 대역폭 공유 (현 구성은 실측으로 문제 없음) | fps 실측이 미달할 때만 PC 직결 |
+| D8 | 카메라가 열리다 실패 / 프레임 드롭 | USB 허브를 거치면 두 카메라가 대역폭을 나눠 쓴다 | 두 카메라를 허브 없이 PC 포트에 직접 꽂는다 (현 구성. 동시 스트리밍에서 각각 30 fps 실측 — §1.2) |
 | D8-D9 | `lerobot-record` 가 캘리브레이션을 새로 요구 | 그 셸에 `HF_LEROBOT_CALIBRATION` 이 없어 기본 경로를 봄 | `echo $HF_LEROBOT_CALIBRATION` 확인 후 재실행. 새로 캘리브하지 않는다 |
 | D9-D10 | 카메라 연결 단계에서 실패 | 실시간 뷰어 (`live_view.py`) 가 켜져 있어 카메라를 잡고 있다. 카메라는 한 번에 한 프로세스만 연다 | 뷰어를 `Ctrl+C` 로 끄고 재실행. `pgrep -af live_view` 로 확인 |
-| D9 | 시작 직후 `FileExistsError` | 앞선 실행이 남긴 같은 이름의 로컬 폴더 | 이어 찍으려면 §2.2 의 `--resume=true`. 처음부터 다시 찍으려면 `~/.cache/huggingface/lerobot/$HF_USER/so101-spike-pick-cube` 폴더를 지운다 |
+| D9 | 시작 직후 `FileExistsError` | 앞선 실행이 남긴 같은 이름의 로컬 폴더 | 이어 찍으려면 §2.2 의 `--resume=true`. 처음부터 다시 찍으려면 `--dataset.repo_id` 를 새 이름으로 바꾼다. `~/.cache/huggingface/lerobot/$HF_USER/so101-spike-pick-cube` 폴더는 must 2 의 증거라 지우지 않는다 (§2.2) |
 | D9 | 시작하자마자 팔로워가 크게 움직인다 | 리더와 팔로워의 자세가 달랐다. 연결 순간 팔로워가 리더 자세로 바로 따라붙는다 | 고장이 아니다. 두 팔을 같은 자세 (휴식 자세) 로 맞추고 시작한다 |
 | D9 | 키가 듣지 않는다 | 터미널 포커스가 다른 곳에 있다 | 녹화를 실행한 터미널을 클릭한 뒤 누른다. `→` 대신 `n`, `←` 대신 `r`, `Esc` 대신 `q` 도 된다 |
 | D9 | 에피소드 첫머리에 팔이 한 번에 움직이는 장면이 찍혔다 | 저장 구간에 리더를 움직여 뒀다. 저장 중에는 팔로워가 따라오지 않다가 다음 에피소드 시작에 한 번에 따라붙는다 | 저장 중에는 리더를 시작 자세에 둔 채 기다린다 (§2.2). 그 에피소드는 `←` 로 버린다 |
 | D9 | 업로드 401 / 403 | 토큰이 없거나 read 권한 | 역할 확인: `python -c "from huggingface_hub import HfApi; print(HfApi().whoami()['auth']['accessToken']['role'])"` — `write` 여야 한다. 아니면 호스트 compose `.env` 의 `HF_WRITE_TOKEN` 을 고치고 컨테이너를 재생성한다. 컨테이너 안에서 `hf auth login` 은 하지 않는다 (§0.2) |
 | D9 | 녹화는 끝났는데 업로드가 실패했다 | 네트워크 등 | 로컬 데이터셋은 그대로 남아 있다. **다시 찍지 않는다.** 업로드만 다시 한다: `python -c "from lerobot.datasets.lerobot_dataset import LeRobotDataset; LeRobotDataset('$HF_USER/so101-spike-pick-cube').push_to_hub(private=True)"` — 끝나면 §2.4 의 private 확인을 한다 |
-| D9 | 저장 구간이 비정상적으로 길다 | 이 환경의 인코딩은 PyAV 에 포함된 `libsvtav1` 이라 ffmpeg 바이너리가 필요 없다. 30초 에피소드에 약 17초가 정상이다 | 그보다 몇 배 길면 다른 작업이 CPU 를 쓰고 있는지 본다. lerobot 이 로그에서 안내하는 `--dataset.streaming_encoding=true` 는 이 환경에서 시험하지 않았다 |
+| D9 | 저장 구간이 비정상적으로 길다 | 이 환경의 인코딩은 PyAV 에 포함된 `libsvtav1` 이라 ffmpeg 바이너리가 필요 없다. 30초 에피소드에 약 20초가 정상이다 | 그보다 몇 배 길면 다른 작업이 CPU 를 쓰고 있는지 본다. lerobot 이 로그에서 안내하는 `--dataset.streaming_encoding=true` 는 이 환경에서 시험하지 않았다 |
 | D9 | 녹화 중 팔로워가 멈칫함 (`Failed to sync read`) | 12V 2A 어댑터의 전압 강하 | 조립 가이드 §0 표 — 5A 급 교체 |
 | D10 | `A teleoperator is required for recording ... use lerobot-rollout instead` | `lerobot-record` 에 `--policy.path` 를 준 옛 방식. lerobot 0.6.2 의 record 는 녹화 전용이다 | §3.4 의 `lerobot-rollout` |
 | D10 | `Visual feature mismatch between policy and robot hardware` | 카메라 이름 ≠ 모델 `input_features` 키 | §3.2 |
@@ -839,7 +856,6 @@ RESULT.md 는 경로를 적을 뿐이고, 증거 자체는 아래 위치에 있�
 | D10-D11 | `ImportError: 'transformers' is required but not installed` | venv 에 `smolvla` extra 가 없음. lerobot 은 이 검사를 import 시점이 아니라 정책 객체를 만드는 시점 (`from_pretrained`) 에 하므로 `import` 와 §3.1 은 통과한다 | §0.2 의 `pip install "lerobot[smolvla]"` |
 | D11 | latency 가 대부분 0-1 ms | action 큐에서 꺼내기만 하고 모델이 안 돎 | 스크립트의 `policy.reset()` 이 루프 안에 있는지 확인 |
 | D11 | `KeyError: observation.language.tokens` 류 | 신버전인데 preprocessor 를 안 거침 | 스크립트의 preprocessor 분기 + §4.3 |
-| 공통 | ELP 좌 · 우 붙은 프레임을 그대로 씀 | 스파이크는 "반응" 만 보므로 크롭하지 않음. 모델이 정사각형으로 패딩 리사이즈해 실효 해상도가 낮아짐 | must 기준 영향 없음. 크롭 (왼쪽 절반) 또는 일반 웹캠 교체는 v2.5 측정 설계 (`../../v25/README.md` §0) 에서 결정 |
 
 ---
 

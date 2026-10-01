@@ -296,7 +296,7 @@ print("\n 실습 3 완료!")
 
 ## 1. 자작 팔 hardware
 - Robot: Dynamixel XM430 6DOF + 그리퍼
-- Camera: ELP Stereo (보유)
+- Camera: 손목 1대 + 전체 뷰 1대 (Realtek 웹캠, 1280x720 30 fps)
 - DoF: 6 + gripper = 7
 
 

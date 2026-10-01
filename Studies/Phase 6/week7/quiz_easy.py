@@ -3,12 +3,15 @@
 
 def p1():
     print("\n문제 1: 본 phase 권장 카메라 위치")
-    print("  A) ee-mount only\n  B) External (ELP Stereo)\n  C) None\n  D) Multi-camera")
+    print("  A) ee-mount only\n  B) External (전체 뷰 카메라)\n  C) None\n  D) Multi-camera")
 
 
 def p2():
-    print("\n문제 2: ELP Stereo 의 frame 구조")
-    print("  A) 단일 카메라\n  B) 양쪽 결합 1280x480 (left|right)\n  C) 별도 frame\n  D) 3D 점 cloud")
+    print("\n문제 2: 전체 뷰 카메라를 OpenCV 로 열 때 맞는 설정")
+    print("  A) /dev/video0, YUYV, 1280x720, 60 fps")
+    print("  B) /dev/so101_cam_overview, MJPG, 1280x720, 30 fps")
+    print("  C) /dev/so101_cam_overview, MJPG, 1280x480, 60 fps")
+    print("  D) /dev/video2, MJPG, 640x480, 25 fps")
 
 
 def p3():

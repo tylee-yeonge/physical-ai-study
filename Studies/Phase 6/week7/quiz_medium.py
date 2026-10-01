@@ -4,7 +4,7 @@
 def p1():
     """Camera viewpoint 매칭"""
     print("\n문제 1: Real <-> Sim camera viewpoint 매칭")
-    print("  Real ELP 가 자작 팔의 앞 0.5m, 0.4m 높이")
+    print("  Real 전체 뷰 카메라는 팔로워의 대각선 앞쪽 위에서 약 45도로 내려다본다 (위치는 줄자로 잰다)")
     print("  Sim Camera 도 같은 위치 + orientation 필요")
     print()
     print("  매칭 검증:")
@@ -16,16 +16,13 @@ def p1():
 
 def p2():
     """FOV 매칭"""
-    print("\n문제 2: ELP 의 FOV vs Sim FOV")
-    import math
-    elp_sensor = 5.86  # ELP CMOS 약 5.86 mm
-    elp_focal = 3.6  # 대략
-    real_fov = math.degrees(2 * math.atan(elp_sensor / (2 * elp_focal)))
-    print(f"  ELP estimated FOV: {real_fov:.1f} deg")
+    print("\n문제 2: 전체 뷰 카메라의 HFOV 를 재서 Sim focal 로 바꾸기")
+    print("  렌즈 앞 D = 0.60 m 에 줄자를 놓았더니 화면 가로에 L = 0.92 m 가 들어왔다")
+    print("  Sim 카메라의 aperture (get_horizontal_aperture) 는 20.955 mm 였다")
     print()
-    print("  Sim 의 focal_length 조정:")
-    print("    sensor_w 36mm (default) 가정")
-    print(f"    focal = 36 / (2 * tan({real_fov/2:.1f}deg))")
+    print("  (1) HFOV 는 몇 도인가?")
+    print("  (2) 같은 화각이 되는 focal length 는 몇 mm 인가?")
+    print("  (3) 사양서의 '대각선 화각 90도' 를 그대로 HFOV 로 쓰면 왜 틀리는가?")
 
 
 def p3():

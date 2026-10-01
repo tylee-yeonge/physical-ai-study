@@ -14,7 +14,7 @@
 
 | 순서 | 단계 | 파일/자료 | 설명 |
 |:----:|------|----------|------|
-| 1 | 환경 | `requirements.txt` | OpenCV, ELP Stereo 드라이버 |
+| 1 | 환경 | `requirements.txt` | OpenCV (카메라는 UVC 라 드라이버 설치 불필요) |
 | 2 | inference wrapper class 작성 | `PRACTICE.md` 1 | model load + predict 분리 |
 | 3 | image preprocess pipeline | `PRACTICE.md` 2 | OpenCV BGR -> PIL RGB -> tensor |
 | 4 | edge case 핸들링 | `PRACTICE.md` 3 | OOM / shape / NaN |
@@ -171,27 +171,28 @@ ROS2 노드에서:
 본 주는 100 회 시도 + 그 안의 fail 모두 분석.
 
 
-### 6. ELP Stereo 카메라 사용 (선택)
+### 6. 자작 팔의 전체 뷰 카메라 사용 (선택)
 
 
-본 로드맵 보유 hardware. 실제 카메라 입력으로 테스트하는 게 mock 보다 가치.
+본 로드맵 보유 hardware (SO-101 에 고정된 Realtek 웹캠). 실제 카메라 입력으로 테스트하는 게 mock 보다 가치.
 
 
 ```python
 import cv2
 
 
-cap = cv2.VideoCapture(0) # ELP Stereo 의 left
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+cap = cv2.VideoCapture("/dev/so101_cam_overview", cv2.CAP_V4L2)  # so101-attach 가 만드는 고정 경로 (/dev/video* 번호는 바뀐다)
+cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))  # 압축 전송. 무압축 YUYV 는 fps 가 낮다
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
 
 ret, frame = cap.read()
-# frame: BGR uint8 (480, 640, 3)
+# frame: BGR uint8 (720, 1280, 3) -- 모델 입력 크기 (224x224) 로는 preprocess 에서 resize
 ```
 
 
-> ELP Stereo 는 left + right 가 한 frame 에 합쳐져서 나옴 (1280x480). 한쪽만 잘라 사용.
+> 지원 fps 는 30 뿐이다. 설정 절차의 원본은 `Studies/Hardware-Arm/spike/week2/week2_guide.md` §1.3-§1.4.
 
 
 ### 7. Logging 표준
@@ -271,7 +272,7 @@ ROS2 launch file 에서 환경 변수 또는 ROS parameter 로 주입 가능.
 3. `vla_inference/exceptions.py` - custom exceptions
 4. `vla_inference/config.py` - 환경 변수
 5. `practice_stress_test.py` - 100회 stress test 통과
-6. (선택) ELP Stereo 로 실제 이미지 테스트
+6. (선택) 전체 뷰 카메라로 실제 이미지 테스트
 7. quiz_easy / quiz_medium
 
 

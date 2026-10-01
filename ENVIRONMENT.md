@@ -20,8 +20,9 @@
 - **Jetson Orin Nano (8GB)** — **256GB SSD + Ubuntu 22.04 설치 완료**. Ubuntu 22.04 이므로 **ROS 2 Humble 을 apt 로 설치**할 수 있고 (Phase 3 배포판과 동일 절차) LeRobot 이 요구하는 Python 3.10 도 기본이다. SO-101 + LeRobot 구동 사례가 공개돼 있고 NVIDIA 공식 SO-101 코스의 기준 구성이기도 하다. **Stage 1 의 팔 옆 기계는 4070 PC 이므로, Jetson 은 v3 실기 배포 타깃과 백업 경로로 남는다** — 상세는 [Hardware-Arm.md](Roadmap/Hardware-Arm.md) Stage 1 실행 머신 절
   - 한계: ACT 학습은 소규모 데이터셋에서 보고된 사례가 있으나 정석은 4070/RunPod. **Isaac Sim 은 불가** (x86 전용), OpenVLA 7B 도 비현실적
   - 확인 필요: JetPack / L4T 버전과 **CUDA·cuDNN 동반 설치 여부** (Ubuntu 22.04 만 올린 경우 CUDA 스택이 없으면 PyTorch GPU 가 안 붙는다) — `cat /etc/nv_tegra_release`, `dpkg -l nvidia-jetpack`
-- **ELP Stereo Camera** — USB 연결 주변기기. SO-101 전체 뷰 카메라 (팔로워 왼쪽 측면에 임시 고정). 흑백, 좌 · 우가 한 프레임에 결합 (1280x480 MJPG 25/60 fps). 전체 뷰 전용 카메라 + 고정수단이 배송 중이며 도착하면 이 역할을 넘긴다 (Stage 1 W3)
 - **손목 카메라** — Realtek UVC 웹캠 (0bda:5844, 1280x720 MJPG 30 fps). SO-101 팔로워 그리퍼에 장착 완료 (2026.09)
+- **전체 뷰 카메라** — 손목 카메라와 같은 모델의 Realtek UVC 웹캠 (0bda:5844, 1280x720 MJPG 30 fps — 지원 fps 는 30 뿐). 팔로워 대각선 앞쪽 위에서 약 45도로 내려다보게 별도 고정수단에 장착 (2026.10, Stage 1 W3). 두 카메라의 USB 시리얼이 같아 컨테이너의 `so101-attach` 는 USB 포트 경로로 구분한다 — 각 카메라를 늘 같은 포트에 꽂는다
+- **ELP Stereo Camera** — 보유 USB 스테레오 카메라. 팔에는 달지 않는다. 흑백, 좌 · 우가 한 프레임에 결합 (1280x480 MJPG 25/60 fps). 스테레오 캘리브 실습 (Phase 2 Week 3 선택) 에 쓸 때만 PC 에 꽂는다
 
 
 ---
@@ -30,8 +31,8 @@
 ## 2. 역할 분담 원칙
 
 
-- 기본: **Ubuntu PC 중심** (ELP 는 USB 주변기기)
-- 출장지: 원격 접속으로 동일 PC 사용. PC 에 ELP 가 연결되어 있으면 실카메라 데이터도 원격으로 처리 가능
+- 기본: **Ubuntu PC 중심** (카메라는 USB 주변기기)
+- 출장지: 원격 접속으로 동일 PC 사용. PC 에 카메라가 연결되어 있으면 실카메라 데이터도 원격으로 처리 가능 (SO-101 카메라 2대는 상시 연결)
 - SO-101 팔 옆 기계는 **Ubuntu PC** 다 (2026.09 자택 이전 확정). Jetson 은 v3 실기 배포 타깃이자 백업 경로 — Phase 3 TensorRT 배포는 v3 이후 옵션
 
 
@@ -178,7 +179,7 @@ PORTS 패널에서 `9090` (web), `9876` (gRPC) 두 포트 모두 forward. 9090 �
 ## 6. ELP Stereo Camera 실습 팁
 
 
-- **좌/우 영상**: 노드 하나에서 좌 · 우가 한 프레임에 나란히 붙어 나온다 (1280x480, 왼쪽 절반이 `frame[:, :640]`). 컨테이너에서는 `so101-attach` 가 만드는 `/dev/so101_cam_overview` 로 연다
+- **좌/우 영상**: 노드 하나에서 좌 · 우가 한 프레임에 나란히 붙어 나온다 (1280x480, 왼쪽 절반이 `frame[:, :640]`). 컨테이너의 `so101-attach` 는 SO-101 카메라 2대만 노드를 만들므로 ELP 는 호스트에서 `/dev/video*` 로 연다
 - **기계적 고정**: 삼각대 또는 클램프로 baseline 유지 (움직이면 캘리브 무효화)
 - **캘리브 타겟**: ChArUco 보드 A3 권장 (두꺼운 판지에 부착해 평탄도 확보)
 - **원격 작업 시**: PC 에 ELP 가 항시 연결 + 전원 on 상태 유지 필요
@@ -206,11 +207,11 @@ PORTS 패널에서 `9090` (web), `9876` (gRPC) 두 포트 모두 forward. 9090 �
 ## 8. 문제 해결 (FAQ)
 
 
-### 원격에서 ELP 카메라가 인식 안 될 때
+### 원격에서 USB 카메라가 인식 안 될 때
 - `udevadm monitor` 로 이벤트 확인
 - `/dev/video*` 권한 확인 (필요 시 사용자를 `video` 그룹에 추가)
 - USB 리셋: `usbreset <bus>:<device>` 또는 `echo 0 > /sys/bus/usb/devices/.../authorized` 후 다시 1
-- Docker 컨테이너 안에서는 `so101-attach` 로 노드를 만든다 (compose 의 `c 81:*` cgroup 규칙이 접근을 열어 둠). 정적 `--device=/dev/videoN` 매핑은 재연결로 번호가 바뀌면 `ENXIO` 로 죽으므로 쓰지 않는다
+- Docker 컨테이너 안에서는 `so101-attach` 로 노드를 만든다 (SO-101 카메라 2대 — 같은 모델이라 USB 포트 경로로 식별하므로 꽂는 포트를 바꾸지 않는다. compose 의 `c 81:*` cgroup 규칙이 접근을 열어 둠). 정적 `--device=/dev/videoN` 매핑은 재연결로 번호가 바뀌면 `ENXIO` 로 죽으므로 쓰지 않는다
 
 
 ### Rerun 네트워크 포트가 방화벽에 막힐 때

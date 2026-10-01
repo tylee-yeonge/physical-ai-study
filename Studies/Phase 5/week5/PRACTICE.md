@@ -70,7 +70,7 @@ prompts_v3 = ["a high-quality photograph of a cat", ...]
 ## 실습 3: 자작 환경 image 테스트
 
 
-자작 책상 + 컵 + 마우스 환경 사진 (스마트폰 또는 ELP) 로:
+자작 책상 + 컵 + 마우스 환경 사진 (스마트폰 또는 자작 팔 전체 뷰 카메라) 로:
 
 
 ```python
