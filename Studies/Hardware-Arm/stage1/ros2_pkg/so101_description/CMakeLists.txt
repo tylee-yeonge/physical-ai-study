@@ -19,6 +19,13 @@ install(
   DESTINATION share/${PROJECT_NAME}
 )
 
+# 파이썬 노드 (소프트웨어 정지). lib/so101_description/ 에 실행 파일로 설치돼
+# launch 의 Node(package="so101_description", executable="soft_stop.py") 가 찾는다
+install(
+  PROGRAMS scripts/soft_stop.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights

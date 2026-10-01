@@ -20,6 +20,12 @@
   <exec_depend>joint_state_broadcaster</exec_depend>
   <exec_depend>forward_command_controller</exec_depend>
   <exec_depend>feetech_ros2_driver</exec_depend>
+  <!-- scripts/soft_stop.py (소프트웨어 정지 노드) 가 쓰는 것 -->
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_srvs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>controller_manager_msgs</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

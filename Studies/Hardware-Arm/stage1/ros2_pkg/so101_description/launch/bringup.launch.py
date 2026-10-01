@@ -87,6 +87,14 @@ def generate_launch_description() -> LaunchDescription:
         output="both",
     )
 
+    # 소프트웨어 정지 (ros2_driver_setup.md §6.4). /soft_stop/stop 으로 현 위치에 멈추고
+    # position_controller 를 끈다, /soft_stop/release 로 다시 켠다. mock 에서도 같이 뜬다
+    soft_stop = Node(
+        package="so101_description",
+        executable="soft_stop.py",
+        output="both",
+    )
+
     # RViz — 처음 뜨면 Fixed Frame 을 base_link 로 바꾸고 RobotModel 을 추가한다
     rviz = Node(
         package="rviz2",
@@ -101,6 +109,7 @@ def generate_launch_description() -> LaunchDescription:
             robot_state_publisher,
             ros2_control_node,
             controller_spawner,
+            soft_stop,
             rviz,
         ]
     )

@@ -468,7 +468,13 @@ controller_manager:
     enforce_command_limits: true
 ```
 
-**시험 — 팔 없이 (mock).** Terminal 1 에 mock bringup 을 띄우고 로그에 `Enforcing command limits is enabled` 가 찍히는지 본다. 그다음 Terminal 3 에서 한계 밖 명령을 보낸다 (mock 이라 안전하다. **실제 팔에는 절대 보내지 않는다** — 다섯 관절이 가운데로 튄다).
+**시험 — 팔 없이 (mock).** Terminal 1 에 mock bringup 을 띄우고 로그에 `Enforcing command limits is enabled` 가 찍히는지 본다. 팔은 꽂혀 있어도 되고 없어도 된다 — mock 은 시리얼 포트를 열지 않는다.
+
+```bash
+source /opt/ros/jazzy/setup.bash && source /workspace/so101_ws/install/setup.bash && ros2 launch so101_description bringup.launch.py use_mock_hardware:=true
+```
+
+로그에서 두 줄을 확인한다: `Enforcing command limits is enabled`, `Loaded hardware 'SO101Hardware' from plugin 'mock_components/GenericSystem'`. 그다음 Terminal 3 에서 한계 밖 명령을 보낸다 (mock 이라 안전하다. **실제 팔에는 절대 보내지 않는다** — 다섯 관절이 가운데로 튄다).
 
 ```bash
 source /opt/ros/jazzy/setup.bash && ros2 topic pub --once /position_controller/commands std_msgs/msg/Float64MultiArray "data: [3.0, 0.0, 0.0, 0.0, 0.0, 0.0]"
@@ -480,7 +486,7 @@ source /opt/ros/jazzy/setup.bash && ros2 topic echo /joint_states --once --field
 
 기대: `shoulder_pan` (알파벳 순 4번째) 이 3.0 이 아니라 상한 1.770 에서 멈춘다. 하한도 `-3.0` 으로 같은 방식으로 본다 (-1.765). 그리퍼는 `[0, 0, 0, 0, 0, -3.0]` 으로 -0.915 에서 멈추는지. `echo --once` 첫 줄의 `A message was lost` 는 구독 직후 100 Hz 메시지 하나를 놓쳤다는 알림일 뿐이다.
 
-결과 (2026-09-30, mock): 로그 `Enforcing command limits is enabled`, 세 명령 모두 그때의 한계값에서 잘림 (통과). 그 뒤 여유를 바깥 0.05 로 바꿨으므로 위 기대값으로 한 번 더 확인한다.
+결과 (2026-10-01, mock, 위 표의 한계값): 로그에 `Enforcing command limits is enabled` 와 여섯 관절의 한계가 위 표와 같게 출력됐다. `shoulder_pan` 3.0 명령은 첫 틱에 속도 한계 (주기당 0.1 rad) 로, 그다음 틱부터 위치 한계 1.770 에서 잘렸다 (통과). 명령값이 한계 밖인 동안 `[ERROR] Command of at least one joint is out of limits (throttled log)` 가 1초마다 찍히는데, 잘라 냈다는 알림이지 고장이 아니다. 하한 -3.0 은 -1.765, 그리퍼 -3.0 은 -0.915 에서 잘렸다 (같은 날 확인). 세 명령 모두 통과.
 
 **시험 — 실제 팔 (회귀, 10분).** 한계까지 갈 필요 없다. 두 가지만 본다: ① 리밋이 켜진 채 §4.2 의 +0.05 rad 명령이 전과 같이 동작하는가 ② 휴식 자세 (`shoulder_lift` 약 -1.77) 를 "그대로 유지하라" 는 명령이 잘리지 않는가 — 원본 한계 (-1.745) 였으면 이 명령이 -1.745 로 잘려 팔이 1.5도 들렸다.
 
@@ -545,7 +551,7 @@ robot.bus.disconnect(disable_torque=False)            # 토크를 켠 채 포트
 EOF
 ```
 
-기대 출력: 여섯 줄 모두 후보값. 적용 (2026-09-30): 여섯 서보 500.
+기대 출력: 여섯 줄 모두 후보값. 적용 (2026-10-01): 여섯 서보 650 (확정값. 시도 표는 D 아래).
 
 **B. 써졌는지 확인** — 위 A 가 끝에 읽어서 보여 주므로 따로 할 일은 없다. 나중에 값만 다시 보려면 아래 "써졌는지 확인" 의 읽기 전용 스니펫을 쓴다 (bringup 이 꺼져 있을 때).
 
@@ -579,13 +585,15 @@ source /opt/ros/jazzy/setup.bash && source /workspace/so101_ws/install/setup.bas
 
 `shoulder_lift` · `elbow_flex` 의 (읽힌 값 - 마지막 명령값) 이 처짐이다. 0.02 rad (1도) 이하면 통과. 넘으면 값을 올리고 A 부터 다시 한다.
 
+결과 (2026-10-01, 500): 휴식 자세 (`shoulder_lift` -1.687 · `elbow_flex` +1.557 · `wrist_flex` +1.243) 에서 팔꿈치 8번 → 어깨 9번 → 손목 7번, 0.2 rad 씩 보내 세 관절 모두 0.000 명령에 도달. 매 단계 읽힌 값이 명령과 0.01 rad 안에서 맞았고 다른 관절은 움직이지 않았다. 30초 뒤 읽힌 값: `shoulder_lift` +0.0123 (+0.70도), `elbow_flex` +0.0184 (+1.05도) — 둘 다 0.02 이하로 통과. `elbow_flex` 는 기준에 가까우므로 500 아래로 내리지 않는다. 650 (= 500 x 1.3) 으로 같은 절차를 반복한 결과는 `shoulder_lift` +0.0092 (+0.53도), `elbow_flex` +0.0169 (+0.97도) — 650 을 확정값으로 쓴다 (시도 표). 접힌 자세 근처에서는 읽힌 값이 명령보다 0.03-0.05 rad 뒤처지다가 0 에 가까워질수록 줄어드는데, 500 과 650 에서 똑같았으므로 토크가 아니라 기어 유격 쪽이다. 같은 자세의 수평계 실측은 위팔이 수직보다 앞으로 5.7도, 아래팔이 수평보다 앞으로 14.7도 — 서보 인코더가 보는 처짐은 1도 안쪽이므로 이 기울기는 W4 가 URDF origin 에 반영한 구조 기울기 (위팔 4.7도, 아래팔 12.6도 + 관절 읽기값) 다. 위팔은 W4 와 0.3도 안에서 같고, 아래팔은 W4 모델값 (약 19도) 보다 4도 작다 — 수평계를 댄 자리 차이로 본다.
+
 3. 끝내기: 팔이 뻗어 있으므로 아래팔을 손으로 받친 채 터미널 1 에서 `Ctrl+C`, 휴식 자세로 내려놓는다.
 
 | 시도 | `max_torque_limit` | C teleop 판정 | D `shoulder_lift` 처짐 (rad) | D `elbow_flex` 처짐 (rad) | 판정 |
 |---|---|---|---|---|---|
-| 1 | 500 | | | | |
-| 2 | | | | | |
-| 확정 | | | | | |
+| 1 | 500 | 통과 | +0.0123 | +0.0184 | C · D 통과 (2026-10-01). elbow 처짐이 기준의 92 % |
+| 2 | 650 (= 500 x 1.3) | 500 통과로 생략 | +0.0092 | +0.0169 | D 통과 (2026-10-01). 어깨는 줄고 팔꿈치는 거의 그대로 — 팔꿈치의 0.017 은 토크 부족이 아니라 기어 유격 · 서보 데드밴드로 본다 (토크를 30 % 올려도 0.0015 만 줄었다) |
+| 확정 | **650** | — | +0.0092 | +0.0169 | 여섯 서보 EEPROM 에 650 (2026-10-01). 더 올려도 팔꿈치 처짐은 안 줄고 부딪히는 힘만 커진다 |
 
 **써졌는지 확인.** 드라이버는 이 레지스터를 읽지 않으므로 bringup 을 끈 뒤 LeRobot 으로 읽는다. `robot.connect()` 는 토크를 껐다 켜므로 쓰지 않고 버스만 연다 (읽기 전용).
 
@@ -604,11 +612,13 @@ EOF
 
 **teleop 회귀.** 이 값은 LeRobot 에도 그대로 적용되므로, 확정한 뒤 `lerobot-teleoperate` 를 1분 돌려 리더를 따라오는 데 문제가 없는지 본다 (조립 가이드 §7 의 검증 항목). 여기서 처지면 v2.5 수집이 망가지므로 값을 올린다.
 
+결과 (2026-10-01, 650): `so101-teleop` 1분 — 6관절 추종에 문제 없음, 처짐 없음. 토크 상한은 650 으로 끝.
+
 ### 6.4 소프트웨어 정지
 
 **정의** ([Stage 2 안전 인터록](../stage2/safety_interlock.md) e-stop 절과 같다): 토크를 유지한 채 현 위치에 정지. 토크 OFF 는 정지가 아니다 (팔이 떨어진다). **명령을 끊기만 해서는 멈추지 않는다** — 위치 제어는 마지막 목표까지 계속 가므로, 이동 중에 걸면 그 목표까지 간다. 그래서 현재 위치를 목표로 덮어쓴 뒤에 명령 흐름을 끊는다. Stage 2 의 C++ 인터록이 이것을 인수한다.
 
-**구현 — `scripts/soft_stop.py`** (W5 에서 작성하는 rclpy 노드. 이 절이 명세다)
+**구현 — `ros2_pkg/so101_description/scripts/soft_stop.py`** (rclpy 노드. 이 절이 명세다. `CMakeLists.txt` 의 `install(PROGRAMS ...)` 로 `lib/so101_description/` 에 설치되고, `bringup.launch.py` 가 `Node(package="so101_description", executable="soft_stop.py")` 로 띄운다. 처음 한 번 `colcon build --packages-select so101_description --symlink-install` — §2 의 빌드 명령 그대로, 반드시 시스템 `/usr/bin/colcon` 으로. venv 가 PATH 앞에 있으면 venv 의 colcon 이 잡혀 `install/local_setup.bash` 가 venv 경로 (공백 포함) 를 적어 `source` 가 깨진다 — 2026-10-01 재현)
 
 | 항목 | 내용 |
 |---|---|
@@ -629,16 +639,20 @@ source /opt/ros/jazzy/setup.bash && ros2 service call /soft_stop/release std_srv
 
 **시험 — mock.** ① 정지 상태에서 명령을 보내도 `/joint_states` 가 안 변하는지 (차단) ② release 뒤 명령이 다시 먹는지 ③ 이동 중 정지: mock 은 명령을 그대로 현재 위치로 돌려주므로 "이동 중" 이 없다. 이 항목은 실제 팔에서만 본다.
 
+결과 (2026-10-01, mock): stop 응답 `success=True` + 유지 목표 6개, `position_controller` inactive · `joint_state_broadcaster` active. ① 정지 중 보낸 명령은 `/joint_states` 에 반영되지 않았고, **release 뒤에도 뒤늦게 적용되지 않는다** (정지 중 들어온 명령은 버려진다). stop 을 두 번 부르면 두 번째는 `success=False` ("이미 정지 중?"). ② release 뒤 명령이 다시 먹는다 (통과).
+
 **시험 — 실제 팔 (1회).** 중력 부하가 없는 `wrist_roll` 로 한다. 터미널 3 에 정지 명령을 쳐 두고, 터미널 2 (또는 다른 터미널) 에서 헬퍼로 `wrist_roll 1.0` 명령을 보낸 직후 (0.3초 안에) Enter. 손목이 1.0 rad 를 다 돌지 않고 도중에 서면 통과. `/joint_states` 의 `wrist_roll` 이 명령값이 아닌 중간값에서 멈춰 있고, 토크가 걸려 있어 손으로 밀면 버틴다. 되돌릴 때는 release → 헬퍼로 원래 값.
+
+결과 (2026-10-01, 실제 팔, 토크 상한 650): 휴식 자세에서 `wrist_roll` -0.943 → +0.057 (+1.0 rad) 명령, 0.2초 뒤 stop 호출 (응답까지 0.48초). 정지 시점의 유지 목표 -0.209, 멈춘 위치 -0.196 — 명령한 1.0 중 0.747 rad 만 돌고 도중에 섰다 (통과). 정지 뒤 1초 동안 위치 변화 0.0015 rad (토크 유지). release 뒤 원래 값 명령으로 -0.934 복귀.
 
 ### 6.5 완료 기준
 
-- [ ] mock 로그에 `Enforcing command limits is enabled`, 한계 밖 명령이 한계값에서 멈춤 (§6.2 시험)
-- [ ] 실제 팔에서 리밋이 켜진 채 §4.2 의 +0.05 명령 동작, 휴식 자세 (`shoulder_lift` -1.77) 도달
-- [ ] `max_torque_limit` 확정값이 URDF 에 있고, 뻗은 자세 30초에 처짐 0.02 rad 이하, 서보 레지스터 읽기로 값 확인, teleop 1분 회귀
-- [ ] 정지 서비스가 이동 중 실제 팔을 도중에 세우고 (토크 유지), 정지 중 명령 차단, release 로 복귀
-- [ ] `bringup.launch.py` 한 줄로 3종이 다 켜진 상태가 뜬다. 이후 §4.2 · §5 · W8 은 전부 이 상태에서 한다
-- [ ] 값의 근거 (캘리브 범위 표, 토크 시도 표) 가 이 절에 채워져 있고 커밋됨 → master roadmap W5 체크
+- [x] mock 로그에 `Enforcing command limits is enabled`, 한계 밖 명령이 한계값에서 멈춤 (§6.2 시험 — 2026-10-01, 현재 한계값으로 상한 · 하한 · 그리퍼 세 명령 통과)
+- [x] 실제 팔에서 리밋이 켜진 채 §4.2 의 +0.05 명령 동작, 휴식 자세 (`shoulder_lift` -1.77) 도달 (2026-09-30)
+- [x] `max_torque_limit` 확정값이 여섯 서보의 EEPROM 에 써져 있고 (§6.3 A — URDF 파라미터로는 쓰지 않는다), 뻗은 자세 30초에 처짐 0.02 rad 이하, 서보 레지스터 읽기로 값 확인, teleop 1분 회귀 (2026-10-01, 650)
+- [x] 정지 서비스가 이동 중 실제 팔을 도중에 세우고 (토크 유지), 정지 중 명령 차단, release 로 복귀 (2026-10-01 — mock ①②, 실제 팔 `wrist_roll` 0.747/1.0 rad 에서 정지)
+- [x] `bringup.launch.py` 한 줄로 3종이 다 켜진 상태가 뜬다 (소프트 리밋 = yaml + URDF, 토크 상한 = 서보 EEPROM 650, 정지 = `soft_stop` 노드). 이후 §4.2 · §5 · W8 은 전부 이 상태에서 한다
+- [x] 값의 근거 (캘리브 범위 표, 토크 시도 표) 가 이 절에 채워져 있고 커밋됨 → master roadmap W5 체크 (2026-10-01)
 
 ### 6.6 끝났다고 하기 전에 스스로 답해 보는 질문
 
