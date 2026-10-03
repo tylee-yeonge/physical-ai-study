@@ -97,31 +97,31 @@ git commit -m "docs: add curriculum career fit spec and plan, allow company name
 
 **Interfaces:** master roadmap §3 의 "2027.02 초 — 판단 게이트" 절. README 부록 D 가 이 절과 spec §2 를 가리킨다.
 
-- [ ] **Step 1: §3 10-11월 병행 줄 재구성**
+- [x] **Step 1: §3 10-11월 병행 줄 재구성**
 
 한 줄에 두 체크박스가 붙어 있던 "병행 (≤2)" 을 하위 목록으로 나누고:
 - JD 격차 매핑 항목에 추가: 회사별 코딩테스트 언어 열 (RLWRLD 는 Python 고정 2h), RLWRLD 2공고의 원문 매핑은 spec §1.1 이 1차분, 로보티즈 모방학습·네비게이션 원문 대조
 - probe 택1 을 "시장 신호 — 아는 사람 2-3명에게 구체 질문 또는 AI 사피엔스 기여" 로 교체 (질문 예 3개, 기록 위치 `.private/`, 게이트 입력 I2)
 
-- [ ] **Step 2: v1.5 소화 ② 부활**
+- [x] **Step 2: v1.5 소화 ② 부활**
 
 §3 ~09.07 의 취소선 줄 끝에 "→ 10월 부활 (2026-10-03)" 주석, §3 10-11월 절에 새 체크박스 (v2.5 착수 전, 30분), §4 스킵 대장 표 아래에 예외 기록.
 
-- [ ] **Step 3: 코테 supersede**
+- [x] **Step 3: 코테 supersede**
 
 §2 일정표 12-2027.02 행과 §3 12월 코테 항목에 주석: 언어는 JD 격차 매핑의 언어 열로 재평가 #1 에서 다시 정한다, C++ 면접 방어는 별도 유지.
 
-- [ ] **Step 4: 판단 게이트 등재**
+- [x] **Step 4: 판단 게이트 등재**
 
 - §2 일정표 12-2027.02 행의 게이트 열에 "판단 게이트 2027.02 초 (패키징 착수 전)"
 - §3 에 "2027.02 초 — 판단 게이트" 절: 입력 I1-I5 체크박스 + 결정 규칙은 spec §2.2 링크 + 결과 기록 체크박스
 - README 부록 D 표에 "2027.02 초" 행, "시그널 → 행동 매핑" 에 게이트 줄
 
-- [ ] **Step 5: 상시 절**
+- [x] **Step 5: 상시 절**
 
 LLM 없는 블록 규칙 요약 (spec §4 링크) 과 월 실적 집계 (9월 표 형식 + "LLM 없는 블록 h" 열, 10월분부터) 추가.
 
-- [ ] **Step 6: 검증 — 반영 위치**
+- [x] **Step 6: 검증 — 반영 위치**
 
 ```bash
 grep -n "판단 게이트" docs/superpowers/plans/2026-08-31-master-roadmap.md README.md
@@ -134,7 +134,9 @@ git diff --stat
 
 기대: 각 grep 이 1줄 이상, diff 는 master roadmap 과 README 두 파일만.
 
-- [ ] **Step 7: Commit**
+진행 상황 (2026-10-03): 기대대로 확인 — master roadmap 에서 게이트 6 · LLM 블록 4 · v1.5 소화 ② 3 · 코테 언어 4 · 지인 질문 3 줄, README 게이트 2 줄. diff 는 두 파일 (+26 / -5). 범위 밖 수정 1건: §2 일정표 10-11월 행의 "probe 택1" 문구도 같은 결정으로 교체.
+
+- [x] **Step 7: Commit**
 
 ```bash
 git add docs/superpowers/plans/2026-08-31-master-roadmap.md README.md docs/superpowers/plans/2026-10-03-curriculum-career-fit.md
