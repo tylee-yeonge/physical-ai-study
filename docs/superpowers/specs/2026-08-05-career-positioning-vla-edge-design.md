@@ -7,6 +7,7 @@
 > Plan: 별도 plan 없음 — 실행은 remediation plan 실행 보드 (`docs/superpowers/plans/2026-07-07-repo-review-remediation.md`) 와 분기 재평가 #1 (2026.11, README 부록 D) 안건이 담당한다
 > 검증 원칙: 휴직 중 구직 지원 금지 (정찰 포함, 2026-07 확정) 를 따른다 — 가설 검증은 정찰 지원이 아니라 분기 재평가 #1 (JD 정독 + probe 반응) 이 담당한다 (§6.4). 서류 통과율은 복직 후 실지원 (또는 재평가에서 조기 지원이 결정될 경우 2027.01) 의 입력이다.
 > 표기: 회사 실명 금지 원칙에 따라 실명은 가린 표현으로 치환했다. 매핑 정본은 `.private/notes.md`.
+> **Supersede (2026-10-03, 회사명 표기)**: 실명 금지 원칙은 대체됐다 — 비공개 레포 문서는 실명 허용, 공개 채널로 옮길 때만 익명화한다 ([curriculum-career-fit spec](2026-10-03-curriculum-career-fit-design.md) §0.2 #2). 이 문서의 익명 표기는 그대로 둔다.
 
 ---
 

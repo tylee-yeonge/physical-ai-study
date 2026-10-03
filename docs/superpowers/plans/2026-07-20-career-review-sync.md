@@ -33,7 +33,7 @@
 
 ## Global Constraints
 
-- 회사 실명(제조사·스타트업·대기업 실명) 금지 — "Dynamixel 제조사" 등 기존 익명 표기만 사용.
+- 회사 실명(제조사·스타트업·대기업 실명) 금지 — "Dynamixel 제조사" 등 기존 익명 표기만 사용. **Supersede (2026-10-03, 회사명 표기)**: 이 plan 의 실행 기록에만 해당하고 이후 문서에는 적용하지 않는다 — 비공개 레포는 실명 허용, 공개 채널로 옮길 때만 익명화 ([curriculum-career-fit spec](../specs/2026-10-03-curriculum-career-fit-design.md) §0.2 #2).
 - 외과적 변경 — 아래 명시된 문자열만 수정하고 인접 내용을 다듬지 않는다.
 - 라인 번호가 아니라 인용된 문자열 기준으로 편집 위치를 찾는다 (실행 시점에 라인이 밀렸을 수 있음).
 - 커밋은 task 단위, Conventional Commits 영어.
