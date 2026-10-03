@@ -196,19 +196,19 @@ git commit -m "docs: add task supervisor fsm to stage1 scope as w9"
 **Files:**
 - Modify: `docs/superpowers/plans/2026-08-31-master-roadmap.md` (§3 재평가 절, §5), `README.md` (부록 D 2026.11 행)
 
-- [ ] **Step 1: master roadmap §5**
+- [x] **Step 1: master roadmap §5**
 
 기존 안건 1 (Phase 5) · 3 (부록 B) · 6 (C++·DDS) · 7 (진열 순서) 끝에 권고 부기. 신규 안건 9 (Stage 2 C++ 인터록) · 10 (부록 E) · 11 (해제 시간 용도) · 12 (지원 회사 필터) · 13 (문서 상한).
 
-- [ ] **Step 2: master roadmap §3 재평가 체크 줄**
+- [x] **Step 2: master roadmap §3 재평가 체크 줄**
 
 "§5 안건 1-8" → "§5 안건 1-13".
 
-- [ ] **Step 3: README 부록 D 2026.11 행**
+- [x] **Step 3: README 부록 D 2026.11 행**
 
 끝에 "curriculum-career-fit 안건" 요약과 spec 경로.
 
-- [ ] **Step 4: 검증**
+- [x] **Step 4: 검증**
 
 ```bash
 grep -n "^9\. \|^10\. \|^11\. \|^12\. \|^13\. " docs/superpowers/plans/2026-08-31-master-roadmap.md
@@ -218,7 +218,9 @@ grep -c "curriculum-career-fit" README.md
 
 기대: 신규 안건 5줄, 체크 줄 1줄, README 의 curriculum-career-fit 언급 1회 이상.
 
-- [ ] **Step 5: Commit**
+진행 상황 (2026-10-03): 기대대로 확인 — 신규 안건 5줄 (9-13), 체크 줄 1줄, README 의 curriculum-career-fit 언급 3회 (부록 D 의 2026.11 행 · 게이트 행 · 시그널 매핑). diff 는 두 파일.
+
+- [x] **Step 5: Commit**
 
 ```bash
 git add docs/superpowers/plans/2026-08-31-master-roadmap.md README.md docs/superpowers/plans/2026-10-03-curriculum-career-fit.md

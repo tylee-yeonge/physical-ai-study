@@ -140,7 +140,7 @@
 ### 11월 하순 — 분기 재평가 #1 (§5 안건 일괄. 시장 신호 입력: [KR Physical AI JD 조사](../../research/2026-08-31-kr-physical-ai-jd-survey.md) + JD 격차 매핑)
 
 - [ ] 준비물 2개 확인 — 9월 실적 집계 표 / JD 격차 매핑 1페이지
-- [ ] §5 안건 1-8 + 부록 D 기존 안건 결정 → 결과를 본 문서에 반영 (2027 체크리스트 추가)
+- [ ] §5 안건 1-13 + 부록 D 기존 안건 결정 → 결과를 본 문서에 반영 (2027 체크리스트 추가)
 
 ### 12월
 
@@ -187,14 +187,19 @@
 ## 5. 분기 재평가 #1 안건 (2026.11 — README 부록 D + 추가분)
 
 부록 D 기존 안건 (Stage 2 확장 수단 / GR00T 투입 / 동역학 / C++·DDS / 실지원 시점·시퀀싱) + **추가 안건**:
-1. Phase 5 규모 — 12주 유지 vs 4-6주 압축 + 면접 방어 전환
+1. Phase 5 규모 — 12주 유지 vs 4-6주 압축 + 면접 방어 전환 — **권고 (2026-10-03)**: 4주 + 주제를 SmolVLA 구조 · action chunking · flow matching · ACT-Diffusion-VLA 계보로 교체 (기준 JD 에 인코더 원리 요구가 없고, 현 구성은 OpenVLA backbone 중심 — [curriculum-career-fit spec](../specs/2026-10-03-curriculum-career-fit-design.md) §1.2, §8.4)
 2. Phase 6/7 Studies 사전 작성분 (각 97파일) — Archive vs 재작성 전제 표기
-3. 부록 B 우선순위 — v2.5 를 "첫 서류의 실물"로 승격
+3. 부록 B 우선순위 — v2.5 를 "첫 서류의 실물"로 승격 — **권고 (2026-10-03)**: 같은 결정으로 Phase 6·7 (v2·v3) 을 헤드라인에서 "지원 중 강화 카드" 로 재정의 (완성이 첫 웨이브 이후이고, Simulation 근거는 v1.5 가 일부 충족 — [curriculum-career-fit spec](../specs/2026-10-03-curriculum-career-fit-design.md) §8.5)
 4. NVIDIA 코스 Phase A 재정위 (§4)
 5. §4 스킵 항목 재심 (되살릴 것이 있는가)
-6. C++·DDS 배치 재판단 — positioning spec §6.2 는 구 시간축 (supersede 주석 참조). JD 정독의 C++ 요구 비율이 판단 입력
-7. **2.5층 (로봇 학습 시스템) 재명명 + 포트폴리오 진열 순서** — eval 하네스·teleop 데이터셋을 전면에, 양자화·latency 는 받침 (JD 조사 §3-§4. README 3층 절·부록 B 서술 갱신 대상)
+6. C++·DDS 배치 재판단 — positioning spec §6.2 는 구 시간축 (supersede 주석 참조). JD 정독의 C++ 요구 비율이 판단 입력 — **추가 입력 (2026-10-03)**: 12월 코테 준비 언어도 여기서 정한다 (JD 격차 매핑의 코테 언어 열. RLWRLD 는 Python 고정). C++ 면접 방어는 코테 언어와 별개로 유지 ([curriculum-career-fit spec](../specs/2026-10-03-curriculum-career-fit-design.md) §0.2 #12)
+7. **2.5층 (로봇 학습 시스템) 재명명 + 포트폴리오 진열 순서** — eval 하네스·teleop 데이터셋을 전면에, 양자화·latency 는 받침 (JD 조사 §3-§4. README 3층 절·부록 B 서술 갱신 대상) — **권고 (2026-10-03)**: 실기 로봇 → 정책 연동 → v2.5 데이터·평가 시스템 → 태스크 실행·복구 (W9). 양자화·latency 는 받침 (spec §0.2 #13)
 8. 타겟 밴드 확정 — 정조준 = FM 조직의 시스템 SW (JD 조사 §2 현실 밴드), 상방은 내부 사다리로
+9. **Stage 2 C++ 안전 인터록 보존** (2026-10-03) — Phase 7 지위와 독립적으로 C++ 실증 카드로 보존할지. W5 soft stop 은 Python 이라 이 카드를 대신하지 않는다 (positioning spec §5.4, [curriculum-career-fit spec](../specs/2026-10-03-curriculum-career-fit-design.md) §0.2 #11)
+10. **부록 E fallback 재정의** (2026-10-03) — 착지점 "AMR/AV Perception·센서퓨전 SW" 를 "로봇 시스템 SW" 로 바꿀지. 판단 게이트 결과 B 와 착지점이 다르고, 센서 경험이 데이터 소비 수준이라 현 정의가 더 약할 수 있다 (spec §0.2 #14)
+11. **해제 시간 용도** (2026-10-03) — 안건 1·3 이 채택되면 생기는 시간 (Phase 5 압축만으로 2027.03-04 에 44-64h) 을 어디에 쓸지: C++·DDS 집중 / 동역학 라잇 / Stage 2 C++ 인터록 / 지원 대응 버퍼. 부록 D 의 동역학·C++·DDS 안건과 함께 판단 (spec §0.2 #15, §1.5)
+12. **지원 회사 필터** (2026-10-03) — 회사 안정성 · 통근 · 출장 비율을 숫자 기준으로 정한다. 배우자와 합의한 뒤 확정 (spec §0.2 #16)
+13. **문서 분량 상한** (2026-10-03) — 의사결정 회차당 spec·plan 1쌍, 회차 사이의 변경은 이 문서의 결정 기록으로 (spec §0.2 #17)
 
 ## 6. 미결 (사용자 판단 대기)
 
