@@ -153,23 +153,23 @@ git commit -m "docs: add feb 2027 decision gate and llm-free study block to mast
 
 **Interfaces:** 이름 "W9 — task supervisor (태스크 실행·실패 복구)". 구현 파일 경로 `scripts/task_supervisor.py`, `config/task_waypoints.yaml` (W9 실행 시 생성).
 
-- [ ] **Step 1: `task_supervisor.md` 작성**
+- [x] **Step 1: `task_supervisor.md` 작성**
 
 W9 구현 가이드: 여는 곳, 만들 파일 3개, 구현 순서, mock·실기 시험 명령, 확정값 기록 표, 막히면, LLM 없는 블록 연계. 설계 원본 (상태·인터페이스·초기값) 은 spec §3 을 가리킨다.
 
-- [ ] **Step 2: stage1 README**
+- [x] **Step 2: stage1 README**
 
 일정 블록, must 표 행, 학습 파일 표, 진행 순서 제목 (W1-W9), Mermaid 에 W9 (W5 뒤), "왜 이 순서인가" 에 W9 줄, W9 절 (W8 절 뒤), 완료 체크리스트.
 
-- [ ] **Step 3: master roadmap**
+- [x] **Step 3: master roadmap**
 
 §2 10-11월 행에 W9, §3 Stage 1 절에 W9 체크박스 (W8 줄 뒤). 기존 W3 줄 끝에 W4 체크박스가 붙어 렌더링되지 않던 줄바꿈 누락도 함께 고친다.
 
-- [ ] **Step 4: Hardware-Arm.md · README Stage 1**
+- [x] **Step 4: Hardware-Arm.md · README Stage 1**
 
 `Roadmap/Hardware-Arm.md` Stage 1 의 목표 bullet, 단계 표 행, 완료 체크리스트 must 항목, "W1-W8" → "W1-W9". `README.md` Stage 1 목표 문구에 W9.
 
-- [ ] **Step 5: 검증 — 네 곳의 이름 일치와 범위 보존**
+- [x] **Step 5: 검증 — 네 곳의 이름 일치와 범위 보존**
 
 ```bash
 grep -ln "task supervisor" Studies/Hardware-Arm/stage1/README.md Roadmap/Hardware-Arm.md README.md docs/superpowers/plans/2026-08-31-master-roadmap.md
@@ -178,7 +178,9 @@ git diff --stat -- Studies/Hardware-Arm/v25 Studies/Hardware-Arm/stage1/ros2_pkg
 
 기대: 첫 명령이 네 파일을 모두 출력, 둘째 명령은 출력 없음.
 
-- [ ] **Step 6: Commit**
+진행 상황 (2026-10-03): 기대대로 확인 — 네 파일 모두 출력, `v25/` · `stage1/ros2_pkg/` 변경 없음. 가이드를 쓰면서 spec §3 을 보강했다: 인터페이스에 `/robot_description` 구독 (한계값을 URDF 에서 한 번 읽는다 — 하드웨어 읽기 아님), mock 시험에 한계 근접 시나리오, W9 구현 파일 목록에 `package.xml` 의 `python3-yaml` 한 줄. stage1 README 에는 "v2.5 와 겹치는 구간" 에 W9 순서 문장을 함께 넣었다.
+
+- [x] **Step 6: Commit**
 
 ```bash
 git add Studies/Hardware-Arm/stage1/task_supervisor.md Studies/Hardware-Arm/stage1/README.md \

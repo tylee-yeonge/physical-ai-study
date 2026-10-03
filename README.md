@@ -318,7 +318,7 @@ gantt
 
 #### Stage 1 (2026.10-11, 2개월, 추가 지출 없음) — 스파이크로 디리스크된 본 빌드 (v2 선행)
 - **하드웨어**: SO-101 리더 + 팔로워 6DOF 키트 (3D 프린팅 부품·전원·케이블 포함) + 손목 카메라 1대
-- **목표**: pick-and-place 단순 동작 + 안전 기초 (소프트 리밋·토크 상한·소프트웨어 정지) + URDF + **ROS2 래핑 (`feetech_ros2_driver` + ros2_control, LeRobot 스택과 병행 운영 — 이중 latency 로 통합 오버헤드 측정)**. Isaac Sim 임포트는 nice (Phase 6 이월 허용)
+- **목표**: pick-and-place 단순 동작 + 안전 기초 (소프트 리밋·토크 상한·소프트웨어 정지) + URDF + **ROS2 래핑 (`feetech_ros2_driver` + ros2_control, LeRobot 스택과 병행 운영 — 이중 latency 로 통합 오버헤드 측정)** + **task supervisor (W9, 2026-10-03 추가 — 태스크 실행·실패 복구 상태기계, v2.5 측정과 분리)**. Isaac Sim 임포트는 nice (Phase 6 이월 허용)
 - **역할**: v2(헤드라인, sim-to-real gap)가 소비하는 선행 하드웨어. 동작 영상 + URDF + Sim 임포트 영상은 v2 의 입력 자료.
 - **이유**: 스파이크에서 LeRobot 경로 (teleop·녹화·정책 실행) 를 이미 검증했으므로 본 빌드는 완성도 + ROS2 층에 집중.
 - **비용**: 팔 키트·손목 카메라·작업대 자재는 2026.09 에 구매를 마쳤고 전체 뷰 카메라 + 고정수단은 배송 중이라, 이 구간의 추가 지출은 없다.

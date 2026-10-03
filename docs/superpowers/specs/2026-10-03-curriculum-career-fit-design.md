@@ -190,6 +190,7 @@ AMR 애플리케이션에서 설계해온 상태기계·예외 복구 패턴을 
 | 방향 | 이름 | 타입 | 비고 |
 |---|---|---|---|
 | 구독 | `/joint_states` | `sensor_msgs/JointState` | 감지의 유일한 입력. 버스를 추가로 읽지 않는다 |
+| 구독 | `/robot_description` | `std_msgs/String` (transient local) | 한계값을 URDF `<limit>` 에서 한 번 읽는다 — 값을 두 곳에 두지 않는다. 하드웨어 읽기가 아니다 |
 | 발행 | `/position_controller/commands` | `std_msgs/Float64MultiArray` | `soft_stop.py` 의 `COMMAND_ORDER` 순서 |
 | 호출 | `/soft_stop/stop`, `/soft_stop/release` | `std_srvs/Trigger` | 정지·해제는 soft_stop 에 위임 |
 | 제공 | `~/start`, `~/resume`, `~/abort` | `std_srvs/Trigger` | 운영자 조작 |
@@ -261,6 +262,7 @@ stateDiagram-v2
 | mock | 타임아웃 주입 (한 단계 `timeout_s: 0.1`) | RETRY 1회 → SAFE_STOP → WAIT_OPERATOR |
 | mock | 파지 실패 (mock 은 명령값을 그대로 돌려줘 빈 손 닫힘이 항상 재현된다) | RETRY 1회 → SAFE_STOP → WAIT_OPERATOR |
 | mock | resume / abort | PRECHECK 재진입 / IDLE 복귀 |
+| mock | 한계 근접 (한 관절 목표를 소프트 리밋 밖으로 — 리미터가 한계값으로 자른다) | RETRY 없이 SAFE_STOP |
 | 실기 | 정상 3회 | DONE 3/3 |
 | 실기 | 큐브를 치운 뒤 실행 3회 | 파지 실패 감지 → RETRY 1회 → SAFE_STOP → WAIT_OPERATOR 3/3 |
 | 실기 | WAIT_OPERATOR 에서 resume 1회 | PRECHECK 재동기화 뒤 튐 없이 재개 |
@@ -413,7 +415,7 @@ stateDiagram-v2
 - `docs/superpowers/specs/2026-10-03-curriculum-career-fit-design.md` — 이 문서
 - `docs/superpowers/plans/2026-10-03-curriculum-career-fit.md` — 문서 반영 plan
 - `Studies/Hardware-Arm/stage1/task_supervisor.md` — W9 구현 가이드
-- (W9 실행 시, 이 설계의 문서 반영 범위 밖) `stage1/ros2_pkg/so101_description/scripts/task_supervisor.py`, `config/task_waypoints.yaml`, `CMakeLists.txt` 의 install 한 줄
+- (W9 실행 시, 이 설계의 문서 반영 범위 밖) `stage1/ros2_pkg/so101_description/scripts/task_supervisor.py`, `config/task_waypoints.yaml`, `CMakeLists.txt` 의 install 한 줄, `package.xml` 의 `python3-yaml` exec_depend 한 줄
 
 ### A.4 변경 없음 (의도적 보존)
 - `Studies/Hardware-Arm/v25/README.md`, `PRACTICE.md` — v2.5 라이트 모드 유지

@@ -137,6 +137,7 @@ LeRobot 표준은 **손목 1대 + 외부 1대**다.
 - pick-and-place 단순 동작 + 조립 완성 (케이블 정리·손목 카메라 마운트·전체 뷰 카메라 교체 — 작업대 고정은 완료)
 - 안전 기초: 소프트 리밋 (관절 범위) + 토크 상한 + 소프트웨어 정지 (키 또는 ROS2 서비스 호출로 토크를 유지한 채 현 위치 정지 — DC 차단은 토크 해제로 팔이 낙하하므로 물리 전원 차단 스위치는 두지 않는다)
 - ROS2 래핑: URDF + `feetech_ros2_driver` + ros2_control 노드 — **LeRobot 스택과 병행 운영** (데이터·학습 = LeRobot, 배포·통합 = ROS2). latency 를 (a) LeRobot 직결 / (b) ROS2 경유 두 경로로 측정해 (b)-(a) 를 **통합 오버헤드** 수치로 남긴다
+- **태스크 실행·복구 (W9, 2026-10-03 추가)**: 웨이포인트 pick-and-place 를 상태기계로 실행하고, 실패를 감지하면 soft stop 으로 정지한 뒤 운영자를 기다린다 — task supervisor ([가이드](../Studies/Hardware-Arm/stage1/task_supervisor.md)). ROS2 독립 노드, v2.5 측정과 분리
 - Isaac Sim 디지털 트윈 첫 사이클 (nice — Phase 6 이월 허용)
 - **v2 선행 하드웨어**: URDF + 안전 3종이 켜진 ROS2 bringup (2026-10-01 완료). 1분 영상은 v2.5 의 실기 영상으로 대체한다 (2026-10-01 결정)
 
@@ -201,10 +202,11 @@ LeRobot 표준은 **손목 1대 + 외부 1대**다.
 |---|---|---|
 | 2026.10 첫 주 | ROS2 드라이버 검증 — 모터 1개 위치 명령 → 6축 데이지체인 + joint_states → 최소 URDF + RViz | 드라이버 동작 확인 |
 | 2026.10 | ROS2 래핑 (`so101_description` 패키지 + controller config + bringup) + 조립 완성 (케이블 정리·손목 카메라 마운트·전체 뷰 카메라 교체) | ROS2 launch |
+| 2026.10 (2026-10-03 추가) | task supervisor (W9) — 태스크 실행·실패 복구 상태기계, v2.5 착수 전 | 상태 전이 로그 + 짧은 영상 |
 | 2026.11 | URDF 캘리브 오프셋 반영 + 안전 기초 3종 + 이중 latency 측정 (1분 영상은 v2.5 로 대체) | **v2 선행 하드웨어** |
 | 2026.12-2027.02 | 버퍼 — 이월분 흡수 (v2.5 마무리와 병행) | — |
 
-주 단위 체크리스트 (W1-W8) 의 원본은 [master roadmap](../docs/superpowers/plans/2026-08-31-master-roadmap.md) §3 이다.
+주 단위 체크리스트 (W1-W9) 의 원본은 [master roadmap](../docs/superpowers/plans/2026-08-31-master-roadmap.md) §3 이다.
 
 
 ### Stage 1 완료 체크리스트
@@ -217,6 +219,7 @@ LeRobot 표준은 **손목 1대 + 외부 1대**다.
 - [x] URDF — 공개 URDF 재사용 + 오프셋 반영, RViz 검증 — 2026-09-27 (화면은 Foxglove)
 - [x] 이중 latency 측정 — (a)/(b)/통합 오버헤드 — 2026-09-25 (37.5 ms 는 잠정값)
 - [ ] ~~1분 영상 — teleop + 정책 실행 + 소프트웨어 정지~~ — 생략 (2026-10-01 결정): v2.5 의 실기 1분 영상 (fine-tuned 정책이 과제를 수행하는 장면 + 정지 시연) 으로 대체한다. 지금 찍으면 정책 실행 장면이 zero-shot 의 0도 자세 이동뿐이라 증거 가치가 없다
+- [ ] 태스크 실행·복구 — task supervisor (mock + 실기 시험) — W9, 2026-10-03 추가
 
 **nice** (이월 허용 — 마감이 서류가 아니라 후속 Phase 다):
 - [ ] Isaac Sim URDF 임포트 + Sim Joint State 매칭 (첫 사이클) — 로컬 사양이 감당하지 못하면 Phase 6 (2027.05-) 로 이월
