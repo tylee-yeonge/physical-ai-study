@@ -246,14 +246,16 @@ git commit -m "docs: register curriculum fit agenda items for review 1"
 
 ## Verification (after all tasks)
 
-- [ ] spec §6 D1 — 게이트가 master roadmap §2·§3 과 README 부록 D 에 있고 spec §2 를 가리킨다
-- [ ] spec §6 D2 — 회사명 규칙 문서 4개의 supersede 주석
-- [ ] spec §6 D3 — §5 신규 안건 9-13, 기존 1·3·6·7 부기, 체크 줄 1-13
-- [ ] spec §6 D4 — W9 가 네 곳에 같은 이름
+- [x] spec §6 D1 — 게이트가 master roadmap §2·§3 과 README 부록 D 에 있고 spec §2 를 가리킨다
+- [x] spec §6 D2 — 회사명 규칙 문서 4개의 supersede 주석
+- [x] spec §6 D3 — §5 신규 안건 9-13, 기존 1·3·6·7 부기, 체크 줄 1-13
+- [x] spec §6 D4 — W9 가 네 곳에 같은 이름
 - [ ] spec §6 D5 — Task 5 후
-- [ ] spec §6 T1 — 이 plan 에 커리어 실행 체크박스 없음
-- [ ] spec §6 S1·S2 — `v25/`, `stage1/ros2_pkg/` 변경 없음
+- [x] spec §6 T1 — 이 plan 에 커리어 실행 체크박스 없음
+- [x] spec §6 S1·S2 — `v25/`, `stage1/ros2_pkg/` 변경 없음
 - [ ] PR 생성 — `claude/curriculum-career-fit` → main
+
+진행 상황 (2026-10-03): D1 (게이트가 master roadmap §2·§3 · README 부록 D 에 있고 둘 다 spec §2 를 가리킨다), D2 (금지 규칙 문서 4개 = supersede 주석 4개), D3 (신규 안건 9-13 각 1줄, 기존 안건 부기 4건), D4 (W9 가 네 파일에), T1, S1·S2 (`v25/` · `stage1/ros2_pkg/` diff 없음) 확인. 바뀐 파일의 상대 링크 전부 대상 존재 (기존 `%20` 인코딩 링크 포함). PR 은 푸시 후 생성.
 
 ## Self-Review
 
