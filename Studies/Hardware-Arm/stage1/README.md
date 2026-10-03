@@ -17,6 +17,7 @@
 2026.11       : 안전 기초 (소프트 리밋·토크 상한·소프트웨어 정지) + URDF 오프셋 반영
                 + 이중 latency 측정 + 1분 영상
                 -> v2 선행 하드웨어. v2.5 (teleop 데이터셋 + SmolVLA) 병행 개시
+2026.10 (추가): task supervisor (W9 — 2026-10-03 must 추가, v2.5 착수 전 목표)
 ```
 
 ---
@@ -31,6 +32,7 @@
 | URDF | must | SO-101 공개 URDF 재사용 + 캘리브레이션 오프셋 반영 |
 | 이중 latency | must | (a) LeRobot 직결 / (b) ROS2 토픽 경유 — (b)-(a) = **통합 오버헤드** (셋째 층 증거) |
 | 1분 영상 | must | teleop + 정책 실행 + 소프트웨어 정지 시연 |
+| 태스크 실행·복구 (task supervisor) | must | 웨이포인트 pick-and-place 를 상태기계로 실행하고, 실패를 감지하면 soft stop 으로 정지한 뒤 운영자를 기다린다 (재시도 1회는 완성선). ROS2 독립 노드, v2.5 측정과 분리 — W9, 2026-10-03 추가 ([task_supervisor.md](task_supervisor.md)) |
 | Isaac Sim 임포트 | nice | Phase 6 이월 허용 ([isaac_sim_import.md](isaac_sim_import.md)) |
 
 ---
@@ -42,13 +44,14 @@
 | [../BOM.md](../BOM.md) | SO-101 구매 구성 + 키트 사양 (구매·조립 완료) |
 | [URDF_guide.md](URDF_guide.md) | SO-101 공개 URDF 재사용 + 검증 |
 | [ros2_driver_setup.md](ros2_driver_setup.md) | feetech_ros2_driver + ros2_control |
+| [task_supervisor.md](task_supervisor.md) | task supervisor — 태스크 실행·실패 복구 상태기계 (W9) |
 | [isaac_sim_import.md](isaac_sim_import.md) | Isaac Sim 임포트 (nice) |
 
 ---
 
-## 진행 순서 (W1-W8)
+## 진행 순서 (W1-W9)
 
-> 주 단위 체크박스의 원본은 [master roadmap](../../../docs/superpowers/plans/2026-08-31-master-roadmap.md) §3 "10-11월 — Stage 1" 이다. **체크는 거기에만 한다.** 이 절은 그 W1-W8 을 "어느 문서의 어느 절을 어떤 순서로 열고, 끝나면 손에 무엇이 남아야 하는가" 로 풀어 쓴 것이다.
+> 주 단위 체크박스의 원본은 [master roadmap](../../../docs/superpowers/plans/2026-08-31-master-roadmap.md) §3 "10-11월 — Stage 1" 이다. **체크는 거기에만 한다.** 이 절은 그 W1-W9 를 "어느 문서의 어느 절을 어떤 순서로 열고, 끝나면 손에 무엇이 남아야 하는가" 로 풀어 쓴 것이다.
 > "W" 는 달력의 주가 아니라 작업 묶음이다. 하나가 22시 이후 1-2시간 세션 2-3회 분량이다. 밀리면 다음 항목을 당기지 말고 버퍼 (2026.12-2027.02) 로 넘긴다.
 
 ### 왜 이 순서인가
@@ -63,6 +66,7 @@ flowchart TD
     W4 --> W5["W5<br/>안전 기초 3종"]
     W5 --> W67["W6-7<br/>이중 latency"]
     W67 --> W8["W8<br/>1분 영상 + 대조"]
+    W5 --> W9["W9<br/>task supervisor"]
     W3["W3 조립 완성<br/>카메라 도착 주"] --> W8
     W4 -.-> N["nice<br/>Isaac Sim 임포트"]
 ```
@@ -73,6 +77,7 @@ flowchart TD
 - **W5 가 W4 뒤**: 소프트 리밋 값은 URDF 의 `<limit>` 값과 같아야 한다. URDF 가 확정돼야 값이 정해진다.
 - **W6-7 · W8 이 W5 뒤**: 둘 다 사람이 아니라 모델이 낸 명령을 ROS2 를 거쳐 팔에 보낸다. 그런 실행은 안전 기초가 선 뒤에 한다.
 - **W3 은 떠 있는 항목**: 새 전체 뷰 카메라의 도착에 달려 있어서 번호 자리 (W2 와 W4 사이) 에 고정하지 않는다. 도착한 주에 끼워 넣는다. 마감은 두 개다 — W8 영상 (정책 실행에 카메라가 필요하다) 과 v2.5 본 수집 (카메라 시점이 데이터에 그대로 박히므로 수집 전에 고정돼 있어야 한다).
+- **W9 가 W5 뒤**: supervisor 는 정지를 W5 의 soft stop 서비스에 맡기고, 한계값을 W5 에서 바꾼 URDF `<limit>` 에서 읽는다. 안전 기초가 먼저 서 있어야 한다. W6-7 · W8 과는 순서가 무관하고, v2.5 착수 전에 끝내는 것이 목표다 (2026-10-03 추가).
 
 `URDF_guide.md` 의 §1 이하 (URDF 구조 · XACRO · mesh) 는 **미리 읽지 않는다.** W1 · W4 에서 URDF 를 고치다 막혔을 때 여는 사전이다.
 
@@ -160,13 +165,22 @@ flowchart TD
 - **끝나면 남는 것**: v2 선행 하드웨어 (1분 영상 + URDF)
 - **결정 (2026-10-01)**: 영상은 찍지 않는다 — 생략 (2026-10-01 결정): v2.5 의 실기 1분 영상 (fine-tuned 정책이 과제를 수행하는 장면 + 정지 시연) 으로 대체한다. 지금 찍으면 정책 실행 장면이 zero-shot 의 0도 자세 이동뿐이라 증거 가치가 없다. 체크리스트 대조만 아래에 반영했다
 
+### W9 — task supervisor (2026-10-03 추가)
+
+- **여는 곳**: [task_supervisor.md](task_supervisor.md) §1 의 순서 (설계 원본은 [curriculum-career-fit spec](../../../docs/superpowers/specs/2026-10-03-curriculum-career-fit-design.md) §3)
+- **왜 하는가**: 타깃 JD 의 필요 기술 Task Planning & Execution (BT · FSM) 과 "실패 상황 예외 처리·복구" 의 직접 근거. AMR 애플리케이션에서 직접 설계해온 상태기계 · 복구 패턴을 매니퓰레이터로 옮긴다
+- **하는 일**: 웨이포인트 pick-and-place 를 상태기계 (IDLE → PRECHECK → EXECUTING ↔ VERIFYING → DONE, 실패 시 RETRY → SAFE_STOP → WAIT_OPERATOR) 로 돌리는 rclpy 노드를 만든다. 감지 입력은 `/joint_states` 하나, 정지는 `/soft_stop/stop` 에 맡긴다. mock 시험 M1-M5 → 실기 시험 R1-R3. 상태기계 핵심은 LLM 없는 블록으로 짠다
+- **주의**: bringup 에 넣지 않고 `ros2 run` 으로 따로 띄운다. v2.5 측정 (LeRobot 스택) 과 섞지 않는다
+- **타임박스**: 10h — 넘으면 재시도를 잘라 최소선 (감지 → 정지 → 운영자 대기) 으로 마감한다
+- **끝나면 남는 것**: `scripts/task_supervisor.py` + `config/task_waypoints.yaml` + 상태 전이 로그 · 짧은 영상, task_supervisor.md §6 의 확정값 표
+
 ### (nice) Isaac Sim 임포트
 
 W4 뒤 아무 때나, 시간이 남을 때만 한다 ([isaac_sim_import.md](isaac_sim_import.md)). 로컬 사양 미달로 실패하면 기록만 남기고 Phase 6 로 넘긴다. must 를 밀어내지 않는다.
 
 ### v2.5 와 겹치는 구간
 
-11월 (W5-W8) 에 [v2.5](../v25/README.md) 가 병행으로 시작된다. v2.5 의 0번 (측정 설계 1페이지) 은 팔을 쓰지 않아 어느 주와도 겹칠 수 있다. 팔을 쓰는 단계 (하네스 검증 · 본 수집) 는 W3 으로 카메라가 고정된 뒤에 한다. 한 세션에는 한 트랙만 잡는다.
+11월 (W5-W8) 에 [v2.5](../v25/README.md) 가 병행으로 시작된다. v2.5 의 0번 (측정 설계 1페이지) 은 팔을 쓰지 않아 어느 주와도 겹칠 수 있다. 팔을 쓰는 단계 (하네스 검증 · 본 수집) 는 W3 으로 카메라가 고정된 뒤에 한다. 한 세션에는 한 트랙만 잡는다. W9 (task supervisor) 는 10월, v2.5 착수 전에 끝내는 것이 목표다 — 늦어지면 최소선으로 마감하고 v2.5 를 먼저 한다.
 
 ---
 
@@ -179,6 +193,7 @@ W4 뒤 아무 때나, 시간이 남을 때만 한다 ([isaac_sim_import.md](isaa
 - [x] URDF — 공개 URDF 재사용 + 오프셋 반영, RViz 검증 — W4, 2026-09-27 (화면은 Foxglove)
 - [x] 이중 latency 측정 — (a)/(b)/통합 오버헤드 — W6-7, 2026-09-25 (37.5 ms 는 잠정값)
 - [ ] ~~1분 영상 — teleop + 정책 실행 + 소프트웨어 정지~~ — 생략 (2026-10-01 결정): v2.5 의 실기 1분 영상 (fine-tuned 정책이 과제를 수행하는 장면 + 정지 시연) 으로 대체한다. 지금 찍으면 정책 실행 장면이 zero-shot 의 0도 자세 이동뿐이라 증거 가치가 없다
+- [ ] 태스크 실행·복구 — task supervisor (mock M1-M5 + 실기 R1-R3) — W9, 2026-10-03 추가
 - [ ] (nice) Isaac Sim 임포트
 
 ---
